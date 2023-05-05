@@ -1,0 +1,19 @@
+{
+  "name": "today.comes.extinspector",
+  "version": "1.0.0",
+  "displayName": "ExtInspector",
+  "description": "A Unity plugin for inspector",
+  "unity": "2019.4",
+  "dependencies": {
+  },
+  "keywords": [
+    "unity",
+    "inspector"
+  ],
+  "author": {
+    "name": "TylerTemp",
+    "email": "tylertempdev@gmail.com",
+    "url": "https://extinspector.comes.today"
+  },
+  "license": "MIT"
+}
