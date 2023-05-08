@@ -1,11 +1,11 @@
 #"use dotween?"
-#-define:EXT_INSPECTOR_DOTWEEN
+-define:EXT_INSPECTOR_DOTWEEN
 
 #"use ext inspector with NaughtyAttributes"
 -define:EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
 
 #"use ext inspector by default (DONT USE IT WITH NaughtyAttributes!)"
--define:EXT_INSPECTOR_ENABLE
+#-define:EXT_INSPECTOR_ENABLE
 
 #"use ext inspector with NaughtyAttributes need to enable these"
 -define:EXT_INSPECTOR_ENABLE_FOR_MONO_BEHAVIOUR
