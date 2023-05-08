@@ -5,6 +5,7 @@
   "description": "A Unity plugin for inspector",
   "unity": "2018.4",
   "dependencies": {
+    "com.dbrizov.naughtyattributes": "2.1.4"
   },
   "keywords": [
     "unity",

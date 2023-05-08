@@ -4,15 +4,25 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+
+#region NaughtyAttributes Imports
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+using NaughtyAttributes;
+using NaughtyAttributes.Editor;
+#endif
+#endregion
+
+#region DOTween Imports
 #if EXT_INSPECTOR_DOTWEEN
 using DG.DOTweenEditor;
 using DG.Tweening;
 #endif
+#endregion
 
 // 这个脚本基本就是复制的 NaughtyInspector；原本的扩展性比较低，所以干脆重来修改
 namespace ExtInspector.Editor
 {
-#if EXT_INSPECTOR_ENABLE
+#if !EXT_INSPECTOR_DISABLE
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.Object), true)]
 #endif
@@ -107,20 +117,21 @@ namespace ExtInspector.Editor
             {
                 // FieldWithInfo fieldWithInfo = this.fiend
                 SerializedProperty property = serializedObject.FindProperty(fieldWithInfo.fieldInfo.Name);
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
                 // Check if visible
-                // bool visible = PropertyUtility.IsVisible(property);
-                // if (!visible)
-                // {
-                //     return;
-                // }
-
+                bool visible = PropertyUtility.IsVisible(property);
+                if (!visible)
+                {
+                    return;
+                }
                 // Validate
-                // ValidatorAttribute[] validatorAttributes = PropertyUtility.GetAttributes<ValidatorAttribute>(property);
-                // foreach (var validatorAttribute in validatorAttributes)
-                // {
-                //     validatorAttribute.GetValidator().ValidateProperty(property);
-                // }
-                //
+                ValidatorAttribute[] validatorAttributes = PropertyUtility.GetAttributes<ValidatorAttribute>(property);
+                foreach (ValidatorAttribute validatorAttribute in validatorAttributes)
+                {
+                    validatorAttribute.GetValidator().ValidateProperty(property);
+                }
+#endif
+
                 // // Check if enabled and draw
                 // EditorGUI.BeginChangeCheck();
                 // bool enabled = PropertyUtility.IsEnabled(property);

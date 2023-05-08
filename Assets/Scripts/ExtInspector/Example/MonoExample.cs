@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using NaughtyAttributes;
 
 namespace ExtInspector.Example
 {

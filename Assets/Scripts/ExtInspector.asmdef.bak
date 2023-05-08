@@ -2,7 +2,8 @@
   "name": "ExtInspector",
   "references": [
     "UnityEngine",
-    "UnityEditor"
+    "UnityEditor",
+    "NaughtyAttributes"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
