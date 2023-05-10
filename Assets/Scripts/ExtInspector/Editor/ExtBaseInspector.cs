@@ -132,21 +132,25 @@ namespace ExtInspector.Editor
                 }
 #endif
 
-                // // Check if enabled and draw
-                // EditorGUI.BeginChangeCheck();
-                // bool enabled = PropertyUtility.IsEnabled(property);
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+                // Check if enabled and draw
+                EditorGUI.BeginChangeCheck();
+                bool enabled = PropertyUtility.IsEnabled(property);
 
-                // using (new EditorGUI.DisabledScope(disabled: !enabled))
-                // {
+                using (new EditorGUI.DisabledScope(disabled: !enabled))
+                {
+#endif
                     // propertyFieldFunction.Invoke(rect, property, PropertyUtility.GetLabel(property), true);
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(fieldWithInfo.fieldInfo.Name));
-                // }
-
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+                }
+            
                 // Call OnValueChanged callbacks
-                // if (EditorGUI.EndChangeCheck())
-                // {
-                //     PropertyUtility.CallOnValueChangedCallbacks(property);
-                // }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    PropertyUtility.CallOnValueChangedCallbacks(property);
+                }
+#endif
             }
         }
 
@@ -236,33 +240,35 @@ namespace ExtInspector.Editor
             }
         }
 
-        // protected class NonSerializedFieldRenderer : Renderer
-        // {
-        //     public NonSerializedFieldRenderer(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
-        //     {
-        //     }
-        //
-        //     public override void Render() => NaughtyEditorGUI.NonSerializedField_Layout(serializedObject.targetObject,
-        //         fieldWithInfo.fieldInfo);
-        // }
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+        protected class NonSerializedFieldRenderer : Renderer
+        {
+            public NonSerializedFieldRenderer(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
+            {
+            }
+        
+            public override void Render() => NaughtyEditorGUI.NonSerializedField_Layout(serializedObject.targetObject,
+                fieldWithInfo.fieldInfo);
+        }
 
-        // protected class MethodRenderer : Renderer
-        // {
-        //     public MethodRenderer(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
-        //     {
-        //     }
-        //
-        //     public override void Render() => NaughtyEditorGUI.Button(serializedObject.targetObject, fieldWithInfo.methodInfo);
-        // }
+        protected class MethodRenderer : Renderer
+        {
+            public MethodRenderer(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
+            {
+            }
+        
+            public override void Render() => NaughtyEditorGUI.Button(serializedObject.targetObject, fieldWithInfo.methodInfo);
+        }
 
-        // protected class NativeProperty : Renderer
-        // {
-        //     public NativeProperty(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
-        //     {
-        //     }
-        //
-        //     public override void Render() => NaughtyEditorGUI.NativeProperty_Layout(serializedObject.targetObject, fieldWithInfo.propertyInfo);
-        // }
+        protected class NativeProperty : Renderer
+        {
+            public NativeProperty(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
+            {
+            }
+        
+            public override void Render() => NaughtyEditorGUI.NativeProperty_Layout(serializedObject.targetObject, fieldWithInfo.propertyInfo);
+        }
+#endif
 
 #if EXT_INSPECTOR_DOTWEEN
         protected class DOTweenRenderer : Renderer
@@ -361,61 +367,63 @@ namespace ExtInspector.Editor
                     OrderedAttribute orderProp = fieldInfo.GetCustomAttribute<OrderedAttribute>();
                     int order = orderProp?.Order ?? -4;
 
-                    // BoxGroupAttribute boxGroupAttribute = fieldInfo.GetCustomAttribute<BoxGroupAttribute>();
-                    // FoldoutAttribute foldoutAttribute = fieldInfo.GetCustomAttribute<FoldoutAttribute>();
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+                    BoxGroupAttribute boxGroupAttribute = fieldInfo.GetCustomAttribute<BoxGroupAttribute>();
+                    FoldoutAttribute foldoutAttribute = fieldInfo.GetCustomAttribute<FoldoutAttribute>();
 
-                    // #region BoxGrouped
-                    // if (boxGroupAttribute != null)
-                    // {
-                    //     string groupName = boxGroupAttribute.Name;
-                    //     FieldWithInfo existsInfo = _fieldWithInfos.FirstOrDefault(each => each.groupName == groupName);
-                    //     if (existsInfo.renderType == FieldWithInfo.RenderType.None)
-                    //     {
-                    //         // Debug.Log($"new group {groupName}: {fieldInfo.Name}");
-                    //         _fieldWithInfos.Add(new FieldWithInfo
-                    //         {
-                    //             renderType = FieldWithInfo.RenderType.GroupAttribute,
-                    //             groupedType = FieldWithInfo.GroupedType.BoxGroup,
-                    //             groupName = groupName,
-                    //             order = order,
-                    //             fieldInfos = new List<FieldInfo>{fieldInfo},
-                    //         });
-                    //     }
-                    //     else
-                    //     {
-                    //         // Debug.Log($"add group {groupName}: {fieldInfo.Name}");
-                    //         Debug.Assert(existsInfo.renderType == FieldWithInfo.RenderType.GroupAttribute);
-                    //         existsInfo.fieldInfos.Add(fieldInfo);
-                    //     }
-                    //     continue;
-                    // }
-                    // #endregion
-                    //
-                    // #region Foldout
-                    //
-                    // if (foldoutAttribute != null)
-                    // {
-                    //     string groupName = foldoutAttribute.Name;
-                    //     FieldWithInfo existsInfo = _fieldWithInfos.FirstOrDefault(each => each.groupName == groupName);
-                    //     if (existsInfo.renderType == FieldWithInfo.RenderType.None)
-                    //     {
-                    //         _fieldWithInfos.Add(new FieldWithInfo
-                    //         {
-                    //             renderType = FieldWithInfo.RenderType.GroupAttribute,
-                    //             groupedType = FieldWithInfo.GroupedType.Foldout,
-                    //             groupName = groupName,
-                    //             order = order,
-                    //             fieldInfos = new List<FieldInfo>{fieldInfo},
-                    //         });
-                    //     }
-                    //     else
-                    //     {
-                    //         Debug.Assert(existsInfo.renderType == FieldWithInfo.RenderType.GroupAttribute);
-                    //         existsInfo.fieldInfos.Add(fieldInfo);
-                    //     }
-                    //     continue;
-                    // }
-                    // #endregion
+                    #region BoxGrouped
+                    if (boxGroupAttribute != null)
+                    {
+                        string groupName = boxGroupAttribute.Name;
+                        FieldWithInfo existsInfo = _fieldWithInfos.FirstOrDefault(each => each.groupName == groupName);
+                        if (existsInfo.renderType == FieldWithInfo.RenderType.None)
+                        {
+                            // Debug.Log($"new group {groupName}: {fieldInfo.Name}");
+                            _fieldWithInfos.Add(new FieldWithInfo
+                            {
+                                renderType = FieldWithInfo.RenderType.GroupAttribute,
+                                groupedType = FieldWithInfo.GroupedType.BoxGroup,
+                                groupName = groupName,
+                                order = order,
+                                fieldInfos = new List<FieldInfo>{fieldInfo},
+                            });
+                        }
+                        else
+                        {
+                            // Debug.Log($"add group {groupName}: {fieldInfo.Name}");
+                            Debug.Assert(existsInfo.renderType == FieldWithInfo.RenderType.GroupAttribute);
+                            existsInfo.fieldInfos.Add(fieldInfo);
+                        }
+                        continue;
+                    }
+                    #endregion
+                    
+                    #region Foldout
+                    
+                    if (foldoutAttribute != null)
+                    {
+                        string groupName = foldoutAttribute.Name;
+                        FieldWithInfo existsInfo = _fieldWithInfos.FirstOrDefault(each => each.groupName == groupName);
+                        if (existsInfo.renderType == FieldWithInfo.RenderType.None)
+                        {
+                            _fieldWithInfos.Add(new FieldWithInfo
+                            {
+                                renderType = FieldWithInfo.RenderType.GroupAttribute,
+                                groupedType = FieldWithInfo.GroupedType.Foldout,
+                                groupName = groupName,
+                                order = order,
+                                fieldInfos = new List<FieldInfo>{fieldInfo},
+                            });
+                        }
+                        else
+                        {
+                            Debug.Assert(existsInfo.renderType == FieldWithInfo.RenderType.GroupAttribute);
+                            existsInfo.fieldInfos.Add(fieldInfo);
+                        }
+                        continue;
+                    }
+                    #endregion
+#endif
 
                     _fieldWithInfos.Add(new FieldWithInfo
                     {
@@ -428,97 +436,105 @@ namespace ExtInspector.Editor
                 }
                 #endregion
 
-                // #region nonSerFieldInfo
-                // IEnumerable<FieldInfo> nonSerFieldInfos = allFields
-                //     .Where(f => f.GetCustomAttributes(typeof(ShowNonSerializedFieldAttribute), true).Length > 0);
-                // foreach (FieldInfo nonSerFieldInfo in nonSerFieldInfos)
-                // {
-                //     OrderedAttribute orderProp = nonSerFieldInfo.GetCustomAttribute<OrderedAttribute>();
-                //     int order = orderProp?.Order ?? -3;
-                //     _fieldWithInfos.Add(new FieldWithInfo
-                //     {
-                //         renderType = FieldWithInfo.RenderType.NonSerializedField,
-                //         // memberType = nonSerFieldInfo.MemberType,
-                //         fieldInfo = nonSerFieldInfo,
-                //         order = order,
-                //         // serializable = false,
-                //     });
-                // }
-                // #endregion
-                //
-                // #region Method
-                //
-                // MethodInfo[] methodInfos = systemType
-                //     .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                //                 BindingFlags.Public | BindingFlags.DeclaredOnly);
-                //
-                // IEnumerable<MethodInfo> buttonMethodInfos = methodInfos.Where(m =>
-                //         m.GetCustomAttributes(typeof(ButtonAttribute), true).Length > 0);
-                //
-                // foreach (MethodInfo methodInfo in buttonMethodInfos)
-                // {
-                //     OrderedAttribute orderProp =
-                //         methodInfo.GetCustomAttribute<OrderedAttribute>();
-                //     int order = orderProp?.Order ?? -2;
-                //     _fieldWithInfos.Add(new FieldWithInfo
-                //     {
-                //         // memberType = MemberTypes.Method,
-                //         renderType = FieldWithInfo.RenderType.Method,
-                //         methodInfo = methodInfo,
-                //         order = order,
-                //     });
-                // }
-                //
-                // IEnumerable<MethodInfo> doTweenMethodInfos = methodInfos.Where(m =>
-                //     m.GetCustomAttributes(typeof(DOTweenPreviewAttribute), true).Length > 0);
-                // foreach (MethodInfo methodInfo in doTweenMethodInfos)
-                // {
-                //     OrderedAttribute orderProp =
-                //         methodInfo.GetCustomAttribute<OrderedAttribute>();
-                //     int order = orderProp?.Order ?? -2;
-                //
-                //     FieldWithInfo existsInfo = _fieldWithInfos.FirstOrDefault(each => each.groupName == DoTweenMethodsGroupName);
-                //     if (existsInfo.renderType == FieldWithInfo.RenderType.None)
-                //     {
-                //         // Debug.Log($"new group {groupName}: {methodInfo.Name}");
-                //         _fieldWithInfos.Add(new FieldWithInfo
-                //         {
-                //             renderType = FieldWithInfo.RenderType.Method,
-                //             groupedType = FieldWithInfo.GroupedType.DOTween,
-                //             groupName = DoTweenMethodsGroupName,
-                //             order = order,
-                //             methodInfos = new List<MethodInfo>{methodInfo},
-                //         });
-                //     }
-                //     else
-                //     {
-                //         // Debug.Log($"add group {groupName}: {fieldInfo.Name}");
-                //         Debug.Assert(existsInfo is { renderType: FieldWithInfo.RenderType.Method, groupedType: FieldWithInfo.GroupedType.DOTween });
-                //         existsInfo.methodInfos.Add(methodInfo);
-                //     }
-                // }
-                //
-                // #endregion
-                //
-                // #region NativeProperty
-                // IEnumerable<PropertyInfo> propertyInfos = systemType
-                //     .GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                //     .Where(p => p.GetCustomAttributes(typeof(ShowNativePropertyAttribute), true).Length > 0);
-                //
-                // foreach (PropertyInfo propertyInfo in propertyInfos)
-                // {
-                //     OrderedAttribute orderProp =
-                //         propertyInfo.GetCustomAttribute<OrderedAttribute>();
-                //     int order = orderProp?.Order ?? -1;
-                //     _fieldWithInfos.Add(new FieldWithInfo
-                //     {
-                //         // memberType = MemberTypes.Property,
-                //         renderType = FieldWithInfo.RenderType.NativeProperty,
-                //         propertyInfo = propertyInfo,
-                //         order = order,
-                //     });
-                // }
-                // #endregion
+                #region nonSerFieldInfo
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+                IEnumerable<FieldInfo> nonSerFieldInfos = allFields
+                    .Where(f => f.GetCustomAttributes(typeof(ShowNonSerializedFieldAttribute), true).Length > 0);
+                foreach (FieldInfo nonSerFieldInfo in nonSerFieldInfos)
+                {
+                    OrderedAttribute orderProp = nonSerFieldInfo.GetCustomAttribute<OrderedAttribute>();
+                    int order = orderProp?.Order ?? -3;
+                    _fieldWithInfos.Add(new FieldWithInfo
+                    {
+                        renderType = FieldWithInfo.RenderType.NonSerializedField,
+                        // memberType = nonSerFieldInfo.MemberType,
+                        fieldInfo = nonSerFieldInfo,
+                        order = order,
+                        // serializable = false,
+                    });
+                }
+#endif
+                #endregion
+                
+                #region Method
+                
+                MethodInfo[] methodInfos = systemType
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+                IEnumerable<MethodInfo> buttonMethodInfos = methodInfos.Where(m =>
+                        m.GetCustomAttributes(typeof(ButtonAttribute), true).Length > 0);
+                
+                foreach (MethodInfo methodInfo in buttonMethodInfos)
+                {
+                    OrderedAttribute orderProp =
+                        methodInfo.GetCustomAttribute<OrderedAttribute>();
+                    int order = orderProp?.Order ?? -2;
+                    _fieldWithInfos.Add(new FieldWithInfo
+                    {
+                        // memberType = MemberTypes.Method,
+                        renderType = FieldWithInfo.RenderType.Method,
+                        methodInfo = methodInfo,
+                        order = order,
+                    });
+                }
+#endif
+                
+#if EXT_INSPECTOR_DOTWEEN
+                IEnumerable<MethodInfo> doTweenMethodInfos = methodInfos.Where(m =>
+                    m.GetCustomAttributes(typeof(DOTweenPreviewAttribute), true).Length > 0);
+                foreach (MethodInfo methodInfo in doTweenMethodInfos)
+                {
+                    OrderedAttribute orderProp =
+                        methodInfo.GetCustomAttribute<OrderedAttribute>();
+                    int order = orderProp?.Order ?? -2;
+                
+                    FieldWithInfo existsInfo = _fieldWithInfos.FirstOrDefault(each => each.groupName == DoTweenMethodsGroupName);
+                    if (existsInfo.renderType == FieldWithInfo.RenderType.None)
+                    {
+                        // Debug.Log($"new group {groupName}: {methodInfo.Name}");
+                        _fieldWithInfos.Add(new FieldWithInfo
+                        {
+                            renderType = FieldWithInfo.RenderType.Method,
+                            groupedType = FieldWithInfo.GroupedType.DOTween,
+                            groupName = DoTweenMethodsGroupName,
+                            order = order,
+                            methodInfos = new List<MethodInfo>{methodInfo},
+                        });
+                    }
+                    else
+                    {
+                        // Debug.Log($"add group {groupName}: {fieldInfo.Name}");
+                        Debug.Assert(existsInfo is { renderType: FieldWithInfo.RenderType.Method, groupedType: FieldWithInfo.GroupedType.DOTween });
+                        existsInfo.methodInfos.Add(methodInfo);
+                    }
+                }
+#endif
+
+                #endregion
+                
+                #region NativeProperty
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+                IEnumerable<PropertyInfo> propertyInfos = systemType
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .Where(p => p.GetCustomAttributes(typeof(ShowNativePropertyAttribute), true).Length > 0);
+                
+                foreach (PropertyInfo propertyInfo in propertyInfos)
+                {
+                    OrderedAttribute orderProp =
+                        propertyInfo.GetCustomAttribute<OrderedAttribute>();
+                    int order = orderProp?.Order ?? -1;
+                    _fieldWithInfos.Add(new FieldWithInfo
+                    {
+                        // memberType = MemberTypes.Property,
+                        renderType = FieldWithInfo.RenderType.NativeProperty,
+                        propertyInfo = propertyInfo,
+                        order = order,
+                    });
+                }
+#endif
+                #endregion
             }
 
             _fieldWithInfos.Sort((a, b) => a.order.CompareTo(b.order));
@@ -580,7 +596,7 @@ namespace ExtInspector.Editor
                 #region NativeProperty
                 PropertyInfo matchedProperty = systemType
                     .GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                    .FirstOrDefault(each => each.Name == checkProp);;
+                    .FirstOrDefault(each => each.Name == checkProp);
 
                 if (matchedProperty != null)
                 {
@@ -896,26 +912,27 @@ namespace ExtInspector.Editor
                 {
                     return new FoldoutRenderer(this, fieldWithInfo);
                 }
-
-                // case (FieldWithInfo.RenderType.NonSerializedField, _):
-                //     return IsVisible(fieldWithInfo.fieldInfo.GetCustomAttribute<ExtShowHideConditionBase>())
-                //         ? new NonSerializedFieldRenderer(this, fieldWithInfo)
-                //         : null;
-                //
-                // case (FieldWithInfo.RenderType.Method, FieldWithInfo.GroupedType.DOTween):
-                //     return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ExtShowHideConditionBase>())
-                //         ? new DOTweenRenderer(this, fieldWithInfo)
-                //         : null;
-                //
-                // case (FieldWithInfo.RenderType.Method, _):
-                //     return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ExtShowHideConditionBase>())
-                //         ? new MethodRenderer(this, fieldWithInfo)
-                //         : null;
-                //
-                // case (FieldWithInfo.RenderType.NativeProperty, _):
-                //     return IsVisible(fieldWithInfo.propertyInfo.GetCustomAttribute<ExtShowHideConditionBase>())
-                //         ? new NativeProperty(this, fieldWithInfo)
-                //         : null;
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+                case (FieldWithInfo.RenderType.NonSerializedField, _):
+                    return IsVisible(fieldWithInfo.fieldInfo.GetCustomAttribute<ShowHideConditionBase>())
+                        ? new NonSerializedFieldRenderer(this, fieldWithInfo)
+                        : null;
+                
+                case (FieldWithInfo.RenderType.Method, FieldWithInfo.GroupedType.DOTween):
+                    return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ShowHideConditionBase>())
+                        ? new DOTweenRenderer(this, fieldWithInfo)
+                        : null;
+                
+                case (FieldWithInfo.RenderType.Method, _):
+                    return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ShowHideConditionBase>())
+                        ? new MethodRenderer(this, fieldWithInfo)
+                        : null;
+                
+                case (FieldWithInfo.RenderType.NativeProperty, _):
+                    return IsVisible(fieldWithInfo.propertyInfo.GetCustomAttribute<ShowHideConditionBase>())
+                        ? new NativeProperty(this, fieldWithInfo)
+                        : null;
+#endif
                 default:
                     throw new ArgumentOutOfRangeException();
             }
