@@ -2,6 +2,9 @@
 Usage:
     release.py dist
     release.py back
+
+dist: copy needed files to dist with required struct
+back: run release.py UNDER the dist folder, to put the struct back to upm requried struct
 """
 
 import os
@@ -11,6 +14,7 @@ import logging
 
 
 root = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
+# print(root)
 
 
 def copytreer(src, dst, symlinks=False, ignore=None):
@@ -55,12 +59,48 @@ def dist():
     return 0
 
 
+def back():
+    project = os.path.dirname(root)
+
+    (_, folders, files) = next(os.walk(project))
+
+    for folder in folders:
+        if folder.startswith('.') or folder == 'dist':
+            continue
+        logging.debug(f'rm -rf {folder}')
+        shutil.rmtree(os.path.join(project, folder))
+    
+    for file_name in files:
+        if file_name.startswith('.'):
+            continue
+        logging.debug(f'rm {file_name}')
+        os.remove(os.path.join(project, file_name))
+
+    # print(files)
+    # print(folders)
+
+    logging.debug(f'cp -r "{root}" "{project}"')
+    copytreer(root, project)
+
+    logging.debug(f'rm release.py')
+    os.remove(os.path.join(project, 'release.py'))
+
+
+def error_exit():
+    sys.stderr.write(__doc__)
+    sys.exit(1)
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+
+    if(len(sys.argv) == 0):
+        error_exit()
 
     param = sys.argv[1]
     if param == 'dist':
         sys.exit(dist())
+    elif param == 'back':
+        sys.exit(back())
     
-    sys.stderr.write(__doc__)
-    sys.exit(1)
+    error_exit()
