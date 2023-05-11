@@ -3,7 +3,8 @@
   "references": [
     "UnityEngine",
     "UnityEditor",
-    "NaughtyAttributes"
+    "NaughtyAttributes",
+    "DG"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

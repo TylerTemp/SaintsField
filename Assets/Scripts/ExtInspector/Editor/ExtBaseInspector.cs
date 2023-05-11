@@ -19,7 +19,6 @@ using DG.Tweening;
 #endif
 #endregion
 
-// 这个脚本基本就是复制的 NaughtyInspector；原本的扩展性比较低，所以干脆重来修改
 namespace ExtInspector.Editor
 {
 #if !EXT_INSPECTOR_DISABLE

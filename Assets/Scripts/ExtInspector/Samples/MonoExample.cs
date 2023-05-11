@@ -1,7 +1,7 @@
 using ExtInspector.Standalone;
 using UnityEngine;
 
-namespace ExtInspector.Example
+namespace ExtInspector.Samples
 {
     public class MonoExample : MonoBehaviour
     {

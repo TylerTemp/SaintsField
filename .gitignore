@@ -97,3 +97,6 @@ __MACOSX
 
 *_log.txt
 /.vsconfig
+
+/dist/*
+!/dist/.placeholder
