@@ -1,10 +1,11 @@
+using ExtInspector.Standalone;
 using UnityEngine;
-using NaughtyAttributes;
 
 namespace ExtInspector.Example
 {
     public class MonoExample : MonoBehaviour
     {
-
+        [SerializeField, Scene] private string _scene;
+        [GO] public GameObject _go;
     }
 }
