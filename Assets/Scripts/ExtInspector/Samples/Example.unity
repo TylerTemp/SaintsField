@@ -153,6 +153,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scene: Example
+  _go: {fileID: 0}
+  <Sth>k__BackingField: 
+  _labelDecTest2: 
+  <SepTitleTest>k__BackingField: 0
 --- !u!4 &1383904219
 Transform:
   m_ObjectHideFlags: 0
