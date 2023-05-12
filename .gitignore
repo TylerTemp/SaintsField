@@ -1,3 +1,8 @@
 .idea
-/dist/*
-!/dist/.placeholder
+/dist
+/Library
+/Logs
+/obj
+/UserSettings
+/*.csproj
+/*.sln
