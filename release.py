@@ -49,6 +49,9 @@ def dist():
     shutil.rmtree(os.path.join(dist, 'Scripts', 'Samples'))
     os.remove(os.path.join(dist, 'Scripts', 'Samples.meta'))
 
+    os.remove(os.path.join(dist, 'Scripts', 'package.json'))
+    os.remove(os.path.join(dist, 'Scripts', 'package.json.meta'))
+
     logging.debug(f'package.json/readme')
     shutil.copyfile(os.path.join(root, 'Assets', 'Scripts', 'ExtInspector', 'package.json'), os.path.join(dist, 'package.json'))
 
