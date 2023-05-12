@@ -1,11 +1,20 @@
 using ExtInspector.Standalone;
+#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+using NaughtyAttributes;
+#endif
 using UnityEngine;
 
 namespace ExtInspector.Samples
 {
     public class MonoExample : MonoBehaviour
     {
-        [SerializeField, Scene] private string _scene;
-        [GO] public GameObject _go;
+//         [SerializeField, Standalone.Scene] private string _scene;
+//         [GO] public GameObject _go;
+// #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
+//         [field: Label("TestLabelOverride"), SerializeField] public string Sth { get; private set; }
+// #endif
+
+        // [field: LabelDec, SerializeField] public string LabelDecTest { get; private set; }
+        [Icon("UnityEditor.SceneView"), SerializeField] private string _labelDecTest2;
     }
 }
