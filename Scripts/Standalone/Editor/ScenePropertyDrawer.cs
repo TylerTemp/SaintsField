@@ -21,7 +21,7 @@ namespace ExtInspector.Standalone.Editor
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            Debug.Log($"get height");
+            // Debug.Log($"get height");
 
             bool validPropertyType = property.propertyType is SerializedPropertyType.String or SerializedPropertyType.Integer;
             bool anySceneInBuildSettings = GetScenes().Length > 0;
@@ -33,7 +33,7 @@ namespace ExtInspector.Standalone.Editor
 
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
         {
-            Debug.Log("On GUI Scene");
+            // Debug.Log("On GUI Scene");
 
             EditorGUI.BeginProperty(rect, label, property);
 

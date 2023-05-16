@@ -1,0 +1,181 @@
+﻿namespace ExtInspector.Standalone
+{
+    public static class Icon
+    {
+        // ReSharper disable InconsistentNaming
+        // ReSharper disable IdentifierTypo
+        // ReSharper disable StringLiteralTypo
+        public static class FA
+        {
+            #region Gen FA
+            public const string ADDRESS_BOOK = "ExtInspector/fa/address-book.png";
+            public const string ADDRESS_CARD = "ExtInspector/fa/address-card.png";
+            public const string BELL_SLASH = "ExtInspector/fa/bell-slash.png";
+            public const string BELL = "ExtInspector/fa/bell.png";
+            public const string BOOKMARK = "ExtInspector/fa/bookmark.png";
+            public const string BUILDING = "ExtInspector/fa/building.png";
+            public const string CALENDAR_CHECK = "ExtInspector/fa/calendar-check.png";
+            public const string CALENDAR_DAYS = "ExtInspector/fa/calendar-days.png";
+            public const string CALENDAR_MINUS = "ExtInspector/fa/calendar-minus.png";
+            public const string CALENDAR_PLUS = "ExtInspector/fa/calendar-plus.png";
+            public const string CALENDAR_XMARK = "ExtInspector/fa/calendar-xmark.png";
+            public const string CALENDAR = "ExtInspector/fa/calendar.png";
+            public const string CHART_BAR = "ExtInspector/fa/chart-bar.png";
+            public const string CHESS_BISHOP = "ExtInspector/fa/chess-bishop.png";
+            public const string CHESS_KING = "ExtInspector/fa/chess-king.png";
+            public const string CHESS_KNIGHT = "ExtInspector/fa/chess-knight.png";
+            public const string CHESS_PAWN = "ExtInspector/fa/chess-pawn.png";
+            public const string CHESS_QUEEN = "ExtInspector/fa/chess-queen.png";
+            public const string CHESS_ROOK = "ExtInspector/fa/chess-rook.png";
+            public const string CIRCLE_CHECK = "ExtInspector/fa/circle-check.png";
+            public const string CIRCLE_DOT = "ExtInspector/fa/circle-dot.png";
+            public const string CIRCLE_DOWN = "ExtInspector/fa/circle-down.png";
+            public const string CIRCLE_LEFT = "ExtInspector/fa/circle-left.png";
+            public const string CIRCLE_PAUSE = "ExtInspector/fa/circle-pause.png";
+            public const string CIRCLE_PLAY = "ExtInspector/fa/circle-play.png";
+            public const string CIRCLE_QUESTION = "ExtInspector/fa/circle-question.png";
+            public const string CIRCLE_RIGHT = "ExtInspector/fa/circle-right.png";
+            public const string CIRCLE_STOP = "ExtInspector/fa/circle-stop.png";
+            public const string CIRCLE_UP = "ExtInspector/fa/circle-up.png";
+            public const string CIRCLE_USER = "ExtInspector/fa/circle-user.png";
+            public const string CIRCLE_XMARK = "ExtInspector/fa/circle-xmark.png";
+            public const string CIRCLE = "ExtInspector/fa/circle.png";
+            public const string CLIPBOARD = "ExtInspector/fa/clipboard.png";
+            public const string CLOCK = "ExtInspector/fa/clock.png";
+            public const string CLONE = "ExtInspector/fa/clone.png";
+            public const string CLOSED_CAPTIONING = "ExtInspector/fa/closed-captioning.png";
+            public const string COMMENT_DOTS = "ExtInspector/fa/comment-dots.png";
+            public const string COMMENT = "ExtInspector/fa/comment.png";
+            public const string COMMENTS = "ExtInspector/fa/comments.png";
+            public const string COMPASS = "ExtInspector/fa/compass.png";
+            public const string COPY = "ExtInspector/fa/copy.png";
+            public const string COPYRIGHT = "ExtInspector/fa/copyright.png";
+            public const string CREDIT_CARD = "ExtInspector/fa/credit-card.png";
+            public const string ENVELOPE_OPEN = "ExtInspector/fa/envelope-open.png";
+            public const string ENVELOPE = "ExtInspector/fa/envelope.png";
+            public const string EYE_SLASH = "ExtInspector/fa/eye-slash.png";
+            public const string EYE = "ExtInspector/fa/eye.png";
+            public const string FACE_ANGRY = "ExtInspector/fa/face-angry.png";
+            public const string FACE_DIZZY = "ExtInspector/fa/face-dizzy.png";
+            public const string FACE_FLUSHED = "ExtInspector/fa/face-flushed.png";
+            public const string FACE_FROWN_OPEN = "ExtInspector/fa/face-frown-open.png";
+            public const string FACE_FROWN = "ExtInspector/fa/face-frown.png";
+            public const string FACE_GRIMACE = "ExtInspector/fa/face-grimace.png";
+            public const string FACE_GRIN_BEAM_SWEAT = "ExtInspector/fa/face-grin-beam-sweat.png";
+            public const string FACE_GRIN_BEAM = "ExtInspector/fa/face-grin-beam.png";
+            public const string FACE_GRIN_HEARTS = "ExtInspector/fa/face-grin-hearts.png";
+            public const string FACE_GRIN_SQUINT_TEARS = "ExtInspector/fa/face-grin-squint-tears.png";
+            public const string FACE_GRIN_SQUINT = "ExtInspector/fa/face-grin-squint.png";
+            public const string FACE_GRIN_STARS = "ExtInspector/fa/face-grin-stars.png";
+            public const string FACE_GRIN_TEARS = "ExtInspector/fa/face-grin-tears.png";
+            public const string FACE_GRIN_TONGUE_SQUINT = "ExtInspector/fa/face-grin-tongue-squint.png";
+            public const string FACE_GRIN_TONGUE_WINK = "ExtInspector/fa/face-grin-tongue-wink.png";
+            public const string FACE_GRIN_TONGUE = "ExtInspector/fa/face-grin-tongue.png";
+            public const string FACE_GRIN_WIDE = "ExtInspector/fa/face-grin-wide.png";
+            public const string FACE_GRIN_WINK = "ExtInspector/fa/face-grin-wink.png";
+            public const string FACE_GRIN = "ExtInspector/fa/face-grin.png";
+            public const string FACE_KISS_BEAM = "ExtInspector/fa/face-kiss-beam.png";
+            public const string FACE_KISS_WINK_HEART = "ExtInspector/fa/face-kiss-wink-heart.png";
+            public const string FACE_KISS = "ExtInspector/fa/face-kiss.png";
+            public const string FACE_LAUGH_BEAM = "ExtInspector/fa/face-laugh-beam.png";
+            public const string FACE_LAUGH_SQUINT = "ExtInspector/fa/face-laugh-squint.png";
+            public const string FACE_LAUGH_WINK = "ExtInspector/fa/face-laugh-wink.png";
+            public const string FACE_LAUGH = "ExtInspector/fa/face-laugh.png";
+            public const string FACE_MEH_BLANK = "ExtInspector/fa/face-meh-blank.png";
+            public const string FACE_MEH = "ExtInspector/fa/face-meh.png";
+            public const string FACE_ROLLING_EYES = "ExtInspector/fa/face-rolling-eyes.png";
+            public const string FACE_SAD_CRY = "ExtInspector/fa/face-sad-cry.png";
+            public const string FACE_SAD_TEAR = "ExtInspector/fa/face-sad-tear.png";
+            public const string FACE_SMILE_BEAM = "ExtInspector/fa/face-smile-beam.png";
+            public const string FACE_SMILE_WINK = "ExtInspector/fa/face-smile-wink.png";
+            public const string FACE_SMILE = "ExtInspector/fa/face-smile.png";
+            public const string FACE_SURPRISE = "ExtInspector/fa/face-surprise.png";
+            public const string FACE_TIRED = "ExtInspector/fa/face-tired.png";
+            public const string FILE_AUDIO = "ExtInspector/fa/file-audio.png";
+            public const string FILE_CODE = "ExtInspector/fa/file-code.png";
+            public const string FILE_EXCEL = "ExtInspector/fa/file-excel.png";
+            public const string FILE_IMAGE = "ExtInspector/fa/file-image.png";
+            public const string FILE_LINES = "ExtInspector/fa/file-lines.png";
+            public const string FILE_PDF = "ExtInspector/fa/file-pdf.png";
+            public const string FILE_POWERPOINT = "ExtInspector/fa/file-powerpoint.png";
+            public const string FILE_VIDEO = "ExtInspector/fa/file-video.png";
+            public const string FILE_WORD = "ExtInspector/fa/file-word.png";
+            public const string FILE_ZIPPER = "ExtInspector/fa/file-zipper.png";
+            public const string FILE = "ExtInspector/fa/file.png";
+            public const string FLAG = "ExtInspector/fa/flag.png";
+            public const string FLOPPY_DISK = "ExtInspector/fa/floppy-disk.png";
+            public const string FOLDER_CLOSED = "ExtInspector/fa/folder-closed.png";
+            public const string FOLDER_OPEN = "ExtInspector/fa/folder-open.png";
+            public const string FOLDER = "ExtInspector/fa/folder.png";
+            public const string FONT_AWESOME = "ExtInspector/fa/font-awesome.png";
+            public const string FUTBOL = "ExtInspector/fa/futbol.png";
+            public const string GEM = "ExtInspector/fa/gem.png";
+            public const string HAND_BACK_FIST = "ExtInspector/fa/hand-back-fist.png";
+            public const string HAND_LIZARD = "ExtInspector/fa/hand-lizard.png";
+            public const string HAND_PEACE = "ExtInspector/fa/hand-peace.png";
+            public const string HAND_POINT_DOWN = "ExtInspector/fa/hand-point-down.png";
+            public const string HAND_POINT_LEFT = "ExtInspector/fa/hand-point-left.png";
+            public const string HAND_POINT_RIGHT = "ExtInspector/fa/hand-point-right.png";
+            public const string HAND_POINT_UP = "ExtInspector/fa/hand-point-up.png";
+            public const string HAND_POINTER = "ExtInspector/fa/hand-pointer.png";
+            public const string HAND_SCISSORS = "ExtInspector/fa/hand-scissors.png";
+            public const string HAND_SPOCK = "ExtInspector/fa/hand-spock.png";
+            public const string HAND = "ExtInspector/fa/hand.png";
+            public const string HANDSHAKE = "ExtInspector/fa/handshake.png";
+            public const string HARD_DRIVE = "ExtInspector/fa/hard-drive.png";
+            public const string HEART = "ExtInspector/fa/heart.png";
+            public const string HOSPITAL = "ExtInspector/fa/hospital.png";
+            public const string HOURGLASS_HALF = "ExtInspector/fa/hourglass-half.png";
+            public const string HOURGLASS = "ExtInspector/fa/hourglass.png";
+            public const string ID_BADGE = "ExtInspector/fa/id-badge.png";
+            public const string ID_CARD = "ExtInspector/fa/id-card.png";
+            public const string IMAGE = "ExtInspector/fa/image.png";
+            public const string IMAGES = "ExtInspector/fa/images.png";
+            public const string KEYBOARD = "ExtInspector/fa/keyboard.png";
+            public const string LEMON = "ExtInspector/fa/lemon.png";
+            public const string LIFE_RING = "ExtInspector/fa/life-ring.png";
+            public const string LIGHTBULB = "ExtInspector/fa/lightbulb.png";
+            public const string MAGNIFYING_GLASS_SOLID = "ExtInspector/fa/magnifying-glass-solid.png";
+            public const string MAP = "ExtInspector/fa/map.png";
+            public const string MESSAGE = "ExtInspector/fa/message.png";
+            public const string MONEY_BILL_1 = "ExtInspector/fa/money-bill-1.png";
+            public const string MOON = "ExtInspector/fa/moon.png";
+            public const string NEWSPAPER = "ExtInspector/fa/newspaper.png";
+            public const string NOTE_STICKY = "ExtInspector/fa/note-sticky.png";
+            public const string OBJECT_GROUP = "ExtInspector/fa/object-group.png";
+            public const string OBJECT_UNGROUP = "ExtInspector/fa/object-ungroup.png";
+            public const string PAPER_PLANE = "ExtInspector/fa/paper-plane.png";
+            public const string PASTE = "ExtInspector/fa/paste.png";
+            public const string PEN_TO_SQUARE = "ExtInspector/fa/pen-to-square.png";
+            public const string RECTANGLE_LIST = "ExtInspector/fa/rectangle-list.png";
+            public const string RECTANGLE_XMARK = "ExtInspector/fa/rectangle-xmark.png";
+            public const string REGISTERED = "ExtInspector/fa/registered.png";
+            public const string SHARE_FROM_SQUARE = "ExtInspector/fa/share-from-square.png";
+            public const string SNOWFLAKE = "ExtInspector/fa/snowflake.png";
+            public const string SQUARE_CARET_DOWN = "ExtInspector/fa/square-caret-down.png";
+            public const string SQUARE_CARET_LEFT = "ExtInspector/fa/square-caret-left.png";
+            public const string SQUARE_CARET_RIGHT = "ExtInspector/fa/square-caret-right.png";
+            public const string SQUARE_CARET_UP = "ExtInspector/fa/square-caret-up.png";
+            public const string SQUARE_CHECK = "ExtInspector/fa/square-check.png";
+            public const string SQUARE_FULL = "ExtInspector/fa/square-full.png";
+            public const string SQUARE_MINUS = "ExtInspector/fa/square-minus.png";
+            public const string SQUARE_PLUS = "ExtInspector/fa/square-plus.png";
+            public const string SQUARE = "ExtInspector/fa/square.png";
+            public const string STAR_HALF_STROKE = "ExtInspector/fa/star-half-stroke.png";
+            public const string STAR_HALF = "ExtInspector/fa/star-half.png";
+            public const string STAR = "ExtInspector/fa/star.png";
+            public const string SUN = "ExtInspector/fa/sun.png";
+            public const string THUMBS_DOWN = "ExtInspector/fa/thumbs-down.png";
+            public const string THUMBS_UP = "ExtInspector/fa/thumbs-up.png";
+            public const string TRASH_CAN = "ExtInspector/fa/trash-can.png";
+            public const string USER = "ExtInspector/fa/user.png";
+            public const string WINDOW_MAXIMIZE = "ExtInspector/fa/window-maximize.png";
+            public const string WINDOW_MINIMIZE = "ExtInspector/fa/window-minimize.png";
+            public const string WINDOW_RESTORE = "ExtInspector/fa/window-restore.png";
+            #endregion
+        }
+        // ReSharper enable StringLiteralTypo
+        // ReSharper enable InconsistentNaming
+        // ReSharper enable IdentifierTypo
+    }
+}
