@@ -4,6 +4,7 @@ namespace ExtInspector.Standalone
 {
     public enum EColor
     {
+        Default,
         Clear,
         White,
         Black,

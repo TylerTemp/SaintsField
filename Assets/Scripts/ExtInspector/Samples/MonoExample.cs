@@ -15,9 +15,10 @@ namespace ExtInspector.Samples
         [field: Label("TestLabelOverride"), SerializeField] public string Sth { get; private set; }
 #endif
 
-        // [field: LabelDec, SerializeField] public string LabelDecTest { get; private set; }
-        [Icon("UnityEditor.SceneView"), SerializeField] private string _labelDecTest2;
+        [LabelText("OK", icon: Icon.FA.CHESS_BISHOP, iconColor: EColor.Pink), SerializeField] private string _labelDecTest2;
 
         [field: SepTitle("TestSep", EColor.Green), SerializeField] public int SepTitleTest { get; private set; }
+
+        // [field: LabelDec, SerializeField] public string LabelDecTest { get; private set; }
     }
 }
