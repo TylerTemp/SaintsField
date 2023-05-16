@@ -1,10 +1,6 @@
 """
 USAGE:
-    svg.py [options] <file_or_folder>... <dist>
-
-OPTIONS:
-    -c, --color=<color>          override color
-    -s, --size=<widthxheight>    resize file, like "256x512". If only use one number, it will be used as both side, like "256" will be the same as "256x256"
+    svg.py <file_or_folder>... <dist>
 """
 
 import logging
@@ -34,13 +30,19 @@ def convert_svg_to_png(svg_path, png_path, width=None, height=None, color=None):
 
 def change_image_color(image, color):
     # Convert the image to RGBA mode
-    image = image.convert('RGBA')
+    cur_image = image.convert("RGBA")
 
-    # Create a new image with the desired color
-    new_image = Image.new('RGBA', image.size, color)
+    # Create a blank image with the same size and target color
+    colored_image = Image.new("RGBA", image.size, color)
+    new_data = []
+    for old_color in cur_image.getdata():
+        if old_color[3] > 0:
+            new_data.append(color)
+        else:
+            new_data.append(old_color)
 
-    # Composite the original image with the new color image
-    return Image.alpha_composite(new_image, image)
+    colored_image.putdata(new_data)
+    return colored_image
 
 
 def resize_image(image, width=None, height=None):
@@ -74,15 +76,21 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     # docpie.logger.setLevel(level=logging.ERROR)
     args = docpie.docpie(__doc__)
-    color = args['--color']
-    size_raw = args['--size']
+    # color = args['--color']
+    color = (255, 255, 255, 255)
+    # size_raw = args['--size']
+    size_raw = '-1x256'
     dist = args['<dist>']
     if size_raw and 'x' in size_raw:
-        width, height = list(map(size_raw.split('x'), lambda each: int(each)))
+        width, height = list(map(lambda each: int(each), size_raw.split('x')))
     elif size_raw:
         width = height = int(size_raw)
     else:
         width = height = None
+    if width == -1:
+        width = None
+    if height == -1:
+        height = None
 
     for file_or_folder in args['<file_or_folder>']:
         if os.path.isdir(file_or_folder):
