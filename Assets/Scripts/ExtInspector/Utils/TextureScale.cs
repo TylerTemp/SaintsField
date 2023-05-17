@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ExtInspector.Standalone
+namespace ExtInspector.Utils
 {
     public static class TextureScale
     {

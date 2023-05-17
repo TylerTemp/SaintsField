@@ -25,6 +25,7 @@ namespace ExtInspector.Editor
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.Object), true)]
 #endif
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class ExtBaseInspector : UnityEditor.Editor
     {
         protected struct FieldWithInfo
@@ -143,7 +144,7 @@ namespace ExtInspector.Editor
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(fieldWithInfo.fieldInfo.Name));
 #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
                 }
-            
+
                 // Call OnValueChanged callbacks
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -245,7 +246,7 @@ namespace ExtInspector.Editor
             public NonSerializedFieldRenderer(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
             {
             }
-        
+
             public override void Render() => NaughtyEditorGUI.NonSerializedField_Layout(serializedObject.targetObject,
                 fieldWithInfo.fieldInfo);
         }
@@ -255,7 +256,7 @@ namespace ExtInspector.Editor
             public MethodRenderer(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
             {
             }
-        
+
             public override void Render() => NaughtyEditorGUI.Button(serializedObject.targetObject, fieldWithInfo.methodInfo);
         }
 
@@ -264,7 +265,7 @@ namespace ExtInspector.Editor
             public NativeProperty(UnityEditor.Editor editor, FieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
             {
             }
-        
+
             public override void Render() => NaughtyEditorGUI.NativeProperty_Layout(serializedObject.targetObject, fieldWithInfo.propertyInfo);
         }
 #endif
@@ -396,9 +397,9 @@ namespace ExtInspector.Editor
                         continue;
                     }
                     #endregion
-                    
+
                     #region Foldout
-                    
+
                     if (foldoutAttribute != null)
                     {
                         string groupName = foldoutAttribute.Name;
@@ -454,9 +455,9 @@ namespace ExtInspector.Editor
                 }
 #endif
                 #endregion
-                
+
                 #region Method
-                
+
                 MethodInfo[] methodInfos = systemType
                     .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                 BindingFlags.Public | BindingFlags.DeclaredOnly);
@@ -464,7 +465,7 @@ namespace ExtInspector.Editor
 #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
                 IEnumerable<MethodInfo> buttonMethodInfos = methodInfos.Where(m =>
                         m.GetCustomAttributes(typeof(ButtonAttribute), true).Length > 0);
-                
+
                 foreach (MethodInfo methodInfo in buttonMethodInfos)
                 {
                     OrderedAttribute orderProp =
@@ -479,7 +480,7 @@ namespace ExtInspector.Editor
                     });
                 }
 #endif
-                
+
 #if EXT_INSPECTOR_DOTWEEN
                 IEnumerable<MethodInfo> doTweenMethodInfos = methodInfos.Where(m =>
                     m.GetCustomAttributes(typeof(DOTweenPreviewAttribute), true).Length > 0);
@@ -488,7 +489,7 @@ namespace ExtInspector.Editor
                     OrderedAttribute orderProp =
                         methodInfo.GetCustomAttribute<OrderedAttribute>();
                     int order = orderProp?.Order ?? -2;
-                
+
                     FieldWithInfo existsInfo = _fieldWithInfos.FirstOrDefault(each => each.groupName == DoTweenMethodsGroupName);
                     if (existsInfo.renderType == FieldWithInfo.RenderType.None)
                     {
@@ -512,13 +513,13 @@ namespace ExtInspector.Editor
 #endif
 
                 #endregion
-                
+
                 #region NativeProperty
 #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
                 IEnumerable<PropertyInfo> propertyInfos = systemType
                     .GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
                     .Where(p => p.GetCustomAttributes(typeof(ShowNativePropertyAttribute), true).Length > 0);
-                
+
                 foreach (PropertyInfo propertyInfo in propertyInfos)
                 {
                     OrderedAttribute orderProp =
@@ -916,17 +917,17 @@ namespace ExtInspector.Editor
                     return IsVisible(fieldWithInfo.fieldInfo.GetCustomAttribute<ShowHideConditionBase>())
                         ? new NonSerializedFieldRenderer(this, fieldWithInfo)
                         : null;
-                
+
                 case (FieldWithInfo.RenderType.Method, FieldWithInfo.GroupedType.DOTween):
                     return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ShowHideConditionBase>())
                         ? new DOTweenRenderer(this, fieldWithInfo)
                         : null;
-                
+
                 case (FieldWithInfo.RenderType.Method, _):
                     return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ShowHideConditionBase>())
                         ? new MethodRenderer(this, fieldWithInfo)
                         : null;
-                
+
                 case (FieldWithInfo.RenderType.NativeProperty, _):
                     return IsVisible(fieldWithInfo.propertyInfo.GetCustomAttribute<ShowHideConditionBase>())
                         ? new NativeProperty(this, fieldWithInfo)

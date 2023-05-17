@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using ExtInspector.Editor.Utils;
+using ExtInspector.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace ExtInspector.Standalone.Editor
@@ -8,55 +10,87 @@ namespace ExtInspector.Standalone.Editor
     {
         private Texture _texture;
         // private EColor _textureColor;
-        private string _textureName;
+        // private string _textureName;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            LabelTextAttribute attributeInfo = (LabelTextAttribute)attribute;
-            if (string.IsNullOrEmpty(attributeInfo.text) && attributeInfo.icon == null)
+            EditorGUI.BeginProperty(position, label, property);
+
+            LabelTextAttribute targetAttribute = (LabelTextAttribute)attribute;
+            bool hasIcon = targetAttribute.icon != null;
+            if (targetAttribute.text == null && !hasIcon)
             {
-                EditorGUI.PropertyField(position, property, null);
+                EditorGUI.PropertyField(position, property, GUIContent.none);
+                EditorGUI.EndProperty();
                 return;
             }
 
-            label.text = " " + attributeInfo.text;
+            label.text = targetAttribute.text;
 
-            bool iconHasColor = false;
-            if (attributeInfo.icon != null)
+            Rect indentedPosition = EditorGUI.IndentedRect(position);
+
+            Rect iconRect = new Rect(indentedPosition)
             {
-                if (_textureName != attributeInfo.icon)
+                width = 0,
+            };
+
+            // bool iconHasColor = false;
+            if (hasIcon)
+            {
+                // 缓存无效
+                // if (_textureName != targetAttribute.icon)
+                // {
+                //     _textureName = targetAttribute.icon;
+                //
+                //     if (_texture)
+                //     {
+                //         Object.DestroyImmediate(_texture);
+                //         _texture = null;
+                //     }
+                //     _texture = Tex.TextureTo((Texture2D)EditorGUIUtility.Load(_textureName), targetAttribute.iconColor.GetColor(), Mathf.FloorToInt(position.height));
+                // }
+
+                _texture = Tex.TextureTo((Texture2D)EditorGUIUtility.Load(targetAttribute.icon),
+                    targetAttribute.iconColor.GetColor(), targetAttribute.iconWidth == -1? -1: targetAttribute.iconWidth, Mathf.FloorToInt(position.height));
+
+                iconRect = new Rect(iconRect)
                 {
-                    _textureName = attributeInfo.icon;
+                    width = (targetAttribute.iconWidth == -1? _texture.width: targetAttribute.iconWidth) + 2,
+                };
 
-                    if (_texture)
+                GUI.Label(indentedPosition, _texture);
+                // GUI.DrawTexture(iconRect, _texture);
+            }
+
+            Rect textRect = new Rect(indentedPosition)
+            {
+                x = iconRect.x + iconRect.width,
+            };
+            GUIStyle labelStyle;
+            if (targetAttribute.textColor == EColor.Default)
+            {
+                labelStyle = GUI.skin.label;
+            }
+            else
+            {
+                labelStyle = new GUIStyle(GUI.skin.label)
+                {
+                    normal =
                     {
-                        Object.DestroyImmediate(_texture);
-                        _texture = null;
-                    }
-                    _texture = Tex.ApplyTextureColor((Texture2D)EditorGUIUtility.Load(_textureName), attributeInfo.iconColor.GetColor());
-                }
+                        textColor = targetAttribute.textColor.GetColor(),
+                    },
+                };
+            }
+            GUI.Label(textRect, targetAttribute.text, labelStyle);
 
-                iconHasColor = attributeInfo.iconColor != EColor.Default && attributeInfo.iconColor != EColor.White;
+            Rect fieldRect = new Rect(position)
+            {
+                x = position.x + EditorGUIUtility.labelWidth,
+            };
 
-                label.image = _texture;
-            }
+            EditorGUI.PropertyField(fieldRect, property, GUIContent.none);
 
-            bool useCustomColor = attributeInfo.textColor != EColor.Default;
-            if (useCustomColor && iconHasColor)
-            {
-                useCustomColor = false;
-                Debug.LogWarning($"can't set color for both icon and text");
-            }
-            Color oldColor = GUI.contentColor;
-            if(useCustomColor)
-            {
-                GUI.contentColor = attributeInfo.textColor.GetColor();
-            }
-            EditorGUI.PropertyField(position, property, label);
-            if(useCustomColor)
-            {
-                GUI.contentColor = oldColor;
-            }
+            EditorGUI.EndProperty();
         }
     }
 }

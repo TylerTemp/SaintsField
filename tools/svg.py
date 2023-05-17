@@ -3,8 +3,8 @@ USAGE:
     svg.py [options] <file_or_folder>... <dist>
 
 Options:
-    -c, --color=<r,g,b,a>      Color to override. [default: 255,255,255,255]
-    -s, --size=<widthxheight>  Resize. -1 for auto resize using another size. [default: -1x256]
+    -c, --color=<r,g,b,a>      Color to override. `default` to use original color. [default: 255,255,255,255]
+    -s, --size=<widthxheight>  Resize. -1 for auto resize using another size. `default` to use original [default: -1x256]
 """
 
 import logging
@@ -80,9 +80,16 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     # docpie.logger.setLevel(level=logging.ERROR)
     args = docpie.docpie(__doc__)
-    color = tuple(int(each.strip()) for each in args['--color'].split(','))
+    color_args = args['--color']
+    if color_args == 'default':
+        color = None
+    else:
+        color = tuple(int(each.strip()) for each in args['--color'].split(','))
     # color = (255, 255, 255, 255)
     size_raw = args['--size']
+    if size_raw == 'default':
+        size_raw = None
+
     # size_raw = '-1x256'
     dist = args['<dist>']
     if size_raw and 'x' in size_raw:

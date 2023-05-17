@@ -1,4 +1,4 @@
-﻿namespace ExtInspector.Standalone
+﻿namespace ExtInspector.Utils
 {
     public static class Icon
     {

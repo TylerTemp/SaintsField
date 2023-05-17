@@ -2,7 +2,7 @@ import os
 
 project_root = os.path.normpath(os.path.join(__file__, '..', '..'))
 
-icon_cs = os.path.join(project_root, 'Assets', 'Scripts', 'ExtInspector', 'Standalone', 'Icon.cs')
+icon_cs = os.path.join(project_root, 'Assets', 'Scripts', 'ExtInspector', 'Utils', 'Icon.cs')
 icon_folder = os.path.join(project_root, 'Assets', 'Editor Default Resources', 'ExtInspector', 'fa')
 # print(icon_folder)
 
