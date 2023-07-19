@@ -153,10 +153,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scene: Example
-  _go: {fileID: 0}
+  _go: {fileID: 1383904217}
   <Sth>k__BackingField: 
   _labelDecTest2: 
+  _labelDecTest3: 
+  _labelDecTest4: 
   <SepTitleTest>k__BackingField: 0
+  labelSuffixAttribute: 0
 --- !u!4 &1383904219
 Transform:
   m_ObjectHideFlags: 0

@@ -1,5 +1,4 @@
-﻿using ExtInspector.Editor.Utils;
-using ExtInspector.Utils;
+﻿using ExtInspector.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,14 +17,22 @@ namespace ExtInspector.Standalone.Editor
 
             LabelTextAttribute targetAttribute = (LabelTextAttribute)attribute;
             bool hasIcon = targetAttribute.icon != null;
-            if (targetAttribute.text == null && !hasIcon)
+            // 不使用原标签+无自定义标签=无标签区域
+            // (如果单纯需要图标，则应该是text="", icon="xxx")
+            if (!targetAttribute.useOldLabel && targetAttribute.text is null)
             {
                 EditorGUI.PropertyField(position, property, GUIContent.none);
                 EditorGUI.EndProperty();
                 return;
             }
 
-            label.text = targetAttribute.text;
+            // Debug.Log($"useOldLabel={targetAttribute.useOldLabel}/label.text={label.text}");
+
+            string useLabelText = targetAttribute.useOldLabel
+                ? label.text
+                : targetAttribute.text;
+
+            Debug.Assert(label.text is not null);
 
             Rect indentedPosition = EditorGUI.IndentedRect(position);
 
@@ -38,20 +45,20 @@ namespace ExtInspector.Standalone.Editor
             if (hasIcon)
             {
                 // 缓存无效
-                // if (_textureName != targetAttribute.icon)
-                // {
-                //     _textureName = targetAttribute.icon;
-                //
-                //     if (_texture)
-                //     {
-                //         Object.DestroyImmediate(_texture);
-                //         _texture = null;
-                //     }
-                //     _texture = Tex.TextureTo((Texture2D)EditorGUIUtility.Load(_textureName), targetAttribute.iconColor.GetColor(), Mathf.FloorToInt(position.height));
-                // }
+                if (_texture is null || (_texture.width == 1 && _texture.height == 1))
+                {
+                    if (_texture)
+                    {
+                        Object.DestroyImmediate(_texture);
+                    }
 
-                _texture = Tex.TextureTo((Texture2D)EditorGUIUtility.Load(targetAttribute.icon),
-                    targetAttribute.iconColor.GetColor(), targetAttribute.iconWidth == -1? -1: targetAttribute.iconWidth, Mathf.FloorToInt(position.height));
+                    _texture = Tex.TextureTo((Texture2D)EditorGUIUtility.Load(targetAttribute.icon),
+                        targetAttribute.iconColor.GetColor(), targetAttribute.iconWidth == -1? -1: targetAttribute.iconWidth, Mathf.FloorToInt(position.height));
+                }
+
+                // Debug.Log(_texture);
+                // Debug.Log(_texture.width);
+                // Debug.Log(_texture.height);
 
                 iconRect = new Rect(iconRect)
                 {
@@ -81,7 +88,7 @@ namespace ExtInspector.Standalone.Editor
                     },
                 };
             }
-            GUI.Label(textRect, targetAttribute.text, labelStyle);
+            GUI.Label(textRect, useLabelText, labelStyle);
 
             Rect fieldRect = new Rect(position)
             {
@@ -91,6 +98,14 @@ namespace ExtInspector.Standalone.Editor
             EditorGUI.PropertyField(fieldRect, property, GUIContent.none);
 
             EditorGUI.EndProperty();
+        }
+
+        ~LabelTextAttributeDrawer()
+        {
+            if (_texture)
+            {
+                Object.DestroyImmediate(_texture);
+            }
         }
     }
 }
