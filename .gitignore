@@ -98,5 +98,9 @@ __MACOSX
 *_log.txt
 /.vsconfig
 
-/dist/*
-!/dist/.placeholder
+/.dist/*
+!/.dist/.placeholder
+/ProjectSettings/boot.config
+/ProjectSettings/ProjectVersion.txt
+/README.md.meta
+/package.json.meta

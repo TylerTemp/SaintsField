@@ -28,18 +28,18 @@ def copytreer(src, dst, symlinks=False, ignore=None):
             shutil.copy2(s, d)
 
 def dist():
-    dist = os.path.join(root, "dist")
+    dist = os.path.join(root, ".dist")
     shutil.rmtree(dist)
     os.makedirs(dist)
     with open(os.path.join(dist, '.placeholder'), 'wb') as _:
         pass
-    
+
     logging.debug(f'Samples~')
     copytreer(os.path.join(root, 'Assets', 'Scripts', 'ExtInspector', 'Samples'), os.path.join(dist, 'Samples~'))
     shutil.copy(os.path.join(root, 'Assets', 'Scripts', 'ExtInspector', 'Samples.meta'), os.path.join(dist, 'Samples~.meta'))
 
     logging.debug(f'Scripts')
-    
+
     copytreer(os.path.join(root, 'Assets', 'Editor Default Resources'), os.path.join(dist, 'Scripts', 'Editor Default Resources'))
     shutil.copyfile(os.path.join(root, 'Assets', 'Editor Default Resources.meta'), os.path.join(dist, 'Scripts', 'Editor Default Resources.meta'))
 
@@ -58,7 +58,7 @@ def dist():
     shutil.copyfile(os.path.join(root, 'Assets', 'Scripts', 'ExtInspector', 'package.json'), os.path.join(dist, 'package.json'))
     shutil.copyfile(os.path.join(root, 'README.md'), os.path.join(dist, 'README.md'))
 
-    shutil.copyfile(__file__, os.path.join('dist', 'release.py'))
+    shutil.copyfile(__file__, os.path.join('.dist', 'release.py'))
     return 0
 
 
@@ -68,11 +68,11 @@ def back():
     (_, folders, files) = next(os.walk(project))
 
     for folder in folders:
-        if folder.startswith('.') or folder == 'dist':
+        if folder.startswith('.'):
             continue
         logging.debug(f'rm -rf {folder}')
         shutil.rmtree(os.path.join(project, folder))
-    
+
     for file_name in files:
         if file_name.startswith('.'):
             continue
@@ -105,5 +105,5 @@ if __name__ == '__main__':
         sys.exit(dist())
     elif param == 'back':
         sys.exit(back())
-    
+
     error_exit()
