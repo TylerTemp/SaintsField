@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ExtInspector.Standalone;
 using ExtInspector.Utils;
 #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
@@ -25,5 +26,16 @@ namespace ExtInspector.Samples
         // [field: LabelDec, SerializeField] public string LabelDecTest { get; private set; }
         [LabelSuffix("TestLabelSuffixAttribute", EColor.Blue)]
         public int labelSuffixAttribute;
+
+        [RichLabel(nameof(GetRichTexts))] public string rich;
+
+        private IReadOnlyList<RichText.RichTextPayload> GetRichTexts() => new RichText.RichTextPayload[]
+        {
+            new RichText.ColoredTextPayload("OK", EColor.Green),
+            new RichText.ColoredIconPayload(Icon.FA.CHESS_BISHOP, true, EColor.Pink),
+            new RichText.ColoredLabelPayload(EColor.Blue),
+            new RichText.IconPayload(Icon.FA.EYE_SLASH, true),
+            new RichText.TextPayload("Text"),
+        };
     }
 }

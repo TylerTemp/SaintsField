@@ -1,4 +1,5 @@
-﻿using ExtInspector.Utils;
+﻿using ExtInspector.Editor;
+using ExtInspector.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ namespace ExtInspector.Standalone.Editor
         private Texture _texture;
         // private EColor _textureColor;
         // private string _textureName;
+
+        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -106,6 +109,7 @@ namespace ExtInspector.Standalone.Editor
             {
                 Object.DestroyImmediate(_texture);
             }
+            _richTextDrawer.Dispose();
         }
     }
 }

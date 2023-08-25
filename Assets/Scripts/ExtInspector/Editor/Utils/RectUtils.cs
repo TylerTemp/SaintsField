@@ -22,5 +22,24 @@ namespace ExtInspector.Editor.Utils
                 leftRect
             );
         }
+
+        public static (Rect curRect, Rect leftRect) SplitWidthRect(Rect targetRect, float width)
+        {
+            Rect curRect = new Rect(targetRect)
+            {
+                width = width,
+            };
+
+            Rect leftRect = new Rect(targetRect)
+            {
+                x = curRect.x + curRect.width,
+                width = targetRect.width - width,
+            };
+
+            return (
+                curRect,
+                leftRect
+            );
+        }
     }
 }
