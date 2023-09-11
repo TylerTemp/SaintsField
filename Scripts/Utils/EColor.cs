@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ExtInspector.Standalone
+namespace ExtInspector.Utils
 {
     public enum EColor
     {

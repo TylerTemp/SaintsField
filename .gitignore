@@ -7,3 +7,7 @@
 /*.csproj
 /*.sln
 /Temp
+/.dist
+/ProjectSettings
+/RADEME.md.meta
+/package.json.meta

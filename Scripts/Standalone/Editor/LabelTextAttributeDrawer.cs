@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using ExtInspector.Editor;
+using ExtInspector.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace ExtInspector.Standalone.Editor
@@ -8,55 +10,106 @@ namespace ExtInspector.Standalone.Editor
     {
         private Texture _texture;
         // private EColor _textureColor;
-        private string _textureName;
+        // private string _textureName;
+
+        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            LabelTextAttribute attributeInfo = (LabelTextAttribute)attribute;
-            if (string.IsNullOrEmpty(attributeInfo.text) && attributeInfo.icon == null)
+            EditorGUI.BeginProperty(position, label, property);
+
+            LabelTextAttribute targetAttribute = (LabelTextAttribute)attribute;
+            bool hasIcon = targetAttribute.icon != null;
+            // 不使用原标签+无自定义标签=无标签区域
+            // (如果单纯需要图标，则应该是text="", icon="xxx")
+            if (!targetAttribute.useOldLabel && targetAttribute.text is null)
             {
-                EditorGUI.PropertyField(position, property, null);
+                EditorGUI.PropertyField(position, property, GUIContent.none);
+                EditorGUI.EndProperty();
                 return;
             }
 
-            label.text = " " + attributeInfo.text;
+            // Debug.Log($"useOldLabel={targetAttribute.useOldLabel}/label.text={label.text}");
 
-            bool iconHasColor = false;
-            if (attributeInfo.icon != null)
+            string useLabelText = targetAttribute.useOldLabel
+                ? label.text
+                : targetAttribute.text;
+
+            Debug.Assert(label.text is not null);
+
+            Rect indentedPosition = EditorGUI.IndentedRect(position);
+
+            Rect iconRect = new Rect(indentedPosition)
             {
-                if (_textureName != attributeInfo.icon)
-                {
-                    _textureName = attributeInfo.icon;
+                width = 0,
+            };
 
+            // bool iconHasColor = false;
+            if (hasIcon)
+            {
+                // 缓存无效
+                if (_texture is null || (_texture.width == 1 && _texture.height == 1))
+                {
                     if (_texture)
                     {
                         Object.DestroyImmediate(_texture);
-                        _texture = null;
                     }
-                    _texture = Tex.ApplyTextureColor((Texture2D)EditorGUIUtility.Load(_textureName), attributeInfo.iconColor.GetColor());
+
+                    _texture = Tex.TextureTo((Texture2D)EditorGUIUtility.Load(targetAttribute.icon),
+                        targetAttribute.iconColor.GetColor(), targetAttribute.iconWidth == -1? -1: targetAttribute.iconWidth, Mathf.FloorToInt(position.height));
                 }
 
-                iconHasColor = attributeInfo.iconColor != EColor.Default && attributeInfo.iconColor != EColor.White;
+                // Debug.Log(_texture);
+                // Debug.Log(_texture.width);
+                // Debug.Log(_texture.height);
 
-                label.image = _texture;
+                iconRect = new Rect(iconRect)
+                {
+                    width = (targetAttribute.iconWidth == -1? _texture.width: targetAttribute.iconWidth) + 2,
+                };
+
+                GUI.Label(indentedPosition, _texture);
+                // GUI.DrawTexture(iconRect, _texture);
             }
 
-            bool useCustomColor = attributeInfo.textColor != EColor.Default;
-            if (useCustomColor && iconHasColor)
+            Rect textRect = new Rect(indentedPosition)
             {
-                useCustomColor = false;
-                Debug.LogWarning($"can't set color for both icon and text");
-            }
-            Color oldColor = GUI.contentColor;
-            if(useCustomColor)
+                x = iconRect.x + iconRect.width,
+            };
+            GUIStyle labelStyle;
+            if (targetAttribute.textColor == EColor.Default)
             {
-                GUI.contentColor = attributeInfo.textColor.GetColor();
+                labelStyle = GUI.skin.label;
             }
-            EditorGUI.PropertyField(position, property, label);
-            if(useCustomColor)
+            else
             {
-                GUI.contentColor = oldColor;
+                labelStyle = new GUIStyle(GUI.skin.label)
+                {
+                    normal =
+                    {
+                        textColor = targetAttribute.textColor.GetColor(),
+                    },
+                };
             }
+            GUI.Label(textRect, useLabelText, labelStyle);
+
+            Rect fieldRect = new Rect(position)
+            {
+                x = position.x + EditorGUIUtility.labelWidth,
+            };
+
+            EditorGUI.PropertyField(fieldRect, property, GUIContent.none);
+
+            EditorGUI.EndProperty();
+        }
+
+        ~LabelTextAttributeDrawer()
+        {
+            if (_texture)
+            {
+                Object.DestroyImmediate(_texture);
+            }
+            _richTextDrawer.Dispose();
         }
     }
 }
