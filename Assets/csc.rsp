@@ -10,3 +10,6 @@
 #"use ext inspector with NaughtyAttributes need to enable these"
 #-define:EXT_INSPECTOR_ENABLE_FOR_MONO_BEHAVIOUR
 #-define:EXT_INSPECTOR_ENABLE_FOR_SCRIPTABLE_OBJECT
+
+#"debug tools"
+-define:EXT_INSPECTOR_LOG

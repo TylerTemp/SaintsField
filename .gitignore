@@ -102,5 +102,8 @@ __MACOSX
 !/.dist/.placeholder
 /ProjectSettings/boot.config
 /ProjectSettings/ProjectVersion.txt
+/ProjectSettings/BurstAotSettings*
+/ProjectSettings/CommonBurstAotSettings.json
 /README.md.meta
 /package.json.meta
+/Packages/packages-lock.json

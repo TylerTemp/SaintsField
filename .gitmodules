@@ -1,0 +1,3 @@
+[submodule "Assets/ExtInspector"]
+	path = Assets/ExtInspector
+	url = git@github.com:TylerTemp/ExtInspector.git
