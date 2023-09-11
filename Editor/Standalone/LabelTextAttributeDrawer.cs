@@ -55,6 +55,10 @@ namespace ExtInspector.Standalone.Editor
                         Object.DestroyImmediate(_texture);
                     }
 
+#if EXT_INSPECTOR_LOG
+                    Debug.Log($"EditorGUIUtility.Load {targetAttribute.icon}");
+#endif
+
                     _texture = Tex.TextureTo((Texture2D)EditorGUIUtility.Load(targetAttribute.icon),
                         targetAttribute.iconColor.GetColor(), targetAttribute.iconWidth == -1? -1: targetAttribute.iconWidth, Mathf.FloorToInt(position.height));
                 }

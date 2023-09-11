@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using ExtInspector.Standalone;
 using ExtInspector.Utils;
+using ExtInspector;
 #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
 using NaughtyAttributes;
 #endif
 using UnityEngine;
 using EColor = ExtInspector.Utils.EColor;
 
-namespace ExtInspector.Samples
+namespace ExtInspectorUnity.Samples
 {
     public class MonoExample : MonoBehaviour
     {
-        [SerializeField, Standalone.Scene] private string _scene;
+        [SerializeField, ExtInspector.Standalone.Scene] private string _scene;
         [GO] public GameObject _go;
 #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
         [field: Label("TestLabelOverride"), SerializeField] public string Sth { get; private set; }

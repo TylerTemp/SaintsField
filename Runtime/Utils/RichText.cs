@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ExtInspector.Editor.Utils;
 using UnityEngine;
 
 namespace ExtInspector.Utils

@@ -1,7 +1,7 @@
 using ExtInspector.Standalone;
 using UnityEngine;
 
-namespace ExtInspector.Samples
+namespace ExtInspectorUnity.Samples
 {
     public class Anim : MonoBehaviour
     {
