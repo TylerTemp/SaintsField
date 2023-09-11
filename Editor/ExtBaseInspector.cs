@@ -46,8 +46,10 @@ namespace ExtInspector.Editor
                 // None,
                 BoxGroup,
                 Foldout,
+#if EXT_INSPECTOR_DOTWEEN
                 // ReSharper disable once InconsistentNaming
                 DOTween,
+#endif
             }
 
             public int order;
@@ -917,11 +919,12 @@ namespace ExtInspector.Editor
                     return IsVisible(fieldWithInfo.fieldInfo.GetCustomAttribute<ShowHideConditionBase>())
                         ? new NonSerializedFieldRenderer(this, fieldWithInfo)
                         : null;
-
+#if EXT_INSPECTOR_DOTWEEN
                 case (FieldWithInfo.RenderType.Method, FieldWithInfo.GroupedType.DOTween):
                     return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ShowHideConditionBase>())
                         ? new DOTweenRenderer(this, fieldWithInfo)
                         : null;
+#endif
 
                 case (FieldWithInfo.RenderType.Method, _):
                     return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ShowHideConditionBase>())
