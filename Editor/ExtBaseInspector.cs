@@ -298,11 +298,18 @@ namespace ExtInspector.Editor
             {
                 try
                 {
-                    _monoScript = MonoScript.FromMonoBehaviour((MonoBehaviour) serializedObject.targetObject);
+                    try
+                    {
+                        _monoScript = MonoScript.FromMonoBehaviour((MonoBehaviour)serializedObject.targetObject);
+                    }
+                    catch (Exception)
+                    {
+                        _monoScript = MonoScript.FromScriptableObject((ScriptableObject)serializedObject.targetObject);
+                    }
                 }
-                catch (Exception)
+                catch (InvalidCastException)
                 {
-                    _monoScript = MonoScript.FromScriptableObject((ScriptableObject) serializedObject.targetObject);
+                    _monoScript = null;
                 }
             }
 

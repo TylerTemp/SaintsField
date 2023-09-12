@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
-using NaughtyAttributes.Editor;
 using UnityEditor;
 
 namespace ExtInspector.Editor.Utils
@@ -21,7 +20,7 @@ namespace ExtInspector.Editor.Utils
 
         public static T[] GetAttributes<T>(SerializedProperty property) where T : class
         {
-            FieldInfo fieldInfo = ReflectionUtility.GetField(GetTargetObjectWithProperty(property), property.name);
+            FieldInfo fieldInfo = Util.GetField(GetTargetObjectWithProperty(property), property.name);
             if (fieldInfo == null)
             {
                 return new T[] { };

@@ -16,5 +16,12 @@
     "email": "tylertempdev@gmail.com",
     "url": "https://extinspector.comes.today"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "Full Example",
+      "description": "Full example of this project",
+      "path": "Samples~"
+    }
+  ]
 }
