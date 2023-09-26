@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace ExtInspector.Utils
+﻿namespace ExtInspector.Utils
 {
     public class RichText
     {

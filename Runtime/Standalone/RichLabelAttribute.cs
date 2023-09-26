@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using ExtInspector.Utils;
 using UnityEngine;
 
 namespace ExtInspector.Standalone
@@ -8,10 +6,10 @@ namespace ExtInspector.Standalone
     [AttributeUsage(AttributeTargets.Field)]
     public class RichLabelAttribute: PropertyAttribute
     {
-        public readonly string CallbackName;
-        public RichLabelAttribute(string callbackName)
+        public readonly string RichTextXml;
+        public RichLabelAttribute(string richTextXml)
         {
-            CallbackName = callbackName;
+            RichTextXml = richTextXml;
         }
     }
 }

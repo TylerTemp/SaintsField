@@ -30,25 +30,40 @@ namespace ExtInspector.Standalone.Editor
             (Rect labelRect, Rect propertyRect) =
                 RectUtils.SplitWidthRect(EditorGUI.IndentedRect(position), EditorGUIUtility.labelWidth);
 
-            if(_cachedResult is null)
-            {
-                string callbackName = targetAttribute.CallbackName;
+            // if(_cachedResult is null)
+            // {
+            //     string callbackName = targetAttribute.CallbackName;
+            //
+            //     object target = property.serializedObject.targetObject;
+            //     List<Type> types = Util.GetSelfAndBaseTypes(target);
+            //     MethodInfo matchedMethod = types
+            //         .SelectMany(systemType => systemType
+            //             .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+            //                         BindingFlags.Public | BindingFlags.DeclaredOnly))
+            //         .First(each => each.Name == callbackName);
+            //     ParameterInfo[] methodParams = matchedMethod.GetParameters();
+            //
+            //     IReadOnlyList<RichText.RichTextPayload> results =
+            //         (IReadOnlyList<RichText.RichTextPayload>)matchedMethod.Invoke(target,
+            //             methodParams.Select(p => p.DefaultValue).ToArray());
+            //     _cachedResult = results;
+            // }
+            // _richTextDrawer.DrawLabel(labelRect, label, _cachedResult);
 
-                object target = property.serializedObject.targetObject;
-                List<Type> types = Util.GetSelfAndBaseTypes(target);
-                MethodInfo matchedMethod = types
-                    .SelectMany(systemType => systemType
-                        .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                    BindingFlags.Public | BindingFlags.DeclaredOnly))
-                    .First(each => each.Name == callbackName);
-                ParameterInfo[] methodParams = matchedMethod.GetParameters();
+            string labelXml = targetAttribute.RichTextXml;
+// #if EXT_INSPECTOR_LOG
+//             Debug.Log($"RichLabelAttributeDrawer: {labelXml}");
+// #endif
 
-                IReadOnlyList<RichText.RichTextPayload> results =
-                    (IReadOnlyList<RichText.RichTextPayload>)matchedMethod.Invoke(target,
-                        methodParams.Select(p => p.DefaultValue).ToArray());
-                _cachedResult = results;
-            }
-            _richTextDrawer.DrawLabel(labelRect, label, _cachedResult);
+            _richTextDrawer.DrawChunks(labelRect, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
+
+            // List<RichTextDrawer.RichTextChunk> parsedChunk = RichTextDrawer.ParseRichXml(labelXml, label.text).ToList();
+            //
+            // foreach (var richTextChunk in RichTextDrawer.ParseRichXml(labelXml, label.text))
+            // {
+            //     Debug.Log(richTextChunk.ToString());
+            // }
+
             EditorGUI.PropertyField(propertyRect, property, GUIContent.none);
 
             EditorGUI.EndProperty();

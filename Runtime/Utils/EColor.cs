@@ -40,5 +40,7 @@ namespace ExtInspector.Utils
                 _ => new Color32(0, 0, 0, 255),
             };
         }
+
+
     }
 }
