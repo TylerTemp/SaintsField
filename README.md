@@ -9,7 +9,7 @@
 5.  `git submodule add ${your-folk} Assets/ExtInspector`
 6.  `cd Assets/ExtInspector` and checkout to your editing branch, e.g. `git checkout master`
 7.  windows: `.\link.cmd`
-    mac/linux: `ln -s 'Assets/ExtInspector/Editor Default Resources~/ExtInspector' 'Assets/Editor Default Resources/ExtInspector'`
+    mac/linux: `ln -s 'Assets/ExtInspector/Samples~' 'Assets/Samples'`
 
 ## Release ##
 
