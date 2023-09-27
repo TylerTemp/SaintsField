@@ -1,10 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using ExtInspector.Standalone;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Standalone.Editor
+namespace ExtInspector.Editor.Standalone
 {
     /// <summary>
     ///  <see href="https://github.com/dbrizov/NaughtyAttributes/blob/a97aa9b3b416e4c9122ea1be1a1b93b1169b0cd3/Assets/NaughtyAttributes/Scripts/Editor/PropertyDrawers/ScenePropertyDrawer.cs#L10" />
@@ -12,12 +13,7 @@ namespace ExtInspector.Standalone.Editor
     [CustomPropertyDrawer(typeof(SceneAttribute))]
     public class ScenePropertyDrawer : PropertyDrawer
     {
-        private const string SceneListItem = "{0} ({1})";
-        private const string ScenePattern = @".+\/(.+)\.unity";
-        private const string TypeWarningMessage = "{0} must be an int or a string";
-        private const string BuildSettingsWarningMessage = "No scenes in the build settings";
-
-        private float GetHelpBoxHeight() => EditorGUIUtility.singleLineHeight * 2.0f;
+        private static float GetHelpBoxHeight() => EditorGUIUtility.singleLineHeight * 2.0f;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -33,19 +29,23 @@ namespace ExtInspector.Standalone.Editor
 
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
         {
-            // Debug.Log("On GUI Scene");
+            using EditorGUI.PropertyScope propertyScoop = new EditorGUI.PropertyScope(rect, label, property);
 
-            EditorGUI.BeginProperty(rect, label, property);
+            label = propertyScoop.content;
 
             string[] scenes = GetScenes();
             bool anySceneInBuildSettings = scenes.Length > 0;
             if (!anySceneInBuildSettings)
             {
-                DrawDefaultPropertyAndHelpBox(rect, property, label, BuildSettingsWarningMessage, MessageType.Warning);
+                DrawDefaultPropertyAndHelpBox(rect, property, label, "No scenes in the build settings", MessageType.Warning);
                 return;
             }
 
-            string[] sceneOptions = GetSceneOptions(scenes);
+            string[] sceneOptions = scenes
+                .Select((name, index) => $"[{index}]{name}")
+                .ToArray();
+
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.String:
@@ -55,12 +55,9 @@ namespace ExtInspector.Standalone.Editor
                     DrawPropertyForInt(rect, property, label, sceneOptions);
                     break;
                 default:
-                    string message = string.Format(TypeWarningMessage, property.name);
-                    DrawDefaultPropertyAndHelpBox(rect, property, label, message, MessageType.Warning);
+                    DrawDefaultPropertyAndHelpBox(rect, property, label, $"{property.name} must be an int or a string, get {property.propertyType}", MessageType.Warning);
                     break;
             }
-
-            EditorGUI.EndProperty();
         }
 
         private void DrawDefaultPropertyAndHelpBox(Rect rect, SerializedProperty property, GUIContent label, string message,
@@ -85,46 +82,44 @@ namespace ExtInspector.Standalone.Editor
             EditorGUI.TextField(propertyRect, label, property.stringValue);
         }
 
-        private string[] GetScenes()
-        {
-            return EditorBuildSettings.scenes
+        private static string[] GetScenes() =>
+            EditorBuildSettings.scenes
                 .Where(scene => scene.enabled)
-                .Select(scene => Regex.Match(scene.path, ScenePattern).Groups[1].Value)
+                .Select(scene => Path.GetFileNameWithoutExtension(scene.path))
                 .ToArray();
-        }
-
-        private string[] GetSceneOptions(string[] scenes)
-        {
-            return scenes.Select((s, i) => string.Format(SceneListItem, s, i)).ToArray();
-        }
 
         private static void DrawPropertyForString(Rect rect, SerializedProperty property, GUIContent label, string[] scenes, string[] sceneOptions)
         {
-            int index = IndexOf(scenes, property.stringValue);
-            int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions);
-            string newScene = scenes[newIndex];
-
-            if (!property.stringValue.Equals(newScene, StringComparison.Ordinal))
+            int index = IndexOfOrZero(scenes, property.stringValue);
+            // ReSharper disable once ConvertToUsingDeclaration
+            using(EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                property.stringValue = scenes[newIndex];
+                int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions);
+                if (changeCheck.changed)
+                {
+                    property.stringValue = scenes[newIndex];
+                }
             }
         }
 
         private static void DrawPropertyForInt(Rect rect, SerializedProperty property, GUIContent label, string[] sceneOptions)
         {
             int index = property.intValue;
-            int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions);
-
-            if (property.intValue != newIndex)
+            // ReSharper disable once ConvertToUsingDeclaration
+            using(EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                property.intValue = newIndex;
+                int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions);
+                if (changeCheck.changed)
+                {
+                    property.intValue = newIndex;
+                }
             }
         }
 
-        private static int IndexOf(string[] scenes, string scene)
+        private static int IndexOfOrZero(string[] scenes, string scene)
         {
-            var index = Array.IndexOf(scenes, scene);
-            return Mathf.Clamp(index, 0, scenes.Length - 1);
+            int index = Array.IndexOf(scenes, scene);
+            return index == -1? 0: index;
         }
     }
 }

@@ -18,9 +18,13 @@ namespace ExtInspector.Utils
 
             BilinearScale(0, newHeight, ratioY, w, w2, ratioX, texColors, newColors);
 
+            // Texture2D result = new Texture2D(newWidth, newHeight);
+
+            // Debug.Log($"resize texture from {tex.width}x{tex.height} to {newWidth}x{newHeight}");
             tex.Reinitialize(newWidth, newHeight);
             tex.SetPixels(newColors);
             tex.Apply();
+            // return result;
         }
 
         private static void BilinearScale(int start, int end, float ratioY, int w, int w2, float ratioX, IReadOnlyList<Color> texColors, IList<Color> newColors) {

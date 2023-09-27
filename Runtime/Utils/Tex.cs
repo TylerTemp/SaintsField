@@ -20,7 +20,7 @@ namespace ExtInspector.Utils
             return convertedTexture;
         }
 
-        private static Texture2D ConvertToCompatibleFormat(Texture2D texture)
+        public static Texture2D ConvertToCompatibleFormat(Texture2D texture)
         {
             // Create a new texture with a compatible format
             Texture2D convertedTexture = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
@@ -42,7 +42,7 @@ namespace ExtInspector.Utils
             int oriWidth = originalTexture.width;
             int oriHeight = originalTexture.height;
             int newWidth = Mathf.RoundToInt((float)oriWidth * newHeight / oriHeight);
-            // Debug.Log($"newWidth={newWidth}");
+            // Debug.Log($"resize texture from {oriWidth}x{oriHeight} to {newWidth}x{newHeight}");
             TextureScale.Scale(originalTexture, newWidth, newHeight);
         }
 

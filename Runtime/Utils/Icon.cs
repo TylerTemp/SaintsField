@@ -10,6 +10,9 @@
 #endif
         ;
 
+        public const string Eye = EditorFolderName + "eye-regular.png";
+        public const string EyeSlash = EditorFolderName + "eye-slash-regular.png";
+
         // ReSharper disable InconsistentNaming
         // ReSharper disable IdentifierTypo
         // ReSharper disable StringLiteralTypo

@@ -21,7 +21,7 @@ namespace ExtInspector.Utils
 
     public static class EColorExtensions
     {
-        public static Color32 GetColor(this EColor color)
+        public static Color GetColor(this EColor color)
         {
             return color switch
             {

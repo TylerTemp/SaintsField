@@ -33,10 +33,10 @@ namespace ExtInspector.Standalone.Editor
 
             // Object targetObject = property.serializedObject.targetObject;
 
-            AnimStateSelector animStateSelector = Serialized.GetAttribute<AnimStateSelector>(property);
+            AnimStateSelector animStateSelector = SerializedUtil.GetAttribute<AnimStateSelector>(property);
             string animFieldName = animStateSelector?.AnimFieldName ?? "animator";
             SerializedObject targetSer = property.serializedObject;
-            SerializedProperty animProp = targetSer.FindProperty(animFieldName) ?? Serialized.FindPropertyByAutoPropertyName(targetSer, animFieldName);
+            SerializedProperty animProp = targetSer.FindProperty(animFieldName) ?? SerializedUtil.FindPropertyByAutoPropertyName(targetSer, animFieldName);
             if(animProp == null)
             {
                 RenderError($"Can't find Animator {animFieldName}{(animStateSelector == null ? ", use AnimStateSelector to specific one" : "")}",

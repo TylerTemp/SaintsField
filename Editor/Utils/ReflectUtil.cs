@@ -1,39 +1,60 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace ExtInspector.Editor.Utils
 {
-    public static class Serialized
+    public static class ReflectUil
     {
-        public static SerializedProperty FindPropertyByAutoPropertyName(SerializedObject obj, string propName)
+        public static FieldInfo GetField(object target, string fieldName)
         {
-            return obj.FindProperty($"<{propName}>k__BackingField");
+            return GetAllFields(target, f => f.Name.Equals(fieldName, StringComparison.Ordinal)).FirstOrDefault();
         }
 
-        public static T GetAttribute<T>(SerializedProperty property) where T : class
+        public static IEnumerable<FieldInfo> GetAllFields(object target, Func<FieldInfo, bool> predicate)
         {
-            T[] attributes = GetAttributes<T>(property);
-            return (attributes.Length > 0) ? attributes[0] : null;
-        }
-
-        public static T[] GetAttributes<T>(SerializedProperty property) where T : class
-        {
-            FieldInfo fieldInfo = Util.GetField(GetTargetObjectWithProperty(property), property.name);
-            if (fieldInfo == null)
+            if (target == null)
             {
-                return new T[] { };
+                Debug.LogError("The target object is null. Check for missing scripts.");
+                yield break;
             }
 
-            return (T[])fieldInfo.GetCustomAttributes(typeof(T), true);
+            List<Type> types = GetSelfAndBaseTypes(target);
+
+            for (int i = types.Count - 1; i >= 0; i--)
+            {
+                IEnumerable<FieldInfo> fieldInfos = types[i]
+                    .GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .Where(predicate);
+
+                foreach (var fieldInfo in fieldInfos)
+                {
+                    yield return fieldInfo;
+                }
+            }
         }
 
-        /// <summary>
-        /// Gets the object that the property is a member of
-        /// </summary>
-        /// <param name="property"></param>
-        /// <returns></returns>
+        public static List<Type> GetSelfAndBaseTypes(object target)
+        {
+            List<Type> types = new List<Type>
+            {
+                target.GetType(),
+            };
+
+            while (types.Last().BaseType != null)
+            {
+                types.Add(types.Last().BaseType);
+            }
+
+            types.Reverse();
+
+            return types;
+        }
+
         public static object GetTargetObjectWithProperty(SerializedProperty property)
         {
             string path = property.propertyPath.Replace(".Array.data[", "[");
@@ -105,5 +126,6 @@ namespace ExtInspector.Editor.Utils
 
             return enumerator.Current;
         }
+
     }
 }

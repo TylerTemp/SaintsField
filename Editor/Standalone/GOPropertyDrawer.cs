@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ExtInspector.Standalone;
+using ExtInspector.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace ExtInspector.Standalone.Editor
+namespace ExtInspector.Editor.Standalone
 {
     [CustomPropertyDrawer(typeof(GOAttribute))]
     public class GOPropertyDrawer : PropertyDrawer
@@ -26,8 +28,8 @@ namespace ExtInspector.Standalone.Editor
                 return;
             }
 
-            _seeTexture = (Texture)EditorGUIUtility.Load("ExtInspector/eye-regular.png");
-            _hiddenTexture = (Texture)EditorGUIUtility.Load("ExtInspector/eye-slash-regular.png");
+            _seeTexture = (Texture)EditorGUIUtility.Load(Icon.Eye);
+            _hiddenTexture = (Texture)EditorGUIUtility.Load(Icon.EyeSlash);
 
             // Debug.Log(EditorGUIUtility.Load("Util/eye-regular.png"));
 

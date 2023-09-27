@@ -4,7 +4,7 @@ namespace ExtInspector.Utils
 {
     public static class Colors
     {
-        public static Color32 GetColorByStringPresent(string name)
+        public static Color GetColorByStringPresent(string name)
         {
             if(ColorUtility.TryParseHtmlString(name, out Color color))
             {
