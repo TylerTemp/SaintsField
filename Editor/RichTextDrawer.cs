@@ -289,6 +289,8 @@ namespace ExtInspector.Editor
 
 
             string leftContent = richText.ToString();
+
+            // ReSharper disable once InvertIf
             if (leftContent != "")
             {
                 string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
