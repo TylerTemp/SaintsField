@@ -288,7 +288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vector2: {x: -0.31, y: 2.15}
-  vector2Int: {x: 2, y: 7}
+  vector2Int: {x: 3, y: 8}
 --- !u!1 &1383904217
 GameObject:
   m_ObjectHideFlags: 0

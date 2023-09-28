@@ -9,7 +9,6 @@ namespace ExtInspector.Editor.Standalone
     {
         private const string KVectorMinName = "x";
         private const string KVectorMaxName = "y";
-        private const float KFloatFieldWidth = 16f;
         private const float KSpacing = 2f;
         private const float KRoundingValue = 100f;
 
@@ -86,9 +85,7 @@ namespace ExtInspector.Editor.Standalone
 
             float ppp = EditorGUIUtility.pixelsPerPoint;
             float spacing = KSpacing * ppp;
-            float fieldWidth = ppp * (attr.DataFields && attr.FlexibleFields
-                ? FlexibleFloatFieldWidth(attr.Min, attr.Max)
-                : KFloatFieldWidth);
+            float fieldWidth = ppp * FlexibleFloatFieldWidth(attr.Min, attr.Max);
 
             int indent = EditorGUI.indentLevel;
 
@@ -97,11 +94,8 @@ namespace ExtInspector.Editor.Standalone
 
             Rect sliderPos = r;
 
-            if (attr.DataFields)
-            {
-                sliderPos.x += fieldWidth + spacing;
-                sliderPos.width -= (fieldWidth + spacing) * 2;
-            }
+            sliderPos.x += fieldWidth + spacing;
+            sliderPos.width -= (fieldWidth + spacing) * 2;
 
             if (Event.current.type == EventType.MouseDown &&
                 sliderPos.Contains(Event.current.mousePosition))
@@ -132,55 +126,52 @@ namespace ExtInspector.Editor.Standalone
                 SetVectorValue(property, ref min, ref max, false);
             }
 
-            if (attr.DataFields)
+            Rect minPos = r;
+            minPos.width = fieldWidth;
+
+            SerializedProperty vectorMinProp = property.FindPropertyRelative(KVectorMinName);
+            EditorGUI.showMixedValue = vectorMinProp.hasMultipleDifferentValues;
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.indentLevel = 0;
+            min = EditorGUI.DelayedFloatField(minPos, min);
+            EditorGUI.indentLevel = indent;
+            if (EditorGUI.EndChangeCheck())
             {
-                Rect minPos = r;
-                minPos.width = fieldWidth;
-
-                SerializedProperty vectorMinProp = property.FindPropertyRelative(KVectorMinName);
-                EditorGUI.showMixedValue = vectorMinProp.hasMultipleDifferentValues;
-                EditorGUI.BeginChangeCheck();
-                EditorGUI.indentLevel = 0;
-                min = EditorGUI.DelayedFloatField(minPos, min);
-                EditorGUI.indentLevel = indent;
-                if (EditorGUI.EndChangeCheck())
+                if (attr.Bound)
                 {
-                    if (attr.Bound)
-                    {
-                        min = Mathf.Max(min, attr.Min);
-                        min = Mathf.Min(min, max);
-                    }
-
-                    SetVectorValue(property, ref min, ref max, attr.Round);
+                    min = Mathf.Max(min, attr.Min);
+                    min = Mathf.Min(min, max);
                 }
 
-                vectorMinProp.Dispose();
-
-                Rect maxPos = position;
-                maxPos.x += maxPos.width - fieldWidth;
-                maxPos.width = fieldWidth;
-
-                SerializedProperty vectorMaxProp = property.FindPropertyRelative(KVectorMaxName);
-                EditorGUI.showMixedValue = vectorMaxProp.hasMultipleDifferentValues;
-                EditorGUI.BeginChangeCheck();
-                EditorGUI.indentLevel = 0;
-                max = EditorGUI.DelayedFloatField(maxPos, max);
-                EditorGUI.indentLevel = indent;
-                if (EditorGUI.EndChangeCheck())
-                {
-                    if (attr.Bound)
-                    {
-                        max = Mathf.Min(max, attr.Max);
-                        max = Mathf.Max(max, min);
-                    }
-
-                    SetVectorValue(property, ref min, ref max, attr.Round);
-                }
-
-                vectorMaxProp.Dispose();
-
-                EditorGUI.showMixedValue = false;
+                SetVectorValue(property, ref min, ref max, attr.Round);
             }
+
+            vectorMinProp.Dispose();
+
+            Rect maxPos = position;
+            maxPos.x += maxPos.width - fieldWidth;
+            maxPos.width = fieldWidth;
+
+            SerializedProperty vectorMaxProp = property.FindPropertyRelative(KVectorMaxName);
+            EditorGUI.showMixedValue = vectorMaxProp.hasMultipleDifferentValues;
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.indentLevel = 0;
+            max = EditorGUI.DelayedFloatField(maxPos, max);
+            EditorGUI.indentLevel = indent;
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (attr.Bound)
+                {
+                    max = Mathf.Min(max, attr.Max);
+                    max = Mathf.Max(max, min);
+                }
+
+                SetVectorValue(property, ref min, ref max, attr.Round);
+            }
+
+            vectorMaxProp.Dispose();
+
+            EditorGUI.showMixedValue = false;
         }
     }
 }

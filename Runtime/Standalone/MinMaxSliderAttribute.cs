@@ -8,19 +8,17 @@ namespace ExtInspector.Standalone
     {
         public readonly float Min;
         public readonly float Max;
-        public readonly bool DataFields = true;
-        public readonly bool FlexibleFields = true;
+        public readonly float Step;
+        // public readonly bool DataFields = true;
+        // public readonly bool FlexibleFields = true;
         public readonly bool Bound = true;
         public readonly bool Round = true;
 
-        public MinMaxSliderAttribute() : this(0, 1)
-        {
-        }
-
-        public MinMaxSliderAttribute(float min, float max)
+        public MinMaxSliderAttribute(float min, float max, float step=-1f)
         {
             Min = min;
             Max = max;
+            Step = step;
         }
     }
 }
