@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ExtInspector.Editor.Standalone
 {
     [CustomPropertyDrawer(typeof(MinMaxSliderAttribute))]
-    public class MinMaxSliderAttributeDrawer : PropertyDrawer
+    public class MinMaxSliderAttributeDrawer : SaintsPropertyDrawer
     {
         private const string KVectorMinName = "x";
         private const string KVectorMaxName = "y";
@@ -55,8 +55,10 @@ namespace ExtInspector.Editor.Standalone
             }
         }
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnSaintsGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // base.OnGUI(position, property, label);
+
             float min, max;
 
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault

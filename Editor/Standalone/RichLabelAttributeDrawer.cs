@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ExtInspector.Editor.Standalone
 {
     [CustomPropertyDrawer(typeof(RichLabelAttribute))]
-    public class RichLabelAttributeDrawer: PropertyDrawer
+    public class RichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
         // private IReadOnlyList<RichText.RichTextPayload> _cachedResult = null;
@@ -16,8 +16,9 @@ namespace ExtInspector.Editor.Standalone
             _richTextDrawer.Dispose();
         }
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnSaintsGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // base.OnGUI(position, property, label);
             label = EditorGUI.BeginProperty(position, label, property);
 
             RichLabelAttribute targetAttribute = (RichLabelAttribute)attribute;
