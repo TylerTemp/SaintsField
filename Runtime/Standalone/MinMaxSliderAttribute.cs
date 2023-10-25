@@ -7,7 +7,6 @@ namespace ExtInspector.Standalone
     public class MinMaxSliderAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string DrawerClass => "ExtInspector.Editor.Standalone.MinMaxSliderAttributeDrawer";
 
         public readonly float Min;
         public readonly float Max;

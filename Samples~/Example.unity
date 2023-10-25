@@ -225,7 +225,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 652b26060ca7d5d45b1250475013f45c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mixed: 29.2
+  _mixed: {x: 0, y: 0}
+  _float: 25.7
+  _sOnly: {x: 0, y: 0}
+  _selfField: {x: 0.21, y: 0.68}
+  _mixedNoLabel: {x: 0.29, y: 0.72}
 --- !u!4 &440518747
 Transform:
   m_ObjectHideFlags: 0
@@ -365,7 +369,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scene: Example
   _go: {fileID: 1383904217}
-  <Sth>k__BackingField: 
   <SepTitleTest>k__BackingField: 0
 --- !u!4 &1383904219
 Transform:

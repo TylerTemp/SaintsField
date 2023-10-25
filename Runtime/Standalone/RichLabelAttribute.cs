@@ -7,7 +7,6 @@ namespace ExtInspector.Standalone
     public class RichLabelAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Label;
-        public string DrawerClass => "ExtInspector.Editor.Standalone.RichLabelAttributeDrawer";
 
         public readonly string RichTextXml;
         public RichLabelAttribute(string richTextXml)

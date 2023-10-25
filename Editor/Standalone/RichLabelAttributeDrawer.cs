@@ -16,26 +16,32 @@ namespace ExtInspector.Editor.Standalone
             _richTextDrawer.Dispose();
         }
 
-        public override void OnSaintsGUI(Rect position, SerializedProperty property, GUIContent label)
+        protected override bool DrawLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            // base.OnGUI(position, property, label);
-            label = EditorGUI.BeginProperty(position, label, property);
+            // label = EditorGUI.BeginProperty(position, label, property);
 
-            RichLabelAttribute targetAttribute = (RichLabelAttribute)attribute;
+            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
 
-            (Rect labelRect, Rect propertyRect) =
-                RectUtils.SplitWidthRect(EditorGUI.IndentedRect(position), EditorGUIUtility.labelWidth);
+            // (Rect labelRect, Rect propertyRect) =
+            //     RectUtils.SplitWidthRect(EditorGUI.IndentedRect(position), EditorGUIUtility.labelWidth);
 
             string labelXml = targetAttribute.RichTextXml;
+
+            if (labelXml is null)
+            {
+                return false;
+            }
+
 // #if EXT_INSPECTOR_LOG
 //             Debug.Log($"RichLabelAttributeDrawer: {labelXml}");
 // #endif
 
-            _richTextDrawer.DrawChunks(labelRect, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
+            _richTextDrawer.DrawChunks(position, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
 
-            EditorGUI.PropertyField(propertyRect, property, GUIContent.none);
+            // EditorGUI.PropertyField(propertyRect, property, GUIContent.none);
 
-            EditorGUI.EndProperty();
+            // EditorGUI.EndProperty();
+            return true;
         }
     }
 }

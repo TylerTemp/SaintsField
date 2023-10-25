@@ -1,4 +1,5 @@
-﻿using ExtInspector.Standalone;
+﻿using ExtInspector.Editor.Utils;
+using ExtInspector.Standalone;
 using UnityEditor;
 using UnityEngine;
 
@@ -55,7 +56,7 @@ namespace ExtInspector.Editor.Standalone
             }
         }
 
-        public override void OnSaintsGUI(Rect position, SerializedProperty property, GUIContent label)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             // base.OnGUI(position, property, label);
 
@@ -83,7 +84,9 @@ namespace ExtInspector.Editor.Standalone
                     return;
             }
 
-            MinMaxSliderAttribute attr = (MinMaxSliderAttribute)attribute;
+            // MinMaxSliderAttribute attr = (MinMaxSliderAttribute)attribute;
+            // MinMaxSliderAttribute attr = SerializedUtil.GetAttribute<MinMaxSliderAttribute>(property);;
+            MinMaxSliderAttribute attr = (MinMaxSliderAttribute)saintsAttribute;
 
             float ppp = EditorGUIUtility.pixelsPerPoint;
             float spacing = KSpacing * ppp;
