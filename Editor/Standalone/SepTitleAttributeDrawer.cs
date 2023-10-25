@@ -23,7 +23,7 @@ namespace ExtInspector.Standalone.Editor
 
             Rect rect = EditorGUI.IndentedRect(indentedPosition);
             // position.yMin += EditorGUIUtility.singleLineHeight * 0.5f;
-            rect.y += (EditorGUIUtility.singleLineHeight / 2f - lineAttr.height);
+            rect.y += EditorGUIUtility.singleLineHeight / 2f - lineAttr.height;
             rect.height = lineAttr.height;
             rect.width -= labelWidth;
             rect.x += labelWidth;

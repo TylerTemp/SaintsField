@@ -22,7 +22,7 @@ namespace ExtInspector.Editor.Standalone
             bool validPropertyType = property.propertyType is SerializedPropertyType.String or SerializedPropertyType.Integer;
             bool anySceneInBuildSettings = GetScenes().Length > 0;
 
-            return (validPropertyType && anySceneInBuildSettings)
+            return validPropertyType && anySceneInBuildSettings
                 ? EditorGUIUtility.singleLineHeight
                 : EditorGUIUtility.singleLineHeight + GetHelpBoxHeight();
         }

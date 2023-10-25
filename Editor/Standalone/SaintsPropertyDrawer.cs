@@ -17,7 +17,7 @@ namespace ExtInspector.Editor.Standalone
         private readonly Dictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDrawers =
             new Dictionary<Type, IReadOnlyList<Type>>();
 
-        private IReadOnlyList<ISaintsAttribute> _allSaintsAttributes;
+        // private IReadOnlyList<ISaintsAttribute> _allSaintsAttributes;
         private SaintsPropertyDrawer _labelDrawer;
         private SaintsPropertyDrawer _fieldDrawer;
 
@@ -71,28 +71,52 @@ namespace ExtInspector.Editor.Standalone
             _propertyAttributeToDrawers.Clear();
         }
 
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return base.GetPropertyHeight(property, label);
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            using var propertyScope = new EditorGUI.PropertyScope(position, label, property);
-            var propertyScoopLabel = propertyScope.content;
+            // // var attributes = SerializedUtil.GetAttributes<ISaintsAttribute>(property).Select(each => (PropertyAttribute) each);
+            // var attributes = SerializedUtil.GetAttributes<PropertyAttribute>(property);
+            // foreach (PropertyAttribute atb in attributes)
+            // {
+            //     Debug.Log($"atb={atb}");
+            //
+            //     Debug.Log(_propertyAttributeToDrawers.TryGetValue(atb.GetType(), out IReadOnlyList<Type> drawers));
+            //     Debug.Log(drawers != null? string.Join(",", drawers): "nothing");
+            // }
+            // // base.OnGUI(position, property, label);
+            // DefaultDrawer(fieldRect, property, newLabel);
 
-            _allSaintsAttributes ??= SerializedUtil.GetAttributes<ISaintsAttribute>(property).ToArray();
+            using EditorGUI.PropertyScope propertyScope = new EditorGUI.PropertyScope(position, label, property);
+            GUIContent propertyScoopLabel = propertyScope.content;
+
+            IReadOnlyList<ISaintsAttribute> allSaintsAttributes = SerializedUtil.GetAttributes<ISaintsAttribute>(property).ToArray();
 
             // label
-            ISaintsAttribute labelAttribute = _allSaintsAttributes.FirstOrDefault(each => each.AttributeType == SaintsAttributeType.Label);
-            Type labelDrawer = (labelAttribute != null &&
-                                _propertyAttributeToDrawers.TryGetValue(labelAttribute.GetType(),
-                                    out IReadOnlyList<Type> labelDrawers))
+            ISaintsAttribute labelAttribute = allSaintsAttributes.FirstOrDefault(each => each.AttributeType == SaintsAttributeType.Label);
+            Type labelDrawer = labelAttribute != null &&
+                               _propertyAttributeToDrawers.TryGetValue(labelAttribute.GetType(),
+                                   out IReadOnlyList<Type> labelDrawers)
                 ? labelDrawers[0]
                 : null;
 
             Rect fieldRect = position;
             GUIContent newLabel = propertyScoopLabel;
-            if (labelDrawer != null)
+            (Rect labelRect, Rect leftPropertyRect) =
+                RectUtils.SplitWidthRect(EditorGUI.IndentedRect(position), EditorGUIUtility.labelWidth);
+
+            if (labelDrawer == null)
+            {
+                // default label drawer
+                EditorGUI.LabelField(labelRect, propertyScoopLabel);
+                fieldRect = leftPropertyRect;
+            }
+            else
             {
                 _labelDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(labelDrawer, false);
-                (Rect labelRect, Rect leftPropertyRect) =
-                    RectUtils.SplitWidthRect(EditorGUI.IndentedRect(position), EditorGUIUtility.labelWidth);
                 // Debug.Log(labelAttribute);
                 if(_labelDrawer.DrawLabel(labelRect, property, propertyScoopLabel, labelAttribute))
                 {
@@ -102,10 +126,10 @@ namespace ExtInspector.Editor.Standalone
             }
 
             // field
-            ISaintsAttribute fieldAttribute = _allSaintsAttributes.FirstOrDefault(each => each.AttributeType == SaintsAttributeType.Field);
-            Type fieldDrawer = (fieldAttribute != null &&
-                                _propertyAttributeToDrawers.TryGetValue(fieldAttribute.GetType(),
-                                    out IReadOnlyList<Type> fieldDrawers))
+            ISaintsAttribute fieldAttribute = allSaintsAttributes.FirstOrDefault(each => each.AttributeType == SaintsAttributeType.Field);
+            Type fieldDrawer = fieldAttribute != null &&
+                               _propertyAttributeToDrawers.TryGetValue(fieldAttribute.GetType(),
+                                   out IReadOnlyList<Type> fieldDrawers)
                 ? fieldDrawers[0]
                 : null;
             if (fieldDrawer == null)
@@ -118,18 +142,6 @@ namespace ExtInspector.Editor.Standalone
                 _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                 _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
             }
-
-            // // var attributes = SerializedUtil.GetAttributes<ISaintsAttribute>(property).Select(each => (PropertyAttribute) each);
-            // var attributes = SerializedUtil.GetAttributes<PropertyAttribute>(property);
-            // foreach (PropertyAttribute atb in attributes)
-            // {
-            //     Debug.Log($"atb={atb}");
-            //
-            //     Debug.Log(_propertyAttributeToDrawers.TryGetValue(atb.GetType(), out IReadOnlyList<Type> drawers));
-            //     Debug.Log(drawers != null? string.Join(",", drawers): "nothing");
-            // }
-            // // base.OnGUI(position, property, label);
-            // DefaultDrawer(fieldRect, property, newLabel);
         }
 
         private static void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label)

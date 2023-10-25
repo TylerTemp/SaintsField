@@ -26,7 +26,7 @@ namespace ExtInspector.Editor.Standalone
         private static float FlexibleFloatFieldWidth(float min, float max)
         {
             float n = Mathf.Max(Mathf.Abs(min), Mathf.Abs(max));
-            return 14f + (Mathf.Floor(Mathf.Log10(Mathf.Abs(n)) + 1) * 2.5f);
+            return 14f + Mathf.Floor(Mathf.Log10(Mathf.Abs(n)) + 1) * 2.5f;
         }
 
         private static void SetVectorValue(SerializedProperty property, ref float min, ref float max, bool round)
@@ -94,10 +94,10 @@ namespace ExtInspector.Editor.Standalone
 
             int indent = EditorGUI.indentLevel;
 
-            int id = GUIUtility.GetControlID(ControlHash, FocusType.Keyboard, position);
-            Rect r = EditorGUI.PrefixLabel(position, id, label);
+            // int id = GUIUtility.GetControlID(ControlHash, FocusType.Keyboard, position);
+            // Rect r = EditorGUI.PrefixLabel(position, id, label);
 
-            Rect sliderPos = r;
+            Rect sliderPos = position;
 
             sliderPos.x += fieldWidth + spacing;
             sliderPos.width -= (fieldWidth + spacing) * 2;
@@ -131,7 +131,7 @@ namespace ExtInspector.Editor.Standalone
                 SetVectorValue(property, ref min, ref max, false);
             }
 
-            Rect minPos = r;
+            Rect minPos = position;
             minPos.width = fieldWidth;
 
             SerializedProperty vectorMinProp = property.FindPropertyRelative(KVectorMinName);

@@ -1,3 +1,4 @@
+using System;
 using ExtInspector.Standalone;
 // using NaughtyAttributes;
 using UnityEngine;
@@ -28,5 +29,16 @@ namespace Samples
         [RichLabel(null)]
         [MinMaxSlider(0f, 1f)]
         private Vector2 _mixedNoLabel;
+
+        [Serializable]
+        public struct Nested
+        {
+            [SerializeField]
+            [RichLabel("<color=green>Self Label + Self Field</color>")]
+            [MinMaxSlider(0f, 1f)]
+            private Vector2 _mixed;
+        }
+
+        [SerializeField] private Nested _nested;
     }
 }
