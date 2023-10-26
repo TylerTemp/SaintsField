@@ -7,6 +7,7 @@ namespace ExtInspector.Standalone
     public class MinMaxSliderAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
+        public string GroupBy => "__LABEL_FIELD__";
 
         public readonly float Min;
         public readonly float Max;

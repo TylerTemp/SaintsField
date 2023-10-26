@@ -175,6 +175,7 @@ MonoBehaviour:
     stateName: Idle
     stateSpeed: 3
     animationClip: {fileID: 0}
+  <AnimStateName>k__BackingField: Idle
 --- !u!95 &380193380
 Animator:
   serializedVersion: 5

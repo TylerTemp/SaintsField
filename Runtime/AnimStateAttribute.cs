@@ -7,12 +7,14 @@ namespace ExtInspector
     public class AnimStateAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
+        public string GroupBy { get; }
 
         public readonly string AnimFieldName;
 
-        public AnimStateAttribute(string animator)
+        public AnimStateAttribute(string animator, string groupBy="")
         {
             AnimFieldName = animator;
+            GroupBy = groupBy;
         }
     }
 }

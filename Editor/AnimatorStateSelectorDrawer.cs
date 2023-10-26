@@ -23,7 +23,7 @@ namespace ExtInspector.Editor
             return EditorStyles.popup.CalcHeight(new GUIContent("M"), EditorGUIUtility.currentViewWidth);
         }
 
-        protected override float GetExtraHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg);
             float subRowHeight = EditorGUIUtility.singleLineHeight * (_targetIsString ? 1 : 2);
@@ -195,7 +195,12 @@ namespace ExtInspector.Editor
             // RenderSubRow(popupLeftRect, property);
         }
 
-        protected override (bool isActive, Rect position) DrawBelow(Rect position, SerializedProperty property,
+        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return true;
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute)
         {
             if(_targetIsString)
@@ -205,7 +210,7 @@ namespace ExtInspector.Editor
                 using (new EditorGUI.DisabledGroupScope(true)) {
                     EditorGUI.TextField(valueRect, "┗Value", property.stringValue);
                 }
-                return (true, leftRect);
+                return leftRect;
             }
 
             SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
@@ -221,7 +226,7 @@ namespace ExtInspector.Editor
                     RectUtils.SplitHeightRect(speedLeftRect, EditorGUIUtility.singleLineHeight);
                 EditorGUI.PropertyField(clipRect, curAnimationClipProp, new GUIContent( $"┗{curAnimationClipProp.displayName}"));
 
-                return (true, leftRect);
+                return leftRect;
             }
         }
 

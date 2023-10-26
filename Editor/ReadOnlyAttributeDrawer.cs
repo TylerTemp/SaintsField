@@ -27,20 +27,24 @@ namespace ExtInspector.Editor
             return (true, position);
         }
 
-        protected override (bool isActive, Rect position) DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return _error != "";
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             if (_error == "")
             {
-                return (true, position);
+                return position;
             }
 
             (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error));
             HelpBox.Draw(errorRect, _error, MessageType.Error);
-            return (true, leftRect);
+            return leftRect;
         }
 
-        protected override float GetExtraHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             // Debug.Log("check extra height!");
             if (_error == "")
