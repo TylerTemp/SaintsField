@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector.Standalone
+namespace ExtInspector
 {
     [Serializable]
     public struct AnimState

@@ -170,11 +170,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Animator>k__BackingField: {fileID: 380193380}
   <AnimState>k__BackingField:
-    layerIndex: 0
-    stateNameHash: -1588485629
-    stateName: Example
-    stateSpeed: 8
-    animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
+    layerIndex: 1
+    stateNameHash: 2081823275
+    stateName: Idle
+    stateSpeed: 3
+    animationClip: {fileID: 0}
 --- !u!95 &380193380
 Animator:
   serializedVersion: 5
