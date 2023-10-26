@@ -76,17 +76,19 @@ namespace ExtInspector.Editor.Standalone
             _propertyAttributeToDrawers.Clear();
         }
 
+        private float _fieldBasicHeight = EditorGUIUtility.singleLineHeight;
+
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             // float defaultHeight = base.GetPropertyHeight(property, label);
             (SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)[] usedDrawerInfos = _usedDrawerTypes.Select(each => _cachedDrawer[each]).ToArray();
             (SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)[] fieldInfos = usedDrawerInfos.Where(each => each.iAttribute.AttributeType == SaintsAttributeType.Field || each.iAttribute.AttributeType == SaintsAttributeType.Label).ToArray();
 
-            float fieldHeight = fieldInfos.Length > 0
+            _fieldBasicHeight = fieldInfos.Length > 0
                 ? fieldInfos.Select(each => each.drawer.GetLabelFieldHeight(property, label, each.iAttribute)).Max()
                 : base.GetPropertyHeight(property, label);
 
-            return fieldHeight + usedDrawerInfos.Select(each => each.drawer.GetExtraHeight(property, label, each.iAttribute)).Sum();
+            return _fieldBasicHeight + usedDrawerInfos.Select(each => each.drawer.GetExtraHeight(property, label, each.iAttribute)).Sum();
         }
 
         protected virtual float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -120,6 +122,30 @@ namespace ExtInspector.Editor.Standalone
 
             IReadOnlyList<ISaintsAttribute> allSaintsAttributes = SerializedUtil.GetAttributes<ISaintsAttribute>(property).ToArray();
 
+            Rect fieldRect = new Rect(position)
+            {
+                height = _fieldBasicHeight,
+            };
+            // GUIContent newLabel = propertyScoopLabel;
+            (Rect labelRect, Rect leftPropertyRect) =
+                RectUtils.SplitWidthRect(EditorGUI.IndentedRect(fieldRect), EditorGUIUtility.labelWidth);
+
+            // pre label
+            foreach (ISaintsAttribute eachAttribute in allSaintsAttributes)
+            {
+                // ReSharper disable once InvertIf
+                if (_propertyAttributeToDrawers.TryGetValue(eachAttribute.GetType(),
+                        out IReadOnlyList<Type> eachDrawer))
+                {
+                    (SaintsPropertyDrawer drawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(eachDrawer[0], eachAttribute);
+                    (bool isActive, Rect newLabelRect) = drawerInstance.DrawPreLabel(labelRect, property, propertyScoopLabel, eachAttribute);
+                    if (isActive)
+                    {
+                        labelRect = newLabelRect;
+                        _usedDrawerTypes.Add(eachDrawer[0]);
+                    }
+                }
+            }
             // label
             ISaintsAttribute labelAttribute = allSaintsAttributes.FirstOrDefault(each => each.AttributeType == SaintsAttributeType.Label);
             Type labelDrawer = labelAttribute != null &&
@@ -127,11 +153,6 @@ namespace ExtInspector.Editor.Standalone
                                    out IReadOnlyList<Type> labelDrawers)
                 ? labelDrawers[0]
                 : null;
-
-            Rect fieldRect = position;
-            GUIContent newLabel = propertyScoopLabel;
-            (Rect labelRect, Rect leftPropertyRect) =
-                RectUtils.SplitWidthRect(EditorGUI.IndentedRect(position), EditorGUIUtility.labelWidth);
 
             if (labelDrawer == null)
             {
@@ -141,22 +162,41 @@ namespace ExtInspector.Editor.Standalone
             }
             else
             {
-                if (!_cachedDrawer.TryGetValue(labelDrawer, out (SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute) labelDrawerInfo))
-                {
-                    _cachedDrawer[labelDrawer] = labelDrawerInfo = (
-                        (SaintsPropertyDrawer) Activator.CreateInstance(labelDrawer, false),
-                        labelAttribute
-                    );
-                }
+                (SaintsPropertyDrawer labelDrawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(labelDrawer, labelAttribute);
                 // Debug.Log(labelAttribute);
-                if(labelDrawerInfo.drawer.DrawLabel(labelRect, property, propertyScoopLabel, labelAttribute))
+                if(labelDrawerInstance.DrawLabel(labelRect, property, propertyScoopLabel, labelAttribute))
                 {
                     fieldRect = leftPropertyRect;
                 }
-                newLabel = GUIContent.none;
+                // newLabel = GUIContent.none;
 
                 _usedDrawerTypes.Add(labelDrawer);
             }
+
+            // post field - width check
+            float postFieldWidth = 0;
+            foreach (ISaintsAttribute eachAttribute in allSaintsAttributes)
+            {
+                // ReSharper disable once InvertIf
+                if (_propertyAttributeToDrawers.TryGetValue(eachAttribute.GetType(),
+                        out IReadOnlyList<Type> eachDrawer))
+                {
+                    (SaintsPropertyDrawer drawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(eachDrawer[0], eachAttribute);
+                    postFieldWidth += drawerInstance.GetPostFieldWidth(fieldRect, property, GUIContent.none, eachAttribute);
+                }
+            }
+
+            fieldRect = new Rect(fieldRect)
+            {
+                width = fieldRect.width - postFieldWidth,
+            };
+            Rect postFieldRect = new Rect
+            {
+                x = fieldRect.x + fieldRect.width,
+                y = fieldRect.y,
+                width = postFieldWidth,
+                height = fieldRect.height,
+            };
 
             // field
             ISaintsAttribute fieldAttribute = allSaintsAttributes.FirstOrDefault(each => each.AttributeType == SaintsAttributeType.Field);
@@ -167,24 +207,70 @@ namespace ExtInspector.Editor.Standalone
                 : null;
             if (fieldDrawer == null)
             {
-                DefaultDrawer(fieldRect, property, newLabel);
+                DefaultDrawer(fieldRect, property, GUIContent.none);
             }
             else
             {
                 // Debug.Log(fieldAttribute);
-                if (!_cachedDrawer.TryGetValue(fieldDrawer, out (SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute) fieldDrawerInfo))
-                {
-                    _cachedDrawer[fieldDrawer] = fieldDrawerInfo = (
-                        (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false),
-                        fieldAttribute
-                    );
-                }
+                (SaintsPropertyDrawer fieldDrawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(fieldDrawer, fieldAttribute);
                 // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
-                fieldDrawerInfo.drawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
+                fieldDrawerInstance.DrawField(fieldRect, property, GUIContent.none, fieldAttribute);
                 // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
                 _usedDrawerTypes.Add(fieldDrawer);
             }
+
+            // post field
+            foreach (ISaintsAttribute eachAttribute in allSaintsAttributes)
+            {
+                // ReSharper disable once InvertIf
+                if (_propertyAttributeToDrawers.TryGetValue(eachAttribute.GetType(),
+                        out IReadOnlyList<Type> eachDrawer))
+                {
+                    (SaintsPropertyDrawer drawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(eachDrawer[0], eachAttribute);
+                    (bool isActive, Rect newPostFieldRect) = drawerInstance.DrawPostField(postFieldRect, property, propertyScoopLabel, eachAttribute);
+                    if (isActive)
+                    {
+                        postFieldRect = newPostFieldRect;
+                        _usedDrawerTypes.Add(eachDrawer[0]);
+                    }
+                }
+            }
+
+            // below
+            Rect belowRect = new Rect(position)
+            {
+                y = fieldRect.y + _fieldBasicHeight,
+                height = position.y - fieldRect.y - fieldRect.height,
+            };
+            foreach (ISaintsAttribute eachAttribute in allSaintsAttributes)
+            {
+                // ReSharper disable once InvertIf
+                if (_propertyAttributeToDrawers.TryGetValue(eachAttribute.GetType(),
+                        out IReadOnlyList<Type> eachDrawer))
+                {
+                    (SaintsPropertyDrawer drawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(eachDrawer[0], eachAttribute);
+                    (bool isActive, Rect newBelowRect) = drawerInstance.DrawBelow(belowRect, property, propertyScoopLabel, eachAttribute);
+                    if (isActive)
+                    {
+                        belowRect = newBelowRect;
+                        _usedDrawerTypes.Add(eachDrawer[0]);
+                    }
+                }
+            }
+        }
+
+        private (SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute) GetOrCreateDrawerInfo(Type drawerType, ISaintsAttribute drawerAttribute)
+        {
+            if (!_cachedDrawer.TryGetValue(drawerType, out (SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute) drawerInfo))
+            {
+                _cachedDrawer[drawerType] = drawerInfo = (
+                    (SaintsPropertyDrawer) Activator.CreateInstance(drawerType, false),
+                    drawerAttribute
+                );
+            }
+
+            return drawerInfo;
         }
 
         private static void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label)
@@ -217,6 +303,26 @@ namespace ExtInspector.Editor.Standalone
         }
 
         // public abstract void OnSaintsGUI(Rect position, SerializedProperty property, GUIContent label);
+        // protected virtual (bool isActive, Rect position) DrawAbove(Rect position, SerializedProperty property,
+        //     GUIContent label, ISaintsAttribute saintsAttribute)
+        // {
+        //     return (false, position);
+        // }
+
+        protected virtual (bool isActive, Rect position) DrawPreLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return (false, position);
+        }
+
+        protected virtual float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return 0;
+        }
+
+        protected virtual (bool isActive, Rect position) DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return (false, position);
+        }
 
         protected virtual bool DrawLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
@@ -225,6 +331,12 @@ namespace ExtInspector.Editor.Standalone
 
         protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
+        }
+
+        protected virtual (bool isActive, Rect position) DrawBelow(Rect position, SerializedProperty property,
+            GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return (false, position);
         }
     }
 }

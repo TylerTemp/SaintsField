@@ -2,11 +2,17 @@
 {
     public enum SaintsAttributeType
     {
-        Above,
-        Pre,
+        Other,
+        // Above,
+
+        // PreLabel,
         Label,
+        // PostLabel,
+
+        // PreField,
         Field,
-        Post,
-        Below,
+        // PostField,
+
+        // Below,
     }
 }
