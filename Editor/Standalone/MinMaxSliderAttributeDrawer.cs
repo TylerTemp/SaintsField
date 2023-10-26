@@ -56,6 +56,11 @@ namespace ExtInspector.Editor.Standalone
             }
         }
 
+        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return base.GetPropertyHeight(property, label);
+        }
+
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             // base.OnGUI(position, property, label);

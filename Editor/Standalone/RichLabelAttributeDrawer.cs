@@ -16,6 +16,14 @@ namespace ExtInspector.Editor.Standalone
             _richTextDrawer.Dispose();
         }
 
+        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
+            return targetAttribute.RichTextXml is null
+                ? 0
+                : base.GetPropertyHeight(property, label);
+        }
+
         protected override bool DrawLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             // label = EditorGUI.BeginProperty(position, label, property);
