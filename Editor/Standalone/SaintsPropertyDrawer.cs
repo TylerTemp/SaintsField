@@ -14,7 +14,7 @@ namespace ExtInspector.Editor.Standalone
     // below-
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
-        private readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _propertyAttributeToDrawers =
+        private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _propertyAttributeToDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
 
         // private IReadOnlyList<ISaintsAttribute> _allSaintsAttributes;
@@ -43,43 +43,47 @@ namespace ExtInspector.Editor.Standalone
 
             _usedAttributes.Clear();
 
-            _propertyAttributeToDrawers.Clear();
+            // _propertyAttributeToDrawers.Clear();
 
-            Dictionary<Type, HashSet<Type>> attrToDrawers = new Dictionary<Type, HashSet<Type>>();
-
-            foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
+            // ReSharper disable once InvertIf
+            if(_propertyAttributeToDrawers.Count == 0)
             {
-                List<Type> saintsSubDrawers = asb.GetTypes()
-                    // .Where(type => type.IsSubclassOf(typeof(SaintsPropertyDrawer)))
-                    .Where(type => type.IsSubclassOf(typeof(PropertyDrawer)))
-                    .ToList();
-                foreach (Type saintsSubDrawer in saintsSubDrawers)
-                {
-                    foreach (Type attr in saintsSubDrawer.GetCustomAttributes(typeof(CustomPropertyDrawer), true)
-                                 .Select(each => (CustomPropertyDrawer) each)
-                                 .Select(instance => typeof(CustomPropertyDrawer)
-                                     .GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance)
-                                     ?.GetValue(instance))
-                                 .Where(each => each != null))
-                    {
-                        if (!attrToDrawers.TryGetValue(attr, out HashSet<Type> attrList))
-                        {
-                            attrToDrawers[attr] = attrList = new HashSet<Type>();
-                        }
+                Dictionary<Type, HashSet<Type>> attrToDrawers = new Dictionary<Type, HashSet<Type>>();
 
-                        attrList.Add(saintsSubDrawer);
+                foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    List<Type> saintsSubDrawers = asb.GetTypes()
+                        // .Where(type => type.IsSubclassOf(typeof(SaintsPropertyDrawer)))
+                        .Where(type => type.IsSubclassOf(typeof(PropertyDrawer)))
+                        .ToList();
+                    foreach (Type saintsSubDrawer in saintsSubDrawers)
+                    {
+                        foreach (Type attr in saintsSubDrawer.GetCustomAttributes(typeof(CustomPropertyDrawer), true)
+                                     .Select(each => (CustomPropertyDrawer)each)
+                                     .Select(instance => typeof(CustomPropertyDrawer)
+                                         .GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance)
+                                         ?.GetValue(instance))
+                                     .Where(each => each != null))
+                        {
+                            if (!attrToDrawers.TryGetValue(attr, out HashSet<Type> attrList))
+                            {
+                                attrToDrawers[attr] = attrList = new HashSet<Type>();
+                            }
+
+                            attrList.Add(saintsSubDrawer);
+                        }
                     }
                 }
-            }
 
-            foreach (KeyValuePair<Type, HashSet<Type>> kv in attrToDrawers)
-            {
-                _propertyAttributeToDrawers[kv.Key] = kv.Value
-                    .Select(each => (each.IsSubclassOf(typeof(SaintsPropertyDrawer)), each))
-                    .ToArray();
+                foreach (KeyValuePair<Type, HashSet<Type>> kv in attrToDrawers)
+                {
+                    _propertyAttributeToDrawers[kv.Key] = kv.Value
+                        .Select(each => (each.IsSubclassOf(typeof(SaintsPropertyDrawer)), each))
+                        .ToArray();
 #if EXT_INSPECTOR_LOG
                 Debug.Log($"attr {kv.Key} has drawer(s) {string.Join(",", kv.Value)}");
 #endif
+                }
             }
         }
 
@@ -136,6 +140,7 @@ namespace ExtInspector.Editor.Standalone
                     aboveHeight += aboveHeights.Max();
                     belowHeight += belowHeights.Max();
                 }
+                Debug.Log($"belowHeight={belowHeight}");
             }
 
             // Debug.Log($"aboveHeight={aboveHeight}");
@@ -163,7 +168,7 @@ namespace ExtInspector.Editor.Standalone
             return 0;
         }
 
-        private float _aboveUsedHeight;
+        // private float _aboveUsedHeight;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -213,6 +218,7 @@ namespace ExtInspector.Editor.Standalone
             }
 
             float aboveUsedHeight = 0;
+            float aboveInitY = aboveRect.y;
 
             foreach ((string groupBy, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo) in groupedAboveDrawers)
             {
@@ -221,7 +227,7 @@ namespace ExtInspector.Editor.Standalone
                     foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
                     {
                         Rect newAboveRect = drawerInstance.DrawAbove(aboveRect, property, propertyScoopLabel, eachAttribute);
-                        aboveUsedHeight = newAboveRect.y - aboveRect.height;
+                        aboveUsedHeight = newAboveRect.y - aboveInitY;
                         aboveRect = newAboveRect;
                     }
                 }
@@ -257,7 +263,7 @@ namespace ExtInspector.Editor.Standalone
 
             // if(Event.current.type == EventType.Repaint)
             // {
-            _aboveUsedHeight = aboveUsedHeight;
+            // _aboveUsedHeight = aboveUsedHeight;
             // }
 
             // Debug.Log($"{Event.current} {aboveUsedHeight} / {_aboveUsedHeight}");
@@ -267,7 +273,7 @@ namespace ExtInspector.Editor.Standalone
             Rect fieldRect = new Rect(position)
             {
                 // y = aboveRect.y + (groupedAboveDrawers.Count == 0? 0: aboveRect.height),
-                y = position.y + _aboveUsedHeight,
+                y = position.y + aboveUsedHeight,
                 height = _fieldBasicHeight,
             };
             // GUIContent newLabel = propertyScoopLabel;
@@ -380,9 +386,11 @@ namespace ExtInspector.Editor.Standalone
 
             Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawers =
                 new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
+            Debug.Log($"allSaintsAttributes={allSaintsAttributes.Count}");
             foreach (ISaintsAttribute eachAttribute in allSaintsAttributes)
             {
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttribute);
+                Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
                 // ReSharper disable once InvertIf
                 if (drawerInstance.WillDrawBelow(belowRect, property, propertyScoopLabel, eachAttribute))
                 {
@@ -399,6 +407,7 @@ namespace ExtInspector.Editor.Standalone
 
             foreach ((string groupBy, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo) in groupedDrawers)
             {
+                // Debug.Log($"draw below: {groupBy}");
                 if (groupBy == "")
                 {
                     foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
@@ -419,11 +428,16 @@ namespace ExtInspector.Editor.Standalone
                             x = belowRect.x + eachWidth * index,
                             width = eachWidth,
                         };
-                        Rect nowRect = drawerInstance.DrawBelow(eachRect, property, propertyScoopLabel, eachAttribute);
-                        height = Mathf.Max(height, nowRect.height);
+                        Rect leftRect = drawerInstance.DrawBelow(eachRect, property, propertyScoopLabel, eachAttribute);
+                        height = Mathf.Max(height, leftRect.y - eachRect.y);
                     }
 
-                    belowRect.height = height;
+                    // belowRect.height = height;
+                    belowRect = new Rect(belowRect)
+                    {
+                        y = belowRect.y + height,
+                        height = belowRect.height - height,
+                    };
                 }
             }
             #endregion

@@ -55,8 +55,6 @@ namespace ExtInspector.Editor.Standalone
             }
         }
 
-        private SaintsAttributeType _attributeType = SaintsAttributeType.Field;
-
         protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute)
         {
