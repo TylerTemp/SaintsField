@@ -55,7 +55,10 @@ namespace ExtInspector.Editor.Standalone
             }
         }
 
-        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        private SaintsAttributeType _attributeType = SaintsAttributeType.Field;
+
+        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             return base.GetPropertyHeight(property, label);
         }
@@ -91,7 +94,6 @@ namespace ExtInspector.Editor.Standalone
             // MinMaxSliderAttribute attr = (MinMaxSliderAttribute)attribute;
             // MinMaxSliderAttribute attr = SerializedUtil.GetAttribute<MinMaxSliderAttribute>(property);;
             MinMaxSliderAttribute attr = (MinMaxSliderAttribute)saintsAttribute;
-
             float ppp = EditorGUIUtility.pixelsPerPoint;
             float spacing = KSpacing * ppp;
             float fieldWidth = ppp * FlexibleFloatFieldWidth(attr.Min, attr.Max);

@@ -18,12 +18,14 @@ namespace ExtInspector.Editor
         private string _errorMsg = "";
         private bool _targetIsString = true;
 
-        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             return EditorStyles.popup.CalcHeight(new GUIContent("M"), EditorGUIUtility.currentViewWidth);
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg);
             float subRowHeight = EditorGUIUtility.singleLineHeight * (_targetIsString ? 1 : 2);

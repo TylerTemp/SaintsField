@@ -44,7 +44,8 @@ namespace ExtInspector.Editor
             return leftRect;
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             // Debug.Log("check extra height!");
             if (_error == "")

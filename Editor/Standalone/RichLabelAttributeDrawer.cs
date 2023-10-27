@@ -15,7 +15,8 @@ namespace ExtInspector.Editor.Standalone
             _richTextDrawer.Dispose();
         }
 
-        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
             return targetAttribute.RichTextXml is null
