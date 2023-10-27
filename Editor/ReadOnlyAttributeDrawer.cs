@@ -39,12 +39,13 @@ namespace ExtInspector.Editor
                 return position;
             }
 
-            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error));
+            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error, position.width));
             HelpBox.Draw(errorRect, _error, MessageType.Error);
             return leftRect;
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute)
         {
             // Debug.Log("check extra height!");
@@ -54,7 +55,7 @@ namespace ExtInspector.Editor
             }
 
             // Debug.Log(HelpBox.GetHeight(_error));
-            return HelpBox.GetHeight(_error);
+            return HelpBox.GetHeight(_error, width);
         }
 
         private bool IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute)

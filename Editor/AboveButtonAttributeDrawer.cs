@@ -15,6 +15,17 @@ namespace ExtInspector.Editor
         private string _error = "";
         private string _execError = "";
 
+        private string DisplayError {
+            get
+            {
+                if (_error != "" && _execError != "")
+                {
+                    return $"{_error}\n\n{_execError}";
+                }
+                return $"{_error}{_execError}";
+            }
+        }
+
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
         // private IReadOnlyList<RichText.RichTextPayload> _cachedResult = null;
 
@@ -24,9 +35,12 @@ namespace ExtInspector.Editor
         }
 
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute)
         {
-            return EditorGUIUtility.singleLineHeight + (_error == ""? 0: HelpBox.GetHeight(_error));
+            float result = EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width));
+            // Debug.Log($"AboveButtonAttributeDrawer.GetAboveExtraHeight={result}/{DisplayError}");
+            return result;
         }
 
         protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -39,20 +53,15 @@ namespace ExtInspector.Editor
             AboveButtonAttribute aboveButtonAttribute = (AboveButtonAttribute) saintsAttribute;
 
             (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
-            Rect errorRect = new Rect(buttonRect)
+            Rect errorRect = new Rect(leftRect)
             {
-                y = buttonRect.y + buttonRect.height,
                 height = 0,
             };
-            if (_error == "")
+            if (DisplayError != "")
             {
-                (Rect errorRectCut, Rect leftRectCut) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error));
+                (Rect errorRectCut, Rect leftRectCut) = RectUtils.SplitHeightRect(leftRect, HelpBox.GetHeight(DisplayError, position.width));
                 errorRect = errorRectCut;
                 leftRect = leftRectCut;
-            }
-            else
-            {
-                buttonRect = position;
             }
 
             string buttonLabelXml = aboveButtonAttribute.ButtonLabel;
@@ -62,62 +71,77 @@ namespace ExtInspector.Editor
                                           BindingFlags.Public | BindingFlags.DeclaredOnly;
             if (aboveButtonAttribute.ButtonLabelIsCallback)
             {
-                MethodInfo methodInfo = objType.GetMethod(aboveButtonAttribute.FuncName, bindAttr);
+                MethodInfo methodInfo = objType.GetMethod(aboveButtonAttribute.ButtonLabel, bindAttr);
                 if (methodInfo == null)
                 {
-                    methodInfo = objType.GetMethod($"<{aboveButtonAttribute.FuncName}>k__BackingField", bindAttr);
+                    methodInfo = objType.GetMethod($"<{aboveButtonAttribute.ButtonLabel}>k__BackingField", bindAttr);
                 }
 
                 if (methodInfo == null)
                 {
-                    _error = $"No field or method named `{aboveButtonAttribute.FuncName}` found on `{target}`";
-                    buttonLabelXml = label.text;
+                    _error = $"No field or method named `{aboveButtonAttribute.ButtonLabel}` found on `{target}`";
+                    buttonLabelXml = aboveButtonAttribute.ButtonLabel;
                 }
                 else
                 {
                     _error = "";
                     ParameterInfo[] methodParams = methodInfo.GetParameters();
                     Debug.Assert(methodParams.All(p => p.IsOptional));
-                    Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    buttonLabelXml = (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                    // Debug.Assert(methodInfo.ReturnType == typeof(string));
+                    if (methodInfo.ReturnType != typeof(string))
+                    {
+                        _error = $"Return type of callback method `{aboveButtonAttribute.ButtonLabel}` should be string";
+                        buttonLabelXml = aboveButtonAttribute.ButtonLabel;
+                    }
+                    else
+                    {
+                        buttonLabelXml =
+                            (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                    }
                 }
             }
 
             if (GUI.Button(buttonRect, string.Empty))
             {
                 _execError = "";
-                MethodInfo methodInfo = objType.GetMethod(aboveButtonAttribute.FuncName, bindAttr);
-                if (methodInfo == null)
+                MethodInfo callMethodInfo = objType.GetMethod(aboveButtonAttribute.FuncName, bindAttr);
+                if (callMethodInfo == null)
                 {
-                    methodInfo = objType.GetMethod($"<{aboveButtonAttribute.FuncName}>k__BackingField", bindAttr);
+                    callMethodInfo = objType.GetMethod($"<{aboveButtonAttribute.FuncName}>k__BackingField", bindAttr);
                 }
 
-                if (methodInfo == null)
+                if (callMethodInfo == null)
                 {
                     _execError = $"No field or method named `{aboveButtonAttribute.FuncName}` found on `{target}`";
                     buttonLabelXml = label.text;
                 }
                 else
                 {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    ParameterInfo[] methodParams = callMethodInfo.GetParameters();
                     Debug.Assert(methodParams.All(p => p.IsOptional));
                     // Debug.Assert(methodInfo.ReturnType == typeof(bool));
                     try
                     {
-                        methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                        callMethodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        _execError = e.InnerException!.Message;
+                        Debug.LogException(e);
                     }
                     catch (Exception e)
                     {
-                        _execError = e.ToString();
+                        _execError = e.Message;
+                        Debug.LogException(e);
                     }
                 }
             }
 
             _richTextDrawer.DrawChunks(buttonRect, label, RichTextDrawer.ParseRichXml(buttonLabelXml, label.text));
 
-            if (_error != "" || _execError != "")
+            if (DisplayError != "")
             {
-                HelpBox.Draw(errorRect, _error == ""? _execError: _error, MessageType.Error);
+                HelpBox.Draw(errorRect, DisplayError, MessageType.Error);
             }
 
             // if (aboveButtonAttribute.ButtonLabelIsCallback)

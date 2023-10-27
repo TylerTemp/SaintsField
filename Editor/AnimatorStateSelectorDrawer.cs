@@ -25,9 +25,10 @@ namespace ExtInspector.Editor
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute)
         {
-            float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg);
+            float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg, width);
             float subRowHeight = EditorGUIUtility.singleLineHeight * (_targetIsString ? 1 : 2);
             return errorHeight + subRowHeight;
         }

@@ -6,9 +6,11 @@ namespace Samples
 {
     public class ButtonsExample : MonoBehaviour
     {
+        [SerializeField] private bool _errorOut;
+
         [SerializeField]
         [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye-regular.png' /></color>!", false, "OK")]
-        [AboveButton(nameof(ClickButton2), "Error <color=green>me</color>!", false, "OK")]
+        [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
         [Range(0, 10)]
         private int _someInt;
 
@@ -17,10 +19,20 @@ namespace Samples
             Debug.Log("CLICKED!");
         }
 
+        private string GetButtonLabel()
+        {
+            return _errorOut
+                ? "Error <color=red>me</color>!"
+                : "No <color=green>Error</color>!";
+        }
+
         private void ClickButton2()
         {
             Debug.Log("CLICKED 2!");
-            throw new Exception("Expected exception!");
+            if(_errorOut)
+            {
+                throw new Exception("Expected exception!");
+            }
         }
     }
 }
