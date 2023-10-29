@@ -107,3 +107,6 @@ __MACOSX
 /README.md.meta
 /package.json.meta
 /Packages/packages-lock.json
+Assets/Resources/BillingMode.json
+Assets/Resources/BillingMode.json.meta
+

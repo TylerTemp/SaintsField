@@ -4,7 +4,7 @@
 -define:EXT_INSPECTOR_DISABLE
 
 #"use dotween?"
--define:EXT_INSPECTOR_DOTWEEN
+#-define:EXT_INSPECTOR_DOTWEEN
 
 #"use ext inspector with NaughtyAttributes functions"
 #-define:EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
