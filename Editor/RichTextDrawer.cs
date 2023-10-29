@@ -287,7 +287,6 @@ namespace ExtInspector.Editor
                 }
             }
 
-
             string leftContent = richText.ToString();
 
             // ReSharper disable once InvertIf

@@ -1,4 +1,7 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using System.Linq;
+using ExtInspector.Standalone;
+using UnityEditor;
 using UnityEngine;
 
 namespace ExtInspector.Editor.Utils
@@ -95,5 +98,21 @@ namespace ExtInspector.Editor.Utils
         {
             EditorGUILayout.EndVertical();
         }
+        
+        // public class SaintsAttributeRefEqualCompare: IEqualityComparer<ISaintsAttribute>
+        // {
+        //     public bool Equals(ISaintsAttribute x, ISaintsAttribute y)
+        //     {
+        //         return ReferenceEquals(x, y);
+        //     }
+        //
+        //     public int GetHashCode(ISaintsAttribute obj)
+        //     {
+        //         return obj.GetHashCode();
+        //     }
+        // }
+
+        public static IEnumerable<(T value, int index)> WithIndex<T>(this IEnumerable<T> seq, int start = 0) =>
+            seq.Select((value, index) => (value, index + start));
     }
 }
