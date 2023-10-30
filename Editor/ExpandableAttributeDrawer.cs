@@ -14,8 +14,6 @@ namespace ExtInspector.Editor
 
         private bool _expanded;
 
-        private float _width = -1;
-
         protected override (bool isActive, Rect position) DrawPreLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             _expanded = EditorGUI.Foldout(position, _expanded, GUIContent.none, true);
