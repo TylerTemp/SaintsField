@@ -12,7 +12,7 @@ namespace ExtInspectorUnity.Samples
 {
     public class MonoExample : MonoBehaviour
     {
-        [SerializeField, ExtInspector.Standalone.Scene] private string _scene;
+        [SerializeField, Scene] private string _scene;
         [GameObjectActive] public GameObject go;
 #if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
         [field: Label("TestNALabelOverride"), SerializeField] public string Sth { get; private set; }

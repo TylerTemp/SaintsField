@@ -515,7 +515,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scene: Example
   go: {fileID: 1383904217}
-  <SepTitleTest>k__BackingField: 0
+  <SepTitleTest>k__BackingField: 71
+  <SepTitleJustLine>k__BackingField: 0
 --- !u!4 &1383904219
 Transform:
   m_ObjectHideFlags: 0
