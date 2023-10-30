@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ExtInspector.Editor.Utils
 {
@@ -175,6 +177,20 @@ namespace ExtInspector.Editor.Utils
             // //type is now the type of the property
             // return type;
         }
+
+        // public static object GetValue(SerializedProperty property)
+        // {
+        //     Object targetObject = property.serializedObject.targetObject;
+        //     Type targetObjectClassType = targetObject.GetType();
+        //     FieldInfo field = targetObjectClassType.GetField(property.propertyPath);
+        //     // if (field != null)
+        //     // {
+        //     //     var value = field.GetValue(targetObject);
+        //     //     // Debug.Log(value.s);
+        //     // }
+        //     Debug.Assert(field != null, $"{property.propertyPath}/{targetObject}");
+        //     return field!.GetValue(targetObject);
+        // }
 
     }
 }

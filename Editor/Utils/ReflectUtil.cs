@@ -130,6 +130,7 @@ namespace ExtInspector.Editor.Utils
         public enum GetPropType
         {
             NotFound,
+            Property,
             Field,
             Method,
         }
@@ -144,39 +145,20 @@ namespace ExtInspector.Editor.Utils
             {
                 fieldInfo = targetType.GetField($"<{fieldName}>k__BackingField", bindAttr);
             }
-
             if (fieldInfo != null)
             {
                 return (GetPropType.Field, fieldInfo);
-                // object value = findFieldInfo.GetValue(target);
-                // buttonLabelXml = value == null ? string.Empty : value.ToString();
+            }
+
+            PropertyInfo propertyInfo = targetType.GetProperty(fieldName, bindAttr);
+            if (propertyInfo != null)
+            {
+                return (GetPropType.Property, propertyInfo);
             }
 
             MethodInfo methodInfo = targetType.GetMethod(fieldName, bindAttr);
-
-            // if (methodInfo == null)
-            // {
-            //     methodInfo = targetType.GetMethod($"<{aboveButtonAttribute.ButtonLabel}>k__BackingField",
-            //         bindAttr);
-            // }
             return methodInfo == null ? (GetPropType.NotFound, null) : (GetPropType.Method, methodInfo);
 
-            //
-            // _error = "";
-            // ParameterInfo[] methodParams = methodInfo.GetParameters();
-            // Debug.Assert(methodParams.All(p => p.IsOptional));
-            // // Debug.Assert(methodInfo.ReturnType == typeof(string));
-            // if (methodInfo.ReturnType != typeof(string))
-            // {
-            //     _error =
-            //         $"Return type of callback method `{aboveButtonAttribute.ButtonLabel}` should be string";
-            //     buttonLabelXml = aboveButtonAttribute.ButtonLabel;
-            // }
-            // else
-            // {
-            //     buttonLabelXml =
-            //         (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-            // }
         }
 
     }

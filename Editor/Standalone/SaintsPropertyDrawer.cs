@@ -512,7 +512,7 @@ namespace ExtInspector.Editor.Standalone
         //     return drawer;
         // }
 
-        private void DefaultDrawer(Rect position, SerializedProperty property)
+        protected void DefaultDrawer(Rect position, SerializedProperty property)
         {
             // // this works nice
             // MethodInfo defaultDraw = typeof(EditorGUI).GetMethod("DefaultPropertyField", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
