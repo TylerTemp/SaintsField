@@ -356,7 +356,7 @@ GameObject:
   - component: {fileID: 847311491}
   - component: {fileID: 847311492}
   m_Layer: 0
-  m_Name: FieldSuffixButton
+  m_Name: PostFieldButtonExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -514,7 +514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scene: Example
-  _go: {fileID: 1383904217}
+  go: {fileID: 1383904217}
   <SepTitleTest>k__BackingField: 0
 --- !u!4 &1383904219
 Transform:

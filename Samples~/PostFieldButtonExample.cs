@@ -4,20 +4,20 @@ using ExtInspector.Utils;
 
 namespace ExtInspector.Samples
 {
-    public class SuffixButtonExample: MonoBehaviour
+    public class PostFieldButtonExample: MonoBehaviour
     {
 #if UNITY_EDITOR
-        [SuffixButton(nameof(EditorExampleCallback), " OK", Icon.Eye)]
+        [PostFieldButton(nameof(EditorExampleCallback), "<color=yellow><icon='eye.png' /></color> OK")]
 #endif
         public string example;
 
 #if UNITY_EDITOR
-        [SuffixButton(nameof(EditorExampleCallback), null, Icon.Eye)]
+        [PostFieldButton(nameof(EditorExampleCallback), "<color=green><icon='eye.png' /></color>")]
 #endif
         public string example2;
 
 #if UNITY_EDITOR
-        [SuffixButton(nameof(EditorExampleCallback), "Click Me!")]
+        [PostFieldButton(nameof(EditorExampleCallback), "Click Me!")]
 #endif
         public string example3;
 
