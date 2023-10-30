@@ -296,7 +296,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _errorOut: 0
   _labelByField: Some label <color=green>here</color>~ center me
-  _someInt: 0
+  _someInt: 9
 --- !u!1 &847311490
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,6 +344,52 @@ MonoBehaviour:
   example: 
   example2: 
   example3: 
+--- !u!1 &896673125
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 896673126}
+  - component: {fileID: 896673127}
+  m_Layer: 0
+  m_Name: GameObjectActive
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &896673126
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896673125}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.119898, y: 3.1530612, z: 0.022500085}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &896673127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896673125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c54e29f6da526c4fa13db8f4abaec9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _go: {fileID: 896673125}
+  _component: {fileID: 896673127}
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
@@ -547,3 +593,4 @@ SceneRoots:
   - {fileID: 1383904219}
   - {fileID: 1730412121}
   - {fileID: 1571298209}
+  - {fileID: 896673126}
