@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using ExtInspector.Editor.Standalone;
 using ExtInspector.Editor.Utils;
-using ExtInspector.Standalone;
 using UnityEditor;
 using UnityEngine;
 

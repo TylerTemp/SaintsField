@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ExtInspector.Editor.Utils;
-using ExtInspector.Standalone;
 using UnityEditor;
 using UnityEngine;
 

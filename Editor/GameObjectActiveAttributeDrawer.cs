@@ -1,5 +1,4 @@
-﻿using System;
-using ExtInspector.Editor.Utils;
+﻿using ExtInspector.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 

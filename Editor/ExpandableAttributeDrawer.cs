@@ -1,4 +1,6 @@
-﻿using ExtInspector.Editor.Standalone;
+﻿using System.Collections.Generic;
+using System.Linq;
+using ExtInspector.Editor.Standalone;
 using ExtInspector.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -6,56 +8,18 @@ using UnityEngine;
 namespace ExtInspector.Editor
 {
     [CustomPropertyDrawer(typeof(ExpandableAttribute))]
-    public class ExpandableAttributeDrawer: DecToggleAttributeDrawer
+    public class ExpandableAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";
 
-        private const string ExpandedXml = "<icon=caret-down-solid.png />";
-        private const string UnExpandedXml = "<icon=caret-right-solid.png />";
-
-        private bool _expanded = true;
+        private bool _expanded;
 
         private float _width = -1;
 
-        private UnityEditor.Editor _editor;
-
-        // private float GetWidth(Rect position)
-        // {
-        //     if (_width >= 0)
-        //     {
-        //         return _width;
-        //     }
-        //     float xmlWidth = RichTextDrawer.GetWidth(new GUIContent(), position.height, RichTextDrawer.ParseRichXml(UnExpandedXml, ""));
-        //     if (xmlWidth > 0)
-        //     {
-        //         return _width = xmlWidth;
-        //     }
-        //
-        //     return position.height;
-        // }
-
-        ~ExpandableAttributeDrawer()
-        {
-            if (_editor)
-            {
-                Object.DestroyImmediate(_editor);
-            }
-        }
-
         protected override (bool isActive, Rect position) DrawPreLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            // Debug.Log("DrawPreLabel!!!!!");
-            // float width = GetWidth(position);
-
-            GUIStyle style = new GUIStyle(EditorStyles.foldout);
-            float foldoutWidth = style.CalcSize(GUIContent.none).x;
-
-            (Rect foldoutRect, Rect leftRect) = RectUtils.SplitWidthRect(position, foldoutWidth);
-            _expanded = EditorGUI.Foldout(foldoutRect, _expanded, GUIContent.none, true, style);
-
-            // Draw(useRect, property, label, _expanded? ExpandedXml: UnExpandedXml, _expanded, (newIsActive) => _expanded = newIsActive);
-
-            return (true, leftRect);
+            _expanded = EditorGUI.Foldout(position, _expanded, GUIContent.none, true);
+            return (true, position);
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -65,20 +29,53 @@ namespace ExtInspector.Editor
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            return _expanded ? 100 : 0;
+            float basicHeight = _error == "" ? 0 : HelpBox.GetHeight(_error, width);
+            if (!_expanded)
+            {
+                return basicHeight;
+            }
+            
+            ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
+            SerializedObject serializedObject = new SerializedObject(scriptableObject);
+            float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
+                GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName))).Sum();
+
+            return basicHeight + expandedHeight;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            Debug.Log($"DRAW BELOW {position}");
+            ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
+            if (property.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                _error = $"Expected ScriptableObject type, get {property.propertyType}";
+            }
+            else if (!(property.objectReferenceValue is ScriptableObject))
+            {
+                _error = $"Expected ScriptableObject type, get {property.objectReferenceValue.GetType()}";
+            }
+            else
+            {
+                _error = "";
+            }
 
-           ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
-            // if (!_expanded || scriptableObject == null)
-            // {
-            //     return position;
-            // }
+            Rect leftRect = position;
+            
+            if (_error != "")
+            {
+                leftRect = HelpBox.Draw(position, _error, MessageType.Error);
+            }
+            
+            if (!_expanded || scriptableObject == null)
+            {
+                return leftRect;
+            }
 
-            GUI.Box(position, GUIContent.none);
+            Rect indentedRect;
+            using (new EditorGUI.IndentLevelScope(1))
+            {
+                indentedRect = EditorGUI.IndentedRect(leftRect);
+            }
 
             // _editor ??= UnityEditor.Editor.CreateEditor(scriptableObject);
             // _editor.OnInspectorGUI();
@@ -86,43 +83,56 @@ namespace ExtInspector.Editor
             SerializedObject serializedObject = new SerializedObject(scriptableObject);
             serializedObject.Update();
 
-            using (var iterator = serializedObject.GetIterator())
+            float usedHeight = 0f;
+            foreach (SerializedProperty childProperty in GetAllField(serializedObject))
             {
-                float yOffset = EditorGUIUtility.singleLineHeight;
-                Debug.Log(yOffset);
-
-                if (iterator.NextVisible(true))
+                float childHeight = GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName));
+                Rect childRect = new Rect()
                 {
-                    do
-                    {
-                        SerializedProperty childProperty = serializedObject.FindProperty(iterator.name);
-                        if (childProperty.name.Equals("m_Script", System.StringComparison.Ordinal))
-                        {
-                            continue;
-                        }
+                    x = indentedRect.x,
+                    y = indentedRect.y + usedHeight,
+                    width = indentedRect.width,
+                    height = childHeight,
+                };
 
-                        float childHeight = GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName));
-                        Rect childRect = new Rect()
-                        {
-                            x = position.x,
-                            y = position.y + yOffset,
-                            width = position.width,
-                            height = childHeight,
-                        };
+                // NaughtyEditorGUI.PropertyField(childRect, childProperty, true);
+                EditorGUI.PropertyField(childRect, childProperty, true);
 
-                        // NaughtyEditorGUI.PropertyField(childRect, childProperty, true);
-                        EditorGUI.PropertyField(childRect, childProperty, true);
-
-                        yOffset += childHeight;
-                    }
-                    while (iterator.NextVisible(false));
-                }
+                usedHeight += childHeight;                
             }
 
             serializedObject.ApplyModifiedProperties();
+            
+            GUI.Box(new Rect(leftRect)
+            {
+                height = usedHeight,
+            }, GUIContent.none);
 
-            return position;
+            return new Rect(leftRect)
+            {
+                y = leftRect.y + usedHeight,
+                height = leftRect.height - usedHeight,
+            };
         }
 
+        private static IEnumerable<SerializedProperty> GetAllField(SerializedObject serializedScriptableObject)
+        {
+            using SerializedProperty iterator = serializedScriptableObject.GetIterator();
+            if (!iterator.NextVisible(true))
+            {
+                yield break;
+            }
+
+            do
+            {
+                SerializedProperty childProperty = serializedScriptableObject.FindProperty(iterator.name);
+                if (childProperty.name.Equals("m_Script", System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                yield return childProperty;
+            } while (iterator.NextVisible(false));
+        }
     }
 }
