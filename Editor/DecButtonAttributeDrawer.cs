@@ -15,7 +15,7 @@ namespace ExtInspector.Editor
         private string _error = "";
         private string _execError = "";
 
-        private string DisplayError {
+        protected string DisplayError {
             get
             {
                 if (_error != "" && _execError != "")
@@ -26,22 +26,25 @@ namespace ExtInspector.Editor
             }
         }
 
-        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
+        protected readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
         // private IReadOnlyList<RichText.RichTextPayload> _cachedResult = null;
 
         ~DecButtonAttributeDrawer()
         {
-            _richTextDrawer.Dispose();
+            RichTextDrawer.Dispose();
         }
 
-        protected float GetExtraHeight(SerializedProperty property, GUIContent label,
-            float width,
-            ISaintsAttribute saintsAttribute)
-        {
-            float result = EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width));
-            // Debug.Log($"AboveButtonAttributeDrawer.GetAboveExtraHeight={result}/{DisplayError}");
-            return result;
-        }
+        // protected float GetExtraHeight(SerializedProperty property, GUIContent label,
+        //     float width,
+        //     ISaintsAttribute saintsAttribute)
+        // {
+        //     float result = EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width));
+        //     // Debug.Log($"AboveButtonAttributeDrawer.GetAboveExtraHeight={result}/{DisplayError}");
+        //     return result;
+        // }
+
+        private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
 
         protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
@@ -49,73 +52,32 @@ namespace ExtInspector.Editor
             DecButtonAttribute aboveButtonAttribute = (DecButtonAttribute) saintsAttribute;
 
             (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
-            Rect errorRect = new Rect(leftRect)
-            {
-                height = 0,
-            };
-            if (DisplayError != "")
-            {
-                (Rect errorRectCut, Rect leftRectCut) = RectUtils.SplitHeightRect(leftRect, HelpBox.GetHeight(DisplayError, position.width));
-                errorRect = errorRectCut;
-                leftRect = leftRectCut;
-            }
+            // Rect errorRect = new Rect(leftRect)
+            // {
+            //     height = 0,
+            // };
+            // if (DisplayError != "")
+            // {
+            //     (Rect errorRectCut, Rect leftRectCut) = RectUtils.SplitHeightRect(leftRect, HelpBox.GetHeight(DisplayError, position.width));
+            //     errorRect = errorRectCut;
+            //     leftRect = leftRectCut;
+            // }
 
-            string buttonLabelXml = aboveButtonAttribute.ButtonLabel;
             object target = property.serializedObject.targetObject;
             Type objType = target.GetType();
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            if (aboveButtonAttribute.ButtonLabelIsCallback)
-            {
-                (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUil.GetProp(objType, aboveButtonAttribute.ButtonLabel);
-                switch (getPropType)
-                {
-                    case ReflectUil.GetPropType.NotFound:
-                    {
-                        _error = $"No field or method named `{aboveButtonAttribute.ButtonLabel}` found on `{target}`";
-                        buttonLabelXml = aboveButtonAttribute.ButtonLabel;
-                    }
-                        break;
-                    case ReflectUil.GetPropType.Field:
-                    {
-                        FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
-                        object value = findFieldInfo.GetValue(target);
-                        buttonLabelXml = value == null ? string.Empty : value.ToString();
-                    }
-                        break;
-                    case ReflectUil.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                        ParameterInfo[] methodParams = methodInfo.GetParameters();
-                        Debug.Assert(methodParams.All(p => p.IsOptional));
-                        // Debug.Assert(methodInfo.ReturnType == typeof(string));
-                        if (methodInfo.ReturnType != typeof(string))
-                        {
-                            _error =
-                                $"Return type of callback method `{aboveButtonAttribute.ButtonLabel}` should be string";
-                            buttonLabelXml = aboveButtonAttribute.ButtonLabel;
-                        }
-                        else
-                        {
-                            _error = "";
-                            buttonLabelXml =
-                                (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-                        }
-                    }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-                }
-            }
+            string buttonLabelXml = GetButtonLabelXml(aboveButtonAttribute, target, objType);
+            // const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+            //                               BindingFlags.Public | BindingFlags.DeclaredOnly;
+
 
             if (GUI.Button(buttonRect, string.Empty))
             {
                 _execError = "";
-                MethodInfo callMethodInfo = objType.GetMethod(aboveButtonAttribute.FuncName, bindAttr);
-                if (callMethodInfo == null)
-                {
-                    callMethodInfo = objType.GetMethod($"<{aboveButtonAttribute.FuncName}>k__BackingField", bindAttr);
-                }
+                MethodInfo callMethodInfo = objType.GetMethod(aboveButtonAttribute.FuncName, BindAttr);
+                // if (callMethodInfo == null)
+                // {
+                //     callMethodInfo = objType.GetMethod($"<{aboveButtonAttribute.FuncName}>k__BackingField", bindAttr);
+                // }
 
                 if (callMethodInfo == null)
                 {
@@ -151,7 +113,7 @@ namespace ExtInspector.Editor
 
             // GetWidth
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text).ToArray();
-            float textWidth = _richTextDrawer.GetWidth(label, buttonRect.height, richChunks);
+            float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
             Rect labelRect = buttonRect;
             // Debug.Log($"textWidth={textWidth}, labelRect.width={labelRect.width}");
             if (textWidth < labelRect.width)
@@ -159,18 +121,62 @@ namespace ExtInspector.Editor
                 float space = (labelRect.width - textWidth) / 2f;
                 labelRect.x += space;
             }
-            _richTextDrawer.DrawChunks(labelRect, label, richChunks);
+            RichTextDrawer.DrawChunks(labelRect, label, richChunks);
 
-            if (DisplayError != "")
-            {
-                HelpBox.Draw(errorRect, DisplayError, MessageType.Error);
-            }
+            // if (DisplayError != "")
+            // {
+            //     HelpBox.Draw(errorRect, DisplayError, MessageType.Error);
+            // }
 
             // Debug.Log(DisplayError);
             // Debug.Log(_execError);
 
             return leftRect;
 
+        }
+
+        protected string GetButtonLabelXml(DecButtonAttribute decButtonAttribute, object target, Type objType)
+        {
+            if (!decButtonAttribute.ButtonLabelIsCallback)
+            {
+                return decButtonAttribute.ButtonLabel;
+            }
+
+            (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUil.GetProp(objType, decButtonAttribute.ButtonLabel);
+            switch (getPropType)
+            {
+                case ReflectUil.GetPropType.NotFound:
+                {
+                    _error = $"No field or method named `{decButtonAttribute.ButtonLabel}` found on `{target}`";
+                    return decButtonAttribute.ButtonLabel;
+                }
+                case ReflectUil.GetPropType.Field:
+                {
+                    FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
+                    object value = findFieldInfo.GetValue(target);
+                    return value == null ? string.Empty : value.ToString();
+                }
+                case ReflectUil.GetPropType.Method:
+                {
+                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    Debug.Assert(methodParams.All(p => p.IsOptional));
+                    // Debug.Assert(methodInfo.ReturnType == typeof(string));
+                    if (methodInfo.ReturnType != typeof(string))
+                    {
+                        _error =
+                            $"Return type of callback method `{decButtonAttribute.ButtonLabel}` should be string";
+                        return decButtonAttribute.ButtonLabel;
+                    }
+
+                    _error = "";
+                    return
+                        (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+            }
         }
     }
 }

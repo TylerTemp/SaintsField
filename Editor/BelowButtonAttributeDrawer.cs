@@ -1,4 +1,5 @@
-﻿using ExtInspector.Standalone;
+﻿using ExtInspector.Editor.Utils;
+using ExtInspector.Standalone;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace ExtInspector.Editor
     {
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute) => GetExtraHeight(property, label, width, saintsAttribute);
+            ISaintsAttribute saintsAttribute) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width));
 
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -20,8 +21,14 @@ namespace ExtInspector.Editor
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute)
         {
-            // Debug.Log($"draw below {position}");
-            return Draw(position, property, label, saintsAttribute);
+            Rect leftRect = Draw(position, property, label, saintsAttribute);
+
+            if (DisplayError != "")
+            {
+                leftRect = HelpBox.Draw(leftRect, DisplayError, MessageType.Error);
+            }
+
+            return leftRect;
         }
     }
 }

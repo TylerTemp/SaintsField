@@ -14,7 +14,7 @@ namespace ExtInspector.Editor
     {
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute) => GetExtraHeight(property, label, width, saintsAttribute);
+            ISaintsAttribute saintsAttribute) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width));
 
 
         protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -23,6 +23,16 @@ namespace ExtInspector.Editor
         }
 
         protected override Rect DrawAbove(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute) => Draw(position, property, label, saintsAttribute);
+            ISaintsAttribute saintsAttribute)
+        {
+            Rect leftRect = Draw(position, property, label, saintsAttribute);
+
+            if (DisplayError != "")
+            {
+                leftRect = HelpBox.Draw(leftRect, DisplayError, MessageType.Error);
+            }
+
+            return leftRect;
+        }
     }
 }
