@@ -11,12 +11,12 @@ using UnityEngine;
 namespace ExtInspector.Editor
 {
     // [CustomPropertyDrawer(typeof(AnimState))]
-    [CustomPropertyDrawer(typeof(AnimStateAttribute))]
-    public class AnimatorStateSelectorDrawer : SaintsPropertyDrawer
+    [CustomPropertyDrawer(typeof(AnimatorStateAttribute))]
+    public class AnimatorStateAttributeDrawer : SaintsPropertyDrawer
     {
         private bool _onEnableChecked;
         private string _errorMsg = "";
-        private bool _targetIsString = true;
+        // private bool _targetIsString = true;
 
         protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute)
@@ -29,18 +29,19 @@ namespace ExtInspector.Editor
             ISaintsAttribute saintsAttribute)
         {
             float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg, width);
-            float subRowHeight = EditorGUIUtility.singleLineHeight * (_targetIsString ? 1 : 2);
+            float subRowHeight = EditorGUIUtility.singleLineHeight * (property.propertyType == SerializedPropertyType.String ? 1 : 2);
             return errorHeight + subRowHeight;
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            _targetIsString = property.propertyType == SerializedPropertyType.String;
+            // _targetIsString = property.propertyType == SerializedPropertyType.String;
+            // Debug.Log($"_targetIsString={_targetIsString}; property.propertyType={property.propertyType}");
 
             // AnimStateSelector animStateSelector = SerializedUtil.GetAttribute<AnimStateSelector>(property);
             // string animFieldName = animStateSelector?.AnimFieldName ?? "animator";
-            AnimStateAttribute animStateAttribute = (AnimStateAttribute) saintsAttribute;
-            string animFieldName = animStateAttribute.AnimFieldName ?? "animator";
+            AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute) saintsAttribute;
+            string animFieldName = animatorStateAttribute.AnimFieldName ?? "animator";
 
             SerializedObject targetSer = property.serializedObject;
             SerializedProperty animProp = targetSer.FindProperty(animFieldName) ?? SerializedUtil.FindPropertyByAutoPropertyName(targetSer, animFieldName);
@@ -57,13 +58,14 @@ namespace ExtInspector.Editor
             if (!animator)
             {
                 _errorMsg = $"Animator {animFieldName} is null";
+                // Debug.Log(_errorMsg);
                 RenderErrorFallback(position, property);
                 return;
             }
 
             AnimatorController controller = (AnimatorController)animator.runtimeAnimatorController;
 
-            List<AnimState> animatorStates = new List<AnimState>();
+            List<AnimatorState> animatorStates = new List<AnimatorState>();
             foreach ((AnimatorControllerLayer animatorControllerLayer, int layerIndex) in controller.layers.Select((each, index) => (each, index)))
             {
                 animatorStates.AddRange(
@@ -73,7 +75,7 @@ namespace ExtInspector.Editor
                             AnimationClip clip = (AnimationClip)childAnimatorState.state.motion;
                             // float clipLength = clip ? clip.length : 0;
                             float speed = childAnimatorState.state.speed;
-                            return new AnimState
+                            return new AnimatorState
                             {
                                 layerIndex = layerIndex,
                                 stateName = childAnimatorState.state.name,
@@ -103,7 +105,7 @@ namespace ExtInspector.Editor
             string[] optionStrings = animatorStates.Select(each => each.stateName).ToArray();
 
             int curIndex;
-            if (_targetIsString)
+            if (property.propertyType == SerializedPropertyType.String)
             {
                 curIndex = Array.IndexOf(optionStrings, property.stringValue);
             }
@@ -122,18 +124,18 @@ namespace ExtInspector.Editor
             if (!_onEnableChecked)  // check whether external source changed, to avoid caching an old value
             {
                 _onEnableChecked = true;
-                AnimState animState = animatorStates[curIndex];
-                if (_targetIsString)
+                AnimatorState animatorState = animatorStates[curIndex];
+                if (property.propertyType == SerializedPropertyType.String)
                 {
-                    property.stringValue = animState.stateName;
+                    property.stringValue = animatorState.stateName;
                 }
                 else
                 {
-                    curLayerIndexProp.intValue = animState.layerIndex;
-                    curStateNameHashProp.intValue = animState.stateNameHash;
-                    curStateNameProp.stringValue = animState.stateName;
-                    curStateSpeedProp.floatValue = animState.stateSpeed;
-                    curAnimationClipProp.objectReferenceValue = animState.animationClip;
+                    curLayerIndexProp.intValue = animatorState.layerIndex;
+                    curStateNameHashProp.intValue = animatorState.stateNameHash;
+                    curStateNameProp.stringValue = animatorState.stateName;
+                    curStateSpeedProp.floatValue = animatorState.stateSpeed;
+                    curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
                 }
             }
 
@@ -149,27 +151,27 @@ namespace ExtInspector.Editor
             // ReSharper disable once InvertIf
             if (popupChanged.changed)
             {
-                AnimState animState = animatorStates[curIndex];
-                if (_targetIsString)
+                AnimatorState animatorState = animatorStates[curIndex];
+                if (property.propertyType == SerializedPropertyType.String)
                 {
-                    property.stringValue = animState.stateName;
+                    property.stringValue = animatorState.stateName;
                 }
                 else
                 {
-                    curLayerIndexProp.intValue = animState.layerIndex;
-                    curStateNameHashProp.intValue = animState.stateNameHash;
-                    curStateNameProp.stringValue = animState.stateName;
-                    curStateSpeedProp.floatValue = animState.stateSpeed;
-                    curAnimationClipProp.objectReferenceValue = animState.animationClip;
+                    curLayerIndexProp.intValue = animatorState.layerIndex;
+                    curStateNameHashProp.intValue = animatorState.stateNameHash;
+                    curStateNameProp.stringValue = animatorState.stateName;
+                    curStateSpeedProp.floatValue = animatorState.stateSpeed;
+                    curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
                 }
             }
 
             // RenderSubRow(popupLeftRect, property);
         }
 
-        private void RenderErrorFallback(Rect position, SerializedProperty property)
+        private static void RenderErrorFallback(Rect position, SerializedProperty property)
         {
-            if (_targetIsString)
+            if (property.propertyType == SerializedPropertyType.String)
             {
                 using EditorGUI.ChangeCheckScope onChange = new EditorGUI.ChangeCheckScope();
                 string newContent = EditorGUI.TextField(position, GUIContent.none, property.stringValue);
@@ -206,7 +208,8 @@ namespace ExtInspector.Editor
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            if(_targetIsString)
+            // Debug.Log(_targetIsString);
+            if(property.propertyType == SerializedPropertyType.String)
             {
                 (Rect valueRect, Rect leftRect) =
                     RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);

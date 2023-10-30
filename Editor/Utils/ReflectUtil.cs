@@ -31,7 +31,7 @@ namespace ExtInspector.Editor.Utils
                     .GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
                     .Where(predicate);
 
-                foreach (var fieldInfo in fieldInfos)
+                foreach (FieldInfo fieldInfo in fieldInfos)
                 {
                     yield return fieldInfo;
                 }
@@ -125,6 +125,58 @@ namespace ExtInspector.Editor.Utils
             }
 
             return enumerator.Current;
+        }
+
+        public enum GetPropType
+        {
+            NotFound,
+            Field,
+            Method,
+        }
+
+        public static (GetPropType getPropType, object fieldOrMethodInfo) GetProp(Type targetType, string fieldName)
+        {
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+
+            FieldInfo fieldInfo = targetType.GetField(fieldName, bindAttr);
+            if (fieldInfo == null)
+            {
+                fieldInfo = targetType.GetField($"<{fieldName}>k__BackingField", bindAttr);
+            }
+
+            if (fieldInfo != null)
+            {
+                return (GetPropType.Field, fieldInfo);
+                // object value = findFieldInfo.GetValue(target);
+                // buttonLabelXml = value == null ? string.Empty : value.ToString();
+            }
+
+            MethodInfo methodInfo = targetType.GetMethod(fieldName, bindAttr);
+
+            // if (methodInfo == null)
+            // {
+            //     methodInfo = targetType.GetMethod($"<{aboveButtonAttribute.ButtonLabel}>k__BackingField",
+            //         bindAttr);
+            // }
+            return methodInfo == null ? (GetPropType.NotFound, null) : (GetPropType.Method, methodInfo);
+
+            //
+            // _error = "";
+            // ParameterInfo[] methodParams = methodInfo.GetParameters();
+            // Debug.Assert(methodParams.All(p => p.IsOptional));
+            // // Debug.Assert(methodInfo.ReturnType == typeof(string));
+            // if (methodInfo.ReturnType != typeof(string))
+            // {
+            //     _error =
+            //         $"Return type of callback method `{aboveButtonAttribute.ButtonLabel}` should be string";
+            //     buttonLabelXml = aboveButtonAttribute.ButtonLabel;
+            // }
+            // else
+            // {
+            //     buttonLabelXml =
+            //         (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+            // }
         }
 
     }

@@ -8,16 +8,19 @@ namespace Samples
     {
         [SerializeField] private bool _errorOut;
 
+        [field: SerializeField] private string _labelByField;
+
         [SerializeField]
-        // [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye-regular.png' /></color>!", false, "")]
-        // [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-        // [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye-regular.png' /></color>!", false, "")]
-        // [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
+        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye-regular.png' /></color>!", false, "")]
+        [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
+        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye-regular.png' /></color>!", false, "")]
+        [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
 
         [BelowButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
         [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye-regular.png' /></color>!", false)]
         [BelowButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
         [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye-regular.png' /></color>!", false)]
+        [BelowButton(nameof(ClickButton), nameof(_labelByField), true)]
         [Range(0, 10)]
         private int _someInt;
 

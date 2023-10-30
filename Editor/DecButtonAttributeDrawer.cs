@@ -66,33 +66,44 @@ namespace ExtInspector.Editor
                                           BindingFlags.Public | BindingFlags.DeclaredOnly;
             if (aboveButtonAttribute.ButtonLabelIsCallback)
             {
-                MethodInfo methodInfo = objType.GetMethod(aboveButtonAttribute.ButtonLabel, bindAttr);
-                if (methodInfo == null)
+                (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUil.GetProp(objType, aboveButtonAttribute.ButtonLabel);
+                switch (getPropType)
                 {
-                    methodInfo = objType.GetMethod($"<{aboveButtonAttribute.ButtonLabel}>k__BackingField", bindAttr);
-                }
-
-                if (methodInfo == null)
-                {
-                    _error = $"No field or method named `{aboveButtonAttribute.ButtonLabel}` found on `{target}`";
-                    buttonLabelXml = aboveButtonAttribute.ButtonLabel;
-                }
-                else
-                {
-                    _error = "";
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    // Debug.Assert(methodInfo.ReturnType == typeof(string));
-                    if (methodInfo.ReturnType != typeof(string))
+                    case ReflectUil.GetPropType.NotFound:
                     {
-                        _error = $"Return type of callback method `{aboveButtonAttribute.ButtonLabel}` should be string";
+                        _error = $"No field or method named `{aboveButtonAttribute.ButtonLabel}` found on `{target}`";
                         buttonLabelXml = aboveButtonAttribute.ButtonLabel;
                     }
-                    else
+                        break;
+                    case ReflectUil.GetPropType.Field:
                     {
-                        buttonLabelXml =
-                            (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                        FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
+                        object value = findFieldInfo.GetValue(target);
+                        buttonLabelXml = value == null ? string.Empty : value.ToString();
                     }
+                        break;
+                    case ReflectUil.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                        ParameterInfo[] methodParams = methodInfo.GetParameters();
+                        Debug.Assert(methodParams.All(p => p.IsOptional));
+                        // Debug.Assert(methodInfo.ReturnType == typeof(string));
+                        if (methodInfo.ReturnType != typeof(string))
+                        {
+                            _error =
+                                $"Return type of callback method `{aboveButtonAttribute.ButtonLabel}` should be string";
+                            buttonLabelXml = aboveButtonAttribute.ButtonLabel;
+                        }
+                        else
+                        {
+                            _error = "";
+                            buttonLabelXml =
+                                (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                        }
+                    }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
                 }
             }
 
@@ -110,7 +121,7 @@ namespace ExtInspector.Editor
                     _execError = $"No field or method named `{aboveButtonAttribute.FuncName}` found on `{target}`";
                     // return leftRect;
                 }
-                
+
                 else
                 {
                     ParameterInfo[] methodParams = callMethodInfo.GetParameters();
@@ -142,7 +153,7 @@ namespace ExtInspector.Editor
             {
                 HelpBox.Draw(errorRect, DisplayError, MessageType.Error);
             }
-            
+
             // Debug.Log(DisplayError);
             // Debug.Log(_execError);
 
