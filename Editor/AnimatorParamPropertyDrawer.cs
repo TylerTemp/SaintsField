@@ -3,7 +3,6 @@ using ExtInspector.Editor.Standalone;
 using ExtInspector.Editor.Utils;
 using ExtInspector.Standalone;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace ExtInspector.Editor
@@ -12,20 +11,16 @@ namespace ExtInspector.Editor
     public class AnimatorParamPropertyDrawer : SaintsPropertyDrawer
     {
         // private const string InvalidAnimatorControllerWarningMessage = "Target animator controller is null";
-        // private const string InvalidTypeWarningMessage = "{0} must be an int or a string";
-
         private string _error = "";
-
-        // private AnimatorParamAttribute AnimAttr => (AnimatorParamAttribute)attribute;
 
         protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             // AnimatorParamAttribute animatorParamAttribute = property .GetAttribute<AnimatorParamAttribute>(property);
-            // AnimatorParamAttribute animAttr = (AnimatorParamAttribute)saintsAttribute;
-            // bool validAnimatorController = GetAnimatorController(property, animAttr.AnimatorName) != null;
+            // AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
+            // bool validAnimatorController = GetAnimatorController(property, animatorParamAttribute.AnimatorName) != null;
             // bool validPropertyType = property.propertyType is SerializedPropertyType.Integer or SerializedPropertyType.String;
-            //
-            // return validAnimatorController && validPropertyType
+
+            // return (validAnimatorController && validPropertyType)
             //     ? EditorGUIUtility.singleLineHeight
             //     : EditorGUIUtility.singleLineHeight * 2;
             return EditorGUIUtility.singleLineHeight;
@@ -33,47 +28,46 @@ namespace ExtInspector.Editor
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            _error = "";
+            // EditorGUI.BeginProperty(rect, label, property);
+            AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
 
-            AnimatorParamAttribute animAttr = (AnimatorParamAttribute)saintsAttribute;
-            AnimatorController animatorController = GetAnimatorController(property, animAttr.AnimatorName);
-            bool invalidAnimatorController = animatorController == null;
+            SerializedObject targetSer = property.serializedObject;
+            SerializedProperty animProp = targetSer.FindProperty(animatorParamAttribute.AnimatorName) ?? SerializedUtil.FindPropertyByAutoPropertyName(targetSer, animatorParamAttribute.AnimatorName);
+
+            List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>();
+
+            bool invalidAnimatorController = animProp == null;
+
             if (invalidAnimatorController)
             {
-                // EditorGUI.HelpBox(new Rect(rect)
-                // {
-                //     height = EditorGUIUtility.singleLineHeight,
-                // }, InvalidAnimatorControllerWarningMessage, MessageType.Info);
-                // EditorGUI.PropertyField(new Rect(rect)
-                // {
-                //     y = rect.y + EditorGUIUtility.singleLineHeight,
-                // }, property, label);
-                // // DrawDefaultPropertyAndHelpBox(rect, property, InvalidAnimatorControllerWarningMessage, MessageType.Warning);
-                // return;
-                _error = $"Animator controller `{animAttr.AnimatorName}` is null";
+                _error = $"Animator controller `{animatorParamAttribute.AnimatorName}` is null";
             }
-
-            int parametersCount = animatorController.parameters.Length;
-            List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>(parametersCount);
-            for (int i = 0; i < parametersCount; i++)
+            else
             {
-                AnimatorControllerParameter parameter = animatorController.parameters[i];
-                if (animAttr.AnimatorParamType == null || parameter.type == animAttr.AnimatorParamType)
+                Animator animatorController = (Animator)animProp.objectReferenceValue;
+
+                int parametersCount = animatorController.parameters.Length;
+
+                for (int i = 0; i < parametersCount; i++)
                 {
-                    animatorParameters.Add(parameter);
+                    AnimatorControllerParameter parameter = animatorController.parameters[i];
+                    if (animatorParamAttribute.AnimatorParamType == null ||
+                        parameter.type == animatorParamAttribute.AnimatorParamType)
+                    {
+                        animatorParameters.Add(parameter);
+                    }
                 }
             }
 
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    DrawPropertyForInt(position, property, animatorParameters);
+                    DrawPropertyForInt(invalidAnimatorController, position, property, animatorParameters);
                     break;
                 case SerializedPropertyType.String:
-                    DrawPropertyForString(position, property, animatorParameters);
+                    DrawPropertyForString(invalidAnimatorController, position, property, animatorParameters);
                     break;
                 default:
-                    _error = $"Support int or string type, get {property.propertyType}";
                     // DrawDefaultPropertyAndHelpBox(rect, property, string.Format(InvalidTypeWarningMessage, property.name), MessageType.Warning);
                     // EditorGUI.HelpBox(new Rect(rect)
                     // {
@@ -83,20 +77,33 @@ namespace ExtInspector.Editor
                     // {
                     //     y = rect.y + EditorGUIUtility.singleLineHeight,
                     // }, property, label);
+                    _error = $"Invalid property type: expect integer or string, get {property.propertyType}";
                     break;
             }
 
             // EditorGUI.EndProperty();
         }
 
-        private static void DrawPropertyForInt(Rect rect, SerializedProperty property,
-            List<AnimatorControllerParameter> animatorParameters)
+        private static void DrawPropertyForInt(bool invalid, Rect position, SerializedProperty property, List<AnimatorControllerParameter> animatorParameters)
         {
+            if (invalid)
+            {
+                using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
+                int directIntValue = EditorGUI.IntField(position, property.intValue);
+                if (changed.changed)
+                {
+                    property.intValue = directIntValue;
+                }
+
+                return;
+            }
+
             int paramNameHash = property.intValue;
             int index = 0;
 
             for (int i = 0; i < animatorParameters.Count; i++)
             {
+                // ReSharper disable once InvertIf
                 if (paramNameHash == animatorParameters[i].nameHash)
                 {
                     index = i + 1; // +1 because the first option is reserved for (None)
@@ -106,22 +113,42 @@ namespace ExtInspector.Editor
 
             string[] displayOptions = GetDisplayOptions(animatorParameters);
 
-            int newIndex = EditorGUI.Popup(rect, index, displayOptions);
-            int newValue = newIndex == 0 ? 0 : animatorParameters[newIndex - 1].nameHash;
-
-            if (property.intValue != newValue)
+            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                property.intValue = newValue;
+                int newIndex = EditorGUI.Popup(position, index, displayOptions);
+                // ReSharper disable once InvertIf
+                if(changed.changed)
+                {
+                    int newValue = newIndex == 0 ? 0 : animatorParameters[newIndex - 1].nameHash;
+
+                    if (property.intValue != newValue)
+                    {
+                        property.intValue = newValue;
+                    }
+                }
             }
         }
 
-        private static void DrawPropertyForString(Rect rect, SerializedProperty property, List<AnimatorControllerParameter> animatorParameters)
+        private static void DrawPropertyForString(bool invalid, Rect position, SerializedProperty property, List<AnimatorControllerParameter> animatorParameters)
         {
+            if (invalid)
+            {
+                using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
+                string directIntValue = EditorGUI.TextField(position, property.stringValue);
+                if (changed.changed)
+                {
+                    property.stringValue = directIntValue;
+                }
+
+                return;
+            }
+
             string paramName = property.stringValue;
             int index = 0;
 
             for (int i = 0; i < animatorParameters.Count; i++)
             {
+                // ReSharper disable once InvertIf
                 if (paramName.Equals(animatorParameters[i].name, System.StringComparison.Ordinal))
                 {
                     index = i + 1; // +1 because the first option is reserved for (None)
@@ -131,41 +158,65 @@ namespace ExtInspector.Editor
 
             string[] displayOptions = GetDisplayOptions(animatorParameters);
 
-            int newIndex = EditorGUI.Popup(rect, index, displayOptions);
-            string newValue = newIndex == 0 ? null : animatorParameters[newIndex - 1].name;
-
-            if (!property.stringValue.Equals(newValue, System.StringComparison.Ordinal))
+            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                property.stringValue = newValue;
+                int newIndex = EditorGUI.Popup(position, index, displayOptions);
+                // ReSharper disable once InvertIf
+                if(changed.changed)
+                {
+                    string newValue = newIndex == 0 ? null : animatorParameters[newIndex - 1].name;
+
+                    if (!property.stringValue.Equals(newValue, System.StringComparison.Ordinal))
+                    {
+                        property.stringValue = newValue;
+                    }
+                }
             }
         }
 
-        private static string[] GetDisplayOptions(List<AnimatorControllerParameter> animatorParams)
+        private static string[] GetDisplayOptions(IReadOnlyList<AnimatorControllerParameter> animatorParams)
         {
             string[] displayOptions = new string[animatorParams.Count + 1];
-            displayOptions[0] = "(None)";
+            displayOptions[0] = "[None]";
 
             for (int i = 0; i < animatorParams.Count; i++)
             {
-                displayOptions[i + 1] = animatorParams[i].name;
+                displayOptions[i + 1] = $"{animatorParams[i].name} [{animatorParams[i].type}]";
             }
 
             return displayOptions;
         }
 
-        private AnimatorController GetAnimatorController(SerializedProperty property, string animatorName)
+        // private AnimatorController GetAnimatorController(SerializedProperty property, string animatorName)
+        // {
+        //     Object targetObject = property.serializedObject.targetObject;
+        //     SerializedObject targetSer = new SerializedObject(targetObject);
+        //     SerializedProperty animProp = targetSer.FindProperty(animatorName);
+        //     Animator animator = (Animator)animProp?.objectReferenceValue;
+        //     // ReSharper disable once Unity.NoNullPropagation
+        //     return (AnimatorController)animator?.runtimeAnimatorController;
+        // }
+
+        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            // switch (ReflectUil.GetProp(property.serializedObject.targetObject.GetType(), animatorName))
-            // {
-            //     case (ReflectUil.GetPropType.NotFound, _):
-            //
-            // }
-            Object targetObject = property.serializedObject.targetObject;
-            SerializedObject targetSer = new SerializedObject(targetObject);
-            SerializedProperty animProp = targetSer.FindProperty(animatorName);
-            Animator animator = (Animator)animProp?.objectReferenceValue;
-            // ReSharper disable once Unity.NoNullPropagation
-            return (AnimatorController)animator?.runtimeAnimatorController;
+            return _error != "";
+        }
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        {
+            return _error == "" ? 0 : HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth);
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            if (_error == "")
+            {
+                return position;
+            }
+
+            (Rect boxRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth));
+            HelpBox.Draw(boxRect, _error, MessageType.Error);
+            return leftRect;
         }
     }
 }

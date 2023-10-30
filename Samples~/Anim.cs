@@ -13,5 +13,11 @@ namespace ExtInspectorUnity.Samples
         public AnimatorState AnimatorState { get; private set; }
         [field: SerializeField, AnimatorState(nameof(Animator))]
         public string AnimStateName { get; private set; }
+
+        [SerializeField, AnimatorParam(nameof(Animator))]
+        private string _animParamName;
+
+        [SerializeField, AnimatorParam(nameof(Animator))]
+        private int _animParamHash;
     }
 }
