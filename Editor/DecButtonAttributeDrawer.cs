@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ExtInspector.Editor.Standalone;
@@ -147,7 +148,18 @@ namespace ExtInspector.Editor
                 }
             }
 
-            _richTextDrawer.DrawChunks(buttonRect, label, RichTextDrawer.ParseRichXml(buttonLabelXml, label.text));
+
+            // GetWidth
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text).ToArray();
+            float textWidth = _richTextDrawer.GetWidth(label, buttonRect.height, richChunks);
+            Rect labelRect = buttonRect;
+            // Debug.Log($"textWidth={textWidth}, labelRect.width={labelRect.width}");
+            if (textWidth < labelRect.width)
+            {
+                float space = (labelRect.width - textWidth) / 2f;
+                labelRect.x += space;
+            }
+            _richTextDrawer.DrawChunks(labelRect, label, richChunks);
 
             if (DisplayError != "")
             {

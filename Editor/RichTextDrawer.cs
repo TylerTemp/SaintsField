@@ -51,74 +51,6 @@ namespace ExtInspector.Editor
             _textureCache.Clear();
         }
 
-        public void DrawChunks(Rect position, GUIContent oldLabel, IEnumerable<RichTextChunk> payloads)
-        {
-            Rect labelRect = position;
-            // List<RichTextChunk> parsedChunk = payloads.ToList();
-
-            // Debug.Log($"parsedChunk.Count={parsedChunk.Count}");
-
-            GUIStyle textStyle = new GUIStyle(EditorStyles.label)
-            {
-                richText = true,
-            };
-
-            foreach(RichTextChunk curChunk in payloads)
-            {
-                // RichTextChunk curChunk = parsedChunk[0];
-                // parsedChunk.RemoveAt(0);
-
-                // Debug.Log($"parsedChunk={curChunk}");
-                GUIContent curGUIContent;
-                float curWidth;
-                if (curChunk.IsIcon)
-                {
-                    TextureCacheKey cacheKey = new TextureCacheKey
-                    {
-                        ColorPresent = curChunk.IconColor,
-                        IconPath = curChunk.Content,
-                    };
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
-                    {
-                        texture = Tex.TextureTo(
-                            LoadTexture(curChunk.Content),
-                            Colors.GetColorByStringPresent(curChunk.IconColor),
-                            -1,
-                            Mathf.FloorToInt(position.height)
-                        );
-                        if (texture.width != 1 && texture.height != 1)
-                        {
-                            _textureCache.Add(cacheKey, texture);
-                        }
-                    }
-
-#if EXT_INSPECTOR_LOG
-                    Debug.Log($"#draw# icon <{curChunk.Content} {curChunk.IconColor}/>");
-#endif
-                    curGUIContent = new GUIContent(oldLabel)
-                    {
-                        text = null,
-                        image = texture,
-                    };
-                    curWidth = texture.width;
-                }
-                else
-                {
-                    curGUIContent = new GUIContent(oldLabel)
-                    {
-                        text = curChunk.Content,
-                        image = null,
-                    };
-                    curWidth = textStyle.CalcSize(curGUIContent).x;
-                }
-
-                (Rect textRect, Rect leftRect) = RectUtils.SplitWidthRect(labelRect, curWidth);
-                GUI.Label(textRect, curGUIContent, textStyle);
-
-                labelRect = leftRect;
-            }
-        }
-
         private const string EditorFolderName =
 #if EXT_INSPECTOR_IN_DEV
                 "Assets/ExtInspector/Editor/Editor Default Resources/ExtInspector/"
@@ -362,6 +294,137 @@ namespace ExtInspector.Editor
             }
 
             return (tagName.Trim(), tagValue);
+        }
+
+        public float GetWidth(GUIContent oldLabel, float height, IEnumerable<RichTextChunk> payloads)
+        {
+            GUIStyle textStyle = new GUIStyle(EditorStyles.label)
+            {
+                richText = true,
+            };
+
+            float totalWidth = 0;
+
+            foreach(RichTextChunk curChunk in payloads)
+            {
+                // RichTextChunk curChunk = parsedChunk[0];
+                // parsedChunk.RemoveAt(0);
+
+                // Debug.Log($"parsedChunk={curChunk}");
+                if (curChunk.IsIcon)
+                {
+                    TextureCacheKey cacheKey = new TextureCacheKey
+                    {
+                        ColorPresent = curChunk.IconColor,
+                        IconPath = curChunk.Content,
+                    };
+                    Texture texture = GetTexture2D(cacheKey, curChunk, height);
+                    float curWidth = texture.height > 0
+                        ? texture.width
+                        : height;
+
+                    totalWidth += curWidth;
+                }
+                else
+                {
+                    GUIContent curGUIContent = new GUIContent(oldLabel)
+                    {
+                        text = curChunk.Content,
+                        image = null,
+                    };
+                    totalWidth += textStyle.CalcSize(curGUIContent).x;
+                }
+            }
+            return totalWidth;
+        }
+
+        public void DrawChunks(Rect position, GUIContent oldLabel, IEnumerable<RichTextChunk> payloads)
+        {
+            Rect labelRect = position;
+            // List<RichTextChunk> parsedChunk = payloads.ToList();
+
+            // Debug.Log($"parsedChunk.Count={parsedChunk.Count}");
+
+            GUIStyle textStyle = new GUIStyle(EditorStyles.label)
+            {
+                richText = true,
+            };
+
+            foreach(RichTextChunk curChunk in payloads)
+            {
+                // RichTextChunk curChunk = parsedChunk[0];
+                // parsedChunk.RemoveAt(0);
+
+                // Debug.Log($"parsedChunk={curChunk}");
+                GUIContent curGUIContent;
+                float curWidth;
+                if (curChunk.IsIcon)
+                {
+                    TextureCacheKey cacheKey = new TextureCacheKey
+                    {
+                        ColorPresent = curChunk.IconColor,
+                        IconPath = curChunk.Content,
+                    };
+                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
+                    {
+                        texture = Tex.TextureTo(
+                            LoadTexture(curChunk.Content),
+                            Colors.GetColorByStringPresent(curChunk.IconColor),
+                            -1,
+                            Mathf.FloorToInt(position.height)
+                        );
+                        if (texture.width != 1 && texture.height != 1)
+                        {
+                            _textureCache.Add(cacheKey, texture);
+                        }
+                    }
+
+#if EXT_INSPECTOR_LOG
+                    Debug.Log($"#draw# icon <{curChunk.Content} {curChunk.IconColor}/>");
+#endif
+                    curGUIContent = new GUIContent(oldLabel)
+                    {
+                        text = null,
+                        image = texture,
+                    };
+                    curWidth = texture.width;
+                }
+                else
+                {
+                    curGUIContent = new GUIContent(oldLabel)
+                    {
+                        text = curChunk.Content,
+                        image = null,
+                    };
+                    curWidth = textStyle.CalcSize(curGUIContent).x;
+                }
+
+                (Rect textRect, Rect leftRect) = RectUtils.SplitWidthRect(labelRect, curWidth);
+                GUI.Label(textRect, curGUIContent, textStyle);
+
+                labelRect = leftRect;
+            }
+        }
+
+        private Texture GetTexture2D(TextureCacheKey cacheKey, RichTextChunk curChunk, float height)
+        {
+            if (_textureCache.TryGetValue(cacheKey, out Texture texture))
+            {
+                return texture;
+            }
+
+            texture = Tex.TextureTo(
+                LoadTexture(curChunk.Content),
+                Colors.GetColorByStringPresent(curChunk.IconColor),
+                -1,
+                Mathf.FloorToInt(height)
+            );
+            if (texture.width != 1 && texture.height != 1)
+            {
+                _textureCache.Add(cacheKey, texture);
+            }
+
+            return texture;
         }
     }
 }

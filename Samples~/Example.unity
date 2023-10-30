@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _errorOut: 0
-  _labelByField: Some label <color=green>here</color>~
+  _labelByField: Some label <color=green>here</color>~ center me
   _someInt: 0
 --- !u!1 &847311490
 GameObject:
