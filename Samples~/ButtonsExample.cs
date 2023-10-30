@@ -23,6 +23,8 @@ namespace Samples
         [BelowButton(nameof(ClickButton), nameof(_labelByField), true)]
 
         [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
+
+        [RichLabel(nameof(GetLabel), true)]
         [Range(0, 10)]
         private int _someInt;
 
@@ -55,6 +57,11 @@ namespace Samples
         {
             Toggle();
             ClickButton2();
+        }
+
+        private string GetLabel()
+        {
+            return $"<label/>: <color=green>{_someInt}</color>";
         }
 
         private void Toggle()

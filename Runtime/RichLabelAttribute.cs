@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector.Standalone
+namespace ExtInspector
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class RichLabelAttribute: PropertyAttribute, ISaintsAttribute
@@ -11,9 +11,12 @@ namespace ExtInspector.Standalone
         public SaintsAttributeType AttributeType => SaintsAttributeType.Label;
 
         public readonly string RichTextXml;
-        public RichLabelAttribute(string richTextXml)
+        public readonly bool IsCallback;
+
+        public RichLabelAttribute(string richTextXml, bool isCallback=false)
         {
             RichTextXml = richTextXml;
+            IsCallback = isCallback;
         }
     }
 }

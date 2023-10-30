@@ -1,7 +1,4 @@
-﻿using ExtInspector.Standalone;
-using UnityEngine;
-
-namespace ExtInspector
+﻿namespace ExtInspector
 {
     [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
     public class BelowButtonAttribute : DecButtonAttribute

@@ -90,7 +90,7 @@ namespace ExtInspector.Editor
                     ParameterInfo[] methodParams = callMethodInfo.GetParameters();
                     Debug.Assert(methodParams.All(p => p.IsOptional));
                     // Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    Debug.Log($"call {callMethodInfo}/{aboveButtonAttribute.FuncName}");
+                    // Debug.Log($"call {callMethodInfo}/{aboveButtonAttribute.FuncName}");
                     try
                     {
                         callMethodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
@@ -98,13 +98,11 @@ namespace ExtInspector.Editor
                     catch (TargetInvocationException e)
                     {
                         _execError = e.InnerException!.Message;
-                        Debug.Log($"execError set to {_execError}");
                         Debug.LogException(e);
                     }
                     catch (Exception e)
                     {
                         _execError = e.Message;
-                        Debug.Log($"execError set to {_execError}");
                         Debug.LogException(e);
                     }
                 }

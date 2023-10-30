@@ -1,5 +1,4 @@
-﻿using ExtInspector.Standalone;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ExtInspector
 {
