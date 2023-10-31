@@ -333,25 +333,34 @@ namespace ExtInspector.Editor.Standalone
 
             // post field - width check
             float postFieldWidth = 0;
+            List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)> postFieldInfoList =
+                new List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)>();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
             {
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                postFieldWidth +=
+                float curWidth =
                     drawerInstance.GetPostFieldWidth(fieldRect, property, GUIContent.none, eachAttributeWithIndex.SaintsAttribute);
+                postFieldWidth += curWidth;
+                postFieldInfoList.Add((
+                    eachAttributeWithIndex,
+                    drawerInstance,
+                    curWidth
+                ));
             }
 
-            fieldRect = new Rect(fieldRect)
-            {
-                width = fieldRect.width - postFieldWidth,
-            };
-            Rect postFieldRect = new Rect
-            {
-                x = fieldRect.x + fieldRect.width,
-                y = fieldRect.y,
-                width = postFieldWidth,
-                height = fieldRect.height,
-            };
+            (Rect fieldUseRect, Rect fieldPostRect) = RectUtils.SplitWidthRect(fieldRect, fieldRect.width - postFieldWidth);
+            // fieldRect = new Rect(fieldRect)
+            // {
+            //     width = fieldRect.width - postFieldWidth,
+            // }
+            // Rect postFieldRect = new Rect
+            // {
+            //     x = fieldRect.x + fieldRect.width,
+            //     y = fieldRect.y,
+            //     width = postFieldWidth,
+            //     height = fieldRect.height,
+            // };
 
             #region field
             SaintsWithIndex fieldAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Field);
@@ -361,14 +370,14 @@ namespace ExtInspector.Editor.Standalone
             // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
             if (fieldDrawer == null)
             {
-                DefaultDrawer(fieldRect, property);
+                DefaultDrawer(fieldUseRect, property);
             }
             else
             {
                 // Debug.Log(fieldAttribute);
                 SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
                 // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
-                fieldDrawerInstance.DrawField(fieldRect, property, GUIContent.none, fieldAttributeWithIndex.SaintsAttribute);
+                fieldDrawerInstance.DrawField(fieldUseRect, property, GUIContent.none, fieldAttributeWithIndex.SaintsAttribute);
                 // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
                 _usedAttributes.TryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
@@ -376,18 +385,36 @@ namespace ExtInspector.Editor.Standalone
             #endregion
 
             #region post field
-            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+
+            float postFieldAccWidth = 0f;
+            foreach ((SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width) in postFieldInfoList)
             {
-                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                (bool isActive, Rect newPostFieldRect) = drawerInstance.DrawPostField(postFieldRect, property, propertyScoopLabel, eachAttributeWithIndex.SaintsAttribute);
+                Rect eachRect = new Rect(fieldPostRect)
+                {
+                    x = fieldPostRect.x + postFieldAccWidth,
+                    width = width,
+                };
+                postFieldAccWidth += width;
+
+                (bool isActive, Rect newPostFieldRect) = drawer.DrawPostField(eachRect, property, propertyScoopLabel, attributeWithIndex.SaintsAttribute);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
-                    postFieldRect = newPostFieldRect;
-                    // _usedDrawerTypes.Add(eachDrawer[0]);
-                    _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
+                    _usedAttributes.TryAdd(attributeWithIndex, drawer);
                 }
             }
+            // foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+            // {
+            //     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+            //     (bool isActive, Rect newPostFieldRect) = drawerInstance.DrawPostField(postFieldRect, property, propertyScoopLabel, eachAttributeWithIndex.SaintsAttribute);
+            //     // ReSharper disable once InvertIf
+            //     if (isActive)
+            //     {
+            //         postFieldRect = newPostFieldRect;
+            //         // _usedDrawerTypes.Add(eachDrawer[0]);
+            //         _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
+            //     }
+            // }
             #endregion
 
             #region below
