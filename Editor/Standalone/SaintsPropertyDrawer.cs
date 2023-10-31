@@ -13,7 +13,7 @@ namespace ExtInspector.Editor.Standalone
     // below-
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
-        private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _propertyAttributeToDrawers =
+        private readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _propertyAttributeToDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
 
         // private IReadOnlyList<ISaintsAttribute> _allSaintsAttributes;
@@ -88,7 +88,7 @@ namespace ExtInspector.Editor.Standalone
                         .Select(each => (each.IsSubclassOf(typeof(SaintsPropertyDrawer)), each))
                         .ToArray();
 #if EXT_INSPECTOR_LOG
-                Debug.Log($"attr {kv.Key} has drawer(s) {string.Join(",", kv.Value)}");
+                    Debug.Log($"attr {kv.Key} has drawer(s) {string.Join(",", kv.Value)}");
 #endif
                 }
             }
@@ -112,16 +112,36 @@ namespace ExtInspector.Editor.Standalone
             // SaintsPropertyDrawer[] usedDrawerInfos = _usedDrawerTypes.Select(each => _cachedDrawer[each]).ToArray();
             // SaintsPropertyDrawer[] fieldInfos = usedDrawerInfos.Where(each => each.AttributeType is SaintsAttributeType.Field or SaintsAttributeType.Label).ToArray();
 
-            _fieldBasicHeight = filedOrLabel.Length > 0
-                ? filedOrLabel
-                    // .ToLookup(
-                    //     each => each.Key.AttributeType,
-                    //     each => (each.Key, _cachedDrawer[each.Value] )
-                    // )
-                    .Select(each => each.drawer.GetLabelFieldHeight(property, label, each.iSaintsAttribute))
-                    .Max()
-                    // .Select(each => each.GetLabelFieldHeight(property, label)).Max()
+            var labelFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Label);
+            var fieldFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Field);
+
+            bool hasLabel = labelFound.iSaintsAttribute != null &&
+                            labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
+            // float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0f;
+            Debug.Log($"hasLabel={hasLabel}");
+            float labelHeight = hasLabel
+                ? labelFound.drawer.GetLabelHeight(property, label, labelFound.iSaintsAttribute)
+                : 0f;
+
+            bool hasField = fieldFound.iSaintsAttribute != null;
+            float fieldHeight = hasField
+                ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, hasLabel)
+                : 0f;
+
+            _fieldBasicHeight = (hasLabel || hasField)
+                ? Mathf.Max(labelHeight, fieldHeight)
                 : base.GetPropertyHeight(property, label);
+
+            // _fieldBasicHeight = filedOrLabel.Length > 0
+            //     ? filedOrLabel
+            //         // .ToLookup(
+            //         //     each => each.Key.AttributeType,
+            //         //     each => (each.Key, _cachedDrawer[each.Value] )
+            //         // )
+            //         .Select(each => each.drawer.GetFieldHeight(property, label, each.iSaintsAttribute, TODO))
+            //         .Max()
+            //         // .Select(each => each.GetLabelFieldHeight(property, label)).Max()
+            //     : base.GetPropertyHeight(property, label);
 
             float aboveHeight = 0;
             float belowHeight = 0;
@@ -156,7 +176,13 @@ namespace ExtInspector.Editor.Standalone
             return _fieldBasicHeight + aboveHeight + belowHeight;
         }
 
-        protected virtual float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected virtual float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, bool hasLabel)
+        {
+            return 0;
+        }
+
+        protected virtual float GetLabelHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             return 0;
         }
@@ -321,8 +347,10 @@ namespace ExtInspector.Editor.Standalone
             {
                 SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
                 // Debug.Log(labelAttribute);
-                if(labelDrawerInstance.DrawLabel(labelRect, property, propertyScoopLabel, labelAttributeWithIndex.SaintsAttribute))
+                if(labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
                 {
+                    labelDrawerInstance.DrawLabel(labelRect, property, propertyScoopLabel,
+                        labelAttributeWithIndex.SaintsAttribute);
                     fieldRect = leftPropertyRect;
                 }
                 // newLabel = GUIContent.none;
@@ -638,9 +666,15 @@ namespace ExtInspector.Editor.Standalone
             return false;
         }
 
-        protected virtual bool DrawLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected virtual bool WillDrawLabel(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             return false;
+        }
+
+        protected virtual void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
+        {
+            // return false;
         }
 
         protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)

@@ -55,8 +55,8 @@ namespace ExtInspector.Editor.Standalone
             }
         }
 
-        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, bool hasLabel)
         {
             return base.GetPropertyHeight(property, label);
         }

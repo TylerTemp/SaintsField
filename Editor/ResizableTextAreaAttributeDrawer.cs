@@ -12,11 +12,12 @@ namespace ExtInspector.Editor
     {
         private string _error = "";
 
-        private float _width = -1;
+        // private float _width = -1;
 
-        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => GetHeight(
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, bool hasLabel) => GetHeight(
             property.stringValue,
-            _width < 0? EditorGUIUtility.currentViewWidth - EditorGUIUtility.labelWidth: _width
+            hasLabel? EditorGUIUtility.currentViewWidth - EditorGUIUtility.labelWidth: EditorGUIUtility.currentViewWidth
         );
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -28,7 +29,7 @@ namespace ExtInspector.Editor
                 return;
             }
 
-            _width = position.width;
+            // _width = position.width;
 
             // _width = GetHeight(
             //     property.stringValue,

@@ -19,7 +19,7 @@ namespace ExtInspector.Editor
             _richTextDrawer.Dispose();
         }
 
-        protected override float GetLabelFieldHeight(SerializedProperty property, GUIContent label,
+        protected override float GetLabelHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
@@ -28,7 +28,14 @@ namespace ExtInspector.Editor
                 : base.GetPropertyHeight(property, label);
         }
 
-        protected override bool DrawLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawLabel(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
+            return GetLabelXml(property, targetAttribute) == null;
+        }
+
+        protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             // label = EditorGUI.BeginProperty(position, label, property);
 
@@ -37,63 +44,65 @@ namespace ExtInspector.Editor
             // (Rect labelRect, Rect propertyRect) =
             //     RectUtils.SplitWidthRect(EditorGUI.IndentedRect(position), EditorGUIUtility.labelWidth);
 
-            string labelXml = targetAttribute.RichTextXml;
-            if (targetAttribute.IsCallback)
-            {
-                _error = "";
-                object target = property.serializedObject.targetObject;
-                (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUil.GetProp(target.GetType(), targetAttribute.RichTextXml);
-                switch (getPropType)
-                {
-                    case ReflectUil.GetPropType.Field:
-                    {
-                        object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-                        labelXml = result == null ? string.Empty : result.ToString();
-                    }
-                        break;
-                    case ReflectUil.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo) fieldOrMethodInfo;
-                        ParameterInfo[] methodParams = methodInfo.GetParameters();
-                        Debug.Assert(methodParams.All(p => p.IsOptional));
-                        if (methodInfo.ReturnType != typeof(string))
-                        {
-                            _error =
-                                $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}";
-                        }
-                        else
-                        {
-                            try
-                            {
-                                labelXml = (string) methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-                            }
-                            catch (TargetInvocationException e)
-                            {
-                                _error = e.InnerException!.Message;
-                                Debug.LogException(e);
-                            }
-                            catch (Exception e)
-                            {
-                                _error = e.Message;
-                                Debug.LogException(e);
-                            }
-                        }
-                    }
-                        break;
-                    case ReflectUil.GetPropType.NotFound:
-                    {
-                        _error =
-                            $"not found `{targetAttribute.RichTextXml}` on `{target}`";
-                    }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-                }
-            }
+            // string labelXml = targetAttribute.RichTextXml;
+            // if (targetAttribute.IsCallback)
+            // {
+            //     _error = "";
+            //     object target = property.serializedObject.targetObject;
+            //     (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUil.GetProp(target.GetType(), targetAttribute.RichTextXml);
+            //     switch (getPropType)
+            //     {
+            //         case ReflectUil.GetPropType.Field:
+            //         {
+            //             object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+            //             labelXml = result == null ? string.Empty : result.ToString();
+            //         }
+            //             break;
+            //         case ReflectUil.GetPropType.Method:
+            //         {
+            //             MethodInfo methodInfo = (MethodInfo) fieldOrMethodInfo;
+            //             ParameterInfo[] methodParams = methodInfo.GetParameters();
+            //             Debug.Assert(methodParams.All(p => p.IsOptional));
+            //             if (methodInfo.ReturnType != typeof(string))
+            //             {
+            //                 _error =
+            //                     $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}";
+            //             }
+            //             else
+            //             {
+            //                 try
+            //                 {
+            //                     labelXml = (string) methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+            //                 }
+            //                 catch (TargetInvocationException e)
+            //                 {
+            //                     _error = e.InnerException!.Message;
+            //                     Debug.LogException(e);
+            //                 }
+            //                 catch (Exception e)
+            //                 {
+            //                     _error = e.Message;
+            //                     Debug.LogException(e);
+            //                 }
+            //             }
+            //         }
+            //             break;
+            //         case ReflectUil.GetPropType.NotFound:
+            //         {
+            //             _error =
+            //                 $"not found `{targetAttribute.RichTextXml}` on `{target}`";
+            //         }
+            //             break;
+            //         default:
+            //             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+            //     }
+            // }
+
+            string labelXml = GetLabelXml(property, targetAttribute);
 
             if (labelXml is null)
             {
-                return false;
+                return;
             }
 
 // #if EXT_INSPECTOR_LOG
@@ -105,7 +114,72 @@ namespace ExtInspector.Editor
             // EditorGUI.PropertyField(propertyRect, property, GUIContent.none);
 
             // EditorGUI.EndProperty();
-            return true;
+            // return;
+        }
+
+        private string GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute)
+        {
+            if (!targetAttribute.IsCallback)
+            {
+                return targetAttribute.RichTextXml;
+            }
+
+            _error = "";
+            object target = property.serializedObject.targetObject;
+            (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUil.GetProp(target.GetType(), targetAttribute.RichTextXml);
+            switch (getPropType)
+            {
+                case ReflectUil.GetPropType.Field:
+                {
+                    object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+                    return result == null ? string.Empty : result.ToString();
+                }
+
+                case ReflectUil.GetPropType.Property:
+                {
+                    object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                    return result == null ? string.Empty : result.ToString();
+                }
+                case ReflectUil.GetPropType.Method:
+                {
+                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    Debug.Assert(methodParams.All(p => p.IsOptional));
+                    if (methodInfo.ReturnType != typeof(string))
+                    {
+                        _error =
+                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}";
+                    }
+                    else
+                    {
+                        try
+                        {
+                            return (string)methodInfo.Invoke(target,
+                                methodParams.Select(p => p.DefaultValue).ToArray());
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            _error = e.InnerException!.Message;
+                            Debug.LogException(e);
+                        }
+                        catch (Exception e)
+                        {
+                            _error = e.Message;
+                            Debug.LogException(e);
+                        }
+                    }
+                    return null;
+                }
+                case ReflectUil.GetPropType.NotFound:
+                {
+                    _error =
+                        $"not found `{targetAttribute.RichTextXml}` on `{target}`";
+                    return null;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+            }
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
