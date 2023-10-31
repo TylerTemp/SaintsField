@@ -78,11 +78,12 @@ namespace ExtInspector.Editor
             return width;
         }
 
-        protected override (bool isActive, Rect position) DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             if (_containerProperty == null)
             {
-                return (false, position);
+                return false;
             }
 
             // if (!(property.objectReferenceValue is Sprite))
@@ -91,7 +92,7 @@ namespace ExtInspector.Editor
             // }
             if ((_isUiImage && _image == null) || (!_isUiImage && _spriteRenderer == null))
             {
-                return (false, position);
+                return false;
             }
 
             Sprite usingSprite = _isUiImage? _image.sprite: _spriteRenderer.sprite;
@@ -116,7 +117,7 @@ namespace ExtInspector.Editor
                 }
             }
 
-            return (true, position);
+            return true;
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";

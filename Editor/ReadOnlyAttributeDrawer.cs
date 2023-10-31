@@ -20,10 +20,11 @@ namespace ExtInspector.Editor
             return (true, position);
         }
 
-        protected override (bool isActive, Rect position) DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             EditorGUI.EndDisabledGroup();
-            return (true, position);
+            return true;
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)

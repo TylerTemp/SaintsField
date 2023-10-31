@@ -11,15 +11,15 @@ namespace Samples
         [field: SerializeField] private string _labelByField;
 
         [SerializeField]
-        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye-regular.png' /></color>!", false, "")]
+        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye.png' /></color>!", false, "")]
         [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye-regular.png' /></color>!", false, "")]
+        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye.png' /></color>!", false, "")]
         [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
 
         [BelowButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-        [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye-regular.png' /></color>!", false)]
+        [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye.png' /></color>!", false)]
         [BelowButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-        [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye-regular.png' /></color>!", false)]
+        [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye.png' /></color>!", false)]
         [BelowButton(nameof(ClickButton), nameof(_labelByField), true)]
 
         [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
@@ -41,8 +41,8 @@ namespace Samples
         }
 
         private string GetButtonLabelIcon() => _errorOut
-            ? "<color=red><icon='eye-regular.png' /></color>"
-            : "<color=green><icon='eye-regular.png' /></color>";
+            ? "<color=red><icon='eye.png' /></color>"
+            : "<color=green><icon='eye.png' /></color>";
 
         private void ClickButton2()
         {

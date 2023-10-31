@@ -16,14 +16,15 @@ namespace ExtInspector.Editor
             return Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(labelXml, label.text))));
         }
 
-        protected override (bool isActive, Rect position) DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             // Debug.Log($"draw below {position}");
             // return Draw(position, property, label, saintsAttribute);
-            float width = GetPostFieldWidth(position, property, label, saintsAttribute);
-            (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
-            Draw(useRect, property, label, saintsAttribute);
-            return (true, leftRect);
+            // float width = GetPostFieldWidth(position, property, label, saintsAttribute);
+            // (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
+            Draw(position, property, label, saintsAttribute);
+            return true;
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)

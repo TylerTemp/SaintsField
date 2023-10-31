@@ -396,7 +396,7 @@ namespace ExtInspector.Editor.Standalone
                 };
                 postFieldAccWidth += width;
 
-                (bool isActive, Rect newPostFieldRect) = drawer.DrawPostField(eachRect, property, propertyScoopLabel, attributeWithIndex.SaintsAttribute);
+                bool isActive = drawer.DrawPostField(eachRect, property, propertyScoopLabel, attributeWithIndex.SaintsAttribute);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
@@ -632,9 +632,10 @@ namespace ExtInspector.Editor.Standalone
             return 0;
         }
 
-        protected virtual (bool isActive, Rect position) DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected virtual bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
-            return (false, position);
+            return false;
         }
 
         protected virtual bool DrawLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)

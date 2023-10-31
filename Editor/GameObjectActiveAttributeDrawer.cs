@@ -30,15 +30,16 @@ namespace ExtInspector.Editor
             return position.height;
         }
 
-        protected override (bool isActive, Rect position) DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute)
         {
             // Debug.Log($"draw below {position}");
             // return Draw(position, property, label, saintsAttribute);
-            float width = _width > 0
-                ? _width
-                : GetPostFieldWidth(position, property, label, saintsAttribute);
+            // float width = _width > 0
+            //     ? _width
+            //     : GetPostFieldWidth(position, property, label, saintsAttribute);
 
-            (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
+            // (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
             // <color=yellow><icon='eye-regular.png' /></color>
 
             // Type fieldType = SerializedUtil.GetType(property);
@@ -55,7 +56,7 @@ namespace ExtInspector.Editor
             bool goIsNull = go == null;
             bool goActive = !goIsNull && go.activeSelf;
 
-            Draw(useRect, property, label, goActive? SeeXml: UnSeeXml, goActive, (newIsActive) =>
+            Draw(position, property, label, goActive? SeeXml: UnSeeXml, goActive, (newIsActive) =>
             {
                 if (go != null)
                 {
@@ -67,7 +68,7 @@ namespace ExtInspector.Editor
             {
                 _error = $"Unable to get GameObject from {property.name}";
             }
-            return (true, leftRect);
+            return true;
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)

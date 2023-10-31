@@ -327,7 +327,7 @@ GameObject:
   - component: {fileID: 417627792}
   - component: {fileID: 417627790}
   m_Layer: 0
-  m_Name: SpriteToggleExample
+  m_Name: SpriteToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -525,7 +525,7 @@ GameObject:
   - component: {fileID: 847311491}
   - component: {fileID: 847311492}
   m_Layer: 0
-  m_Name: PostFieldButtonExample
+  m_Name: PostFieldButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -607,6 +607,87 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _go: {fileID: 896673125}
   _component: {fileID: 896673127}
+--- !u!1 &1138076587
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1138076588}
+  - component: {fileID: 1138076589}
+  m_Layer: 0
+  m_Name: ResizableTextArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1138076588
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138076587}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.13942365, y: 0.047697563, z: -0.006200691}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1138076589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138076587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff1162fe387fd3408ee8c17c002ea6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _short: 'short
+
+    content'
+  _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
+    10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7
+    wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap
+    5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2
+    wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12'
+  _noLabel: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9
+    wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap
+    7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4
+    wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp
+    2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12'
+  _nat: "long long long long long long long long long long long long long long long
+    long long long long long long long long long long long long long long long long
+    long long long long long long long long long long long long long long long long
+    long long long long long long long \nlong long long long long long long long
+    long long long long long long long long long long long long long long long long
+    long long long long long long long long long long "
+  _unity: "long long long long long long long long long long long long long long
+    long long long long long long long long long long long long long long long long
+    long long long long long long long long long long long long long long long long
+    long long long long long long long long \nlong long long long long long long
+    long long long long long long long long long long long long long long long long
+    long long long long long long long long long long long "
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
@@ -1039,3 +1120,4 @@ SceneRoots:
   - {fileID: 1730412121}
   - {fileID: 1571298209}
   - {fileID: 417627791}
+  - {fileID: 1138076588}
