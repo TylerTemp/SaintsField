@@ -30,4 +30,4 @@ if '%errorlevel%' NEQ '0' (
 :--------------------------------------
 
 REM mklink /D "%~dp0\Assets\Editor Default Resources\ExtInspector" "%~dp0\Assets\ExtInspector\Editor Default Resources~\ExtInspector"
-mklink /D "%~dp0\Assets\Samples" "%~dp0\Assets\ExtInspector\Samples~"
+mklink /D "%~dp0\Assets\ExtInspector\Samples" "%~dp0\Assets\ExtInspector\Samples~"
