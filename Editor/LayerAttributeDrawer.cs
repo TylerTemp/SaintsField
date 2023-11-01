@@ -89,7 +89,7 @@ namespace ExtInspector.Editor
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => property.propertyType != SerializedPropertyType.Integer && property.propertyType != SerializedPropertyType.String;
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => (property.propertyType != SerializedPropertyType.Integer && property.propertyType != SerializedPropertyType.String)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => property.propertyType != SerializedPropertyType.Integer && property.propertyType != SerializedPropertyType.String
             ? HelpBox.GetHeight($"Expect string or int, get {property.propertyType}", width, MessageType.Error)
             : 0f;
 

@@ -811,7 +811,7 @@ namespace ExtInspector.Editor.Standalone
                     {
                         if (property.propertyType == SerializedPropertyType.Float)
                         {
-                            property.floatValue += (xOffset * 0.03f);
+                            property.floatValue += xOffset * 0.03f;
                         }
                         else
                         {
