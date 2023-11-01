@@ -139,22 +139,22 @@ namespace ExtInspector.Editor
                 return decButtonAttribute.ButtonLabel;
             }
 
-            (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUil.GetProp(objType, decButtonAttribute.ButtonLabel);
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUtils.GetProp(objType, decButtonAttribute.ButtonLabel);
             switch (getPropType)
             {
-                case ReflectUil.GetPropType.NotFound:
+                case ReflectUtils.GetPropType.NotFound:
                 {
                     _error = $"No field or method named `{decButtonAttribute.ButtonLabel}` found on `{target}`";
                     return decButtonAttribute.ButtonLabel;
                 }
-                case ReflectUil.GetPropType.Field:
+                case ReflectUtils.GetPropType.Field:
                 {
                     FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
                     object value = findFieldInfo.GetValue(target);
                     return value == null ? string.Empty : value.ToString();
                 }
-                case ReflectUil.GetPropType.Method:
+                case ReflectUtils.GetPropType.Method:
                 {
                     MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
                     ParameterInfo[] methodParams = methodInfo.GetParameters();

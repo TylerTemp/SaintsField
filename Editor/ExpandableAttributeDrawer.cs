@@ -27,12 +27,12 @@ namespace ExtInspector.Editor
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            float basicHeight = _error == "" ? 0 : HelpBox.GetHeight(_error, width);
+            float basicHeight = _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
             if (!_expanded)
             {
                 return basicHeight;
             }
-            
+
             ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
             SerializedObject serializedObject = new SerializedObject(scriptableObject);
             float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
@@ -58,12 +58,12 @@ namespace ExtInspector.Editor
             }
 
             Rect leftRect = position;
-            
+
             if (_error != "")
             {
                 leftRect = HelpBox.Draw(position, _error, MessageType.Error);
             }
-            
+
             if (!_expanded || scriptableObject == null)
             {
                 return leftRect;
@@ -96,11 +96,11 @@ namespace ExtInspector.Editor
                 // NaughtyEditorGUI.PropertyField(childRect, childProperty, true);
                 EditorGUI.PropertyField(childRect, childProperty, true);
 
-                usedHeight += childHeight;                
+                usedHeight += childHeight;
             }
 
             serializedObject.ApplyModifiedProperties();
-            
+
             GUI.Box(new Rect(leftRect)
             {
                 height = usedHeight,

@@ -5,25 +5,17 @@ namespace ExtInspector.Editor.Utils
 {
     public static class HelpBox
     {
-        public static float GetHeight(string content, float width, GUIStyle guiStyle = null)
+        public static float GetHeight(string content, float width, MessageType messageType)
         {
-            // GUIStyle helpBoxStyle = guiStyle ?? EditorStyles.helpBox;
-            // return Mathf.Max(
-            //     30f,
-            //     helpBoxStyle.CalcHeight(new GUIContent(content), EditorGUIUtility.currentViewWidth)
-            // );
-
-            // InfoBoxAttribute infoBoxAttribute = (InfoBoxAttribute)attribute;
-            float minHeight = EditorGUIUtility.singleLineHeight * 2.0f;
-            float desiredHeight = GUI.skin.box.CalcHeight(new GUIContent(content), width);
-            float height = Mathf.Max(minHeight, desiredHeight);
-
-            return height;
+            float basicHeight = GUI.skin.box.CalcHeight(new GUIContent(content), width);
+            return messageType == MessageType.None
+                ? basicHeight
+                : Mathf.Max(EditorGUIUtility.singleLineHeight * 2.0f, basicHeight);
         }
 
         public static Rect Draw(Rect position, string content, MessageType messageType)
         {
-            (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, GetHeight(content, position.width));
+            (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, GetHeight(content, position.width, messageType));
             EditorGUI.HelpBox(curRect, content, messageType);
             return leftRect;
         }

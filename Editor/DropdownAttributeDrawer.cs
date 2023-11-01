@@ -28,17 +28,17 @@ namespace ExtInspector.Editor
             string funcName = dropdownAttribute.FuncName;
             UnityEngine.Object target = property.serializedObject.targetObject;
             Type targetType = target.GetType();
-            (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUil.GetProp(targetType, funcName);
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(targetType, funcName);
             IDropdownList dropdownListValue;
             switch (getPropType)
             {
-                case ReflectUil.GetPropType.NotFound:
+                case ReflectUtils.GetPropType.NotFound:
                 {
                     _error = $"not found `{funcName}` on target `{target}`";
                     DefaultDrawer(position, property);
                 }
                     return;
-                case ReflectUil.GetPropType.Property:
+                case ReflectUtils.GetPropType.Property:
                 {
                     PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
                     dropdownListValue = foundPropertyInfo.GetValue(target) as IDropdownList;
@@ -50,7 +50,7 @@ namespace ExtInspector.Editor
                     }
                 }
                     break;
-                case ReflectUil.GetPropType.Field:
+                case ReflectUtils.GetPropType.Field:
                 {
                     FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
                     dropdownListValue = foundFieldInfo.GetValue(target) as IDropdownList;
@@ -62,7 +62,7 @@ namespace ExtInspector.Editor
                     }
                 }
                     break;
-                case ReflectUil.GetPropType.Method:
+                case ReflectUtils.GetPropType.Method:
                 {
                     MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
                     ParameterInfo[] methodParams = methodInfo.GetParameters();
@@ -167,7 +167,7 @@ namespace ExtInspector.Editor
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : HelpBox.GetHeight(_error, width);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : HelpBox.Draw(position, _error, MessageType.Error);
     }

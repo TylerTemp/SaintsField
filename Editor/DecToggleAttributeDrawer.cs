@@ -107,22 +107,22 @@ namespace ExtInspector.Editor
 
         protected string GetButtonLabelXmlCallback(string name, object target, Type objType)
         {
-            (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUil.GetProp(objType, name);
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUtils.GetProp(objType, name);
             switch (getPropType)
             {
-                case ReflectUil.GetPropType.NotFound:
+                case ReflectUtils.GetPropType.NotFound:
                 {
                     _error = $"No field or method named `{name}` found on `{target}`";
                     return name;
                 }
-                case ReflectUil.GetPropType.Field:
+                case ReflectUtils.GetPropType.Field:
                 {
                     FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
                     object value = findFieldInfo.GetValue(target);
                     return value == null ? string.Empty : value.ToString();
                 }
-                case ReflectUil.GetPropType.Method:
+                case ReflectUtils.GetPropType.Method:
                 {
                     MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
                     ParameterInfo[] methodParams = methodInfo.GetParameters();

@@ -314,7 +314,7 @@ namespace ExtInspector.Editor
                 }
             }
 
-            List<Type> types = ReflectUil.GetSelfAndBaseTypes(target);
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             // List<FieldWithInfo> fieldWithInfos = new List<FieldWithInfo>();
             string[] serializableFields = GetSerializedProperties().ToArray();
             foreach (Type systemType in types)
@@ -562,7 +562,7 @@ namespace ExtInspector.Editor
 
             // Debug.Log($"IsVisible {checkProp}, {inverted}");
 
-            List<Type> types = ReflectUil.GetSelfAndBaseTypes(target);
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             // List<FieldWithInfo> fieldWithInfos = new List<FieldWithInfo>();
             foreach (Type systemType in types)
             {
@@ -623,7 +623,7 @@ namespace ExtInspector.Editor
         }
 
         private bool IsVisible(SerializedProperty serializedProp) =>
-            IsVisible(SerializedUtil.GetAttribute<ShowHideConditionBase>(serializedProp));
+            IsVisible(SerializedUtils.GetAttribute<ShowHideConditionBase>(serializedProp));
 
         public virtual void OnDisable()
         {

@@ -34,7 +34,7 @@ namespace ExtInspector.Editor
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            return DisplayError == "" ? 0 : HelpBox.GetHeight(DisplayError, width);
+            return DisplayError == "" ? 0 : HelpBox.GetHeight(DisplayError, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) =>

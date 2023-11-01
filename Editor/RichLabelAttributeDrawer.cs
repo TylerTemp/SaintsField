@@ -123,22 +123,22 @@ namespace ExtInspector.Editor
 
             _error = "";
             object target = property.serializedObject.targetObject;
-            (ReflectUil.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUil.GetProp(target.GetType(), targetAttribute.RichTextXml);
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
             switch (getPropType)
             {
-                case ReflectUil.GetPropType.Field:
+                case ReflectUtils.GetPropType.Field:
                 {
                     object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
                     return result == null ? string.Empty : result.ToString();
                 }
 
-                case ReflectUil.GetPropType.Property:
+                case ReflectUtils.GetPropType.Property:
                 {
                     object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
                     return result == null ? string.Empty : result.ToString();
                 }
-                case ReflectUil.GetPropType.Method:
+                case ReflectUtils.GetPropType.Method:
                 {
                     MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
                     ParameterInfo[] methodParams = methodInfo.GetParameters();
@@ -168,7 +168,7 @@ namespace ExtInspector.Editor
                     }
                     return null;
                 }
-                case ReflectUil.GetPropType.NotFound:
+                case ReflectUtils.GetPropType.NotFound:
                 {
                     _error =
                         $"not found `{targetAttribute.RichTextXml}` on `{target}`";
@@ -186,7 +186,7 @@ namespace ExtInspector.Editor
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            return _error == "" ? 0 : HelpBox.GetHeight(_error, width);
+            return _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)

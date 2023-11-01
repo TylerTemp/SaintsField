@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace ExtInspector.Editor.Utils
 {
-    public static class SerializedUtil
+    public static class SerializedUtils
     {
         public static SerializedProperty FindPropertyByAutoPropertyName(SerializedObject obj, string propName)
         {
@@ -15,12 +15,12 @@ namespace ExtInspector.Editor.Utils
         public static T GetAttribute<T>(SerializedProperty property) where T : class
         {
             T[] attributes = GetAttributes<T>(property);
-            return (attributes.Length > 0) ? attributes[0] : null;
+            return attributes.Length > 0 ? attributes[0] : null;
         }
 
         public static T[] GetAttributes<T>(SerializedProperty property) where T : class
         {
-            FieldInfo fieldInfo = ReflectUil.GetField(GetTargetObjectWithProperty(property), property.name);
+            FieldInfo fieldInfo = ReflectUtils.GetField(GetTargetObjectWithProperty(property), property.name);
             if (fieldInfo == null)
             {
                 return new T[] { };
@@ -112,7 +112,7 @@ namespace ExtInspector.Editor.Utils
             string[] slices = prop.propertyPath.Split('.');
             object targetObj = prop.serializedObject.targetObject;
 
-            foreach (Type eachType in ReflectUil.GetSelfAndBaseTypes(targetObj))
+            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypes(targetObj))
             {
                 // foreach (FieldInfo field in type!.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
                 // {

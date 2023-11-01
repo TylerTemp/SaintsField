@@ -27,7 +27,7 @@ namespace ExtInspector.Editor
             float width,
             ISaintsAttribute saintsAttribute)
         {
-            float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg, width);
+            float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg, width, MessageType.Error);
             float subRowHeight = EditorGUIUtility.singleLineHeight * (property.propertyType == SerializedPropertyType.String ? 1 : 2);
             return errorHeight + subRowHeight;
         }
@@ -43,7 +43,7 @@ namespace ExtInspector.Editor
             string animFieldName = animatorStateAttribute.AnimFieldName ?? "animator";
 
             SerializedObject targetSer = property.serializedObject;
-            SerializedProperty animProp = targetSer.FindProperty(animFieldName) ?? SerializedUtil.FindPropertyByAutoPropertyName(targetSer, animFieldName);
+            SerializedProperty animProp = targetSer.FindProperty(animFieldName) ?? SerializedUtils.FindPropertyByAutoPropertyName(targetSer, animFieldName);
 
             // Debug.Log(property.type);
             if(animProp == null)

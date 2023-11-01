@@ -244,7 +244,7 @@ namespace ExtInspector.Editor.Standalone
             using EditorGUI.PropertyScope propertyScope = new EditorGUI.PropertyScope(position, label, property);
             GUIContent propertyScoopLabel = propertyScope.content;
 
-            IReadOnlyList<SaintsWithIndex> allSaintsAttributes = SerializedUtil.GetAttributes<ISaintsAttribute>(property).Select((each, index) => new SaintsWithIndex
+            IReadOnlyList<SaintsWithIndex> allSaintsAttributes = SerializedUtils.GetAttributes<ISaintsAttribute>(property).Select((each, index) => new SaintsWithIndex
             {
                 SaintsAttribute = each,
                 Index = index,
@@ -633,7 +633,7 @@ namespace ExtInspector.Editor.Standalone
 
             // OK this should deal everything
 
-            IEnumerable<PropertyAttribute> allOtherAttributes = SerializedUtil.GetAttributes<PropertyAttribute>(property)
+            IEnumerable<PropertyAttribute> allOtherAttributes = SerializedUtils.GetAttributes<PropertyAttribute>(property)
                 .Where(each => each is not ISaintsAttribute);
             foreach (PropertyAttribute propertyAttribute in allOtherAttributes)
             {

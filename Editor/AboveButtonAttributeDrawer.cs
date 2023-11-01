@@ -9,7 +9,7 @@ namespace ExtInspector.Editor
     {
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width));
+            ISaintsAttribute saintsAttribute) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width, MessageType.Error));
 
 
         protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)

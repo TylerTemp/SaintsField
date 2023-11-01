@@ -32,7 +32,7 @@ namespace ExtInspector.Editor
             AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
 
             SerializedObject targetSer = property.serializedObject;
-            SerializedProperty animProp = targetSer.FindProperty(animatorParamAttribute.AnimatorName) ?? SerializedUtil.FindPropertyByAutoPropertyName(targetSer, animatorParamAttribute.AnimatorName);
+            SerializedProperty animProp = targetSer.FindProperty(animatorParamAttribute.AnimatorName) ?? SerializedUtils.FindPropertyByAutoPropertyName(targetSer, animatorParamAttribute.AnimatorName);
 
             List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>();
 
@@ -204,7 +204,7 @@ namespace ExtInspector.Editor
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            return _error == "" ? 0 : HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth);
+            return _error == "" ? 0 : HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -214,7 +214,7 @@ namespace ExtInspector.Editor
                 return position;
             }
 
-            (Rect boxRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth));
+            (Rect boxRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error));
             HelpBox.Draw(boxRect, _error, MessageType.Error);
             return leftRect;
         }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace ExtInspector.Editor.Utils
 {
-    public static class ReflectUil
+    public static class ReflectUtils
     {
         public static FieldInfo GetField(object target, string fieldName)
         {
@@ -161,5 +161,32 @@ namespace ExtInspector.Editor.Utils
 
         }
 
+        public static bool Truly(object value)
+        {
+            try
+            {
+                return Convert.ToBoolean(value);
+            }
+            catch (InvalidCastException)
+            {
+                bool equalNull = value == null;
+                if (equalNull)
+                {
+                    return false;
+                }
+                try
+                {
+                    return (UnityEngine.Object)value == null;
+                }
+                catch (InvalidCastException)
+                {
+                    return true;
+                }
+            }
+            catch (NullReferenceException)
+            {
+                return false;
+            }
+        }
     }
 }
