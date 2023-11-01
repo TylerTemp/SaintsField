@@ -197,26 +197,10 @@ namespace ExtInspector.Editor
         //     return (AnimatorController)animator?.runtimeAnimatorController;
         // }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
-        {
-            return _error != "";
-        }
+        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
-        {
-            return _error == "" ? 0 : HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error);
-        }
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error);
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
-        {
-            if (_error == "")
-            {
-                return position;
-            }
-
-            (Rect boxRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error));
-            HelpBox.Draw(boxRect, _error, MessageType.Error);
-            return leftRect;
-        }
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => HelpBox.Draw(position, _error, MessageType.Error);
     }
 }
