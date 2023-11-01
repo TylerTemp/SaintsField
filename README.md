@@ -1,4 +1,4 @@
-# ExtInspector #
+# SaintsField #
 
 ## Development ##
 
@@ -12,10 +12,3 @@
 
     mac/linux: `ln -s 'Assets/ExtInspector/Samples~' 'Assets/ExtInspector/Samples'`
 
-## Release ##
-
-```bash
-cd Assets/ExtInspecor
-git add .
-// ... as per usual
-```
