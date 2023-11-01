@@ -20,9 +20,12 @@ namespace ExtInspector.Editor.Standalone
         // private SaintsPropertyDrawer _labelDrawer;
         // private SaintsPropertyDrawer _fieldDrawer;
 
+        private readonly string _fieldControlName;
+
         private struct SaintsWithIndex
         {
             public ISaintsAttribute SaintsAttribute;
+            // ReSharper disable once NotAccessedField.Local
             public int Index;
         }
 
@@ -45,6 +48,8 @@ namespace ExtInspector.Editor.Standalone
             {
                 return;
             }
+
+            _fieldControlName = Guid.NewGuid().ToString();
 
             _usedAttributes.Clear();
 
@@ -121,9 +126,9 @@ namespace ExtInspector.Editor.Standalone
                                    labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
             // float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0f;
             // Debug.Log($"hasLabel={hasLabel}");
-            float labelHeight = drawSaintsLabel
-                ? labelFound.drawer.GetLabelHeight(property, label, labelFound.iSaintsAttribute)
-                : 0f;
+            // float labelHeight = drawSaintsLabel
+            //     ? labelFound.drawer.GetLabelHeight(property, label, labelFound.iSaintsAttribute)
+            //     : 0f;
 
             bool saintsDrawNoLabel = hasSaintsLabel && !drawSaintsLabel;
 
@@ -133,7 +138,7 @@ namespace ExtInspector.Editor.Standalone
             //     : 0f;
             bool fieldBreakLine = hasSaintsField && fieldFound.iSaintsAttribute.GroupBy != "__LABEL_FIELD__";
 
-            float basicHeight;
+            // float basicHeight;
             if (fieldBreakLine)
             {
                 float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
@@ -204,10 +209,10 @@ namespace ExtInspector.Editor.Standalone
             return 0;
         }
 
-        protected virtual float GetLabelHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
-        {
-            return 0;
-        }
+        // protected virtual float GetLabelHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        // {
+        //     return 0;
+        // }
 
         protected virtual float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
@@ -239,6 +244,8 @@ namespace ExtInspector.Editor.Standalone
             // }
             // // base.OnGUI(position, property, label);
             // DefaultDrawer(fieldRect, property, newLabel);
+            GUI.SetNextControlName(_fieldControlName);
+
             _usedAttributes.Clear();
 
             using EditorGUI.PropertyScope propertyScope = new EditorGUI.PropertyScope(position, label, property);
@@ -335,6 +342,13 @@ namespace ExtInspector.Editor.Standalone
                 y = position.y + aboveUsedHeight,
                 height = _fieldBasicHeight,
             };
+
+            // Color backgroundColor = EditorGUIUtility.isProSkin
+            //     ? new Color32(56, 56, 56, 255)
+            //     : new Color32(194, 194, 194, 255);
+            // UnityDraw(fieldRect, property, propertyScoopLabel);
+            // EditorGUI.DrawRect(fieldRect, backgroundColor);
+
             // GUIContent newLabel = propertyScoopLabel;
             (Rect labelRect, Rect leftPropertyRect) =
                 RectUtils.SplitWidthRect(EditorGUI.IndentedRect(fieldRect), EditorGUIUtility.labelWidth);
@@ -365,8 +379,14 @@ namespace ExtInspector.Editor.Standalone
             if (labelDrawer == null)
             {
                 anyLabelDrew = true;
+                if(labelRect.Contains(_labelClickedMousePos))
+                {
+                    GUI.Box(labelRect, GUIContent.none, "SelectionRect");
+                }
                 // default label drawer
                 EditorGUI.LabelField(labelRect, propertyScoopLabel);
+                // RichLabelAttributeDrawer.LabelMouseProcess(labelRect, property);
+                LabelMouseProcess(labelRect, property, _fieldControlName);
                 fieldRect = leftPropertyRect;
             }
             else
@@ -376,8 +396,15 @@ namespace ExtInspector.Editor.Standalone
                 if(labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
                 {
                     anyLabelDrew = true;
+
+                    if(labelRect.Contains(_labelClickedMousePos))
+                    {
+                        GUI.Box(labelRect, GUIContent.none, "SelectionRect");
+                    }
+
                     labelDrawerInstance.DrawLabel(labelRect, property, propertyScoopLabel,
                         labelAttributeWithIndex.SaintsAttribute);
+                    LabelMouseProcess(labelRect, property, _fieldControlName);
                     fieldRect = leftPropertyRect;
                 }
                 // newLabel = GUIContent.none;
@@ -433,8 +460,11 @@ namespace ExtInspector.Editor.Standalone
                 ? null
                 : GetFirstSaintsDrawerType(fieldAttributeWithIndex.SaintsAttribute.GetType());
             // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
+
+            // Debug.Log($"{label.text}={_fieldControlName}");
             if (fieldDrawer == null)
             {
+                GUI.SetNextControlName(_fieldControlName);
                 DefaultDrawer(fieldUseRect, property);
             }
             else
@@ -442,6 +472,7 @@ namespace ExtInspector.Editor.Standalone
                 // Debug.Log(fieldAttribute);
                 SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
                 // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
+                GUI.SetNextControlName(_fieldControlName);
                 fieldDrawerInstance.DrawField(fieldUseRect, property, GUIContent.none, fieldAttributeWithIndex.SaintsAttribute);
                 // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
@@ -665,8 +696,15 @@ namespace ExtInspector.Editor.Standalone
             }
 
             // fallback to pure unity one (unity default attribute not included)
+            // MethodInfo defaultDraw = typeof(EditorGUI).GetMethod("DefaultPropertyField", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            // defaultDraw!.Invoke(null, new object[] { position, property, GUIContent.none });
+            UnityDraw(position, property, GUIContent.none);
+        }
+
+        private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label)
+        {
             MethodInfo defaultDraw = typeof(EditorGUI).GetMethod("DefaultPropertyField", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            defaultDraw!.Invoke(null, new object[] { position, property, GUIContent.none });
+            defaultDraw!.Invoke(null, new object[] { position, property, label });
         }
 
         // public abstract void OnSaintsGUI(Rect position, SerializedProperty property, GUIContent label);
@@ -727,6 +765,61 @@ namespace ExtInspector.Editor.Standalone
             GUIContent label, ISaintsAttribute saintsAttribute)
         {
             return position;
+        }
+
+        private bool _mouseHold;
+        private static Vector2 _labelClickedMousePos = new Vector2(-1, -1);
+
+        private void LabelMouseProcess(Rect position, SerializedProperty property, string focusName)
+        {
+            Event e = Event.current;
+            if (e.isMouse && e.type == EventType.MouseDown)
+            {
+                _labelClickedMousePos = e.mousePosition;
+            }
+
+            if (e.isMouse && e.button == 0)
+            {
+                if(!_mouseHold && position.Contains(e.mousePosition))
+                {
+                    // Debug.Log($"start hold");
+                    _mouseHold = true;
+                    // e.Use();
+                    // Debug.Log($"focus {_fieldControlName}");
+                    GUI.FocusControl(focusName);
+                }
+            }
+
+            if (e.type == EventType.MouseUp)
+            {
+                _mouseHold = false;
+            }
+
+            if (property.propertyType == SerializedPropertyType.Integer ||
+                property.propertyType == SerializedPropertyType.Float)
+            {
+                EditorGUIUtility.AddCursorRect(position, MouseCursor.SlideArrow);
+                if (e.isMouse && e.button == 0
+                              && _mouseHold
+                    // && position.Contains(e.mousePosition)
+                   )
+                {
+                    int xOffset = Mathf.RoundToInt(e.delta.x);
+                    // if(xOffset)
+                    // Debug.Log(xOffset);
+                    if (xOffset != 0)
+                    {
+                        if (property.propertyType == SerializedPropertyType.Float)
+                        {
+                            property.floatValue += (xOffset * 0.03f);
+                        }
+                        else
+                        {
+                            property.intValue += xOffset;
+                        }
+                    }
+                }
+            }
         }
     }
 }

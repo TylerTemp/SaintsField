@@ -236,9 +236,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _float: 3.2
-  _refs: {fileID: 0}
+  _refs: {fileID: 380193377}
   _go1: {fileID: 380193377}
   _go2: {fileID: 461560855}
+--- !u!1 &246861350
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 246861352}
+  - component: {fileID: 246861351}
+  m_Layer: 0
+  m_Name: InfoBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &246861351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246861350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63b9516b5d617ed458d446e946ef4fc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _show: 1
+  _content: 1372
+  _float: -3.46
+--- !u!4 &246861352
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246861350}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.808034, y: 9.394365, z: -0.040846735}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &380193377
 GameObject:
   m_ObjectHideFlags: 0
@@ -445,11 +492,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 652b26060ca7d5d45b1250475013f45c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mixed: {x: 0, y: 0}
-  _float: 25.7
-  _sOnly: {x: 0, y: 0}
+  _mixed: {x: 0, y: 0.25}
+  _float: 43.2
+  _sOnly: {x: -0.02, y: 0.37}
   _selfField: {x: 0.21, y: 0.68}
-  _mixedNoLabel: {x: 0.29, y: 0.72}
+  _mixedNoLabel: {x: 2.1, y: 0.43}
   _nested:
     _mixed: {x: 0, y: 0}
 --- !u!4 &440518747
@@ -689,6 +736,29 @@ MonoBehaviour:
     long
     wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11
     wrap 12'
+  _inlineShort: 'short
+
+    content always min 3 rows'
+  _inlineLong: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp
+    9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6
+    wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap
+    4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1
+    warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long
+    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11
+    wrap 12
+
+    ~~~~~~
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap
+    7 wrap 8 warp 9 wap 10 wrap 11 wrap 12'
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
@@ -733,7 +803,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vector2: {x: -0.31, y: 2.15}
+  vector2: {x: -0.31, y: 1.25}
   vector2Int: {x: 3, y: 8}
 --- !u!1 &1383904217
 GameObject:
@@ -766,7 +836,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scene: Example
   go: {fileID: 1383904217}
-  <SepTitleTest>k__BackingField: 71
+  <SepTitleTest>k__BackingField: 142
   <SepTitleJustLine>k__BackingField: 0
 --- !u!4 &1383904219
 Transform:
@@ -1122,3 +1192,4 @@ SceneRoots:
   - {fileID: 1571298209}
   - {fileID: 417627791}
   - {fileID: 1138076588}
+  - {fileID: 246861352}
