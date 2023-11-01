@@ -35,7 +35,7 @@ namespace ExtInspector.Utils
 
         public static void ResizeTexture(Texture2D originalTexture, int newWidth, int newHeight)
         {
-            Debug.Log($"ResizeTexture resize {newWidth}x{newHeight}");
+            // Debug.Log($"ResizeTexture resize {newWidth}x{newHeight}");
             TextureScale.Scale(originalTexture, newWidth, newHeight);
         }
 
