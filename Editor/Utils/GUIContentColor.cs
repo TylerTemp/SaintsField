@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector.Editor.Utils
+namespace SaintsField.Editor.Utils
 {
     public class GUIContentColor: IDisposable
     {

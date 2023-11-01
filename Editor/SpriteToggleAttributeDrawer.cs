@@ -1,9 +1,10 @@
-﻿using ExtInspector.Editor.Utils;
+﻿using SaintsField;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     [CustomPropertyDrawer(typeof(SpriteToggleAttribute))]
     public class SpriteToggleAttributeDrawer: SaintsPropertyDrawer

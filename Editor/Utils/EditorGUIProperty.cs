@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor.Utils
+namespace SaintsField.Editor.Utils
 {
     public class EditorGUIProperty: IDisposable
     {

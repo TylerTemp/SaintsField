@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     public class FieldTypeAttribute: PropertyAttribute, ISaintsAttribute
     {

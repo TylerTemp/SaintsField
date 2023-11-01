@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     public class FieldTypeExample: MonoBehaviour
     {

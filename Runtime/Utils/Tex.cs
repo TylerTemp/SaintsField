@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ExtInspector.Utils
+namespace SaintsField.Utils
 {
     public static class Tex
     {

@@ -1,4 +1,4 @@
-﻿namespace ExtInspector
+﻿namespace SaintsField
 {
     public enum SaintsAttributeType
     {

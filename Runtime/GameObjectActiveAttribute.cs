@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = false)]
     public class GameObjectActiveAttribute : PropertyAttribute, ISaintsAttribute

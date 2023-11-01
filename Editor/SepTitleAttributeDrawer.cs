@@ -1,9 +1,9 @@
-﻿using ExtInspector.Standalone;
-using ExtInspector.Utils;
+﻿using SaintsField.Standalone;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     [CustomPropertyDrawer(typeof(SepTitleAttribute))]
     public class SepTitleAttributeDrawer : DecoratorDrawer

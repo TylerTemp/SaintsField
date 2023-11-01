@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     [Serializable]
     public struct AnimatorState

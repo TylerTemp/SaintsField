@@ -1,6 +1,6 @@
 using System;
 
-namespace ExtInspector
+namespace SaintsField
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
     public class ShowIfAttribute: ShowHideConditionBase

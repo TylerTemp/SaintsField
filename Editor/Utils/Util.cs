@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor.Utils
+namespace SaintsField.Editor.Utils
 {
     public static class Util
     {

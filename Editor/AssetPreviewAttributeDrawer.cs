@@ -1,8 +1,9 @@
-﻿using ExtInspector.Editor.Utils;
+﻿using SaintsField;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     [CustomPropertyDrawer(typeof(AssetPreviewAttribute))]
     public class AssetPreviewAttributeDrawer : SaintsPropertyDrawer
@@ -62,7 +63,7 @@ namespace ExtInspector.Editor
 
             _cachedWidth = width;
             // return _cachedWidthTexture = formatted;
-            _cachedWidthTexture = ExtInspector.Utils.Tex.TextureTo(_previewTexture, width, maxHeight);
+            _cachedWidthTexture = SaintsField.Utils.Tex.TextureTo(_previewTexture, width, maxHeight);
             if (_cachedWidthTexture.width == 1)
             {
                 return _previewTexture;

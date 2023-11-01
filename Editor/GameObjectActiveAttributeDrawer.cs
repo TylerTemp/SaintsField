@@ -1,8 +1,9 @@
-﻿using ExtInspector.Editor.Utils;
+﻿using SaintsField;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     [CustomPropertyDrawer(typeof(GameObjectActiveAttribute))]
     public class GameObjectActiveAttributeDrawer: DecToggleAttributeDrawer

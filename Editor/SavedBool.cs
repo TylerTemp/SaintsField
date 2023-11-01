@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     public class SavedBool
     {

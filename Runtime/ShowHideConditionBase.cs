@@ -1,6 +1,6 @@
 using System;
 
-namespace ExtInspector
+namespace SaintsField
 {
     public class ShowHideConditionBase: Attribute
     {

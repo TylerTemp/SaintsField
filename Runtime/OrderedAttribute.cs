@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace ExtInspector
+namespace SaintsField
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
     public class OrderedAttribute: Attribute

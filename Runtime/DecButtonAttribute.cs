@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     public abstract class DecButtonAttribute: PropertyAttribute, ISaintsAttribute
     {

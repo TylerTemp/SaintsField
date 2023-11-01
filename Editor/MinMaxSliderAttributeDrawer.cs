@@ -1,8 +1,9 @@
-﻿using ExtInspector.Standalone;
+﻿using SaintsField;
+using SaintsField.Standalone;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     [CustomPropertyDrawer(typeof(MinMaxSliderAttribute))]
     public class MinMaxSliderAttributeDrawer : SaintsPropertyDrawer

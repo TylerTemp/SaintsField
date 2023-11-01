@@ -3,7 +3,7 @@ using System.Collections;
 using System.Reflection;
 using UnityEditor;
 
-namespace ExtInspector.Editor.Utils
+namespace SaintsField.Editor.Utils
 {
     public static class SerializedUtils
     {

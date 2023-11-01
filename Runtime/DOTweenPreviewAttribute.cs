@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExtInspector
+namespace SaintsField
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class DOTweenPreviewAttribute: Attribute

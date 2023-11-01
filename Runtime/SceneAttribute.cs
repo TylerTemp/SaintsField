@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     /// <summary>
     /// <see href="https://github.com/dbrizov/NaughtyAttributes/blob/a97aa9b3b416e4c9122ea1be1a1b93b1169b0cd3/Assets/NaughtyAttributes/Scripts/Core/DrawerAttributes/SceneAttribute.cs#L6"/>

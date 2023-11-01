@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
     public class SpriteToggleAttribute: PropertyAttribute, ISaintsAttribute

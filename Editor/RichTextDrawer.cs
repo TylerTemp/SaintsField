@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using ExtInspector.Editor.Utils;
-using ExtInspector.Utils;
+using SaintsField.Utils;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     public class RichTextDrawer: IDisposable
     {
@@ -56,8 +56,8 @@ namespace ExtInspector.Editor
             Texture2D result = new[]
             {
                 iconPath,
-                "Assets/ExtInspector/Editor/Editor Default Resources/ExtInspector/" + iconPath,
-                "Packages/today.comes.extinspector/Editor/Editor Default Resources/ExtInspector/" + iconPath,
+                "Assets/ExtInspector/Editor/Editor Default Resources/SaintsField/" + iconPath,
+                "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/" + iconPath,
             }
                 .Select(each => (Texture2D)EditorGUIUtility.Load(each))
                 .FirstOrDefault(each => each != null);

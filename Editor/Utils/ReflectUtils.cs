@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor.Utils
+namespace SaintsField.Editor.Utils
 {
     public static class ReflectUtils
     {

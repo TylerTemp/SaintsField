@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     // [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public class LayerAttribute: PropertyAttribute, ISaintsAttribute

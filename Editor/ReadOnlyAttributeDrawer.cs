@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using ExtInspector.Editor.Utils;
+using SaintsField;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor
+namespace SaintsField.Editor
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
     public class ReadOnlyAttributeDrawer: SaintsPropertyDrawer

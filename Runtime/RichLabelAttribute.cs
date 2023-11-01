@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ExtInspector
+namespace SaintsField
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class RichLabelAttribute: PropertyAttribute, ISaintsAttribute
