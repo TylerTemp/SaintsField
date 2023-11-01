@@ -14,11 +14,28 @@ namespace ExtInspector.Editor
 
         // private float _width = -1;
 
+        // private bool _hasLabel = true;
+
+        private static bool BreakLine(ISaintsAttribute saintsAttribute) => saintsAttribute.GroupBy != "__LABEL_FIELD__";
+
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel) => GetHeight(
-            property.stringValue,
-            hasLabel? EditorGUIUtility.currentViewWidth - EditorGUIUtility.labelWidth: EditorGUIUtility.currentViewWidth
-        );
+            ISaintsAttribute saintsAttribute, bool hasLabel)
+        {
+            // _hasLabel = hasLabel;
+            // bool fullWidth = ((ResizableTextAreaAttribute)saintsAttribute).FullWidth;
+            Rect indented = EditorGUI.IndentedRect(new Rect(0, 0, EditorGUIUtility.currentViewWidth, EditorGUIUtility.singleLineHeight));
+            float viewWidth = indented.width;
+            bool breakLine = BreakLine(saintsAttribute);
+
+            bool useFullView = breakLine || !hasLabel;
+
+            return GetHeight(
+                property.stringValue,
+                useFullView
+                    ? viewWidth
+                    : viewWidth - EditorGUIUtility.labelWidth
+            );
+        }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {

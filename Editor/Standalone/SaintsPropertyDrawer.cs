@@ -112,25 +112,47 @@ namespace ExtInspector.Editor.Standalone
             // SaintsPropertyDrawer[] usedDrawerInfos = _usedDrawerTypes.Select(each => _cachedDrawer[each]).ToArray();
             // SaintsPropertyDrawer[] fieldInfos = usedDrawerInfos.Where(each => each.AttributeType is SaintsAttributeType.Field or SaintsAttributeType.Label).ToArray();
 
-            var labelFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Label);
-            var fieldFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Field);
+            (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) labelFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Label);
+            (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) fieldFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Field);
 
-            bool hasLabel = labelFound.iSaintsAttribute != null &&
-                            labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
+            bool hasSaintsLabel = labelFound.iSaintsAttribute != null;
+
+            bool drawSaintsLabel = hasSaintsLabel &&
+                                   labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
             // float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0f;
-            Debug.Log($"hasLabel={hasLabel}");
-            float labelHeight = hasLabel
+            // Debug.Log($"hasLabel={hasLabel}");
+            float labelHeight = drawSaintsLabel
                 ? labelFound.drawer.GetLabelHeight(property, label, labelFound.iSaintsAttribute)
                 : 0f;
 
-            bool hasField = fieldFound.iSaintsAttribute != null;
-            float fieldHeight = hasField
-                ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, hasLabel)
-                : 0f;
+            bool saintsDrawNoLabel = hasSaintsLabel && !drawSaintsLabel;
 
-            _fieldBasicHeight = (hasLabel || hasField)
-                ? Mathf.Max(labelHeight, fieldHeight)
-                : base.GetPropertyHeight(property, label);
+            bool hasSaintsField = fieldFound.iSaintsAttribute != null;
+            // float fieldHeight = hasSaintsField
+            //     ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
+            //     : 0f;
+            bool fieldBreakLine = hasSaintsField && fieldFound.iSaintsAttribute.GroupBy != "__LABEL_FIELD__";
+
+            float basicHeight;
+            if (fieldBreakLine)
+            {
+                float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+                float fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
+                    !saintsDrawNoLabel);
+                _fieldBasicHeight = labelBasicHeight + fieldBasicHeight;
+            }
+            else
+            {
+                float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+                float fieldBasicHeight = hasSaintsField
+                    ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
+                    : EditorGUIUtility.singleLineHeight;
+                _fieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
+            }
+
+            // _fieldBasicHeight = (drawSaintsLabel || hasSaintsField)
+            //     ? Mathf.Max(labelHeight, fieldHeight)
+            //     : base.GetPropertyHeight(property, label);
 
             // _fieldBasicHeight = filedOrLabel.Length > 0
             //     ? filedOrLabel
@@ -317,6 +339,8 @@ namespace ExtInspector.Editor.Standalone
             (Rect labelRect, Rect leftPropertyRect) =
                 RectUtils.SplitWidthRect(EditorGUI.IndentedRect(fieldRect), EditorGUIUtility.labelWidth);
 
+            labelRect.height = EditorGUIUtility.singleLineHeight;
+
             #region pre label
             foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
             {
@@ -337,8 +361,10 @@ namespace ExtInspector.Editor.Standalone
             Type labelDrawer = labelAttributeWithIndex.SaintsAttribute == null
                 ? null
                 : GetFirstSaintsDrawerType(labelAttributeWithIndex.SaintsAttribute.GetType());
+            bool anyLabelDrew = false;
             if (labelDrawer == null)
             {
+                anyLabelDrew = true;
                 // default label drawer
                 EditorGUI.LabelField(labelRect, propertyScoopLabel);
                 fieldRect = leftPropertyRect;
@@ -349,6 +375,7 @@ namespace ExtInspector.Editor.Standalone
                 // Debug.Log(labelAttribute);
                 if(labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
                 {
+                    anyLabelDrew = true;
                     labelDrawerInstance.DrawLabel(labelRect, property, propertyScoopLabel,
                         labelAttributeWithIndex.SaintsAttribute);
                     fieldRect = leftPropertyRect;
@@ -359,7 +386,17 @@ namespace ExtInspector.Editor.Standalone
             }
             #endregion
 
-            // post field - width check
+            SaintsWithIndex fieldAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Field);
+            bool fieldBreakLine = fieldAttributeWithIndex.SaintsAttribute != null && fieldAttributeWithIndex.SaintsAttribute.GroupBy != "__LABEL_FIELD__";
+            if (anyLabelDrew && fieldBreakLine)
+            {
+                fieldRect.x = labelRect.x;
+                fieldRect.y += EditorGUIUtility.singleLineHeight;
+                fieldRect.height -= EditorGUIUtility.singleLineHeight;
+                fieldRect.width = position.width;
+            }
+
+            #region post field - width check
             float postFieldWidth = 0;
             List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)> postFieldInfoList =
                 new List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)>();
@@ -376,6 +413,7 @@ namespace ExtInspector.Editor.Standalone
                     curWidth
                 ));
             }
+            #endregion
 
             (Rect fieldUseRect, Rect fieldPostRect) = RectUtils.SplitWidthRect(fieldRect, fieldRect.width - postFieldWidth);
             // fieldRect = new Rect(fieldRect)
@@ -391,7 +429,6 @@ namespace ExtInspector.Editor.Standalone
             // };
 
             #region field
-            SaintsWithIndex fieldAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Field);
             Type fieldDrawer = fieldAttributeWithIndex.SaintsAttribute == null
                 ? null
                 : GetFirstSaintsDrawerType(fieldAttributeWithIndex.SaintsAttribute.GetType());

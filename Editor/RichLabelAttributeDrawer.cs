@@ -20,18 +20,15 @@ namespace ExtInspector.Editor
         }
 
         protected override float GetLabelHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
-        {
-            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-            return targetAttribute.RichTextXml is null
-                ? 0
-                : base.GetPropertyHeight(property, label);
-        }
+            ISaintsAttribute saintsAttribute) =>
+            EditorGUIUtility.singleLineHeight;
 
         protected override bool WillDrawLabel(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-            return GetLabelXml(property, targetAttribute) == null;
+            bool result = GetLabelXml(property, targetAttribute) != null;
+            // Debug.Log($"result={result}/{GetLabelXml(property, targetAttribute)}");
+            return result;
         }
 
         protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,

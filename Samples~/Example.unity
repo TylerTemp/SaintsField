@@ -653,7 +653,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _short: 'short
 
-    content'
+    content always min 3 rows'
   _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
     10 wrap 11 wrap 12
 
@@ -664,7 +664,16 @@ MonoBehaviour:
     5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
 
     long wrap 1 warp 2
-    wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap '
+    wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long
+    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11
+    wrap 12
+
+    ~~~~~~
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap
+    7 wrap 8 warp 9 wap 10 wrap 11 wrap 12'
   _noLabel: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9
     wap 10 wrap 11 wrap 12
 
@@ -680,18 +689,6 @@ MonoBehaviour:
     long
     wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11
     wrap 12'
-  _nat: "long long long long long long long long long long long long long long long
-    long long long long long long long long long long long long long long long long
-    long long long long long long long long long long long long long long long long
-    long long long long long long long \nlong long long long long long long long
-    long long long long long long long long long long long long long long long long
-    long long long long long long long long long long "
-  _unity: "long long long long long long long long long long long long long long
-    long long long long long long long long long long long long long long long long
-    long long long long long long long long long long long long long long long long
-    long long long long long long long long \nlong long long long long long long
-    long long long long long long long long long long long long long long long long
-    long long long long long long long long long long long "
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
