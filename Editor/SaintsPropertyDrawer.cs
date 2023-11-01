@@ -6,7 +6,7 @@ using ExtInspector.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Editor.Standalone
+namespace ExtInspector.Editor
 {
     // above
     // pre, label, field, post

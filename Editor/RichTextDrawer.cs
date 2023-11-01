@@ -51,25 +51,18 @@ namespace ExtInspector.Editor
             _textureCache.Clear();
         }
 
-        private const string EditorFolderName =
-#if EXT_INSPECTOR_IN_DEV
-                "Assets/ExtInspector/Editor/Editor Default Resources/ExtInspector/"
-#else
-                "Packages/today.comes.extinspector/Editor/Editor Default Resources/ExtInspector/"
-#endif
-            ;
-
         private static Texture2D LoadTexture(string iconPath)
         {
             Texture2D result = new[]
             {
                 iconPath,
-                EditorFolderName + iconPath,
+                "Assets/ExtInspector/Editor/Editor Default Resources/ExtInspector/" + iconPath,
+                "Packages/today.comes.extinspector/Editor/Editor Default Resources/ExtInspector/" + iconPath,
             }
                 .Select(each => (Texture2D)EditorGUIUtility.Load(each))
                 .FirstOrDefault(each => each != null);
 
-            Debug.Assert(result != null, $"{iconPath} not found in default or {EditorFolderName}");
+            Debug.Assert(result != null, $"{iconPath} not found in {string.Join(", ", result)}");
             return result;
             // return iconPayload.IsEditorResource
             //     ? (Texture2D)EditorGUIUtility.Load(iconPayload.IconResourcePath)

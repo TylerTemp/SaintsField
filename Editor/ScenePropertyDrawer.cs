@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ExtInspector.Editor.Standalone;
 using ExtInspector.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
