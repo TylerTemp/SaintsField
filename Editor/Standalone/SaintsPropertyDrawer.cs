@@ -13,7 +13,7 @@ namespace ExtInspector.Editor.Standalone
     // below-
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
-        private readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _propertyAttributeToDrawers =
+        private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _propertyAttributeToDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
 
         // private IReadOnlyList<ISaintsAttribute> _allSaintsAttributes;
