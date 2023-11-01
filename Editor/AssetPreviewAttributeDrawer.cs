@@ -39,7 +39,7 @@ namespace ExtInspector.Editor
                 _previewTexture = AssetPreview.GetAssetPreview(target);
             }
 
-            if (_previewTexture.width == 1)
+            if (_previewTexture == null || _previewTexture.width == 1)
             {
                 return _previewTexture;
             }
@@ -57,6 +57,7 @@ namespace ExtInspector.Editor
             if (_cachedWidthTexture != null)
             {
                 Object.DestroyImmediate(_cachedWidthTexture);
+                _cachedWidthTexture = null;
             }
 
             _cachedWidth = width;
@@ -78,6 +79,12 @@ namespace ExtInspector.Editor
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute)
         {
+            string error = MismatchError(property);
+            if (error != null)
+            {
+                return 0;
+            }
+
             return ((AssetPreviewAttribute)saintsAttribute).Above? GetExtraHeight(property, width, saintsAttribute): 0;
         }
 
@@ -134,7 +141,7 @@ namespace ExtInspector.Editor
             int maxHeight = assetPreviewAttribute.MaxHeight;
 
             Texture2D previewTexture = GetPreview(useWidth, maxHeight, property.objectReferenceValue);
-            return previewTexture.height;
+            return previewTexture?.height ?? width;
         }
 
         private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -148,7 +155,7 @@ namespace ExtInspector.Editor
 
             Texture2D previewTexture = GetPreview(useWidth, maxHeight, property.objectReferenceValue);
 
-            if (previewTexture.width == 1)
+            if (previewTexture == null || previewTexture.width == 1)
             {
                 return position;
             }
