@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SaintsField.Standalone
+namespace SaintsField
 {
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public class MinMaxSliderAttribute : PropertyAttribute, ISaintsAttribute

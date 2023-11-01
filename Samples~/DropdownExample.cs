@@ -1,9 +1,7 @@
-using System;
-using ExtInspector;
-using ExtInspector.DropdownBase;
+using SaintsField.DropdownBase;
 using UnityEngine;
 
-namespace Samples
+namespace SaintsField.Samples
 {
     public class DropdownExample : MonoBehaviour
     {

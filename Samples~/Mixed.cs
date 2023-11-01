@@ -1,10 +1,8 @@
 using System;
-using ExtInspector;
-using ExtInspector.Standalone;
-// using NaughtyAttributes;
 using UnityEngine;
+// using NaughtyAttributes;
 
-namespace Samples
+namespace SaintsField.Samples
 {
     public class Mixed : MonoBehaviour
     {

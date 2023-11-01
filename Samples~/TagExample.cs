@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ExtInspector.Samples
+namespace SaintsField.Samples
 {
     public class TagExample: MonoBehaviour
     {

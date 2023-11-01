@@ -1,6 +1,4 @@
-﻿using SaintsField;
-using SaintsField.Standalone;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor
@@ -13,7 +11,7 @@ namespace SaintsField.Editor
         private const float KSpacing = 2f;
         private const float KRoundingValue = 100f;
 
-        private static readonly int ControlHash = "Foldout".GetHashCode();
+        // private static readonly int ControlHash = "Foldout".GetHashCode();
         private static readonly GUIContent Unsupported = EditorGUIUtility.TrTextContent("Unsupported field type");
 
         private bool _pressed;

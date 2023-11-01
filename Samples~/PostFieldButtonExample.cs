@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using ExtInspector;
-using ExtInspector.Utils;
 
-namespace ExtInspector.Samples
+namespace SaintsField.Samples
 {
     public class PostFieldButtonExample: MonoBehaviour
     {

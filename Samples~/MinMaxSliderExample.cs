@@ -1,7 +1,6 @@
-﻿using ExtInspector.Standalone;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Samples
+namespace SaintsField.Samples
 {
     public class MinMaxSliderExample: MonoBehaviour
     {

@@ -1,7 +1,6 @@
-using ExtInspector;
 using UnityEngine;
 
-namespace Samples
+namespace SaintsField.Samples
 {
     public class GameObjectActiveExample : MonoBehaviour
     {

@@ -1,14 +1,7 @@
-using System.Collections.Generic;
-using ExtInspector.Standalone;
-using ExtInspector.Utils;
-using ExtInspector;
-#if EXT_INSPECTOR_WITH_NAUGHTY_ATTRIBUTES
-using NaughtyAttributes;
-#endif
+using SaintsField.Utils;
 using UnityEngine;
-using EColor = ExtInspector.Utils.EColor;
 
-namespace ExtInspectorUnity.Samples
+namespace SaintsField.Samples
 {
     public class MonoExample : MonoBehaviour
     {

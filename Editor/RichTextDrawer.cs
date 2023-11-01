@@ -53,16 +53,18 @@ namespace SaintsField.Editor
 
         private static Texture2D LoadTexture(string iconPath)
         {
-            Texture2D result = new[]
+            string[] paths = new[]
             {
                 iconPath,
-                "Assets/ExtInspector/Editor/Editor Default Resources/SaintsField/" + iconPath,
+                "Assets/SaintsField/Editor/Editor Default Resources/SaintsField/" + iconPath,
                 "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/" + iconPath,
-            }
+            };
+
+            Texture2D result = paths
                 .Select(each => (Texture2D)EditorGUIUtility.Load(each))
                 .FirstOrDefault(each => each != null);
 
-            Debug.Assert(result != null, $"{iconPath} not found in {string.Join(", ", result)}");
+            Debug.Assert(result != null, $"{iconPath} not found in {string.Join(", ", paths)}");
             return result;
             // return iconPayload.IsEditorResource
             //     ? (Texture2D)EditorGUIUtility.Load(iconPayload.IconResourcePath)

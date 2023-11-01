@@ -1,7 +1,6 @@
-using ExtInspector;
 using UnityEngine;
 
-namespace Samples
+namespace SaintsField.Samples
 {
     [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Scriptable", order = 0)]
     public class Scriptable : ScriptableObject

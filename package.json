@@ -1,8 +1,8 @@
 {
-  "name": "today.comes.extinspector",
+  "name": "today.comes.saintsfield",
   "version": "1.0.0",
-  "displayName": "ExtInspector",
-  "description": "A Unity plugin for inspector",
+  "displayName": "SaintsField",
+  "description": "A Unity plugin for field in inspector",
   "unity": "2018.4",
   "dependencies": {
   },
@@ -14,7 +14,7 @@
   "author": {
     "name": "TylerTemp",
     "email": "tylertempdev@gmail.com",
-    "url": "https://extinspector.comes.today"
+    "url": "https://saintsfield.comes.today"
   },
   "license": "MIT",
   "samples": [

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Utils;
 using UnityEditor;

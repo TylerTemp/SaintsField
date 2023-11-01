@@ -1,8 +1,7 @@
 using System;
-using ExtInspector;
 using UnityEngine;
 
-namespace Samples
+namespace SaintsField.Samples
 {
     public class ButtonsExample : MonoBehaviour
     {

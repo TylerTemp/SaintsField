@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace ExtInspector.Samples
+namespace SaintsField.Samples
 {
     public class InfoBoxExample : MonoBehaviour
     {

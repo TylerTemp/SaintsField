@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ExtInspector.Samples
+namespace SaintsField.Samples
 {
     public class SpriteToggleExample : MonoBehaviour
     {

@@ -1,8 +1,6 @@
-using ExtInspector;
-using ExtInspector.Standalone;
 using UnityEngine;
 
-namespace ExtInspectorUnity.Samples
+namespace SaintsField.Samples
 {
     public class Anim : MonoBehaviour
     {
