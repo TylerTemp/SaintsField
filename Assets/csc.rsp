@@ -1,5 +1,3 @@
--define:EXT_INSPECTOR_IN_DEV
-
 #"disable ext inspector as default (ENABLE IT WITH NaughtyAttributes!)"
 -define:EXT_INSPECTOR_DISABLE
 
