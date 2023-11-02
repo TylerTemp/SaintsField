@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -6,8 +7,8 @@ using UnityEngine;
 
 namespace SaintsField.Editor
 {
-    [CustomPropertyDrawer(typeof(OnChangeAttribute))]
-    public class OnChangeAttributeDrawer : SaintsPropertyDrawer
+    [CustomPropertyDrawer(typeof(OnValueChangedAttribute))]
+    public class OnValueChangedAttributeDrawer : SaintsPropertyDrawer
     {
         private string _error = "";
 
@@ -19,21 +20,40 @@ namespace SaintsField.Editor
                 return true;
             }
 
-            string callback = ((OnChangeAttribute)saintsAttribute).Callback;
+            property.serializedObject.ApplyModifiedProperties();
+
+            string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
             object target = property.serializedObject.targetObject;
 
-            MethodInfo methodInfo = GetMethodInfo(target.GetType(), callback);
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+            MethodInfo methodInfo =  target.GetType().GetMethod(callback, bindAttr);
             if (methodInfo == null)
             {
                 _error = $"no method found `{callback}` on `{target}`";
+                return true;
             }
-        }
 
-        protected MethodInfo GetMethodInfo(Type targetType, string fieldName)
-        {
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            return targetType.GetMethod(fieldName, bindAttr);
+            _error = "";
+            
+            ParameterInfo[] methodParams = methodInfo.GetParameters();
+            Debug.Assert(methodParams.All(p => p.IsOptional));
+            try
+            {
+                methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+            }
+            catch (TargetInvocationException e)
+            {
+                _error = e.InnerException!.Message;
+                Debug.LogException(e);
+            }
+            catch (Exception e)
+            {
+                _error = e.Message;
+                Debug.LogException(e);
+            }
+
+            return true;
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
