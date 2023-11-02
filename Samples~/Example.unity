@@ -5844,8 +5844,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vector2: {x: -0.31, y: 1.25}
-  vector2Int: {x: 3, y: 8}
+  vector2: {x: -0.39999998, y: 0.8000001}
+  vector2Int: {x: 6, y: 9}
+  vector2Free: {x: -0.04575354, y: 1.2353446}
+  vector2IntFree: {x: 8, y: 11}
 --- !u!1 &1383904217
 GameObject:
   m_ObjectHideFlags: 0

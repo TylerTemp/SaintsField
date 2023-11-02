@@ -12,16 +12,30 @@ namespace SaintsField
         public readonly float Min;
         public readonly float Max;
         public readonly float Step;
-        // public readonly bool DataFields = true;
-        // public readonly bool FlexibleFields = true;
-        public readonly bool Bound = true;
-        public readonly bool Round = true;
 
-        public MinMaxSliderAttribute(float min, float max, float step=-1f)
+        public readonly float MinWidth;
+        public readonly float MaxWidth;
+
+        private const float DefaultWidth = 50f;
+
+        public MinMaxSliderAttribute(float min, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)
         {
             Min = min;
             Max = max;
             Step = step;
+
+            MinWidth = minWidth;
+            MaxWidth = maxWidth;
+        }
+
+        public MinMaxSliderAttribute(int min, int max, int step=1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)
+        {
+            Min = min;
+            Max = max;
+            Step = step;
+
+            MinWidth = minWidth;
+            MaxWidth = maxWidth;
         }
     }
 }
