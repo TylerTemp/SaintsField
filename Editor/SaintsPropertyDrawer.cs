@@ -832,7 +832,7 @@ namespace SaintsField.Editor
                         }
                         else
                         {
-                            property.intValue += (xOffset>0? 1: -1);
+                            property.intValue += xOffset;
                         }
                         // Debug.Log($"valueChange=true");
                         _valueChange = true;
