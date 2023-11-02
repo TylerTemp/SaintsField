@@ -11,19 +11,18 @@ namespace SaintsField.Editor
     public class MaxValueAttributeDrawer : SaintsPropertyDrawer
     {
         private string _error = "";
-        private int _prevInt = int.MinValue;
-        private float _prevFloat = float.MinValue;
 
-        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, bool valueChanged)
         {
+            if (!valueChanged)
+            {
+                return true;
+            }
+
             if (property.propertyType == SerializedPropertyType.Float)
             {
                 float curValue = property.floatValue;
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (curValue == _prevFloat)
-                {
-                    return true;
-                }
                 MaxValueAttribute maxValueAttribute = (MaxValueAttribute)saintsAttribute;
                 float valueLimit;
                 if (maxValueAttribute.ValueCallback == null)
@@ -44,18 +43,12 @@ namespace SaintsField.Editor
 
                 if (valueLimit < curValue)
                 {
-                    property.floatValue = curValue = valueLimit;
+                    property.floatValue = valueLimit;
                 }
-
-                _prevFloat = curValue;
             }
             else if (property.propertyType == SerializedPropertyType.Integer)
             {
                 int curValue = property.intValue;
-                if (curValue == _prevInt)
-                {
-                    return true;
-                }
                 MaxValueAttribute maxValueAttribute = (MaxValueAttribute)saintsAttribute;
                 float valueLimit;
                 if (maxValueAttribute.ValueCallback == null)
@@ -76,10 +69,8 @@ namespace SaintsField.Editor
 
                 if (valueLimit < curValue)
                 {
-                    property.intValue = curValue = (int)valueLimit;
+                    property.intValue = (int)valueLimit;
                 }
-
-                _prevInt = curValue;
             }
             return true;
         }

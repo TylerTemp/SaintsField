@@ -19,7 +19,7 @@ namespace SaintsField.Editor
         }
 
         protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, bool valueChanged)
         {
             EditorGUI.EndDisabledGroup();
             return true;

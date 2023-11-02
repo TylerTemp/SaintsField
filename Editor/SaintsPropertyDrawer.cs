@@ -230,6 +230,8 @@ namespace SaintsField.Editor
 
         // private float _aboveUsedHeight;
 
+        private bool _valueChange;
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // Debug.Log($"position.height={position.height}");
@@ -371,6 +373,9 @@ namespace SaintsField.Editor
             #endregion
 
             #region label
+
+            _valueChange = false;
+            // Debug.Log($"valueChange reset to false");
             SaintsWithIndex labelAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Label);
             Type labelDrawer = labelAttributeWithIndex.SaintsAttribute == null
                 ? null
@@ -462,22 +467,33 @@ namespace SaintsField.Editor
             // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
 
             // Debug.Log($"{label.text}={_fieldControlName}");
-            if (fieldDrawer == null)
+            using(var changed = new EditorGUI.ChangeCheckScope())
             {
-                GUI.SetNextControlName(_fieldControlName);
-                DefaultDrawer(fieldUseRect, property);
-            }
-            else
-            {
-                // Debug.Log(fieldAttribute);
-                SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
-                // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
-                GUI.SetNextControlName(_fieldControlName);
-                fieldDrawerInstance.DrawField(fieldUseRect, property, GUIContent.none, fieldAttributeWithIndex.SaintsAttribute);
-                // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
+                if (fieldDrawer == null)
+                {
+                    GUI.SetNextControlName(_fieldControlName);
+                    DefaultDrawer(fieldUseRect, property);
+                }
+                else
+                {
+                    // Debug.Log(fieldAttribute);
+                    SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
+                    // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
+                    GUI.SetNextControlName(_fieldControlName);
+                    fieldDrawerInstance.DrawField(fieldUseRect, property, GUIContent.none,
+                        fieldAttributeWithIndex.SaintsAttribute);
+                    // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
-                _usedAttributes.TryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
+                    _usedAttributes.TryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
+                }
+
+                if (!_valueChange && changed.changed)
+                {
+                    _valueChange = true;
+                }
             }
+
+            // Debug.Log($"after field: ValueChange={_valueChange}");
             #endregion
 
             #region post field
@@ -492,7 +508,8 @@ namespace SaintsField.Editor
                 };
                 postFieldAccWidth += width;
 
-                bool isActive = drawer.DrawPostField(eachRect, property, propertyScoopLabel, attributeWithIndex.SaintsAttribute);
+                // Debug.Log($"DrawPostField, valueChange={_valueChange}");
+                bool isActive = drawer.DrawPostField(eachRect, property, propertyScoopLabel, attributeWithIndex.SaintsAttribute, _valueChange);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
@@ -736,7 +753,7 @@ namespace SaintsField.Editor
         }
 
         protected virtual bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, bool valueChanged)
         {
             return false;
         }
@@ -817,6 +834,8 @@ namespace SaintsField.Editor
                         {
                             property.intValue += (xOffset>0? 1: -1);
                         }
+                        // Debug.Log($"valueChange=true");
+                        _valueChange = true;
                     }
                 }
             }
