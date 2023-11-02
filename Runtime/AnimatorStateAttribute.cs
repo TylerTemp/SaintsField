@@ -6,14 +6,13 @@ namespace SaintsField
     public class AnimatorStateAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string GroupBy { get; }
+        public string GroupBy => "__LABEL_FIELD__";
 
         public readonly string AnimFieldName;
 
-        public AnimatorStateAttribute(string animator, string groupBy="")
+        public AnimatorStateAttribute(string animator)
         {
             AnimFieldName = animator;
-            GroupBy = groupBy;
         }
     }
 }
