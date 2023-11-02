@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using SaintsField.Editor.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor
@@ -94,8 +95,10 @@ namespace SaintsField.Editor
                 if (EditorGUI.EndChangeCheck())
                 {
                     // Debug.Log(sliderValue);
-                    property.vector2IntValue = BoundV2IntStep(sliderValue, minValue, maxValue,
-                        Mathf.Max(1, Mathf.RoundToInt(minMaxSliderAttribute.Step)));
+                    int actualStep = Mathf.Max(1, Mathf.RoundToInt(minMaxSliderAttribute.Step));
+                    property.vector2IntValue = actualStep == 1
+                        ? sliderValue
+                        : BoundV2IntStep(sliderValue, minValue, maxValue, actualStep);
                 }
             }
         }
@@ -153,5 +156,11 @@ namespace SaintsField.Editor
             int newValue = useStart + stepRound * step;
             return Mathf.Clamp(newValue, useStart, useEnd);
         }
+
+        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : HelpBox.Draw(position, _error, MessageType.Error);
     }
 }
