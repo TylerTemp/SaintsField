@@ -1,4 +1,7 @@
-﻿using SaintsField.Editor.Utils;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,8 +29,23 @@ namespace SaintsField.Editor
             }
 
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
-            float minValue = minMaxSliderAttribute.Min;
-            float maxValue = minMaxSliderAttribute.Max;
+            float minValue = minMaxSliderAttribute.MinCallback == null
+                ? minMaxSliderAttribute.Min
+                : GetCallbackValue(property, minMaxSliderAttribute.MinCallback);
+            float maxValue = minMaxSliderAttribute.MaxCallback == null
+                ? minMaxSliderAttribute.Max
+                : GetCallbackValue(property, minMaxSliderAttribute.MaxCallback);
+
+            if (minValue > maxValue)
+            {
+                _error = $"invalid min ({minValue}) max ({maxValue}) value";
+            }
+
+            if (_error != "")
+            {
+                DefaultDrawer(position, property);
+                return;
+            }
 
             float leftFieldWidth = property.propertyType == SerializedPropertyType.Vector2
                 ? GetNumberFieldWidth(property.vector2Value.x, minMaxSliderAttribute.MinWidth, minMaxSliderAttribute.MaxWidth)
@@ -38,7 +56,7 @@ namespace SaintsField.Editor
 
             // float floatFieldWidth = EditorGUIUtility.fieldWidth;
             float sliderWidth = position.width - leftFieldWidth - rightFieldWidth;
-            float sliderPadding = 5.0f;
+            const float sliderPadding = 5.0f;
 
             Rect sliderRect = new Rect(
                 position.x + leftFieldWidth + sliderPadding,
@@ -100,6 +118,58 @@ namespace SaintsField.Editor
                         ? sliderValue
                         : BoundV2IntStep(sliderValue, minValue, maxValue, actualStep);
                 }
+            }
+        }
+
+        private float GetCallbackValue(SerializedProperty property, string by)
+        {
+            _error = "";
+
+            SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
+                                               property.FindPropertyRelative($"<{by}>k__BackingField");
+            if (foundProperty != null)
+            {
+                if (foundProperty.propertyType == SerializedPropertyType.Integer)
+                {
+                    return foundProperty.intValue;
+                }
+                if (foundProperty.propertyType == SerializedPropertyType.Float)
+                {
+                    return foundProperty.floatValue;
+                }
+
+                _error = $"Expect int or float for `{by}`, get {foundProperty.propertyType}";
+                return -1;
+            }
+
+            object target = property.serializedObject.targetObject;
+
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
+            switch (found)
+            {
+                case (ReflectUtils.GetPropType.NotFound, _):
+                {
+                    _error = $"No field or method named `{by}` found on `{target}`";
+                    // Debug.LogError(_error);
+                    return -1;
+                }
+                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+                {
+                    return (float)propertyInfo.GetValue(target);
+                }
+                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+                {
+                    return (float)(foundFieldInfo.GetValue(target));
+                }
+                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+                {
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    Debug.Assert(methodParams.All(p => p.IsOptional));
+                    Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                    return (float)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
             }
         }
 
