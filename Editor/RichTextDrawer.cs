@@ -53,10 +53,11 @@ namespace SaintsField.Editor
 
         private static Texture2D LoadTexture(string iconPath)
         {
-            string[] paths = new[]
-            {
+            string[] paths = {
                 iconPath,
                 "Assets/SaintsField/Editor/Editor Default Resources/SaintsField/" + iconPath,
+                "SaintsField/" + iconPath,
+                // this is readonly, put it to last so user  can easily override it
                 "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/" + iconPath,
             };
 
