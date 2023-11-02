@@ -815,7 +815,7 @@ namespace SaintsField.Editor
                         }
                         else
                         {
-                            property.intValue += xOffset;
+                            property.intValue += (xOffset>0? 1: -1);
                         }
                     }
                 }

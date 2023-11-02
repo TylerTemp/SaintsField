@@ -43,8 +43,8 @@ namespace SaintsField.Samples
         [field: SerializeField]
         public float DynamicMax { get; private set; }
 
-        [SerializeField, MinMaxSlider(nameof(DynamicMin), nameof(DynamicMax))] public Vector2 _propRange;
-        [SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] public Vector2 _propLeftRange;
-        [SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] public Vector2 _propRightRange;
+        [SerializeField, MinMaxSlider(nameof(DynamicMin), nameof(DynamicMax))] private Vector2 _propRange;
+        [SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] private Vector2 _propLeftRange;
+        [SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] private Vector2 _propRightRange;
     }
 }

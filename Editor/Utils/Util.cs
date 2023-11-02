@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,111 +9,60 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
-        public static void BeginBoxGroup_Layout(string label = "")
+        public static (float, string) GetCallbackFloat(SerializedProperty property, string by)
         {
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-            if (!string.IsNullOrEmpty(label))
+            SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
+                                               property.FindPropertyRelative($"<{by}>k__BackingField");
+            if (foundProperty != null)
             {
-                EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+                if (foundProperty.propertyType == SerializedPropertyType.Integer)
+                {
+                    return (foundProperty.intValue, null);
+                }
+                if (foundProperty.propertyType == SerializedPropertyType.Float)
+                {
+                    return (foundProperty.floatValue, null);
+                }
+
+                return (-1, $"Expect int or float for `{by}`, get {foundProperty.propertyType}");
+            }
+
+            object target = property.serializedObject.targetObject;
+
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
+            switch (found)
+            {
+                case (ReflectUtils.GetPropType.NotFound, _):
+                {
+                    return (-1, $"No field or method named `{by}` found on `{target}`");
+                }
+                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+                {
+                    return ObjToFloat(propertyInfo.GetValue(target));
+                }
+                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+                {
+                    return ObjToFloat(foundFieldInfo.GetValue(target));
+                }
+                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+                {
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    Debug.Assert(methodParams.All(p => p.IsOptional));
+                    Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                    return ObjToFloat(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
             }
         }
 
-        // public static void NonSerializedField_Layout(UnityEngine.Object target, FieldInfo field)
-        // {
-        //     object value = field.GetValue(target);
-        //
-        //     if (value == null)
-        //     {
-        //         string warning = string.Format("{0} is null. {1} doesn't support reference types with null value", ObjectNames.NicifyVariableName(field.Name), typeof(ShowNonSerializedFieldAttribute).Name);
-        //         HelpBox_Layout(warning, MessageType.Warning, context: target);
-        //     }
-        //     else if (!Field_Layout(value, ObjectNames.NicifyVariableName(field.Name)))
-        //     {
-        //         string warning = string.Format("{0} doesn't support {1} types", typeof(ShowNonSerializedFieldAttribute).Name, field.FieldType.Name);
-        //         HelpBox_Layout(warning, MessageType.Warning, context: target);
-        //     }
-        // }
+        private static (float, string) ObjToFloat(object result) =>
+            result switch
+            {
+                int intValue => (intValue, ""),
+                float floatValue => (floatValue, ""),
+                _ => (-1, $"{result} is neither int or float"),
+            };
 
-        // public static GUIContent GetLabel(SerializedProperty property)
-        // {
-        //     LabelAttribute labelAttribute = GetAttribute<LabelAttribute>(property);
-        //     string labelText = (labelAttribute == null)
-        //         ? property.displayName
-        //         : labelAttribute.Label;
-        //
-        //     GUIContent label = new GUIContent(labelText);
-        //     return label;
-        // }
-
-        // public static void PropertyField_Layout(SerializedProperty property, bool includeChildren)
-        // {
-        //     Rect dummyRect = new Rect();
-        //     PropertyField_Implementation(dummyRect, property, includeChildren, DrawPropertyField_Layout);
-        // }
-        //
-        // private static void PropertyField_Implementation(Rect rect, SerializedProperty property, bool includeChildren, PropertyFieldFunction propertyFieldFunction)
-        // {
-        //     SpecialCaseDrawerAttribute specialCaseAttribute = PropertyUtility.GetAttribute<SpecialCaseDrawerAttribute>(property);
-        //     if (specialCaseAttribute != null)
-        //     {
-        //         specialCaseAttribute.GetDrawer().OnGUI(rect, property);
-        //     }
-        //     else
-        //     {
-        //         // Check if visible
-        //         bool visible = PropertyUtility.IsVisible(property);
-        //         if (!visible)
-        //         {
-        //             return;
-        //         }
-        //
-        //         // Validate
-        //         ValidatorAttribute[] validatorAttributes = PropertyUtility.GetAttributes<ValidatorAttribute>(property);
-        //         foreach (var validatorAttribute in validatorAttributes)
-        //         {
-        //             validatorAttribute.GetValidator().ValidateProperty(property);
-        //         }
-        //
-        //         // Check if enabled and draw
-        //         EditorGUI.BeginChangeCheck();
-        //         bool enabled = PropertyUtility.IsEnabled(property);
-        //
-        //         using (new EditorGUI.DisabledScope(disabled: !enabled))
-        //         {
-        //             propertyFieldFunction.Invoke(rect, property, PropertyUtility.GetLabel(property), includeChildren);
-        //         }
-        //
-        //         // Call OnValueChanged callbacks
-        //         if (EditorGUI.EndChangeCheck())
-        //         {
-        //             PropertyUtility.CallOnValueChangedCallbacks(property);
-        //         }
-        //     }
-        // }
-        //
-        // private static void DrawPropertyField_Layout(Rect rect, SerializedProperty property, GUIContent label, bool includeChildren)
-        // {
-        //     EditorGUILayout.PropertyField(property, label, includeChildren);
-        // }
-        public static void EndBoxGroup_Layout()
-        {
-            EditorGUILayout.EndVertical();
-        }
-        
-        // public class SaintsAttributeRefEqualCompare: IEqualityComparer<ISaintsAttribute>
-        // {
-        //     public bool Equals(ISaintsAttribute x, ISaintsAttribute y)
-        //     {
-        //         return ReferenceEquals(x, y);
-        //     }
-        //
-        //     public int GetHashCode(ISaintsAttribute obj)
-        //     {
-        //         return obj.GetHashCode();
-        //     }
-        // }
-
-        public static IEnumerable<(T value, int index)> WithIndex<T>(this IEnumerable<T> seq, int start = 0) =>
-            seq.Select((value, index) => (value, index + start));
     }
 }

@@ -29,12 +29,35 @@ namespace SaintsField.Editor
             }
 
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
-            float minValue = minMaxSliderAttribute.MinCallback == null
-                ? minMaxSliderAttribute.Min
-                : GetCallbackValue(property, minMaxSliderAttribute.MinCallback);
-            float maxValue = minMaxSliderAttribute.MaxCallback == null
-                ? minMaxSliderAttribute.Max
-                : GetCallbackValue(property, minMaxSliderAttribute.MaxCallback);
+            float minValue;
+            if (minMaxSliderAttribute.MinCallback == null)
+            {
+                minValue = minMaxSliderAttribute.Min;
+            }
+            else
+            {
+                (float getValue, string getError) = Util.GetCallbackFloat(property, minMaxSliderAttribute.MinCallback);
+                _error = getError;
+                minValue = getValue;
+            }
+
+            float maxValue;
+            if (minMaxSliderAttribute.MaxCallback == null)
+            {
+                maxValue = minMaxSliderAttribute.Max;
+            }
+            else
+            {
+                (float getValue, string getError) = Util.GetCallbackFloat(property, minMaxSliderAttribute.MaxCallback);
+                _error = getError;
+                maxValue = getValue;
+            }
+
+            if (_error != "")
+            {
+                DefaultDrawer(position, property);
+                return;
+            }
 
             if (minValue > maxValue)
             {
@@ -118,58 +141,6 @@ namespace SaintsField.Editor
                         ? sliderValue
                         : BoundV2IntStep(sliderValue, minValue, maxValue, actualStep);
                 }
-            }
-        }
-
-        private float GetCallbackValue(SerializedProperty property, string by)
-        {
-            _error = "";
-
-            SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
-                                               property.FindPropertyRelative($"<{by}>k__BackingField");
-            if (foundProperty != null)
-            {
-                if (foundProperty.propertyType == SerializedPropertyType.Integer)
-                {
-                    return foundProperty.intValue;
-                }
-                if (foundProperty.propertyType == SerializedPropertyType.Float)
-                {
-                    return foundProperty.floatValue;
-                }
-
-                _error = $"Expect int or float for `{by}`, get {foundProperty.propertyType}";
-                return -1;
-            }
-
-            object target = property.serializedObject.targetObject;
-
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
-            switch (found)
-            {
-                case (ReflectUtils.GetPropType.NotFound, _):
-                {
-                    _error = $"No field or method named `{by}` found on `{target}`";
-                    // Debug.LogError(_error);
-                    return -1;
-                }
-                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
-                {
-                    return (float)propertyInfo.GetValue(target);
-                }
-                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                {
-                    return (float)(foundFieldInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
-                {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    return (float)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
             }
         }
 
