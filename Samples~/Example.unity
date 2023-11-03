@@ -669,8 +669,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _image: {fileID: 2045437329}
   _sprite: {fileID: 417627792}
-  _sprite1: {fileID: 21300000, guid: cb9a478ab3ffb9549b182a3f4fb4504b, type: 3}
-  _sprite2: {fileID: 21300000, guid: b51727bc334a8ee4c8f7400d8e01b8d8, type: 3}
+  _sprite1: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  _sprite2: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!4 &417627791
 Transform:
   m_ObjectHideFlags: 0
@@ -727,15 +727,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: b51727bc334a8ee4c8f7400d8e01b8d8, type: 3}
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.88, y: 2.56}
+  m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &440518745
@@ -773,7 +773,7 @@ MonoBehaviour:
   _selfField: {x: 0.21, y: 0.68}
   _mixedNoLabel: {x: 2.1, y: 0.43}
   _nested:
-    _mixed: {x: 0, y: 0}
+    _mixed: {x: 0.14565316, y: 0.46426943}
 --- !u!4 &440518747
 Transform:
   m_ObjectHideFlags: 0
@@ -6224,6 +6224,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   richLabel: 
+  _myStructBadView:
+    Int: 0
+    String: 
+    V2: {x: 0, y: 0}
+    Float: 0
+  _myStructWorkAround:
+    Int: 0
+    String: 
+    V2: {x: 0, y: 0}
+    Float: 0
 --- !u!1 &1621177995
 GameObject:
   m_ObjectHideFlags: 0

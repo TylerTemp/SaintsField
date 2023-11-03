@@ -101,10 +101,10 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        ~SaintsPropertyDrawer()
-        {
-            PropertyAttributeToDrawers.Clear();
-        }
+        // ~SaintsPropertyDrawer()
+        // {
+        //     PropertyAttributeToDrawers.Clear();
+        // }
 
         private float _fieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
