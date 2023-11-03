@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.Decorator
 {
     [CustomPropertyDrawer(typeof(SepTitleAttribute))]
     public class SepTitleAttributeDrawer : DecoratorDrawer

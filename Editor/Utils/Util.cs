@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Utils
                 {
                     ParameterInfo[] methodParams = methodInfo.GetParameters();
                     Debug.Assert(methodParams.All(p => p.IsOptional));
-                    Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                    // Debug.Assert(methodInfo.ReturnType == typeof(bool));
                     return ObjToFloat(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
                 }
                 default:

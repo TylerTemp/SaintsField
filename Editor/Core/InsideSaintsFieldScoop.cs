@@ -6,12 +6,12 @@ namespace SaintsField.Editor.Core
     {
         public InsideSaintsFieldScoop()
         {
-            SaintsPropertyDrawer.isSubDrawer = true;
+            SaintsPropertyDrawer.IsSubDrawer = true;
         }
 
         public void Dispose()
         {
-            SaintsPropertyDrawer.isSubDrawer = false;
+            SaintsPropertyDrawer.IsSubDrawer = false;
         }
     }
 }

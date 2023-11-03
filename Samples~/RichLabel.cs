@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SaintsField.Samples
 {
@@ -11,5 +12,26 @@ namespace SaintsField.Samples
         // {
         //     return "<color=red>RichLabel</color>";
         // }
+
+        [Serializable]
+        private struct MyStruct
+        {
+            public int Int;
+            public string String;
+            // sadly this wont work with label attribute because of the propertyField problem
+            [MinMaxSlider(0f, 10f, 0.1f)] public Vector2 V2;
+            public float Float;
+        }
+
+        [SerializeField]
+        [RichLabel("<color=green><label /></color>")]
+        // [RichLabel(null)]
+        private MyStruct _myStructBadView;
+
+        // this is a workaround
+        [SerializeField]
+        [AboveRichLabel("<color=green><label /></color>")]
+        [RichLabel(null)]
+        private MyStruct _myStructWorkAround;
     }
 }
