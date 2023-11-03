@@ -29,5 +29,5 @@ if '%errorlevel%' NEQ '0' (
     CD /D "%~dp0"
 :--------------------------------------
 
-mklink /D "%~dp0\Assets\Editor Default Resources\SaintsField" "%~dp0\Assets\SaintsField\Editor\Editor Default Resources\SaintsField"
+@REM mklink /D "%~dp0\Assets\Editor Default Resources\SaintsField" "%~dp0\Assets\SaintsField\Editor\Editor Default Resources\SaintsField"
 mklink /D "%~dp0\Assets\SaintsField\Samples" "%~dp0\Assets\SaintsField\Samples~"
