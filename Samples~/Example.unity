@@ -454,7 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _show: 1
   _content: 1372
-  _float: -3.46
+  _float: -3.22
 --- !u!4 &246861352
 Transform:
   m_ObjectHideFlags: 0
