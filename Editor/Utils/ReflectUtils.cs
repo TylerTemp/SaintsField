@@ -165,6 +165,7 @@ namespace SaintsField.Editor.Utils
         {
             try
             {
+                // Debug.Log($"try convert to bool");
                 return Convert.ToBoolean(value);
             }
             catch (InvalidCastException)
@@ -172,19 +173,23 @@ namespace SaintsField.Editor.Utils
                 bool equalNull = value == null;
                 if (equalNull)
                 {
+                    // Debug.Log($"InvalidCastException, but value is null.");
                     return false;
                 }
                 try
                 {
-                    return (UnityEngine.Object)value == null;
+                    // Debug.Log($"try to cast to UnityEngine.Object");
+                    return (UnityEngine.Object)value != null;
                 }
                 catch (InvalidCastException)
                 {
+                    // Debug.Log($"failed to cast to UnityEngine.Object");
                     return true;
                 }
             }
             catch (NullReferenceException)
             {
+                // Debug.Log($"Null, return false");
                 return false;
             }
         }
