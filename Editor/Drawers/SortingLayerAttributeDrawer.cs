@@ -30,6 +30,7 @@ namespace SaintsField.Editor.Drawers
             int selectedIndex = property.propertyType == SerializedPropertyType.Integer ? property.intValue : Array.IndexOf(layers, property.stringValue);
 
             using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
+
             int newIndex = EditorGUI.Popup(position, selectedIndex, layers);
             // ReSharper disable once InvertIf
             if (changed.changed)

@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers
 
             // float floatFieldWidth = EditorGUIUtility.fieldWidth;
             float sliderWidth = position.width - leftFieldWidth - rightFieldWidth;
-            const float sliderPadding = 5.0f;
+            const float sliderPadding = 3f;
 
             Rect sliderRect = new Rect(
                 position.x + leftFieldWidth + sliderPadding,

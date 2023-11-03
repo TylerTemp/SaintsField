@@ -328,7 +328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _float: 3.2
-  _refs: {fileID: 380193377}
+  _refs: {fileID: 461560855}
   _go1: {fileID: 380193377}
   _go2: {fileID: 461560855}
 --- !u!1 &164392812
@@ -6226,13 +6226,18 @@ MonoBehaviour:
   richLabel: 
   _myStructBadView:
     Int: 0
-    String: 
-    V2: {x: 0, y: 0}
+    String: NewSortingLayer1
+    V2: {x: 0, y: 1}
     Float: 0
   _myStructWorkAround:
     Int: 0
-    String: 
-    V2: {x: 0, y: 0}
+    String: NewSortingLayer1
+    V2: {x: 2.6000001, y: 6.3}
+    Float: -0.06
+  _pure:
+    Int: 0
+    String: NewSortingLayer2
+    V2: {x: 2.4, y: 7.2000003}
     Float: 0
 --- !u!1 &1621177995
 GameObject:

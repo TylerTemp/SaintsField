@@ -16,7 +16,10 @@ namespace SaintsField.Samples
         [Serializable]
         private struct MyStruct
         {
+            [Scene]
             public int Int;
+            [AboveButton("", "above")]
+            [SortingLayer]
             public string String;
             // sadly this wont work with label attribute because of the propertyField problem
             [MinMaxSlider(0f, 10f, 0.1f)] public Vector2 V2;
@@ -33,5 +36,8 @@ namespace SaintsField.Samples
         [AboveRichLabel("<color=green><label /></color>")]
         [RichLabel(null)]
         private MyStruct _myStructWorkAround;
+
+        [SerializeField]
+        private MyStruct _pure;
     }
 }

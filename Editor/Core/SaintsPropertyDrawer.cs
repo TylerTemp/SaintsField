@@ -13,6 +13,7 @@ namespace SaintsField.Editor.Core
     // below-
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
+        // this is... not useful and, still have some bug on fallback drawer
         public static bool IsSubDrawer = false;
 
         private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToDrawers =
@@ -227,15 +228,41 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            // Debug.Log(isSubDrawer);
-            if (IsSubDrawer)
+            IReadOnlyList<SaintsWithIndex> allSaintsAttributes = SerializedUtils.GetAttributes<ISaintsAttribute>(property).Select((each, index) => new SaintsWithIndex
             {
-                // Debug.Log($"property.isExpanded={property.isExpanded}");
-                EditorGUI.PropertyField(position, property, GUIContent.none, true);
-                // EditorGUI.PropertyField(position, property, label);
-                // base.OnGUI(position, property, label);
-                return;
-            }
+                SaintsAttribute = each,
+                Index = index,
+            }).ToArray();
+
+            SaintsWithIndex labelAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Label);
+            SaintsWithIndex fieldAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Field);
+
+            // if (IsSubDrawer)
+            // {
+            //     (Rect subLabelRect, Rect subLeftPropertyRect) =
+            //         RectUtils.SplitWidthRect(position, EditorGUIUtility.labelWidth);
+            //
+            //     bool subLabelDraw = DoDrawLabel(labelAttributeWithIndex, subLabelRect, property, label);
+            //     Rect subFieldRect = subLabelDraw ? subLeftPropertyRect : position;
+            //
+            //         // EditorGUI.DrawRect(subFieldRect, Color.yellow);
+            //     using(new ResetIndentScoop())
+            //     {
+            //         // Debug.Log($"property.isExpanded={property.isExpanded}");
+            //         if (fieldAttributeWithIndex.SaintsAttribute != null)
+            //         {
+            //             GetOrCreateSaintsDrawer(fieldAttributeWithIndex)
+            //                 .DrawField(subFieldRect, property, label, fieldAttributeWithIndex.SaintsAttribute);
+            //         }
+            //         else
+            //         {
+            //             EditorGUI.PropertyField(subFieldRect, property, GUIContent.none, true);
+            //         }
+            //     }
+            //
+            //     return;
+            // }
+
             // Debug.Log($"position.height={position.height}");
             // // var attributes = SerializedUtil.GetAttributes<ISaintsAttribute>(property).Select(each => (PropertyAttribute) each);
             // var attributes = SerializedUtil.GetAttributes<PropertyAttribute>(property);
@@ -255,12 +282,6 @@ namespace SaintsField.Editor.Core
             using EditorGUI.PropertyScope propertyScope = new EditorGUI.PropertyScope(position, label, property);
             // GUIContent propertyScoopLabel = propertyScope.content;
             GUIContent bugFixCopyLabel = new GUIContent(label);
-
-            IReadOnlyList<SaintsWithIndex> allSaintsAttributes = SerializedUtils.GetAttributes<ISaintsAttribute>(property).Select((each, index) => new SaintsWithIndex
-            {
-                SaintsAttribute = each,
-                Index = index,
-            }).ToArray();
 
             // Debug.Log($"above: {label.text}");
 
@@ -358,7 +379,7 @@ namespace SaintsField.Editor.Core
 
             // GUIContent newLabel = propertyScoopLabel;
             (Rect labelRect, Rect leftPropertyRect) =
-                RectUtils.SplitWidthRect(EditorGUI.IndentedRect(fieldRect), EditorGUIUtility.labelWidth);
+                RectUtils.SplitWidthRect(fieldRect, EditorGUIUtility.labelWidth);
 
             labelRect.height = EditorGUIUtility.singleLineHeight;
 
@@ -383,51 +404,15 @@ namespace SaintsField.Editor.Core
 
             _valueChange = false;
             // Debug.Log($"valueChange reset to false");
-            SaintsWithIndex labelAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Label);
-            Type labelDrawer = labelAttributeWithIndex.SaintsAttribute == null
-                ? null
-                : GetFirstSaintsDrawerType(labelAttributeWithIndex.SaintsAttribute.GetType());
-            bool anyLabelDrew = false;
-            if (labelDrawer == null)
+
+            bool anyLabelDrew = DoDrawLabel(labelAttributeWithIndex, labelRect, property, bugFixCopyLabel);
+            if (anyLabelDrew)
             {
-                anyLabelDrew = true;
-                // Debug.Log(labelRect);
-                // Debug.Log(_labelClickedMousePos);
-                // if(labelRect.Contains(_labelClickedMousePos))
-                // {
-                //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
-                // }
-                // default label drawer
-                EditorGUI.LabelField(labelRect, bugFixCopyLabel);
-                // RichLabelAttributeDrawer.LabelMouseProcess(labelRect, property);
-                LabelMouseProcess(labelRect, property, _fieldControlName);
                 fieldRect = leftPropertyRect;
             }
-            else
-            {
-                SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
-                // Debug.Log(labelAttribute);
-                if(labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
-                {
-                    anyLabelDrew = true;
 
-                    // if(labelRect.Contains(_labelClickedMousePos))
-                    // {
-                    //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
-                    // }
-
-                    labelDrawerInstance.DrawLabel(labelRect, property, bugFixCopyLabel,
-                        labelAttributeWithIndex.SaintsAttribute);
-                    LabelMouseProcess(labelRect, property, _fieldControlName);
-                    fieldRect = leftPropertyRect;
-                }
-                // newLabel = GUIContent.none;
-
-                _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
-            }
             #endregion
 
-            SaintsWithIndex fieldAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Field);
             bool fieldBreakLine = fieldAttributeWithIndex.SaintsAttribute != null && fieldAttributeWithIndex.SaintsAttribute.GroupBy != "__LABEL_FIELD__";
             if (anyLabelDrew && fieldBreakLine)
             {
@@ -657,6 +642,52 @@ namespace SaintsField.Editor.Core
         //
         //     return drawer;
         // }
+
+        private bool DoDrawLabel(SaintsWithIndex labelAttributeWithIndex, Rect labelRect, SerializedProperty property, GUIContent label)
+        {
+            Type labelDrawer = labelAttributeWithIndex.SaintsAttribute == null
+                ? null
+                : GetFirstSaintsDrawerType(labelAttributeWithIndex.SaintsAttribute.GetType());
+            // bool anyLabelDrew = false;
+            if (labelDrawer == null)
+            {
+                // anyLabelDrew = true;
+                // Debug.Log(labelRect);
+                // Debug.Log(_labelClickedMousePos);
+                // if(labelRect.Contains(_labelClickedMousePos))
+                // {
+                //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
+                // }
+                // default label drawer
+                EditorGUI.LabelField(labelRect, label);
+                // RichLabelAttributeDrawer.LabelMouseProcess(labelRect, property);
+                LabelMouseProcess(labelRect, property, _fieldControlName);
+                // fieldRect = leftPropertyRect;
+                // return (true, leftPropertyRect);
+                return true;
+            }
+
+            SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
+            // Debug.Log(labelAttribute);
+            if (!labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
+            {
+                return false;
+            }
+
+            // if(labelRect.Contains(_labelClickedMousePos))
+            // {
+            //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
+            // }
+
+            labelDrawerInstance.DrawLabel(labelRect, property, label,
+                labelAttributeWithIndex.SaintsAttribute);
+            LabelMouseProcess(labelRect, property, _fieldControlName);
+            // fieldRect = leftPropertyRect;
+            // newLabel = GUIContent.none;
+
+            _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
+            return true;
+        }
 
         protected void DefaultDrawer(Rect position, SerializedProperty property)
         {
