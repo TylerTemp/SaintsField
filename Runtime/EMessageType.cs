@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 
 namespace SaintsField
 {
@@ -30,6 +31,7 @@ namespace SaintsField
             EMessageType.Info => MessageType.Info,
             EMessageType.Warning => MessageType.Warning,
             EMessageType.Error => MessageType.Error,
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };
     }
 }

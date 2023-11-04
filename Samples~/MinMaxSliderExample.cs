@@ -4,20 +4,11 @@ namespace SaintsField.Samples
 {
     public class MinMaxSliderExample: MonoBehaviour
     {
-        // [MinMaxSlider(-1f, 3f)]
-        // public Vector2 vector2;
-        //
-        // [MinMaxSlider(1, 10)]
-        // public Vector2Int vector2Int;
-        //
-        // [NaughtyAttributes.MinMaxSlider(-1f, 3f)]
-        // public Vector2 naughtyVector2;
-
         [MinMaxSlider(-1f, 3f, 0.3f)]
-        public Vector2 vector2;
+        public Vector2 vector2Step03;
 
         [MinMaxSlider(0, 20, 3)]
-        public Vector2Int vector2Int;
+        public Vector2Int vector2IntStep3;
 
         [MinMaxSlider(-1f, 3f)]
         public Vector2 vector2Free;

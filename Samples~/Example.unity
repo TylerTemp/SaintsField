@@ -397,6 +397,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upLimit: 7
+  min0Max: 7
+  fMinMax10: 7
   <_maxValue>k__BackingField: 136
   <_minValue>k__BackingField: 90
   <_range>k__BackingField: {x: 95.26165, y: 132.61935}
@@ -490,7 +493,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6830dc4b87389ed4daf7678ce72b922f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _value: -29
+  _value: -32
 --- !u!4 &272774834
 Transform:
   m_ObjectHideFlags: 0
@@ -535,10 +538,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1f3676e837542e48c725147bd633bb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bool1: 1
-  _bool2: 1
-  _bool3: 1
-  _bool4: 1
+  directlyReadOnly: 
+  _bool1: 0
+  _bool2: 0
+  _bool3: 0
+  _bool4: 0
   _ro1and2: 
   _ro1or2: 
   _ro1234: 
@@ -878,6 +882,52 @@ MonoBehaviour:
   _errorOut: 0
   _labelByField: Dynamic Label!
   _someInt: 9
+--- !u!1 &633783409
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 633783411}
+  - component: {fileID: 633783410}
+  m_Layer: 0
+  m_Name: Scene
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &633783410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633783409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71aaeaf3bdd04306ba6b52810d6f241c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sceneInt: 0
+  _sceneString: 
+--- !u!4 &633783411
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633783409}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 35
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &724537242
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,6 +992,8 @@ MonoBehaviour:
   <Go>k__BackingField: {fileID: 0}
   _object: {fileID: 0}
   _wontWork: 8.550002
+  wontWorkWontNoticeYou:
+    theInt: 0
 --- !u!4 &768079761
 Transform:
   m_ObjectHideFlags: 0
@@ -1170,8 +1222,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b403bd36614aacb791b2f4b7868665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _layerString: UI
-  _layerInt: 2
+  layerString: TransparentFX
+  layerInt: 0
 --- !u!114 &1098124222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6061,20 +6113,23 @@ MonoBehaviour:
   _short: 'short
 
     content'
-  _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
-    10 wrap 11 wrap 12
+  _long: '1
 
-    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7
-    wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    2
 
-    long wrap 1 warp 2 wrap 3 wrap 4 wrap
-    5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    3
 
-    long wrap 1 warp 2
-    wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    4
 
-    long
-    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+    5
+
+    6
+
+    7
+
+    8
+
+    9'
   _noLabel: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9
     wap 10 wrap 11 wrap 12
 
@@ -6105,7 +6160,8 @@ MonoBehaviour:
     warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
 
     long
-    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11
+    wrap 12'
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
@@ -6150,17 +6206,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vector2: {x: -0.39999998, y: 0.8000001}
-  vector2Int: {x: 6, y: 9}
-  vector2Free: {x: 0.3889047, y: 1.6700026}
-  vector2IntFree: {x: 4, y: 7}
-  _autoWidth: {x: 24, y: 67}
-  <OuterRange>k__BackingField: {x: -73.2056, y: 36.6028}
-  _innerRange: {x: -29, y: 1}
-  <DynamicMin>k__BackingField: -1.08
-  <DynamicMax>k__BackingField: 7.63
-  _propRange: {x: 1.0960252, y: 5.054391}
-  _propLeftRange: {x: 8.825602, y: 41.701668}
+  vector2Step03: {x: -0.7, y: 1.4000001}
+  vector2IntStep3: {x: 3, y: 9}
+  vector2Free: {x: -0.03852184, y: 1.5987648}
+  vector2IntFree: {x: 5, y: 10}
+  _autoWidth: {x: 0, y: 33}
+  <OuterRange>k__BackingField: {x: -54.585938, y: 45.427277}
+  _innerRange: {x: -23, y: 3}
+  <DynamicMin>k__BackingField: -0.73
+  <DynamicMax>k__BackingField: 9.45
+  _propRange: {x: 2.3279486, y: 4.918863}
+  _propLeftRange: {x: 28.491407, y: 80.10487}
   _propRightRange: {x: -76.03111, y: -12.263084}
 --- !u!1 &1383904217
 GameObject:
@@ -6601,7 +6657,7 @@ GameObject:
   - component: {fileID: 2048334551}
   - component: {fileID: 2048334550}
   m_Layer: 0
-  m_Name: SepTitleExample
+  m_Name: SepTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

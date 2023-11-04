@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers
 
             _errors.Clear();
 
-            return (visibilityAttribute.IsForHide, visibilityAttribute.OrCallbacks.All(callback => IsTruly(target, type, callback)));
+            return (visibilityAttribute.IsForHide, visibilityAttribute.andCallbacks.All(callback => IsTruly(target, type, callback)));
         }
 
         private bool IsTruly(Object target, Type type, string by)

@@ -129,12 +129,23 @@ namespace SaintsField.Editor.Core
                             Debug.Log($"colors add {parsedResult.value}");
 #endif
                             colors.Add(parsedResult.value);
+                            if(Colors.ColorNameSupported(parsedResult.value))
+                            {
+                                richText.Append(part);
+                            }
+                            else
+                            {
+                                richText.Append(
+                                    $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
+                            }
                         }
-
+                        else
+                        {
 #if EXT_INSPECTOR_LOG
-                        Debug.Log($"string append {part}");
+                            Debug.Log($"string append {part}");
 #endif
-                        richText.Append(part);
+                            richText.Append(part);
+                        }
                     }
                         break;
                     case (RichPartType.EndTag, not null, _, _):
@@ -289,7 +300,8 @@ namespace SaintsField.Editor.Core
                 tagValue = tagValue.Substring(1, tagValue.Length - 2);
             }
 
-            return (tagName.Trim(), tagValue);
+            string tagNameStrip = tagName.Trim();
+            return (tagNameStrip, tagValue);
         }
 
         public float GetWidth(GUIContent oldLabel, float height, IEnumerable<RichTextChunk> payloads)

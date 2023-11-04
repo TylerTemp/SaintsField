@@ -5,20 +5,19 @@ namespace SaintsField.Samples
 {
     public class RequiredExample: MonoBehaviour
     {
-        [SerializeField, Required] private Sprite _spriteImage;
-        [field: SerializeField, Required("Add this please!")] public GameObject Go { get; private set; }
-        [SerializeField, Required] private UnityEngine.Object _object;
+        [Required("Add this please!")] public Sprite _spriteImage;
+        // works for property field
+        [field: SerializeField, Required] public GameObject Go { get; private set; }
+        [Required] public UnityEngine.Object _object;
         [SerializeField, Required] private float _wontWork;
 
-        // [Serializable]
-        // private struct MyStruct
-        // {
-        //     public int theInt;
-        // }
+        [Serializable]
+        public struct MyStruct
+        {
+            public int theInt;
+        }
 
-        // [SerializeField, RichLabel("HI"), AboveButton(nameof(TestButton), "CLICK")] private MyStruct _myStruct;
-        // [SerializeField, RichLabel("HI")] private int[] _ints;
-
-        // private void TestButton() {}
+        [Required, FieldDrawerConfig]
+        public MyStruct wontWorkWontNoticeYou;
     }
 }

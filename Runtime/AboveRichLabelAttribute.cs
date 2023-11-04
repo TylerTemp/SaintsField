@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace SaintsField
+﻿namespace SaintsField
 {
     public class AboveRichLabelAttribute : FullWidthRichLabelAttribute
     {

@@ -10,12 +10,13 @@ namespace SaintsField
         public string GroupBy => "";
 
         public readonly bool IsForHide;
-        public readonly string[] OrCallbacks;
+        public readonly string[] andCallbacks;
 
-        public VisibilityAttribute(bool isForHide, params string[] orCallbacks)
+        // ReSharper disable once MemberCanBeProtected.Global
+        public VisibilityAttribute(bool isForHide, params string[] andCallbacks)
         {
             IsForHide = isForHide;
-            OrCallbacks = orCallbacks;
+            this.andCallbacks = andCallbacks;
         }
     }
 }

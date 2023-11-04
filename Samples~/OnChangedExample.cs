@@ -5,8 +5,8 @@ namespace SaintsField.Samples
 {
     public class OnChangedExample : MonoBehaviour
     {
-        [SerializeField, OnValueChanged(nameof(Changed))]
-        private int _value;
+        [OnValueChanged(nameof(Changed))]
+        public int _value;
 
         private void Changed()
         {

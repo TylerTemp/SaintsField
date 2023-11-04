@@ -4,10 +4,12 @@ namespace SaintsField.Samples
 {
     public class MinMaxExample: MonoBehaviour
     {
-        // [SerializeField, MinValue(0), MaxValue(50)] private int _valueRange;
-        // [SerializeField, NaughtyAttributes.MinValue(10)] private int _nRange;
+        public int upLimit;
 
-        [field: SerializeField, MinValue(nameof(_minValue))]
+        [MinValue(0), MaxValue(nameof(upLimit))] public int min0Max;
+        [MinValue(nameof(upLimit)), MaxValue(10)] public float fMinMax10;
+
+        [field: SerializeField, MinValue(nameof(_minValue)), Space]
         public int _maxValue { get; private set; }
 
         [field: SerializeField, MaxValue(nameof(_maxValue))]

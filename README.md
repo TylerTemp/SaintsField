@@ -12,13 +12,6 @@ Developed by: TylerTemp, 墨瞳
 
 ## Enhancements ##
 
-All fields enhancement can generally be divided into:
-
-1.  Label Decorator
-2.  Field Decorator
-3.  Above Decorator
-4.  Below Decorator
-
 ### Label & Text ###
 
 #### `RichLabel` ####
@@ -270,7 +263,7 @@ public class ButtonsExample : MonoBehaviour
 https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7
 
 
-### Field Utilities ###
+### Field Modifier ###
 
 #### `GameObjectActive` ####
 
@@ -327,8 +320,6 @@ The field itself must be `Sprite`.
 https://github.com/TylerTemp/SaintsField/assets/6391063/705498e9-4d70-482f-9ae6-b231cd9497ca
 
 
-
-
 #### `MaterialToggle` ####
 
 A toggle button to toggle the `Material` of the target.
@@ -343,6 +334,8 @@ The field itself must be `Material`.
 
     which slot index of `materials` on `Renderer` you want to swap
 
+*   AllowMultiple: Yes
+
 ```csharp
 public class MaterialToggleExample: MonoBehaviour
 {
@@ -355,9 +348,39 @@ public class MaterialToggleExample: MonoBehaviour
 
 https://github.com/TylerTemp/SaintsField/assets/6391063/00c5702c-a41e-42a4-abb1-97a0713c3f66
 
+#### `Expandable` ####
 
+Make scriptable objects expandable.
+
+*   AllowMultiple: No
+
+```csharp
+public class ExpandableExample : MonoBehaviour
+{
+    [Expandable] public ScriptableObject _scriptable;
+}
+```
 
 ### Field Enhancement ###
+
+#### `FieldType` ####
+
+Ask the inspector to display another type of field rather than the field's original type.
+
+This is useful when you want to have a `GameObject` of prefab, but you want this target prefab has specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you enforce the inspector to sign the required object that has your expected component, but still give you the original type value to field.
+
+*   AllowMultiple: No
+
+```csharp
+public class FieldTypeExample: MonoBehaviour
+{
+    [SerializeField, FieldType(typeof(SpriteRenderer))]
+    private GameObject _go;
+
+    [SerializeField, FieldType(typeof(FieldTypeExample))]
+    private ParticleSystem _ps;
+}
+```
 
 #### `DropDown` ####
 
@@ -396,9 +419,368 @@ public class DropdownExample : MonoBehaviour
 
 ![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
 
+#### `MinMaxSlider` ####
+
+A range slider for `Vector2` or `Vector2Int`
+
+This Attibute has overrides:
+
+*   `MinMaxSliderAttribute(float min, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
+*   `MinMaxSliderAttribute(int min, int max, int step=1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
+*   `MinMaxSliderAttribute(string minCallback, string maxCallback, int step=-1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
+*   `MinMaxSliderAttribute(float min, string maxCallback, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
+*   `MinMaxSliderAttribute(string minCallback, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
+
+For each arguments:
+
+*   `min`: the minimum value of the slider
+*   `max`: the maximum value of the slider
+*   `minCallback`: use a function or property as the minimum value of the slider
+*   `maxCallback`: use a function or property as the maximum value of the slider
+*   `step`: the step of the slider, `<= 0` means no limit and float type will not be limited
+*   `minWidth`: the minimum width of the value label. -1 for default (not recommended)
+*   `maxWidth`: the maximum width of the value label. -1 for default (not recommended)
+
+*   AllowMultiple: No
+
+a full futured example:
+
+```csharp
+public class MinMaxSliderExample: MonoBehaviour
+{
+    [MinMaxSlider(-1f, 3f, 0.3f)]
+    public Vector2 vector2Step03;
+
+    [MinMaxSlider(0, 20, 3)]
+    public Vector2Int vector2IntStep3;
+
+    [MinMaxSlider(-1f, 3f)]
+    public Vector2 vector2Free;
+
+    [MinMaxSlider(0, 20)]
+    public Vector2Int vector2IntFree;
+
+    // not recommended
+    [SerializeField]
+    [MinMaxSlider(0, 100, minWidth:-1, maxWidth:-1)]
+    private Vector2Int _autoWidth;
+
+    [field: SerializeField, MinMaxSlider(-100f, 100f)]
+    public Vector2 OuterRange { get; private set; }
+
+    [SerializeField, MinMaxSlider(nameof(GetOuterMin), nameof(GetOuterMax), 1)] public Vector2Int _innerRange;
+
+    private float GetOuterMin() => OuterRange.x;
+    private float GetOuterMax() => OuterRange.y;
+
+    [field: SerializeField]
+    public float DynamicMin { get; private set; }
+    [field: SerializeField]
+    public float DynamicMax { get; private set; }
+
+    [SerializeField, MinMaxSlider(nameof(DynamicMin), nameof(DynamicMax))] private Vector2 _propRange;
+    [SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] private Vector2 _propLeftRange;
+    [SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] private Vector2 _propRightRange;
+}
+```
+
+#### `ResizableTextArea` ####
+
+This `TextArea` will always grow it's height to fit the content. (minimal height is 3 rows).
+
+Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
+
+*   `bool fullWidth=true`
+
+    if false, the text area will be the same width as a normal field, rather that take the whole width of view
+
+*   AllowMultiple: No
+
+```csharp
+public class ResizableTextAreaExample : MonoBehaviour
+{
+    [SerializeField, ResizableTextArea] private string _short;
+    [SerializeField, ResizableTextArea] private string _long;
+    [SerializeField, RichLabel(null), ResizableTextArea] private string _noLabel;
+
+    [SerializeField, ResizableTextArea(false)] private string _inlineShort;
+    [SerializeField, ResizableTextArea(false)] private string _inlineLong;
+}
+```
+
+#### `Layer` ####
+
+A dropdown selector for layer.
+
+*   AllowMultiple: No
+
+```csharp
+public class LayerAttributeExample: MonoBehaviour
+{
+    [Layer] public string layerString;
+    [Layer] public int layerInt;
+}
+```
+
+#### `Scene` ####
+
+A dropdown selector for scene in build list.
+
+*   AllowMultiple: No
+
+```csharp
+public class SceneExample: MonoBehaviour
+{
+    [Scene] public int _sceneInt;
+    [Scene] public string _sceneString;
+}
+```
+
+#### `SortingLayer` ####
+
+A dropdown selector for sorting layer.
+
+*   AllowMultiple: No
+
+```csharp
+public class SortingLayerExample: MonoBehaviour
+{
+    [SortingLayer] public string _sortingLayerString;
+    [SortingLayer] public int _sortingLayerInt;
+}
+```
+
+#### `Tag` ####
+
+A dropdown selector for tag.
+
+*   AllowMultiple: No
+
+```csharp
+public class TagExample: MonoBehaviour
+{
+    [Tag] public string _tag;
+}
+```
+
+### Field Utilities ###
+
+#### `OnValueChanged` ####
+
+Call a function every time the field value is changed
+
+*   `string callback` the callback function name
+*   AllowMultiple: Yes
+
+```csharp
+public class OnChangedExample : MonoBehaviour
+{
+    [OnValueChanged(nameof(Changed))]
+    public int _value;
+
+    private void Changed()
+    {
+        Debug.Log($"changed={_value}");
+    }
+}
+```
+
+#### `ReadOnly` ####
+
+This has two overrides:
+
+*   `ReadOnlyAttribute(bool directValue)`
+*   `ReadOnlyAttribute(params string[] by)`
+
+Each arguemnts:
+
+*   `bool directValue=false`
+
+    if true, the field will be readonly
+
+*   `string[] by`
+
+    a callback or property name, if **ALL** the value is truly, the field will be readonly
+
+*   AllowMultiple: Yes
+
+    When use mutiple `ReadOnly` on a field, the field will be readonly if **ANY** of them is readonly
+
+```csharp
+public class ReadOnlyGroupExample: MonoBehaviour
+{
+    [ReadOnly(true)] public string directlyReadOnly;
+
+    [SerializeField] private bool _bool1;
+    [SerializeField] private bool _bool2;
+    [SerializeField] private bool _bool3;
+    [SerializeField] private bool _bool4;
+
+    [SerializeField]
+    [ReadOnly(nameof(_bool1))]
+    [ReadOnly(nameof(_bool2))]
+    [RichLabel("readonly=1||2")]
+    private string _ro1and2;
+
+
+    [SerializeField]
+    [ReadOnly(nameof(_bool1), nameof(_bool2))]
+    [RichLabel("readonly=1&&2")]
+    private string _ro1or2;
+
+
+    [SerializeField]
+    [ReadOnly(nameof(_bool1), nameof(_bool2))]
+    [ReadOnly(nameof(_bool3), nameof(_bool4))]
+    [RichLabel("readonly=(1&&2)||(3&&4)")]
+    private string _ro1234;
+}
+```
+
+#### `Required` ####
+
+Remide a given reference type field to be required.
+
+This will check if the field value is a `truly` value, that means:
+
+1.  Won't work for int and float (It'll give an error, asking you to not use on int/float)
+2.  `struct` value will always be `truly` because `struct` is not nullable and Unity will fill a default value for it no matter what
+3.  It works on refenece type and will NOT skip unity's life-circle null check
+
+*   `string errorMessage = null` Error message. Default is `{label} is required`
+*   AllowMultiple: No
+
+
+```csharp
+public class RequiredExample: MonoBehaviour
+{
+    [Required("Add this please!")] public Sprite _spriteImage;
+    // works for property field
+    [field: SerializeField, Required] public GameObject Go { get; private set; }
+    [Required] public UnityEngine.Object _object;
+    [SerializeField, Required] private float _wontWork;
+
+    [Serializable]
+    public struct MyStruct
+    {
+        public int theInt;
+    }
+
+    [Required, FieldDrawerConfig]
+    public MyStruct wontWorkWontNoticeYou;
+}
+```
+
+#### `ValidateInput` ####
+
+Validate the input of the field when value changed.
+
+*   `string callback` the callback function to validate the data. note: return type is **`string`** not bool! return null or empty string for valid, otherwise the string will be used as error message
+
+*   AllowMultiple: Yes
+
+```csharp
+public class ValidateInputExample : MonoBehaviour
+{
+    [ValidateInput(nameof(OnValidateInput))]
+    public int _value;
+
+    private string OnValidateInput() => _value < 0 ? $"Should be positive, but gets {_value}" : null;
+}
+```
+
+#### `ShowIf` / `HideIf` ####
+
+Show or hide the field based on a condition.
+
+For `ShowIf`:
+
+*   `string andCallbacks...` a list of callback or property name, if **ALL** the value is truly, the field will be shown/hidden
+
+*   AllowMultiple: Yes
+
+    When use mutiple `ShowIf` on a field, the field will be shown if **ANY** of them is shown
+
+`HideIf` is the oppsite of `ShowIf`. You can use mutiple `ShowIf`, `HideIf` and even the mix of the two
+
+A full futured example:
+
+
+```csharp
+public class ShowHideExample: MonoBehaviour
+{
+    public bool _bool1;
+    public bool _bool2;
+    public bool _bool3;
+    public bool _bool4;
+
+    [ShowIf(nameof(_bool1))]
+    [ShowIf(nameof(_bool2))]
+    [RichLabel("<color=red>show=1||2")]
+    public string _showIf1Or2;
+
+
+    [ShowIf(nameof(_bool1), nameof(_bool2))]
+    [RichLabel("<color=green>show=1&&2")]
+    public string _showIf1And2;
+
+    [HideIf(nameof(_bool1))]
+    [HideIf(nameof(_bool2))]
+    [RichLabel("<color=blue>show=!1||!2")]
+    public string _hideIf1Or2;
+
+
+    [HideIf(nameof(_bool1), nameof(_bool2))]
+    [RichLabel("<color=yellow>show=!1&&!2")]
+    public string _hideIf1And2;
+
+    [ShowIf(nameof(_bool1))]
+    [HideIf(nameof(_bool2))]
+    [RichLabel("<color=magenta>show=1||!2")]
+    public string _showIf1OrNot2;
+
+    [ShowIf(nameof(_bool1), nameof(_bool2))]
+    [ShowIf(nameof(_bool3), nameof(_bool4))]
+    [RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
+    public string _showIf1234;
+
+    [HideIf(nameof(_bool1), nameof(_bool2))]
+    [HideIf(nameof(_bool3), nameof(_bool4))]
+    [RichLabel("<color=pink>show=(!1&&!2)||(!3&&!4)")]
+    public string _hideIf1234;
+}
+```
+
+#### `MinValue` / `MaxValue` ####
+
+Limit for int/float field
+
+They have the same overrides:
+
+*   `float value`: directly limit to a number value
+*   `string valueCallback`: a callback or property for limit
+
+*   AllowMultiple: Yes
+
+```csharp
+public class MinMaxExample: MonoBehaviour
+{
+    public int upLimit;
+
+    [MinValue(0), MaxValue(nameof(upLimit))] public int min0Max;
+    [MinValue(nameof(upLimit)), MaxValue(10)] public float fMinMax10;
+}
+```
 
 ### GroupBy ###
 
 group with any decorator that has the same `groupBy` for this field. Same group will share even width of the view width between them .
 
 `""` means no group.
+
+## Known Issues ##
+
+Because it handle the label drawing process seperated from the actual field drawing, the label is not using Unity's default label. Which lead to the problem:
+
+1.  Drawing label for int/float field is not very smooth
+2.  Click a label will not focus the field
