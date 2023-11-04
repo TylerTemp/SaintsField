@@ -361,6 +361,8 @@ public class ExpandableExample : MonoBehaviour
 }
 ```
 
+![expandable](https://github.com/TylerTemp/SaintsField/assets/6391063/92fd1f45-82c5-4d5e-bbc4-c9a70fefe158)
+
 ### Field Enhancement ###
 
 #### `FieldType` ####
@@ -381,6 +383,9 @@ public class FieldTypeExample: MonoBehaviour
     private ParticleSystem _ps;
 }
 ```
+
+![field_type](https://github.com/TylerTemp/SaintsField/assets/6391063/7bcc058f-5cb4-4a4f-9d8e-ec08bcb8da2c)
+
 
 #### `DropDown` ####
 
@@ -484,6 +489,10 @@ public class MinMaxSliderExample: MonoBehaviour
 }
 ```
 
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47
+
+
 #### `ResizableTextArea` ####
 
 This `TextArea` will always grow it's height to fit the content. (minimal height is 3 rows).
@@ -508,6 +517,10 @@ public class ResizableTextAreaExample : MonoBehaviour
 }
 ```
 
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/2ddfd6af-20b7-40ee-a306-1d42ae5161ce
+
+
 #### `Layer` ####
 
 A dropdown selector for layer.
@@ -522,7 +535,10 @@ public class LayerAttributeExample: MonoBehaviour
 }
 ```
 
+![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/17fdc955-d637-4750-9856-3d5012fa0cb2)
+
 #### `Scene` ####
+
 
 A dropdown selector for scene in build list.
 
@@ -535,6 +551,8 @@ public class SceneExample: MonoBehaviour
     [Scene] public string _sceneString;
 }
 ```
+
+![scene](https://github.com/TylerTemp/SaintsField/assets/6391063/a8844b0a-d19d-485d-9df7-3e0b937e0765)
 
 #### `SortingLayer` ####
 
@@ -550,6 +568,10 @@ public class SortingLayerExample: MonoBehaviour
 }
 ```
 
+![sorting_layer](https://github.com/TylerTemp/SaintsField/assets/6391063/cab99c5c-0ec2-49c5-843c-89f65f402b93)
+
+
+
 #### `Tag` ####
 
 A dropdown selector for tag.
@@ -562,6 +584,9 @@ public class TagExample: MonoBehaviour
     [Tag] public string _tag;
 }
 ```
+
+![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/df1526a5-75fe-4fc9-ba47-19e7f2d63dda)
+
 
 ### Field Utilities ###
 
@@ -637,6 +662,8 @@ public class ReadOnlyGroupExample: MonoBehaviour
 }
 ```
 
+https://github.com/TylerTemp/SaintsField/assets/6391063/6761a0f2-07c2-4252-9dd0-c1a60091a891
+
 #### `Required` ####
 
 Remide a given reference type field to be required.
@@ -688,6 +715,12 @@ public class ValidateInputExample : MonoBehaviour
     private string OnValidateInput() => _value < 0 ? $"Should be positive, but gets {_value}" : null;
 }
 ```
+
+
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/fb437329-0608-45da-bb12-a2581b2fae4f
+
+
 
 #### `ShowIf` / `HideIf` ####
 
@@ -751,6 +784,12 @@ public class ShowHideExample: MonoBehaviour
 }
 ```
 
+
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0
+
+
+
 #### `MinValue` / `MaxValue` ####
 
 Limit for int/float field
@@ -772,6 +811,11 @@ public class MinMaxExample: MonoBehaviour
 }
 ```
 
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/76ed3093-6c50-42d9-a62d-0bb71e054091
+
+
+
 ### GroupBy ###
 
 group with any decorator that has the same `groupBy` for this field. Same group will share even width of the view width between them .
@@ -784,3 +828,5 @@ Because it handle the label drawing process seperated from the actual field draw
 
 1.  Drawing label for int/float field is not very smooth
 2.  Click a label will not focus the field
+
+Note: These issue only affect the fields that uses this project's feature. It won't affect other fields, even it's on the same script. It should be safe enough to use it together with your other inspector enhancement
