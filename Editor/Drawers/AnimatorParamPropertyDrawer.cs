@@ -41,21 +41,22 @@ namespace SaintsField.Editor.Drawers
             if (invalidAnimatorController)
             {
                 _error = $"Animator controller `{animatorParamAttribute.AnimatorName}` is null";
+                DefaultDrawer(position, property);
+                return;
             }
-            else
+
+            Animator animatorController = (Animator)animProp.objectReferenceValue;
+
+            // int parametersCount = animatorController.parameters.Length;
+
+            // for (int i = 0; i < parametersCount; i++)
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (AnimatorControllerParameter parameter in animatorController.parameters)
             {
-                Animator animatorController = (Animator)animProp.objectReferenceValue;
-
-                int parametersCount = animatorController.parameters.Length;
-
-                for (int i = 0; i < parametersCount; i++)
+                if (animatorParamAttribute.AnimatorParamType == null ||
+                    parameter.type == animatorParamAttribute.AnimatorParamType)
                 {
-                    AnimatorControllerParameter parameter = animatorController.parameters[i];
-                    if (animatorParamAttribute.AnimatorParamType == null ||
-                        parameter.type == animatorParamAttribute.AnimatorParamType)
-                    {
-                        animatorParameters.Add(parameter);
-                    }
+                    animatorParameters.Add(parameter);
                 }
             }
 

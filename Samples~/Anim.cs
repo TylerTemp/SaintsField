@@ -7,15 +7,16 @@ namespace SaintsField.Samples
         [field: SerializeField]
         public Animator Animator { get; private set; }
 
-        [field: SerializeField, AnimatorState(nameof(Animator)), RichLabel("<color=green><label/></color>")]
-        public AnimatorState AnimatorState { get; private set; }
-        [field: SerializeField, AnimatorState(nameof(Animator))]
-        public string AnimStateName { get; private set; }
+        [AnimatorState(nameof(Animator))]
+        public AnimatorState animatorState;
 
-        [SerializeField, AnimatorParam(nameof(Animator))]
-        private string _animParamName;
+        [AnimatorState(nameof(Animator))]
+        public string animStateName;
 
-        [SerializeField, AnimatorParam(nameof(Animator))]
-        private int _animParamHash;
+        [AnimatorParam(nameof(Animator))]
+        public string animParamName;
+
+        [AnimatorParam(nameof(Animator))]
+        public int animParamHash;
     }
 }

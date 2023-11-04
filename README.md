@@ -363,7 +363,7 @@ public class ExpandableExample : MonoBehaviour
 
 ![expandable](https://github.com/TylerTemp/SaintsField/assets/6391063/92fd1f45-82c5-4d5e-bbc4-c9a70fefe158)
 
-### Field Enhancement ###
+### Field ###
 
 #### `FieldType` ####
 
@@ -520,6 +520,64 @@ public class ResizableTextAreaExample : MonoBehaviour
 
 https://github.com/TylerTemp/SaintsField/assets/6391063/2ddfd6af-20b7-40ee-a306-1d42ae5161ce
 
+#### `AnimatorParam` ###
+
+A dropdown selector for animator parameter.
+
+*   `string animatorName`
+
+    name of the animator
+
+*   (Optional) `AnimatorControllerParameterType animatorParamType`
+
+    type of the parameter to filter
+
+```csharp
+public class Anim : MonoBehaviour
+{
+    [field: SerializeField]
+    public Animator Animator { get; private set;}
+
+    [AnimatorParam(nameof(Animator))]
+    private string animParamName;
+
+    [AnimatorParam(nameof(Animator))]
+    private int animParamHash;
+}
+```
+
+#### `AnimatorState` ###
+
+A dropdown selector for animator state.
+
+*   `string animatorName`
+
+    name of the animator
+
+to get more useful info from the state, you can use `AnimatorState` type instead of `string` for field.
+
+`AnimatorState` has the following properties:
+
+*   `int layerIndex` index of layer
+*   `int stateNameHash` hash value of state
+*   `string stateName` actual state name
+*   `float stateSpeed` the `Speed` paramater of the state
+*   `AnimationClip animationClip` the actual animation clip of the state (can be null). It has `length` value for the length of the clip. For more detail see [Unity Doc of AnimationClip](https://docs.unity3d.com/ScriptReference/AnimationClip.html)
+
+
+```csharp
+public class Anim : MonoBehaviour
+{
+    [field: SerializeField]
+    public Animator Animator { get; private set; }
+
+    [AnimatorState(nameof(Animator))]
+    public AnimatorState animatorState;
+
+    [AnimatorState(nameof(Animator))]
+    public string animStateName;
+}
+```
 
 #### `Layer` ####
 
