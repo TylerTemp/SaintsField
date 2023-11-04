@@ -9,7 +9,7 @@ namespace SaintsField.Samples
         [RichLabel("├<icon=eye.png/><label />┤")]
         [BelowRichLabel(nameof(BelowLabel), true)]
         [BelowRichLabel("~~~~~~~")]
-        private int _int;
+        private int _intValue;
 
         private string BelowLabel() => "└<icon=eye.png/><label />┘";
     }

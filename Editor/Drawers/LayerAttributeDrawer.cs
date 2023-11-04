@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Drawers
     public class LayerAttributeDrawer: SaintsPropertyDrawer
     {
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel)
+            ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
             return EditorGUIUtility.singleLineHeight;
         }

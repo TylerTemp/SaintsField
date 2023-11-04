@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers
         private static bool BreakLine(ISaintsAttribute saintsAttribute) => saintsAttribute.GroupBy != "__LABEL_FIELD__";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel)
+            ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
             // _hasLabel = hasLabel;
             // bool fullWidth = ((ResizableTextAreaAttribute)saintsAttribute).FullWidth;
@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers
             float viewWidth = indented.width;
             bool breakLine = BreakLine(saintsAttribute);
 
-            bool useFullView = breakLine || !hasLabel;
+            bool useFullView = breakLine || !hasLabelWidth;
 
             return GetHeight(
                 property.stringValue,
@@ -37,6 +37,8 @@ namespace SaintsField.Editor.Drawers
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
+            // EditorGUI.DrawRect(position, Color.blue);
+
             if (property.propertyType != SerializedPropertyType.String)
             {
                 _error = $"expect string, get {property.propertyType}";

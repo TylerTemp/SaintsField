@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         private bool _overrideMessageType;
-        private MessageType _messageType;
+        private EMessageType _messageType;
 
         protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers
                 ? HelpBox.GetHeight(GetContent(property, (InfoBoxAttribute)saintsAttribute), width, _overrideMessageType ? _messageType : infoboxAttribute.MessageType)
                 : 0f;
 
-            float errorHeight = _error != "" ? HelpBox.GetHeight(_error, width, MessageType.Error) : 0f;
+            float errorHeight = _error != "" ? HelpBox.GetHeight(_error, width, EMessageType.Error) : 0f;
             return boxHeight + errorHeight;
         }
 
@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Drawers
                 return leftRect;
             }
 
-            return HelpBox.Draw(leftRect, _error, MessageType.Error);
+            return HelpBox.Draw(leftRect, _error, EMessageType.Error);
         }
 
         private bool WillDraw(SerializedProperty property, InfoBoxAttribute infoboxAttribute)
@@ -163,7 +163,7 @@ namespace SaintsField.Editor.Drawers
                     // Debug.Log(propertyInfo.GetValue(target).GetType());
                     object result = propertyInfo.GetValue(target);
                     // ReSharper disable once InvertIf
-                    if(result is ValueTuple<MessageType, string> resultTuple)
+                    if(result is ValueTuple<EMessageType, string> resultTuple)
                     {
                         _overrideMessageType = true;
                         _messageType = resultTuple.Item1;
@@ -176,7 +176,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     object result = foundFieldInfo.GetValue(target);
                     // ReSharper disable once InvertIf
-                    if(result is ValueTuple<MessageType, string> resultTuple)
+                    if(result is ValueTuple<EMessageType, string> resultTuple)
                     {
                         _overrideMessageType = true;
                         _messageType = resultTuple.Item1;
@@ -192,9 +192,9 @@ namespace SaintsField.Editor.Drawers
                     // Debug.Assert(methodInfo.ReturnType == typeof(string));
                     // Debug.Log(methodInfo.ReturnType);
                     // ReSharper disable once InvertIf
-                    if (methodInfo.ReturnType == typeof(ValueTuple<MessageType, string>))
+                    if (methodInfo.ReturnType == typeof(ValueTuple<EMessageType, string>))
                     {
-                        (MessageType messageType, string content) = ((MessageType, string))methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                        (EMessageType messageType, string content) = ((EMessageType, string))methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
                         _overrideMessageType = true;
                         _messageType = messageType;
                         return content;

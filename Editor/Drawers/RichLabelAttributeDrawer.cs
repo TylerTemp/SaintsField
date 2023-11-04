@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
             bool result = GetLabelXml(property, targetAttribute) != null;
-            // Debug.Log($"result={result}/{GetLabelXml(property, targetAttribute)}");
+            // Debug.Log($"richLabel willDraw={result}");
             return result;
         }
 

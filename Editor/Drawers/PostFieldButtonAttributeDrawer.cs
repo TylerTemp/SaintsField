@@ -9,12 +9,14 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(PostFieldButtonAttribute))]
     public class PostFieldButtonAttributeDrawer: DecButtonAttributeDrawer
     {
+        private const float PaddingWidth = 3f;
+
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute)
         {
             object target = property.serializedObject.targetObject;
             string labelXml = GetButtonLabelXml((DecButtonAttribute)saintsAttribute, target, target.GetType());
-            return Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(labelXml, label.text))));
+            return PaddingWidth*2 + Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(labelXml, label.text))));
         }
 
         protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,

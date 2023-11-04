@@ -10,4 +10,19 @@ Developed by: TylerTemp, 墨瞳
 2.  Allow stack on many cases
 3.  Allow dynamic arguments on many cases
 
-##
+## Enhancements ##
+
+All fields enhancement can generally be divided into:
+
+1.  Label Decorator
+2.  Field Decorator
+3.  Above Decorator
+4.  Below Decorator
+
+### Label ###
+
+#### `RichLabel` ####
+
+*   `string richTextXml` the content of the label, supported tag:
+
+    *   All Unity rich label tag, like `<color=#ff0000>red</color>`

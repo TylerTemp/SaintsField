@@ -13,8 +13,8 @@ namespace SaintsField.Editor.Core
     // below-
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
-        // this is... not useful and, still have some bug on fallback drawer
-        public static bool IsSubDrawer = false;
+        // public static bool IsSubDrawer = false;
+        public static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
 
         private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
@@ -45,12 +45,15 @@ namespace SaintsField.Editor.Core
         // private readonly List<UsedAttributeInfo> _usedAttributes = new List<UsedAttributeInfo>();
         private readonly Dictionary<SaintsWithIndex, SaintsPropertyDrawer> _usedAttributes = new Dictionary<SaintsWithIndex, SaintsPropertyDrawer>();
 
+        // private static readonly FieldDrawerConfigAttribute DefaultFieldDrawerConfigAttribute =
+        //     new FieldDrawerConfigAttribute(FieldDrawerConfigAttribute.FieldDrawType.Inline, 0);
+
         protected SaintsPropertyDrawer()
         {
-            if (IsSubDrawer)
-            {
-                return;
-            }
+            // if (IsSubDrawer)
+            // {
+            //     return;
+            // }
 
             _fieldControlName = Guid.NewGuid().ToString();
 
@@ -107,13 +110,18 @@ namespace SaintsField.Editor.Core
         //     PropertyAttributeToDrawers.Clear();
         // }
 
-        private float _fieldBasicHeight = EditorGUIUtility.singleLineHeight;
+        private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if (IsSubDrawer)
+            // if (IsSubDrawer)
+            // {
+            //     return EditorGUI.GetPropertyHeight(property, label);
+            // }
+
+            if (SubCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
             {
-                return EditorGUI.GetPropertyHeight(property, label);
+                return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
             }
 
             // float defaultHeight = base.GetPropertyHeight(property, label);
@@ -122,47 +130,90 @@ namespace SaintsField.Editor.Core
                 .Select(each => (IsaintsAttribute: each.Key.SaintsAttribute, each.Value))
                 .ToArray();
 
+            // foreach ((ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) in filedOrLabel)
+            // {
+            //     Debug.Log($"GetHeight found {iSaintsAttribute} {iSaintsAttribute.AttributeType} {drawer}");
+            // }
+
             // SaintsPropertyDrawer[] usedDrawerInfos = _usedDrawerTypes.Select(each => _cachedDrawer[each]).ToArray();
             // SaintsPropertyDrawer[] fieldInfos = usedDrawerInfos.Where(each => each.AttributeType is SaintsAttributeType.Field or SaintsAttributeType.Label).ToArray();
 
             (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) labelFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Label);
             (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) fieldFound = filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Field);
 
+            // Debug.Log($"labelFound.iSaintsAttribute={labelFound.iSaintsAttribute}");
             bool hasSaintsLabel = labelFound.iSaintsAttribute != null;
 
-            bool drawSaintsLabel = hasSaintsLabel &&
-                                   labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
+            bool saintsDrawNoLabel = hasSaintsLabel &&
+                                     !labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
             // float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0f;
             // Debug.Log($"hasLabel={hasLabel}");
             // float labelHeight = drawSaintsLabel
             //     ? labelFound.drawer.GetLabelHeight(property, label, labelFound.iSaintsAttribute)
             //     : 0f;
 
-            bool saintsDrawNoLabel = hasSaintsLabel && !drawSaintsLabel;
+            // bool saintsDrawNoLabel = hasSaintsLabel && !drawSaintsLabel;
+
+            // Debug.Log($"hasSaintsLabel={hasSaintsLabel}, saintsDrawNoLabel={saintsDrawNoLabel}");
 
             bool hasSaintsField = fieldFound.iSaintsAttribute != null;
             // float fieldHeight = hasSaintsField
             //     ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
             //     : 0f;
+
             bool fieldBreakLine = hasSaintsField && fieldFound.iSaintsAttribute.GroupBy != "__LABEL_FIELD__";
 
-            // float basicHeight;
-            if (fieldBreakLine)
+            FieldDrawerConfigAttribute fieldDrawerConfigAttribute = _usedAttributes
+                .Select(each => each.Key.SaintsAttribute)
+                .OfType<FieldDrawerConfigAttribute>()
+                .FirstOrDefault() ?? GetDefaultFieldDrawerConfigAttribute(fieldBreakLine);
+
+            // Debug.Log($"draw type {fieldDrawerConfigAttribute.FieldDraw}/{IsSubDrawer}");
+            switch (fieldDrawerConfigAttribute.FieldDraw)
             {
-                float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-                float fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
-                    !saintsDrawNoLabel);
-                _fieldBasicHeight = labelBasicHeight + fieldBasicHeight;
+                case FieldDrawerConfigAttribute.FieldDrawType.Inline:
+                case FieldDrawerConfigAttribute.FieldDrawType.FullWidthOverlay:
+                {
+                    float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+                    float fieldBasicHeight = hasSaintsField
+                        ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
+                        // : EditorGUIUtility.singleLineHeight;
+                        : EditorGUI.GetPropertyHeight(property, label, true);
+                    _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
+                }
+                    break;
+                case FieldDrawerConfigAttribute.FieldDrawType.FullWidthNewLine:
+                {
+                    float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+                    float fieldBasicHeight = hasSaintsField
+                        ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
+                            !saintsDrawNoLabel)
+                        : EditorGUI.GetPropertyHeight(property, label, true);
+                    // Debug.Log($"FullWidthNewLine, labelBasicHeight={labelBasicHeight}");
+                    _labelFieldBasicHeight = labelBasicHeight + fieldBasicHeight;
+                }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(fieldDrawerConfigAttribute.FieldDraw), fieldDrawerConfigAttribute.FieldDraw, null);
             }
-            else
-            {
-                float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-                float fieldBasicHeight = hasSaintsField
-                    ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
-                    // : EditorGUIUtility.singleLineHeight;
-                    : EditorGUI.GetPropertyHeight(property, label);
-                _fieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
-            }
+
+            // // float basicHeight;
+            // if (fieldBreakLine)
+            // {
+            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+            //     float fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
+            //         !saintsDrawNoLabel);
+            //     _fieldBasicHeight = labelBasicHeight + fieldBasicHeight;
+            // }
+            // else
+            // {
+            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+            //     float fieldBasicHeight = hasSaintsField
+            //         ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
+            //         // : EditorGUIUtility.singleLineHeight;
+            //         : EditorGUI.GetPropertyHeight(property, label);
+            //     _fieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
+            // }
 
             float aboveHeight = 0;
             float belowHeight = 0;
@@ -194,11 +245,16 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"aboveHeight={aboveHeight}");
 
-            return _fieldBasicHeight + aboveHeight + belowHeight;
+            return _labelFieldBasicHeight + aboveHeight + belowHeight;
+        }
+
+        private static FieldDrawerConfigAttribute GetDefaultFieldDrawerConfigAttribute(bool newLine)
+        {
+            return new FieldDrawerConfigAttribute(newLine? FieldDrawerConfigAttribute.FieldDrawType.FullWidthNewLine: FieldDrawerConfigAttribute.FieldDrawType.Inline, 0);
         }
 
         protected virtual float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel)
+            ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
             return 0;
         }
@@ -228,6 +284,14 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            if (SubCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
+            {
+                // Debug.Log($"capture sub drawer {property.displayName} {insideCount}");
+                // EditorGUI.PropertyField(position, property, label, true);
+                UnityDraw(position, property);
+                return;
+            }
+
             IReadOnlyList<SaintsWithIndex> allSaintsAttributes = SerializedUtils.GetAttributes<ISaintsAttribute>(property).Select((each, index) => new SaintsWithIndex
             {
                 SaintsAttribute = each,
@@ -287,7 +351,7 @@ namespace SaintsField.Editor.Core
 
             #region Above
 
-            Rect aboveRect = new Rect(position);
+            Rect aboveRect = EditorGUI.IndentedRect(position);
 
             Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedAboveDrawers =
                 new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
@@ -296,7 +360,7 @@ namespace SaintsField.Editor.Core
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
 
                 // ReSharper disable once InvertIf
-                if (!IsSubDrawer && drawerInstance.WillDrawAbove(aboveRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute))
+                if (drawerInstance.WillDrawAbove(aboveRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute))
                 {
                     if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
                             out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
@@ -314,11 +378,11 @@ namespace SaintsField.Editor.Core
             float aboveUsedHeight = 0;
             float aboveInitY = aboveRect.y;
 
-            foreach ((string groupBy, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo) in groupedAboveDrawers)
+            foreach ((string groupBy, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfos) in groupedAboveDrawers)
             {
                 if (groupBy == "")
                 {
-                    foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
+                    foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
                     {
                         Rect newAboveRect = drawerInstance.DrawAbove(aboveRect, property, bugFixCopyLabel, eachAttribute);
                         aboveUsedHeight = newAboveRect.y - aboveInitY;
@@ -328,11 +392,11 @@ namespace SaintsField.Editor.Core
                 else
                 {
                     float totalWidth = aboveRect.width;
-                    float eachWidth = totalWidth / drawerInfo.Count;
+                    float eachWidth = totalWidth / drawerInfos.Count;
                     float height = 0;
-                    for (int index = 0; index < drawerInfo.Count; index++)
+                    for (int index = 0; index < drawerInfos.Count; index++)
                     {
-                        (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfo[index];
+                        (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfos[index];
                         Rect eachRect = new Rect(aboveRect)
                         {
                             x = aboveRect.x + eachWidth * index,
@@ -368,7 +432,7 @@ namespace SaintsField.Editor.Core
             {
                 // y = aboveRect.y + (groupedAboveDrawers.Count == 0? 0: aboveRect.height),
                 y = position.y + aboveUsedHeight,
-                height = _fieldBasicHeight,
+                height = _labelFieldBasicHeight,
             };
 
             // Color backgroundColor = EditorGUIUtility.isProSkin
@@ -406,21 +470,61 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"valueChange reset to false");
 
             bool anyLabelDrew = DoDrawLabel(labelAttributeWithIndex, labelRect, property, bugFixCopyLabel);
-            if (anyLabelDrew)
-            {
-                fieldRect = leftPropertyRect;
-            }
+            fieldRect = anyLabelDrew ? leftPropertyRect : EditorGUI.IndentedRect(fieldRect);
 
             #endregion
 
+            // adjust field rect
             bool fieldBreakLine = fieldAttributeWithIndex.SaintsAttribute != null && fieldAttributeWithIndex.SaintsAttribute.GroupBy != "__LABEL_FIELD__";
-            if (anyLabelDrew && fieldBreakLine)
+            FieldDrawerConfigAttribute fieldDrawerConfigAttribute = allSaintsAttributes
+                .Select(each => each.SaintsAttribute)
+                .OfType<FieldDrawerConfigAttribute>()
+                .FirstOrDefault() ?? GetDefaultFieldDrawerConfigAttribute(fieldBreakLine);
+
+            // Debug.Log($"{fieldDrawerConfigAttribute.FieldDraw}/{anyLabelDrew}");
+            switch (fieldDrawerConfigAttribute.FieldDraw)
             {
-                fieldRect.x = labelRect.x;
-                fieldRect.y += EditorGUIUtility.singleLineHeight;
-                fieldRect.height -= EditorGUIUtility.singleLineHeight;
-                fieldRect.width = position.width;
+                case FieldDrawerConfigAttribute.FieldDrawType.Inline:
+                    break;
+                case FieldDrawerConfigAttribute.FieldDrawType.FullWidthNewLine:
+                {
+                    if (anyLabelDrew)
+                    {
+                        fieldRect.x = labelRect.x;
+                        fieldRect.y += EditorGUIUtility.singleLineHeight;
+                        fieldRect.height -= EditorGUIUtility.singleLineHeight;
+                        fieldRect.width = position.width;
+                    }
+                }
+                    break;
+                case FieldDrawerConfigAttribute.FieldDrawType.FullWidthOverlay:
+                {
+                    fieldRect.x = labelRect.x;
+                    // fieldRect.y += EditorGUIUtility.singleLineHeight;
+                    // fieldRect.height -= EditorGUIUtility.singleLineHeight;
+                    fieldRect.width = position.width;
+                    // fieldRect = new Rect(labelRect)
+                    // {
+                    //     height = fieldRect.height,
+                    //     width = fieldRect.width,
+                    // };
+
+                    // EditorGUI.DrawRect(labelRect, Color.red);
+                    //
+                    // Debug.Log($"FullWidthOverlay");
+                }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(fieldDrawerConfigAttribute.FieldDraw), fieldDrawerConfigAttribute.FieldDraw, null);
             }
+
+            // if (anyLabelDrew && fieldBreakLine)
+            // {
+            //     fieldRect.x = labelRect.x;
+            //     fieldRect.y += EditorGUIUtility.singleLineHeight;
+            //     fieldRect.height -= EditorGUIUtility.singleLineHeight;
+            //     fieldRect.width = position.width;
+            // }
 
             #region post field - width check
             float postFieldWidth = 0;
@@ -445,6 +549,12 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"field: {label.text}");
 
+            // if(!property.displayName)
+            // Debug.Log(property.name);
+            // if(property.name == "LabelFloat") {
+            //     EditorGUI.DrawRect(fieldUseRect, Color.black);
+            // }
+
             #region field
             Type fieldDrawer = fieldAttributeWithIndex.SaintsAttribute == null
                 ? null
@@ -452,12 +562,13 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
 
             // Debug.Log($"{label.text}={_fieldControlName}");
+            using(new ResetIndentScoop())
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                // Debug.Log($"field drawer {fieldDrawer} {fieldDrawer==null}");
                 if (fieldDrawer == null)
                 {
                     GUI.SetNextControlName(_fieldControlName);
+                    // Debug.Log($"default drawer for {label.text}");
                     DefaultDrawer(fieldUseRect, property);
                 }
                 else
@@ -519,11 +630,11 @@ namespace SaintsField.Editor.Core
             #endregion
 
             #region below
-            Rect belowRect = new Rect(position)
+            Rect belowRect = EditorGUI.IndentedRect(new Rect(position)
             {
-                y = fieldRect.y + _fieldBasicHeight,
+                y = fieldRect.y + _labelFieldBasicHeight,
                 height = position.y - fieldRect.y - fieldRect.height,
-            };
+            });
 
             Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawers =
                 new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
@@ -626,11 +737,8 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"create new drawer for {saintsAttributeWithIndex.SaintsAttribute}[{saintsAttributeWithIndex.Index}]");
             Type drawerType = PropertyAttributeToDrawers[saintsAttributeWithIndex.SaintsAttribute.GetType()].First(each => each.isSaints)!.drawerType;
-            using(new InsideSaintsFieldScoop())
-            {
-                return _cachedDrawer[saintsAttributeWithIndex] =
-                    (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
-            }
+            return _cachedDrawer[saintsAttributeWithIndex] =
+                (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
         }
 
         // private SaintsPropertyDrawer GetOrCreateDrawerInfo(Type drawerType)
@@ -668,6 +776,10 @@ namespace SaintsField.Editor.Core
             }
 
             SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
+
+            // add anyway, cus it decide draw or not, which affects the break line type field drawing
+            _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
+
             // Debug.Log(labelAttribute);
             if (!labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
             {
@@ -679,13 +791,15 @@ namespace SaintsField.Editor.Core
             //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
             // }
 
-            labelDrawerInstance.DrawLabel(labelRect, property, label,
+            Rect indentedRect = EditorGUI.IndentedRect(labelRect);
+
+            labelDrawerInstance.DrawLabel(indentedRect, property, label,
                 labelAttributeWithIndex.SaintsAttribute);
             LabelMouseProcess(labelRect, property, _fieldControlName);
             // fieldRect = leftPropertyRect;
             // newLabel = GUIContent.none;
 
-            _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
+            // _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
             return true;
         }
 
@@ -742,7 +856,7 @@ namespace SaintsField.Editor.Core
                         // drawerInstance.attribute = propertyAttribute;
 
                         // UnityEditor.RangeDrawer
-                        // Debug.Log($"drawerInstance={drawerInstance}");
+                        // Debug.Log($"fallback drawerInstance={drawerInstance} for {propertyAttribute}");
                         drawerInstance.OnGUI(position, property, GUIContent.none);
                         // Debug.Log($"finished drawerInstance={drawerInstance}");
                         return;
@@ -768,12 +882,13 @@ namespace SaintsField.Editor.Core
 
         private static void UnityDraw(Rect position, SerializedProperty property)
         {
-            using (new InsideSaintsFieldScoop())
+            using (new InsideSaintsFieldScoop(InsideSaintsFieldScoop.MakeKey(property)))
             {
                 // MethodInfo defaultDraw = typeof(EditorGUI).GetMethod("DefaultPropertyField",
                 //     BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                 // defaultDraw!.Invoke(null, new object[] { position, property, label });
                 // base.OnGUI(position, property, GUIContent.none);
+                // Debug.Log($"UnityDraw: {property.displayName}");
                 EditorGUI.PropertyField(position, property, GUIContent.none, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
             }

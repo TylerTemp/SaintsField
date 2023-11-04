@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers
         // private bool _targetIsString = true;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel)
+            ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
             return EditorStyles.popup.CalcHeight(new GUIContent("M"), EditorGUIUtility.currentViewWidth);
         }

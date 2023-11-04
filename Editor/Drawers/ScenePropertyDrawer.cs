@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel)
+            ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
             // Debug.Log($"get height");
 

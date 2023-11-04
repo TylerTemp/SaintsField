@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel)
+            ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
             return EditorGUIUtility.singleLineHeight;
         }
