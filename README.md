@@ -621,6 +621,8 @@ public class AssetPreviewExample: MonoBehaviour
 }
 ```
 
+![asset_preview](https://github.com/TylerTemp/SaintsField/assets/6391063/ffed3715-f531-43d0-b4c3-98d20d419b3e)
+
 #### `OnValueChanged` ####
 
 Call a function every time the field value is changed
