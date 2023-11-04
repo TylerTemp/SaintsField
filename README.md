@@ -546,6 +546,9 @@ public class Anim : MonoBehaviour
 }
 ```
 
+![animator_params](https://github.com/TylerTemp/SaintsField/assets/6391063/3cd5fb6d-1a75-457c-9bbd-e1e6b377a83c)
+
+
 #### `AnimatorState` ###
 
 A dropdown selector for animator state.
@@ -578,6 +581,8 @@ public class Anim : MonoBehaviour
     public string animStateName;
 }
 ```
+
+![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/f3e63d15-57b6-4e48-a769-f3743df22dbb)
 
 #### `Layer` ####
 
