@@ -590,6 +590,26 @@ public class TagExample: MonoBehaviour
 
 ### Field Utilities ###
 
+#### `AssetPreview` ####
+
+Show an image preview for prefabs, Sprite, Texture2D etc. (Internally use `AssetPreview.GetAssetPreview`)
+
+*   `int maxWidth=-1`
+
+    preview max width, -1 for current view width
+
+*   `int maxHeight=-1`
+
+    preview max height, -1 for auto resize (with same aspect) using width
+
+*   `bool above=false`
+
+    if true, render above the field instead of below
+
+*   `string groupBy=""`
+
+    See `GroupBy` section
+
 #### `OnValueChanged` ####
 
 Call a function every time the field value is changed
