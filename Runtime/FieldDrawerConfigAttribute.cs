@@ -15,12 +15,12 @@ namespace SaintsField
         }
 
         public readonly FieldDrawType FieldDraw;
-        public readonly int IndentLevelIncr;
+        // public readonly int IndentLevelIncr;
 
-        public FieldDrawerConfigAttribute(FieldDrawType fieldDrawType, int indentLevelIncr = 0)
+        public FieldDrawerConfigAttribute(FieldDrawType fieldDrawType)
         {
             FieldDraw = fieldDrawType;
-            IndentLevelIncr = indentLevelIncr;
+            // IndentLevelIncr = indentLevelIncr;
         }
     }
 }

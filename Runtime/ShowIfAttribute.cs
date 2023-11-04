@@ -2,11 +2,9 @@ using System;
 
 namespace SaintsField
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
-    public class ShowIfAttribute: ShowHideConditionBase
+    public class ShowIfAttribute: VisibilityAttribute
     {
-        public ShowIfAttribute(string condition)
-            : base(false, condition)
+        public ShowIfAttribute(params string[] orCallbacks) : base(false, orCallbacks)
         {
         }
     }

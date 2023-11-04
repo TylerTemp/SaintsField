@@ -112,6 +112,38 @@ namespace SaintsField.Editor.Core
 
         private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
+        protected virtual (bool isForHide, bool orResult) GetOrVisibility(SerializedProperty property,
+            ISaintsAttribute saintsAttribute)
+        {
+            return (false, true);
+        }
+
+        private bool GetVisibility(SerializedProperty property, IEnumerable<SaintsWithIndex> saintsAttributeWithIndexes)
+        {
+            List<bool> showOrResults = new List<bool>();
+            List<bool> hideOrResults = new List<bool>();
+            // private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SaintsWithIndex saintsAttributeWithIndex);
+            foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
+            {
+                SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
+                (bool isForHide, bool orResult) = drawer.GetOrVisibility(property, saintsAttributeWithIndex.SaintsAttribute);
+                if (isForHide)
+                {
+                    // Debug.Log($"hide or: {orResult}");
+                    hideOrResults.Add(orResult);
+                }
+                else
+                {
+                    // Debug.Log($"show or: {orResult}");
+                    showOrResults.Add(orResult);
+                }
+            }
+
+            bool showResult = showOrResults.Count == 0 || showOrResults.All(each => each);
+            bool hideResult = hideOrResults.Count != 0 && hideOrResults.All(each => each);
+            return showResult && !hideResult;
+        }
+
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             // if (IsSubDrawer)
@@ -122,6 +154,17 @@ namespace SaintsField.Editor.Core
             if (SubCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
             {
                 return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
+            }
+
+            if (!GetVisibility(property, SerializedUtils.GetAttributes<ISaintsAttribute>(property)
+                    .Select((each, index) => new SaintsWithIndex
+                    {
+                        SaintsAttribute = each,
+                        Index = index,
+                    })
+                    .Where(each => each.SaintsAttribute is VisibilityAttribute)))
+            {
+                return 0f;
             }
 
             // float defaultHeight = base.GetPropertyHeight(property, label);
@@ -250,7 +293,7 @@ namespace SaintsField.Editor.Core
 
         private static FieldDrawerConfigAttribute GetDefaultFieldDrawerConfigAttribute(bool newLine)
         {
-            return new FieldDrawerConfigAttribute(newLine? FieldDrawerConfigAttribute.FieldDrawType.FullWidthNewLine: FieldDrawerConfigAttribute.FieldDrawType.Inline, 0);
+            return new FieldDrawerConfigAttribute(newLine? FieldDrawerConfigAttribute.FieldDrawType.FullWidthNewLine: FieldDrawerConfigAttribute.FieldDrawType.Inline);
         }
 
         protected virtual float GetFieldHeight(SerializedProperty property, GUIContent label,
@@ -297,6 +340,11 @@ namespace SaintsField.Editor.Core
                 SaintsAttribute = each,
                 Index = index,
             }).ToArray();
+
+            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is VisibilityAttribute)))
+            {
+                return;
+            }
 
             SaintsWithIndex labelAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Label);
             SaintsWithIndex fieldAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Field);
