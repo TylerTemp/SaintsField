@@ -7,7 +7,7 @@ Developed by: TylerTemp, 墨瞳
 ## Highlights ##
 
 1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancer like `Odin` & `NaughtyAttributes`.
-2.  Allow stack on many cases
+2.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 3.  Allow dynamic arguments on many cases
 
 ## Enhancements ##
@@ -914,7 +914,9 @@ https://github.com/TylerTemp/SaintsField/assets/6391063/76ed3093-6c50-42d9-a62d-
 
 ### GroupBy ###
 
-group with any decorator that has the same `groupBy` for this field. Same group will share even width of the view width between them .
+group with any decorator that has the same `groupBy` for this field. Same group will share even width of the view width between them.
+
+This only works for decorator draws above or below the field. The above drawer will not grouped with below drawer, and vice versa.
 
 `""` means no group.
 
