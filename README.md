@@ -610,6 +610,17 @@ Show an image preview for prefabs, Sprite, Texture2D etc. (Internally use `Asset
 
     See `GroupBy` section
 
+*   AllowMultiple: No
+
+```csharp
+public class AssetPreviewExample: MonoBehaviour
+{
+    [AssetPreview(20, 100)] public Texture2D _texture2D;
+    [AssetPreview(50)] public GameObject _go;
+    [AssetPreview(above: true)] public Sprite _sprite;
+}
+```
+
 #### `OnValueChanged` ####
 
 Call a function every time the field value is changed
