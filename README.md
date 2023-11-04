@@ -922,7 +922,7 @@ group with any decorator that has the same `groupBy` for this field. Same group 
 
 Because it handle the label drawing process seperated from the actual field drawing, the label is not using Unity's default label. Which lead to the problem:
 
-1.  Drawing label for int/float field is not very smooth
+1.  Draging label to change value for int/float field is not very smooth
 2.  Click a label will not focus the field
 
 Note: These issue only affect the fields that uses this project's feature. It won't affect other fields, even it's on the same script. It should be safe enough to use it together with your other inspector enhancement
