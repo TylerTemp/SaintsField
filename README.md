@@ -107,7 +107,7 @@ public class FullWidthRichLabelExample: MonoBehaviour
 }
 ```
 
-![above_below_richlabel](https://github.com/TylerTemp/SaintsField/assets/6391063/c5919a6e-bd52-45b7-bf29-37220564171b)
+![full_width_label](https://github.com/TylerTemp/SaintsField/assets/6391063/9283e25a-34b3-4192-8a07-5d97a4e55406)
 
 #### `InfoBox` ####
 
