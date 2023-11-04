@@ -34,16 +34,8 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool valueChanged)
         {
-            // Debug.Log($"draw below {position}");
-            // return Draw(position, property, label, saintsAttribute);
-            // float width = _width > 0
-            //     ? _width
-            //     : GetPostFieldWidth(position, property, label, saintsAttribute);
+            _error = "";
 
-            // (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
-            // <color=yellow><icon='eye-regular.png' /></color>
-
-            // Type fieldType = SerializedUtil.GetType(property);
             GameObject go;
             if (property.objectReferenceValue is GameObject isGO)
             {

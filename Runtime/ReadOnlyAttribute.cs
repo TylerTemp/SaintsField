@@ -3,30 +3,30 @@ using UnityEngine;
 
 namespace SaintsField
 {
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class ReadOnlyAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
         public readonly bool ReadOnlyDirectValue;
-        public readonly string ReadOnlyBy;
+        public readonly string[] ReadOnlyBys;
 
         public ReadOnlyAttribute(bool directValue, string groupBy=null)
         {
             ReadOnlyDirectValue = directValue;
-            ReadOnlyBy = null;
+            ReadOnlyBys = null;
 
             GroupBy = groupBy;
         }
 
-        public ReadOnlyAttribute(string by, string groupBy="")
+        public ReadOnlyAttribute(params string[] by)
         {
-            Debug.Assert(!string.IsNullOrEmpty(by));
+            // Debug.Assert(!string.IsNullOrEmpty(by));
             ReadOnlyDirectValue = default;
-            ReadOnlyBy = by;
+            ReadOnlyBys = by;
 
-            GroupBy = groupBy;
+            GroupBy = "";
         }
     }
 }

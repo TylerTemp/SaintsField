@@ -7,9 +7,5 @@ namespace SaintsField
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
-
-        public GameObjectActiveAttribute()
-        {
-        }
     }
 }

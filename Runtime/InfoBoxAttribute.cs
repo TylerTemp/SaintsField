@@ -14,7 +14,7 @@ namespace SaintsField
         public readonly bool ContentIsCallback;
         public readonly string ShowCallback;
 
-        public InfoBoxAttribute(string content, EMessageType messageType, string show=null, bool contentIsCallback=false, bool above=false, string groupBy="")
+        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool contentIsCallback=false, bool above=false, string groupBy="")
         {
             GroupBy = groupBy;
 

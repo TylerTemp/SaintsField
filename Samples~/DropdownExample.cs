@@ -5,11 +5,11 @@ namespace SaintsField.Samples
 {
     public class DropdownExample : MonoBehaviour
     {
-        [SerializeField, Dropdown(nameof(GetDropdownItems))] private float _float;
-        [field: SerializeField, Dropdown(nameof(GetDropdownRefs))] private GameObject _refs;
+        [Dropdown(nameof(GetDropdownItems))] public float _float;
 
-        [SerializeField] private GameObject _go1;
-        [SerializeField] private GameObject _go2;
+        public GameObject _go1;
+        public GameObject _go2;
+        [Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
 
         private DropdownList<float> GetDropdownItems()
         {
@@ -21,13 +21,6 @@ namespace SaintsField.Samples
                 { "3/2", 3.2f },
             };
         }
-
-        // [Serializable]
-        // private struct ExampleStruct
-        // {
-        //     public string Name;
-        //     public float Value;
-        // }
 
         private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
         {

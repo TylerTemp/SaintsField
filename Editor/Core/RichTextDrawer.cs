@@ -55,8 +55,8 @@ namespace SaintsField.Editor.Core
         {
             string[] paths = {
                 iconPath,
-                "Assets/SaintsField/Editor/Editor Default Resources/SaintsField/" + iconPath,
                 "SaintsField/" + iconPath,
+                "Assets/SaintsField/Editor/Editor Default Resources/SaintsField/" + iconPath,
                 // this is readonly, put it to last so user  can easily override it
                 "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/" + iconPath,
             };

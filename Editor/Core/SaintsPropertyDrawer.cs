@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Core
 
         private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
-        protected virtual (bool isForHide, bool orResult) GetOrVisibility(SerializedProperty property,
+        protected virtual (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property,
             ISaintsAttribute saintsAttribute)
         {
             return (false, true);
@@ -120,28 +120,50 @@ namespace SaintsField.Editor.Core
 
         private bool GetVisibility(SerializedProperty property, IEnumerable<SaintsWithIndex> saintsAttributeWithIndexes)
         {
-            List<bool> showOrResults = new List<bool>();
-            List<bool> hideOrResults = new List<bool>();
+            List<bool> showAndResults = new List<bool>();
+            // List<bool> hideAndResults = new List<bool>();
             // private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SaintsWithIndex saintsAttributeWithIndex);
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
                 SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
-                (bool isForHide, bool orResult) = drawer.GetOrVisibility(property, saintsAttributeWithIndex.SaintsAttribute);
+                (bool isForHide, bool andResult) = drawer.GetAndVisibility(property, saintsAttributeWithIndex.SaintsAttribute);
                 if (isForHide)
                 {
                     // Debug.Log($"hide or: {orResult}");
-                    hideOrResults.Add(orResult);
+                    showAndResults.Add(!andResult);
                 }
                 else
                 {
                     // Debug.Log($"show or: {orResult}");
-                    showOrResults.Add(orResult);
+                    showAndResults.Add(andResult);
                 }
             }
 
-            bool showResult = showOrResults.Count == 0 || showOrResults.All(each => each);
-            bool hideResult = hideOrResults.Count != 0 && hideOrResults.All(each => each);
-            return showResult && !hideResult;
+            return showAndResults.Count == 0 || showAndResults.Any(each => each);
+
+            // bool showResult = showAndResults.Count == 0
+            //     ? true
+            //     : showAndResults.Any(each => each);
+            // bool hideResult = hideAndResults.Count == 0
+            //     ? false
+            //     : hideAndResults.Any(each => each);
+            //
+            // return showResult && !hideResult;
+
+            // // bool showResult = showAndResults.Any(each => each);
+            // // bool hideResult = hideAndResults.Any(each => each);
+            // // return showResult && !hideResult;
+            // if (hideAndResults.Count > 0 && hideAndResults.Any(each => each))
+            // {
+            //     return false;
+            // }
+            //
+            // if (showAndResults.Count == 0)
+            // {
+            //     return true;
+            // }
+            //
+            // return showAndResults.All(each => each);
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

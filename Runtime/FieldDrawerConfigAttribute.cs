@@ -17,7 +17,7 @@ namespace SaintsField
         public readonly FieldDrawType FieldDraw;
         // public readonly int IndentLevelIncr;
 
-        public FieldDrawerConfigAttribute(FieldDrawType fieldDrawType)
+        public FieldDrawerConfigAttribute(FieldDrawType fieldDrawType=FieldDrawType.FullWidthOverlay)
         {
             FieldDraw = fieldDrawType;
             // IndentLevelIncr = indentLevelIncr;

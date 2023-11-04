@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(HideIfAttribute))]
     public class VisibilityAttributeDrawer: SaintsPropertyDrawer
     {
-        protected override (bool isForHide, bool orResult) GetOrVisibility(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             VisibilityAttribute visibilityAttribute = ((VisibilityAttribute)saintsAttribute);
 
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers
 
             _errors.Clear();
 
-            return (visibilityAttribute.IsForHide, visibilityAttribute.OrCallbacks.Any(callback => IsTruly(target, type, callback)));
+            return (visibilityAttribute.IsForHide, visibilityAttribute.OrCallbacks.All(callback => IsTruly(target, type, callback)));
         }
 
         private bool IsTruly(Object target, Type type, string by)

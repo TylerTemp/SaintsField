@@ -15,7 +15,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override (bool isActive, Rect position) DrawPreLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            EditorGUI.BeginDisabledGroup(IsDisabled(property, (ReadOnlyAttribute)saintsAttribute));
+            if(IsDisabled(property, (ReadOnlyAttribute)saintsAttribute))
+            {
+                EditorGUI.BeginDisabledGroup(true);
+            }
             return (true, position);
         }
 
@@ -59,41 +62,55 @@ namespace SaintsField.Editor.Drawers
 
         private bool IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute)
         {
-            string by = targetAttribute.ReadOnlyBy;
-            if(by is null)
+            string[] bys = targetAttribute.ReadOnlyBys;
+            if(bys is null)
             {
                 return targetAttribute.ReadOnlyDirectValue;
             }
 
             UnityEngine.Object target = property.serializedObject.targetObject;
 
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
-            switch (found)
+            foreach (string by in bys)
             {
-                case (ReflectUtils.GetPropType.NotFound, _):
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
+                bool result;
+                switch (found)
                 {
-                    _error = $"No field or method named `{by}` found on `{target}`";
-                    Debug.LogError(_error);
+                    case (ReflectUtils.GetPropType.NotFound, _):
+                    {
+                        _error = $"No field or method named `{by}` found on `{target}`";
+                        Debug.LogError(_error);
+                        result = false;
+                    }
+                        break;
+                    case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+                    {
+                        result = ReflectUtils.Truly(propertyInfo.GetValue(target));
+                    }
+                        break;
+                    case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+                    {
+                        result = ReflectUtils.Truly(foundFieldInfo.GetValue(target));
+                    }
+                        break;
+                    case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+                    {
+                        ParameterInfo[] methodParams = methodInfo.GetParameters();
+                        Debug.Assert(methodParams.All(p => p.IsOptional));
+                        // Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                        result =  ReflectUtils.Truly(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+                    }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(found), found, null);
+                }
+
+                if (!result)
+                {
                     return false;
                 }
-                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
-                {
-                    return ReflectUtils.Truly(propertyInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                {
-                    return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
-                {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    return (bool)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
             }
+            return true;
         }
     }
 }

@@ -18,5 +18,13 @@ namespace SaintsField
             this.height = height;
             this.gap = gap;
         }
+
+        public SepTitleAttribute(EColor color, float gap = 2f, float height = 2f)
+        {
+            this.title = null;
+            this.color = color;
+            this.height = height;
+            this.gap = gap;
+        }
     }
 }

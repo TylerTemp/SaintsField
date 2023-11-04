@@ -9,41 +9,30 @@ namespace SaintsField.Samples
 
         [field: SerializeField] private string _labelByField;
 
-        [SerializeField]
-        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye.png' /></color>!", false, "")]
-        [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-        [AboveButton(nameof(ClickButton), "Click <color=green><icon='eye.png' /></color>!", false, "")]
-        [AboveButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-
-        [BelowButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-        [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye.png' /></color>!", false)]
-        [BelowButton(nameof(ClickButton2), nameof(GetButtonLabel), true, "OK")]
-        [BelowButton(nameof(ClickButton), "Below <color=green><icon='eye.png' /></color>!", false)]
-        [BelowButton(nameof(ClickButton), nameof(_labelByField), true)]
+        [AboveButton(nameof(ClickErrorButton), nameof(_labelByField), true)]
+        [AboveButton(nameof(ClickErrorButton), "Click <color=green><icon='eye.png' /></color>!")]
+        [AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+        [AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
 
         [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
 
-        [RichLabel(nameof(GetLabel), true)]
-        [Range(0, 10)]
-        private int _someInt;
+        [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+        [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+        [BelowButton(nameof(ClickErrorButton), "Below <color=green><icon='eye.png' /></color>!")]
+        public int _someInt;
 
-        private void ClickButton()
-        {
-            Debug.Log("CLICKED!");
-        }
+        private void ClickErrorButton() => Debug.Log("CLICKED!");
 
-        private string GetButtonLabel()
-        {
-            return _errorOut
+        private string GetButtonLabel() =>
+            _errorOut
                 ? "Error <color=red>me</color>!"
                 : "No <color=green>Error</color>!";
-        }
 
         private string GetButtonLabelIcon() => _errorOut
             ? "<color=red><icon='eye.png' /></color>"
             : "<color=green><icon='eye.png' /></color>";
 
-        private void ClickButton2()
+        private void ClickButton()
         {
             Debug.Log("CLICKED 2!");
             if(_errorOut)
@@ -55,17 +44,9 @@ namespace SaintsField.Samples
         private void ToggleAndError()
         {
             Toggle();
-            ClickButton2();
+            ClickButton();
         }
 
-        private string GetLabel()
-        {
-            return $"<label/>: <color=green>{_someInt}</color>";
-        }
-
-        private void Toggle()
-        {
-            _errorOut = !_errorOut;
-        }
+        private void Toggle() => _errorOut = !_errorOut;
     }
 }

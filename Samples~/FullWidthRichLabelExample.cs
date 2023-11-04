@@ -8,7 +8,8 @@ namespace SaintsField.Samples
         [AboveRichLabel("┌<icon=eye.png/><label />┐")]
         [RichLabel("├<icon=eye.png/><label />┤")]
         [BelowRichLabel(nameof(BelowLabel), true)]
-        [BelowRichLabel("~~~~~~~")]
+        [BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
+        [BelowRichLabel("==================================", groupBy: "example")]
         private int _intValue;
 
         private string BelowLabel() => "└<icon=eye.png/><label />┘";

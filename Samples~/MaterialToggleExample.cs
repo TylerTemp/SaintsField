@@ -4,7 +4,8 @@ namespace SaintsField.Samples
 {
     public class MaterialToggleExample: MonoBehaviour
     {
-        [SerializeField, MaterialToggle] private Material _mat1;
-        [SerializeField, MaterialToggle] private Material _mat2;
+        public Renderer targetRenderer;
+        [MaterialToggle(nameof(targetRenderer))] public Material _mat1;
+        [MaterialToggle(nameof(targetRenderer))] public Material _mat2;
     }
 }
