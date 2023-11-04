@@ -343,6 +343,14 @@ The field itself must be `Material`.
 
     which slot index of `materials` on `Renderer` you want to swap
 
+```csharp
+public class MaterialToggleExample: MonoBehaviour
+{
+    public Renderer targetRenderer;
+    [MaterialToggle(nameof(targetRenderer))] public Material _mat1;
+    [MaterialToggle(nameof(targetRenderer))] public Material _mat2;
+}
+```
 
 
 https://github.com/TylerTemp/SaintsField/assets/6391063/00c5702c-a41e-42a4-abb1-97a0713c3f66
