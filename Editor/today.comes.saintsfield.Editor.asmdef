@@ -2,18 +2,13 @@
     "name": "today.comes.saintsfield.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:f88fb04354076c646a4107a491394033",
-        "GUID:776d03a35f1b52c4a9aed9f56d7b4229",
         "GUID:9b261077c7a2ac34886513ec1345f8e0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [
-        "DOTweenEditor.dll",
-        "DOTween.dll"
-    ],
+    "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],

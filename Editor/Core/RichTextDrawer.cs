@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Core
 
             public override bool Equals(object obj)
             {
-                if (obj is not TextureCacheKey other)
+                if (!(obj is TextureCacheKey other))
                 {
                     return false;
                 }
@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Core
 #endif
                 switch (parsedResult)
                 {
-                    case (RichPartType.Content, not null, null, false):
+                    case (RichPartType.Content, _, null, false):
                     {
 #if EXT_INSPECTOR_LOG
                         Debug.Log($"string append {parsedResult.content}");
@@ -120,7 +120,7 @@ namespace SaintsField.Editor.Core
                         richText.Append(parsedResult.content);
                     }
                         break;
-                    case (RichPartType.StartTag, not null, _, false):
+                    case (RichPartType.StartTag, _, _, false):
                     {
                         openTags.Add((parsedResult.content, parsedResult.value, part));
                         if (parsedResult.content == "color")
@@ -129,15 +129,9 @@ namespace SaintsField.Editor.Core
                             Debug.Log($"colors add {parsedResult.value}");
 #endif
                             colors.Add(parsedResult.value);
-                            if(Colors.ColorNameSupported(parsedResult.value))
-                            {
-                                richText.Append(part);
-                            }
-                            else
-                            {
-                                richText.Append(
-                                    $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
-                            }
+                            richText.Append(Colors.ColorNameSupported(parsedResult.value)
+                                ? part
+                                : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
                         }
                         else
                         {
@@ -148,11 +142,11 @@ namespace SaintsField.Editor.Core
                         }
                     }
                         break;
-                    case (RichPartType.EndTag, not null, _, _):
+                    case (RichPartType.EndTag, _, _, _):
                     {
                         if (!parsedResult.isSelfClose)
                         {
-                            Debug.Assert(openTags[^1].tagName == parsedResult.content);
+                            Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content);
                             openTags.RemoveAt(openTags.Count - 1);
                         }
 
@@ -202,7 +196,7 @@ namespace SaintsField.Editor.Core
                                 {
                                     IsIcon = true,
                                     Content = parsedResult.value,
-                                    IconColor = colors.Count > 0 ? colors[^1] : null,
+                                    IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
                                 };
 
                                 string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
@@ -262,9 +256,11 @@ namespace SaintsField.Editor.Core
             if (part.StartsWith("</"))  // close
             {
                 string endTagRawContent = part.Substring(2, part.Length - 3).Trim();
-                return endTagRawContent.Length > 0
-                    ? (RichPartType.EndTag, endTagRawContent.Trim(), null, false)
-                    : (RichPartType.Content, part, null, false);
+                if (endTagRawContent.Length > 0)
+                {
+                    return (RichPartType.EndTag, endTagRawContent.Trim(), null, false);
+                }
+                return (RichPartType.Content, part, null, false);
             }
             if (part.EndsWith("/>"))  // self close
             {

@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Utils
 
         private static object GetValue_Imp(object source, string name, int index)
         {
-            if (GetValue_Imp(source, name) is not IEnumerable enumerable)
+            if (!(GetValue_Imp(source, name) is IEnumerable enumerable))
             {
                 return null;
             }

@@ -191,7 +191,7 @@ namespace SaintsField.Editor.Core
 
             // float defaultHeight = base.GetPropertyHeight(property, label);
             (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer)[] filedOrLabel = _usedAttributes
-                .Where(each => each.Key.SaintsAttribute.AttributeType is SaintsAttributeType.Field or SaintsAttributeType.Label)
+                .Where(each => each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Field || each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Label)
                 .Select(each => (IsaintsAttribute: each.Key.SaintsAttribute, each.Value))
                 .ToArray();
 
@@ -342,6 +342,18 @@ namespace SaintsField.Editor.Core
 
         // private float _aboveUsedHeight;
 
+        private void UsedAttributesTryAdd(SaintsWithIndex key, SaintsPropertyDrawer value)
+        {
+#if UNITY_2021_3_OR_NEWER
+            _usedAttributes.TryAdd(key, value);
+#else
+            if (!_usedAttributes.TryGetValue(key, out SaintsPropertyDrawer _))
+            {
+                _usedAttributes[key] = value;
+            }
+#endif
+        }
+
         private bool _valueChange;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -398,15 +410,18 @@ namespace SaintsField.Editor.Core
 
                     currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
                     // _usedDrawerTypes.Add(eachDrawer[0]);
-                    _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
+                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
                 }
             }
 
             float aboveUsedHeight = 0;
             float aboveInitY = aboveRect.y;
 
-            foreach ((string groupBy, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfos) in groupedAboveDrawers)
+            foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> drawerInfoKv in groupedAboveDrawers)
             {
+                string groupBy = drawerInfoKv.Key;
+                List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfos = drawerInfoKv.Value;
+
                 if (groupBy == "")
                 {
                     foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
@@ -485,7 +500,7 @@ namespace SaintsField.Editor.Core
                 if (isActive)
                 {
                     labelRect = newLabelRect;
-                    _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
+                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
                 }
             }
             #endregion
@@ -530,7 +545,7 @@ namespace SaintsField.Editor.Core
             {
                 // needFallbackLabel = false;
                 SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
-                _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
+                UsedAttributesTryAdd(labelAttributeWithIndex, labelDrawerInstance);
                 // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
                 bool hasLabelSpace = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
                 if (hasLabelSpace)
@@ -653,7 +668,7 @@ namespace SaintsField.Editor.Core
                         fieldAttributeWithIndex.SaintsAttribute);
                     // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
-                    _usedAttributes.TryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
+                    UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
                 }
 
                 if (!_valueChange && changed.changed)
@@ -693,7 +708,7 @@ namespace SaintsField.Editor.Core
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
-                    _usedAttributes.TryAdd(attributeWithIndex, drawer);
+                    UsedAttributesTryAdd(attributeWithIndex, drawer);
                 }
             }
             // foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
@@ -734,12 +749,14 @@ namespace SaintsField.Editor.Core
                     }
                     currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
                     // _usedDrawerTypes.Add(eachDrawer[0]);
-                    _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
+                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
                 }
             }
 
-            foreach ((string groupBy, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo) in groupedDrawers)
+            foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawerInfo in groupedDrawers)
             {
+                string groupBy = groupedDrawerInfo.Key;
+                List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo = groupedDrawerInfo.Value;
                 // Debug.Log($"draw below: {groupBy}/{bugFixCopyLabel.text}/{label.text}");
                 if (groupBy == "")
                 {
@@ -913,7 +930,7 @@ namespace SaintsField.Editor.Core
             // OK this should deal everything
 
             IEnumerable<PropertyAttribute> allOtherAttributes = SerializedUtils.GetAttributes<PropertyAttribute>(property)
-                .Where(each => each is not ISaintsAttribute);
+                .Where(each => !(each is ISaintsAttribute));
             foreach (PropertyAttribute propertyAttribute in allOtherAttributes)
             {
                 // ReSharper disable once InvertIf
