@@ -882,7 +882,7 @@ namespace SaintsField.Editor.Core
         //     return true;
         // }
 
-        protected void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label=null)
+        protected void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label)
         {
             // // this works nice
             // MethodInfo defaultDraw = typeof(EditorGUI).GetMethod("DefaultPropertyField", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);

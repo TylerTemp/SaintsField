@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers
             if (invalidAnimatorController)
             {
                 _error = $"Animator controller `{animatorParamAttribute.AnimatorName}` is null";
-                DefaultDrawer(position, property);
+                DefaultDrawer(position, property, label);
                 return;
             }
 

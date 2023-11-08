@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers
             {
                 // DrawDefaultPropertyAndHelpBox(rect, property, label, "No scenes in the build settings", MessageType.Warning);
                 _error = "No scenes in the build settings";
-                DefaultDrawer(position, property);
+                DefaultDrawer(position, property, label);
                 return;
             }
 
@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers
                     break;
                 default:
                     _error = $"{property.name} must be an int or a string, get {property.propertyType}";
-                    DefaultDrawer(position, property);
+                    DefaultDrawer(position, property, label);
                     break;
             }
         }

@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers
                 case ReflectUtils.GetPropType.NotFound:
                 {
                     _error = $"not found `{funcName}` on target `{target}`";
-                    DefaultDrawer(position, property);
+                    DefaultDrawer(position, property, label);
                 }
                     return;
                 case ReflectUtils.GetPropType.Property:
@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers
                     if (dropdownListValue == null)
                     {
                         _error = $"dropdownListValue is null from `{funcName}` on target `{target}`";
-                        DefaultDrawer(position, property);
+                        DefaultDrawer(position, property, label);
                         return;
                     }
                 }
@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers
                     if (dropdownListValue == null)
                     {
                         _error = $"dropdownListValue is null from `{funcName}` on target `{target}`";
-                        DefaultDrawer(position, property);
+                        DefaultDrawer(position, property, label);
                         return;
                     }
                 }
@@ -96,7 +96,7 @@ namespace SaintsField.Editor.Drawers
                     if (dropdownListValue == null)
                     {
                         _error = $"dropdownListValue is null from `{funcName}()` on target `{target}`";
-                        DefaultDrawer(position, property);
+                        DefaultDrawer(position, property, label);
                         return;
                     }
                 }

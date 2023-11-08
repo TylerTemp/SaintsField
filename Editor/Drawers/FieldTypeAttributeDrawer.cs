@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers
             {
                 Debug.LogException(e);
                 _error = e.Message;
-                DefaultDrawer(position, property);
+                DefaultDrawer(position, property, label);
                 return;
             }
 

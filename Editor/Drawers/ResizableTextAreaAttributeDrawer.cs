@@ -47,7 +47,7 @@ namespace SaintsField.Editor.Drawers
             if (property.propertyType != SerializedPropertyType.String)
             {
                 _error = $"expect string, get {property.propertyType}";
-                DefaultDrawer(position, property);
+                DefaultDrawer(position, property, label);
                 return;
             }
 

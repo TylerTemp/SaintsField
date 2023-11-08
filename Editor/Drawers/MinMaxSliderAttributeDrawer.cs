@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers
                 property.propertyType != SerializedPropertyType.Vector2Int)
             {
                 _error = $"Expect Vector2 or Vector2Int, get {property.propertyType}";
-                DefaultDrawer(position, property);
+                DefaultDrawer(position, property, label);
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers
 
             if (_error != "")
             {
-                DefaultDrawer(position, property);
+                DefaultDrawer(position, property, label);
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace SaintsField.Editor.Drawers
 
             if (_error != "")
             {
-                DefaultDrawer(position, property);
+                DefaultDrawer(position, property, label);
                 return;
             }
 
