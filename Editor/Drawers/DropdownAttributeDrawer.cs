@@ -147,7 +147,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            int newIndex = EditorGUI.Popup(position, selectedIndex, options.ToArray());
+            int newIndex = EditorGUI.Popup(position, label, selectedIndex, options.Select(each => new GUIContent(each)).ToArray());
             // ReSharper disable once InvertIf
             if (changed.changed)
             {

@@ -1,6 +1,6 @@
 # SaintsField #
 
-`SaintsField` is a Unity Inspector extension tools focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) with more powerful features.
+`SaintsField` is a Unity Inspector extension tools focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
 
 Developed by: TylerTemp, 墨瞳
 
@@ -64,10 +64,8 @@ public class RichLabel: MonoBehaviour
         public float LabelFloat;
     }
 
-    // this is a workaround
     [SerializeField]
-    [RichLabel("<color=green>Fix For Struct</color>")]
-    [FieldDrawerConfig(FieldDrawerConfigAttribute.FieldDrawType.FullWidthOverlay)]
+    [RichLabel("<color=green>Fixed For Struct!</color>")]
     private MyStruct _myStructWorkAround;
 }
 ```
@@ -789,7 +787,7 @@ public class RequiredExample: MonoBehaviour
         public int theInt;
     }
 
-    [Required, FieldDrawerConfig]
+    [Required]
     public MyStruct wontWorkWontNoticeYou;
 }
 ```
@@ -922,9 +920,9 @@ This only works for decorator draws above or below the field. The above drawer w
 
 ## Known Issues ##
 
-Because it handle the label drawing process seperated from the actual field drawing, the label is not using Unity's default label. Which lead to the problem:
+~~Because it handle the label drawing process seperated from the actual field drawing, the label is not using Unity's default label. Which lead to the problem:~~
 
-1.  Draging label to change value for int/float field is not very smooth
-2.  Click a label will not focus the field
+1.  ~~Dragging label to change value for int/float field is not very smooth~~ (FIXED)
+2.  ~~Click a label will not focus the field~~ (FIXED)
 
-Note: These issue only affect the fields that uses this project's feature. It won't affect other fields, even it's on the same script. It should be safe enough to use it together with your other inspector enhancement
+~~Note: These issue only affect the fields that uses this project's feature. It won't affect other fields, even it's on the same script. It should be safe enough to use it together with your other inspector enhancement~~

@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers
 
         // private bool _hasLabel = true;
 
-        private static bool BreakLine(ISaintsAttribute saintsAttribute) => saintsAttribute.GroupBy != "__LABEL_FIELD__";
+        // private static bool BreakLine(ISaintsAttribute saintsAttribute) => saintsAttribute.GroupBy != "__LABEL_FIELD__";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool hasLabelWidth)
@@ -23,15 +23,19 @@ namespace SaintsField.Editor.Drawers
             // bool fullWidth = ((ResizableTextAreaAttribute)saintsAttribute).FullWidth;
             Rect indented = EditorGUI.IndentedRect(new Rect(0, 0, EditorGUIUtility.currentViewWidth, EditorGUIUtility.singleLineHeight));
             float viewWidth = indented.width;
-            bool breakLine = BreakLine(saintsAttribute);
+            // bool breakLine = BreakLine(saintsAttribute);
 
-            bool useFullView = breakLine || !hasLabelWidth;
+            // bool useFullView = !hasLabelWidth;
 
+            // return GetHeight(
+            //     property.stringValue,
+            //     useFullView
+            //         ? viewWidth
+            //         : viewWidth - EditorGUIUtility.labelWidth
+            // );
             return GetHeight(
                 property.stringValue,
-                useFullView
-                    ? viewWidth
-                    : viewWidth - EditorGUIUtility.labelWidth
+                viewWidth
             );
         }
 
@@ -60,6 +64,12 @@ namespace SaintsField.Editor.Drawers
                 wordWrap = true,
             };
             EditorStyles.textField.wordWrap = true;
+            if (label.text != "")
+            {
+                (Rect labelFieldRect, Rect textAreaRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+                EditorGUI.LabelField(labelFieldRect, label);
+                position = textAreaRect;
+            }
 
             string textAreaValue = EditorGUI.TextArea(position, property.stringValue, style);
             if (changed.changed)

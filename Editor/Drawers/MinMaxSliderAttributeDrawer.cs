@@ -68,34 +68,45 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
+            float labelWidth = label.text == ""? 0: EditorGUIUtility.labelWidth;
+
             float leftFieldWidth = property.propertyType == SerializedPropertyType.Vector2
                 ? GetNumberFieldWidth(property.vector2Value.x, minMaxSliderAttribute.MinWidth, minMaxSliderAttribute.MaxWidth)
                 : GetNumberFieldWidth(property.vector2IntValue.x, minMaxSliderAttribute.MinWidth, minMaxSliderAttribute.MaxWidth);
+            leftFieldWidth += 5f;
             float rightFieldWidth = property.propertyType == SerializedPropertyType.Vector2
                 ? GetNumberFieldWidth(property.vector2Value.y, minMaxSliderAttribute.MinWidth, minMaxSliderAttribute.MaxWidth)
                 : GetNumberFieldWidth(property.vector2IntValue.y, minMaxSliderAttribute.MinWidth, minMaxSliderAttribute.MaxWidth);
 
             // float floatFieldWidth = EditorGUIUtility.fieldWidth;
-            float sliderWidth = position.width - leftFieldWidth - rightFieldWidth;
-            const float sliderPadding = 3f;
+            float sliderWidth = position.width - labelWidth - leftFieldWidth - rightFieldWidth;
+            const float sliderPadding = 4f;
 
-            Rect sliderRect = new Rect(
-                position.x + leftFieldWidth + sliderPadding,
-                position.y,
-                sliderWidth - 2.0f * sliderPadding,
-                position.height);
+            (Rect labelWithMinFieldRect, Rect fieldRect) = RectUtils.SplitWidthRect(position, labelWidth + leftFieldWidth);
 
-            Rect minFloatFieldRect = new Rect(
-                position.x,
-                position.y,
-                leftFieldWidth,
-                position.height);
+            // (Rect minFloatFieldRect, Rect field2Rect) = RectUtils.SplitWidthRect(fieldRect, leftFieldWidth);
+            (Rect sliderRect, Rect field3Rect) = RectUtils.SplitWidthRect(new Rect(fieldRect)
+            {
+                x = fieldRect.x + sliderPadding,
+            }, sliderWidth - sliderPadding);
+            // EditorGUI.DrawRect(field3Rect, Color.yellow);
 
-            Rect maxFloatFieldRect = new Rect(
-                position.x  + leftFieldWidth + sliderWidth,
-                position.y,
-                rightFieldWidth,
-                position.height);
+            (Rect maxFloatFieldRect, Rect _) = RectUtils.SplitWidthRect(new Rect(field3Rect)
+            {
+                x = field3Rect.x +sliderPadding,
+            }, rightFieldWidth);
+
+            // return;
+
+            // Rect maxFloatFieldRect = new Rect(fieldRect)
+            // {
+            //     x = fieldRect.x + leftFieldWidth + sliderWidth,
+            //     // position.y,
+            //     width = rightFieldWidth,
+            //     // position.height);
+            // };
+
+            EditorGUI.LabelField(labelWithMinFieldRect, label);
 
             // Draw the slider
             EditorGUI.BeginChangeCheck();
@@ -105,7 +116,8 @@ namespace SaintsField.Editor.Drawers
                 Vector2 sliderValue = property.vector2Value;
                 EditorGUI.MinMaxSlider(sliderRect, ref sliderValue.x, ref sliderValue.y, minValue, maxValue);
 
-                sliderValue.x = EditorGUI.FloatField(minFloatFieldRect, sliderValue.x);
+                GUI.SetNextControlName(_fieldControlName);
+                sliderValue.x = EditorGUI.FloatField(labelWithMinFieldRect, label, sliderValue.x);
                 sliderValue.x = Mathf.Clamp(sliderValue.x, minValue, Mathf.Min(maxValue, sliderValue.y));
 
                 sliderValue.y = EditorGUI.FloatField(maxFloatFieldRect, sliderValue.y);
@@ -125,7 +137,8 @@ namespace SaintsField.Editor.Drawers
                 float yValue = sliderValue.y;
                 EditorGUI.MinMaxSlider(sliderRect, ref xValue, ref yValue, minValue, maxValue);
 
-                sliderValue.x = EditorGUI.IntField(minFloatFieldRect, (int)xValue);
+                GUI.SetNextControlName(_fieldControlName);
+                sliderValue.x = EditorGUI.IntField(labelWithMinFieldRect, label, (int)xValue);
                 sliderValue.x = (int)Mathf.Clamp(sliderValue.x, minValue, Mathf.Min(maxValue, sliderValue.y));
 
                 sliderValue.y = EditorGUI.IntField(maxFloatFieldRect, (int)yValue);
@@ -140,6 +153,8 @@ namespace SaintsField.Editor.Drawers
                         : BoundV2IntStep(sliderValue, minValue, maxValue, actualStep);
                 }
             }
+
+            // ClickFocus(labelWithMinFieldRect, _fieldControlName);
         }
 
         private float GetNumberFieldWidth(float value, float minWidth, float maxWidth) => GetFieldWidth($"{value}", minWidth, maxWidth);

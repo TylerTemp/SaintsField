@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers
 
             using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
             UnityEngine.Object fieldResult  =
-                EditorGUI.ObjectField(position, GUIContent.none, requiredValue, requiredComp, true);
+                EditorGUI.ObjectField(position, label, requiredValue, requiredComp, true);
             if (changed.changed)
             {
                 UnityEngine.Object result =

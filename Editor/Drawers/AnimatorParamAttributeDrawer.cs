@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(AnimatorParamAttribute))]
-    public class AnimatorParamPropertyDrawer : SaintsPropertyDrawer
+    public class AnimatorParamAttributeDrawer : SaintsPropertyDrawer
     {
         // private const string InvalidAnimatorControllerWarningMessage = "Target animator controller is null";
         private string _error = "";
@@ -63,10 +64,10 @@ namespace SaintsField.Editor.Drawers
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    DrawPropertyForInt(invalidAnimatorController, position, property, animatorParameters);
+                    DrawPropertyForInt(position, property, label, animatorParameters);
                     break;
                 case SerializedPropertyType.String:
-                    DrawPropertyForString(invalidAnimatorController, position, property, animatorParameters);
+                    DrawPropertyForString(position, property, label, animatorParameters);
                     break;
                 default:
                     // DrawDefaultPropertyAndHelpBox(rect, property, string.Format(InvalidTypeWarningMessage, property.name), MessageType.Warning);
@@ -85,19 +86,19 @@ namespace SaintsField.Editor.Drawers
             // EditorGUI.EndProperty();
         }
 
-        private static void DrawPropertyForInt(bool invalid, Rect position, SerializedProperty property, List<AnimatorControllerParameter> animatorParameters)
+        private static void DrawPropertyForInt(Rect position, SerializedProperty property, GUIContent label, IReadOnlyList<AnimatorControllerParameter> animatorParameters)
         {
-            if (invalid)
-            {
-                using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                int directIntValue = EditorGUI.IntField(position, property.intValue);
-                if (changed.changed)
-                {
-                    property.intValue = directIntValue;
-                }
-
-                return;
-            }
+            // if (invalid)
+            // {
+            //     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
+            //     int directIntValue = EditorGUI.IntField(position, property.intValue);
+            //     if (changed.changed)
+            //     {
+            //         property.intValue = directIntValue;
+            //     }
+            //
+            //     return;
+            // }
 
             int paramNameHash = property.intValue;
             int index = 0;
@@ -112,11 +113,11 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            string[] displayOptions = GetDisplayOptions(animatorParameters);
+            IEnumerable<string> displayOptions = GetDisplayOptions(animatorParameters);
 
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                int newIndex = EditorGUI.Popup(position, index, displayOptions);
+                int newIndex = EditorGUI.Popup(position, label, index, displayOptions.Select(each => new GUIContent(each)).ToArray());
                 // ReSharper disable once InvertIf
                 if(changed.changed)
                 {
@@ -130,19 +131,19 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static void DrawPropertyForString(bool invalid, Rect position, SerializedProperty property, List<AnimatorControllerParameter> animatorParameters)
+        private static void DrawPropertyForString(Rect position, SerializedProperty property, GUIContent label, IReadOnlyList<AnimatorControllerParameter> animatorParameters)
         {
-            if (invalid)
-            {
-                using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                string directIntValue = EditorGUI.TextField(position, property.stringValue);
-                if (changed.changed)
-                {
-                    property.stringValue = directIntValue;
-                }
-
-                return;
-            }
+            // if (invalid)
+            // {
+            //     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
+            //     string directIntValue = EditorGUI.TextField(position, property.stringValue);
+            //     if (changed.changed)
+            //     {
+            //         property.stringValue = directIntValue;
+            //     }
+            //
+            //     return;
+            // }
 
             string paramName = property.stringValue;
             int index = 0;
@@ -157,11 +158,11 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            string[] displayOptions = GetDisplayOptions(animatorParameters);
+            IEnumerable<string> displayOptions = GetDisplayOptions(animatorParameters);
 
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                int newIndex = EditorGUI.Popup(position, index, displayOptions);
+                int newIndex = EditorGUI.Popup(position, label, index, displayOptions.Select(each => new GUIContent(each)).ToArray());
                 // ReSharper disable once InvertIf
                 if(changed.changed)
                 {
@@ -175,7 +176,8 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static string[] GetDisplayOptions(IReadOnlyList<AnimatorControllerParameter> animatorParams)
+        // ReSharper disable once ReturnTypeCanBeEnumerable.Local
+        private static IReadOnlyList<string> GetDisplayOptions(IReadOnlyList<AnimatorControllerParameter> animatorParams)
         {
             string[] displayOptions = new string[animatorParams.Count + 1];
             displayOptions[0] = "[None]";

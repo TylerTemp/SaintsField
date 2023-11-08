@@ -8,7 +8,7 @@ namespace SaintsField.Samples
         [ResizableTextArea] public string _long;
         [RichLabel(null), ResizableTextArea] public string _noLabel;
 
-        [ResizableTextArea(false)] public string _inlineShort;
-        [ResizableTextArea(false)] public string _inlineLong;
+        // [ResizableTextArea(false)] public string _inlineShort;
+        // [ResizableTextArea(false)] public string _inlineLong;
     }
 }

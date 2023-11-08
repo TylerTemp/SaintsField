@@ -6,7 +6,7 @@ namespace SaintsField.Samples
     public class RichLabel: MonoBehaviour
     {
         [RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
-        public string _rainbow;
+        public int _rainbow;
 
         [RichLabel(nameof(LabelCallback), true)]
         public bool _callbackToggle;
@@ -38,18 +38,13 @@ namespace SaintsField.Samples
         // this is a workaround
         [SerializeField]
         [RichLabel("<color=green>Fix For Struct</color>")]
-        [FieldDrawerConfig]
+        // [FieldDrawerConfig]
         private MyStruct _myStructWorkAround;
 
-
         [SerializeField]
-        [Space(100)]
-        [SepTitle(null, EColor.Black)]
-        [RichLabel("<color=green>Weird: <label /></color>")]
-        private MyStruct _myStructBadView;
+        private MyStruct _defaultDrawerForStruct;
 
         [RichLabel("hi<b>!</b><color=red>some <color=\"green\"><b>[<color=yellow><icon='eye.png' /></color><label /></b>]</color>:su<color='yellow'> ff</color> ix</color> and long long long text")]
-        public string richLabel;
-
+        public int richLabel;
     }
 }

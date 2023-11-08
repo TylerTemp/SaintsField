@@ -20,6 +20,9 @@ namespace SaintsField.Samples
         [SerializeField]
         [MinMaxSlider(0, 100, minWidth:-1, maxWidth:-1)]
         private Vector2Int _autoWidth;
+        [SerializeField]
+        [MinMaxSlider(-100f, 100f, minWidth:-1, maxWidth:-1)]
+        private Vector2 _autoWidthFloat;
 
         [field: SerializeField, MinMaxSlider(-100f, 100f)]
         public Vector2 OuterRange { get; private set; }

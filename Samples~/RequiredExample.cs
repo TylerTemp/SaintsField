@@ -17,7 +17,7 @@ namespace SaintsField.Samples
             public int theInt;
         }
 
-        [Required, FieldDrawerConfig]
+        [Required]
         public MyStruct wontWorkWontNoticeYou;
     }
 }

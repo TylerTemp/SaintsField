@@ -5,8 +5,8 @@ namespace SaintsField.Samples
 {
     public class DropdownExample : MonoBehaviour
     {
-        [Dropdown(nameof(GetDropdownItems))] public float _float;
-
+        [Dropdown(nameof(GetDropdownItems))]
+        public float _float;
         public GameObject _go1;
         public GameObject _go2;
         [Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;

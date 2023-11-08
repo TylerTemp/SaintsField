@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -31,7 +32,7 @@ namespace SaintsField.Editor.Drawers
 
             using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
 
-            int newIndex = EditorGUI.Popup(position, selectedIndex, layers);
+            int newIndex = EditorGUI.Popup(position, label, selectedIndex, layers.Select(each => new GUIContent(each)).ToArray());
             // ReSharper disable once InvertIf
             if (changed.changed)
             {

@@ -15,5 +15,10 @@ namespace SaintsField.Samples
 
         private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");
         private string DynamicMessage() => _content ? "False" : "True";
+
+        [InfoBox("does not modify label & field")]
+        public int _modInt;
+
+        public int _defaultInt;
     }
 }
