@@ -497,10 +497,6 @@ This `TextArea` will always grow it's height to fit the content. (minimal height
 
 Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
 
-*   `bool fullWidth=true`
-
-    if false, the text area will be the same width as a normal field, rather that take the whole width of view
-
 *   AllowMultiple: No
 
 ```csharp
@@ -509,14 +505,15 @@ public class ResizableTextAreaExample : MonoBehaviour
     [SerializeField, ResizableTextArea] private string _short;
     [SerializeField, ResizableTextArea] private string _long;
     [SerializeField, RichLabel(null), ResizableTextArea] private string _noLabel;
-
-    [SerializeField, ResizableTextArea(false)] private string _inlineShort;
-    [SerializeField, ResizableTextArea(false)] private string _inlineLong;
 }
 ```
 
 
-https://github.com/TylerTemp/SaintsField/assets/6391063/2ddfd6af-20b7-40ee-a306-1d42ae5161ce
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922
+
+
+
 
 #### `AnimatorParam` ###
 
@@ -812,7 +809,11 @@ public class ValidateInputExample : MonoBehaviour
 
 
 
-https://github.com/TylerTemp/SaintsField/assets/6391063/fb437329-0608-45da-bb12-a2581b2fae4f
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/9d52e663-c9f8-430a-814c-011b17b67a86
+
+
+
 
 
 
@@ -906,7 +907,11 @@ public class MinMaxExample: MonoBehaviour
 ```
 
 
-https://github.com/TylerTemp/SaintsField/assets/6391063/76ed3093-6c50-42d9-a62d-0bb71e054091
+
+
+https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604
+
+
 
 
 
