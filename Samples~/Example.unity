@@ -397,12 +397,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upLimit: 0
+  upLimit: 7
   min0Max: 0
-  fMinMax10: 0
-  <_maxValue>k__BackingField: 132
-  <_minValue>k__BackingField: 88
-  <_range>k__BackingField: {x: 96.51, y: 119.667915}
+  fMinMax10: 7
+  <_maxValue>k__BackingField: 129
+  <_minValue>k__BackingField: 87
+  <_range>k__BackingField: {x: 96.71, y: 119.667915}
 --- !u!4 &185980176
 Transform:
   m_ObjectHideFlags: 0
@@ -495,7 +495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6830dc4b87389ed4daf7678ce72b922f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _value: 30
+  _value: 38
 --- !u!4 &272774834
 Transform:
   m_ObjectHideFlags: 0
@@ -6115,23 +6115,20 @@ MonoBehaviour:
   _short: 'short
 
     content'
-  _long: '1
+  _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
+    10 wrap 11 wrap 12
 
-    2
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7
+    wrap 8 warp 9 wap 10 wrap 11 wrap 12
 
-    3
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap
+    5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
 
-    4
+    long wrap 1 warp 2
+    wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
 
-    5
-
-    6
-
-    7
-
-    8
-
-    9'
+    long
+    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
   _noLabel: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9
     wap 10 wrap 11 wrap 12
 

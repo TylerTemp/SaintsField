@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers
                 Vector2 sliderValue = property.vector2Value;
                 EditorGUI.MinMaxSlider(sliderRect, ref sliderValue.x, ref sliderValue.y, minValue, maxValue);
 
-                GUI.SetNextControlName(_fieldControlName);
+                // GUI.SetNextControlName(FieldControlName);
                 sliderValue.x = EditorGUI.FloatField(labelWithMinFieldRect, label, sliderValue.x);
                 sliderValue.x = Mathf.Clamp(sliderValue.x, minValue, Mathf.Min(maxValue, sliderValue.y));
 
@@ -137,7 +137,7 @@ namespace SaintsField.Editor.Drawers
                 float yValue = sliderValue.y;
                 EditorGUI.MinMaxSlider(sliderRect, ref xValue, ref yValue, minValue, maxValue);
 
-                GUI.SetNextControlName(_fieldControlName);
+                // GUI.SetNextControlName(FieldControlName);
                 sliderValue.x = EditorGUI.IntField(labelWithMinFieldRect, label, (int)xValue);
                 sliderValue.x = (int)Mathf.Clamp(sliderValue.x, minValue, Mathf.Min(maxValue, sliderValue.y));
 

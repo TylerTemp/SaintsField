@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Core
         // private SaintsPropertyDrawer _labelDrawer;
         // private SaintsPropertyDrawer _fieldDrawer;
 
-        protected readonly string _fieldControlName;
+        // protected readonly string FieldControlName;
 
         private struct SaintsWithIndex
         {
@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Core
             //     return;
             // }
 
-            _fieldControlName = Guid.NewGuid().ToString();
+            // FieldControlName = Guid.NewGuid().ToString();
 
             _usedAttributes.Clear();
 
@@ -208,6 +208,7 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"labelFound.iSaintsAttribute={labelFound.iSaintsAttribute}");
             bool hasSaintsLabel = labelFound.iSaintsAttribute != null;
+            // Debug.Log($"hasSaintsLabel={hasSaintsLabel}");
 
             bool saintsDrawNoLabel = hasSaintsLabel &&
                                      !labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
@@ -226,7 +227,7 @@ namespace SaintsField.Editor.Core
             //     ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
             //     : 0f;
 
-            bool fieldBreakLine = hasSaintsField && fieldFound.iSaintsAttribute.GroupBy != "__LABEL_FIELD__";
+            // bool fieldBreakLine = hasSaintsField && fieldFound.iSaintsAttribute.GroupBy != "__LABEL_FIELD__";
 
             // FieldDrawerConfigAttribute fieldDrawerConfigAttribute = _usedAttributes
             //     .Select(each => each.Key.SaintsAttribute)
@@ -234,23 +235,34 @@ namespace SaintsField.Editor.Core
             //     .FirstOrDefault() ?? GetDefaultFieldDrawerConfigAttribute(fieldBreakLine);
 
             // Debug.Log($"draw type {fieldDrawerConfigAttribute.FieldDraw}/{IsSubDrawer}");
-            if(!fieldBreakLine)
-            {
-                float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-                float fieldBasicHeight = hasSaintsField
-                    ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
-                    // : EditorGUIUtility.singleLineHeight;
-                    : EditorGUI.GetPropertyHeight(property, label, true);
-                _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
-            }
-            else
-            {
-                float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-                float fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
-                    !saintsDrawNoLabel);
-                // Debug.Log($"FullWidthNewLine, labelBasicHeight={labelBasicHeight}");
-                _labelFieldBasicHeight = labelBasicHeight + fieldBasicHeight;
-            }
+            bool disabledLabelField = label.text == "" || saintsDrawNoLabel;
+            // Debug.Log(disabledLabelField);
+
+            float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+            float fieldBasicHeight = hasSaintsField
+                ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
+                    !disabledLabelField)
+                // : EditorGUIUtility.singleLineHeight;
+                : EditorGUI.GetPropertyHeight(property, label, true);
+            _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
+
+            // if(!fieldBreakLine)
+            // {
+            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+            //     float fieldBasicHeight = hasSaintsField
+            //         ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
+            //         // : EditorGUIUtility.singleLineHeight;
+            //         : EditorGUI.GetPropertyHeight(property, label, true);
+            //     _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
+            // }
+            // else
+            // {
+            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
+            //     float fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
+            //         !saintsDrawNoLabel);
+            //     // Debug.Log($"FullWidthNewLine, labelBasicHeight={labelBasicHeight}");
+            //     _labelFieldBasicHeight = labelBasicHeight + fieldBasicHeight;
+            // }
 
             // // float basicHeight;
             // if (fieldBreakLine)
@@ -457,7 +469,7 @@ namespace SaintsField.Editor.Core
             // EditorGUI.DrawRect(fieldRect, backgroundColor);
 
             // GUIContent newLabel = propertyScoopLabel;
-            (Rect labelRect, Rect leftOutLabelRect) =
+            (Rect labelRect, Rect _) =
                 RectUtils.SplitWidthRect(fieldRect, EditorGUIUtility.labelWidth);
 
             labelRect.height = EditorGUIUtility.singleLineHeight;
@@ -501,27 +513,26 @@ namespace SaintsField.Editor.Core
             #region label info
 
             // bool completelyDisableLabel = string.IsNullOrEmpty(label.text);
-            bool hasLabelSpace;
             GUIContent useGuiContent;
             if (string.IsNullOrEmpty(label.text))
             {
                 // needFallbackLabel = true;
                 useGuiContent = new GUIContent(label);
-                hasLabelSpace = false;
+                // hasLabelSpace = false;
             }
             else if (labelAttributeWithIndex.SaintsAttribute == null)  // has label, no saints label drawer
             {
                 // needFallbackLabel = false;
                 useGuiContent = new GUIContent(label);
-                hasLabelSpace = false;
+                // hasLabelSpace = false;
             }
             else
             {
                 // needFallbackLabel = false;
                 SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
+                _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
                 // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
-                hasLabelSpace =
-                    labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
+                bool hasLabelSpace = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
                 if (hasLabelSpace)
                 {
                     labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
@@ -821,55 +832,55 @@ namespace SaintsField.Editor.Core
         //     return drawer;
         // }
 
-        private bool DoDrawLabel(SaintsWithIndex labelAttributeWithIndex, Rect labelRect, SerializedProperty property, GUIContent label)
-        {
-            // Type labelDrawer = labelAttributeWithIndex.SaintsAttribute == null
-            //     ? null
-            //     : GetFirstSaintsDrawerType(labelAttributeWithIndex.SaintsAttribute.GetType());
-            // // bool anyLabelDrew = false;
-            // if (labelDrawer == null)
-            // {
-            //     // anyLabelDrew = true;
-            //     // Debug.Log(labelRect);
-            //     // Debug.Log(_labelClickedMousePos);
-            //     // if(labelRect.Contains(_labelClickedMousePos))
-            //     // {
-            //     //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
-            //     // }
-            //     // default label drawer
-            //     EditorGUI.LabelField(labelRect, label);
-            //     // RichLabelAttributeDrawer.LabelMouseProcess(labelRect, property);
-            //     // fieldRect = leftPropertyRect;
-            //     // return (true, leftPropertyRect);
-            //     return true;
-            // }
-
-            SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
-
-            // add anyway, cus it decide draw or not, which affects the break line type field drawing
-            _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
-
-            // Debug.Log(labelAttribute);
-            if (!labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
-            {
-                return false;
-            }
-
-            // if(labelRect.Contains(_labelClickedMousePos))
-            // {
-            //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
-            // }
-
-            Rect indentedRect = EditorGUI.IndentedRect(labelRect);
-
-            labelDrawerInstance.DrawLabel(indentedRect, property, label,
-                labelAttributeWithIndex.SaintsAttribute);
-            // fieldRect = leftPropertyRect;
-            // newLabel = GUIContent.none;
-
-            // _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
-            return true;
-        }
+        // private bool DoDrawLabel(SaintsWithIndex labelAttributeWithIndex, Rect labelRect, SerializedProperty property, GUIContent label)
+        // {
+        //     // Type labelDrawer = labelAttributeWithIndex.SaintsAttribute == null
+        //     //     ? null
+        //     //     : GetFirstSaintsDrawerType(labelAttributeWithIndex.SaintsAttribute.GetType());
+        //     // // bool anyLabelDrew = false;
+        //     // if (labelDrawer == null)
+        //     // {
+        //     //     // anyLabelDrew = true;
+        //     //     // Debug.Log(labelRect);
+        //     //     // Debug.Log(_labelClickedMousePos);
+        //     //     // if(labelRect.Contains(_labelClickedMousePos))
+        //     //     // {
+        //     //     //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
+        //     //     // }
+        //     //     // default label drawer
+        //     //     EditorGUI.LabelField(labelRect, label);
+        //     //     // RichLabelAttributeDrawer.LabelMouseProcess(labelRect, property);
+        //     //     // fieldRect = leftPropertyRect;
+        //     //     // return (true, leftPropertyRect);
+        //     //     return true;
+        //     // }
+        //
+        //     SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
+        //
+        //     // add anyway, cus it decide draw or not, which affects the break line type field drawing
+        //     _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
+        //
+        //     // Debug.Log(labelAttribute);
+        //     if (!labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
+        //     {
+        //         return false;
+        //     }
+        //
+        //     // if(labelRect.Contains(_labelClickedMousePos))
+        //     // {
+        //     //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
+        //     // }
+        //
+        //     Rect indentedRect = EditorGUI.IndentedRect(labelRect);
+        //
+        //     labelDrawerInstance.DrawLabel(indentedRect, property, label,
+        //         labelAttributeWithIndex.SaintsAttribute);
+        //     // fieldRect = leftPropertyRect;
+        //     // newLabel = GUIContent.none;
+        //
+        //     // _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
+        //     return true;
+        // }
 
         protected void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label=null)
         {
@@ -1026,71 +1037,71 @@ namespace SaintsField.Editor.Core
         private bool _mouseHold;
         // private Vector2 _labelClickedMousePos = new Vector2(-1, -1);
 
-        protected void ClickFocus(Rect position, string focusName)
-        {
-            Event e = Event.current;
-            if (e.isMouse && e.button == 0)
-            {
-                if(position.Contains(e.mousePosition))
-                {
-                    GUI.FocusControl(focusName);
-                }
-            }
-        }
-
-        private void LabelMouseProcess(Rect position, SerializedProperty property, string focusName)
-        {
-            Event e = Event.current;
-            // if (e.isMouse && e.type == EventType.MouseDown)
-            // {
-            //     _labelClickedMousePos = e.mousePosition;
-            // }
-
-            if (e.isMouse && e.button == 0)
-            {
-                if(!_mouseHold && position.Contains(e.mousePosition))
-                {
-                    // Debug.Log($"start hold");
-                    _mouseHold = true;
-                    // e.Use();
-                    // Debug.Log($"focus {_fieldControlName}");
-                    GUI.FocusControl(focusName);
-                }
-            }
-
-            if (e.type == EventType.MouseUp)
-            {
-                _mouseHold = false;
-                // _labelClickedMousePos = new Vector2(-1, -1);
-            }
-
-            if (property.propertyType == SerializedPropertyType.Integer ||
-                property.propertyType == SerializedPropertyType.Float)
-            {
-                EditorGUIUtility.AddCursorRect(position, MouseCursor.SlideArrow);
-                if (e.isMouse && e.button == 0
-                              && _mouseHold
-                    // && position.Contains(e.mousePosition)
-                   )
-                {
-                    int xOffset = Mathf.RoundToInt(e.delta.x);
-                    // if(xOffset)
-                    // Debug.Log(xOffset);
-                    if (xOffset != 0)
-                    {
-                        if (property.propertyType == SerializedPropertyType.Float)
-                        {
-                            property.floatValue = (float)(Math.Truncate((property.floatValue + xOffset * 0.03d) * 100) / 100d);
-                        }
-                        else
-                        {
-                            property.intValue += xOffset;
-                        }
-                        // Debug.Log($"valueChange=true");
-                        _valueChange = true;
-                    }
-                }
-            }
-        }
+        // protected void ClickFocus(Rect position, string focusName)
+        // {
+        //     Event e = Event.current;
+        //     if (e.isMouse && e.button == 0)
+        //     {
+        //         if(position.Contains(e.mousePosition))
+        //         {
+        //             GUI.FocusControl(focusName);
+        //         }
+        //     }
+        // }
+        //
+        // private void LabelMouseProcess(Rect position, SerializedProperty property, string focusName)
+        // {
+        //     Event e = Event.current;
+        //     // if (e.isMouse && e.type == EventType.MouseDown)
+        //     // {
+        //     //     _labelClickedMousePos = e.mousePosition;
+        //     // }
+        //
+        //     if (e.isMouse && e.button == 0)
+        //     {
+        //         if(!_mouseHold && position.Contains(e.mousePosition))
+        //         {
+        //             // Debug.Log($"start hold");
+        //             _mouseHold = true;
+        //             // e.Use();
+        //             // Debug.Log($"focus {_fieldControlName}");
+        //             GUI.FocusControl(focusName);
+        //         }
+        //     }
+        //
+        //     if (e.type == EventType.MouseUp)
+        //     {
+        //         _mouseHold = false;
+        //         // _labelClickedMousePos = new Vector2(-1, -1);
+        //     }
+        //
+        //     if (property.propertyType == SerializedPropertyType.Integer ||
+        //         property.propertyType == SerializedPropertyType.Float)
+        //     {
+        //         EditorGUIUtility.AddCursorRect(position, MouseCursor.SlideArrow);
+        //         if (e.isMouse && e.button == 0
+        //                       && _mouseHold
+        //             // && position.Contains(e.mousePosition)
+        //            )
+        //         {
+        //             int xOffset = Mathf.RoundToInt(e.delta.x);
+        //             // if(xOffset)
+        //             // Debug.Log(xOffset);
+        //             if (xOffset != 0)
+        //             {
+        //                 if (property.propertyType == SerializedPropertyType.Float)
+        //                 {
+        //                     property.floatValue = (float)(Math.Truncate((property.floatValue + xOffset * 0.03d) * 100) / 100d);
+        //                 }
+        //                 else
+        //                 {
+        //                     property.intValue += xOffset;
+        //                 }
+        //                 // Debug.Log($"valueChange=true");
+        //                 _valueChange = true;
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

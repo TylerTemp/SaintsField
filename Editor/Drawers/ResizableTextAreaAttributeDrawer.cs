@@ -33,10 +33,11 @@ namespace SaintsField.Editor.Drawers
             //         ? viewWidth
             //         : viewWidth - EditorGUIUtility.labelWidth
             // );
+            // Debug.Log(hasLabelWidth);
             return GetHeight(
                 property.stringValue,
                 viewWidth
-            );
+            ) + (hasLabelWidth ? EditorGUIUtility.singleLineHeight : 0f);
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
