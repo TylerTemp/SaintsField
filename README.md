@@ -461,7 +461,7 @@ dropdownList.AddSeparator();  # add a separator
 
 A range slider for `Vector2` or `Vector2Int`
 
-This Attibute has overrides:
+This Attribute has overrides:
 
 *   `MinMaxSliderAttribute(float min, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
 *   `MinMaxSliderAttribute(int min, int max, int step=1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
@@ -481,7 +481,7 @@ For each arguments:
 
 *   AllowMultiple: No
 
-a full futured example:
+a full featured example:
 
 ```csharp
 public class MinMaxSliderExample: MonoBehaviour
@@ -543,12 +543,7 @@ public class ResizableTextAreaExample : MonoBehaviour
 }
 ```
 
-
-
 https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922
-
-
-
 
 #### `AnimatorParam` ###
 
