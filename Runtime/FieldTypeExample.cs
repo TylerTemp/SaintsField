@@ -8,6 +8,6 @@ namespace SaintsField
         private GameObject _go;
 
         [SerializeField, FieldType(typeof(FieldTypeExample))]
-        private ParticleSystem _ps;
+        private BoxCollider _collider;
     }
 }
