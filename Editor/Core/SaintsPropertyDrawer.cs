@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Core
         // private SaintsPropertyDrawer _labelDrawer;
         // private SaintsPropertyDrawer _fieldDrawer;
 
-        // protected readonly string FieldControlName;
+        protected readonly string FieldControlName;
 
         private struct SaintsWithIndex
         {
@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Core
             //     return;
             // }
 
-            // FieldControlName = Guid.NewGuid().ToString();
+            FieldControlName = Guid.NewGuid().ToString();
 
             _usedAttributes.Clear();
 
@@ -1054,17 +1054,17 @@ namespace SaintsField.Editor.Core
         private bool _mouseHold;
         // private Vector2 _labelClickedMousePos = new Vector2(-1, -1);
 
-        // protected void ClickFocus(Rect position, string focusName)
-        // {
-        //     Event e = Event.current;
-        //     if (e.isMouse && e.button == 0)
-        //     {
-        //         if(position.Contains(e.mousePosition))
-        //         {
-        //             GUI.FocusControl(focusName);
-        //         }
-        //     }
-        // }
+        protected void ClickFocus(Rect position, string focusName)
+        {
+            Event e = Event.current;
+            if (e.isMouse && e.button == 0)
+            {
+                if(position.Contains(e.mousePosition))
+                {
+                    GUI.FocusControl(focusName);
+                }
+            }
+        }
         //
         // private void LabelMouseProcess(Rect position, SerializedProperty property, string focusName)
         // {

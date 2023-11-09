@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SaintsField.DropdownBase
 {
-    public interface IDropdownList: IEnumerable<KeyValuePair<string, object>>
+    public interface IDropdownList: IEnumerable<ValueTuple<string, object, bool, bool>>
     {
 
     }

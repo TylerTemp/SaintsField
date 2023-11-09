@@ -422,6 +422,38 @@ public class DropdownExample : MonoBehaviour
 
 ![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
 
+You can control separator and disabled item too
+
+```csharp
+    [Dropdown(nameof(GetAdvancedDropdownItems))]
+    public Color color;
+
+    private DropdownList<Color> GetAdvancedDropdownItems()
+    {
+        return new DropdownList<Color>
+        {
+            { "Black", Color.black },
+            { "White", Color.white },
+            DropdownList<Color>.Separator(),
+            { "Basic/Red", Color.red, true },  // the third arg means it's disabled
+            { "Basic/Green", Color.green },
+            { "Basic/Blue", Color.blue },
+            DropdownList<Color>.Separator("Basic/"),
+            { "Basic/Magenta", Color.magenta },
+            { "Basic/Cyan", Color.cyan },
+        };
+    }
+```
+
+And you can always manually add it:
+
+```csharp
+DropdownList<Color> dropdownList = new DropdownList<Color>();
+dropdownList.Add("Black", Color.black);  # add an item
+dropdownList.Add("White", Color.white, true);  # and a disabled item
+dropdownList.AddSeparator();  # add a separator
+```
+
 #### `MinMaxSlider` ####
 
 A range slider for `Vector2` or `Vector2Int`

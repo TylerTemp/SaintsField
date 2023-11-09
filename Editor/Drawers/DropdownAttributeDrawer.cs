@@ -105,7 +105,7 @@ namespace SaintsField.Editor.Drawers
                     throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
             }
 
-            int selectedIndex = -1;
+            // int selectedIndex = -1;
             // Debug.Log(property.propertyPath);
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
@@ -113,56 +113,145 @@ namespace SaintsField.Editor.Drawers
             FieldInfo field = targetType.GetField(property.propertyPath, bindAttr);
             Debug.Assert(field != null, $"{property.propertyPath}/{target}");
             object curValue = field!.GetValue(target);
-            List<string> options = new List<string>();
-            List<object> values = new List<object>();
-
-            foreach ((KeyValuePair<string, object> keyValuePair, int index) in dropdownListValue!.Select((keyValuePair, index) => (keyValuePair, index)))
+            string curDisplay = "";
+            foreach (ValueTuple<string, object, bool, bool> itemInfos in dropdownListValue!.Where(each => !each.Item4))
             {
-                // Debug.Log($"{keyValuePair.Key} -> {keyValuePair.Value}");
-                // bool bothNull = curValue == null && keyValuePair.Value == null;
+                string name = itemInfos.Item1;
+                object itemValue = itemInfos.Item2;
 
-                // Debug.Log(keyValuePair.Value);
-                // Debug.Log(curValue);
-
-                // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (curValue == null && keyValuePair.Value == null)
+                if (curValue == null && itemValue == null)
                 {
-                    selectedIndex = index;
+                    curDisplay = name;
+                    break;
                 }
-                else if (curValue is UnityEngine.Object curValueObj
-                          && curValueObj == keyValuePair.Value as UnityEngine.Object)
+                if (curValue is UnityEngine.Object curValueObj
+                          && curValueObj == itemValue as UnityEngine.Object)
                 {
-                    selectedIndex = index;
+                    curDisplay = name;
+                    break;
                 }
-                else if (keyValuePair.Value == null)
+                if (itemValue == null)
                 {
                     // nothing
                 }
-                else if (keyValuePair.Value.Equals(curValue))
+                else if (itemValue.Equals(curValue))
                 {
-                    selectedIndex = index;
+                    curDisplay = name;
+                    break;
                 }
-                options.Add(keyValuePair.Key);
-                values.Add(keyValuePair.Value);
             }
 
-            using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            int newIndex = EditorGUI.Popup(position, label, selectedIndex, options.Select(each => new GUIContent(each)).ToArray());
-            // ReSharper disable once InvertIf
-            if (changed.changed)
+            // List<string> options = new List<string>();
+            // List<object> values = new List<object>();
+
+            // foreach ((ValueTuple<string, object, bool> keyValuePair, int index) in dropdownListValue!.Select((keyValuePair, index) => (keyValuePair, index)))
+            // {
+            //     string displayName = keyValuePair.Item1;
+            //     object value = keyValuePair.Item2;
+            //     bool isSeparator = keyValuePair.Item3;
+            //
+            //     // Debug.Log($"{keyValuePair.Key} -> {keyValuePair.Value}");
+            //     // bool bothNull = curValue == null && keyValuePair.Value == null;
+            //
+            //     // Debug.Log(keyValuePair.Value);
+            //     // Debug.Log(curValue);
+            //
+            //     // ReSharper disable once ConvertIfStatementToSwitchStatement
+            //     if (curValue == null && keyValuePair.Value == null)
+            //     {
+            //         selectedIndex = index;
+            //     }
+            //     else if (curValue is UnityEngine.Object curValueObj
+            //               && curValueObj == keyValuePair.Value as UnityEngine.Object)
+            //     {
+            //         selectedIndex = index;
+            //     }
+            //     else if (keyValuePair.Value == null)
+            //     {
+            //         // nothing
+            //     }
+            //     else if (keyValuePair.Value.Equals(curValue))
+            //     {
+            //         selectedIndex = index;
+            //     }
+            //     options.Add(keyValuePair.Key);
+            //     values.Add(keyValuePair.Value);
+            // }
+
+            // using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
+
+            bool hasLabel = label.text != "";
+            float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0;
+            (Rect labelRect, Rect fieldRect) = RectUtils.SplitWidthRect(position, labelWidth);
+
+            EditorGUI.LabelField(labelRect, label);
+
+            // int newIndex = EditorGUI.Popup(position, label, selectedIndex, options.Select(each => new GUIContent(each)).ToArray());
+            GUI.SetNextControlName(FieldControlName);
+            // string display = selectedIndex == -1 ? "" : options[selectedIndex];
+            if (EditorGUI.DropdownButton(fieldRect, new GUIContent(curDisplay), FocusType.Keyboard))
             {
-                Undo.RecordObject(target, "Dropdown");
-                object newValue = values[newIndex];
-                field.SetValue(target, newValue);
-                // try
+                // create the menu and add items to it
+                GenericMenu menu = new GenericMenu();
+
+                foreach (ValueTuple<string, object, bool, bool> itemInfo in dropdownListValue!)
+                {
+                    string curName = itemInfo.Item1;
+                    object curItem = itemInfo.Item2;
+                    bool disabled = itemInfo.Item3;
+                    bool curIsSeparator = itemInfo.Item4;
+                    if (curIsSeparator)
+                    {
+                        menu.AddSeparator(curName);
+                    }
+                    else if (disabled)
+                    {
+                        // Debug.Log($"disabled: {curName}");
+                        menu.AddDisabledItem(new GUIContent(curName), curName == curDisplay);
+                    }
+                    else
+                    {
+                        menu.AddItem(new GUIContent(curName), curName == curDisplay, () =>
+                        {
+                            // selectedIndex = options.IndexOf(option);
+                            Undo.RecordObject(target, "Dropdown");
+                            // object newValue = curItem;
+                            field.SetValue(target, curItem);
+                        });
+                    }
+                }
+
+                // for (int index = 0; index < options.Count; index++)
                 // {
-                //     field.SetValue(target, newValue);
+                //     int curIndex = index;
+                //     string option = options[curIndex];
+                //     menu.AddItem(new GUIContent(option), curIndex == selectedIndex, () =>
+                //     {
+                //         // selectedIndex = options.IndexOf(option);
+                //         Undo.RecordObject(target, "Dropdown");
+                //         object newValue = values[curIndex];
+                //         field.SetValue(target, newValue);
+                //     });
                 // }
-                // catch (ArgumentException)
-                // {
-                //     property.objectReferenceValue = (UnityEngine.GameObject)newValue;
-                // }
+
+                // display the menu
+                // menu.ShowAsContext();
+                menu.DropDown(fieldRect);
             }
+
+            if(hasLabel)
+            {
+                ClickFocus(labelRect, FieldControlName);
+            }
+
+            // int newIndex = selectedIndex;
+            // // ReSharper disable once InvertIf
+            // if (changed.changed)
+            // {
+            //     Undo.RecordObject(target, "Dropdown");
+            //     object newValue = values[newIndex];
+            //     field.SetValue(target, newValue);
+            // }
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
