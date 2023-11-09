@@ -454,7 +454,8 @@ dropdownList.Add("White", Color.white, true);  # and a disabled item
 dropdownList.AddSeparator();  # add a separator
 ```
 
-![required](https://github.com/TylerTemp/SaintsField/assets/6391063/1879c9d9-00b5-4953-97b6-1ba05782dd2e)
+![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
+
 
 
 #### `MinMaxSlider` ####
