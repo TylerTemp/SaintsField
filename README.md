@@ -12,6 +12,35 @@ Unity Version Requirement: 2020.2 or higher
 2.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 3.  Allow dynamic arguments on many cases
 
+## Installation ##
+
+*   Using git upm:
+
+    add this line to `manifest.json` in your project
+
+    ```javascript
+    {
+        // your other dependencies...
+        "today.comes.saintsfield": "https://github.com/TylerTemp/SaintsField.git"
+    }
+    ```
+
+*   Using a `unitypackage`:
+
+    Go to the [Release Page](https://github.com/TylerTemp/SaintsField/releases) to download a desired version of `unitypackage` and import it to your project
+
+*   Using a git submodule:
+
+    ```bash
+    git submodule add https://github.com/TylerTemp/SaintsField.git Assets/SaintsField
+    ```
+
+If you're using unitypackage or git submodule but you put this project under another folder rather than `Assets/SaintsField`, please also do:
+
+*   Create `Assets/Editor Default Resources/SaintsField`.
+*   Copy only image files (no `.meta` files) from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
+*   Select all the image files you copied, and enable the `Advanced - Read/Write` option for these icons.
+
 ## Enhancements ##
 
 ### Label & Text ###
