@@ -385,9 +385,9 @@ public class FieldTypeExample: MonoBehaviour
 ![field_type](https://github.com/TylerTemp/SaintsField/assets/6391063/7bcc058f-5cb4-4a4f-9d8e-ec08bcb8da2c)
 
 
-#### `DropDown` ####
+#### `Dropdown` ####
 
-A dropdown selector. Supports reference type and sub menu.
+A dropdown selector. Supports reference type, sub menu, separator, and disabled select item.
 
 *   AllowMultiple: No
 
@@ -422,7 +422,7 @@ public class DropdownExample : MonoBehaviour
 
 ![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
 
-You can control separator and disabled item too
+To control separator and disabled item
 
 ```csharp
     [Dropdown(nameof(GetAdvancedDropdownItems))]
