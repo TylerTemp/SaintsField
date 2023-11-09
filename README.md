@@ -454,6 +454,9 @@ dropdownList.Add("White", Color.white, true);  # and a disabled item
 dropdownList.AddSeparator();  # add a separator
 ```
 
+![required](https://github.com/TylerTemp/SaintsField/assets/6391063/1879c9d9-00b5-4953-97b6-1ba05782dd2e)
+
+
 #### `MinMaxSlider` ####
 
 A range slider for `Vector2` or `Vector2Int`
@@ -799,6 +802,8 @@ This will check if the field value is a `truly` value, that means:
 
 *   `string errorMessage = null` Error message. Default is `{label} is required`
 *   AllowMultiple: No
+
+![required](https://github.com/TylerTemp/SaintsField/assets/6391063/1e93c51c-ada6-4848-8fc8-a963266ee2cf)
 
 
 ```csharp
