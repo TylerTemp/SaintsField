@@ -4,6 +4,8 @@
 
 Developed by: TylerTemp, 墨瞳
 
+Unity Version Requirement: 2020.2 or higher
+
 ## Highlights ##
 
 1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancer like `Odin` & `NaughtyAttributes`.
