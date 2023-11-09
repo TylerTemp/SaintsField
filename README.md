@@ -14,6 +14,12 @@ Unity Version Requirement: 2020.2 or higher
 
 ## Installation ##
 
+*   Using [OpenUPM](https://openupm.com/)
+    
+    ```bash
+    openupm add today.comes.saintsfield
+    ```
+
 *   Using git upm:
 
     add this line to `manifest.json` in your project
