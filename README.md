@@ -1,4 +1,4 @@
-![v-00011](https://github.com/TylerTemp/SaintsField/assets/6391063/1c315d2d-1c9e-4859-913c-373acdfd4abb)# SaintsField #
+# SaintsField #
 
 `SaintsField` is a Unity Inspector extension tools focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
 
