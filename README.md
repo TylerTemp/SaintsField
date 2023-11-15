@@ -18,7 +18,7 @@ Unity: 2020.2 or higher
 ## Installation ##
 
 *   Using [OpenUPM](https://openupm.com/)
-    
+
     ```bash
     openupm add today.comes.saintsfield
     ```
@@ -508,8 +508,8 @@ For each arguments:
 *   `minCallback`: use a function or property as the minimum value of the slider
 *   `maxCallback`: use a function or property as the maximum value of the slider
 *   `step`: the step of the slider, `<= 0` means no limit and float type will not be limited
-*   `minWidth`: the minimum width of the value label. -1 for default (not recommended)
-*   `maxWidth`: the maximum width of the value label. -1 for default (not recommended)
+*   `minWidth`: the minimum width of the value label. -1 for auto size (not recommended)
+*   `maxWidth`: the maximum width of the value label. -1 for auto size (not recommended)
 
 *   AllowMultiple: No
 
