@@ -1,10 +1,10 @@
-# SaintsField #
+![v-00011](https://github.com/TylerTemp/SaintsField/assets/6391063/1c315d2d-1c9e-4859-913c-373acdfd4abb)# SaintsField #
 
 `SaintsField` is a Unity Inspector extension tools focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
 
-Developed by: TylerTemp, 墨瞳
+Deveoped by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github.com/xc13308)
 
-Unity Version Requirement: 2020.2 or higher
+Unity: 2020.2 or higher
 
 ## Highlights ##
 
@@ -107,7 +107,7 @@ public class RichLabel: MonoBehaviour
 }
 ```
 
-https://github.com/TylerTemp/SaintsField/assets/6391063/25f6c7cc-ee7e-444e-b078-007dd6df499e
+[![richlabel](https://github.com/TylerTemp/SaintsField/assets/6391063/5e865350-6eeb-4f2a-8305-c7d8b8720eac)](https://github.com/TylerTemp/SaintsField/assets/6391063/25f6c7cc-ee7e-444e-b078-007dd6df499e)
 
 
 #### `AboveRichLabel` / `BelowRichLabel` ####
@@ -191,8 +191,7 @@ public class InfoBoxExample : MonoBehaviour
 }
 ```
 
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/03ac649a-9e89-407d-a59d-3e224a7f84c8
+[![infobox](https://github.com/TylerTemp/SaintsField/assets/6391063/c96b4b14-594d-4bfd-9cc4-e53390ed99be)](https://github.com/TylerTemp/SaintsField/assets/6391063/03ac649a-9e89-407d-a59d-3e224a7f84c8)
 
 
 #### `SepTitle` ####
@@ -294,8 +293,7 @@ public class ButtonsExample : MonoBehaviour
 }
 ```
 
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7
+[![button](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
 
 
 ### Field Modifier ###
@@ -316,11 +314,7 @@ public class GameObjectActiveExample : MonoBehaviour
 }
 ```
 
-
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/ddb0bd02-8869-47b9-aac4-880ab9bfb81a
-
-
+[![gameobjectactive](https://github.com/TylerTemp/SaintsField/assets/6391063/19944339-4bfa-4b10-b1fb-b50e0b0433e0)](https://github.com/TylerTemp/SaintsField/assets/6391063/ddb0bd02-8869-47b9-aac4-880ab9bfb81a)
 
 #### `SpriteToggle` ####
 
@@ -351,9 +345,7 @@ The field itself must be `Sprite`.
     }
 ```
 
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/705498e9-4d70-482f-9ae6-b231cd9497ca
-
+[![spritetoggle](https://github.com/TylerTemp/SaintsField/assets/6391063/70ae0697-d13b-460d-be8b-30d4f823659b)](https://github.com/TylerTemp/SaintsField/assets/6391063/705498e9-4d70-482f-9ae6-b231cd9497ca)
 
 #### `MaterialToggle` ####
 
@@ -380,8 +372,7 @@ public class MaterialToggleExample: MonoBehaviour
 }
 ```
 
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/00c5702c-a41e-42a4-abb1-97a0713c3f66
+[![mattoggle](https://github.com/TylerTemp/SaintsField/assets/6391063/cd949e21-e07e-4ee7-8239-280d5d7b8ce1)](https://github.com/TylerTemp/SaintsField/assets/6391063/00c5702c-a41e-42a4-abb1-97a0713c3f66)
 
 #### `Expandable` ####
 
@@ -560,8 +551,7 @@ public class MinMaxSliderExample: MonoBehaviour
 }
 ```
 
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47
+[![minmaxslider](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
 
 
 #### `ResizableTextArea` ####
@@ -581,7 +571,7 @@ public class ResizableTextAreaExample : MonoBehaviour
 }
 ```
 
-https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922
+[![resizabletextarea](https://github.com/TylerTemp/SaintsField/assets/6391063/202a742a-965c-4e68-a829-4a8aa4c8fe9e)](https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922)
 
 #### `AnimatorParam` ###
 
@@ -820,8 +810,7 @@ public class ReadOnlyGroupExample: MonoBehaviour
     private string _ro1234;
 }
 ```
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/6761a0f2-07c2-4252-9dd0-c1a60091a891
+[![readonly](https://github.com/TylerTemp/SaintsField/assets/6391063/e267567b-469c-4156-a82c-82f21fc43021)](https://github.com/TylerTemp/SaintsField/assets/6391063/6761a0f2-07c2-4252-9dd0-c1a60091a891)
 
 #### `Required` ####
 
@@ -877,15 +866,7 @@ public class ValidateInputExample : MonoBehaviour
 }
 ```
 
-
-
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/9d52e663-c9f8-430a-814c-011b17b67a86
-
-
-
-
-
+[![validateinput](https://github.com/TylerTemp/SaintsField/assets/6391063/f554084c-78f3-43ca-a6ab-b3f59ecbf44c)](https://github.com/TylerTemp/SaintsField/assets/6391063/9d52e663-c9f8-430a-814c-011b17b67a86)
 
 #### `ShowIf` / `HideIf` ####
 
@@ -949,11 +930,7 @@ public class ShowHideExample: MonoBehaviour
 }
 ```
 
-
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0
-
-
+[![showifhideif](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
 
 #### `MinValue` / `MaxValue` ####
 
@@ -976,14 +953,7 @@ public class MinMaxExample: MonoBehaviour
 }
 ```
 
-
-
-
-https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604
-
-
-
-
+[![minmax](https://github.com/TylerTemp/SaintsField/assets/6391063/7714fa76-fc5c-4ebc-9aae-be189cef7743)](https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604)
 
 ### GroupBy ###
 
@@ -992,12 +962,3 @@ group with any decorator that has the same `groupBy` for this field. Same group 
 This only works for decorator draws above or below the field. The above drawer will not grouped with below drawer, and vice versa.
 
 `""` means no group.
-
-## Known Issues ##
-
-~~Because it handle the label drawing process seperated from the actual field drawing, the label is not using Unity's default label. Which lead to the problem:~~
-
-1.  ~~Dragging label to change value for int/float field is not very smooth~~ (FIXED)
-2.  ~~Click a label will not focus the field~~ (FIXED)
-
-~~Note: These issue only affect the fields that uses this project's feature. It won't affect other fields, even it's on the same script. It should be safe enough to use it together with your other inspector enhancement~~
