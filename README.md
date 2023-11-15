@@ -25,7 +25,7 @@ Unity: 2020.2 or higher
 
 *   Using git upm:
 
-    add this line to `manifest.json` in your project
+    add this line to `Packages/manifest.json` in your project
 
     ```javascript
     {
