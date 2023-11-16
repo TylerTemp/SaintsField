@@ -381,16 +381,16 @@ public class MaterialToggleExample: MonoBehaviour
 
 #### `ColorToggle` ####
 
-A toggle button to toggle color for `SpriteRenderer`, `Button`, `SpriteRenderer` or `Renderer`
+A toggle button to toggle color for `Image`, `Button`, `SpriteRenderer` or `Renderer`
 
 The field itself must be `Material`.
 
 *   `string compName=null`
 
-    The target, must be `SpriteRenderer`, `Button`, `SpriteRenderer` or `Renderer` (or it's subClass like `MeshRenderer`). 
-    
+    The target, must be `Image`, `Button`, `SpriteRenderer` or `Renderer` (or it's subClass like `MeshRenderer`).
+
     When using `null`, it will try to get the correct component from the target object of this field by order.
-    
+
     When it's a `Renderer`, it will change the material's `.color` property.
 
     When it's a `Button`, it will change the button's `targetGraphic.color` property.
