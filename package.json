@@ -1,6 +1,6 @@
 {
   "name": "today.comes.saintsfield",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "displayName": "SaintsField",
   "description": "A Unity plugin for field in inspector",
   "unity": "2020.2",
@@ -19,7 +19,7 @@
   "license": "MIT",
   "samples": [
     {
-      "displayName": "Full Example",
+      "displayName": "Samples",
       "description": "Full example of this project",
       "path": "Samples~"
     }

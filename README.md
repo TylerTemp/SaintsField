@@ -5,7 +5,7 @@
 
 `SaintsField` is a Unity Inspector extension tools focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
 
-Deveoped by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github.com/xc13308)
+Developed by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github.com/xc13308)
 
 Unity: 2020.2 or higher
 
@@ -376,6 +376,43 @@ public class MaterialToggleExample: MonoBehaviour
 ```
 
 [![mattoggle](https://github.com/TylerTemp/SaintsField/assets/6391063/cd949e21-e07e-4ee7-8239-280d5d7b8ce1)](https://github.com/TylerTemp/SaintsField/assets/6391063/00c5702c-a41e-42a4-abb1-97a0713c3f66)
+
+#### `ColorToggle` ####
+
+A toggle button to toggle color for `SpriteRenderer`, `Button`, `SpriteRenderer` or `Renderer`
+
+The field itself must be `Material`.
+
+*   `string compName=null`
+
+    The target, must be `SpriteRenderer`, `Button`, `SpriteRenderer` or `Renderer` (or it's subClass like `MeshRenderer`). 
+    
+    When using `null`, it will try to get the correct component from the target object of this field by order.
+    
+    When it's a `Renderer`, it will change the material's `.color` property.
+
+    When it's a `Button`, it will change the button's `targetGraphic.color` property.
+
+*   `int index=0`
+
+    (only works for `Renderer` type) which slot index of `materials` on `Renderer` you want to apply the color
+
+*   AllowMultiple: Yes
+
+```csharp
+public class ColorToggleImage: MonoBehaviour
+{
+    // auto find on target object
+    [SerializeField, ColorToggle] private Color _onColor;
+    [SerializeField, ColorToggle] private Color _offColor;
+
+    [Space]
+    // by name
+    [SerializeField] private Image _image;
+    [SerializeField, ColorToggle(nameof(_image))] private Color _onColor2;
+    [SerializeField, ColorToggle(nameof(_image))] private Color _offColor2;
+}
+```
 
 #### `Expandable` ####
 
