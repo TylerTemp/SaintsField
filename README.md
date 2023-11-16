@@ -999,7 +999,7 @@ public class MinMaxExample: MonoBehaviour
 
 [![minmax](https://github.com/TylerTemp/SaintsField/assets/6391063/7714fa76-fc5c-4ebc-9aae-be189cef7743)](https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604)
 
-### GroupBy ###
+## GroupBy ##
 
 group with any decorator that has the same `groupBy` for this field. Same group will share even width of the view width between them.
 
