@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Core
             _textureCache.Clear();
         }
 
-        private static Texture2D LoadTexture(string iconPath)
+        public static Texture2D LoadTexture(string iconPath)
         {
             string[] paths = {
                 iconPath,
