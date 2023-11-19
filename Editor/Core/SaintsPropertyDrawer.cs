@@ -212,29 +212,9 @@ namespace SaintsField.Editor.Core
 
             bool saintsDrawNoLabel = hasSaintsLabel &&
                                      !labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
-            // float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0f;
-            // Debug.Log($"hasLabel={hasLabel}");
-            // float labelHeight = drawSaintsLabel
-            //     ? labelFound.drawer.GetLabelHeight(property, label, labelFound.iSaintsAttribute)
-            //     : 0f;
-
-            // bool saintsDrawNoLabel = hasSaintsLabel && !drawSaintsLabel;
-
-            // Debug.Log($"hasSaintsLabel={hasSaintsLabel}, saintsDrawNoLabel={saintsDrawNoLabel}");
 
             bool hasSaintsField = fieldFound.iSaintsAttribute != null;
-            // float fieldHeight = hasSaintsField
-            //     ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
-            //     : 0f;
 
-            // bool fieldBreakLine = hasSaintsField && fieldFound.iSaintsAttribute.GroupBy != "__LABEL_FIELD__";
-
-            // FieldDrawerConfigAttribute fieldDrawerConfigAttribute = _usedAttributes
-            //     .Select(each => each.Key.SaintsAttribute)
-            //     .OfType<FieldDrawerConfigAttribute>()
-            //     .FirstOrDefault() ?? GetDefaultFieldDrawerConfigAttribute(fieldBreakLine);
-
-            // Debug.Log($"draw type {fieldDrawerConfigAttribute.FieldDraw}/{IsSubDrawer}");
             bool disabledLabelField = label.text == "" || saintsDrawNoLabel;
             // Debug.Log(disabledLabelField);
 
@@ -244,43 +224,10 @@ namespace SaintsField.Editor.Core
                     !disabledLabelField)
                 // : EditorGUIUtility.singleLineHeight;
                 : EditorGUI.GetPropertyHeight(property, label, true);
+
+            // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
             _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
 
-            // if(!fieldBreakLine)
-            // {
-            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-            //     float fieldBasicHeight = hasSaintsField
-            //         ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
-            //         // : EditorGUIUtility.singleLineHeight;
-            //         : EditorGUI.GetPropertyHeight(property, label, true);
-            //     _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
-            // }
-            // else
-            // {
-            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-            //     float fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
-            //         !saintsDrawNoLabel);
-            //     // Debug.Log($"FullWidthNewLine, labelBasicHeight={labelBasicHeight}");
-            //     _labelFieldBasicHeight = labelBasicHeight + fieldBasicHeight;
-            // }
-
-            // // float basicHeight;
-            // if (fieldBreakLine)
-            // {
-            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-            //     float fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
-            //         !saintsDrawNoLabel);
-            //     _fieldBasicHeight = labelBasicHeight + fieldBasicHeight;
-            // }
-            // else
-            // {
-            //     float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
-            //     float fieldBasicHeight = hasSaintsField
-            //         ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, !saintsDrawNoLabel)
-            //         // : EditorGUIUtility.singleLineHeight;
-            //         : EditorGUI.GetPropertyHeight(property, label);
-            //     _fieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
-            // }
 
             float aboveHeight = 0;
             float belowHeight = 0;
@@ -311,6 +258,8 @@ namespace SaintsField.Editor.Core
             }
 
             // Debug.Log($"aboveHeight={aboveHeight}");
+
+            // Debug.Log($"_labelFieldBasicHeight={_labelFieldBasicHeight}");
 
             return _labelFieldBasicHeight + aboveHeight + belowHeight;
         }

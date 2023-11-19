@@ -105,6 +105,11 @@ namespace SaintsField.Editor.Drawers
             Object.DestroyImmediate(_clear);
         }
 
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, bool hasLabelWidth)
+        {
+            return EditorGUIUtility.singleLineHeight;
+        }
+
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             RateAttribute rateAttribute = (RateAttribute)saintsAttribute;
@@ -120,13 +125,13 @@ namespace SaintsField.Editor.Drawers
                 options.Add(0);
             }
 
-            Rect starsRect = position;
-            if (!string.IsNullOrEmpty(label.text))
-            {
-                (Rect labelRect, Rect leftRect) = RectUtils.SplitWidthRect(position, EditorGUIUtility.labelWidth);
-                EditorGUI.LabelField(labelRect, label);
-                starsRect = leftRect;
-            }
+            Rect starsRect = EditorGUI.PrefixLabel(position, label);
+            // if (!string.IsNullOrEmpty(label.text))
+            // {
+            //     (Rect labelRect, Rect leftRect) = RectUtils.SplitWidthRect(position, EditorGUIUtility.labelWidth);
+            //     EditorGUI.LabelField(labelRect, label);
+            //     starsRect = leftRect;
+            // }
 
             float eachWidth = starsRect.height + 4;
             // Debug.Log(_starActive.width);

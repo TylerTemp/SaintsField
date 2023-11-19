@@ -182,9 +182,15 @@ namespace SaintsField.Editor.Drawers
 
             bool hasLabel = label.text != "";
             float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0;
-            (Rect labelRect, Rect fieldRect) = RectUtils.SplitWidthRect(position, labelWidth);
+            Rect labelRect = new Rect(position)
+            {
+                width = labelWidth,
+            };
+            // (Rect labelRect, Rect fieldRect) = RectUtils.SplitWidthRect(position, labelWidth);
+            //
+            // EditorGUI.LabelField(labelRect, label);
 
-            EditorGUI.LabelField(labelRect, label);
+            Rect fieldRect = EditorGUI.PrefixLabel(position, label);
 
             // int newIndex = EditorGUI.Popup(position, label, selectedIndex, options.Select(each => new GUIContent(each)).ToArray());
             GUI.SetNextControlName(FieldControlName);
