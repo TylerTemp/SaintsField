@@ -13,13 +13,21 @@ namespace SaintsField.Editor.Drawers
     {
         private string _error = "";
 
+        // ensure first time render will check the value
+        private bool _againRender;
+
         protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool valueChanged)
         {
             if (!valueChanged)
             {
-                return true;
+                if(_againRender)
+                {
+                    return true;
+                }
             }
+
+            _againRender = true;
 
             string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
             object target = property.serializedObject.targetObject;
@@ -32,14 +40,17 @@ namespace SaintsField.Editor.Drawers
                 _error = $"no method found `{callback}` on `{target}`";
                 return true;
             }
-            
+
             _error = "";
-            
+
             ParameterInfo[] methodParams = methodInfo.GetParameters();
             Debug.Assert(methodParams.All(p => p.IsOptional));
 
             string validateResult = "";
-            property.serializedObject.ApplyModifiedProperties();
+            if(valueChanged)
+            {
+                property.serializedObject.ApplyModifiedProperties();
+            }
             // Debug.Log($"call on {property.intValue}");
             try
             {
@@ -57,7 +68,7 @@ namespace SaintsField.Editor.Drawers
                 Debug.LogException(e);
                 return true;
             }
-            
+
             // Debug.Log($"get: {validateResult}");
 
             _error = string.IsNullOrEmpty(validateResult) ? "" : validateResult;
