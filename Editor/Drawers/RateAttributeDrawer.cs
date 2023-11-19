@@ -41,8 +41,8 @@ namespace SaintsField.Editor.Drawers
             Texture2D star = RichTextDrawer.LoadTexture("star.png");
 
             _starActive = Tex.ApplyTextureColor(star, Color.yellow);
-            _starIncrease = Tex.ApplyTextureColor(star, Color.green);
-            _starDecrease = Tex.ApplyTextureColor(star, Color.black);
+            _starIncrease = Tex.ApplyTextureColor(star, new Color(228/255f, 1, 0, 0.7f));
+            _starDecrease = Tex.ApplyTextureColor(star, new Color(100/255f, 100/255f, 0, 1f));
             _starInactive = Tex.ApplyTextureColor(star, Color.grey);
 
             Texture2D starSlash = RichTextDrawer.LoadTexture("star-slash.png");
