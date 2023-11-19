@@ -52,6 +52,13 @@ If you're using unitypackage or git submodule but you put this project under ano
 *   Copy only image files (no `.meta` files) from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
 *   Select all the image files you copied, and enable the `Advanced - Read/Write` option for these icons.
 
+## Change Log ##
+
+**1.0.5**
+
+1.  Add `RateAttribute` for rating stars.
+2.  Fix `ValidateInputAttribute` won't call the validator the first time it renders.
+
 ## Enhancements ##
 
 ### Label & Text ###
