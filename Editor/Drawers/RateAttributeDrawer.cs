@@ -20,11 +20,19 @@ namespace SaintsField.Editor.Drawers
         private readonly Texture2D _starDecrease;
         private readonly Texture2D _starInactive;
 
+        private readonly GUIContent _guiContentSlash;
+        private readonly GUIContent _guiContentSlashInactive;
+        private readonly GUIContent _guiContentActive;
+        private readonly GUIContent _guiContentIncrease;
+        private readonly GUIContent _guiContentDecrease;
+        private readonly GUIContent _guiContentInactive;
+
         private readonly Texture2D _clear;
         // private readonly Texture2D _hover;
         // private readonly Texture2D _active;
 
-        private readonly GUIStyle _normalActive;
+        private readonly GUIStyle _normalClear;
+        private readonly GUIStyle _normalFramed;
         // private readonly GUIStyle _hoverActive;
         // private readonly GUIStyle _inactive;
 
@@ -41,6 +49,13 @@ namespace SaintsField.Editor.Drawers
             _starSlash = Tex.ApplyTextureColor(starSlash, Color.red);
             _starSlashInactive = Tex.ApplyTextureColor(starSlash, Color.grey);
 
+            _guiContentSlash = new GUIContent(_starSlash);
+            _guiContentSlashInactive = new GUIContent(_starSlashInactive);
+            _guiContentActive = new GUIContent(_starActive);
+            _guiContentIncrease = new GUIContent(_starIncrease);
+            _guiContentDecrease = new GUIContent(_starDecrease);
+            _guiContentInactive = new GUIContent(_starInactive);
+
             // Color[] pix = new Color[]{ Color.clear };
             // Texture2D result = new Texture2D(1, 1);
             // result.SetPixels(pix);
@@ -50,7 +65,7 @@ namespace SaintsField.Editor.Drawers
             // _hover = MakePixel(Color.blue * new Color(1, 1, 1, 0.6f));
             // _active = MakePixel(Color.blue);
 
-            _normalActive = new GUIStyle(GUI.skin.button)
+            _normalFramed = new GUIStyle(GUI.skin.button)
             {
                 margin = new RectOffset(0, 0, 0, 0),
                 padding = new RectOffset(0, 0, 0, 0),
@@ -58,18 +73,14 @@ namespace SaintsField.Editor.Drawers
                 overflow = new RectOffset(0, 0, 0, 0),
                 contentOffset = new Vector2(0, 0),
                 alignment = TextAnchor.MiddleCenter,
+            };
+
+            _normalClear = new GUIStyle(_normalFramed)
+            {
                 normal =
                 {
                     background = _clear,
                 },
-                // hover =
-                // {
-                //     background = _hover,
-                // },
-                // active =
-                // {
-                //     background = _active,
-                // },
             };
             Debug.Assert(_starActive.width != 1);
         }
@@ -148,6 +159,10 @@ namespace SaintsField.Editor.Drawers
 
             Vector2 mousePosition = Event.current.mousePosition;
             // bool hover = false;
+
+            // Debug.Log("check hover");
+            // Debug.Log(mousePosition);
+
             foreach ((Rect starRect, int index) in startRects.Select(((rect, index) => (rect, index))))
             {
                 if (starRect.Contains(mousePosition))
@@ -161,22 +176,23 @@ namespace SaintsField.Editor.Drawers
             for (int index = 0; index < options.Count; index++)
             {
                 int curValue = options[index];
-                Texture2D icon;
+                // bool belowMix = curValue < min;
+                GUIContent iconContent;
                 if (curValue > useValue && curValue > hoverValue)
                 {
-                    icon = _starInactive;
+                    iconContent = _guiContentInactive;
                 }
                 else if (curValue <= useValue && curValue <= hoverValue)
                 {
-                    icon = _starActive;
+                    iconContent = _guiContentActive;
                 }
                 else if (curValue > useValue && curValue <= hoverValue)
                 {
-                    icon = _starIncrease;
+                    iconContent = _guiContentIncrease;
                 }
                 else if (curValue <= useValue && curValue > hoverValue)
                 {
-                    icon = _starDecrease;
+                    iconContent = curValue <= min? _guiContentActive: _guiContentDecrease;
                 }
                 else
                 {
@@ -185,84 +201,28 @@ namespace SaintsField.Editor.Drawers
 
                 if (curValue == 0)
                 {
-                    icon = useValue == 0? _starSlash: _starSlashInactive;
+                    iconContent = useValue == 0? _guiContentSlash: _guiContentSlashInactive;
                 }
 
                 // int thisValue = startRects[index];
 
-                using(new EditorGUI.DisabledScope(curValue < min))
+                // using(new EditorGUI.DisabledScope(belowMix))
+                // {
+                //     if (GUI.Button(startRects[index], new GUIContent(icon), _normalActive))
+                //     {
+                //         property.intValue = curValue;
+                //     }
+                // }
+
+                GUIStyle style = curValue != 0 && curValue <= min
+                    ? _normalFramed
+                    : _normalClear;
+
+                if (GUI.Button(startRects[index], iconContent, style))
                 {
-                    if (GUI.Button(startRects[index], new GUIContent(icon), _normalActive))
-                    {
-                        property.intValue = curValue;
-                    }
+                    property.intValue = Mathf.Clamp(curValue, min, max);
                 }
             }
-
-            // for (int index = 0; index < max - min; index++)
-            // {
-            //     int value = min + index;
-            //
-            //     bool activeStar = value <= useValue;
-            //     GUIStyle guiStyle;
-            //     Texture2D icon;
-            //
-            //     if (activeStar)
-            //     {
-            //         if (hover)
-            //         {
-            //             guiStyle = _hoverActive;
-            //         }
-            //         else
-            //         {
-            //             guiStyle = _normalActive;
-            //         }
-            //
-            //         icon = _starActive;
-            //     }
-            //     else
-            //     {
-            //         guiStyle = _normalActive;
-            //         icon = _starInactive;
-            //     }
-            //
-            //     Rect rect = startRects[value - min + 1];
-            //     GUI.Button(rect, new GUIContent(), guiStyle);
-            // }
-
-            // GUIStyle myStyle = new GUIStyle(GUI.skin.button)
-            // {
-            //     margin = new RectOffset(0, 0, 0, 0),
-            //     padding = new RectOffset(0, 0, 0, 0),
-            //     border = new RectOffset(0, 0, 0, 0),
-            //     overflow = new RectOffset(0, 0, 0, 0),
-            //     contentOffset = new Vector2(0, 0),
-            //     alignment = TextAnchor.MiddleCenter,
-            //     normal =
-            //     {
-            //         background = _clear,
-            //     },
-            //     hover =
-            //     {
-            //         background = _hover,
-            //     },
-            //     active =
-            //     {
-            //         background = _active,
-            //     },
-            // };
-
-            // GUI.backgroundColor = new Color(0,0,0,0);
-
-            // GUI.Button(new Rect(position)
-            // {
-            //     width = 20
-            // }, new GUIContent(_starActive), myStyle);
-            // GUI.Button(new Rect(position)
-            // {
-            //     x = position.x + 30,
-            //     width = 20
-            // }, new GUIContent(_starActive), myStyle);
         }
     }
 }
