@@ -5,7 +5,7 @@
 [![openupm](https://img.shields.io/npm/v/today.comes.saintsfield?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/today.comes.saintsfield/)
 [![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Ftoday.comes.saintsfield)](https://openupm.com/packages/today.comes.saintsfield/)
 
-`SaintsField` is a Unity Inspector extension tools focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
+`SaintsField` is a Unity Inspector extension tool focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
 
 Developed by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github.com/xc13308)
 
@@ -13,9 +13,9 @@ Unity: 2020.2 or higher
 
 ## Highlights ##
 
-1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancer like `Odin` & `NaughtyAttributes`.
+1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `Odin` & `NaughtyAttributes`.
 2.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
-3.  Allow dynamic arguments on many cases
+3.  Allow dynamic arguments in many cases
 
 ## Installation ##
 
@@ -46,7 +46,7 @@ Unity: 2020.2 or higher
     git submodule add https://github.com/TylerTemp/SaintsField.git Assets/SaintsField
     ```
 
-If you're using unitypackage or git submodule but you put this project under another folder rather than `Assets/SaintsField`, please also do:
+If you're using unitypackage or git submodule but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy only image files (no `.meta` files) from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
@@ -77,17 +77,17 @@ If you're using unitypackage or git submodule but you put this project under ano
 
     *   `"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons)
     *   `"Assets/Editor Default Resources/SaintsField/"`  (again for override)
-    *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when install using `unitypackage`)
-    *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when install using `upm`)
+    *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
+    *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
 
     for `color` it supports:
 
     *   `Clear`, `White`, `Black`, `Gray`, `Red`, `Pink`, `Orange`, `Yellow`, `Green`, `Blue`, `Indigo`, `Violet`
-    *   html color which supported by `ColorUtility.TryParseHtmlString`, like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
+    *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
 
 *   `bool isCallback=false`
 
-    if true, the `richTextXml` will be interpreted as a property / callback function, and the string value / the returned string value (tag supported) will be used as the label content
+    if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
 
 *   AllowMultiple: No. A field can only have one `RichLabel`
 
@@ -124,7 +124,7 @@ public class RichLabel: MonoBehaviour
 
 #### `AboveRichLabel` / `BelowRichLabel` ####
 
-Like `RichLabel` but it's rendered above/below the field in full width of view.
+Like `RichLabel`, but it's rendered above/below the field in full width of view instead.
 
 
 *   `string|null richTextXml` Same as `RichLabel`
@@ -151,7 +151,7 @@ public class FullWidthRichLabelExample: MonoBehaviour
 
 #### `InfoBox` ####
 
-Draw a info box above/below the field.
+Draw an info box above/below the field.
 
 *   `string content`
 
@@ -172,9 +172,9 @@ Draw a info box above/below the field.
 
 *   `bool contentIsCallback=false`
 
-    if true, the `content` will be interpreted as a property / callback function.
+    if true, the `content` will be interpreted as a property/callback function.
 
-    If the value (or returned value) is string, then the content will be changed
+    If the value (or returned value) is a string, then the content will be changed
 
     If the value is `(string content, EMessageType messageType)` then both content and message type will be changed
 
@@ -208,7 +208,7 @@ public class InfoBoxExample : MonoBehaviour
 
 #### `SepTitle` ####
 
-A separator with a text
+A separator with text
 
 *   `string title=null` title, `null` for no title at all. Does **NOT** support rich text
 *   `EColor color`, color for title and line separator
@@ -248,7 +248,7 @@ All of them have the same arguments:
 
 *   `bool buttonLabelIsCallback = false`
 
-    a callback or propery name for button label, same as `RichLabel`
+    a callback or property name for button's label, same as `RichLabel`
 
 *   `string groupBy = ""`
 
@@ -314,7 +314,7 @@ public class ButtonsExample : MonoBehaviour
 
 A toggle button to toggle the `GameObject.activeSelf` of the field.
 
-This does not require the field is `GameObject`. It can be a component which already attached to a `GameObject`.
+This does not require the field to be `GameObject`. It can be a component which already attached to a `GameObject`.
 
 *   AllowMultiple: No
 
@@ -336,7 +336,7 @@ The field itself must be `Sprite`.
 
 *   `string imageOrSpriteRenderer`
 
-    The target, must be either `UI.Image` or `SpriteRenderer`
+    the target, must be either `UI.Image` or `SpriteRenderer`
 
 *   AllowMultiple: Yes
 
@@ -367,7 +367,7 @@ The field itself must be `Material`.
 
 *   `string rendererName=null`
 
-    The target, must be `Renderer` (or it's subClass like `MeshRenderer`). when using null, it will try to get the `Renderer` component from the current component
+    the target, must be `Renderer` (or its subClass like `MeshRenderer`). When using null, it will try to get the `Renderer` component from the current component
 
 *   `int index=0`
 
@@ -394,7 +394,7 @@ The field itself must be `Material`.
 
 *   `string compName=null`
 
-    The target, must be `Image`, `Button`, `SpriteRenderer` or `Renderer` (or it's subClass like `MeshRenderer`).
+    the target, must be `Image`, `Button`, `SpriteRenderer`, or `Renderer` (or its subClass like `MeshRenderer`).
 
     When using `null`, it will try to get the correct component from the target object of this field by order.
 
@@ -411,7 +411,7 @@ The field itself must be `Material`.
 ```csharp
 public class ColorToggleImage: MonoBehaviour
 {
-    // auto find on target object
+    // auto find on the target object
     [SerializeField, ColorToggle] private Color _onColor;
     [SerializeField, ColorToggle] private Color _offColor;
 
@@ -446,17 +446,19 @@ This will change the look & behavior of a field.
 
 #### Rate ####
 
-A rating stars tool for `Vector2Int` field.
+A rating stars tool for an `int` field.
 
 Parameters:
 
-*   `int min` minimum value of the rating. Must be equal or greater than 0. 
+*   `int min` minimum value of the rating. Must be equal to or greater than 0.
 
     When it's equal to 0, it'll draw a red slashed star to select `0`.
 
     When it's greater than 0, it will draw `min` number of fixed stars that you can not un-rate.
 
 *   `int max` maximum value of the rating. Must be greater than `min`.
+
+*   AllowMultiple: No
 
 ```csharp
 public class RateExample: MonoBehaviour
@@ -473,7 +475,7 @@ public class RateExample: MonoBehaviour
 
 Ask the inspector to display another type of field rather than the field's original type.
 
-This is useful when you want to have a `GameObject` of prefab, but you want this target prefab has specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you enforce the inspector to sign the required object that has your expected component, but still give you the original type value to field.
+This is useful when you want to have a `GameObject` prefab, but you want this target prefab to have a specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you force the inspector to sign the required object that has your expected component but still gives you the original typed value to field.
 
 *   AllowMultiple: No
 
@@ -492,7 +494,7 @@ public class FieldTypeExample: MonoBehaviour
 
 #### `Dropdown` ####
 
-A dropdown selector. Supports reference type, sub menu, separator, and disabled select item.
+A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
 
 *   AllowMultiple: No
 
@@ -527,7 +529,7 @@ public class DropdownExample : MonoBehaviour
 
 ![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
 
-To control separator and disabled item
+To control the separator and disabled item
 
 ```csharp
     [Dropdown(nameof(GetAdvancedDropdownItems))]
@@ -573,19 +575,19 @@ This Attribute has overrides:
 *   `MinMaxSliderAttribute(float min, string maxCallback, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
 *   `MinMaxSliderAttribute(string minCallback, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
 
-For each arguments:
+For each argument:
 
 *   `min`: the minimum value of the slider
 *   `max`: the maximum value of the slider
 *   `minCallback`: use a function or property as the minimum value of the slider
 *   `maxCallback`: use a function or property as the maximum value of the slider
-*   `step`: the step of the slider, `<= 0` means no limit and float type will not be limited
+*   `step`: the step of the slider, `<= 0` means no limit, and float type will not be limited
 *   `minWidth`: the minimum width of the value label. -1 for auto size (not recommended)
 *   `maxWidth`: the maximum width of the value label. -1 for auto size (not recommended)
 
 *   AllowMultiple: No
 
-a full featured example:
+a full-featured example:
 
 ```csharp
 public class MinMaxSliderExample: MonoBehaviour
@@ -630,7 +632,7 @@ public class MinMaxSliderExample: MonoBehaviour
 
 #### `ResizableTextArea` ####
 
-This `TextArea` will always grow it's height to fit the content. (minimal height is 3 rows).
+This `TextArea` will always grow its height to fit the content. (minimal height is 3 rows).
 
 Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
 
@@ -649,7 +651,7 @@ public class ResizableTextAreaExample : MonoBehaviour
 
 #### `AnimatorParam` ###
 
-A dropdown selector for animator parameter.
+A dropdown selector for an animator parameter.
 
 *   `string animatorName`
 
@@ -683,15 +685,15 @@ A dropdown selector for animator state.
 
     name of the animator
 
-to get more useful info from the state, you can use `AnimatorState` type instead of `string` for field.
+to get more useful info from the state, you can use `AnimatorState` type instead of `string` type.
 
 `AnimatorState` has the following properties:
 
 *   `int layerIndex` index of layer
 *   `int stateNameHash` hash value of state
 *   `string stateName` actual state name
-*   `float stateSpeed` the `Speed` paramater of the state
-*   `AnimationClip animationClip` the actual animation clip of the state (can be null). It has `length` value for the length of the clip. For more detail see [Unity Doc of AnimationClip](https://docs.unity3d.com/ScriptReference/AnimationClip.html)
+*   `float stateSpeed` the `Speed` parameter of the state
+*   `AnimationClip animationClip` is the actual animation clip of the state (can be null). It has a `length` value for the length of the clip. For more detail see [Unity Doc of AnimationClip](https://docs.unity3d.com/ScriptReference/AnimationClip.html)
 
 
 ```csharp
@@ -729,7 +731,7 @@ public class LayerAttributeExample: MonoBehaviour
 #### `Scene` ####
 
 
-A dropdown selector for scene in build list.
+A dropdown selector for a scene in the build list.
 
 *   AllowMultiple: No
 
@@ -761,7 +763,7 @@ public class SortingLayerExample: MonoBehaviour
 
 #### `Tag` ####
 
-A dropdown selector for tag.
+A dropdown selector for a tag.
 
 *   AllowMultiple: No
 
@@ -778,15 +780,15 @@ public class TagExample: MonoBehaviour
 
 #### `AssetPreview` ####
 
-Show an image preview for prefabs, Sprite, Texture2D etc. (Internally use `AssetPreview.GetAssetPreview`)
+Show an image preview for prefabs, Sprite, Texture2D, etc. (Internally use `AssetPreview.GetAssetPreview`)
 
 *   `int maxWidth=-1`
 
-    preview max width, -1 for current view width
+    preview max-width, -1 for current view width
 
 *   `int maxHeight=-1`
 
-    preview max height, -1 for auto resize (with same aspect) using width
+    preview max height, -1 for auto resize (with the same aspect) using the width
 
 *   `bool above=false`
 
@@ -794,7 +796,7 @@ Show an image preview for prefabs, Sprite, Texture2D etc. (Internally use `Asset
 
 *   `string groupBy=""`
 
-    See `GroupBy` section
+    See the `GroupBy` section
 
 *   AllowMultiple: No
 
@@ -836,19 +838,19 @@ This has two overrides:
 *   `ReadOnlyAttribute(bool directValue)`
 *   `ReadOnlyAttribute(params string[] by)`
 
-Each arguemnts:
+Each arguments:
 
 *   `bool directValue=false`
 
-    if true, the field will be readonly
+    if true, the field will be read-only
 
 *   `string[] by`
 
-    a callback or property name, if **ALL** the value is truly, the field will be readonly
+    a callback or property name, if **ALL** the value is truly, the field will be read-only
 
 *   AllowMultiple: Yes
 
-    When use mutiple `ReadOnly` on a field, the field will be readonly if **ANY** of them is readonly
+    When using multiple `ReadOnly` on a field, the field will be read only if **ANY** of them is read-only
 
 ```csharp
 public class ReadOnlyGroupExample: MonoBehaviour
@@ -886,11 +888,11 @@ public class ReadOnlyGroupExample: MonoBehaviour
 
 Remide a given reference type field to be required.
 
-This will check if the field value is a `truly` value, that means:
+This will check if the field value is a `truly` value, which means:
 
 1.  Won't work for int and float (It'll give an error, asking you to not use on int/float)
-2.  `struct` value will always be `truly` because `struct` is not nullable and Unity will fill a default value for it no matter what
-3.  It works on refenece type and will NOT skip unity's life-circle null check
+2. The `struct` value will always be `truly` because `struct` is not nullable and Unity will fill a default value for it no matter what
+3.  It works on reference type and will NOT skip Unity's life-circle null check
 
 *   `string errorMessage = null` Error message. Default is `{label} is required`
 *   AllowMultiple: No
@@ -902,7 +904,7 @@ This will check if the field value is a `truly` value, that means:
 public class RequiredExample: MonoBehaviour
 {
     [Required("Add this please!")] public Sprite _spriteImage;
-    // works for property field
+    // works for the property field
     [field: SerializeField, Required] public GameObject Go { get; private set; }
     [Required] public UnityEngine.Object _object;
     [SerializeField, Required] private float _wontWork;
@@ -920,9 +922,9 @@ public class RequiredExample: MonoBehaviour
 
 #### `ValidateInput` ####
 
-Validate the input of the field when value changed.
+Validate the input of the field when the value changes.
 
-*   `string callback` the callback function to validate the data. note: return type is **`string`** not bool! return null or empty string for valid, otherwise the string will be used as error message
+*   `string callback` is the callback function to validate the data. note: return type is **`string`** not bool! return a null or empty string for valid, otherwise, the string will be used as the error message
 
 *   AllowMultiple: Yes
 
@@ -944,15 +946,15 @@ Show or hide the field based on a condition.
 
 For `ShowIf`:
 
-*   `string andCallbacks...` a list of callback or property name, if **ALL** the value is truly, the field will be shown/hidden
+*   `string andCallbacks...` a list of callback or property names, if **ALL** the value is truly, the field will be shown/hidden
 
 *   AllowMultiple: Yes
 
-    When use mutiple `ShowIf` on a field, the field will be shown if **ANY** of them is shown
+    When using multiple `ShowIf` on a field, the field will be shown if **ANY** of them is shown
 
-`HideIf` is the oppsite of `ShowIf`. You can use mutiple `ShowIf`, `HideIf` and even the mix of the two
+`HideIf` is the opposite of `ShowIf`. You can use multiple `ShowIf`, `HideIf`, and even a mix of the two
 
-A full futured example:
+A full featured example:
 
 
 ```csharp
@@ -1027,8 +1029,85 @@ public class MinMaxExample: MonoBehaviour
 
 ## GroupBy ##
 
-group with any decorator that has the same `groupBy` for this field. Same group will share even width of the view width between them.
+group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
 
-This only works for decorator draws above or below the field. The above drawer will not grouped with below drawer, and vice versa.
+This only works for decorator draws above or below the field. The above drawer will not grouped with the below drawer, and vice versa.
 
 `""` means no group.
+
+
+## Common Pitfalls & Compatibility ##
+
+**List/Array**
+
+1.  Directly using on list/array will not work
+2.  Using on list/array's element works
+
+Unlike NaughtyAttributes, `SaintsField` does not need a `Nested` attribute to work on list/array's element.
+
+```csharp
+public class ArrayLabelExample : MonoBehaviour
+{
+    // this won't work
+    [RichLabel("HI"), InfoBox("this actually wont work", EMessageType.Warning)] public int[] _ints;
+
+    [Serializable]
+    public struct MyStruct
+    {
+        // this works
+        [RichLabel("HI"), MinMaxSlider(0f, 1f)] public Vector2 minMax;
+        public float normalFloat;
+    }
+
+    public MyStruct[] myStructs;
+}
+```
+
+**Order Matters**
+
+`SaintsField` only uses `PropertyDrawer` to draw the field, and will properly fall back to the rest drawers if there is one.
+This works for both 3rd party drawer, your custom drawer, and Unity's default drawer.
+
+However, Unity only allows decorators to be loaded from top to bottom, left to right. Any drawer that does not properly handle the fallback
+will override `PropertyDrawer` follows by. Thus, ensure `SaintsField` is always the first decorator.
+
+An example of working with NaughtyAttributes:
+
+```csharp
+public class CompatibilityNaAndDefault : MonoBehaviour
+{
+    [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
+    public AnimationCurve naCurve;
+
+    [RichLabel("<color=green>+Native</color>"), Range(0, 5)]
+    public float nativeRange;
+
+    // this wont work. Please put `SaintsField` before other drawers
+    [Range(0, 5), RichLabel("<color=green>+Native</color>")]
+    public float nativeRangeHandled;
+
+    // this wont work too.
+    [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), RichLabel("<color=green>+NA</color>")]
+    public AnimationCurve naCurveHandled;
+}
+```
+
+**Multiple Fields Handling**
+
+Unlike `NaghthyAttributes`/`Odin`, `SaintsField` does not have a decorator like `Tag`, or `GroupBox` that puts several fields into one place
+because it does not inject a global `CustomEditor`.
+
+For the same reason, it can not handle `NonSerializedField` and `AutoPropertyField`. Because they are all not `PropertyAttribute`.
+
+**Other Drawers**
+
+`SaintsField` is designed to be compatible with other drawers if
+
+1.  the drawer itself respects the `GUIContent` argument in `OnGUI`
+
+    NOTE: `NaughtyAttributes` uses `property.displayName` instead of `GUIContent`. `SaintsField` deals with it by drawing a background rect
+    before drawing the label, so it's fine
+
+2.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
+
+    NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`

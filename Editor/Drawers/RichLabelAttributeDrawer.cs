@@ -14,6 +14,15 @@ namespace SaintsField.Editor.Drawers
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
         private string _error = "";
 
+        private Color _backgroundColor;
+
+        public RichLabelAttributeDrawer()
+        {
+            _backgroundColor = EditorGUIUtility.isProSkin
+                ? new Color32(56, 56, 56, 255)
+                : new Color32(194, 194, 194, 255);
+        }
+
         ~RichLabelAttributeDrawer()
         {
             _richTextDrawer.Dispose();
@@ -43,6 +52,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
+            EditorGUI.DrawRect(position, _backgroundColor);
             _richTextDrawer.DrawChunks(position, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
             // LabelMouseProcess(position, property);
         }

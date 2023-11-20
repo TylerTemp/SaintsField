@@ -36,6 +36,8 @@ namespace SaintsField.Samples
             [RichLabel("<color=green>Self Label + Self Field</color>")]
             [MinMaxSlider(0f, 1f)]
             private Vector2 _mixed;
+
+            public int normalInt;
         }
 
         [SerializeField] private Nested _nested;

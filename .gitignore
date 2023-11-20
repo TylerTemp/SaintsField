@@ -1,3 +1,6 @@
 .idea
 /Samples
 /Samples.meta
+/*.html
+/*.html.meta
+

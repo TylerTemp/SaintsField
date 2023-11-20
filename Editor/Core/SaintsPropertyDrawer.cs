@@ -419,12 +419,12 @@ namespace SaintsField.Editor.Core
 
             #endregion
 
-            Rect fieldRect = new Rect(position)
+            Rect fieldRect = EditorGUI.IndentedRect(new Rect(position)
             {
                 // y = aboveRect.y + (groupedAboveDrawers.Count == 0? 0: aboveRect.height),
                 y = position.y + aboveUsedHeight,
                 height = _labelFieldBasicHeight,
-            };
+            });
 
             // Color backgroundColor = EditorGUIUtility.isProSkin
             //     ? new Color32(56, 56, 56, 255)
@@ -454,30 +454,12 @@ namespace SaintsField.Editor.Core
             }
             #endregion
 
-            // Debug.Log($"label: {label.text}");
-            // #region label
-            //
-            // _valueChange = false;
-            //
-            // bool anyLabelDrew = false;
-            // if(labelAttributeWithIndex.SaintsAttribute != null)
-            // {
-            //     anyLabelDrew = DoDrawLabel(labelAttributeWithIndex, labelRect, property, bugFixCopyLabel);
-            // }
-            // bool needFallbackLabel = !anyLabelDrew && !string.IsNullOrEmpty(label.text);
-            //
-            // if (anyLabelDrew || needFallbackLabel)
-            // {
-            //     fieldRect = leftOutLabelRect;
-            // }
-            // // fieldRect = anyLabelDrew ? leftPropertyRect : fieldRect;
-            //
-            // #endregion
-
             #region label info
 
             // bool completelyDisableLabel = string.IsNullOrEmpty(label.text);
             GUIContent useGuiContent;
+            // SaintsPropertyDrawer saintslabelDrawerAndWillDrawInstance = null;
+            Action saintsPropertyDrawerDrawLabelCallback = () => { };
             if (string.IsNullOrEmpty(label.text))
             {
                 // needFallbackLabel = true;
@@ -499,7 +481,11 @@ namespace SaintsField.Editor.Core
                 bool hasLabelSpace = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
                 if (hasLabelSpace)
                 {
-                    labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
+                    // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
+                    // saintslabelDrawerAndWillDrawInstance = labelDrawerInstance;
+                    saintsPropertyDrawerDrawLabelCallback = () =>
+                        labelDrawerInstance.DrawLabel(labelRect, property, label,
+                            labelAttributeWithIndex.SaintsAttribute);
                 }
                 useGuiContent = hasLabelSpace
                     ? new GUIContent(label) {text = "                 "}
@@ -509,58 +495,6 @@ namespace SaintsField.Editor.Core
             }
 
             #endregion
-
-            // adjust field rect
-            // bool fieldBreakLine = fieldAttributeWithIndex.SaintsAttribute != null && fieldAttributeWithIndex.SaintsAttribute.GroupBy != "__LABEL_FIELD__";
-            // FieldDrawerConfigAttribute fieldDrawerConfigAttribute = allSaintsAttributes
-            //     .Select(each => each.SaintsAttribute)
-            //     .OfType<FieldDrawerConfigAttribute>()
-            //     .FirstOrDefault() ?? GetDefaultFieldDrawerConfigAttribute(fieldBreakLine);
-
-            // Debug.Log($"{fieldDrawerConfigAttribute.FieldDraw}/{anyLabelDrew}");
-            // switch (fieldDrawerConfigAttribute.FieldDraw)
-            // {
-            //     case FieldDrawerConfigAttribute.FieldDrawType.Inline:
-            //         break;
-            //     case FieldDrawerConfigAttribute.FieldDrawType.FullWidthNewLine:
-            //     {
-            //         if (anyLabelDrew)
-            //         {
-            //             fieldRect.x = labelRect.x;
-            //             fieldRect.y += EditorGUIUtility.singleLineHeight;
-            //             fieldRect.height -= EditorGUIUtility.singleLineHeight;
-            //             fieldRect.width = position.width;
-            //         }
-            //     }
-            //         break;
-            //     case FieldDrawerConfigAttribute.FieldDrawType.FullWidthOverlay:
-            //     {
-            //         fieldRect.x = labelRect.x;
-            //         // fieldRect.y += EditorGUIUtility.singleLineHeight;
-            //         // fieldRect.height -= EditorGUIUtility.singleLineHeight;
-            //         fieldRect.width = position.width;
-            //         // fieldRect = new Rect(labelRect)
-            //         // {
-            //         //     height = fieldRect.height,
-            //         //     width = fieldRect.width,
-            //         // };
-            //
-            //         // EditorGUI.DrawRect(labelRect, Color.red);
-            //         //
-            //         // Debug.Log($"FullWidthOverlay");
-            //     }
-            //         break;
-            //     default:
-            //         throw new ArgumentOutOfRangeException(nameof(fieldDrawerConfigAttribute.FieldDraw), fieldDrawerConfigAttribute.FieldDraw, null);
-            // }
-
-            // if (anyLabelDrew && fieldBreakLine)
-            // {
-            //     fieldRect.x = labelRect.x;
-            //     fieldRect.y += EditorGUIUtility.singleLineHeight;
-            //     fieldRect.height -= EditorGUIUtility.singleLineHeight;
-            //     fieldRect.width = position.width;
-            // }
 
             #region post field - width check
             float postFieldWidth = 0;
@@ -598,7 +532,10 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
 
             // Debug.Log($"{label.text}={_fieldControlName}");
-            // using(new ResetIndentScoop())
+
+            // EditorGUIUtility.labelWidth = ProperLabelWidth();
+            using(new AdaptLabelWidth())
+            using(new ResetIndentScoop())
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 if (fieldDrawer == null)
@@ -627,16 +564,17 @@ namespace SaintsField.Editor.Core
             }
 
             // Debug.Log($"after field: ValueChange={_valueChange}");
+            saintsPropertyDrawerDrawLabelCallback?.Invoke();
             #endregion
 
-            #region label click
+            // #region label click
 
             // if (anyLabelDrew)
             // {
             //     LabelMouseProcess(labelRect, property, _fieldControlName);
             // }
 
-            #endregion
+            // #endregion
 
             // Debug.Log($"post field: {label.text}");
 
@@ -902,6 +840,7 @@ namespace SaintsField.Editor.Core
 
                         // UnityEditor.RangeDrawer
                         // Debug.Log($"fallback drawerInstance={drawerInstance} for {propertyAttribute}");
+                        // Debug.Log($"drawerInstance {drawerInstance}={label?.text.Length}");
                         drawerInstance.OnGUI(position, property, label ?? GUIContent.none);
                         // Debug.Log($"finished drawerInstance={drawerInstance}");
                         return;
@@ -913,7 +852,7 @@ namespace SaintsField.Editor.Core
             // MethodInfo defaultDraw = typeof(EditorGUI).GetMethod("DefaultPropertyField", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             // defaultDraw!.Invoke(null, new object[] { position, property, GUIContent.none });
             // Debug.Log($"use unity draw: {property.propertyType}");
-            UnityDraw(position, property, label ?? GUIContent.none);
+            UnityDraw(position, property, label);
             // EditorGUI.PropertyField(position, property, GUIContent.none, true);
             // if (property.propertyType == SerializedPropertyType.Generic)
             // {
@@ -1003,9 +942,10 @@ namespace SaintsField.Editor.Core
         private bool _mouseHold;
         // private Vector2 _labelClickedMousePos = new Vector2(-1, -1);
 
-        protected void ClickFocus(Rect position, string focusName)
+        protected static void ClickFocus(Rect position, string focusName)
         {
             Event e = Event.current;
+            // ReSharper disable once InvertIf
             if (e.isMouse && e.button == 0)
             {
                 if(position.Contains(e.mousePosition))
@@ -1014,6 +954,8 @@ namespace SaintsField.Editor.Core
                 }
             }
         }
+
+
         //
         // private void LabelMouseProcess(Rect position, SerializedProperty property, string focusName)
         // {

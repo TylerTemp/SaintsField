@@ -84,29 +84,15 @@ namespace SaintsField.Editor.Drawers
 
             (Rect labelWithMinFieldRect, Rect fieldRect) = RectUtils.SplitWidthRect(position, labelWidth + leftFieldWidth);
 
-            // (Rect minFloatFieldRect, Rect field2Rect) = RectUtils.SplitWidthRect(fieldRect, leftFieldWidth);
             (Rect sliderRect, Rect field3Rect) = RectUtils.SplitWidthRect(new Rect(fieldRect)
             {
                 x = fieldRect.x + sliderPadding,
             }, sliderWidth - sliderPadding);
-            // EditorGUI.DrawRect(field3Rect, Color.yellow);
 
             (Rect maxFloatFieldRect, Rect _) = RectUtils.SplitWidthRect(new Rect(field3Rect)
             {
                 x = field3Rect.x +sliderPadding,
             }, rightFieldWidth);
-
-            // return;
-
-            // Rect maxFloatFieldRect = new Rect(fieldRect)
-            // {
-            //     x = fieldRect.x + leftFieldWidth + sliderWidth,
-            //     // position.y,
-            //     width = rightFieldWidth,
-            //     // position.height);
-            // };
-
-            EditorGUI.LabelField(labelWithMinFieldRect, label);
 
             // Draw the slider
             EditorGUI.BeginChangeCheck();
