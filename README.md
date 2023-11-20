@@ -467,6 +467,8 @@ public class RateExample: MonoBehaviour
 }
 ```
 
+[![stars](https://github.com/TylerTemp/SaintsField/assets/6391063/55658254-94f4-4d39-9270-e22dd095b3aa)](https://github.com/TylerTemp/SaintsField/assets/6391063/a506681f-92f8-42ab-b08d-483b26b2f7c3)
+
 #### `FieldType` ####
 
 Ask the inspector to display another type of field rather than the field's original type.
