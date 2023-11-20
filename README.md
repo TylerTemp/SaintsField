@@ -440,7 +440,32 @@ public class ExpandableExample : MonoBehaviour
 
 ![expandable](https://github.com/TylerTemp/SaintsField/assets/6391063/92fd1f45-82c5-4d5e-bbc4-c9a70fefe158)
 
-### Field ###
+### Field Re-Draw ###
+
+This will change the look & behavior of a field.
+
+#### Rate ####
+
+A rating stars tool for `Vector2Int` field.
+
+Parameters:
+
+*   `int min` minimum value of the rating. Must be equal or greater than 0. 
+
+    When it's equal to 0, it'll draw a red slashed star to select `0`.
+
+    When it's greater than 0, it will draw `min` number of fixed stars that you can not un-rate.
+
+*   `int max` maximum value of the rating. Must be greater than `min`.
+
+```csharp
+public class RateExample: MonoBehaviour
+{
+    [Rate(0, 5)] public int rate0To5;
+    [Rate(1, 5)] public int rate1To5;
+    [Rate(3, 5)] public int rate3To5;
+}
+```
 
 #### `FieldType` ####
 
@@ -462,7 +487,6 @@ public class FieldTypeExample: MonoBehaviour
 ```
 
 ![field_type](https://github.com/TylerTemp/SaintsField/assets/6391063/7bcc058f-5cb4-4a4f-9d8e-ec08bcb8da2c)
-
 
 #### `Dropdown` ####
 
@@ -535,8 +559,6 @@ dropdownList.AddSeparator();  # add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
-
-
 #### `MinMaxSlider` ####
 
 A range slider for `Vector2` or `Vector2Int`
@@ -604,7 +626,6 @@ public class MinMaxSliderExample: MonoBehaviour
 
 [![minmaxslider](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
 
-
 #### `ResizableTextArea` ####
 
 This `TextArea` will always grow it's height to fit the content. (minimal height is 3 rows).
@@ -651,7 +672,6 @@ public class Anim : MonoBehaviour
 ```
 
 ![animator_params](https://github.com/TylerTemp/SaintsField/assets/6391063/3cd5fb6d-1a75-457c-9bbd-e1e6b377a83c)
-
 
 #### `AnimatorState` ###
 
@@ -737,8 +757,6 @@ public class SortingLayerExample: MonoBehaviour
 
 ![sorting_layer](https://github.com/TylerTemp/SaintsField/assets/6391063/cab99c5c-0ec2-49c5-843c-89f65f402b93)
 
-
-
 #### `Tag` ####
 
 A dropdown selector for tag.
@@ -753,7 +771,6 @@ public class TagExample: MonoBehaviour
 ```
 
 ![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/df1526a5-75fe-4fc9-ba47-19e7f2d63dda)
-
 
 ### Field Utilities ###
 
