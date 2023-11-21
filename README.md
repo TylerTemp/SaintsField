@@ -567,23 +567,13 @@ dropdownList.AddSeparator();  # add a separator
 
 A range slider for `Vector2` or `Vector2Int`
 
-This Attribute has overrides:
-
-*   `MinMaxSliderAttribute(float min, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
-*   `MinMaxSliderAttribute(int min, int max, int step=1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
-*   `MinMaxSliderAttribute(string minCallback, string maxCallback, int step=-1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
-*   `MinMaxSliderAttribute(float min, string maxCallback, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
-*   `MinMaxSliderAttribute(string minCallback, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)`
-
 For each argument:
 
-*   `min`: the minimum value of the slider
-*   `max`: the maximum value of the slider
-*   `minCallback`: use a function or property as the minimum value of the slider
-*   `maxCallback`: use a function or property as the maximum value of the slider
-*   `step`: the step of the slider, `<= 0` means no limit, and float type will not be limited
-*   `minWidth`: the minimum width of the value label. -1 for auto size (not recommended)
-*   `maxWidth`: the maximum width of the value label. -1 for auto size (not recommended)
+*   `int|float min` or `string minCallback`: the minimum value of the slider, or a property/callback name.
+*   `int|float max` or `string maxCallback`: the maximum value of the slider, or a property/callback name.
+*   `int|float step=1|-1f`: the step of the slider, `<= 0` means no limit. By default, int type use `1` and float type use `-1f`
+*   `float minWidth`: the minimum width of the value label. -1 for auto size (not recommended)
+*   `float maxWidth`: the maximum width of the value label. -1 for auto size (not recommended)
 
 *   AllowMultiple: No
 
