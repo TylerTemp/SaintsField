@@ -779,6 +779,8 @@ public class InputAxisExample: MonoBehaviour
 }
 ```
 
+![input_axis](https://github.com/TylerTemp/SaintsField/assets/6391063/e7bb79f6-28f9-4080-93b4-f9781bf91b77)
+
 ### Field Utilities ###
 
 #### `AssetPreview` ####
