@@ -54,10 +54,9 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.0.5**
+**1.0.6**
 
-1.  Add `RateAttribute` for rating stars.
-2.  Fix `ValidateInputAttribute` won't call the validator the first time it renders.
+Add `InputAxisAttribute`
 
 ## Enhancements ##
 
@@ -766,6 +765,19 @@ public class TagExample: MonoBehaviour
 ```
 
 ![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/df1526a5-75fe-4fc9-ba47-19e7f2d63dda)
+
+#### `InputAxis` ####
+
+A string dropdown selector for an input axis.
+
+*   AllowMultiple: No
+
+```csharp
+public class InputAxisExample: MonoBehaviour
+{
+    [InputAxis] public string inputAxis;
+}
+```
 
 ### Field Utilities ###
 
