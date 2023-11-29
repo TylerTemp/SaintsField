@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -8,56 +10,77 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(RichLabelAttribute))]
-    public class RichLabelAttributeDrawer: SaintsPropertyDrawer
+    [CustomPropertyDrawer(typeof(OverlayRichLabelAttribute))]
+    public class OverlayRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
         private string _error = "";
 
-        private readonly Color _backgroundColor;
-
-        public RichLabelAttributeDrawer()
-        {
-            _backgroundColor = EditorGUIUtility.isProSkin
-                ? new Color32(56, 56, 56, 255)
-                : new Color32(194, 194, 194, 255);
-        }
-
-        ~RichLabelAttributeDrawer()
+        ~OverlayRichLabelAttributeDrawer()
         {
             _richTextDrawer.Dispose();
         }
 
-        // protected override float GetLabelHeight(SerializedProperty property, GUIContent label,
-        //     ISaintsAttribute saintsAttribute) =>
-        //     EditorGUIUtility.singleLineHeight;
-
-        protected override bool WillDrawLabel(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override (bool willDraw, Rect drawPosition) DrawOverlay(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, bool hasLabel, IReadOnlyCollection<Rect> takenPositions)
         {
-            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-            bool result = GetLabelXml(property, targetAttribute) != null;
-            // Debug.Log($"richLabel willDraw={result}");
-            return result;
-        }
+            string inputContent = GetContent(property);
+            // Debug.Log(inputContent);
+            OverlayRichLabelAttribute targetAttribute = (OverlayRichLabelAttribute)saintsAttribute;
 
-        protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
-        {
-            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-
+            float contentWidth = GetPlainTextWidth(inputContent) + targetAttribute.Padding;
             string labelXml = GetLabelXml(property, targetAttribute);
 
             if (labelXml is null)
             {
-                return;
+                return (false, default);
             }
 
-            EditorGUI.DrawRect(position, _backgroundColor);
-            _richTextDrawer.DrawChunks(position, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
-            // LabelMouseProcess(position, property);
+            float labelWidth = hasLabel? EditorGUIUtility.labelWidth : 0;
+
+            RichTextDrawer.RichTextChunk[] payloads = RichTextDrawer.ParseRichXml(labelXml, label.text).ToArray();
+            float overlayWidth = _richTextDrawer.GetWidth(label, position.height, payloads);
+
+            float leftWidth = position.width - labelWidth - contentWidth;
+
+            bool hasEnoughSpace = !targetAttribute.End && leftWidth > overlayWidth;
+
+            float useWidth = hasEnoughSpace? overlayWidth : leftWidth;
+            float useOffset = hasEnoughSpace? labelWidth + contentWidth : position.width - overlayWidth;
+
+            Rect overlayRect = new Rect(position)
+            {
+                x = position.x + useOffset,
+                width = useWidth,
+            };
+
+            _richTextDrawer.DrawChunks(overlayRect, label, payloads);
+
+            return (true, overlayRect);
         }
 
-        private string GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute)
+        private static string GetContent(SerializedProperty property)
+        {
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                    return property.longValue.ToString();
+                case SerializedPropertyType.Float:
+                    return $"{property.doubleValue}";
+                case SerializedPropertyType.String:
+                    return property.stringValue;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
+            }
+        }
+
+        private static float GetPlainTextWidth(string plainContent)
+        {
+            return EditorStyles.label.CalcSize(new GUIContent(plainContent)).x;
+        }
+
+        private string GetLabelXml(SerializedProperty property, OverlayRichLabelAttribute targetAttribute)
         {
             if (!targetAttribute.IsCallback)
             {
@@ -120,21 +143,6 @@ namespace SaintsField.Editor.Drawers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
             }
-        }
-
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
-        {
-            return _error != "";
-        }
-
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
-        {
-            return _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
-        }
-
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
-        {
-            return HelpBox.Draw(position, _error, MessageType.Error);
         }
     }
 }

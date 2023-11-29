@@ -612,6 +612,25 @@ namespace SaintsField.Editor.Core
             // }
             #endregion
 
+            #region Overlay
+
+            List<Rect> overlayTakenPositions = new List<Rect>();
+            bool hasLabelWidth = !string.IsNullOrEmpty(useGuiContent.text);
+            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+            {
+                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                (bool isActive, Rect newLabelRect) =
+                    drawerInstance.DrawOverlay(fieldUseRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute, hasLabelWidth, overlayTakenPositions);
+                // ReSharper disable once InvertIf
+                if (isActive)
+                {
+                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
+                    overlayTakenPositions.Add(newLabelRect);
+                }
+            }
+
+            #endregion
+
             #region below
             Rect belowRect = EditorGUI.IndentedRect(new Rect(position)
             {
@@ -931,6 +950,14 @@ namespace SaintsField.Editor.Core
         protected virtual bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             return false;
+        }
+
+        protected virtual (bool willDraw, Rect drawPosition) DrawOverlay(Rect position,
+            SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            bool hasLabel,
+            IReadOnlyCollection<Rect> takenPositions)
+        {
+            return (false, default);
         }
 
         protected virtual Rect DrawBelow(Rect position, SerializedProperty property,
