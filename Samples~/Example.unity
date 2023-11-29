@@ -1049,7 +1049,8 @@ MonoBehaviour:
   count: -2147483648
   longInt: -9223372036854775808
   atEnd: always at the end
-  notOk: {fileID: 0}
+  guess: 9
+  notSupported: {fileID: 0}
 --- !u!4 &679680719
 Transform:
   m_ObjectHideFlags: 0
