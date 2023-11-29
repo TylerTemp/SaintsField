@@ -1,6 +1,7 @@
 ## 1.0.7 ##
 
-Add `OverlayRichLabel`
+*   Add `OverlayRichLabel`
+*   Add `PostFieldRichLabel`
 
 ## 1.0.6 ##
 

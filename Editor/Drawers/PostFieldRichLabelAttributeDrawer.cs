@@ -9,83 +9,59 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(OverlayRichLabelAttribute))]
-    public class OverlayRichLabelAttributeDrawer: SaintsPropertyDrawer
+    [CustomPropertyDrawer(typeof(PostFieldRichLabelAttribute))]
+    public class PostFieldRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
         private string _error = "";
 
-        ~OverlayRichLabelAttributeDrawer()
+        ~PostFieldRichLabelAttributeDrawer()
         {
             _richTextDrawer.Dispose();
         }
 
-        protected override (bool willDraw, Rect drawPosition) DrawOverlay(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel, IReadOnlyCollection<Rect> takenPositions)
+        private IReadOnlyList<RichTextDrawer.RichTextChunk> _payloads;
+
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            string inputContent = GetContent(property);
-            if (inputContent == null)  // null=error
-            {
-                return (false, default);
-            }
-
-            // Debug.Log(inputContent);
-            OverlayRichLabelAttribute targetAttribute = (OverlayRichLabelAttribute)saintsAttribute;
-
-            float contentWidth = GetPlainTextWidth(inputContent) + targetAttribute.Padding;
+            PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
             string labelXml = GetLabelXml(property, targetAttribute);
-
-            if (labelXml is null)
+            if (string.IsNullOrEmpty(labelXml))
             {
-                return (false, default);
+                _payloads = null;
+                return 0;
             }
 
-            float labelWidth = hasLabel? EditorGUIUtility.labelWidth : 0;
+            _payloads = RichTextDrawer.ParseRichXml(labelXml, label.text).ToArray();
+            return _richTextDrawer.GetWidth(label, position.height, _payloads) + targetAttribute.Padding;
+        }
 
-            RichTextDrawer.RichTextChunk[] payloads = RichTextDrawer.ParseRichXml(labelXml, label.text).ToArray();
-            float overlayWidth = _richTextDrawer.GetWidth(label, position.height, payloads);
-
-            float leftWidth = position.width - labelWidth - contentWidth;
-
-            bool hasEnoughSpace = !targetAttribute.End && leftWidth > overlayWidth;
-
-            float useWidth = hasEnoughSpace? overlayWidth : leftWidth;
-            float useOffset = hasEnoughSpace? labelWidth + contentWidth : position.width - overlayWidth;
-
-            Rect overlayRect = new Rect(position)
+        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, bool valueChanged)
+        {
+            if (_error != "")
             {
-                x = position.x + useOffset,
-                width = useWidth,
+                return false;
+            }
+
+            if(_payloads == null || _payloads.Count == 0)
+            {
+                return false;
+            }
+
+            PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
+
+            Rect drawRect = new Rect(position)
+            {
+                x = position.x + targetAttribute.Padding,
+                width = position.width - targetAttribute.Padding,
             };
 
-            _richTextDrawer.DrawChunks(overlayRect, label, payloads);
+            _richTextDrawer.DrawChunks(drawRect, label, _payloads);
 
-            return (true, overlayRect);
+            return true;
         }
 
-        private static string GetContent(SerializedProperty property)
-        {
-            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-            switch (property.propertyType)
-            {
-                case SerializedPropertyType.Integer:
-                    return property.longValue.ToString();
-                case SerializedPropertyType.Float:
-                    return $"{property.doubleValue}";
-                case SerializedPropertyType.String:
-                    return property.stringValue ?? "";
-                default:
-                    return null;
-                    // throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
-            }
-        }
-
-        private static float GetPlainTextWidth(string plainContent)
-        {
-            return EditorStyles.label.CalcSize(new GUIContent(plainContent)).x;
-        }
-
-        private string GetLabelXml(SerializedProperty property, OverlayRichLabelAttribute targetAttribute)
+        private string GetLabelXml(SerializedProperty property, PostFieldRichLabelAttribute targetAttribute)
         {
             if (!targetAttribute.IsCallback)
             {
@@ -152,14 +128,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            SerializedPropertyType propType = property.propertyType;
-            bool notOk = propType != SerializedPropertyType.Integer && propType != SerializedPropertyType.Float && propType != SerializedPropertyType.String;
-            if (notOk)
-            {
-                _error = $"Expect int/float/string, get {propType}";
-            }
-
-            return notOk;
+            return _error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)

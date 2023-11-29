@@ -31,8 +31,8 @@ Unity: 2020.2 or higher
 
     ```javascript
     {
+        "today.comes.saintsfield": "https://github.com/TylerTemp/SaintsField.git",
         // your other dependencies...
-        "today.comes.saintsfield": "https://github.com/TylerTemp/SaintsField.git"
     }
     ```
 
@@ -56,7 +56,8 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 **1.0.7**
 
-Add `OverlayRichLabel`
+*   Add `OverlayRichLabel`
+*   Add `PostFieldRichLabel`
 
 ## Enhancements ##
 
@@ -153,10 +154,13 @@ public class FullWidthRichLabelExample: MonoBehaviour
 
 Like `RichLabel`, but it's rendered on top of the field.
 
+Only supports string/number type of field. Does not work with any kind of `TextArea` (multiple line) and `Range`.
+
 Parameters:
 
 *   `string richTextXml` the content of the label, or a property/callback. Supports tags like `RichLabel`
 *   `bool isCallback=false` if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
+*   `float padding=5f` padding between your input and the label. Not work when `end=true`
 *   `bool end=false` when false, the label will follow the end of your input. Otherwise, it will stay at the end of the field.
 *   `string GroupBy=""` this is only for the error message box.
 *   AllowMultiple: No
@@ -173,6 +177,44 @@ public class OverlayRichLabelExample: MonoBehaviour
 ```
 
 ![overlay_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bd85b5c8-3ef2-4899-9bc3-b9799e3331ed)
+
+#### `PostFieldRichLabel` ####
+
+Like `RichLabel`, but it's rendered at the end of the field.
+
+Parameters:
+
+*   `string richTextXml` the content of the label, or a property/callback. Supports tags like `RichLabel`
+*   `bool isCallback=false` if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
+*   `float padding=5f` padding between the field and the label.
+*   `string GroupBy=""` this is only for the error message box.
+*   AllowMultiple: Yes
+
+```csharp
+public class PostFieldRichLabelExample: MonoBehaviour
+{
+    [PostFieldRichLabel("<color=grey>km/s")] public float speed;
+    [PostFieldRichLabel("<icon=eye.png/>", padding: 0)] public GameObject eye;
+    [PostFieldRichLabel(nameof(TakeAGuess), isCallback: true)] public int guess;
+
+    public string TakeAGuess()
+    {
+        if(guess > 20)
+        {
+            return "<color=red>too high";
+        }
+
+        if (guess < 10)
+        {
+            return "<color=blue>too low";
+        }
+
+        return "<color=green>acceptable!";
+    }
+}
+```
+
+![post_field_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bdd9446b-97fe-4cd2-900a-f5ed5f1ccb56)
 
 #### `InfoBox` ####
 
