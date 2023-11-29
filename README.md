@@ -54,9 +54,9 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.0.6**
+**1.0.7**
 
-Add `InputAxisAttribute`
+Add `OverlayRichLabel`
 
 ## Enhancements ##
 
@@ -147,6 +147,32 @@ public class FullWidthRichLabelExample: MonoBehaviour
 ```
 
 ![full_width_label](https://github.com/TylerTemp/SaintsField/assets/6391063/9283e25a-34b3-4192-8a07-5d97a4e55406)
+
+
+#### `OverlayRichLabel` ####
+
+Like `RichLabel`, but it's rendered on top of the field.
+
+Parameters:
+
+*   `string richTextXml` the content of the label, or a property/callback. Supports tags like `RichLabel`
+*   `bool isCallback=false` if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
+*   `bool end=false` when false, the label will follow the end of your input. Otherwise, it will stay at the end of the field.
+*   `string GroupBy=""` this is only for the error message box.
+*   AllowMultiple: No
+
+```csharp
+public class OverlayRichLabelExample: MonoBehaviour
+{
+    [OverlayRichLabel("<color=grey>km/s")] public double speed = double.MinValue;
+    [OverlayRichLabel("<icon=eye.png/>")] public string text;
+    [OverlayRichLabel("<color=grey>/int", padding: 1)] public int count = int.MinValue;
+    [OverlayRichLabel("<color=grey>/long", padding: 1)] public long longInt = long.MinValue;
+    [OverlayRichLabel("<color=grey>suffix", end: true)] public string atEnd;
+}
+```
+
+![overlay_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bd85b5c8-3ef2-4899-9bc3-b9799e3331ed)
 
 #### `InfoBox` ####
 
@@ -305,7 +331,6 @@ public class ButtonsExample : MonoBehaviour
 ```
 
 [![button](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
-
 
 ### Field Modifier ###
 

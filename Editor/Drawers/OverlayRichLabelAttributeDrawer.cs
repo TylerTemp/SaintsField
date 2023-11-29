@@ -25,6 +25,11 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, bool hasLabel, IReadOnlyCollection<Rect> takenPositions)
         {
             string inputContent = GetContent(property);
+            if (inputContent == null)  // null=error
+            {
+                return (false, default);
+            }
+
             // Debug.Log(inputContent);
             OverlayRichLabelAttribute targetAttribute = (OverlayRichLabelAttribute)saintsAttribute;
 
@@ -69,9 +74,10 @@ namespace SaintsField.Editor.Drawers
                 case SerializedPropertyType.Float:
                     return $"{property.doubleValue}";
                 case SerializedPropertyType.String:
-                    return property.stringValue;
+                    return property.stringValue ?? "";
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
+                    return null;
+                    // throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
             }
         }
 
@@ -144,5 +150,27 @@ namespace SaintsField.Editor.Drawers
                     throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
             }
         }
+
+        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            SerializedPropertyType propType = property.propertyType;
+            bool notOk = propType != SerializedPropertyType.Integer && propType != SerializedPropertyType.Float && propType != SerializedPropertyType.String;
+            if (notOk)
+            {
+                _error = $"Expect int/float/string, get {propType}";
+            }
+
+            return notOk;
+        }
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        {
+            return _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) =>
+            _error == ""
+                ? position
+                : HelpBox.Draw(position, _error, MessageType.Error);
     }
 }

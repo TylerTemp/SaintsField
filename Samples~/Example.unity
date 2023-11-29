@@ -1048,7 +1048,8 @@ MonoBehaviour:
   text: open your eyes
   count: -2147483648
   longInt: -9223372036854775808
-  atEnd: 
+  atEnd: always at the end
+  notOk: {fileID: 0}
 --- !u!4 &679680719
 Transform:
   m_ObjectHideFlags: 0

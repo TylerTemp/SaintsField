@@ -1,3 +1,7 @@
+## 1.0.7 ##
+
+Add `OverlayRichLabel`
+
 ## 1.0.6 ##
 
 Add `InputAxisAttribute`
