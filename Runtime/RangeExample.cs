@@ -6,7 +6,6 @@ namespace SaintsField
     {
         public int min;
         public int max;
-        // public float step;
 
         [Range(nameof(min), nameof(max))] public float rangeFloat;
         [Range(nameof(min), nameof(max))] public int rangeInt;

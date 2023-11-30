@@ -629,6 +629,32 @@ dropdownList.AddSeparator();  # add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
+#### `Range` ####
+
+Very like Unity's `Range` but allow you to dynamically change the range, plus allow to set range step.
+
+For each argument:
+
+*   `string minCallback` or `float min`: the minimum value of the slider, or a property/callback name.
+*   `string maxCallback` or `float max`: the maximum value of the slider, or a property/callback name.
+*   `float step=-1f`: the step for the range. `<= 0` means no limit.
+
+```csharp
+public class RangeExample: MonoBehaviour
+{
+    public int min;
+    public int max;
+
+    [Range(nameof(min), nameof(max))] public float rangeFloat;
+    [Range(nameof(min), nameof(max))] public int rangeInt;
+
+    [Range(nameof(min), nameof(max), step: 0.5f)] public float rangeFloatStep;
+    [Range(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
+}
+```
+
+![range](https://github.com/TylerTemp/SaintsField/assets/6391063/55f3fc5a-3ee4-4bd8-9b0a-cd016a7a79e7)
+
 #### `MinMaxSlider` ####
 
 A range slider for `Vector2` or `Vector2Int`
