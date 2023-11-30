@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Utils
         public static (float, string) GetCallbackFloat(SerializedProperty property, string by)
         {
             SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
-                                               property.FindPropertyRelative($"<{by}>k__BackingField");
+                                               SerializedUtils.FindPropertyByAutoPropertyName(property, by);
             if (foundProperty != null)
             {
                 if (foundProperty.propertyType == SerializedPropertyType.Integer)
@@ -63,6 +63,26 @@ namespace SaintsField.Editor.Utils
                 float floatValue => (floatValue, ""),
                 _ => (-1, $"{result} is neither int or float"),
             };
+
+        public static float BoundFloatStep(float curValue, float start, float end, float step)
+        {
+            float distance = curValue - start;
+            int stepRound = Mathf.RoundToInt(distance / step);
+            float newValue = start + stepRound * step;
+            return Mathf.Min(newValue, end);
+        }
+
+        public static int BoundIntStep(float curValue, float start, float end, int step)
+        {
+            int useStart = Mathf.CeilToInt(start);
+            int useEnd = Mathf.FloorToInt(end);
+
+            float distance = curValue - useStart;
+            int stepRound = Mathf.RoundToInt(distance / step);
+            int newValue = useStart + stepRound * step;
+            return Mathf.Clamp(newValue, useStart, useEnd);
+        }
+
 
     }
 }

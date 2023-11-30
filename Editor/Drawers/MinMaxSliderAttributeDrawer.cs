@@ -162,39 +162,20 @@ namespace SaintsField.Editor.Drawers
             return actualWidth;
         }
 
-        private Vector2 BoundV2Step(Vector2 curValue, float min, float max, float step)
+        private static Vector2 BoundV2Step(Vector2 curValue, float min, float max, float step)
         {
             return new Vector2(
-                BoundFloatStep(curValue.x, min, max, step),
-                BoundFloatStep(curValue.y, min, max, step)
+                Util.BoundFloatStep(curValue.x, min, max, step),
+                Util.BoundFloatStep(curValue.y, min, max, step)
             );
         }
 
-        private float BoundFloatStep(float curValue, float start, float end, float step)
-        {
-            float distance = curValue - start;
-            int stepRound = Mathf.RoundToInt(distance / step);
-            float newValue = start + stepRound * step;
-            return Mathf.Min(newValue, end);
-        }
-
-        private Vector2Int BoundV2IntStep(Vector2Int curValue, float min, float max, int step)
+        private static Vector2Int BoundV2IntStep(Vector2Int curValue, float min, float max, int step)
         {
             return new Vector2Int(
-                BoundIntStep(curValue.x, min, max, step),
-                BoundIntStep(curValue.y, min, max, step)
+                Util.BoundIntStep(curValue.x, min, max, step),
+                Util.BoundIntStep(curValue.y, min, max, step)
             );
-        }
-
-        private int BoundIntStep(float curValue, float start, float end, int step)
-        {
-            int useStart = Mathf.CeilToInt(start);
-            int useEnd = Mathf.FloorToInt(end);
-
-            float distance = curValue - useStart;
-            int stepRound = Mathf.RoundToInt(distance / step);
-            int newValue = useStart + stepRound * step;
-            return Mathf.Clamp(newValue, useStart, useEnd);
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";

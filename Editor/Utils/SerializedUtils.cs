@@ -12,6 +12,11 @@ namespace SaintsField.Editor.Utils
             return obj.FindProperty($"<{propName}>k__BackingField");
         }
 
+        public static SerializedProperty FindPropertyByAutoPropertyName(SerializedProperty prop, string propName)
+        {
+            return prop.FindPropertyRelative($"<{propName}>k__BackingField");
+        }
+
         public static T GetAttribute<T>(SerializedProperty property) where T : class
         {
             T[] attributes = GetAttributes<T>(property);
