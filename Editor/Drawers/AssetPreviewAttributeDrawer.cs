@@ -54,13 +54,17 @@ namespace SaintsField.Editor.Drawers
                 return _cachedWidthTexture = _previewTexture;
             }
 
-            if (_cachedWidth == width && _cachedHeight == maxHeight && _cachedWidthTexture != null && _cachedWidthTexture.width != 1 && _cachedWidthTexture.height != 1)
+            (int scaleWidth, int scaleHeight) = SaintsField.Utils.Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, _previewTexture.width, _previewTexture.height);
+
+            if (_cachedWidth == scaleWidth && _cachedHeight == scaleHeight && _cachedWidthTexture != null && _cachedWidthTexture.width != 1 && _cachedWidthTexture.height != 1)
             {
                 return _cachedWidthTexture;
             }
-            _cachedWidth = width;
+            _cachedWidth = scaleWidth;
+            _cachedHeight = scaleHeight;
             // return _cachedWidthTexture = formatted;
-            _cachedWidthTexture = SaintsField.Utils.Tex.TextureTo(_previewTexture, width, maxHeight);
+
+            _cachedWidthTexture = SaintsField.Utils.Tex.TextureTo(_previewTexture, scaleWidth, scaleHeight);
 
             if (_cachedWidthTexture.width == 1)
             {

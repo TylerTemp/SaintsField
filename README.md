@@ -407,20 +407,20 @@ The field itself must be `Sprite`.
 *   AllowMultiple: Yes
 
 ```csharp
-    public class SpriteToggleExample : MonoBehaviour
-    {
-        [field: SerializeField] private Image _image;
-        [field: SerializeField] private SpriteRenderer _sprite;
+public class SpriteToggleExample : MonoBehaviour
+{
+    [field: SerializeField] private Image _image;
+    [field: SerializeField] private SpriteRenderer _sprite;
 
-        [SerializeField
-         , SpriteToggle(nameof(_image))
-         , SpriteToggle(nameof(_sprite))
-        ] private Sprite _sprite1;
-        [SerializeField
-         , SpriteToggle(nameof(_image))
-         , SpriteToggle(nameof(_sprite))
-        ] private Sprite _sprite2;
-    }
+    [SerializeField
+     , SpriteToggle(nameof(_image))
+     , SpriteToggle(nameof(_sprite))
+    ] private Sprite _sprite1;
+    [SerializeField
+     , SpriteToggle(nameof(_image))
+     , SpriteToggle(nameof(_sprite))
+    ] private Sprite _sprite2;
+}
 ```
 
 [![spritetoggle](https://github.com/TylerTemp/SaintsField/assets/6391063/70ae0697-d13b-460d-be8b-30d4f823659b)](https://github.com/TylerTemp/SaintsField/assets/6391063/705498e9-4d70-482f-9ae6-b231cd9497ca)
@@ -882,11 +882,15 @@ Show an image preview for prefabs, Sprite, Texture2D, etc. (Internally use `Asse
 
 *   `int maxWidth=-1`
 
-    preview max-width, -1 for current view width
+    preview max-width, -1 for original image size that returned by Unity. If it's greater than current view width, it'll be scaled down to fit the view. Use `int.MaxValue` to always fit the view width.
 
 *   `int maxHeight=-1`
 
     preview max height, -1 for auto resize (with the same aspect) using the width
+
+*   `EAlign align=EAlign.End`
+
+    Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
 
 *   `bool above=false`
 
@@ -908,6 +912,56 @@ public class AssetPreviewExample: MonoBehaviour
 ```
 
 ![asset_preview](https://github.com/TylerTemp/SaintsField/assets/6391063/ffed3715-f531-43d0-b4c3-98d20d419b3e)
+
+#### `AboveImage`/`BelowImage` ####
+
+Show an image above/below the field.
+
+*   `string image`
+
+    An image to display. This can be a property or a callback, which returns a `Sprite`, `Texture2D`, `SpriteRenderer`, `UI.Image`, `UI.RawImage` or `UI.Button`
+
+*   `string maxWidth=-1`
+
+    preview max width, -1 for original image size. If it's greater than current view width, it'll be scaled down to fit the view. . Use `int.MaxValue` to always fit the view width.
+
+*   `int maxHeight=-1`
+
+    preview max height, -1 for auto resize (with the same aspect) using the width
+
+*   `EAlign align=EAlign.Start`
+
+    Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
+
+*   `bool above=false`
+
+    if true, render above the field instead of below
+
+*   `string groupBy=""`
+
+    See the `GroupBy` section
+
+*   AllowMultiple: No
+
+```csharp
+public class ShowImageExample: MonoBehaviour
+{
+    [AboveImage(nameof(spriteField))]
+    // size and group
+    [BelowImage(nameof(spriteField), maxWidth: 25, groupBy: "Below1")]
+    [BelowImage(nameof(spriteField), maxHeight: 20, align: EAlign.End, groupBy: "Below1")]
+    public Sprite spriteField;
+
+    // align
+    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.FieldStart)]
+    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Start)]
+    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Center)]
+    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.End)]
+    public string alignField;
+}
+```
+
+![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
 
 #### `OnValueChanged` ####
 
@@ -995,8 +1049,6 @@ This will check if the field value is a `truly` value, which means:
 *   `string errorMessage = null` Error message. Default is `{label} is required`
 *   AllowMultiple: No
 
-![required](https://github.com/TylerTemp/SaintsField/assets/6391063/1e93c51c-ada6-4848-8fc8-a963266ee2cf)
-
 
 ```csharp
 public class RequiredExample: MonoBehaviour
@@ -1017,6 +1069,8 @@ public class RequiredExample: MonoBehaviour
     public MyStruct wontWorkWontNoticeYou;
 }
 ```
+
+![required](https://github.com/TylerTemp/SaintsField/assets/6391063/1e93c51c-ada6-4848-8fc8-a963266ee2cf)
 
 #### `ValidateInput` ####
 

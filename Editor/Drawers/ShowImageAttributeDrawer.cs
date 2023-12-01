@@ -140,7 +140,8 @@ namespace SaintsField.Editor.Drawers
             }
             else  // fixed width / overflow height
             {
-                _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, width, maxHeight);
+                (int scaleWidth, int scaleHeight) = SaintsField.Utils.Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, _originTexture.width, _originTexture.height);
+                _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, scaleWidth, scaleHeight);
             }
 
             if (_originTexture.width <= width && (maxHeight == -1 || _previewTexture.height <= maxHeight))
@@ -177,6 +178,10 @@ namespace SaintsField.Editor.Drawers
                 //     targetChanged = !ReferenceEquals(_originTexture, texture);
                 //     _originTexture = texture as Texture2D;
                 //     break;
+                case SpriteRenderer spriteRenderer:
+                    targetChanged = !ReferenceEquals(_originTexture, spriteRenderer.sprite.texture);
+                    _originTexture = spriteRenderer.sprite.texture;
+                    break;
                 case Image image:
                     targetChanged = !ReferenceEquals(_originTexture, image.sprite.texture);
                     _originTexture = image.sprite.texture;
@@ -184,10 +189,6 @@ namespace SaintsField.Editor.Drawers
                 case RawImage image:
                     targetChanged = !ReferenceEquals(_originTexture, image.texture);
                     _originTexture = image.texture as Texture2D;
-                    break;
-                case SpriteRenderer spriteRenderer:
-                    targetChanged = !ReferenceEquals(_originTexture, spriteRenderer.sprite.texture);
-                    _originTexture = spriteRenderer.sprite.texture;
                     break;
                 case Button button:
                     targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);

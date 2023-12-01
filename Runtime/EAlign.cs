@@ -4,7 +4,7 @@
     {
         Start,
         End,
-        FieldStart,
         Center,
+        FieldStart,
     }
 }

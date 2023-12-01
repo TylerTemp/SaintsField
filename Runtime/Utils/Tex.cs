@@ -4,6 +4,19 @@ namespace SaintsField.Utils
 {
     public static class Tex
     {
+        public static (int width, int height) GetProperScaleRect(int maxWidth, int widthLimit, int heightLimit, int curWidth, int curHeight)
+        {
+            Debug.Assert(maxWidth > 0);
+
+            (int rectScaleWidth, int rectScaleHeight) = FitScale(widthLimit, heightLimit, curWidth, curHeight);
+            if(rectScaleWidth > maxWidth)
+            {
+                (rectScaleWidth, rectScaleHeight) = FitScale(maxWidth, heightLimit, rectScaleWidth, rectScaleHeight);
+            }
+
+            return (rectScaleWidth, rectScaleHeight);
+        }
+
         public static Texture2D ApplyTextureColor(Texture2D texture, Color newColor)
         {
             Texture2D convertedTexture = ConvertToCompatibleFormat(texture);
@@ -95,6 +108,47 @@ namespace SaintsField.Utils
                 ResizeTexture(colored, width, height);
             }
             return colored;
+        }
+
+        private static (int width, int height) FitScale(int widthLimit, int heightLimit, int oriWidth, int oriHeight)
+        {
+            if (widthLimit != -1 && heightLimit != -1)  // scale to rect
+            {
+                float aspectRatio = (float)oriWidth / oriHeight;
+
+                int newWidth = oriWidth;
+                int newHeight = oriHeight;
+
+                // ReSharper disable once InvertIf
+                if (oriWidth > widthLimit || oriHeight > heightLimit)
+                {
+                    if (oriWidth / (float)widthLimit > oriHeight / (float)heightLimit)
+                    {
+                        newWidth = widthLimit;
+                        newHeight = Mathf.RoundToInt(widthLimit / aspectRatio);
+                    }
+                    else
+                    {
+                        newHeight = heightLimit;
+                        newWidth = Mathf.RoundToInt(heightLimit * aspectRatio);
+                    }
+                }
+
+                return (newWidth, newHeight);
+            }
+            if(widthLimit == -1)  // fit height
+            {
+                int newWidth = Mathf.RoundToInt((float)oriWidth * heightLimit / oriHeight);
+                return (newWidth, oriHeight);
+            }
+            // ReSharper disable once InvertIf
+            if (heightLimit == -1) // fit width
+            {
+                int newHeight = Mathf.RoundToInt((float)oriHeight * widthLimit / oriWidth);
+                return (oriWidth, newHeight);
+            }
+            // -1, -1
+            return (oriWidth, oriHeight);
         }
 
         public static Texture2D TextureTo(Texture2D texture, int width=-1, int height=-1) {

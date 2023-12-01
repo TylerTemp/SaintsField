@@ -1,3 +1,9 @@
+## 1.0.8 ##
+
+*   Add `AboveImage`, `BelowImage`
+*   Add `EAlign` for `AssetPreview`
+*   Fix scale for `AssetPreview`
+
 ## 1.0.7 ##
 
 *   Add `OverlayRichLabel`

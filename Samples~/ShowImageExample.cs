@@ -18,6 +18,7 @@ namespace SaintsField.Samples
         [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.End)]
         public string alignField;
 
+        [Space]
         [BelowImage(nameof(rawImageField), maxWidth: 20, align: EAlign.End)]
         public RawImage rawImageField;
         [BelowImage(nameof(imageField), maxWidth: 20, align: EAlign.End)]
