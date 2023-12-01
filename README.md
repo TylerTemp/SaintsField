@@ -933,10 +933,6 @@ Show an image above/below the field.
 
     Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
 
-*   `bool above=false`
-
-    if true, render above the field instead of below
-
 *   `string groupBy=""`
 
     See the `GroupBy` section
