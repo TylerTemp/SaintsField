@@ -2705,9 +2705,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 208681e4fcde4545bdc7fe22715fcb93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _texture2D: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 3}
+  _texture2D: {fileID: 2800000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   _go: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  _sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 3}
+  _sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
 --- !u!4 &2118824044
 Transform:
   m_ObjectHideFlags: 0

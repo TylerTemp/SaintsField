@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private Texture2D GetPreview(int width, int maxHeight, Object target)
+        private Texture2D GetPreview(int width, int maxHeight, float viewWidth, Object target)
         {
             // if (property.propertyType != SerializedPropertyType.ObjectReference ||
             //     property.objectReferenceValue == null)
@@ -42,28 +42,24 @@ namespace SaintsField.Editor.Drawers
 
             if (_previewTexture == null || _previewTexture.width == 1)
             {
-                return _previewTexture;
+                return null;
             }
 
-            if(_previewTexture.width <= width && (maxHeight == -1 || _previewTexture.height <= maxHeight))
+            bool widthOk = width == -1 || _previewTexture.width <= viewWidth;
+            bool heightOk = maxHeight == -1 && _previewTexture.height <= maxHeight;
+            if (widthOk && heightOk)
             {
-                return _previewTexture;
+                return _cachedWidthTexture = _previewTexture;
             }
 
-            if (_cachedWidth == width && (_cachedHeight == maxHeight || maxHeight == -1) && _cachedWidthTexture != null && _cachedWidthTexture.width != 1)
+            if (_cachedWidth == width && _cachedHeight == maxHeight && _cachedWidthTexture != null && _cachedWidthTexture.width != 1 && _cachedWidthTexture.height != 1)
             {
                 return _cachedWidthTexture;
             }
-
-            if (_cachedWidthTexture != null)
-            {
-                Object.DestroyImmediate(_cachedWidthTexture);
-                _cachedWidthTexture = null;
-            }
-
             _cachedWidth = width;
             // return _cachedWidthTexture = formatted;
             _cachedWidthTexture = SaintsField.Utils.Tex.TextureTo(_previewTexture, width, maxHeight);
+
             if (_cachedWidthTexture.width == 1)
             {
                 return _previewTexture;
@@ -138,10 +134,11 @@ namespace SaintsField.Editor.Drawers
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             int maxWidth = assetPreviewAttribute.MaxWidth;
-            int useWidth = maxWidth == -1? Mathf.FloorToInt(width): Mathf.Min(maxWidth, Mathf.FloorToInt(width));
+            // int useWidth = maxWidth == -1? Mathf.FloorToInt(width): Mathf.Min(maxWidth, Mathf.FloorToInt(width));
             int maxHeight = assetPreviewAttribute.MaxHeight;
 
-            Texture2D previewTexture = GetPreview(useWidth, maxHeight, property.objectReferenceValue);
+            Texture2D previewTexture = GetPreview(maxWidth, maxHeight, width, property.objectReferenceValue);
+            // ReSharper disable once Unity.NoNullPropagation
             return previewTexture?.height ?? width;
         }
 
@@ -150,11 +147,11 @@ namespace SaintsField.Editor.Drawers
 
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             int maxWidth = assetPreviewAttribute.MaxWidth;
-            int useWidth = maxWidth == -1? Mathf.FloorToInt(position.width): Mathf.Min(maxWidth, Mathf.FloorToInt(position.width));
+            // int useWidth = maxWidth == -1? Mathf.FloorToInt(position.width): Mathf.Min(maxWidth, Mathf.FloorToInt(position.width));
             // int maxHeight = Mathf.Min(assetPreviewAttribute.MaxHeight, Mathf.FloorToInt(position.height));
             int maxHeight = assetPreviewAttribute.MaxHeight;
 
-            Texture2D previewTexture = GetPreview(useWidth, maxHeight, property.objectReferenceValue);
+            Texture2D previewTexture = GetPreview(maxWidth, maxHeight, position.width, property.objectReferenceValue);
 
             if (previewTexture == null || previewTexture.width == 1)
             {
