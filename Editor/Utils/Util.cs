@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Utils
         public static (float, string) GetCallbackFloat(SerializedProperty property, string by)
         {
             SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
-                                               SerializedUtils.FindPropertyByAutoPropertyName(property, by);
+                                               SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, by);
             if (foundProperty != null)
             {
                 if (foundProperty.propertyType == SerializedPropertyType.Integer)
