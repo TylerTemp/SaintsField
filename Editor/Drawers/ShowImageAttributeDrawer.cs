@@ -129,6 +129,11 @@ namespace SaintsField.Editor.Drawers
                 return _previewTexture;
             }
 
+            if (_originTexture == null)
+            {
+                return null;
+            }
+
             CleanPreviewTexture(_previewTexture);
 
             bool widthOk = width == -1 || _originTexture.width <= viewWidth;
