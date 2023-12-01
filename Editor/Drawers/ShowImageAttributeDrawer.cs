@@ -264,7 +264,6 @@ namespace SaintsField.Editor.Drawers
 
         private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
-
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
             int maxWidth = showImageAttribute.MaxWidth;
             // int useWidth = maxWidth == -1? Mathf.FloorToInt(position.width): Mathf.Min(maxWidth, Mathf.FloorToInt(position.width));
@@ -287,9 +286,30 @@ namespace SaintsField.Editor.Drawers
                 return position;
             }
 
+            EAlign align = showImageAttribute.Align;
+            float xOffset;
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (align)
+            {
+                case EAlign.Start:
+                    xOffset = 0;
+                    break;
+                case EAlign.Center:
+                    xOffset = (position.width - previewTexture.width) / 2;
+                    break;
+                case EAlign.End:
+                    xOffset = position.width - previewTexture.width;
+                    break;
+                case EAlign.FieldStart:
+                    xOffset = EditorGUIUtility.labelWidth;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(align), align, null);
+            }
+
             Rect previewRect = new Rect(position)
             {
-                x = position.x + (position.width - previewTexture.width),
+                x = position.x + xOffset,
                 height = previewTexture.height,
             };
 

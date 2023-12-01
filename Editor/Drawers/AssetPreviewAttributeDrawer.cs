@@ -1,7 +1,9 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -158,9 +160,30 @@ namespace SaintsField.Editor.Drawers
                 return position;
             }
 
+            EAlign align = assetPreviewAttribute.Align;
+            float xOffset;
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (align)
+            {
+                case EAlign.Start:
+                    xOffset = 0;
+                    break;
+                case EAlign.Center:
+                    xOffset = (position.width - previewTexture.width) / 2;
+                    break;
+                case EAlign.End:
+                    xOffset = position.width - previewTexture.width;
+                    break;
+                case EAlign.FieldStart:
+                    xOffset = EditorGUIUtility.labelWidth;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(align), align, null);
+            }
+
             Rect previewRect = new Rect(position)
             {
-                x = position.x + (position.width - previewTexture.width),
+                x = position.x + xOffset,
                 height = previewTexture.height,
             };
 

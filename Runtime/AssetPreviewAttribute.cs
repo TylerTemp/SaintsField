@@ -12,14 +12,16 @@ namespace SaintsField
         public readonly bool Above;
         public readonly int MaxWidth;
         public readonly int MaxHeight;
+        public readonly EAlign Align;
 
-        public AssetPreviewAttribute(int maxWidth=-1, int maxHeight=-1, bool above=false, string groupBy="")
+        public AssetPreviewAttribute(int maxWidth=-1, int maxHeight=-1, EAlign align=EAlign.End, bool above=false, string groupBy="")
         {
             GroupBy = groupBy;
 
             Above = above;
             MaxWidth = maxWidth;
             MaxHeight = maxHeight;
+            Align = align;
         }
     }
 }

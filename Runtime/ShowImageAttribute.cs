@@ -12,8 +12,10 @@ namespace SaintsField
         public readonly bool Above;
         public readonly int MaxWidth;
         public readonly int MaxHeight;
+        public readonly EAlign Align;
 
-        public ShowImageAttribute(string image, int maxWidth = -1, int maxHeight = -1, bool above = false,
+        // ReSharper disable once MemberCanBeProtected.Global
+        public ShowImageAttribute(string image, int maxWidth = -1, int maxHeight = -1, EAlign align = EAlign.Start, bool above = false,
             string groupBy = "")
         {
             GroupBy = groupBy;
@@ -22,6 +24,7 @@ namespace SaintsField
             Above = above;
             MaxWidth = maxWidth;
             MaxHeight = maxHeight;
+            Align = align;
         }
     }
 }
