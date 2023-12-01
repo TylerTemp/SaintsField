@@ -5,6 +5,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -171,6 +172,26 @@ namespace SaintsField.Editor.Drawers
                 case Texture2D texture2D:
                     targetChanged = !ReferenceEquals(_originTexture, texture2D);
                     _originTexture = texture2D;
+                    break;
+                // case Texture texture:
+                //     targetChanged = !ReferenceEquals(_originTexture, texture);
+                //     _originTexture = texture as Texture2D;
+                //     break;
+                case Image image:
+                    targetChanged = !ReferenceEquals(_originTexture, image.sprite.texture);
+                    _originTexture = image.sprite.texture;
+                    break;
+                case RawImage image:
+                    targetChanged = !ReferenceEquals(_originTexture, image.texture);
+                    _originTexture = image.texture as Texture2D;
+                    break;
+                case SpriteRenderer spriteRenderer:
+                    targetChanged = !ReferenceEquals(_originTexture, spriteRenderer.sprite.texture);
+                    _originTexture = spriteRenderer.sprite.texture;
+                    break;
+                case Button button:
+                    targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);
+                    _originTexture = button.targetGraphic.mainTexture as Texture2D;
                     break;
                 default:
                     _error = $"Expect Sprite or Texture2D, get {(result == null? "null": result.GetType().ToString())}";

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace SaintsField.Samples
 {
@@ -16,5 +17,12 @@ namespace SaintsField.Samples
         [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Center)]
         [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.End)]
         public string alignField;
+
+        [BelowImage(nameof(rawImageField), maxWidth: 20, align: EAlign.End)]
+        public RawImage rawImageField;
+        [BelowImage(nameof(imageField), maxWidth: 20, align: EAlign.End)]
+        public Image imageField;
+        [BelowImage(nameof(buttonField), maxWidth: 20, align: EAlign.End)]
+        public Button buttonField;
     }
 }
