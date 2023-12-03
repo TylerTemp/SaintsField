@@ -13,7 +13,7 @@ Unity: 2020.2 or higher
 
 ## Highlights ##
 
-1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `Odin` & `NaughtyAttributes`.
+1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 2.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 3.  Allow dynamic arguments in many cases
 
@@ -54,10 +54,13 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.0.7**
+**1.0.8**
 
-*   Add `OverlayRichLabel`
-*   Add `PostFieldRichLabel`
+*   Add `AboveImage`, `BelowImage`
+*   Add `EAlign` for `AssetPreview`
+*   Fix scale for `AssetPreview`
+*   Add `Range`
+*   Fix an issue that editor scripts will get build and lead to a build error
 
 ## Enhancements ##
 
