@@ -8,6 +8,8 @@
 *   Add `AboveImage`, `BelowImage`
 *   Add `EAlign` for `AssetPreview`
 *   Fix scale for `AssetPreview`
+*   Add `Range`
+*   Fix an issue that editor scripts will get build and lead to a build error
 
 ## 1.0.7 ##
 

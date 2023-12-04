@@ -13,7 +13,7 @@ Unity: 2020.2 or higher
 
 ## Highlights ##
 
-1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `Odin` & `NaughtyAttributes`.
+1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 2.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 3.  Allow dynamic arguments in many cases
 
@@ -722,7 +722,7 @@ For each argument:
 
 *   `bool autoExpand=true`: if the view is not enough to show all buttons in a row, automatically expand to a vertical group.
 *   `bool defaultExpanded=false`: if true, the buttons group will be expanded as a vertical group by default.
-*   AllowMultiple: No 
+*   AllowMultiple: No
 
 Note: If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
 
