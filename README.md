@@ -54,12 +54,12 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.0.7**
+**1.0.9**
 
-*   Add `OverlayRichLabel`
-*   Add `PostFieldRichLabel`
+*   Add `EnumFlags`
+*   Fix a issue that `OnValueChanged` will get called when no change happens at all.
 
-## Enhancements ##
+## Document ##
 
 ### Label & Text ###
 
@@ -712,6 +712,38 @@ public class MinMaxSliderExample: MonoBehaviour
 
 [![minmaxslider](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
 
+#### `EnumFlags` ####
+
+A toggle buttons group for enum flags (bit mask). It provides a button to toggle all bits on/off.
+
+This field has compact mode and expanded mode.
+
+For each argument:
+
+*   `bool autoExpand=true`: if the view is not enough to show all buttons in a row, automatically expand to a vertical group.
+*   `bool defaultExpanded=false`: if true, the buttons group will be expanded as a vertical group by default.
+*   AllowMultiple: No 
+
+Note: If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
+
+```csharp
+public class EnumFlagsExample: MonoBehaviour
+{
+    [Serializable, Flags]
+    public enum BitMask
+    {
+        None = 0,  // this will be hide as we will have an all/none button
+        Mask1 = 1,
+        Mask2 = 1 << 1,
+        Mask3 = 1 << 2,
+    }
+
+    [EnumFlags] public BitMask myMask;
+}
+```
+
+[![enum_flags](https://github.com/TylerTemp/SaintsField/assets/6391063/710d3efc-5cba-471b-a0f1-a4319ded86fd)](https://github.com/TylerTemp/SaintsField/assets/6391063/48f4c25b-a4cd-40c6-bb42-913a0dc18daa)
+
 #### `ResizableTextArea` ####
 
 This `TextArea` will always grow its height to fit the content. (minimal height is 3 rows).
@@ -826,7 +858,6 @@ public class SceneExample: MonoBehaviour
 ```
 
 ![scene](https://github.com/TylerTemp/SaintsField/assets/6391063/94ae457e-44e2-4434-ab68-d8d51df1e2fa)
-
 
 #### `SortingLayer` ####
 

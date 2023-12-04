@@ -1,3 +1,8 @@
+## 1.0.9 ##
+
+*   Add `EnumFlags`
+*   Fix a issue that `OnValueChanged` will get called when no change happens at all.
+
 ## 1.0.8 ##
 
 *   Add `AboveImage`, `BelowImage`

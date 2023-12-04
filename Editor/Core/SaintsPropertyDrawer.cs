@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Core
         // private static readonly FieldDrawerConfigAttribute DefaultFieldDrawerConfigAttribute =
         //     new FieldDrawerConfigAttribute(FieldDrawerConfigAttribute.FieldDrawType.Inline, 0);
 
-        protected SaintsPropertyDrawer()
+        public SaintsPropertyDrawer()
         {
             // if (IsSubDrawer)
             // {
@@ -534,6 +534,7 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"{label.text}={_fieldControlName}");
 
             // EditorGUIUtility.labelWidth = ProperLabelWidth();
+            _valueChange = false;
             using(new AdaptLabelWidth())
             using(new ResetIndentScoop())
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
@@ -557,7 +558,7 @@ namespace SaintsField.Editor.Core
                     UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
                 }
 
-                if (!_valueChange && changed.changed)
+                if (changed.changed)
                 {
                     _valueChange = true;
                 }
