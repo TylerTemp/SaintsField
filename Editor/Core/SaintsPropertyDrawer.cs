@@ -50,6 +50,7 @@ namespace SaintsField.Editor.Core
 
         public SaintsPropertyDrawer()
         {
+            // Debug.Log("new SaintsPropertyDrawer");
             // if (IsSubDrawer)
             // {
             //     return;
@@ -307,9 +308,11 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            Debug.Log($"OnGUI: {property.displayName} path {property.propertyPath}");
+
             if (SubCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
             {
-                // Debug.Log($"capture sub drawer {property.displayName} {insideCount}");
+                Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
                 // EditorGUI.PropertyField(position, property, label, true);
                 UnityDraw(position, property, label);
                 return;
@@ -320,6 +323,8 @@ namespace SaintsField.Editor.Core
                 SaintsAttribute = each,
                 Index = index,
             }).ToArray();
+
+            // Debug.Log($"Saints: {property.displayName} found {allSaintsAttributes.Count}");
 
             if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is VisibilityAttribute)))
             {
@@ -892,7 +897,7 @@ namespace SaintsField.Editor.Core
                 //     BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                 // defaultDraw!.Invoke(null, new object[] { position, property, label });
                 // base.OnGUI(position, property, GUIContent.none);
-                // Debug.Log($"UnityDraw: {property.displayName}");
+                Debug.Log($"UnityDraw: `{property.displayName}`");
                 EditorGUI.PropertyField(position, property, label ?? GUIContent.none, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
             }
