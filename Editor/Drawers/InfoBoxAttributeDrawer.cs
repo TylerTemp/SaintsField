@@ -94,7 +94,7 @@ namespace SaintsField.Editor.Drawers
                 return true;
             }
 
-            object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
 
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), infoboxAttribute.ShowCallback);
             switch (found)
@@ -147,7 +147,7 @@ namespace SaintsField.Editor.Drawers
                 return infoboxAttribute.Content;
             }
 
-            object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
 
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), infoboxAttribute.Content);
             switch (found)

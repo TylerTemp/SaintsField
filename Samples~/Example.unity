@@ -315,10 +315,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b547be381cef1e4f8fc59d2557887d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 1, g: 1, b: 1, a: 1}
-  uniq1: 1
-  uniq2: 2
-  uniq3: 3
+  my:
+    myInt: 3
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -1049,7 +1047,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  eye: {fileID: 0}
+  eye: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   guess: 19
 --- !u!4 &622173743
 Transform:

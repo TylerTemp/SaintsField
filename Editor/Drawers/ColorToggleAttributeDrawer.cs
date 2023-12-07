@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers
             ColorToggleAttribute toggleAttribute = (ColorToggleAttribute)saintsAttribute;
             string imageCompName = toggleAttribute.CompName;
 
-            Object targetObject = property.serializedObject.targetObject;
+            Object targetObject = (Object) GetParentTarget(property);
             SerializedObject targetSer = new SerializedObject(targetObject);
 
             _error = "";

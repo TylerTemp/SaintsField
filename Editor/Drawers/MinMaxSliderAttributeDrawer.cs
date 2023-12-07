@@ -26,6 +26,8 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
+            object parentTarget = GetParentTarget(property);
+
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
             float minValue;
             if (minMaxSliderAttribute.MinCallback == null)
@@ -34,7 +36,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(property, minMaxSliderAttribute.MinCallback);
+                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MinCallback);
                 _error = getError ?? "";
                 minValue = getValue;
             }
@@ -46,7 +48,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(property, minMaxSliderAttribute.MaxCallback);
+                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MaxCallback);
                 _error = getError ?? "";
                 maxValue = getValue;
             }

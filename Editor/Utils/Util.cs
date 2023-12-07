@@ -8,25 +8,25 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
-        public static (float, string) GetCallbackFloat(SerializedProperty property, string by)
+        public static (float, string) GetCallbackFloat(object target, string by)
         {
-            SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
-                                               SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, by);
-            if (foundProperty != null)
-            {
-                if (foundProperty.propertyType == SerializedPropertyType.Integer)
-                {
-                    return (foundProperty.intValue, null);
-                }
-                if (foundProperty.propertyType == SerializedPropertyType.Float)
-                {
-                    return (foundProperty.floatValue, null);
-                }
-
-                return (-1, $"Expect int or float for `{by}`, get {foundProperty.propertyType}");
-            }
-
-            object target = property.serializedObject.targetObject;
+            // SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
+            //                                    SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, by);
+            // if (foundProperty != null)
+            // {
+            //     if (foundProperty.propertyType == SerializedPropertyType.Integer)
+            //     {
+            //         return (foundProperty.intValue, null);
+            //     }
+            //     if (foundProperty.propertyType == SerializedPropertyType.Float)
+            //     {
+            //         return (foundProperty.floatValue, null);
+            //     }
+            //
+            //     return (-1, $"Expect int or float for `{by}`, get {foundProperty.propertyType}");
+            // }
+            //
+            // object target = property.serializedObject.targetObject;
 
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
             switch (found)

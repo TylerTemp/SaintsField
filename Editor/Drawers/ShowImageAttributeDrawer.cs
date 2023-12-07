@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers
             else
             {
                 _error = "";
-                object target = property.serializedObject.targetObject;
+                object target = GetParentTarget(property);
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
                     ReflectUtils.GetProp(target.GetType(), name);
                 switch (getPropType)

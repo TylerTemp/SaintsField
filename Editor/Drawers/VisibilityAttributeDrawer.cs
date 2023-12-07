@@ -6,7 +6,6 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -19,7 +18,7 @@ namespace SaintsField.Editor.Drawers
         {
             VisibilityAttribute visibilityAttribute = ((VisibilityAttribute)saintsAttribute);
 
-            Object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
             Type type = target.GetType();
 
             _errors.Clear();
@@ -27,7 +26,7 @@ namespace SaintsField.Editor.Drawers
             return (visibilityAttribute.IsForHide, visibilityAttribute.andCallbacks.All(callback => IsTruly(target, type, callback)));
         }
 
-        private bool IsTruly(Object target, Type type, string by)
+        private bool IsTruly(object target, Type type, string by)
         {
             // SerializedObject serializedObject = property.serializedObject;
             //

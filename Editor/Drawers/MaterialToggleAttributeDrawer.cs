@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers
             MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
             string rendererCompName = toggleAttribute.CompName;
 
-            Object targetObject = property.serializedObject.targetObject;
+            Object targetObject = (Object) GetParentTarget(property);
             SerializedObject targetSer = new SerializedObject(targetObject);
 
             if (rendererCompName == null)

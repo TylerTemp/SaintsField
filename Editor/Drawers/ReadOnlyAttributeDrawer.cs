@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers
                 return targetAttribute.ReadOnlyDirectValue;
             }
 
-            UnityEngine.Object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
 
             foreach (string by in bys)
             {

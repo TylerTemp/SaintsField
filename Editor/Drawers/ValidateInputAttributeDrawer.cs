@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Drawers
             _againRender = true;
 
             string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
-            object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly;

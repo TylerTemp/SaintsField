@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Core
         // private static readonly FieldDrawerConfigAttribute DefaultFieldDrawerConfigAttribute =
         //     new FieldDrawerConfigAttribute(FieldDrawerConfigAttribute.FieldDrawType.Inline, 0);
 
-
+        private string _cachedPropPath;
 
         public SaintsPropertyDrawer()
         {
@@ -116,6 +116,14 @@ namespace SaintsField.Editor.Core
             }
         }
 
+        ~SaintsPropertyDrawer()
+        {
+            if (!string.IsNullOrEmpty(_cachedPropPath) && PropertyPathToShared.ContainsKey(_cachedPropPath))
+            {
+                PropertyPathToShared.Remove(_cachedPropPath);
+            }
+        }
+
         // ~SaintsPropertyDrawer()
         // {
         //     PropertyAttributeToDrawers.Clear();
@@ -134,6 +142,16 @@ namespace SaintsField.Editor.Core
             List<bool> showAndResults = new List<bool>();
             // List<bool> hideAndResults = new List<bool>();
             // private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SaintsWithIndex saintsAttributeWithIndex);
+
+            string propPath = property.propertyPath;
+            if(!PropertyPathToShared.ContainsKey(propPath))
+            {
+                PropertyPathToShared[propPath] = new SharedInfo
+                {
+                    parentTarget = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).parent,
+                };
+            }
+
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
                 SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
@@ -331,6 +349,8 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            _cachedPropPath = property.propertyPath;
+
             if (!PropertyPathToShared.ContainsKey(property.propertyPath))
             {
                 PropertyPathToShared[property.propertyPath] = new SharedInfo();

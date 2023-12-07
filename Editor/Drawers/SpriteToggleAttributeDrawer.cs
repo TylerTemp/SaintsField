@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers
             string imageCompName = toggleAttribute.CompName;
 
             // Object targetObject = (Object)GetTargetObjectWithProperty(property);
-            Object targetObject = property.serializedObject.targetObject;
+            Object targetObject = (Object)GetParentTarget(property);
             SerializedObject targetSer = new SerializedObject(targetObject);
 
             _containerProperty =

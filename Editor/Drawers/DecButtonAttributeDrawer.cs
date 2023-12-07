@@ -62,7 +62,7 @@ namespace SaintsField.Editor.Drawers
             //     leftRect = leftRectCut;
             // }
 
-            object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
             Type objType = target.GetType();
             string buttonLabelXml = GetButtonLabelXml(aboveButtonAttribute, target, objType);
             // const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |

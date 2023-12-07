@@ -24,6 +24,8 @@ namespace SaintsField.Editor.Drawers
                 return true;
             }
 
+            object parentTarget = GetParentTarget(property);
+
             if (property.propertyType == SerializedPropertyType.Float)
             {
                 float curValue = property.floatValue;
@@ -35,7 +37,7 @@ namespace SaintsField.Editor.Drawers
                 }
                 else
                 {
-                    (float getValueLimit, string getError) = Util.GetCallbackFloat(property, minValueAttribute.ValueCallback);
+                    (float getValueLimit, string getError) = Util.GetCallbackFloat(parentTarget, minValueAttribute.ValueCallback);
                     valueLimit = getValueLimit;
                     _error = getError;
                 }
@@ -61,7 +63,7 @@ namespace SaintsField.Editor.Drawers
                 }
                 else
                 {
-                    (float getValueLimit, string getError) = Util.GetCallbackFloat(property, minValueAttribute.ValueCallback);
+                    (float getValueLimit, string getError) = Util.GetCallbackFloat(parentTarget, minValueAttribute.ValueCallback);
                     valueLimit = getValueLimit;
                     _error = getError;
                 }

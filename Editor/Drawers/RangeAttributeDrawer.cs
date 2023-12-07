@@ -14,6 +14,8 @@ namespace SaintsField.Editor.Drawers
         {
             RangeAttribute rangeAttribute = (RangeAttribute) saintsAttribute;
 
+            object parentTarget = GetParentTarget(property);
+
             float minValue;
             if (rangeAttribute.MinCallback == null)
             {
@@ -21,7 +23,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(property, rangeAttribute.MinCallback);
+                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, rangeAttribute.MinCallback);
                 _error = getError;
                 minValue = getValue;
             }
@@ -33,7 +35,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(property, rangeAttribute.MaxCallback);
+                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, rangeAttribute.MaxCallback);
                 _error = getError;
                 maxValue = getValue;
             }
