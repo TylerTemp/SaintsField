@@ -64,7 +64,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             _error = "";
-            object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
                 ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
             switch (getPropType)

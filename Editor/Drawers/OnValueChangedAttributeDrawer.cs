@@ -16,6 +16,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool valueChanged)
         {
+            // Debug.Log($"OnValueChangedAttributeDrawer={valueChanged}");
             if (!valueChanged)
             {
                 return true;
@@ -24,7 +25,7 @@ namespace SaintsField.Editor.Drawers
             property.serializedObject.ApplyModifiedProperties();
 
             string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
-            object target = property.serializedObject.targetObject;
+            object target = GetParentTarget(property);
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly;
@@ -36,7 +37,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             _error = "";
-            
+
             ParameterInfo[] methodParams = methodInfo.GetParameters();
             Debug.Assert(methodParams.All(p => p.IsOptional));
             try

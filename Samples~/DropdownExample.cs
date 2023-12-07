@@ -1,5 +1,4 @@
 using System;
-using SaintsField.DropdownBase;
 using UnityEngine;
 
 namespace SaintsField.Samples
@@ -29,53 +28,63 @@ namespace SaintsField.Samples
         //     {_go2.name, _go2},
         //     {"NULL", null},
         // };
-
-        [Dropdown(nameof(GetAdvancedDropdownItems))]
-        public Color color;
-
-        private DropdownList<Color> GetAdvancedDropdownItems()
-        {
-            return new DropdownList<Color>
-            {
-                { "Black", Color.black },
-                { "White", Color.white },
-                DropdownList<Color>.Separator(),
-                { "Basic/Red", Color.red, true },
-                { "Basic/Green", Color.green },
-                { "Basic/Blue", Color.blue },
-                DropdownList<Color>.Separator("Basic/"),
-                { "Basic/Magenta", Color.magenta },
-                { "Basic/Cyan", Color.cyan },
-            };
-        }
-
-        [Dropdown(nameof(GetUniqItems))] public string uniq1;
-        [Dropdown(nameof(GetUniqItems))] public string uniq2;
-        [Dropdown(nameof(GetUniqItems))] public string uniq3;
-
-        private DropdownList<string> GetUniqItems() => new DropdownList<string>
-        {
-            { "One", "1", Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "1") != -1 },
-            { "Two", "2" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "2") != -1 },
-            { "Three", "3" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "3") != -1 },
-            { "Four", "4" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "4") != -1 },
-        };
+        //
+        // [Dropdown(nameof(GetAdvancedDropdownItems))]
+        // public Color color;
+        //
+        // private DropdownList<Color> GetAdvancedDropdownItems()
+        // {
+        //     return new DropdownList<Color>
+        //     {
+        //         { "Black", Color.black },
+        //         { "White", Color.white },
+        //         DropdownList<Color>.Separator(),
+        //         { "Basic/Red", Color.red, true },
+        //         { "Basic/Green", Color.green },
+        //         { "Basic/Blue", Color.blue },
+        //         DropdownList<Color>.Separator("Basic/"),
+        //         { "Basic/Magenta", Color.magenta },
+        //         { "Basic/Cyan", Color.cyan },
+        //     };
+        // }
+        //
+        // [Dropdown(nameof(GetUniqItems))] public string uniq1;
+        // [Dropdown(nameof(GetUniqItems))] public string uniq2;
+        // [Dropdown(nameof(GetUniqItems))] public string uniq3;
+        //
+        // private DropdownList<string> GetUniqItems() => new DropdownList<string>
+        // {
+        //     { "One", "1", Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "1") != -1 },
+        //     { "Two", "2" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "2") != -1 },
+        //     { "Three", "3" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "3") != -1 },
+        //     { "Four", "4" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "4") != -1 },
+        // };
 
         // dropdown under stuck
 
         [Serializable]
-        private class MyData
+        private struct MyData
         {
-            [Dropdown(nameof(MyStructValues))] public int myInt;
+            [OnValueChanged(nameof(OnChanged))]
+            [Dropdown(nameof(MyStructValues))]
+            [BelowRichLabel(nameof(GetValue), true)]
+            public int myInt;
 
             private DropdownList<int> MyStructValues => new DropdownList<int>
             {
+                { "0", 0 },
                 { "1", 1 },
                 { "2", 2 },
                 { "3", 3 },
             };
+
+            // private string GetValue() => myInt;
+            private string GetValue() => myInt.ToString();
+            private void OnChanged() => Debug.Log(myInt.ToString());
         }
 
-        [SerializeField] private MyData myData;
+        [SerializeField] private MyData my;
+
+
     }
 }
