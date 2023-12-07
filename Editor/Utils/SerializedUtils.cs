@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -27,32 +25,16 @@ namespace SaintsField.Editor.Utils
         //     return attributes.Length > 0 ? attributes[0] : null;
         // }
 
-        public static T[] GetAttributes<T>(SerializedProperty property) where T : class
+        private struct FileOrProp
         {
-            // FieldInfo fieldInfo = GetDecoratedProperty(property);
-            // Debug.Log($"get fieldInfo={fieldInfo} for {property.propertyPath}");
-            // // FieldInfo fieldInfo = ReflectUtils.GetField(targetObject, property.name);
-            // // Debug.Log($"get fieldInfo {fieldInfo} from {targetObject} for {property.propertyPath}");
-            // if (fieldInfo == null)
-            // {
-            //     return new T[] { };
-            // }
-            //
-            // return (T[])fieldInfo.GetCustomAttributes(typeof(T), true);
-            // SerializedProperty prop = GetDecoratedProperty(property);
-            return GetDecoratedProperty<T>(property).ToArray();
-        }
-
-        public struct FileOrProp
-        {
-            public bool isFile;
+            public bool IsFile;
             public FieldInfo FileInfo;
             public PropertyInfo PropertyInfo;
         }
 
-        private static IEnumerable<T> GetDecoratedProperty<T>(SerializedProperty property)
+        public static T[] GetAttributes<T>(SerializedProperty property) where T : class
         {
-            // return property.serializedObject.FindProperty(property.propertyPath);
+
             string originPath = property.propertyPath;
             string[] propPaths = originPath.Split('.');
             int usePathLength = propPaths.Length;
@@ -63,18 +45,18 @@ namespace SaintsField.Editor.Utils
                 bool isArray = secLastPart == "Array" && lastPart.StartsWith("data[") && lastPart.EndsWith("]");
                 if (isArray)
                 {
-                    Debug.Log($"use sub length {originPath}");
+                    // Debug.Log($"use sub length {originPath}");
                     usePathLength -= 2;
                 }
-                else
-                {
-                    Debug.Log($"use normal length {originPath}");
-                }
+                // else
+                // {
+                //     Debug.Log($"use normal length {originPath}");
+                // }
             }
-            else
-            {
-                Debug.Log($"use normal length {originPath}");
-            }
+            // else
+            // {
+            //     Debug.Log($"use normal length {originPath}");
+            // }
 
             // SerializedObject serObj = property.serializedObject;
             // SerializedProperty targetProp = null;
@@ -100,7 +82,7 @@ namespace SaintsField.Editor.Utils
             foreach (int propIndex in Enumerable.Range(0, usePathLength))
             {
                 string propSegName = propPaths[propIndex];
-                Debug.Log($"check key {propSegName}");
+                // Debug.Log($"check key {propSegName}");
                 if(propSegName == "Array")
                 {
                     preNameIsArray = true;
@@ -115,7 +97,7 @@ namespace SaintsField.Editor.Utils
 
                     int elemIndex = Convert.ToInt32(propSegName.Substring(5, propSegName.Length - 6));
 
-                    object useObject = null;
+                    object useObject;
 
                     if(fileOrProp.FileInfo is null && fileOrProp.PropertyInfo is null)
                     {
@@ -123,14 +105,14 @@ namespace SaintsField.Editor.Utils
                     }
                     else
                     {
-                        useObject = fileOrProp.isFile
-                            ? fileOrProp.FileInfo.GetValue(sourceObj)
+                        useObject = fileOrProp.IsFile
+                            ? fileOrProp.FileInfo!.GetValue(sourceObj)
                             : fileOrProp.PropertyInfo.GetValue(sourceObj);
                     }
 
-                    Debug.Log($"Get index from obj {useObject}[{elemIndex}]");
-                    sourceObj = GetValue_Imp(useObject, elemIndex);
-                    Debug.Log($"Get index from obj [{useObject}] returns {sourceObj}");
+                    // Debug.Log($"Get index from obj {useObject}[{elemIndex}]");
+                    sourceObj = GetValueAtIndex(useObject, elemIndex);
+                    // Debug.Log($"Get index from obj [{useObject}] returns {sourceObj}");
                     fileOrProp = default;
                     // Debug.Log($"[index={elemIndex}]={targetObj}");
                     continue;
@@ -138,20 +120,20 @@ namespace SaintsField.Editor.Utils
 
                 preNameIsArray = false;
 
-                if (propSegName.StartsWith("<") && propSegName.EndsWith(">k__BackingField"))
-                {
-                    propSegName = propSegName.Substring(1, propSegName.Length - 17);
-                }
+                // if (propSegName.StartsWith("<") && propSegName.EndsWith(">k__BackingField"))
+                // {
+                //     propSegName = propSegName.Substring(1, propSegName.Length - 17);
+                // }
 
-                Debug.Log($"get obj {sourceObj}.{propSegName}");
+                // Debug.Log($"get obj {sourceObj}.{propSegName}");
                 if(fileOrProp.FileInfo is null && fileOrProp.PropertyInfo is null)
                 {
                     fileOrProp = GetFileOrProp(sourceObj, propSegName);
                 }
                 else
                 {
-                    sourceObj = fileOrProp.isFile
-                        ? fileOrProp.FileInfo.GetValue(sourceObj)
+                    sourceObj = fileOrProp.IsFile
+                        ? fileOrProp.FileInfo!.GetValue(sourceObj)
                         : fileOrProp.PropertyInfo.GetValue(sourceObj);
                     fileOrProp = GetFileOrProp(sourceObj, propSegName);
                 }
@@ -159,16 +141,31 @@ namespace SaintsField.Editor.Utils
                 // Debug.Log($"[{propSegName}]={targetObj}");
             }
 
-            // Debug.Log($"return result ");
-            return fileOrProp.isFile
-                ? fileOrProp.FileInfo.GetCustomAttributes(typeof(T), true).Cast<T>()
-                : fileOrProp.PropertyInfo.GetCustomAttributes(typeof(T), true).Cast<T>();
+
+            // if (!fileOrProp.isFile)
+            // {
+            //     Debug.Log($"check prop {fileOrProp.PropertyInfo.Name}/{fileOrProp.PropertyInfo.GetCustomAttributes().Count()}");
+            //     foreach (CustomAttributeData customAttributeData in fileOrProp.PropertyInfo.CustomAttributes)
+            //     {
+            //         Debug.Log($"check attr {customAttributeData.AttributeType}");
+            //         // if (customAttributeData.AttributeType == typeof(T))
+            //         // {
+            //         //     Debug.Log($"return attr {customAttributeData.AttributeType}");
+            //         //     yield return (T)fileOrProp.PropertyInfo.GetValue(sourceObj);
+            //         // }
+            //     }
+            // }
+
+            // Debug.Log($"return result for {property.propertyPath}: {fileOrProp.FileInfo?.Name ?? fileOrProp.PropertyInfo.Name}");
+            return fileOrProp.IsFile
+                ? fileOrProp.FileInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray()
+                : fileOrProp.PropertyInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray();
         }
 
-        public static FileOrProp GetFileOrProp(object source, string name)
+        private static FileOrProp GetFileOrProp(object source, string name)
         {
             Type type = source.GetType();
-            Debug.Log($"get type {type}");
+            // Debug.Log($"get type {type}");
 
             while (type != null)
             {
@@ -178,7 +175,7 @@ namespace SaintsField.Editor.Utils
                     // Debug.Log($"return field {field.Name}");
                     return new FileOrProp()
                     {
-                        isFile = true,
+                        IsFile = true,
                         PropertyInfo = null,
                         FileInfo = field,
                     };
@@ -191,7 +188,7 @@ namespace SaintsField.Editor.Utils
                     // Debug.Log($"return prop {property.Name}");
                     return new FileOrProp
                     {
-                        isFile = false,
+                        IsFile = false,
                         PropertyInfo = property,
                         FileInfo = null,
                     };
@@ -203,65 +200,7 @@ namespace SaintsField.Editor.Utils
             throw new Exception($"Unable to get type from {source}");
         }
 
-        /// <summary>
-        /// Gets the object that the property is a member of
-        /// </summary>
-        /// <param name="property"></param>
-        /// <returns></returns>
-        public static object GetTargetObjectWithProperty(SerializedProperty property)
-        {
-            string path = property.propertyPath.Replace(".Array.data[", "[");
-            object obj = property.serializedObject.targetObject;
-            string[] elements = path.Split('.');
-
-            for (int i = 0; i < elements.Length - 1; i++)
-            {
-                string element = elements[i];
-                if (element.Contains("["))
-                {
-                    string elementName = element.Substring(0, element.IndexOf("["));
-                    int index = Convert.ToInt32(element.Substring(element.IndexOf("[")).Replace("[", "").Replace("]", ""));
-                    obj = GetValue_Imp(obj, index);
-                }
-                else
-                {
-                    obj = GetValue_Imp(obj, element);
-                }
-            }
-
-            return obj;
-        }
-
-        private static object GetValue_Imp(object source, string name)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            Type type = source.GetType();
-
-            while (type != null)
-            {
-                FieldInfo field = type.GetField(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-                if (field != null)
-                {
-                    return field.GetValue(source);
-                }
-
-                PropertyInfo property = type.GetProperty(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (property != null)
-                {
-                    return property.GetValue(source, null);
-                }
-
-                type = type.BaseType;
-            }
-
-            return null;
-        }
-
-        private static object GetValue_Imp(object source, int index)
+        private static object GetValueAtIndex(object source, int index)
         {
             if (!(source is IEnumerable enumerable))
             {
@@ -269,10 +208,10 @@ namespace SaintsField.Editor.Utils
             }
 
             int searchIndex = 0;
-            Debug.Log($"start check index in {source}");
+            // Debug.Log($"start check index in {source}");
             foreach (object result in enumerable)
             {
-                Debug.Log($"check index {searchIndex} in {source}");
+                // Debug.Log($"check index {searchIndex} in {source}");
                 if(searchIndex == index)
                 {
                     return result;

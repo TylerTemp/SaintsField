@@ -8,21 +8,21 @@ namespace SaintsField.Editor.Core
     {
         public struct PropertyKey
         {
-            public int objectHash;
-            public string propertyPath;
+            public int ObjectHash;
+            public string PropertyPath;
 
             public override string ToString()
             {
-                return $"{objectHash}.{propertyPath}";
+                return $"{ObjectHash}.{PropertyPath}";
             }
         }
 
-        private PropertyKey _property;
+        private readonly PropertyKey _property;
 
         public static PropertyKey MakeKey(SerializedProperty property) => new PropertyKey
         {
-            objectHash = property.serializedObject.targetObject.GetInstanceID(),
-            propertyPath = property.propertyPath,
+            ObjectHash = property.serializedObject.targetObject.GetInstanceID(),
+            PropertyPath = property.propertyPath,
         };
 
         public InsideSaintsFieldScoop(PropertyKey key)

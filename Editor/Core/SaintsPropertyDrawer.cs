@@ -897,7 +897,7 @@ namespace SaintsField.Editor.Core
                 //     BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                 // defaultDraw!.Invoke(null, new object[] { position, property, label });
                 // base.OnGUI(position, property, GUIContent.none);
-                Debug.Log($"UnityDraw: `{property.displayName}`");
+                // Debug.Log($"UnityDraw: `{property.displayName}`");
                 EditorGUI.PropertyField(position, property, label ?? GUIContent.none, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
             }

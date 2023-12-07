@@ -1,3 +1,8 @@
+## 1.1.0 ##
+
+*   Allow for list
+*   `RichLabel` no longer draw a background
+
 ## 1.0.9 ##
 
 *   Add `EnumFlags`

@@ -54,10 +54,12 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.0.9**
+**1.1.0**
 
-*   Add `EnumFlags`
-*   Fix a issue that `OnValueChanged` will get called when no change happens at all.
+*   Allow for list
+*   `RichLabel` no longer draw a background
+
+The core of how `Attribute`s are discovered is now changed. This version should be compatible with old ones, but in case I pumped the minor version to `1`.
 
 ## Document ##
 
@@ -622,9 +624,9 @@ And you can always manually add it:
 
 ```csharp
 DropdownList<Color> dropdownList = new DropdownList<Color>();
-dropdownList.Add("Black", Color.black);  # add an item
-dropdownList.Add("White", Color.white, true);  # and a disabled item
-dropdownList.AddSeparator();  # add a separator
+dropdownList.Add("Black", Color.black);  // add an item
+dropdownList.Add("White", Color.white, true);  // and a disabled item
+dropdownList.AddSeparator();  // add a separator
 ```
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
@@ -1255,7 +1257,10 @@ An example of working with NaughtyAttributes:
 ```csharp
 public class CompatibilityNaAndDefault : MonoBehaviour
 {
-    [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
+    [RichLabel("<color=green>+NA</color>"), 
+     NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), 
+     NaughtyAttributes.Label(" ")  // a little hack for label issue
+    ]
     public AnimationCurve naCurve;
 
     [RichLabel("<color=green>+Native</color>"), Range(0, 5)]
@@ -1284,9 +1289,16 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 
 1.  the drawer itself respects the `GUIContent` argument in `OnGUI`
 
-    NOTE: `NaughtyAttributes` uses `property.displayName` instead of `GUIContent`. `SaintsField` deals with it by drawing a background rect
-    before drawing the label, so it's fine
+    NOTE: `NaughtyAttributes` uses `property.displayName` instead of `GUIContent`. You need to set `Label(" ")` if you want to use `RichLabel`.
+    Also, `NaughtyAttributes` tread many Attribute as first-class citizen, so the compatibility is not guaranteed.
 
 2.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
 
     NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
+
+My (not full) tested about compatibility:
+
+*   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
+*   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
+*   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good for Odin's `EditorWindow`.
+
