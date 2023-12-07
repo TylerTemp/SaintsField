@@ -60,5 +60,22 @@ namespace SaintsField.Samples
             { "Three", "3" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "3") != -1 },
             { "Four", "4" , Array.IndexOf(new[]{uniq1, uniq2, uniq3}, "4") != -1 },
         };
+
+        // dropdown under stuck
+
+        [Serializable]
+        private class MyData
+        {
+            [Dropdown(nameof(MyStructValues))] public int myInt;
+
+            private DropdownList<int> MyStructValues => new DropdownList<int>
+            {
+                { "1", 1 },
+                { "2", 2 },
+                { "3", 3 },
+            };
+        }
+
+        [SerializeField] private MyData myData;
     }
 }

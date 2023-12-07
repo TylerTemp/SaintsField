@@ -27,8 +27,7 @@ namespace SaintsField.Editor.Drawers
             IDropdownList dropdownListValue;
 
             string funcName = dropdownAttribute.FuncName;
-            {  // callback from parent
-                object parentObj = SerializedUtils.GetAttributesAndDirectParent<DropdownAttribute>(property).parent;
+object parentObj = SerializedUtils.GetAttributesAndDirectParent<DropdownAttribute>(property).parent;
                 Debug.Assert(parentObj != null);
                 Type parentType = parentObj!.GetType();
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
@@ -109,17 +108,16 @@ namespace SaintsField.Editor.Drawers
                     default:
                         throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
                 }
-            }
 
             // int selectedIndex = -1;
             // Debug.Log(property.propertyPath);
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                               BindingFlags.Public | BindingFlags.DeclaredOnly;
-            Object target = property.serializedObject.targetObject;
-            FieldInfo field = target.GetType().GetField(property.propertyPath, bindAttr);
-            Debug.Assert(field != null, $"{property.propertyPath}/{target}");
-            object curValue = field!.GetValue(target);
+            // Object target = property.serializedObject.targetObject;
+            FieldInfo field = parentType.GetField(property.name, bindAttr);
+            Debug.Assert(field != null, $"{property.name}/{parentObj}");
+            object curValue = field!.GetValue(parentObj);
             string curDisplay = "";
             foreach (ValueTuple<string, object, bool, bool> itemInfos in dropdownListValue!.Where(each => !each.Item4))
             {
@@ -188,9 +186,11 @@ namespace SaintsField.Editor.Drawers
                         menu.AddItem(new GUIContent(curName), curName == curDisplay, () =>
                         {
                             // selectedIndex = options.IndexOf(option);
-                            Undo.RecordObject(target, "Dropdown");
+                            Undo.RecordObject(property.serializedObject.targetObject, "Dropdown");
                             // object newValue = curItem;
-                            field.SetValue(target, curItem);
+                            // Debug.Log($"set value {parentObj}->{field.Name} = {curItem}");
+                            // TODO: what about struct :(
+                            field.SetValue(parentObj, curItem);
                         });
                     }
                 }
