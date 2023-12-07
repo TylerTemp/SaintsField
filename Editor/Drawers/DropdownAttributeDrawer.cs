@@ -6,6 +6,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -23,86 +24,91 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
+            IDropdownList dropdownListValue;
 
             string funcName = dropdownAttribute.FuncName;
-            object target = SerializedUtils.GetAttributesAndDirectParent<DropdownAttribute>(property).parent;
-            Debug.Assert(target != null);
-            Type targetType = target.GetType();
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(targetType, funcName);
-            IDropdownList dropdownListValue;
-            switch (getPropType)
-            {
-                case ReflectUtils.GetPropType.NotFound:
+            {  // callback from parent
+                object parentObj = SerializedUtils.GetAttributesAndDirectParent<DropdownAttribute>(property).parent;
+                Debug.Assert(parentObj != null);
+                Type parentType = parentObj!.GetType();
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                    ReflectUtils.GetProp(parentType, funcName);
+                switch (getPropType)
                 {
-                    _error = $"not found `{funcName}` on target `{target}`";
-                    DefaultDrawer(position, property, label);
-                }
-                    return;
-                case ReflectUtils.GetPropType.Property:
-                {
-                    PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundPropertyInfo.GetValue(target) as IDropdownList;
-                    if (dropdownListValue == null)
+                    case ReflectUtils.GetPropType.NotFound:
                     {
-                        _error = $"dropdownListValue is null from `{funcName}` on target `{target}`";
+                        _error = $"not found `{funcName}` on target `{parentObj}`";
                         DefaultDrawer(position, property, label);
-                        return;
                     }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Field:
-                {
-                    FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundFieldInfo.GetValue(target) as IDropdownList;
-                    if (dropdownListValue == null)
+                        return;
+                    case ReflectUtils.GetPropType.Property:
                     {
-                        _error = $"dropdownListValue is null from `{funcName}` on target `{target}`";
-                        DefaultDrawer(position, property, label);
-                        return;
+                        PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
+                        dropdownListValue = foundPropertyInfo.GetValue(parentObj) as IDropdownList;
+                        if (dropdownListValue == null)
+                        {
+                            _error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`";
+                            DefaultDrawer(position, property, label);
+                            return;
+                        }
                     }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    // Debug.Assert(methodInfo.ReturnType == typeof(string));
-                    // if (methodInfo.ReturnType != typeof(string))
-                    // {
-                    //     _error =
-                    //         $"Return type of callback method `{decButtonAttribute.ButtonLabel}` should be string";
-                    //     return decButtonAttribute.ButtonLabel;
-                    // }
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
+                        dropdownListValue = foundFieldInfo.GetValue(parentObj) as IDropdownList;
+                        if (dropdownListValue == null)
+                        {
+                            _error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`";
+                            DefaultDrawer(position, property, label);
+                            return;
+                        }
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                        ParameterInfo[] methodParams = methodInfo.GetParameters();
+                        Debug.Assert(methodParams.All(p => p.IsOptional));
+                        // Debug.Assert(methodInfo.ReturnType == typeof(string));
+                        // if (methodInfo.ReturnType != typeof(string))
+                        // {
+                        //     _error =
+                        //         $"Return type of callback method `{decButtonAttribute.ButtonLabel}` should be string";
+                        //     return decButtonAttribute.ButtonLabel;
+                        // }
 
-                    _error = "";
-                    try
-                    {
-                        dropdownListValue = methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()) as IDropdownList;
-                    }
-                    catch (TargetInvocationException e)
-                    {
-                        _error = e.InnerException!.Message;
-                        Debug.LogException(e);
-                        return;
-                    }
-                    catch (Exception e)
-                    {
-                        _error = e.Message;
-                        Debug.LogException(e);
-                        return;
-                    }
+                        _error = "";
+                        try
+                        {
+                            dropdownListValue =
+                                methodInfo.Invoke(parentObj, methodParams.Select(p => p.DefaultValue).ToArray()) as
+                                    IDropdownList;
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            _error = e.InnerException!.Message;
+                            Debug.LogException(e);
+                            return;
+                        }
+                        catch (Exception e)
+                        {
+                            _error = e.Message;
+                            Debug.LogException(e);
+                            return;
+                        }
 
-                    if (dropdownListValue == null)
-                    {
-                        _error = $"dropdownListValue is null from `{funcName}()` on target `{target}`";
-                        DefaultDrawer(position, property, label);
-                        return;
+                        if (dropdownListValue == null)
+                        {
+                            _error = $"dropdownListValue is null from `{funcName}()` on target `{parentObj}`";
+                            DefaultDrawer(position, property, label);
+                            return;
+                        }
                     }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
                 }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
             }
 
             // int selectedIndex = -1;
@@ -110,7 +116,8 @@ namespace SaintsField.Editor.Drawers
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                               BindingFlags.Public | BindingFlags.DeclaredOnly;
-            FieldInfo field = targetType.GetField(property.propertyPath, bindAttr);
+            Object target = property.serializedObject.targetObject;
+            FieldInfo field = target.GetType().GetField(property.propertyPath, bindAttr);
             Debug.Assert(field != null, $"{property.propertyPath}/{target}");
             object curValue = field!.GetValue(target);
             string curDisplay = "";
@@ -124,8 +131,8 @@ namespace SaintsField.Editor.Drawers
                     curDisplay = name;
                     break;
                 }
-                if (curValue is UnityEngine.Object curValueObj
-                          && curValueObj == itemValue as UnityEngine.Object)
+                if (curValue is Object curValueObj
+                          && curValueObj == itemValue as Object)
                 {
                     curDisplay = name;
                     break;
@@ -140,45 +147,6 @@ namespace SaintsField.Editor.Drawers
                     break;
                 }
             }
-
-            // List<string> options = new List<string>();
-            // List<object> values = new List<object>();
-
-            // foreach ((ValueTuple<string, object, bool> keyValuePair, int index) in dropdownListValue!.Select((keyValuePair, index) => (keyValuePair, index)))
-            // {
-            //     string displayName = keyValuePair.Item1;
-            //     object value = keyValuePair.Item2;
-            //     bool isSeparator = keyValuePair.Item3;
-            //
-            //     // Debug.Log($"{keyValuePair.Key} -> {keyValuePair.Value}");
-            //     // bool bothNull = curValue == null && keyValuePair.Value == null;
-            //
-            //     // Debug.Log(keyValuePair.Value);
-            //     // Debug.Log(curValue);
-            //
-            //     // ReSharper disable once ConvertIfStatementToSwitchStatement
-            //     if (curValue == null && keyValuePair.Value == null)
-            //     {
-            //         selectedIndex = index;
-            //     }
-            //     else if (curValue is UnityEngine.Object curValueObj
-            //               && curValueObj == keyValuePair.Value as UnityEngine.Object)
-            //     {
-            //         selectedIndex = index;
-            //     }
-            //     else if (keyValuePair.Value == null)
-            //     {
-            //         // nothing
-            //     }
-            //     else if (keyValuePair.Value.Equals(curValue))
-            //     {
-            //         selectedIndex = index;
-            //     }
-            //     options.Add(keyValuePair.Key);
-            //     values.Add(keyValuePair.Value);
-            // }
-
-            // using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
 
             bool hasLabel = label.text != "";
             float labelWidth = hasLabel? EditorGUIUtility.labelWidth: 0;
@@ -220,7 +188,7 @@ namespace SaintsField.Editor.Drawers
                         menu.AddItem(new GUIContent(curName), curName == curDisplay, () =>
                         {
                             // selectedIndex = options.IndexOf(option);
-                            Undo.RecordObject((UnityEngine.Object)target, "Dropdown");
+                            Undo.RecordObject(target, "Dropdown");
                             // object newValue = curItem;
                             field.SetValue(target, curItem);
                         });
