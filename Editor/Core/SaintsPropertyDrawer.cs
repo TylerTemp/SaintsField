@@ -179,7 +179,7 @@ namespace SaintsField.Editor.Core
                 return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
             }
 
-            if (!GetVisibility(property, SerializedUtils.GetAttributes<ISaintsAttribute>(property)
+            if (!GetVisibility(property, SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).attributes
                     .Select((each, index) => new SaintsWithIndex
                     {
                         SaintsAttribute = each,
@@ -306,23 +306,28 @@ namespace SaintsField.Editor.Core
 
         private bool _valueChange;
 
+        // protected object DirectParentObject { get; private set; }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // Debug.Log($"OnGUI: {property.displayName} path {property.propertyPath}; obj={property.serializedObject.targetObject}");
 
             if (SubCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
             {
-                Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
+                // Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
                 // EditorGUI.PropertyField(position, property, label, true);
                 UnityDraw(position, property, label);
                 return;
             }
 
-            IReadOnlyList<SaintsWithIndex> allSaintsAttributes = SerializedUtils.GetAttributes<ISaintsAttribute>(property).Select((each, index) => new SaintsWithIndex
-            {
-                SaintsAttribute = each,
-                Index = index,
-            }).ToArray();
+            IReadOnlyList<SaintsWithIndex> allSaintsAttributes = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property)
+                .attributes
+                .Select((each, index) => new SaintsWithIndex
+                {
+                    SaintsAttribute = each,
+                    Index = index,
+                })
+                .ToArray();
 
             // Debug.Log($"Saints: {property.displayName} found {allSaintsAttributes.Count}");
 
@@ -463,7 +468,7 @@ namespace SaintsField.Editor.Core
 
             // bool completelyDisableLabel = string.IsNullOrEmpty(label.text);
             GUIContent useGuiContent;
-            // SaintsPropertyDrawer saintslabelDrawerAndWillDrawInstance = null;
+
             Action saintsPropertyDrawerDrawLabelCallback = () => { };
             if (string.IsNullOrEmpty(label.text))
             {
@@ -487,7 +492,7 @@ namespace SaintsField.Editor.Core
                 if (hasLabelSpace)
                 {
                     // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
-                    // saintslabelDrawerAndWillDrawInstance = labelDrawerInstance;
+
                     saintsPropertyDrawerDrawLabelCallback = () =>
                         labelDrawerInstance.DrawLabel(labelRect, property, label,
                             labelAttributeWithIndex.SaintsAttribute);
@@ -841,7 +846,9 @@ namespace SaintsField.Editor.Core
 
             // OK this should deal everything
 
-            IEnumerable<PropertyAttribute> allOtherAttributes = SerializedUtils.GetAttributes<PropertyAttribute>(property)
+            IEnumerable<PropertyAttribute> allOtherAttributes = SerializedUtils
+                .GetAttributesAndDirectParent<PropertyAttribute>(property)
+                .attributes
                 .Where(each => !(each is ISaintsAttribute));
             foreach (PropertyAttribute propertyAttribute in allOtherAttributes)
             {

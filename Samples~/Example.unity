@@ -1845,7 +1845,14 @@ MonoBehaviour:
     myNormalString: 
     <mySubStrings>k__BackingField:
     - 
+    - Example
     - EmptyScene
+    myNoDecStrings: []
+  - myDecString: 
+    myNormalString: 
+    <mySubStrings>k__BackingField:
+    - 
+    - Example
     - EmptyScene
     myNoDecStrings: []
 --- !u!1 &1227266396

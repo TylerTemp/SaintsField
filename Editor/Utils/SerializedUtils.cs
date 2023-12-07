@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Utils
             public PropertyInfo PropertyInfo;
         }
 
-        public static T[] GetAttributes<T>(SerializedProperty property) where T : class
+        public static (T[] attributes, object parent) GetAttributesAndDirectParent<T>(SerializedProperty property) where T : class
         {
 
             string originPath = property.propertyPath;
@@ -157,9 +157,10 @@ namespace SaintsField.Editor.Utils
             // }
 
             // Debug.Log($"return result for {property.propertyPath}: {fileOrProp.FileInfo?.Name ?? fileOrProp.PropertyInfo.Name}");
-            return fileOrProp.IsFile
+            T[] attributes = fileOrProp.IsFile
                 ? fileOrProp.FileInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray()
                 : fileOrProp.PropertyInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray();
+            return (attributes, sourceObj);
         }
 
         private static FileOrProp GetFileOrProp(object source, string name)

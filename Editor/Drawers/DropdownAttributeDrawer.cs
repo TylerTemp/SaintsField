@@ -25,7 +25,8 @@ namespace SaintsField.Editor.Drawers
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
 
             string funcName = dropdownAttribute.FuncName;
-            UnityEngine.Object target = property.serializedObject.targetObject;
+            object target = SerializedUtils.GetAttributesAndDirectParent<DropdownAttribute>(property).parent;
+            Debug.Assert(target != null);
             Type targetType = target.GetType();
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(targetType, funcName);
             IDropdownList dropdownListValue;
@@ -219,7 +220,7 @@ namespace SaintsField.Editor.Drawers
                         menu.AddItem(new GUIContent(curName), curName == curDisplay, () =>
                         {
                             // selectedIndex = options.IndexOf(option);
-                            Undo.RecordObject(target, "Dropdown");
+                            Undo.RecordObject((UnityEngine.Object)target, "Dropdown");
                             // object newValue = curItem;
                             field.SetValue(target, curItem);
                         });
