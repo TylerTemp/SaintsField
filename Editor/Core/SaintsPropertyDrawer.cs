@@ -308,7 +308,7 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            Debug.Log($"OnGUI: {property.displayName} path {property.propertyPath}");
+            // Debug.Log($"OnGUI: {property.displayName} path {property.propertyPath}; obj={property.serializedObject.targetObject}");
 
             if (SubCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
             {

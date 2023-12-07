@@ -15,8 +15,8 @@ namespace SaintsField.Samples
             public List<string> myNoDecStrings;
         }
 
-        [field: SerializeField, RichLabel("HI"), AboveRichLabel("Above!")]
-        public List<SimpleObject> myArrField { get; private set; }
+        [field: SerializeField, AboveRichLabel("Above!")]
+        public List<SimpleObject> myArrField2 { get; private set; }
 
         // [System.Serializable]
         // public class SimpleObject

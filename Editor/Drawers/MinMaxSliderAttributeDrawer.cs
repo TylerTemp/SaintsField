@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers
             else
             {
                 (float getValue, string getError) = Util.GetCallbackFloat(property, minMaxSliderAttribute.MinCallback);
-                _error = getError;
+                _error = getError ?? "";
                 minValue = getValue;
             }
 
@@ -47,7 +47,7 @@ namespace SaintsField.Editor.Drawers
             else
             {
                 (float getValue, string getError) = Util.GetCallbackFloat(property, minMaxSliderAttribute.MaxCallback);
-                _error = getError;
+                _error = getError ?? "";
                 maxValue = getValue;
             }
 

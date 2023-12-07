@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
@@ -17,21 +21,186 @@ namespace SaintsField.Editor.Utils
         //     return prop.FindPropertyRelative($"<{propName}>k__BackingField");
         // }
 
-        public static T GetAttribute<T>(SerializedProperty property) where T : class
-        {
-            T[] attributes = GetAttributes<T>(property);
-            return attributes.Length > 0 ? attributes[0] : null;
-        }
+        // public static T GetAttribute<T>(SerializedProperty property) where T : class
+        // {
+        //     T[] attributes = GetAttributes<T>(property);
+        //     return attributes.Length > 0 ? attributes[0] : null;
+        // }
 
         public static T[] GetAttributes<T>(SerializedProperty property) where T : class
         {
-            FieldInfo fieldInfo = ReflectUtils.GetField(GetTargetObjectWithProperty(property), property.name);
-            if (fieldInfo == null)
+            // FieldInfo fieldInfo = GetDecoratedProperty(property);
+            // Debug.Log($"get fieldInfo={fieldInfo} for {property.propertyPath}");
+            // // FieldInfo fieldInfo = ReflectUtils.GetField(targetObject, property.name);
+            // // Debug.Log($"get fieldInfo {fieldInfo} from {targetObject} for {property.propertyPath}");
+            // if (fieldInfo == null)
+            // {
+            //     return new T[] { };
+            // }
+            //
+            // return (T[])fieldInfo.GetCustomAttributes(typeof(T), true);
+            // SerializedProperty prop = GetDecoratedProperty(property);
+            return GetDecoratedProperty<T>(property).ToArray();
+        }
+
+        public struct FileOrProp
+        {
+            public bool isFile;
+            public FieldInfo FileInfo;
+            public PropertyInfo PropertyInfo;
+        }
+
+        private static IEnumerable<T> GetDecoratedProperty<T>(SerializedProperty property)
+        {
+            // return property.serializedObject.FindProperty(property.propertyPath);
+            string originPath = property.propertyPath;
+            string[] propPaths = originPath.Split('.');
+            int usePathLength = propPaths.Length;
+            if(propPaths.Length > 2)
             {
-                return new T[] { };
+                string lastPart = propPaths[propPaths.Length - 1];
+                string secLastPart = propPaths[propPaths.Length - 2];
+                bool isArray = secLastPart == "Array" && lastPart.StartsWith("data[") && lastPart.EndsWith("]");
+                if (isArray)
+                {
+                    Debug.Log($"use sub length {originPath}");
+                    usePathLength -= 2;
+                }
+                else
+                {
+                    Debug.Log($"use normal length {originPath}");
+                }
+            }
+            else
+            {
+                Debug.Log($"use normal length {originPath}");
             }
 
-            return (T[])fieldInfo.GetCustomAttributes(typeof(T), true);
+            // SerializedObject serObj = property.serializedObject;
+            // SerializedProperty targetProp = null;
+            //
+            // IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(targetObj);
+            // foreach (Type eachType in types)
+            // {
+            //     IEnumerable<FieldInfo> fieldInfos = eachType
+            //         .GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            //
+            //     foreach (FieldInfo fieldInfo in fieldInfos)
+            //     {
+            //         Debug.Log(fieldInfo.Name);
+            //     }
+            // }
+            //
+            // return null;
+
+            object sourceObj = property.serializedObject.targetObject;
+            FileOrProp fileOrProp = default;
+
+            bool preNameIsArray = false;
+            foreach (int propIndex in Enumerable.Range(0, usePathLength))
+            {
+                string propSegName = propPaths[propIndex];
+                Debug.Log($"check key {propSegName}");
+                if(propSegName == "Array")
+                {
+                    preNameIsArray = true;
+                    continue;
+                }
+                if (propSegName.StartsWith("data[") && propSegName.EndsWith("]"))
+                {
+                    Debug.Assert(preNameIsArray);
+                    // Debug.Log(propSegName);
+                    // Debug.Assert(targetProp != null);
+                    preNameIsArray = false;
+
+                    int elemIndex = Convert.ToInt32(propSegName.Substring(5, propSegName.Length - 6));
+
+                    object useObject = null;
+
+                    if(fileOrProp.FileInfo is null && fileOrProp.PropertyInfo is null)
+                    {
+                        useObject = sourceObj;
+                    }
+                    else
+                    {
+                        useObject = fileOrProp.isFile
+                            ? fileOrProp.FileInfo.GetValue(sourceObj)
+                            : fileOrProp.PropertyInfo.GetValue(sourceObj);
+                    }
+
+                    Debug.Log($"Get index from obj {useObject}[{elemIndex}]");
+                    sourceObj = GetValue_Imp(useObject, elemIndex);
+                    Debug.Log($"Get index from obj [{useObject}] returns {sourceObj}");
+                    fileOrProp = default;
+                    // Debug.Log($"[index={elemIndex}]={targetObj}");
+                    continue;
+                }
+
+                preNameIsArray = false;
+
+                if (propSegName.StartsWith("<") && propSegName.EndsWith(">k__BackingField"))
+                {
+                    propSegName = propSegName.Substring(1, propSegName.Length - 17);
+                }
+
+                Debug.Log($"get obj {sourceObj}.{propSegName}");
+                if(fileOrProp.FileInfo is null && fileOrProp.PropertyInfo is null)
+                {
+                    fileOrProp = GetFileOrProp(sourceObj, propSegName);
+                }
+                else
+                {
+                    sourceObj = fileOrProp.isFile
+                        ? fileOrProp.FileInfo.GetValue(sourceObj)
+                        : fileOrProp.PropertyInfo.GetValue(sourceObj);
+                    fileOrProp = GetFileOrProp(sourceObj, propSegName);
+                }
+                // targetFieldName = propSegName;
+                // Debug.Log($"[{propSegName}]={targetObj}");
+            }
+
+            // Debug.Log($"return result ");
+            return fileOrProp.isFile
+                ? fileOrProp.FileInfo.GetCustomAttributes(typeof(T), true).Cast<T>()
+                : fileOrProp.PropertyInfo.GetCustomAttributes(typeof(T), true).Cast<T>();
+        }
+
+        public static FileOrProp GetFileOrProp(object source, string name)
+        {
+            Type type = source.GetType();
+            Debug.Log($"get type {type}");
+
+            while (type != null)
+            {
+                FieldInfo field = type.GetField(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                if (field != null)
+                {
+                    // Debug.Log($"return field {field.Name}");
+                    return new FileOrProp()
+                    {
+                        isFile = true,
+                        PropertyInfo = null,
+                        FileInfo = field,
+                    };
+                }
+
+                PropertyInfo property = type.GetProperty(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                if (property != null)
+                {
+                    // return property.GetValue(source, null);
+                    // Debug.Log($"return prop {property.Name}");
+                    return new FileOrProp
+                    {
+                        isFile = false,
+                        PropertyInfo = property,
+                        FileInfo = null,
+                    };
+                }
+
+                type = type.BaseType;
+            }
+
+            throw new Exception($"Unable to get type from {source}");
         }
 
         /// <summary>
@@ -52,7 +221,7 @@ namespace SaintsField.Editor.Utils
                 {
                     string elementName = element.Substring(0, element.IndexOf("["));
                     int index = Convert.ToInt32(element.Substring(element.IndexOf("[")).Replace("[", "").Replace("]", ""));
-                    obj = GetValue_Imp(obj, elementName, index);
+                    obj = GetValue_Imp(obj, index);
                 }
                 else
                 {
@@ -92,23 +261,37 @@ namespace SaintsField.Editor.Utils
             return null;
         }
 
-        private static object GetValue_Imp(object source, string name, int index)
+        private static object GetValue_Imp(object source, int index)
         {
-            if (!(GetValue_Imp(source, name) is IEnumerable enumerable))
+            if (!(source is IEnumerable enumerable))
             {
-                return null;
+                throw new Exception($"Not a enumerable {source}");
             }
 
-            IEnumerator enumerator = enumerable.GetEnumerator();
-            for (int i = 0; i <= index; i++)
+            int searchIndex = 0;
+            Debug.Log($"start check index in {source}");
+            foreach (object result in enumerable)
             {
-                if (!enumerator.MoveNext())
+                Debug.Log($"check index {searchIndex} in {source}");
+                if(searchIndex == index)
                 {
-                    return null;
+                    return result;
                 }
+                searchIndex++;
             }
 
-            return enumerator.Current;
+            throw new Exception($"Not found index {index} in {source}");
+
+            // IEnumerator enumerator = enumerable.GetEnumerator();
+            // for (int i = 0; i <= index; i++)
+            // {
+            //     if (!enumerator.MoveNext())
+            //     {
+            //         return null;
+            //     }
+            // }
+            //
+            // return enumerator.Current;
         }
 
         public static Type GetType(SerializedProperty prop)
