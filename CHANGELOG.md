@@ -1,7 +1,13 @@
 ## 1.1.0 ##
 
-*   Allow for list
+*   Allow for list/array field
 *   `RichLabel` no longer draw a background
+*   Massive fix for callbacks that did not use the parent container as the target
+*   Fix image cached logic for `AssetPreview` and `AboveImage`/`BelowImage`
+*   Fix `Dropdown` when you put it on a field of a `struct`
+*   Now you can use `RichLabel` to override child field of an array/list
+
+The core of how `Attribute`s are discovered is now changed. This version should be compatible with old ones, but in case I pumped the minor version number to `1`.
 
 ## 1.0.9 ##
 
