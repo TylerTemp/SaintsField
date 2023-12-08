@@ -37,6 +37,11 @@ namespace SaintsField.Editor.Drawers
 
         private Texture2D GetPreview(SerializedProperty property, int width, int maxHeight, float viewWidth, string name)
         {
+            if (viewWidth < 0)
+            {
+                return null;
+            }
+
             _error = "";
 
             bool targetChanged;

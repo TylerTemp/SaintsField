@@ -360,7 +360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ce5118ba42f4824cbe1daf592932b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ints: 02000000
+  _ints: 0200000002000000
   myStructs:
   - minMax: {x: 0.19696581, y: 0.8069658}
     normalFloat: 0
@@ -703,6 +703,7 @@ MonoBehaviour:
   animStateName: Idle
   animParamName: Trigger
   animParamHash: -707381567
+  animParamHashes: c136d6d572017303
 --- !u!95 &380193380
 Animator:
   serializedVersion: 3
@@ -2975,6 +2976,8 @@ MonoBehaviour:
   _texture2D: {fileID: 2800000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   _go: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   _sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
+  sprites:
+  - {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
 --- !u!4 &2118824044
 Transform:
   m_ObjectHideFlags: 0

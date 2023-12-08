@@ -6,7 +6,7 @@ namespace SaintsField.Samples
     public class ArrayLabelExample : MonoBehaviour
     {
         // this wont work
-        [RichLabel("HI"), InfoBox("this actually wont work", EMessageType.Warning)] public int[] _ints;
+        [RichLabel("HI"), InfoBox("this will apply to all element", EMessageType.Warning)] public int[] _ints;
 
         [Serializable]
         public struct MyStruct

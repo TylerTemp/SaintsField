@@ -18,5 +18,8 @@ namespace SaintsField.Samples
 
         [AnimatorParam(nameof(Animator))]
         public int animParamHash;
+
+        [AnimatorParam(nameof(Animator))]
+        public int[] animParamHashes;
     }
 }

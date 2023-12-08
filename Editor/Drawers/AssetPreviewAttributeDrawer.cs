@@ -30,6 +30,11 @@ namespace SaintsField.Editor.Drawers
 
         private Texture2D GetPreview(int width, int maxHeight, float viewWidth, Object target)
         {
+            if (viewWidth < 0)
+            {
+                return null;
+            }
+
             // if (property.propertyType != SerializedPropertyType.ObjectReference ||
             //     property.objectReferenceValue == null)
             // {
@@ -54,7 +59,9 @@ namespace SaintsField.Editor.Drawers
                 return _cachedWidthTexture = _previewTexture;
             }
 
+            // Debug.Log($"viewWidth={viewWidth}, width={width}, maxHeight={maxHeight}, _previewTexture.width={_previewTexture.width}, _previewTexture.height={_previewTexture.height}");
             (int scaleWidth, int scaleHeight) = SaintsField.Utils.Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, _previewTexture.width, _previewTexture.height);
+            // Debug.Log($"scaleWidth={scaleWidth}, scaleHeight={scaleHeight}");
 
             if (_cachedWidth == scaleWidth && _cachedHeight == scaleHeight && _cachedWidthTexture != null && _cachedWidthTexture.width != 1 && _cachedWidthTexture.height != 1)
             {
@@ -150,7 +157,6 @@ namespace SaintsField.Editor.Drawers
 
         private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
-
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             int maxWidth = assetPreviewAttribute.MaxWidth;
             // int useWidth = maxWidth == -1? Mathf.FloorToInt(position.width): Mathf.Min(maxWidth, Mathf.FloorToInt(position.width));
