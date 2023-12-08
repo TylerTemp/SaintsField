@@ -516,7 +516,7 @@ namespace SaintsField.Editor.Core
             // bool completelyDisableLabel = string.IsNullOrEmpty(label.text);
             GUIContent useGuiContent;
 
-            Action saintsPropertyDrawerDrawLabelCallback = () => { };
+            // Action saintsPropertyDrawerDrawLabelCallback = () => { };
             if (string.IsNullOrEmpty(label.text))
             {
                 // needFallbackLabel = true;
@@ -540,9 +540,9 @@ namespace SaintsField.Editor.Core
                 {
                     // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
 
-                    saintsPropertyDrawerDrawLabelCallback = () =>
-                        labelDrawerInstance.DrawLabel(labelRect, property, label,
-                            labelAttributeWithIndex.SaintsAttribute);
+                    // saintsPropertyDrawerDrawLabelCallback = () =>
+                    labelDrawerInstance.DrawLabel(labelRect, property, label,
+                        labelAttributeWithIndex.SaintsAttribute);
                 }
                 useGuiContent = hasLabelSpace
                     ? new GUIContent(label) {text = "                 "}
@@ -622,7 +622,7 @@ namespace SaintsField.Editor.Core
             }
 
             // Debug.Log($"after field: ValueChange={_valueChange}");
-            saintsPropertyDrawerDrawLabelCallback?.Invoke();
+            // saintsPropertyDrawerDrawLabelCallback?.Invoke();
             #endregion
 
             // #region label click

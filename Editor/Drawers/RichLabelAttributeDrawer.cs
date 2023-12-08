@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -85,7 +86,9 @@ namespace SaintsField.Editor.Drawers
                 {
                     MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
                     ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
+                    ParameterInfo[] requiredParams = methodParams.Where(p => !p.IsOptional).ToArray();
+                    // Debug.Assert(methodParams.All(p => p.IsOptional));
+                    Debug.Assert(requiredParams.Length <= 1);
                     if (methodInfo.ReturnType != typeof(string))
                     {
                         _error =
@@ -93,10 +96,52 @@ namespace SaintsField.Editor.Drawers
                     }
                     else
                     {
+                        int arrayIndex = 0;
+                        bool dataCallback = false;
+                        if (requiredParams.Length == 1)
+                        {
+                            Debug.Assert(requiredParams[0].ParameterType == typeof(int));
+                            string[] propPaths = property.propertyPath.Split('.');
+                            string lastPropPath = propPaths[propPaths.Length - 1];
+                            if(lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
+                            {
+                                dataCallback = true;
+                                arrayIndex = int.Parse(lastPropPath.Substring(5, lastPropPath.Length - 6));
+                            }
+                        }
+
+                        object[] passParams;
+                        if(dataCallback)
+                        {
+                            List<object> injectedParams = new List<object>();
+                            bool injected = false;
+                            foreach (ParameterInfo methodParam in methodParams)
+                            {
+                                if (!injected && methodParam.ParameterType == typeof(int))
+                                {
+                                    injectedParams.Add(arrayIndex);
+                                    injected = true;
+                                }
+                                else
+                                {
+                                    injectedParams.Add(methodParam.DefaultValue);
+                                }
+                            }
+                            passParams = injectedParams.ToArray();
+                        }
+                        else
+                        {
+                            passParams = methodParams
+                                .Select(p => p.DefaultValue)
+                                .ToArray();
+                        }
+
                         try
                         {
-                            return (string)methodInfo.Invoke(target,
-                                methodParams.Select(p => p.DefaultValue).ToArray());
+                            return (string)methodInfo.Invoke(
+                                target,
+                                passParams
+                            );
                         }
                         catch (TargetInvocationException e)
                         {

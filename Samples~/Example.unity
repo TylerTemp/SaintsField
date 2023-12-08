@@ -2395,7 +2395,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rainbow: 22
   _callbackToggle: 0
+  arrayLabels:
+  - 
+  - 
+  - 
+  - 
   _propertyLabel: Callback Label!
+  colorClear: 
+  colorWhite: 
+  colorBlack: 
+  colorGray: 
+  colorRed: 
+  colorPink: 
+  colorOrange: 
+  colorYellow: 
+  colorGreen: 
+  colorBlue: 
+  colorIndigo: 
+  colorViolet: 
   _myStructWorkAround:
     LabelFloat: 12.55
     Scene: 0

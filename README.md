@@ -56,10 +56,14 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 **1.1.0**
 
-*   Allow for list
+*   Allow for list/array field
 *   `RichLabel` no longer draw a background
+*   Massive fix for callbacks that did not use the parent container as the target
+*   Fix image cached logic for `AssetPreview` and `AboveImage`/`BelowImage`
+*   Fix `Dropdown` when you put it on a field of a `struct`
+*   Now you can use `RichLabel` to override child field of an array/list
 
-The core of how `Attribute`s are discovered is now changed. This version should be compatible with old ones, but in case I pumped the minor version to `1`.
+The core of how `Attribute`s are discovered is now changed. This version should be compatible with old ones, but in case I pumped the minor version number to `1`.
 
 ## Document ##
 
@@ -85,6 +89,9 @@ The core of how `Attribute`s are discovered is now changed. This version should 
     for `color` it supports:
 
     *   `Clear`, `White`, `Black`, `Gray`, `Red`, `Pink`, `Orange`, `Yellow`, `Green`, `Blue`, `Indigo`, `Violet`
+
+         ![color_list](https://github.com/TylerTemp/SaintsField/assets/6391063/24638017-58ab-4f34-843b-3c76a9d012f2)
+
     *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
 
 *   `bool isCallback=false`
@@ -92,6 +99,16 @@ The core of how `Attribute`s are discovered is now changed. This version should 
     if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
 
 *   AllowMultiple: No. A field can only have one `RichLabel`
+
+Special Note:
+
+Use it on an array/list will apply it to all the direct child element instead of the field label itself.
+You can use this to modify elements of an array/list field, in this way:
+
+1.  Ensure you make it a callback: `isCallback=true`
+2.  Your function must receive one `int` argument
+3.  The `int` argument will receive a value from `0` to `length-1` of the array/list
+4.  Return the desired label content from the function
 
 ```csharp
 public class RichLabel: MonoBehaviour
@@ -123,6 +140,16 @@ public class RichLabel: MonoBehaviour
 
 [![richlabel](https://github.com/TylerTemp/SaintsField/assets/6391063/5e865350-6eeb-4f2a-8305-c7d8b8720eac)](https://github.com/TylerTemp/SaintsField/assets/6391063/25f6c7cc-ee7e-444e-b078-007dd6df499e)
 
+Here is an example of using on a array:
+
+```csharp
+[RichLabel(nameof(ArrayLabels), true)]
+public string[] arrayLabels;
+
+private string ArrayLabels(int index) => $"<color=pink>[{(char)('A' + index)}]";
+```
+
+![label_array](https://github.com/TylerTemp/SaintsField/assets/6391063/232da62c-9e31-4415-a09a-8e1e95ae9441)
 
 #### `AboveRichLabel` / `BelowRichLabel` ####
 
@@ -1221,26 +1248,14 @@ This only works for decorator draws above or below the field. The above drawer w
 
 **List/Array**
 
-1.  Directly using on list/array will not work
-2.  Using on list/array's element works
+Directly using on list/array will apply to every direct element of the list
 
 Unlike NaughtyAttributes, `SaintsField` does not need a `Nested` attribute to work on list/array's element.
 
 ```csharp
 public class ArrayLabelExample : MonoBehaviour
 {
-    // this won't work
-    [RichLabel("HI"), InfoBox("this actually wont work", EMessageType.Warning)] public int[] _ints;
-
-    [Serializable]
-    public struct MyStruct
-    {
-        // this works
-        [RichLabel("HI"), MinMaxSlider(0f, 1f)] public Vector2 minMax;
-        public float normalFloat;
-    }
-
-    public MyStruct[] myStructs;
+    [Scene] public int myScenes;
 }
 ```
 
