@@ -1,7 +1,8 @@
 // using MarkupAttributes;
+
 using UnityEngine;
 
-namespace SaintsField.Samples
+namespace SaintsField.Samples.Scripts
 {
     public class CompatibilityNaAndDefault : MonoBehaviour
     {
