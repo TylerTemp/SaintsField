@@ -16,49 +16,51 @@ namespace SaintsField.Editor.Drawers
     public class ShowImageAttributeDrawer: SaintsPropertyDrawer
     {
         private Texture2D _originTexture;
-        private Texture2D _previewTexture;
+        // private Texture2D _previewTexture;
 
         private string _error = "";
 
-        ~ShowImageAttributeDrawer()
-        {
-            CleanPreviewTexture(_previewTexture);
-            _previewTexture = null;
-        }
+        // ~ShowImageAttributeDrawer()
+        // {
+        //     CleanPreviewTexture(_previewTexture);
+        //     _previewTexture = null;
+        // }
 
-        private static void CleanPreviewTexture(Texture2D texture2D)
-        {
-            if(texture2D && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(texture2D)))
-            {
-                Object.DestroyImmediate(texture2D);
-                // _previewTexture = null;
-            }
-        }
+        // private static void CleanPreviewTexture(Texture2D texture2D)
+        // {
+        //     if(texture2D && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(texture2D)))
+        //     {
+        //         Object.DestroyImmediate(texture2D);
+        //         // _previewTexture = null;
+        //     }
+        // }
 
-        private Texture2D GetPreview(SerializedProperty property, int width, int maxHeight, float viewWidth, string name)
+        private (Texture2D, float preferredWidth, float preferredHeight) GetPreview(SerializedProperty property, int maxWidth, int maxHeight, float viewWidth, string name)
         {
-            if (viewWidth < 0)
+            // Debug.Log($"viewWidth={viewWidth}");
+            if (viewWidth - 1f < Mathf.Epsilon)
             {
-                return null;
+                return (null, maxWidth, maxWidth);
             }
 
             _error = "";
 
-            bool targetChanged;
+            // bool targetChanged;
             SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
             if (prop != null)
             {
                 if(prop.propertyType != SerializedPropertyType.ObjectReference)
                 {
                     _error = $"Expect ObjectReference for `{name}`, get {prop.propertyType}";
-                    return null;
+                    return (null, 0, 0);
                 }
 
-                targetChanged = CheckSetOriginalTextureAndError(prop.objectReferenceValue);
+                // targetChanged = CheckSetOriginalTextureAndError(prop.objectReferenceValue);
+                CheckSetOriginalTextureAndError(prop.objectReferenceValue);
 
                 if(_error != "")
                 {
-                    return null;
+                    return (null, 0, 0);
                 }
             }
             else
@@ -71,13 +73,15 @@ namespace SaintsField.Editor.Drawers
                 {
                     case ReflectUtils.GetPropType.Field:
                     {
-                        targetChanged = CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
+                        // targetChanged = CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
+                        CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
                         break;
                     }
 
                     case ReflectUtils.GetPropType.Property:
                     {
-                        targetChanged = CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
+                        // targetChanged = CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
+                        CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
                         break;
                     }
                     case ReflectUtils.GetPropType.Method:
@@ -95,15 +99,16 @@ namespace SaintsField.Editor.Drawers
                         {
                             _error = e.InnerException!.Message;
                             Debug.LogException(e);
-                            return null;
+                            return (null, 0, 0);
                         }
                         catch (Exception e)
                         {
                             _error = e.Message;
-                            return null;
+                            return (null, 0, 0);
                         }
 
-                        targetChanged = CheckSetOriginalTextureAndError(result);
+                        // targetChanged = CheckSetOriginalTextureAndError(result);
+                        CheckSetOriginalTextureAndError(result);
 
                         break;
                     }
@@ -111,7 +116,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         _error =
                             $"not found `{name}` on `{target}`";
-                        return null;
+                        return (null, 0, 0);
                     }
                     default:
                         throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
@@ -120,68 +125,72 @@ namespace SaintsField.Editor.Drawers
 
             if(_error != "")
             {
-                return null;
+                return (null, 0, 0);
             }
 
-            bool previewTextureNull = _previewTexture == null;
-            if(!previewTextureNull && _previewTexture.width == 1 && _previewTexture.height == 1)
-            {
-                targetChanged = true;
-            }
-
-            if (!previewTextureNull && !targetChanged)
-            {
-                return _previewTexture;
-            }
+            // bool previewTextureNull = _previewTexture == null;
+            // if(!previewTextureNull && _previewTexture.width == 1 && _previewTexture.height == 1)
+            // {
+            //     targetChanged = true;
+            // }
+            //
+            // if (!previewTextureNull && !targetChanged)
+            // {
+            //     return _previewTexture;
+            // }
 
             if (_originTexture == null)
             {
-                return null;
+                return (null, 0, 0);
             }
 
-            CleanPreviewTexture(_previewTexture);
+            // CleanPreviewTexture(_previewTexture);
 
-            bool widthOk = width == -1 || _originTexture.width <= viewWidth;
+            bool widthOk = maxWidth == -1
+                ? _originTexture.width <= viewWidth
+                : _originTexture.width <= maxWidth;
             bool heightOk = maxHeight == -1 || _originTexture.height <= maxHeight;
 
             if (widthOk && heightOk)  // original width & smaller than view width
             {
-                _previewTexture = _originTexture;
-            }
-            else  // fixed width / overflow height
-            {
-                (int scaleWidth, int scaleHeight) = SaintsField.Utils.Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, _originTexture.width, _originTexture.height);
-                _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, scaleWidth, scaleHeight);
+                // Debug.Log($"_originTexture {_originTexture.width}x{_originTexture.height} <= viewWidth {viewWidth}; width={width}");
+                return (_originTexture, _originTexture.width, _originTexture.height);
             }
 
-            if (_originTexture.width <= width && (maxHeight == -1 || _previewTexture.height <= maxHeight))
-            {
-                // _previewTexture = SaintsField.Utils.Tex.ConvertToCompatibleFormat(_originTexture);
-                // Debug.Log($"use original height {_originTexture.height}");
-                _previewTexture = _originTexture;
-            }
-            else
-            {
-                // Debug.Log($"use original height {_originTexture.height}");
-                _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, width, maxHeight);
-            }
+            // fixed width / overflow height
+            (int scaleWidth, int scaleHeight) = SaintsField.Utils.Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), maxWidth, maxHeight, _originTexture.width, _originTexture.height);
+            // Debug.Log($"scale to {scaleWidth}x{scaleHeight}; from {_originTexture.width}x{_originTexture.height}; viewWidth={viewWidth}, fitTo={maxWidth}x{maxHeight}");
+            return (_originTexture, scaleWidth, scaleHeight);
+            // _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, scaleWidth, scaleHeight);
 
-            return _previewTexture;
+            // if (_originTexture.width <= width && (maxHeight == -1 || _previewTexture.height <= maxHeight))
+            // {
+            //     // _previewTexture = SaintsField.Utils.Tex.ConvertToCompatibleFormat(_originTexture);
+            //     // Debug.Log($"use original height {_originTexture.height}");
+            //     _previewTexture = _originTexture;
+            // }
+            // else
+            // {
+            //     // Debug.Log($"use original height {_originTexture.height}");
+            //     _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, width, maxHeight);
+            // }
+            //
+            // return _previewTexture;
         }
 
-        private bool CheckSetOriginalTextureAndError(object result)
+        private void CheckSetOriginalTextureAndError(object result)
         {
-            bool targetChanged;
+            // bool targetChanged;
 
             _error = "";
             switch (result)
             {
                 case Sprite sprite:
-                    targetChanged = !ReferenceEquals(_originTexture, sprite.texture);
+                    // targetChanged = !ReferenceEquals(_originTexture, sprite.texture);
                     _originTexture = sprite.texture;
                     break;
                 case Texture2D texture2D:
-                    targetChanged = !ReferenceEquals(_originTexture, texture2D);
+                    // targetChanged = !ReferenceEquals(_originTexture, texture2D);
                     _originTexture = texture2D;
                     break;
                 // case Texture texture:
@@ -189,27 +198,28 @@ namespace SaintsField.Editor.Drawers
                 //     _originTexture = texture as Texture2D;
                 //     break;
                 case SpriteRenderer spriteRenderer:
-                    targetChanged = !ReferenceEquals(_originTexture, spriteRenderer.sprite.texture);
+                    // targetChanged = !ReferenceEquals(_originTexture, spriteRenderer.sprite.texture);
                     _originTexture = spriteRenderer.sprite.texture;
                     break;
                 case Image image:
-                    targetChanged = !ReferenceEquals(_originTexture, image.sprite.texture);
+                    // targetChanged = !ReferenceEquals(_originTexture, image.sprite.texture);
                     _originTexture = image.sprite.texture;
                     break;
                 case RawImage image:
-                    targetChanged = !ReferenceEquals(_originTexture, image.texture);
+                    // targetChanged = !ReferenceEquals(_originTexture, image.texture);
                     _originTexture = image.texture as Texture2D;
                     break;
                 case Button button:
-                    targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);
+                    // targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);
                     _originTexture = button.targetGraphic.mainTexture as Texture2D;
                     break;
                 default:
                     _error = $"Expect Sprite or Texture2D, get {(result == null? "null": result.GetType().ToString())}";
-                    return false;
+                    // return false;
+                    break;
             }
 
-            return targetChanged;
+            // return targetChanged;
         }
 
         protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -249,6 +259,8 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute)
         {
+            // Debug.Log($"draw below view width: {width}");
+
             if (_error != "")
             {
                 return HelpBox.GetHeight(_error, width, MessageType.Error);
@@ -280,8 +292,9 @@ namespace SaintsField.Editor.Drawers
             // int useWidth = maxWidth == -1? viewWidth: Mathf.Min(maxWidth, viewWidth);
             int maxHeight = showImageAttribute.MaxHeight;
 
-            Texture2D previewTexture = GetPreview(property, maxWidth, maxHeight, width, showImageAttribute.ImageCallback);
+            (Texture2D _, float _, float preferredHeight) = GetPreview(property, maxWidth, maxHeight, width, showImageAttribute.ImageCallback);
 
+            // Debug.Log($"GetImageHeight viewWidth={width} -> {preferredHeight}");
             // if (previewTexture)
             // {
             //     Debug.Log($"get preview {previewTexture.width}x{previewTexture.height}");
@@ -291,19 +304,30 @@ namespace SaintsField.Editor.Drawers
             //     Debug.Log($"get no preview");
             // }
             // ReSharper disable once Unity.NoNullPropagation
-            return previewTexture?.height ?? 0;
+            return preferredHeight;
         }
 
         private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
+            // Debug.Log($"Draw height: {position.height}");
+
+            if (position.height <= 0)
+            {
+                // Debug.Log($"height<0: {position.height}");
+                return position;
+            }
+
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
             int maxWidth = showImageAttribute.MaxWidth;
             // int useWidth = maxWidth == -1? Mathf.FloorToInt(position.width): Mathf.Min(maxWidth, Mathf.FloorToInt(position.width));
             // int maxHeight = Mathf.Min(assetPreviewAttribute.MaxHeight, Mathf.FloorToInt(position.height));
             int maxHeight = showImageAttribute.MaxHeight;
 
-            Texture2D previewTexture = GetPreview(property, maxWidth, maxHeight, position.width, showImageAttribute.ImageCallback);
+            // Debug.Log($"Draw height={position.height}");
 
+            (Texture2D previewTexture, float preferredWidth, float preferredHeight)  = GetPreview(property, maxWidth, maxHeight, position.width, showImageAttribute.ImageCallback);
+
+            // Debug.Log($"preview to {preferredWidth}x{preferredHeight}");
             // if (previewTexture)
             // {
             //     Debug.Log($"draw get preview {previewTexture.width}x{previewTexture.height}");
@@ -327,10 +351,10 @@ namespace SaintsField.Editor.Drawers
                     xOffset = 0;
                     break;
                 case EAlign.Center:
-                    xOffset = (position.width - previewTexture.width) / 2;
+                    xOffset = (position.width - preferredWidth) / 2;
                     break;
                 case EAlign.End:
-                    xOffset = position.width - previewTexture.width;
+                    xOffset = position.width - preferredWidth;
                     break;
                 case EAlign.FieldStart:
                     xOffset = EditorGUIUtility.labelWidth;
@@ -342,12 +366,18 @@ namespace SaintsField.Editor.Drawers
             Rect previewRect = new Rect(position)
             {
                 x = position.x + xOffset,
-                height = previewTexture.height,
+                height = preferredHeight,
+                width = preferredWidth,
             };
 
-            GUI.Label(previewRect, previewTexture);
+            // EditorGUI.DrawRect(previewRect, Color.blue);
 
-            return RectUtils.SplitHeightRect(position, previewTexture.height).leftRect;
+            GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
+
+            // GUI.Label(previewRect, previewTexture);
+            // GUI.Label(previewRect, new GUIContent(previewTexture));
+
+            return RectUtils.SplitHeightRect(position, preferredHeight).leftRect;
         }
     }
 }

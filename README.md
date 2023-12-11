@@ -54,16 +54,12 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.1.0**
+**1.1.1**
 
-*   Allow for list/array field
-*   `RichLabel` no longer draw a background
-*   Massive fix for callbacks that did not use the parent container as the target
-*   Fix image cached logic for `AssetPreview` and `AboveImage`/`BelowImage`
-*   Fix `Dropdown` when you put it on a field of a `struct`
-*   Now you can use `RichLabel` to override child field of an array/list
-
-The core of how `Attribute`s are discovered is now changed. This version should be compatible with old ones, but in case I pumped the minor version number to `1`.
+*   Fix `AboveImage` and `BelowImage` won't scale if the target image is not readable/writeable
+*   Fix `AboveImage` and `BelowImage` scale logic
+*   Rename `Range` to `PropRange`
+*   Fix a bug that the space below the field is calculated incorrectly
 
 ## Document ##
 
@@ -658,7 +654,7 @@ dropdownList.AddSeparator();  // add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
-#### `Range` ####
+#### `PropRange` ####
 
 Very like Unity's `Range` but allow you to dynamically change the range, plus allow to set range step.
 
@@ -674,11 +670,11 @@ public class RangeExample: MonoBehaviour
     public int min;
     public int max;
 
-    [Range(nameof(min), nameof(max))] public float rangeFloat;
-    [Range(nameof(min), nameof(max))] public int rangeInt;
+    [PropRange(nameof(min), nameof(max))] public float rangeFloat;
+    [PropRange(nameof(min), nameof(max))] public int rangeInt;
 
-    [Range(nameof(min), nameof(max), step: 0.5f)] public float rangeFloatStep;
-    [Range(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
+    [PropRange(nameof(min), nameof(max), step: 0.5f)] public float rangeFloatStep;
+    [PropRange(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
 }
 ```
 
@@ -1255,7 +1251,19 @@ Unlike NaughtyAttributes, `SaintsField` does not need a `Nested` attribute to wo
 ```csharp
 public class ArrayLabelExample : MonoBehaviour
 {
-    [Scene] public int myScenes;
+    // works for list/array
+    [Scene] public int[] myScenes;
+    
+    [System.Serializable]
+    public struct MyStruct
+    {
+        public bool enableFlag;
+    
+        [AboveRichLabel("No need for `[Nested]`, it just works")]
+        public int integer;
+    }
+    
+    public MyStruct myStruct;
 }
 ```
 
@@ -1296,7 +1304,7 @@ public class CompatibilityNaAndDefault : MonoBehaviour
 Unlike `NaghthyAttributes`/`Odin`, `SaintsField` does not have a decorator like `Tag`, or `GroupBox` that puts several fields into one place
 because it does not inject a global `CustomEditor`.
 
-For the same reason, it can not handle `NonSerializedField` and `AutoPropertyField`. Because they are all not `PropertyAttribute`.
+For the same reason, it can not handle `NonSerializedField` and `AutoPropertyField` (unless you give a `[field: SerializedFile]` decorator to make it as a normal property). Because they are all not `PropertyAttribute`.
 
 **Other Drawers**
 
@@ -1311,7 +1319,7 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 
     NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
 
-My (not full) tested about compatibility:
+My (not full) test about compatibility:
 
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
 *   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.

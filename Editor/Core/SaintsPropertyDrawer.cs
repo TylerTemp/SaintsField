@@ -289,6 +289,7 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"aboveHeight={aboveHeight}");
 
             // Debug.Log($"_labelFieldBasicHeight={_labelFieldBasicHeight}");
+            // Debug.Log($"prop basicheight={_labelFieldBasicHeight}, above={aboveHeight}, below={belowHeight}");
 
             return _labelFieldBasicHeight + aboveHeight + belowHeight;
         }
@@ -349,6 +350,7 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // Debug.Log($"raw pos={position.y} height={position.height}");
             _cachedPropPath = property.propertyPath;
 
             if (!PropertyPathToShared.ContainsKey(property.propertyPath))
@@ -690,11 +692,14 @@ namespace SaintsField.Editor.Core
             #endregion
 
             #region below
+            // Debug.Log($"pos.y={position.y}; pos.h={position.height}; fieldRect.y={fieldRect.y}; fieldRect.height={fieldRect.height}");
             Rect belowRect = EditorGUI.IndentedRect(new Rect(position)
             {
                 y = fieldRect.y + _labelFieldBasicHeight,
-                height = position.y - fieldRect.y - fieldRect.height,
+                height = position.y + position.height - (fieldRect.y + fieldRect.height),
             });
+
+            // Debug.Log($"belowRect={belowRect}");
 
             Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawers =
                 new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();

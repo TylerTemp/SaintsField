@@ -6,9 +6,10 @@ namespace SaintsField.Utils
     {
         public static (int width, int height) GetProperScaleRect(int maxWidth, int widthLimit, int heightLimit, int curWidth, int curHeight)
         {
-            Debug.Assert(maxWidth > 0);
+            Debug.Assert(maxWidth > 0, $"maxWidth {maxWidth} <= 0");
 
             (int rectScaleWidth, int rectScaleHeight) = FitScale(widthLimit, heightLimit, curWidth, curHeight);
+            // Debug.Log($"first fit {rectScaleWidth}x{rectScaleHeight} from {curWidth}x{curHeight} by {widthLimit}x{heightLimit}");
             if(rectScaleWidth > maxWidth)
             {
                 (rectScaleWidth, rectScaleHeight) = FitScale(maxWidth, heightLimit, rectScaleWidth, rectScaleHeight);
@@ -136,16 +137,18 @@ namespace SaintsField.Utils
 
                 return (newWidth, newHeight);
             }
-            if(widthLimit == -1)  // fit height
+            if(widthLimit == -1)
             {
                 int newWidth = Mathf.RoundToInt((float)oriWidth * heightLimit / oriHeight);
-                return (newWidth, oriHeight);
+                // Debug.Log($"newWidth {newWidth} = oriWidth {oriWidth} * heightLimit {heightLimit} / oriHeight {oriHeight}");
+                return (newWidth, heightLimit);
             }
             // ReSharper disable once InvertIf
-            if (heightLimit == -1) // fit width
+            if (heightLimit == -1)
             {
                 int newHeight = Mathf.RoundToInt((float)oriHeight * widthLimit / oriWidth);
-                return (oriWidth, newHeight);
+                // Debug.Log($"newHeight {newHeight} = oriHeight {oriHeight} * widthLimit {widthLimit} / oriWidth {oriWidth}");
+                return (widthLimit, newHeight);
             }
             // -1, -1
             return (oriWidth, oriHeight);

@@ -7,10 +7,10 @@ namespace SaintsField
         public int min;
         public int max;
 
-        [Range(nameof(min), nameof(max))] public float rangeFloat;
-        [Range(nameof(min), nameof(max))] public int rangeInt;
+        [PropRange(nameof(min), nameof(max))] public float rangeFloat;
+        [PropRange(nameof(min), nameof(max))] public int rangeInt;
 
-        [Range(nameof(min), nameof(max), step: 0.5f)] public float rangeFloatStep;
-        [Range(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
+        [PropRange(nameof(min), nameof(max), step: 0.5f)] public float rangeFloatStep;
+        [PropRange(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
     }
 }
