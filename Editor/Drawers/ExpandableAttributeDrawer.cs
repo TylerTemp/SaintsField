@@ -69,6 +69,11 @@ namespace SaintsField.Editor.Drawers
                 return leftRect;
             }
 
+            SerializedObject serializedObject = new SerializedObject(scriptableObject);
+            serializedObject.Update();
+
+            float usedHeight = 0f;
+
             Rect indentedRect;
             using (new EditorGUI.IndentLevelScope(1))
             {
@@ -78,25 +83,26 @@ namespace SaintsField.Editor.Drawers
             // _editor ??= UnityEditor.Editor.CreateEditor(scriptableObject);
             // _editor.OnInspectorGUI();
 
-            SerializedObject serializedObject = new SerializedObject(scriptableObject);
-            serializedObject.Update();
-
-            float usedHeight = 0f;
-            foreach (SerializedProperty childProperty in GetAllField(serializedObject))
+            using(new EditorGUI.IndentLevelScope(1))
+            using(new AdaptLabelWidth())
+            using(new ResetIndentScoop())
             {
-                float childHeight = GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName));
-                Rect childRect = new Rect()
+                foreach (SerializedProperty childProperty in GetAllField(serializedObject))
                 {
-                    x = indentedRect.x,
-                    y = indentedRect.y + usedHeight,
-                    width = indentedRect.width,
-                    height = childHeight,
-                };
+                    float childHeight = GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName));
+                    Rect childRect = new Rect
+                    {
+                        x = indentedRect.x,
+                        y = indentedRect.y + usedHeight,
+                        width = indentedRect.width,
+                        height = childHeight,
+                    };
 
-                // NaughtyEditorGUI.PropertyField(childRect, childProperty, true);
-                EditorGUI.PropertyField(childRect, childProperty, true);
+                    // NaughtyEditorGUI.PropertyField(childRect, childProperty, true);
+                    EditorGUI.PropertyField(childRect, childProperty, true);
 
-                usedHeight += childHeight;
+                    usedHeight += childHeight;
+                }
             }
 
             serializedObject.ApplyModifiedProperties();

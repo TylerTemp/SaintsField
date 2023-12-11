@@ -9,6 +9,8 @@ namespace SaintsField.Samples.Scripts
         [RichLabel("<color=red><label /></color>"), PropRange(0, 100)]
         private int _intRange;
 
-        public int _publicValue;
+        public int publicValue;
+
+        [RichLabel(null)] public string noLabel;
     }
 }

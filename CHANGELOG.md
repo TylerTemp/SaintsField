@@ -1,3 +1,7 @@
+## 1.1.2 ##
+
+*   Fix indent for `Expandable`
+
 ## 1.1.1 ##
 
 *   Fix `AboveImage` and `BelowImage` won't scale if the target image is not readable/writeable
