@@ -1,6 +1,10 @@
 ## 1.1.2 ##
 
 *   Fix indent for `Expandable`
+*   Add `GetComponentInChildren`
+*   Add `GetComponent`
+*   Add `GetComponentInScene`
+*   Add `GetPrefabWithComponent`
 
 ## 1.1.1 ##
 
