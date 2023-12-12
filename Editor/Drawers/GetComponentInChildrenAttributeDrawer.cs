@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -28,7 +29,7 @@ namespace SaintsField.Editor.Drawers
 
             if (getComponentInChildrenAttribute.CompType == typeof(GameObject))
             {
-                _error = "You can not use GetComponentInChildrenAttribute with GameObject type";
+                _error = "You can not use GetComponentInChildren with GameObject type";
                 return false;
             }
 
@@ -48,7 +49,19 @@ namespace SaintsField.Editor.Drawers
                     return false;
             }
 
-            Component componentInChildren = transform.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
+            // var directChildren = transform.Cast<Transform>();
+
+            Component componentInChildren = null;
+                // = transform.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
+            foreach (Transform directChildTrans in transform.Cast<Transform>())
+            {
+                componentInChildren = directChildTrans.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
+                if (componentInChildren != null)
+                {
+                    break;
+                }
+            }
+
             if (componentInChildren == null)
             {
                 _error = $"No {type} found in children";

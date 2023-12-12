@@ -4,10 +4,11 @@ namespace SaintsField.Samples.Scripts
 {
     public class GetComponentExample: MonoBehaviour
     {
-        [GetComponent] public GetComponentExample selfScript;
-        [GetComponent] public Dummy otherScript;
         [GetComponent] public BoxCollider otherComponent;
-        [GetComponent] public GameObject selfGameObject;
-        [GetComponent] public Transform selfTransform;
+        [GetComponent] public GameObject selfGameObject;  // get the GameObject itself
+        [GetComponent] public RectTransform selfRectTransform;  // useful for UI
+
+        [GetComponent] public GetComponentExample selfScript;  // yeah you can get your script itself
+        [GetComponent] public Dummy otherScript;  // other script
     }
 }

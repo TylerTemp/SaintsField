@@ -54,12 +54,15 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.1.1**
+**1.1.2**
 
-*   Fix `AboveImage` and `BelowImage` won't scale if the target image is not readable/writeable
-*   Fix `AboveImage` and `BelowImage` scale logic
-*   Rename `Range` to `PropRange`
-*   Fix a bug that the space below the field is calculated incorrectly
+*   Fix indent for `Expandable`
+*   Add `GetComponentInChildren`
+*   Add `GetComponent`
+*   Add `GetComponentInScene`
+*   Add `GetPrefabWithComponent`
+
+See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
 ## Document ##
 
@@ -1230,6 +1233,119 @@ public class MinMaxExample: MonoBehaviour
 ```
 
 [![minmax](https://github.com/TylerTemp/SaintsField/assets/6391063/7714fa76-fc5c-4ebc-9aae-be189cef7743)](https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604)
+
+#### `GetComponent` ####
+
+Automatically sign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
+
+*   `Type compType = null`
+    
+    The component type to sign. If null, it'll use the field type.
+    
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+```csharp
+public class GetComponentExample: MonoBehaviour
+{
+    [GetComponent] public BoxCollider otherComponent;
+    [GetComponent] public GameObject selfGameObject;  // get the GameObject itself
+    [GetComponent] public RectTransform selfRectTransform;  // useful for UI
+
+    [GetComponent] public GetComponentExample selfScript;  // yeah you can get your script itself
+    [GetComponent] public Dummy otherScript;  // other script
+}
+```
+
+![get_component](https://github.com/TylerTemp/SaintsField/assets/6391063/a5e9ca85-ab23-4b4a-b228-5d19c66c4052)
+
+#### `GetComponentInChildren` ####
+
+Automatically sign a component to a field, if the field value is null and the component is already attached to its child GameObjects. (First one found will be used)
+
+NOTE: Unlike `GetComponentInChildren` by Unity, this will **NOT** check the target object itself.
+
+*   `bool includeInactive = false`
+
+    Should inactive children be included? `true` to include inactive children.
+
+*   `Type compType = null`
+
+    The component type to sign. If null, it'll use the field type.
+  
+*   `string groupBy = ""` 
+
+    For error message grouping.
+
+```csharp
+public class GetComponentInChildrenExample: MonoBehaviour
+{
+    [GetComponentInChildren] public BoxCollider childBoxCollider;
+    // by setting compType, you can sign it as a different type
+    [GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
+    // and GameObject type works too
+    [GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
+}
+```
+
+![get_component_in_children](https://github.com/TylerTemp/SaintsField/assets/6391063/854aeefc-6456-4df2-a4a7-40a5cd5e2290)
+
+#### `GetComponentInScene` ####
+
+Automatically sign a component to a field, if the field value is null and the component is in the currently opened scene. (First one found will be used)
+
+*   `bool includeInactive = false`
+
+    Should inactive GameObject be included? `true` to include inactive GameObject.
+
+*   `Type compType = null`
+
+    The component type to sign. If null, it'll use the field type.
+  
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+```csharp
+public class GetComponentInSceneExample: MonoBehaviour
+{
+    [GetComponentInScene] public Dummy dummy;
+    // by setting compType, you can sign it as a different type
+    [GetComponentInScene(compType: typeof(Dummy))] public RectTransform dummyTrans;
+    // and GameObject type works too
+    [GetComponentInScene(compType: typeof(Dummy))] public GameObject dummyGo;
+}
+```
+
+![get_component_in_scene](https://github.com/TylerTemp/SaintsField/assets/6391063/95a008a2-c7f8-4bc9-90f6-57c58724ebaf)
+
+#### `GetPrefabWithComponent` ####
+
+Automatically sign a prefab to a field, if the field value is null and the prefab has the component. (First one found will be used)
+
+Recommended to use it with `FieldType`!
+
+*   `Type compType = null`
+
+    The component type to sign. If null, it'll use the field type.
+
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+```csharp
+public class GetPrefabWithComponentExample: MonoBehaviour
+{
+    [GetPrefabWithComponent] public Dummy dummy;
+    // get the prefab itself
+    [GetPrefabWithComponent(compType: typeof(Dummy))] public GameObject dummyPrefab;
+    // works so good with `FieldType`
+    [GetPrefabWithComponent(compType: typeof(Dummy)), FieldType(typeof(Dummy))] public GameObject dummyPrefabFieldType;
+}
+```
+
+![get_prefab_with_component](https://github.com/TylerTemp/SaintsField/assets/6391063/07eae93c-d2fc-4641-b71f-55a98f17b360)
 
 ## GroupBy ##
 
