@@ -5,6 +5,7 @@
 *   Add `GetComponent`
 *   Add `GetComponentInScene`
 *   Add `GetPrefabWithComponent`
+*   Add `AddComponent`
 
 ## 1.1.1 ##
 

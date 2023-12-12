@@ -16,6 +16,7 @@ Unity: 2020.2 or higher
 1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 2.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 3.  Allow dynamic arguments in many cases
+4.  Works on deep nested fields too!
 
 ## Installation ##
 
@@ -61,6 +62,7 @@ If you're using unitypackage or git submodule but you put this project under ano
 *   Add `GetComponent`
 *   Add `GetComponentInScene`
 *   Add `GetPrefabWithComponent`
+*   Add `AddComponent`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1284,7 +1286,7 @@ public class GetComponentInChildrenExample: MonoBehaviour
     [GetComponentInChildren] public BoxCollider childBoxCollider;
     // by setting compType, you can sign it as a different type
     [GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
-    // and GameObject type works too
+    // and GameObject field works too
     [GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
 }
 ```
@@ -1313,7 +1315,7 @@ public class GetComponentInSceneExample: MonoBehaviour
     [GetComponentInScene] public Dummy dummy;
     // by setting compType, you can sign it as a different type
     [GetComponentInScene(compType: typeof(Dummy))] public RectTransform dummyTrans;
-    // and GameObject type works too
+    // and GameObject field works too
     [GetComponentInScene(compType: typeof(Dummy))] public GameObject dummyGo;
 }
 ```
@@ -1347,6 +1349,30 @@ public class GetPrefabWithComponentExample: MonoBehaviour
 
 ![get_prefab_with_component](https://github.com/TylerTemp/SaintsField/assets/6391063/07eae93c-d2fc-4641-b71f-55a98f17b360)
 
+#### `AddComponent` ####
+
+Automatically add a component to the current target if the target does not have this component. (This will not sign the component added to the field)
+
+Recommended to use it with `GetComponent`!
+
+*   `Type compType = null`
+
+    The component type to add. If null, it'll use the field type.
+
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+```csharp
+public class AddComponentExample: MonoBehaviour
+{
+    [AddComponent, GetComponent] public Dummy dummy;
+    [AddComponent(typeof(BoxCollider)), GetComponent] public GameObject thisObj;
+}
+```
+
+![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
+
 ## GroupBy ##
 
 group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
@@ -1362,7 +1388,7 @@ This only works for decorator draws above or below the field. The above drawer w
 
 Directly using on list/array will apply to every direct element of the list
 
-Unlike NaughtyAttributes, `SaintsField` does not need a `Nested` attribute to work on list/array's element.
+Unlike NaughtyAttributes, `SaintsField` does not need a `AllowNesting` attribute to work on nested element.
 
 ```csharp
 public class ArrayLabelExample : MonoBehaviour
@@ -1375,7 +1401,7 @@ public class ArrayLabelExample : MonoBehaviour
     {
         public bool enableFlag;
     
-        [AboveRichLabel("No need for `[Nested]`, it just works")]
+        [AboveRichLabel("No need for `[AllowNesting]`, it just works")]
         public int integer;
     }
     
