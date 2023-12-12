@@ -19,10 +19,10 @@ namespace SaintsField.Editor.Core
         private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
 
-        public class SharedInfo
+        private class SharedInfo
         {
-            public bool changed;
-            public object parentTarget;
+            public bool Changed;
+            public object ParentTarget;
         }
 
         private static readonly Dictionary<string, SharedInfo> PropertyPathToShared = new Dictionary<string, SharedInfo>();
@@ -58,6 +58,7 @@ namespace SaintsField.Editor.Core
 
         private string _cachedPropPath;
 
+        // ReSharper disable once PublicConstructorInAbstractClass
         public SaintsPropertyDrawer()
         {
             // Debug.Log("new SaintsPropertyDrawer");
@@ -148,7 +149,7 @@ namespace SaintsField.Editor.Core
             {
                 PropertyPathToShared[propPath] = new SharedInfo
                 {
-                    parentTarget = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).parent,
+                    ParentTarget = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).parent,
                 };
             }
 
@@ -289,7 +290,6 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"aboveHeight={aboveHeight}");
 
             // Debug.Log($"_labelFieldBasicHeight={_labelFieldBasicHeight}");
-            // Debug.Log($"prop basicheight={_labelFieldBasicHeight}, above={aboveHeight}, below={belowHeight}");
 
             return _labelFieldBasicHeight + aboveHeight + belowHeight;
         }
@@ -335,15 +335,19 @@ namespace SaintsField.Editor.Core
 
         // protected bool _valueChange { get; private set; }
 
-        protected static void SetValueChanged(SerializedProperty property)
+        protected static void SetValueChanged(SerializedProperty property, bool changed=true)
         {
             // Debug.LogWarning($"set {property.propertyPath}=true");
-            PropertyPathToShared[property.propertyPath].changed = true;
+            if(!PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo sharedInfo))
+            {
+                PropertyPathToShared[property.propertyPath] = sharedInfo = new SharedInfo();
+            }
+            sharedInfo.Changed = changed;
         }
 
         protected object GetParentTarget(SerializedProperty property)
         {
-            return PropertyPathToShared[property.propertyPath].parentTarget;
+            return PropertyPathToShared[property.propertyPath].ParentTarget;
         }
 
         // protected object DirectParentObject { get; private set; }
@@ -368,7 +372,7 @@ namespace SaintsField.Editor.Core
             }
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
-            PropertyPathToShared[property.propertyPath].parentTarget = parent;
+            PropertyPathToShared[property.propertyPath].ParentTarget = parent;
 
             IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
                 .Select((each, index) => new SaintsWithIndex
@@ -619,7 +623,7 @@ namespace SaintsField.Editor.Core
 
                 if (changed.changed)
                 {
-                    PropertyPathToShared[property.propertyPath].changed = true;
+                    PropertyPathToShared[property.propertyPath].Changed = true;
                 }
             }
 
@@ -651,7 +655,7 @@ namespace SaintsField.Editor.Core
                 postFieldAccWidth += width;
 
                 // Debug.Log($"DrawPostField, valueChange={_valueChange}");
-                bool isActive = drawer.DrawPostField(eachRect, property, label, attributeWithIndex.SaintsAttribute, PropertyPathToShared[property.propertyPath].changed);
+                bool isActive = drawer.DrawPostField(eachRect, property, label, attributeWithIndex.SaintsAttribute, PropertyPathToShared[property.propertyPath].Changed);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
@@ -777,7 +781,8 @@ namespace SaintsField.Editor.Core
             // }
 
             // Debug.Log($"reset {property.propertyPath}=false");
-            PropertyPathToShared[property.propertyPath].changed = false;
+            // PropertyPathToShared[property.propertyPath].changed = false;
+            SetValueChanged(property, false);
         }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local

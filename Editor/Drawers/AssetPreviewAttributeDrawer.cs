@@ -152,7 +152,7 @@ namespace SaintsField.Editor.Drawers
 
             Texture2D previewTexture = GetPreview(maxWidth, maxHeight, width, property.objectReferenceValue);
             // ReSharper disable once Unity.NoNullPropagation
-            return previewTexture?.height ?? width;
+            return previewTexture?.height ?? 0;
         }
 
         private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
