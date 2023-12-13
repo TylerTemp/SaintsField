@@ -145,10 +145,10 @@ namespace SaintsField.Editor.Drawers
             // ClickFocus(labelWithMinFieldRect, _fieldControlName);
         }
 
-        private float GetNumberFieldWidth(float value, float minWidth, float maxWidth) => GetFieldWidth($"{value}", minWidth, maxWidth);
-        private float GetNumberFieldWidth(int value, float minWidth, float maxWidth) => GetFieldWidth($"{value}", minWidth, maxWidth);
+        private static float GetNumberFieldWidth(float value, float minWidth, float maxWidth) => GetFieldWidth($"{value}", minWidth, maxWidth);
+        private static float GetNumberFieldWidth(int value, float minWidth, float maxWidth) => GetFieldWidth($"{value}", minWidth, maxWidth);
 
-        private float GetFieldWidth(string content, float minWidth, float maxWidth)
+        private static float GetFieldWidth(string content, float minWidth, float maxWidth)
         {
             float actualWidth = EditorStyles.numberField.CalcSize(new GUIContent(content)).x;
             if (minWidth > 0 && actualWidth < minWidth)
