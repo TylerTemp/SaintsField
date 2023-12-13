@@ -10,7 +10,7 @@ namespace SaintsField
 
         public readonly string AnimFieldName;
 
-        public AnimatorStateAttribute(string animator)
+        public AnimatorStateAttribute(string animator=null)
         {
             AnimFieldName = animator;
         }

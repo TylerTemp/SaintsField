@@ -12,6 +12,12 @@ namespace SaintsField
         public readonly string AnimatorName;
         public readonly AnimatorControllerParameterType? AnimatorParamType;
 
+        public AnimatorParamAttribute()
+        {
+            AnimatorName = null;
+            AnimatorParamType = null;
+        }
+
         public AnimatorParamAttribute(string animatorName)
         {
             AnimatorName = animatorName;

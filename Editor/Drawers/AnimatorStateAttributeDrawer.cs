@@ -6,6 +6,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -34,26 +35,46 @@ namespace SaintsField.Editor.Drawers
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            // _targetIsString = property.propertyType == SerializedPropertyType.String;
-            // Debug.Log($"_targetIsString={_targetIsString}; property.propertyType={property.propertyType}");
 
-            // AnimStateSelector animStateSelector = SerializedUtil.GetAttribute<AnimStateSelector>(property);
-            // string animFieldName = animStateSelector?.AnimFieldName ?? "animator";
             AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute) saintsAttribute;
-            string animFieldName = animatorStateAttribute.AnimFieldName ?? "animator";
+            string animFieldName = animatorStateAttribute.AnimFieldName;
 
-            SerializedObject targetSer = property.serializedObject;
-            SerializedProperty animProp = targetSer.FindProperty(animFieldName) ?? SerializedUtils.FindPropertyByAutoPropertyName(targetSer, animFieldName);
-
-            // Debug.Log(property.type);
-            if(animProp == null)
+            Animator animator;
+            if (animFieldName == null)
             {
-                _errorMsg = $"Can't find Animator {animFieldName}";
-                RenderErrorFallback(position, property);
-                return;
+                Object targetObj = property.serializedObject.targetObject;
+                // animatorController = (Animator)animProp.objectReferenceValue;
+                switch (targetObj)
+                {
+                    case GameObject go:
+                        animator = go.GetComponent<Animator>();
+                        break;
+                    case Component component:
+                        animator = component.GetComponent<Animator>();
+                        break;
+                    default:
+                        _errorMsg = $"Animator controller not found in {targetObj}. Try specific a name instead.";
+                        DefaultDrawer(position, property, label);
+                        return;
+                }
+            }
+            else
+            {
+                SerializedObject targetSer = property.serializedObject;
+                SerializedProperty animProp = targetSer.FindProperty(animFieldName) ??
+                                              SerializedUtils.FindPropertyByAutoPropertyName(targetSer, animFieldName);
+
+                // Debug.Log(property.type);
+                if (animProp == null)
+                {
+                    _errorMsg = $"Can't find Animator {animFieldName}";
+                    RenderErrorFallback(position, property);
+                    return;
+                }
+                animator = (Animator)animProp.objectReferenceValue;
             }
 
-            Animator animator = (Animator)animProp.objectReferenceValue;
+
             if (!animator)
             {
                 _errorMsg = $"Animator {animFieldName} is null";

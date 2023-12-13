@@ -16,41 +16,56 @@ namespace SaintsField.Editor.Drawers
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
-            // AnimatorParamAttribute animatorParamAttribute = property .GetAttribute<AnimatorParamAttribute>(property);
-            // AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
-            // bool validAnimatorController = GetAnimatorController(property, animatorParamAttribute.AnimatorName) != null;
-            // bool validPropertyType = property.propertyType is SerializedPropertyType.Integer or SerializedPropertyType.String;
-
-            // return (validAnimatorController && validPropertyType)
-            //     ? EditorGUIUtility.singleLineHeight
-            //     : EditorGUIUtility.singleLineHeight * 2;
             return EditorGUIUtility.singleLineHeight;
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            // EditorGUI.BeginProperty(rect, label, property);
+            _error = "";
+
             AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
 
-            SerializedObject targetSer = property.serializedObject;
-            SerializedProperty animProp = targetSer.FindProperty(animatorParamAttribute.AnimatorName) ?? SerializedUtils.FindPropertyByAutoPropertyName(targetSer, animatorParamAttribute.AnimatorName);
+            Animator animatorController;
+            if (animatorParamAttribute.AnimatorName == null)
+            {
+                Object targetObj = property.serializedObject.targetObject;
+                // animatorController = (Animator)animProp.objectReferenceValue;
+                switch (targetObj)
+                {
+                    case GameObject go:
+                        animatorController = go.GetComponent<Animator>();
+                        break;
+                    case Component component:
+                        animatorController = component.GetComponent<Animator>();
+                        break;
+                    default:
+                        _error = $"Animator controller not found in {targetObj}. Try specific a name instead.";
+                        DefaultDrawer(position, property, label);
+                        return;
+                }
+            }
+            else
+            {
+
+                SerializedObject targetSer = property.serializedObject;
+                SerializedProperty animProp = targetSer.FindProperty(animatorParamAttribute.AnimatorName) ??
+                                              SerializedUtils.FindPropertyByAutoPropertyName(targetSer,
+                                                  animatorParamAttribute.AnimatorName);
+
+                bool invalidAnimatorController = animProp == null;
+
+                if (invalidAnimatorController)
+                {
+                    _error = $"Animator controller `{animatorParamAttribute.AnimatorName}` is null";
+                    DefaultDrawer(position, property, label);
+                    return;
+                }
+
+                animatorController = (Animator)animProp.objectReferenceValue;
+            }
 
             List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>();
 
-            bool invalidAnimatorController = animProp == null;
-
-            if (invalidAnimatorController)
-            {
-                _error = $"Animator controller `{animatorParamAttribute.AnimatorName}` is null";
-                DefaultDrawer(position, property, label);
-                return;
-            }
-
-            Animator animatorController = (Animator)animProp.objectReferenceValue;
-
-            // int parametersCount = animatorController.parameters.Length;
-
-            // for (int i = 0; i < parametersCount; i++)
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (AnimatorControllerParameter parameter in animatorController.parameters)
             {
@@ -61,6 +76,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
@@ -70,36 +86,14 @@ namespace SaintsField.Editor.Drawers
                     DrawPropertyForString(position, property, label, animatorParameters);
                     break;
                 default:
-                    // DrawDefaultPropertyAndHelpBox(rect, property, string.Format(InvalidTypeWarningMessage, property.name), MessageType.Warning);
-                    // EditorGUI.HelpBox(new Rect(rect)
-                    // {
-                    //     height = EditorGUIUtility.singleLineHeight,
-                    // }, InvalidAnimatorControllerWarningMessage, MessageType.Info);
-                    // EditorGUI.PropertyField(new Rect(rect)
-                    // {
-                    //     y = rect.y + EditorGUIUtility.singleLineHeight,
-                    // }, property, label);
                     _error = $"Invalid property type: expect integer or string, get {property.propertyType}";
+                    DefaultDrawer(position, property, label);
                     break;
             }
-
-            // EditorGUI.EndProperty();
         }
 
         private static void DrawPropertyForInt(Rect position, SerializedProperty property, GUIContent label, IReadOnlyList<AnimatorControllerParameter> animatorParameters)
         {
-            // if (invalid)
-            // {
-            //     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            //     int directIntValue = EditorGUI.IntField(position, property.intValue);
-            //     if (changed.changed)
-            //     {
-            //         property.intValue = directIntValue;
-            //     }
-            //
-            //     return;
-            // }
-
             int paramNameHash = property.intValue;
             int index = 0;
 
@@ -115,13 +109,14 @@ namespace SaintsField.Editor.Drawers
 
             IEnumerable<string> displayOptions = GetDisplayOptions(animatorParameters);
 
+            // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 int newIndex = EditorGUI.Popup(position, label, index, displayOptions.Select(each => new GUIContent(each)).ToArray());
                 // ReSharper disable once InvertIf
                 if(changed.changed)
                 {
-                    int newValue = newIndex == 0 ? 0 : animatorParameters[newIndex - 1].nameHash;
+                    int newValue = animatorParameters[newIndex].nameHash;
 
                     if (property.intValue != newValue)
                     {
@@ -133,40 +128,33 @@ namespace SaintsField.Editor.Drawers
 
         private static void DrawPropertyForString(Rect position, SerializedProperty property, GUIContent label, IReadOnlyList<AnimatorControllerParameter> animatorParameters)
         {
-            // if (invalid)
-            // {
-            //     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            //     string directIntValue = EditorGUI.TextField(position, property.stringValue);
-            //     if (changed.changed)
-            //     {
-            //         property.stringValue = directIntValue;
-            //     }
-            //
-            //     return;
-            // }
-
             string paramName = property.stringValue;
-            int index = 0;
-
-            for (int i = 0; i < animatorParameters.Count; i++)
-            {
-                // ReSharper disable once InvertIf
-                if (paramName.Equals(animatorParameters[i].name, System.StringComparison.Ordinal))
-                {
-                    index = i + 1; // +1 because the first option is reserved for (None)
-                    break;
-                }
-            }
+            int index = animatorParameters
+                .Select((value, index) => new {value, index})
+                .FirstOrDefault(each => each.value.name == paramName)?.index ?? -1;
+            // int index = 0;
+            //
+            // for (int i = 0; i < animatorParameters.Count; i++)
+            // {
+            //     // ReSharper disable once InvertIf
+            //     if (paramName.Equals(animatorParameters[i].name, System.StringComparison.Ordinal))
+            //     {
+            //         index = i + 1; // +1 because the first option is reserved for (None)
+            //         break;
+            //     }
+            // }
 
             IEnumerable<string> displayOptions = GetDisplayOptions(animatorParameters);
 
+            // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 int newIndex = EditorGUI.Popup(position, label, index, displayOptions.Select(each => new GUIContent(each)).ToArray());
                 // ReSharper disable once InvertIf
                 if(changed.changed)
                 {
-                    string newValue = newIndex == 0 ? null : animatorParameters[newIndex - 1].name;
+                    // string newValue = newIndex == 0 ? null : animatorParameters[newIndex - 1].name;
+                    string newValue = animatorParameters[newIndex].name;
 
                     if (!property.stringValue.Equals(newValue, System.StringComparison.Ordinal))
                     {
@@ -177,28 +165,19 @@ namespace SaintsField.Editor.Drawers
         }
 
         // ReSharper disable once ReturnTypeCanBeEnumerable.Local
-        private static IReadOnlyList<string> GetDisplayOptions(IReadOnlyList<AnimatorControllerParameter> animatorParams)
+        private static IReadOnlyList<string> GetDisplayOptions(IEnumerable<AnimatorControllerParameter> animatorParams)
         {
-            string[] displayOptions = new string[animatorParams.Count + 1];
-            displayOptions[0] = "[None]";
-
-            for (int i = 0; i < animatorParams.Count; i++)
-            {
-                displayOptions[i + 1] = $"{animatorParams[i].name} [{animatorParams[i].type}]";
-            }
-
-            return displayOptions;
+            // string[] displayOptions = new string[animatorParams.Count + 1];
+            // displayOptions[0] = "[None]";
+            //
+            // for (int i = 0; i < animatorParams.Count; i++)
+            // {
+            //     displayOptions[i + 1] = $"{animatorParams[i].name} [{animatorParams[i].type}]";
+            // }
+            //
+            // return displayOptions;
+            return animatorParams.Select(each => $"{each.name} [{each.type}]").ToList();
         }
-
-        // private AnimatorController GetAnimatorController(SerializedProperty property, string animatorName)
-        // {
-        //     Object targetObject = property.serializedObject.targetObject;
-        //     SerializedObject targetSer = new SerializedObject(targetObject);
-        //     SerializedProperty animProp = targetSer.FindProperty(animatorName);
-        //     Animator animator = (Animator)animProp?.objectReferenceValue;
-        //     // ReSharper disable once Unity.NoNullPropagation
-        //     return (AnimatorController)animator?.runtimeAnimatorController;
-        // }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
 

@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace SaintsField
 {
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class AddComponentAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;

@@ -1,3 +1,9 @@
+## 1.1.3 ##
+
+*   `AnimatorParam` no longer offers `null` value
+*   `AnimatorParam` and `AnimatorState` now will try to find the `animator` on current object if the name of `animator` is not set
+*   Use standard field picker for `layer` and `tag`
+
 ## 1.1.2 ##
 
 *   Fix indent for `Expandable`

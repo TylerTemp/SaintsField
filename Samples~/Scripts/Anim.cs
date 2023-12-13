@@ -7,13 +7,13 @@ namespace SaintsField.Samples.Scripts
         [field: SerializeField]
         public Animator Animator { get; private set; }
 
-        [AnimatorState(nameof(Animator))]
+        [AnimatorState]
         public AnimatorState animatorState;
 
         [AnimatorState(nameof(Animator))]
         public string animStateName;
 
-        [AnimatorParam(nameof(Animator))]
+        [AnimatorParam]
         public string animParamName;
 
         [AnimatorParam(nameof(Animator))]

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -19,30 +16,20 @@ namespace SaintsField.Editor.Drawers
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            List<string> tagList = new List<string>
+            if (property.propertyType != SerializedPropertyType.String)
             {
-                "(None)",
-                "Untagged",
-            };
-            tagList.AddRange(UnityEditorInternal.InternalEditorUtility.tags);
-
-            int selectedIndex = -1;
-            for (int i = 1; i < tagList.Count; i++)
-            {
-                // ReSharper disable once InvertIf
-                if (tagList[i].Equals(property.stringValue, StringComparison.Ordinal))
-                {
-                    selectedIndex = i;
-                    break;
-                }
+                DefaultDrawer(position, property, label);
+                return;
             }
 
-            using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            int newIndex = EditorGUI.Popup(position, label, selectedIndex, tagList.Select(each => new GUIContent(each)).ToArray());
-            // ReSharper disable once InvertIf
-            if (changed.changed)
+            // ReSharper disable once ConvertToUsingDeclaration
+            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                property.stringValue = tagList[newIndex];
+                string result = EditorGUI.TagField(position, label, property.stringValue);
+                if (changed.changed)
+                {
+                    property.stringValue = result;
+                }
             }
         }
 

@@ -28,12 +28,14 @@ Unity: 2020.2 or higher
 
 *   Using git upm:
 
-    add this line to `Packages/manifest.json` in your project
+    add to `Packages/manifest.json` in your project
 
     ```javascript
     {
-        "today.comes.saintsfield": "https://github.com/TylerTemp/SaintsField.git",
-        // your other dependencies...
+        "dependencies": {
+            "today.comes.saintsfield": "https://github.com/TylerTemp/SaintsField.git",
+            // your other dependencies...
+        }
     }
     ```
 
@@ -47,7 +49,7 @@ Unity: 2020.2 or higher
     git submodule add https://github.com/TylerTemp/SaintsField.git Assets/SaintsField
     ```
 
-If you're using unitypackage or git submodule but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
+If you're using `unitypackage` or git submodule but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy only image files (no `.meta` files) from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
@@ -55,14 +57,11 @@ If you're using unitypackage or git submodule but you put this project under ano
 
 ## Change Log ##
 
-**1.1.2**
+**1.1.3**
 
-*   Fix indent for `Expandable`
-*   Add `GetComponentInChildren`
-*   Add `GetComponent`
-*   Add `GetComponentInScene`
-*   Add `GetPrefabWithComponent`
-*   Add `AddComponent`
+*   `AnimatorParam` no longer offers `null` value
+*   `AnimatorParam` and `AnimatorState` now will try to find the `animator` on current object if the name of `animator` is not set
+*   Use standard field picker for `layer` and `tag`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -80,16 +79,16 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
     `null` means no label
 
-    for `icon` it will search the following path:
+    for `icon` it will search the following path (This will always fallback to built-in editor resources by name, as it uses [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html)):
 
-    *   `"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons)
+    *   `"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons), 
     *   `"Assets/Editor Default Resources/SaintsField/"`  (again for override)
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
 
     for `color` it supports:
 
-    *   `Clear`, `White`, `Black`, `Gray`, `Red`, `Pink`, `Orange`, `Yellow`, `Green`, `Blue`, `Indigo`, `Violet`
+    *   `clear`, `white`, `black`, `gray`, `red`, `pink`, `orange`, `yellow`, `green`, `blue`, `indigo`, `violet` (all in lower case)
 
          ![color_list](https://github.com/TylerTemp/SaintsField/assets/6391063/24638017-58ab-4f34-843b-3c76a9d012f2)
 
@@ -797,9 +796,9 @@ public class ResizableTextAreaExample : MonoBehaviour
 
 A dropdown selector for an animator parameter.
 
-*   `string animatorName`
+*   `string animatorName=null`
 
-    name of the animator
+    name of the animator. When omitted, it will try to get the animator from the current component
 
 *   (Optional) `AnimatorControllerParameterType animatorParamType`
 
@@ -825,9 +824,9 @@ public class Anim : MonoBehaviour
 
 A dropdown selector for animator state.
 
-*   `string animatorName`
+*   `string animatorName=null`
 
-    name of the animator
+    name of the animator. When omitted, it will try to get the animator from the current component
 
 to get more useful info from the state, you can use `AnimatorState` type instead of `string` type.
 
@@ -1248,6 +1247,8 @@ Automatically sign a component to a field, if the field value is null and the co
 
     For error message grouping.
 
+*   AllowMultiple: No
+
 ```csharp
 public class GetComponentExample: MonoBehaviour
 {
@@ -1280,6 +1281,8 @@ NOTE: Unlike `GetComponentInChildren` by Unity, this will **NOT** check the targ
 
     For error message grouping.
 
+*   AllowMultiple: No
+
 ```csharp
 public class GetComponentInChildrenExample: MonoBehaviour
 {
@@ -1309,6 +1312,8 @@ Automatically sign a component to a field, if the field value is null and the co
 
     For error message grouping.
 
+*   AllowMultiple: No
+
 ```csharp
 public class GetComponentInSceneExample: MonoBehaviour
 {
@@ -1336,6 +1341,8 @@ Recommended to use it with `FieldType`!
 
     For error message grouping.
 
+*   AllowMultiple: No
+
 ```csharp
 public class GetPrefabWithComponentExample: MonoBehaviour
 {
@@ -1351,7 +1358,7 @@ public class GetPrefabWithComponentExample: MonoBehaviour
 
 #### `AddComponent` ####
 
-Automatically add a component to the current target if the target does not have this component. (This will not sign the component added to the field)
+Automatically add a component to the current target if the target does not have this component. (This will not sign the component added)
 
 Recommended to use it with `GetComponent`!
 
@@ -1362,6 +1369,8 @@ Recommended to use it with `GetComponent`!
 *   `string groupBy = ""`
 
     For error message grouping.
+
+*   AllowMultiple: Yes
 
 ```csharp
 public class AddComponentExample: MonoBehaviour
@@ -1384,9 +1393,9 @@ This only works for decorator draws above or below the field. The above drawer w
 
 ## Common Pitfalls & Compatibility ##
 
-**List/Array**
+**List/Array & Nesting**
 
-Directly using on list/array will apply to every direct element of the list
+Directly using on list/array will apply to every direct element of the list, this is a limit from Unity.
 
 Unlike NaughtyAttributes, `SaintsField` does not need a `AllowNesting` attribute to work on nested element.
 
@@ -1435,8 +1444,9 @@ public class CompatibilityNaAndDefault : MonoBehaviour
     [Range(0, 5), RichLabel("<color=green>+Native</color>")]
     public float nativeRangeHandled;
 
-    // this wont work too.
-    [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), RichLabel("<color=green>+NA</color>")]
+    // this wont work too. Please put `SaintsField` before other drawers
+    [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
+    [RichLabel("<color=green>+NA</color>")]
     public AnimationCurve naCurveHandled;
 }
 ```
@@ -1466,4 +1476,3 @@ My (not full) test about compatibility:
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
 *   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
 *   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good for Odin's `EditorWindow`.
-

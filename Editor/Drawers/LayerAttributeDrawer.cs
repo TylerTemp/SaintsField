@@ -18,36 +18,34 @@ namespace SaintsField.Editor.Drawers
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            // DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
-
-            // UnityEngine.Object target = property.serializedObject.targetObject;
-            // Type targetType = target.GetType();
-
-            string[] layers = UnityEditorInternal.InternalEditorUtility.layers;
-
-            int selectedIndex = property.propertyType == SerializedPropertyType.Integer ? property.intValue : Array.IndexOf(layers, property.stringValue);
-
-            using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            int newIndex = EditorGUI.Popup(position, label, selectedIndex, layers.Select(each => new GUIContent(each)).ToArray());
-            // ReSharper disable once InvertIf
-            if (changed.changed)
+            if (property.propertyType != SerializedPropertyType.Integer &&
+                property.propertyType != SerializedPropertyType.String)
             {
-                if (property.propertyType == SerializedPropertyType.Integer)
+                DefaultDrawer(position, property, label);
+                return;
+            }
+
+            int curSelected = property.propertyType == SerializedPropertyType.Integer
+                ? property.intValue
+                : LayerMask.NameToLayer(property.stringValue);
+
+            // ReSharper disable once ConvertToUsingDeclaration
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            {
+                int selectedLayer = EditorGUI.LayerField(position, label, curSelected);
+                // ReSharper disable once InvertIf
+                if (changed.changed)
                 {
-                    property.intValue = newIndex;
+                    if (property.propertyType == SerializedPropertyType.Integer)
+                    {
+                        property.intValue = selectedLayer;
+                    }
+                    else
+                    {
+                        // Debug.Log($"change index {selectedLayer} on {string.Join(", ", layers)}");
+                        property.stringValue = LayerMask.LayerToName(selectedLayer);
+                    }
                 }
-                else
-                {
-                    property.stringValue = layers[newIndex];
-                }
-                // try
-                // {
-                //     field.SetValue(target, newValue);
-                // }
-                // catch (ArgumentException)
-                // {
-                //     property.objectReferenceValue = (UnityEngine.GameObject)newValue;
-                // }
             }
         }
 
