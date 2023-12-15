@@ -19,14 +19,6 @@ namespace SaintsField.Editor.Drawers
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
-            // Debug.Log($"get height");
-
-            // bool validPropertyType = property.propertyType is SerializedPropertyType.String or SerializedPropertyType.Integer;
-            // bool anySceneInBuildSettings = GetScenes().Length > 0;
-            //
-            // return validPropertyType && anySceneInBuildSettings
-            //     ? EditorGUIUtility.singleLineHeight
-            //     : EditorGUIUtility.singleLineHeight + GetHelpBoxHeight();
             return EditorGUIUtility.singleLineHeight;
         }
 
@@ -43,7 +35,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             string[] sceneOptions = scenes
-                .Select((name, index) => $"[{index}] {name}")
+                .Select((name, index) => $"{name} [{index}]")
                 .ToArray();
 
             _error = "";
@@ -72,6 +64,12 @@ namespace SaintsField.Editor.Drawers
         private static void DrawPropertyForString(Rect rect, SerializedProperty property, GUIContent label, string[] scenes, string[] sceneOptions)
         {
             int index = IndexOfOrZero(scenes, property.stringValue);
+
+            if (string.IsNullOrEmpty(property.stringValue) && scenes.Length > 0)
+            {
+                property.stringValue = scenes[0];
+            }
+
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
             {

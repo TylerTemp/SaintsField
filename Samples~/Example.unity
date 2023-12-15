@@ -1242,8 +1242,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71aaeaf3bdd04306ba6b52810d6f241c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneInt: 0
-  _sceneString: 
+  sceneInt: 0
+  sceneStr: 
 --- !u!4 &633783411
 Transform:
   m_ObjectHideFlags: 0
@@ -1598,6 +1598,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1030583575
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1030583577}
+  - component: {fileID: 1030583576}
+  m_Layer: 0
+  m_Name: LeftToggle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1030583576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030583575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f37c124cf02a416dace5fbb4c6b38569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myToggle: 0
+  richToggle: 0
+--- !u!4 &1030583577
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030583575}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 51
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1036765199
 GameObject:
   m_ObjectHideFlags: 0
@@ -1836,8 +1881,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b403bd36614aacb791b2f4b7868665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerStr: Ignore Raycast
-  layerBit: 0
+  layerString: Ignore Raycast
+  layerInt: 1
+  myLayerMask:
+    serializedVersion: 2
+    m_Bits: 16
 --- !u!114 &1098124222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3373,7 +3421,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: EditorOnly
+  _tag: Untagged
 --- !u!1 &2118824042
 GameObject:
   m_ObjectHideFlags: 0

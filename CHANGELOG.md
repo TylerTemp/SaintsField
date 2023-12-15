@@ -3,6 +3,10 @@
 *   `AnimatorParam` no longer offers `null` value
 *   `AnimatorParam` and `AnimatorState` now will try to find the `animator` on current object if the name of `animator` is not set
 *   Use standard field picker for `layer` and `tag`
+*   Add `LeftToggle`
+*   Fix a issue that when using `Scene` with a string without default value, it would display the first item but the actually value is null or empty string.
+    Now it will sign the first value on it.
+*   Fix a issue that `Scene` will display empty when your scene name starts with an underscore.
 
 ## 1.1.2 ##
 

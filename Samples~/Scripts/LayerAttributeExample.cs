@@ -4,7 +4,9 @@ namespace SaintsField.Samples.Scripts
 {
     public class LayerAttributeExample: MonoBehaviour
     {
-        [Layer] public string layerStr;
-        [Layer] public int layerBit;
+        [Layer] public string layerString;
+        [Layer] public int layerInt;
+
+        public LayerMask myLayerMask;
     }
 }

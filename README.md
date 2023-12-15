@@ -62,6 +62,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 *   `AnimatorParam` no longer offers `null` value
 *   `AnimatorParam` and `AnimatorState` now will try to find the `animator` on current object if the name of `animator` is not set
 *   Use standard field picker for `layer` and `tag`
+*   Add `LeftToggle`
+*   Fix a issue that when using `Scene` with a string without default value, it would display the first item but the actually value is null or empty string.
+    Now it will sign the first value on it.
+*   Fix a issue that `Scene` will display empty when your scene name starts with an underscore.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -861,6 +865,8 @@ A dropdown selector for layer.
 
 *   AllowMultiple: No
 
+Note: want a bitmask layer selector? Unity already has it. Just use `public LayerMask myLayerMask;`
+
 ```csharp
 public class LayerAttributeExample: MonoBehaviour
 {
@@ -869,7 +875,7 @@ public class LayerAttributeExample: MonoBehaviour
 }
 ```
 
-![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/17fdc955-d637-4750-9856-3d5012fa0cb2)
+![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/a7ff79a3-f7b8-48ca-8233-5facc975f5eb)
 
 #### `Scene` ####
 
@@ -917,7 +923,7 @@ public class TagExample: MonoBehaviour
 }
 ```
 
-![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/df1526a5-75fe-4fc9-ba47-19e7f2d63dda)
+![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/1a705bce-60ac-4434-826f-69c34055450c)
 
 #### `InputAxis` ####
 
@@ -933,6 +939,21 @@ public class InputAxisExample: MonoBehaviour
 ```
 
 ![input_axis](https://github.com/TylerTemp/SaintsField/assets/6391063/e7bb79f6-28f9-4080-93b4-f9781bf91b77)
+
+#### `LeftToggle` ####
+
+A toggle button on the left of the bool field. Only works on boolean field.
+
+```csharp
+public class LeftToggleExample: MonoBehaviour
+{
+    [LeftToggle] public bool myToggle;
+    // To use with `RichLabel`, you need to add 6 spaces ahead as a hack
+    [LeftToggle, RichLabel("      <color=green><label />")] public bool richToggle;
+}
+```
+
+![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
 
 ### Field Utilities ###
 
