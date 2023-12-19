@@ -656,7 +656,7 @@ namespace SaintsField.Editor.Core
                 postFieldAccWidth += width;
 
                 // Debug.Log($"DrawPostField, valueChange={_valueChange}");
-                bool isActive = drawer.DrawPostField(eachRect, property, label, attributeWithIndex.SaintsAttribute, PropertyPathToShared[property.propertyPath].Changed);
+                bool isActive = drawer.DrawPostField(eachRect, property, label, attributeWithIndex.SaintsAttribute, PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result)? result.Changed: false);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {

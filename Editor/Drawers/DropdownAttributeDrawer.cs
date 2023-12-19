@@ -275,9 +275,9 @@ namespace SaintsField.Editor.Drawers
                                     case SerializedPropertyType.BoundsInt:
                                         property.boundsIntValue = (BoundsInt) curItem;
                                         break;
-                                    case SerializedPropertyType.ManagedReference:
-                                        property.managedReferenceValue = (Object) curItem;
-                                        break;
+                                    // case SerializedPropertyType.ManagedReference:
+                                    //     property.managedReferenceValue = (Object) curItem;
+                                    //     break;
                                     case SerializedPropertyType.Gradient:
                                     case SerializedPropertyType.FixedBufferSize:
                                     default:

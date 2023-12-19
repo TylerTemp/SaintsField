@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;

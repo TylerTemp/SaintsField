@@ -94,9 +94,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
-    m_TrainingDataDestination: TrainingData
-    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -314,7 +313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   my:
-    myInt: 3
+    myInt: 0
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,8 +359,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ints: 0200000002000000
   myStructs:
-  - minMax: {x: 0.22511846, y: 0.68720365}
-    normalFloat: 0
+  - minMax: {x: 0.11, y: 0.68720365}
+    normalFloat: 0.21
 --- !u!1 &185980174
 GameObject:
   m_ObjectHideFlags: 0
@@ -490,7 +489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _show: 1
   _content: 0
-  _modInt: 19
+  _modInt: 32
   _defaultInt: 4
 --- !u!4 &246861352
 Transform:
@@ -741,13 +740,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Animator>k__BackingField: {fileID: 380193380}
   animatorState:
-    layerIndex: 0
+    layerIndex: 1
     stateNameHash: 2081823275
     stateName: Idle
     stateSpeed: 3
     animationClip: {fileID: 0}
-  animStateName: Idle
-  animParamName: Trigger
+  animStateName: FromTest
+  animParamName: Some Bool
   animParamHash: -707381567
   animParamHashes: c136d6d572017303
 --- !u!95 &380193380
@@ -877,7 +876,6 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -889,7 +887,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -960,7 +957,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -972,7 +968,6 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -1040,12 +1035,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mixed: {x: 0.27947393, y: 0.5294739}
-  _float: 34.3
+  _float: 39.8
   _sOnly: {x: -0.02, y: 0.37}
   _selfField: {x: 0.24154574, y: 0.7115457}
-  _mixedNoLabel: {x: 0.17071503, y: 0.62150866}
+  _mixedNoLabel: {x: 0.2001268, y: 0.6509203}
   _nested:
-    _mixed: {x: 0.14565316, y: 0.46426943}
+    _mixed: {x: 0.31, y: 0.46426943}
     normalInt: 0
 --- !u!4 &440518747
 Transform:
@@ -1716,7 +1711,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45cb9069ce004c2ab4ee78763c064fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myMask: 2
+  myMask: 5
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0
@@ -2052,31 +2047,31 @@ MonoBehaviour:
   _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
     10 wrap 11 wrap 12
 
-    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7
-    wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
 
-    long wrap 1 warp 2 wrap 3 wrap 4 wrap
-    5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
 
-    long wrap 1 warp 2
-    wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
 
-    long
-    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
-  _noLabel: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9
-    wap 10 wrap 11 wrap 12
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11'
+  _noLabel: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
+    10 wrap 11 wrap 12
 
-    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap
-    7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
 
-    long wrap 1 warp 2 wrap 3 wrap 4
-    wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
 
-    long wrap 1 warp
-    2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
 
-    long
-    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11'
 --- !u!1 &1160369190
 GameObject:
   m_ObjectHideFlags: 0
@@ -2599,7 +2594,6 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2611,7 +2605,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -2625,7 +2618,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
-  m_Color: {r: 1, g: 0.8118372, b: 0, a: 1}
+  m_Color: {r: 0.119199276, g: 0, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2799,7 +2792,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 285828b4b0a19cb46804e478c7f9acf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _value: 32
+  _value: 47
 --- !u!4 &1484731013
 Transform:
   m_ObjectHideFlags: 0
@@ -3502,7 +3495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: GameController
+  _tag: MainCamera
 --- !u!1 &2118824042
 GameObject:
   m_ObjectHideFlags: 0
@@ -3576,9 +3569,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134144047}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 1
-  m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -3711,7 +3703,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3723,7 +3714,6 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
