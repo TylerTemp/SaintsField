@@ -14,17 +14,17 @@ namespace SaintsField.Addressable
 
         public readonly string[][] LabelFilters;
 
-        public AddressableAddressAttribute()
-        {
-            Group = null;
-            LabelFilters = null;
-        }
-
-        public AddressableAddressAttribute(string group = "")
-        {
-            Group = group;
-            LabelFilters = null;
-        }
+        // public AddressableAddressAttribute()
+        // {
+        //     Group = null;
+        //     LabelFilters = null;
+        // }
+        //
+        // public AddressableAddressAttribute(string group = "")
+        // {
+        //     Group = group;
+        //     LabelFilters = null;
+        // }
 
         // public AddressableAddressAttribute(string group = "", string[][] labelFilters = null)
         // {
@@ -33,7 +33,7 @@ namespace SaintsField.Addressable
         // }
 
         // and
-        public AddressableAddressAttribute(string group = "", params string[] orLabels)
+        public AddressableAddressAttribute(string group = null, params string[] orLabels)
         {
             Group = group;
             LabelFilters = orLabels?

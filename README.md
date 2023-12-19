@@ -57,15 +57,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**1.1.3**
+**1.1.4**
 
-*   `AnimatorParam` no longer offers `null` value
-*   `AnimatorParam` and `AnimatorState` now will try to find the `animator` on current object if the name of `animator` is not set
-*   Use standard field picker for `layer` and `tag`
-*   Add `LeftToggle`
-*   Fix a issue that when using `Scene` with a string without default value, it would display the first item but the actually value is null or empty string.
-    Now it will sign the first value on it.
-*   Fix a issue that `Scene` will display empty when your scene name starts with an underscore.
+*   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
+*   Add `AddressableAddress`. This only works if you have `Addressable` installed in your project.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -85,7 +80,7 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
     for `icon` it will search the following path (This will always fallback to built-in editor resources by name, as it uses [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html)):
 
-    *   `"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons), 
+    *   `"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons),
     *   `"Assets/Editor Default Resources/SaintsField/"`  (again for override)
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
@@ -1261,9 +1256,9 @@ public class MinMaxExample: MonoBehaviour
 Automatically sign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
 
 *   `Type compType = null`
-    
+
     The component type to sign. If null, it'll use the field type.
-    
+
 *   `string groupBy = ""`
 
     For error message grouping.
@@ -1297,8 +1292,8 @@ NOTE: Unlike `GetComponentInChildren` by Unity, this will **NOT** check the targ
 *   `Type compType = null`
 
     The component type to sign. If null, it'll use the field type.
-  
-*   `string groupBy = ""` 
+
+*   `string groupBy = ""`
 
     For error message grouping.
 
@@ -1328,7 +1323,7 @@ Automatically sign a component to a field, if the field value is null and the co
 *   `Type compType = null`
 
     The component type to sign. If null, it'll use the field type.
-  
+
 *   `string groupBy = ""`
 
     For error message grouping.
@@ -1403,6 +1398,64 @@ public class AddComponentExample: MonoBehaviour
 
 ![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
 
+### Third Partly Tools ###
+
+#### Addressable ####
+
+These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.unity.addressables@latest). It's there only if you have `Addressable` installed.
+
+Namespace: `SaintsField.Addressable`
+
+##### `AddressableLabel` #####
+
+A picker to select an addressable label.
+
+*   Allow Multiple: No
+
+```csharp
+public class AddressableLabelExample : MonoBehaviour
+{
+    [AddressableLabel]
+    public string addressableLabel;
+}
+```
+
+![addressable_label](https://github.com/TylerTemp/SaintsField/assets/6391063/c0485d73-0f5f-4748-9684-d16f712e00e9)
+
+##### `AddressableAddress` #####
+
+A picker to select an addressable address (key).
+
+*   `string group = null` the Addressable group name. `null` for all groups
+*   `params string[] orLabels` the addressable label names to filter. Only `entries` with this label will be shown. `null` for no filter.
+
+    If it requires multiple labels, use `A && B`, then only entries with both labels will be shown.
+
+    If it requires any of the labels, just pass them seperatly, then entries with either label will be shown. For example, pass `"A && B", "C"` will show entries with both `A` and `B` label, or with `C` label.
+
+*   Allow Multiple: No
+
+```csharp
+public class AddressableAddressExample: MonoBehaviour
+{
+    [AddressableAddress]  // from all group
+    public string address;
+
+    [AddressableAddress("Packed Assets")]  // from this group
+    public string addressInGroup;
+
+    [AddressableAddress(null, "Label1", "Label2")]  // either has label `Label1` or `Label2`
+    public string addressLabel1Or2;
+
+    // must have both label `default` and `Label1`
+    // or have both label `default` and `Label2`
+    [AddressableAddress(null, "default && Label1", "default && Label2")]
+    public string addressLabelAnd;
+}
+```
+
+![addressable_address](https://github.com/TylerTemp/SaintsField/assets/6391063/5646af00-c167-4131-be06-7e0b8e9b102e)
+
 ## GroupBy ##
 
 group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
@@ -1425,16 +1478,16 @@ public class ArrayLabelExample : MonoBehaviour
 {
     // works for list/array
     [Scene] public int[] myScenes;
-    
+
     [System.Serializable]
     public struct MyStruct
     {
         public bool enableFlag;
-    
+
         [AboveRichLabel("No need for `[AllowNesting]`, it just works")]
         public int integer;
     }
-    
+
     public MyStruct myStruct;
 }
 ```
@@ -1452,8 +1505,8 @@ An example of working with NaughtyAttributes:
 ```csharp
 public class CompatibilityNaAndDefault : MonoBehaviour
 {
-    [RichLabel("<color=green>+NA</color>"), 
-     NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), 
+    [RichLabel("<color=green>+NA</color>"),
+     NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green),
      NaughtyAttributes.Label(" ")  // a little hack for label issue
     ]
     public AnimationCurve naCurve;

@@ -1,7 +1,7 @@
 ## 1.1.4 ##
 
 *   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
-*   Add `AddressableAddress`
+*   Add `AddressableAddress`. This only works if you have `Addressable` installed in your project.
 
 ## 1.1.3 ##
 

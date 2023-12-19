@@ -36,20 +36,20 @@ namespace SaintsField.Editor.Drawers.Addressable
 
             string[][] labelFilters = addressableAddressAttribute.LabelFilters;
 
-            List<string> keys = _targetGroups
-                .SelectMany(each => each.entries)
-                .Where(eachName =>
-                {
-                    if(labelFilters == null)
-                    {
-                        return true;
-                    }
+            IEnumerable<AddressableAssetEntry> entries = _targetGroups
+                .SelectMany(each => each.entries);
 
+            if (labelFilters != null && labelFilters.Length > 0)
+            {
+                entries = entries.Where(eachName =>
+                {
                     HashSet<string> labels = eachName.labels;
-                    bool match = labelFilters.Any(eachOr => eachOr.All(eachAnd => labels.Contains(eachAnd)));
+                    return labelFilters.Any(eachOr => eachOr.All(eachAnd => labels.Contains(eachAnd)));
                     // Debug.Log($"{eachName.address} {match}: {string.Join(",", labels)}");
-                    return match;
-                })
+                });
+            }
+
+            List<string> keys = entries
                 .Select(each => each.address)
                 .ToList();
 

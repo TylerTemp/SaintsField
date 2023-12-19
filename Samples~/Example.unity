@@ -1337,10 +1337,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb2d5351d8f40d881d369e3b7bdc3a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  address: just/default
-  addressInGroup: just/2
-  addressLabel1Or2: Default&2
-  addressLabelAnd: Default&1
+  address: Resources
+  addressInGroup: NoLabel
+  addressLabel1Or2: 1&2
+  addressLabelAnd: Default&2
 --- !u!4 &724414865
 Transform:
   m_ObjectHideFlags: 0
