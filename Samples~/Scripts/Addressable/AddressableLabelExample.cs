@@ -1,9 +1,7 @@
-using UnityEngine;
-#if SAINTSFIELD_ADDRESSABLE
 using SaintsField.Addressable;
-#endif
+using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.Addressable
 {
     public class AddressableLabelExample : MonoBehaviour
     {
