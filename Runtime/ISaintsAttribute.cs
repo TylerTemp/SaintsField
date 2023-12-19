@@ -2,9 +2,9 @@
 {
     public interface ISaintsAttribute
     {
-        public SaintsAttributeType AttributeType { get; }
+        SaintsAttributeType AttributeType { get; }
 
-        public string GroupBy { get; }
+        string GroupBy { get; }
         // public string DrawerClass { get; }
     }
 }

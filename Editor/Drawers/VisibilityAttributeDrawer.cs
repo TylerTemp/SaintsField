@@ -36,34 +36,63 @@ namespace SaintsField.Editor.Drawers
             //
             // }
 
+            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(type, by);
+            // switch (found)
+            // {
+            //     case (ReflectUtils.GetPropType.NotFound, _):
+            //     {
+            //         string error = $"No field or method named `{by}` found on `{target}`";
+            //         Debug.LogError(error);
+            //         _errors.Add(error);
+            //         return false;
+            //     }
+            //     case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+            //     {
+            //         return ReflectUtils.Truly(propertyInfo.GetValue(target));
+            //     }
+            //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+            //     {
+            //         return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
+            //     }
+            //     case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+            //     {
+            //         ParameterInfo[] methodParams = methodInfo.GetParameters();
+            //         Debug.Assert(methodParams.All(p => p.IsOptional));
+            //         // Debug.Assert(methodInfo.ReturnType == typeof(bool));
+            //         return ReflectUtils.Truly(methodInfo.Invoke(target,
+            //             methodParams.Select(p => p.DefaultValue).ToArray()));
+            //     }
+            //     default:
+            //         throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            // }
+
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(type, by);
-            switch (found)
+
+            if (found.Item1 == ReflectUtils.GetPropType.NotFound)
             {
-                case (ReflectUtils.GetPropType.NotFound, _):
-                {
-                    string error = $"No field or method named `{by}` found on `{target}`";
-                    Debug.LogError(error);
-                    _errors.Add(error);
-                    return false;
-                }
-                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
-                {
-                    return ReflectUtils.Truly(propertyInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                {
-                    return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
-                {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    // Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    return ReflectUtils.Truly(methodInfo.Invoke(target,
-                        methodParams.Select(p => p.DefaultValue).ToArray()));
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
+                string error = $"No field or method named `{by}` found on `{target}`";
+                Debug.LogError(error);
+                _errors.Add(error);
+                return false;
+            }
+            else if (found.Item1 == ReflectUtils.GetPropType.Property && found.Item2 is PropertyInfo propertyInfo)
+            {
+                return ReflectUtils.Truly(propertyInfo.GetValue(target));
+            }
+            else if (found.Item1 == ReflectUtils.GetPropType.Field && found.Item2 is FieldInfo foundFieldInfo)
+            {
+                return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
+            }
+            else if (found.Item1 == ReflectUtils.GetPropType.Method && found.Item2 is MethodInfo methodInfo)
+            {
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                Debug.Assert(methodParams.All(p => p.IsOptional));
+                // Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                return ReflectUtils.Truly(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(found), found, null);
             }
         }
 

@@ -5,13 +5,21 @@ namespace SaintsField.Editor.Utils
 {
     public static class EMessageTypeExtensions
     {
-        public static MessageType GetMessageType(this EMessageType messageType) => messageType switch
+        public static MessageType GetMessageType(this EMessageType messageType)
         {
-            EMessageType.None => MessageType.None,
-            EMessageType.Info => MessageType.Info,
-            EMessageType.Warning => MessageType.Warning,
-            EMessageType.Error => MessageType.Error,
-            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
-        };
+            switch (messageType)
+            {
+                case EMessageType.None:
+                    return MessageType.None;
+                case EMessageType.Info:
+                    return MessageType.Info;
+                case EMessageType.Warning:
+                    return MessageType.Warning;
+                case EMessageType.Error:
+                    return MessageType.Error;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
+            }
+        }
     }
 }

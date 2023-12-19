@@ -107,117 +107,80 @@ namespace SaintsField.Editor.Core
             foreach (string part in splitByTags.Where(each => each != ""))
             {
                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
-#if EXT_INSPECTOR_LOG
-                Debug.Log($"get part {part} -> {parsedResult}");
-#endif
-                switch (parsedResult)
+
+                if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
                 {
-                    case (RichPartType.Content, _, null, false):
+                    richText.Append(parsedResult.content);
+                }
+                else if (parsedResult.partType == RichPartType.StartTag && !parsedResult.isSelfClose)
+                {
+                    openTags.Add((parsedResult.content, parsedResult.value, part));
+                    if (parsedResult.content == "color")
                     {
-#if EXT_INSPECTOR_LOG
-                        Debug.Log($"string append {parsedResult.content}");
-#endif
-                        richText.Append(parsedResult.content);
+                        colors.Add(parsedResult.value);
+                        richText.Append(Colors.ColorNameSupported(parsedResult.value)
+                            ? part
+                            : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
                     }
-                        break;
-                    case (RichPartType.StartTag, _, _, false):
+                    else
                     {
-                        openTags.Add((parsedResult.content, parsedResult.value, part));
-                        if (parsedResult.content == "color")
-                        {
-#if EXT_INSPECTOR_LOG
-                            Debug.Log($"colors add {parsedResult.value}");
-#endif
-                            colors.Add(parsedResult.value);
-                            richText.Append(Colors.ColorNameSupported(parsedResult.value)
-                                ? part
-                                : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
-                        }
-                        else
-                        {
-#if EXT_INSPECTOR_LOG
-                            Debug.Log($"string append {part}");
-#endif
+                        richText.Append(part);
+                    }
+                }
+                else if (parsedResult.partType == RichPartType.EndTag)
+                {
+                    if (!parsedResult.isSelfClose)
+                    {
+                        Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content);
+                        openTags.RemoveAt(openTags.Count - 1);
+                    }
+
+                    switch (parsedResult.content)
+                    {
+                        case "color" when colors.Count == 0:
+                            Debug.LogWarning($"missing open color tag for {richText}");
+                            break;
+                        case "color" when colors.Count > 0:
+                            colors.RemoveAt(colors.Count - 1);
                             richText.Append(part);
-                        }
-                    }
-                        break;
-                    case (RichPartType.EndTag, _, _, _):
-                    {
-                        if (!parsedResult.isSelfClose)
+                            break;
+                        case "label":
+                            richText.Append(labelText);
+                            break;
+                        case "icon":
                         {
-                            Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content);
-                            openTags.RemoveAt(openTags.Count - 1);
-                        }
-
-                        switch (parsedResult.content)
-                        {
-                            case "color" when colors.Count == 0:
-                                Debug.LogWarning($"missing open color tag for {richText}");
-                                break;
-                            case "color" when colors.Count > 0:
-#if EXT_INSPECTOR_LOG
-                                Debug.Log($"colors remove last");
-#endif
-                                colors.RemoveAt(colors.Count - 1);
-#if EXT_INSPECTOR_LOG
-                                Debug.Log($"string append {part}");
-#endif
-                                richText.Append(part);
-                                break;
-                            case "label":
-#if EXT_INSPECTOR_LOG
-                                Debug.Log($"string append {labelText}");
-#endif
-                                richText.Append(labelText);
-                                break;
-                            case "icon":
+                            Debug.Assert(parsedResult.value != null);
+                            // process ending
+                            string curContent = richText.ToString();
+                            if (curContent != "")
                             {
-                                Debug.Assert(parsedResult.value != null);
-                                // process ending
-                                string curContent = richText.ToString();
-                                if (curContent != "")
-                                {
-                                    string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
-#if EXT_INSPECTOR_LOG
-                                    Debug.Log($"chunk added {curContent}{endTagsString}");
-#endif
-                                    yield return new RichTextChunk
-                                    {
-                                        IsIcon = false,
-                                        Content = $"{curContent}{endTagsString}",
-                                    };
-                                }
-#if EXT_INSPECTOR_LOG
-                                Debug.Log($"chunk added icon {parsedResult.value}");
-#endif
-
+                                string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
                                 yield return new RichTextChunk
                                 {
-                                    IsIcon = true,
-                                    Content = parsedResult.value,
-                                    IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
+                                    IsIcon = false,
+                                    Content = $"{curContent}{endTagsString}",
                                 };
+                            }
 
-                                string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
-#if EXT_INSPECTOR_LOG
-                                Debug.Log($"string new with {textOpeningTags}");
-#endif
-                                richText = new StringBuilder(textOpeningTags);
-                            }
-                                break;
-                            default:
+                            yield return new RichTextChunk
                             {
-#if EXT_INSPECTOR_LOG
-                                Debug.Log($"default string append {part} for {parsedResult}");
-#endif
-                                richText.Append(part);
-                            }
-                                break;
+                                IsIcon = true,
+                                Content = parsedResult.value,
+                                IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
+                            };
+
+                            string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
+                            richText = new StringBuilder(textOpeningTags);
                         }
+                            break;
+                        default:
+                        {
+                            richText.Append(part);
+                        }
+                            break;
                     }
-                        break;
                 }
+
             }
 
             string leftContent = richText.ToString();

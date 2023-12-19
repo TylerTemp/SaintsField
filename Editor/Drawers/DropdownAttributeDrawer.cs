@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers
             string funcName = dropdownAttribute.FuncName;
             object parentObj = GetParentTarget(property);
             Debug.Assert(parentObj != null);
-            Type parentType = parentObj!.GetType();
+            Type parentType = parentObj.GetType();
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
                 ReflectUtils.GetProp(parentType, funcName);
             switch (getPropType)
@@ -86,7 +86,8 @@ namespace SaintsField.Editor.Drawers
                     }
                     catch (TargetInvocationException e)
                     {
-                        _error = e.InnerException!.Message;
+                        Debug.Assert(e.InnerException != null);
+                        _error = e.InnerException.Message;
                         Debug.LogException(e);
                         return;
                     }
@@ -117,10 +118,11 @@ namespace SaintsField.Editor.Drawers
             // Object target = property.serializedObject.targetObject;
             FieldInfo field = parentType.GetField(property.name, bindAttr);
             Debug.Assert(field != null, $"{property.name}/{parentObj}");
-            object curValue = field!.GetValue(parentObj);
+            object curValue = field.GetValue(parentObj);
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             string curDisplay = "";
-            foreach (ValueTuple<string, object, bool, bool> itemInfos in dropdownListValue!.Where(each => !each.Item4))
+            Debug.Assert(dropdownListValue != null);
+            foreach (ValueTuple<string, object, bool, bool> itemInfos in dropdownListValue.Where(each => !each.Item4))
             {
                 string name = itemInfos.Item1;
                 object itemValue = itemInfos.Item2;
@@ -167,7 +169,8 @@ namespace SaintsField.Editor.Drawers
                 // create the menu and add items to it
                 GenericMenu menu = new GenericMenu();
 
-                foreach (ValueTuple<string, object, bool, bool> itemInfo in dropdownListValue!)
+                Debug.Assert(dropdownListValue != null);
+                foreach (ValueTuple<string, object, bool, bool> itemInfo in dropdownListValue)
                 {
                     string curName = itemInfo.Item1;
                     object curItem = itemInfo.Item2;

@@ -66,23 +66,45 @@ namespace SaintsField.Editor.Drawers
                 {
                     Type targetType = targetObject.GetType();
 
+                    // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) propInfo =
+                    //     ReflectUtils.GetProp(targetType, imageCompName);
+                    // switch (propInfo)
+                    // {
+                    //     case (ReflectUtils.GetPropType.NotFound, _):
+                    //         _error = $"target {imageCompName} not found";
+                    //         return 0;
+                    //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+                    //         SignObject(foundFieldInfo.GetValue(targetObject));
+                    //         break;
+                    //     case (ReflectUtils.GetPropType.Property, PropertyInfo foundPropertyInfo):
+                    //         SignObject(foundPropertyInfo.GetValue(targetObject));
+                    //         break;
+                    //     case (ReflectUtils.GetPropType.Method, MethodInfo foundMethodInfo):
+                    //         SignObject(foundMethodInfo.Invoke(targetObject, null));
+                    //         break;
+                    // }
+
                     (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) propInfo =
                         ReflectUtils.GetProp(targetType, imageCompName);
-                    switch (propInfo)
+
+                    if (propInfo.Item1 == ReflectUtils.GetPropType.NotFound)
                     {
-                        case (ReflectUtils.GetPropType.NotFound, _):
-                            _error = $"target {imageCompName} not found";
-                            return 0;
-                        case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                            SignObject(foundFieldInfo.GetValue(targetObject));
-                            break;
-                        case (ReflectUtils.GetPropType.Property, PropertyInfo foundPropertyInfo):
-                            SignObject(foundPropertyInfo.GetValue(targetObject));
-                            break;
-                        case (ReflectUtils.GetPropType.Method, MethodInfo foundMethodInfo):
-                            SignObject(foundMethodInfo.Invoke(targetObject, null));
-                            break;
+                        _error = $"target {imageCompName} not found";
+                        return 0;
                     }
+                    else if (propInfo.Item1 == ReflectUtils.GetPropType.Field && propInfo.Item2 is FieldInfo foundFieldInfo)
+                    {
+                        SignObject(foundFieldInfo.GetValue(targetObject));
+                    }
+                    else if (propInfo.Item1 == ReflectUtils.GetPropType.Property && propInfo.Item2 is PropertyInfo foundPropertyInfo)
+                    {
+                        SignObject(foundPropertyInfo.GetValue(targetObject));
+                    }
+                    else if (propInfo.Item1 == ReflectUtils.GetPropType.Method && propInfo.Item2 is MethodInfo foundMethodInfo)
+                    {
+                        SignObject(foundMethodInfo.Invoke(targetObject, null));
+                    }
+
                 }
             }
             else
@@ -262,14 +284,20 @@ namespace SaintsField.Editor.Drawers
         private static Color GetColor(Container container, int index)
         {
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            return container.FieldType switch
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (container.FieldType)
             {
-                FieldType.Image => container.Image.color,
-                FieldType.SpriteRenderer => container.SpriteRenderer.color,
-                FieldType.Button => container.Button.targetGraphic.color,
-                FieldType.Renderer => container.Renderer.sharedMaterials[index].color,
-                _ => throw new ArgumentOutOfRangeException(nameof(container.FieldType), container.FieldType, null)
-            };
+                case FieldType.Image:
+                    return container.Image.color;
+                case FieldType.SpriteRenderer:
+                    return container.SpriteRenderer.color;
+                case FieldType.Button:
+                    return container.Button.targetGraphic.color;
+                case FieldType.Renderer:
+                    return container.Renderer.sharedMaterials[index].color;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(container.FieldType), container.FieldType, null);
+            }
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";

@@ -58,24 +58,27 @@ namespace SaintsField.Editor.Drawers
             //     position.width
             // );
 
-            using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            // Debug.Log(position);
-            GUIStyle style = new GUIStyle(EditorStyles.textField)
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                wordWrap = true,
-            };
-            EditorStyles.textField.wordWrap = true;
-            if (label.text != "")
-            {
-                (Rect labelFieldRect, Rect textAreaRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
-                EditorGUI.LabelField(labelFieldRect, label);
-                position = textAreaRect;
-            }
+                // Debug.Log(position);
+                GUIStyle style = new GUIStyle(EditorStyles.textField)
+                {
+                    wordWrap = true,
+                };
+                EditorStyles.textField.wordWrap = true;
+                if (label.text != "")
+                {
+                    (Rect labelFieldRect, Rect textAreaRect) =
+                        RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+                    EditorGUI.LabelField(labelFieldRect, label);
+                    position = textAreaRect;
+                }
 
-            string textAreaValue = EditorGUI.TextArea(position, property.stringValue, style);
-            if (changed.changed)
-            {
-                property.stringValue = textAreaValue;
+                string textAreaValue = EditorGUI.TextArea(position, property.stringValue, style);
+                if (changed.changed)
+                {
+                    property.stringValue = textAreaValue;
+                }
             }
         }
 

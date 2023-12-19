@@ -24,21 +24,34 @@ namespace SaintsField
     {
         public static Color GetColor(this EColor color)
         {
-            return color switch
+            switch (color)
             {
-                EColor.Clear => Color.clear,
-                EColor.White => Color.white,
-                EColor.Black => Color.black,
-                EColor.Gray => Color.gray,
-                EColor.Red => Color.red,
-                EColor.Pink => Colors.GetColorByName("pink"),
-                EColor.Orange => Colors.GetColorByName("orange"),
-                EColor.Yellow => Color.yellow,
-                EColor.Green => Color.green,
-                EColor.Blue => Color.blue,
-                EColor.Indigo => Colors.GetColorByName("indigo"),
-                EColor.Violet => Colors.GetColorByName("violet"),
-                _ => Color.white,
+                case EColor.Clear:
+                    return Color.clear;
+                case EColor.White:
+                    return Color.white;
+                case EColor.Black:
+                    return Color.black;
+                case EColor.Gray:
+                    return Color.gray;
+                case EColor.Red:
+                    return Color.red;
+                case EColor.Pink:
+                    return Colors.GetColorByName("pink");
+                case EColor.Orange:
+                    return Colors.GetColorByName("orange");
+                case EColor.Yellow:
+                    return Color.yellow;
+                case EColor.Green:
+                    return Color.green;
+                case EColor.Blue:
+                    return Color.blue;
+                case EColor.Indigo:
+                    return Colors.GetColorByName("indigo");
+                case EColor.Violet:
+                    return Colors.GetColorByName("violet");
+                default:
+                    return Color.white;
             };
         }
 

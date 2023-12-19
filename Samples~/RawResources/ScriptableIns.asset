@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: ScriptableIns
   m_EditorClassIdentifier: 
   _intRange: 34
-  _publicValue: 3
+  publicValue: -11
+  noLabel: 

@@ -106,7 +106,8 @@ namespace SaintsField.Editor.Utils
                     else
                     {
                         useObject = fileOrProp.IsFile
-                            ? fileOrProp.FileInfo!.GetValue(sourceObj)
+                            // ReSharper disable once PossibleNullReferenceException
+                            ? fileOrProp.FileInfo.GetValue(sourceObj)
                             : fileOrProp.PropertyInfo.GetValue(sourceObj);
                     }
 
@@ -133,7 +134,8 @@ namespace SaintsField.Editor.Utils
                 else
                 {
                     sourceObj = fileOrProp.IsFile
-                        ? fileOrProp.FileInfo!.GetValue(sourceObj)
+                        // ReSharper disable once PossibleNullReferenceException
+                        ? fileOrProp.FileInfo.GetValue(sourceObj)
                         : fileOrProp.PropertyInfo.GetValue(sourceObj);
                     fileOrProp = GetFileOrProp(sourceObj, propSegName);
                 }
@@ -254,12 +256,14 @@ namespace SaintsField.Editor.Utils
                     {
                         i++; //skips "data[x]"
                         // type = type!.GetElementType(); //gets info on array elements
-                        getType = getType.GetElementType()!;
+                        Debug.Assert(getType != null);
+                        getType = getType.GetElementType();
                     }
                     else  //gets info on field and its type
                     {
                         // Debug.Log($"{slices[i]}, {type!.GetField(slices[i], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance)}");
-                        FieldInfo field = getType!.GetField(slices[i],
+                        Debug.Assert(getType != null);
+                        FieldInfo field = getType.GetField(slices[i],
                             BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy |
                             BindingFlags.Instance);
                         if (field != null)

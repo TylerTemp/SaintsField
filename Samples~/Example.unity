@@ -43,7 +43,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -118,8 +118,6 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
-    maxJobWorkers: 0
-    preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
@@ -316,7 +314,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   my:
-    myInt: 2
+    myInt: 3
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,8 +394,8 @@ MonoBehaviour:
   upLimit: 7
   min0Max: 0
   fMinMax10: 7
-  <_maxValue>k__BackingField: 129
-  <_minValue>k__BackingField: 87
+  <_maxValue>k__BackingField: 126
+  <_minValue>k__BackingField: 80
   <_range>k__BackingField: {x: 96.71, y: 119.667915}
 --- !u!4 &185980176
 Transform:
@@ -457,8 +455,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  dummyPrefab: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  dummyPrefabFieldType: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  dummyPrefab: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6,
+    type: 3}
+  dummyPrefabFieldType: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6,
+    type: 3}
 --- !u!1 &246861350
 GameObject:
   m_ObjectHideFlags: 0
@@ -490,8 +490,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _show: 1
   _content: 0
-  _modInt: 1
-  _defaultInt: 18
+  _modInt: 19
+  _defaultInt: 4
 --- !u!4 &246861352
 Transform:
   m_ObjectHideFlags: 0
@@ -535,7 +535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6830dc4b87389ed4daf7678ce72b922f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _value: 46
+  _value: -5
 --- !u!4 &272774834
 Transform:
   m_ObjectHideFlags: 0
@@ -630,8 +630,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0134a10044b2475886a64552e7a8f4ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sortingLayerString: NewSortingLayer1
-  _sortingLayerInt: 2
+  _sortingLayerString: Default
+  _sortingLayerInt: 0
 --- !u!4 &301131439
 Transform:
   m_ObjectHideFlags: 0
@@ -878,7 +878,6 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -903,7 +902,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f6dd782be9f6242428748582d3c70a63, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -962,7 +961,6 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -987,7 +985,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &435171143
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1042,11 +1039,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 652b26060ca7d5d45b1250475013f45c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mixed: {x: 0.19535196, y: 0.4453519}
-  _float: 38.3
+  _mixed: {x: 0.27947393, y: 0.5294739}
+  _float: 34.3
   _sOnly: {x: -0.02, y: 0.37}
-  _selfField: {x: 0.21, y: 0.68}
-  _mixedNoLabel: {x: 0.19365081, y: 0.64444447}
+  _selfField: {x: 0.24154574, y: 0.7115457}
+  _mixedNoLabel: {x: 0.17071503, y: 0.62150866}
   _nested:
     _mixed: {x: 0.14565316, y: 0.46426943}
     normalInt: 0
@@ -1107,7 +1104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ab45109167a42a49a02633e4f9f8b7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _errorOut: 0
+  _errorOut: 1
   _labelByField: Dynamic Label!
   _someInt: 33
 --- !u!1 &556802672
@@ -1243,7 +1240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneInt: 0
-  sceneStr: 
+  sceneStr: Example
 --- !u!4 &633783411
 Transform:
   m_ObjectHideFlags: 0
@@ -1555,7 +1552,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54fdc29f5ce44e0a9750019eaf9cecdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _intValue: 0
+  _intValue: -22
 --- !u!4 &887127789
 Transform:
   m_ObjectHideFlags: 0
@@ -1847,7 +1844,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
-    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -2320,9 +2316,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <DynamicMin>k__BackingField: -0.73
+  <DynamicMin>k__BackingField: -5.87
   <DynamicMax>k__BackingField: 10.94
-  _propRange: {x: 2.3279486, y: 4.918863}
+  _propRange: {x: 1.714384, y: 4.305299}
 --- !u!1 &1271404088
 GameObject:
   m_ObjectHideFlags: 0
@@ -2424,7 +2420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50a944f54e0f41ed8aebd21ecf823272, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputAxis: Enable Debug Button 2
+  inputAxis: Horizontal
 --- !u!4 &1350909639
 Transform:
   m_ObjectHideFlags: 0
@@ -2470,8 +2466,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scene: Example
   go: {fileID: 1383904217}
-  <SepTitleTest>k__BackingField: 142
-  <SepTitleJustLine>k__BackingField: 0
+  <SepTitleTest>k__BackingField: 150
+  <SepTitleJustLine>k__BackingField: 5
 --- !u!4 &1383904219
 Transform:
   m_ObjectHideFlags: 0
@@ -2538,7 +2534,6 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2605,7 +2600,6 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2631,7 +2625,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
-  m_Color: {r: 0.119199276, g: 0, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.8118372, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2757,7 +2751,6 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2806,7 +2799,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 285828b4b0a19cb46804e478c7f9acf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _value: 39
+  _value: 32
 --- !u!4 &1484731013
 Transform:
   m_ObjectHideFlags: 0
@@ -3079,7 +3072,6 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
 --- !u!223 &1670516895
 Canvas:
   m_ObjectHideFlags: 0
@@ -3229,9 +3221,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.14509805, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -3301,8 +3292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rate0To5: 0
-  rate1To5: 1
-  rate3To5: 3
+  rate1To5: 3
+  rate3To5: 4
 --- !u!4 &1881364801
 Transform:
   m_ObjectHideFlags: 0
@@ -3401,12 +3392,11 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f6dd782be9f6242428748582d3c70a63, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3512,7 +3502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: Untagged
+  _tag: GameController
 --- !u!1 &2118824042
 GameObject:
   m_ObjectHideFlags: 0
@@ -3637,7 +3627,6 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &2134144049
@@ -3684,9 +3673,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bool1: 1
-  _bool2: 1
+  _bool2: 0
   _bool3: 1
-  _bool4: 1
+  _bool4: 0
   _showIf1Or2: 
   _showIf1And2: 
   _hideIf1Or2: 
@@ -3723,7 +3712,6 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3748,7 +3736,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &3605750295276394857
 MeshFilter:
   m_ObjectHideFlags: 0

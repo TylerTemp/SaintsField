@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Drawers
         {
             string paramName = property.stringValue;
             int index = animatorParameters
-                .Select((value, index) => new {value, index})
+                .Select((value, valueIndex) => new {value, index=valueIndex})
                 .FirstOrDefault(each => each.value.name == paramName)?.index ?? -1;
             // int index = 0;
             //

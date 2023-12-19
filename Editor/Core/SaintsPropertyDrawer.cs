@@ -394,7 +394,8 @@ namespace SaintsField.Editor.Core
 
             _usedAttributes.Clear();
 
-            using EditorGUI.PropertyScope propertyScope = new EditorGUI.PropertyScope(position, label, property);
+            EditorGUI.PropertyScope propertyScope = new EditorGUI.PropertyScope(position, label, property);
+            propertyScope.Dispose();
             // GUIContent propertyScoopLabel = propertyScope.content;
             GUIContent bugFixCopyLabel = new GUIContent(label);
 
@@ -811,7 +812,7 @@ namespace SaintsField.Editor.Core
             }
 
             // Debug.Log($"create new drawer for {saintsAttributeWithIndex.SaintsAttribute}[{saintsAttributeWithIndex.Index}]");
-            Type drawerType = PropertyAttributeToDrawers[saintsAttributeWithIndex.SaintsAttribute.GetType()].First(each => each.isSaints)!.drawerType;
+            Type drawerType = PropertyAttributeToDrawers[saintsAttributeWithIndex.SaintsAttribute.GetType()].First(each => each.isSaints).drawerType;
             return _cachedDrawer[saintsAttributeWithIndex] =
                 (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
         }
@@ -927,7 +928,8 @@ namespace SaintsField.Editor.Core
                         }
 
                         FieldInfo drawerFieldInfo = drawerType.GetField("m_Attribute", BindingFlags.NonPublic | BindingFlags.Instance);
-                        drawerFieldInfo!.SetValue(drawerInstance, propertyAttribute);
+                        Debug.Assert(drawerFieldInfo != null);
+                        drawerFieldInfo.SetValue(drawerInstance, propertyAttribute);
                         // drawerInstance.attribute = propertyAttribute;
 
                         // UnityEditor.RangeDrawer

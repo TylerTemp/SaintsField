@@ -28,40 +28,72 @@ namespace SaintsField.Editor.Utils
             //
             // object target = property.serializedObject.targetObject;
 
+            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
+            // switch (found)
+            // {
+            //     case (ReflectUtils.GetPropType.NotFound, _):
+            //     {
+            //         return (-1, $"No field or method named `{by}` found on `{target}`");
+            //     }
+            //     case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+            //     {
+            //         return ObjToFloat(propertyInfo.GetValue(target));
+            //     }
+            //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+            //     {
+            //         return ObjToFloat(foundFieldInfo.GetValue(target));
+            //     }
+            //     case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+            //     {
+            //         ParameterInfo[] methodParams = methodInfo.GetParameters();
+            //         Debug.Assert(methodParams.All(p => p.IsOptional));
+            //         // Debug.Assert(methodInfo.ReturnType == typeof(bool));
+            //         return ObjToFloat(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+            //     }
+            //     default:
+            //         throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            // }
+
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
-            switch (found)
+
+            if (found.Item1 == ReflectUtils.GetPropType.NotFound)
             {
-                case (ReflectUtils.GetPropType.NotFound, _):
-                {
-                    return (-1, $"No field or method named `{by}` found on `{target}`");
-                }
-                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
-                {
-                    return ObjToFloat(propertyInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                {
-                    return ObjToFloat(foundFieldInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
-                {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    // Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    return ObjToFloat(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
+                return (-1, $"No field or method named `{by}` found on `{target}`");
             }
+            else if (found.Item1 == ReflectUtils.GetPropType.Property && found.Item2 is PropertyInfo propertyInfo)
+            {
+                return ObjToFloat(propertyInfo.GetValue(target));
+            }
+            else if (found.Item1 == ReflectUtils.GetPropType.Field && found.Item2 is FieldInfo foundFieldInfo)
+            {
+                return ObjToFloat(foundFieldInfo.GetValue(target));
+            }
+            else if (found.Item1 == ReflectUtils.GetPropType.Method && found.Item2 is MethodInfo methodInfo)
+            {
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                Debug.Assert(methodParams.All(p => p.IsOptional));
+                // Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                return ObjToFloat(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            }
+
         }
 
-        private static (float, string) ObjToFloat(object result) =>
-            result switch
+        private static (float, string) ObjToFloat(object result)
+        {
+            switch (result)
             {
-                int intValue => (intValue, ""),
-                float floatValue => (floatValue, ""),
-                _ => (-1, $"{result} is neither int or float"),
-            };
+                case int intValue:
+                    return (intValue, "");
+                case float floatValue:
+                    return (floatValue, "");
+                default:
+                    return (-1, $"{result} is neither int or float");
+            }
+        }
 
         public static float BoundFloatStep(float curValue, float start, float end, float step)
         {

@@ -19,18 +19,47 @@ namespace SaintsField.Editor.Drawers
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;
             Type fieldType = SerializedUtils.GetType(property);
-            UnityEngine.Object requiredValue;
+            UnityEngine.Object requiredValue = null;
             try
             {
                 // Debug.Log(property.objectReferenceValue);
 
-                requiredValue = (fieldType == typeof(GameObject), requiredComp == typeof(GameObject)) switch
+                bool fieldTypeIsGameObject = fieldType == typeof(GameObject);
+                bool requiredCompIsGameObject = requiredComp == typeof(GameObject);
+
+                if (fieldTypeIsGameObject && requiredCompIsGameObject)
                 {
-                    (true, true) => property.objectReferenceValue,
-                    (false, false) => ((Component)property.objectReferenceValue)?.GetComponent(requiredComp),
-                    (true, false) => ((GameObject)property.objectReferenceValue)?.GetComponent(requiredComp),
-                    (false, true) => ((Component)property.objectReferenceValue)?.gameObject,
-                };
+                    requiredValue = property.objectReferenceValue;
+                }
+                else if (!fieldTypeIsGameObject && !requiredCompIsGameObject)
+                {
+                    requiredValue = ((Component)property.objectReferenceValue)?.GetComponent(requiredComp);
+                }
+                else if (fieldTypeIsGameObject && !requiredCompIsGameObject)
+                {
+                    requiredValue = ((GameObject)property.objectReferenceValue)?.GetComponent(requiredComp);
+                }
+                else if (!fieldTypeIsGameObject && requiredCompIsGameObject)
+                {
+                    requiredValue = ((Component)property.objectReferenceValue)?.gameObject;
+                }
+
+
+                // switch (fieldType == typeof(GameObject), requiredComp == typeof(GameObject))
+                // {
+                //     case (true, true):
+                //         requiredValue = property.objectReferenceValue;
+                //         break;
+                //     case (false, false):
+                //         requiredValue = ((Component)property.objectReferenceValue)?.GetComponent(requiredComp);
+                //         break;
+                //     case (true, false):
+                //         requiredValue = ((GameObject)property.objectReferenceValue)?.GetComponent(requiredComp);
+                //         break;
+                //     case (false, true):
+                //         requiredValue = ((Component)property.objectReferenceValue)?.gameObject;
+                //         break;
+                // }
             }
             catch (Exception e)
             {
@@ -40,25 +69,48 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-            UnityEngine.Object fieldResult  =
-                EditorGUI.ObjectField(position, label, requiredValue, requiredComp, true);
-            if (changed.changed)
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                UnityEngine.Object result =
-                    (requiredComp == typeof(GameObject), fieldType == typeof(GameObject)) switch
-                    {
-                        (true, true) => fieldResult,
-                        (false, false) => ((Component)fieldResult)?.GetComponent(fieldType),
-                        (true, false) => ((GameObject)fieldResult)?.GetComponent(fieldType),
-                        (false, true) => ((Component)fieldResult)?.gameObject,
-                    };
-
-                property.objectReferenceValue = result;
-
-                if (fieldResult != null && result == null)
+                UnityEngine.Object fieldResult =
+                    EditorGUI.ObjectField(position, label, requiredValue, requiredComp, true);
+                if (changed.changed)
                 {
-                    _error = $"{fieldResult} has no component {fieldType}";
+                    // UnityEngine.Object result =
+                    //     (requiredComp == typeof(GameObject), fieldType == typeof(GameObject)) switch
+                    //     {
+                    //         (true, true) => fieldResult,
+                    //         (false, false) => ((Component)fieldResult)?.GetComponent(fieldType),
+                    //         (true, false) => ((GameObject)fieldResult)?.GetComponent(fieldType),
+                    //         (false, true) => ((Component)fieldResult)?.gameObject,
+                    //     };
+                    bool requiredCompIsGameObject = requiredComp == typeof(GameObject);
+                    bool fieldTypeIsGameObject = fieldType == typeof(GameObject);
+
+                    UnityEngine.Object result = null;
+
+                    if (requiredCompIsGameObject && fieldTypeIsGameObject)
+                    {
+                        result = fieldResult;
+                    }
+                    else if (!requiredCompIsGameObject && !fieldTypeIsGameObject)
+                    {
+                        result = ((Component)fieldResult)?.GetComponent(fieldType);
+                    }
+                    else if (requiredCompIsGameObject && !fieldTypeIsGameObject)
+                    {
+                        result = ((GameObject)fieldResult)?.GetComponent(fieldType);
+                    }
+                    else if (!requiredCompIsGameObject && fieldTypeIsGameObject)
+                    {
+                        result = ((Component)fieldResult)?.gameObject;
+                    }
+
+                    property.objectReferenceValue = result;
+
+                    if (fieldResult != null && result == null)
+                    {
+                        _error = $"{fieldResult} has no component {fieldType}";
+                    }
                 }
             }
         }

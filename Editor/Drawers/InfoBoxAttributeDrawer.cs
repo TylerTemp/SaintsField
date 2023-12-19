@@ -94,49 +94,91 @@ namespace SaintsField.Editor.Drawers
                 return true;
             }
 
+            // object target = GetParentTarget(property);
+            //
+            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), infoboxAttribute.ShowCallback);
+            // switch (found)
+            // {
+            //     case (ReflectUtils.GetPropType.NotFound, _):
+            //     {
+            //         _error = $"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`";
+            //         Debug.LogError(_error);
+            //         return false;
+            //     }
+            //     case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+            //     {
+            //         if (!ReflectUtils.Truly(propertyInfo.GetValue(target)))
+            //         {
+            //             return false;
+            //         }
+            //     }
+            //         break;
+            //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+            //     {
+            //         if (!ReflectUtils.Truly(foundFieldInfo.GetValue(target)))
+            //         {
+            //             return false;
+            //         }
+            //     }
+            //         break;
+            //     case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+            //     {
+            //         ParameterInfo[] methodParams = methodInfo.GetParameters();
+            //         Debug.Assert(methodParams.All(p => p.IsOptional));
+            //         Debug.Assert(methodInfo.ReturnType == typeof(bool));
+            //         if (!(bool)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()))
+            //         {
+            //             return false;
+            //         }
+            //     }
+            //         break;
+            //     default:
+            //         throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            // }
+            //
+            // return true;
+
             object target = GetParentTarget(property);
 
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), infoboxAttribute.ShowCallback);
-            switch (found)
+
+            if (found.getPropType == ReflectUtils.GetPropType.NotFound)
             {
-                case (ReflectUtils.GetPropType.NotFound, _):
+                _error = $"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`";
+                Debug.LogError(_error);
+                return false;
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
+            {
+                if (!ReflectUtils.Truly(propertyInfo.GetValue(target)))
                 {
-                    _error = $"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`";
-                    Debug.LogError(_error);
                     return false;
                 }
-                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
+            {
+                if (!ReflectUtils.Truly(foundFieldInfo.GetValue(target)))
                 {
-                    if (!ReflectUtils.Truly(propertyInfo.GetValue(target)))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-                    break;
-                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
+            {
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                Debug.Assert(methodParams.All(p => p.IsOptional));
+                Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                if (!(bool)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()))
                 {
-                    if (!ReflectUtils.Truly(foundFieldInfo.GetValue(target)))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-                    break;
-                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
-                {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    if (!(bool)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()))
-                    {
-                        return false;
-                    }
-                }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(found), found, null);
             }
 
             return true;
+
         }
 
         private string GetContent(SerializedProperty property, InfoBoxAttribute infoboxAttribute)
@@ -147,64 +189,129 @@ namespace SaintsField.Editor.Drawers
                 return infoboxAttribute.Content;
             }
 
+            // object target = GetParentTarget(property);
+            //
+            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), infoboxAttribute.Content);
+            // switch (found)
+            // {
+            //     case (ReflectUtils.GetPropType.NotFound, _):
+            //     {
+            //         _error = $"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`";
+            //         Debug.LogError(_error);
+            //         return string.Empty;
+            //     }
+            //     case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+            //     {
+            //         // Debug.Log(propertyInfo.GetValue(target).GetType());
+            //         object result = propertyInfo.GetValue(target);
+            //         // ReSharper disable once InvertIf
+            //         if(result is ValueTuple<EMessageType, string> resultTuple)
+            //         {
+            //             _overrideMessageType = true;
+            //             _messageType = resultTuple.Item1;
+            //             return resultTuple.Item2;
+            //         }
+            //
+            //         return result.ToString();
+            //     }
+            //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+            //     {
+            //         object result = foundFieldInfo.GetValue(target);
+            //         // ReSharper disable once InvertIf
+            //         if(result is ValueTuple<EMessageType, string> resultTuple)
+            //         {
+            //             _overrideMessageType = true;
+            //             _messageType = resultTuple.Item1;
+            //             return resultTuple.Item2;
+            //         }
+            //
+            //         return result.ToString();
+            //     }
+            //     case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+            //     {
+            //         ParameterInfo[] methodParams = methodInfo.GetParameters();
+            //         Debug.Assert(methodParams.All(p => p.IsOptional));
+            //         // Debug.Assert(methodInfo.ReturnType == typeof(string));
+            //         // Debug.Log(methodInfo.ReturnType);
+            //         // ReSharper disable once InvertIf
+            //         if (methodInfo.ReturnType == typeof(ValueTuple<EMessageType, string>))
+            //         {
+            //             (EMessageType messageType, string content) = ((EMessageType, string))methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+            //             _overrideMessageType = true;
+            //             _messageType = messageType;
+            //             return content;
+            //         }
+            //
+            //         return methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()).ToString();
+            //     }
+            //     default:
+            //         throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            // }
+
             object target = GetParentTarget(property);
 
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), infoboxAttribute.Content);
-            switch (found)
+
+            // string result;
+
+            if (found.getPropType == ReflectUtils.GetPropType.NotFound)
             {
-                case (ReflectUtils.GetPropType.NotFound, _):
-                {
-                    _error = $"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`";
-                    Debug.LogError(_error);
-                    return string.Empty;
-                }
-                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
-                {
-                    // Debug.Log(propertyInfo.GetValue(target).GetType());
-                    object result = propertyInfo.GetValue(target);
-                    // ReSharper disable once InvertIf
-                    if(result is ValueTuple<EMessageType, string> resultTuple)
-                    {
-                        _overrideMessageType = true;
-                        _messageType = resultTuple.Item1;
-                        return resultTuple.Item2;
-                    }
+                _error = $"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`";
+                Debug.LogError(_error);
+                return string.Empty;
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
+            {
+                object propertyValue = propertyInfo.GetValue(target);
 
-                    return result.ToString();
-                }
-                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+                if (propertyValue is ValueTuple<EMessageType, string> resultTuple)
                 {
-                    object result = foundFieldInfo.GetValue(target);
-                    // ReSharper disable once InvertIf
-                    if(result is ValueTuple<EMessageType, string> resultTuple)
-                    {
-                        _overrideMessageType = true;
-                        _messageType = resultTuple.Item1;
-                        return resultTuple.Item2;
-                    }
-
-                    return result.ToString();
+                    _overrideMessageType = true;
+                    _messageType = resultTuple.Item1;
+                    return resultTuple.Item2;
                 }
-                case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
+                else
                 {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    // Debug.Assert(methodInfo.ReturnType == typeof(string));
-                    // Debug.Log(methodInfo.ReturnType);
-                    // ReSharper disable once InvertIf
-                    if (methodInfo.ReturnType == typeof(ValueTuple<EMessageType, string>))
-                    {
-                        (EMessageType messageType, string content) = ((EMessageType, string))methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-                        _overrideMessageType = true;
-                        _messageType = messageType;
-                        return content;
-                    }
+                    return propertyValue.ToString();
+                }
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
+            {
+                object fieldValue = foundFieldInfo.GetValue(target);
 
+                if (fieldValue is ValueTuple<EMessageType, string> resultTuple)
+                {
+                    _overrideMessageType = true;
+                    _messageType = resultTuple.Item1;
+                    return resultTuple.Item2;
+                }
+                else
+                {
+                    return fieldValue.ToString();
+                }
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
+            {
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                Debug.Assert(methodParams.All(p => p.IsOptional));
+
+                if (methodInfo.ReturnType == typeof(ValueTuple<EMessageType, string>))
+                {
+                    (EMessageType messageType, string content) = ((EMessageType, string))methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                    _overrideMessageType = true;
+                    _messageType = messageType;
+                    return content;
+                }
+                else
+                {
                     return methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()).ToString();
                 }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(found), found, null);
             }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
+            }
+
         }
     }
 }

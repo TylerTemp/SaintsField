@@ -145,7 +145,8 @@ namespace SaintsField.Editor.Drawers
                         }
                         catch (TargetInvocationException e)
                         {
-                            _error = e.InnerException!.Message;
+                            Debug.Assert(e.InnerException != null);
+                            _error = e.InnerException.Message;
                             Debug.LogException(e);
                         }
                         catch (Exception e)

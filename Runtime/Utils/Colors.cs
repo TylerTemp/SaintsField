@@ -24,41 +24,65 @@ namespace SaintsField.Utils
             return GetColorByName(name);
         }
 
-        public static Color GetColorByName(string name) => name switch
+        public static Color GetColorByName(string name)
         {
-            "red" => Color.red,
-            "green" => Color.green,
-            "blue" => Color.blue,
-            "white" => Color.white,
-            "black" => Color.black,
-            "yellow" => Color.yellow,
-            "cyan" => Color.cyan,
-            "magenta" => Color.magenta,
-            "gray" => Color.gray,
-            "grey" => Color.grey,
-            "clear" => Color.clear,
-            "pink" => new Color32(255, 152, 203, 255),
-            "orange" => new Color32(255, 128, 0, 255),
-            "indigo" => new Color32(75, 0, 130, 255),
-            "violet" => new Color32(128, 0, 255, 255),
-            _ => Color.white,
-        };
+            switch (name)
+            {
+                case "red":
+                    return Color.red;
+                case "green":
+                    return Color.green;
+                case "blue":
+                    return Color.blue;
+                case "white":
+                    return Color.white;
+                case "black":
+                    return Color.black;
+                case "yellow":
+                    return Color.yellow;
+                case "cyan":
+                    return Color.cyan;
+                case "magenta":
+                    return Color.magenta;
+                case "gray":
+                    return Color.gray;
+                case "grey":
+                    return Color.grey;
+                case "clear":
+                    return Color.clear;
+                case "pink":
+                    return new Color32(255, 152, 203, 255);
+                case "orange":
+                    return new Color32(255, 128, 0, 255);
+                case "indigo":
+                    return new Color32(75, 0, 130, 255);
+                case "violet":
+                    return new Color32(128, 0, 255, 255);
+                default:
+                    return Color.white;
+            }
+        }
 
-        public static bool ColorNameSupported(string name) => name switch
+        public static bool ColorNameSupported(string name)
         {
-            "red" => true,
-            "green" => true,
-            "blue" => true,
-            "white" => true,
-            "black" => true,
-            "yellow" => true,
-            "cyan" => true,
-            "magenta" => true,
-            "gray" => true,
-            "grey" => true,
-            "clear" => true,
-            _ => false,
-        };
+            switch (name)
+            {
+                case "red":
+                case "green":
+                case "blue":
+                case "white":
+                case "black":
+                case "yellow":
+                case "cyan":
+                case "magenta":
+                case "gray":
+                case "grey":
+                case "clear":
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         public static string ToHtmlHexString(Color color)
         {

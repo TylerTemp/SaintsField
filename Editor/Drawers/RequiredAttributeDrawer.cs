@@ -29,26 +29,49 @@ namespace SaintsField.Editor.Drawers
 
         private static bool Truly(SerializedProperty property)
         {
+            // UnityEngine.Object target = property.serializedObject.targetObject;
+            //
+            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), property.name);
+            // switch (found)
+            // {
+            //     case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
+            //     {
+            //         return ReflectUtils.Truly(propertyInfo.GetValue(target));
+            //     }
+            //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
+            //     {
+            //         return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
+            //     }
+            //     // ReSharper disable once RedundantCaseLabel
+            //     case (ReflectUtils.GetPropType.NotFound, _):
+            //     // ReSharper disable once RedundantCaseLabel
+            //     case (ReflectUtils.GetPropType.Method, MethodInfo _):
+            //     default:
+            //         throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
+            // }
+
             UnityEngine.Object target = property.serializedObject.targetObject;
 
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), property.name);
-            switch (found)
+
+            if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
             {
-                case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
-                {
-                    return ReflectUtils.Truly(propertyInfo.GetValue(target));
-                }
-                case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                {
-                    return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
-                }
-                // ReSharper disable once RedundantCaseLabel
-                case (ReflectUtils.GetPropType.NotFound, _):
-                // ReSharper disable once RedundantCaseLabel
-                case (ReflectUtils.GetPropType.Method, MethodInfo _):
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
+                return ReflectUtils.Truly(propertyInfo.GetValue(target));
             }
+            else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
+            {
+                return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.NotFound || found.getPropType == ReflectUtils.GetPropType.Method)
+            {
+                throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
+            }
+            else
+            {
+                // Handle any other cases here, if needed
+                throw new NotImplementedException("Unexpected case");
+            }
+
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => ValidateType(property) != "";

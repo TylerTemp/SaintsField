@@ -15,7 +15,8 @@ namespace SaintsField.Editor.Drawers
         {
             Type internalEditorUtilityType = typeof(UnityEditorInternal.InternalEditorUtility);
             PropertyInfo sortingLayersProperty = internalEditorUtilityType.GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
-            return (string[])sortingLayersProperty!.GetValue(null, Array.Empty<object>());
+            Debug.Assert(sortingLayersProperty != null);
+            return (string[])sortingLayersProperty.GetValue(null, Array.Empty<object>());
         }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
@@ -30,19 +31,22 @@ namespace SaintsField.Editor.Drawers
 
             int selectedIndex = property.propertyType == SerializedPropertyType.Integer ? property.intValue : Array.IndexOf(layers, property.stringValue);
 
-            using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-
-            int newIndex = EditorGUI.Popup(position, label, selectedIndex, layers.Select(each => new GUIContent(each)).ToArray());
-            // ReSharper disable once InvertIf
-            if (changed.changed)
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                if (property.propertyType == SerializedPropertyType.Integer)
+
+                int newIndex = EditorGUI.Popup(position, label, selectedIndex,
+                    layers.Select(each => new GUIContent(each)).ToArray());
+                // ReSharper disable once InvertIf
+                if (changed.changed)
                 {
-                    property.intValue = newIndex;
-                }
-                else
-                {
-                    property.stringValue = layers[newIndex];
+                    if (property.propertyType == SerializedPropertyType.Integer)
+                    {
+                        property.intValue = newIndex;
+                    }
+                    else
+                    {
+                        property.stringValue = layers[newIndex];
+                    }
                 }
             }
         }

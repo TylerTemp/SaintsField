@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -83,6 +84,8 @@ namespace SaintsField.Editor.Drawers
             // _editor ??= UnityEditor.Editor.CreateEditor(scriptableObject);
             // _editor.OnInspectorGUI();
 
+            List<(Rect, SerializedProperty)> propertyRects = new List<(Rect, SerializedProperty)>();
+
             using(new EditorGUI.IndentLevelScope(1))
             using(new AdaptLabelWidth())
             using(new ResetIndentScoop())
@@ -98,19 +101,24 @@ namespace SaintsField.Editor.Drawers
                         height = childHeight,
                     };
 
-                    // NaughtyEditorGUI.PropertyField(childRect, childProperty, true);
-                    EditorGUI.PropertyField(childRect, childProperty, true);
+                    // EditorGUI.PropertyField(childRect, childProperty, true);
+                    propertyRects.Add((childRect, childProperty));
 
                     usedHeight += childHeight;
                 }
             }
 
-            serializedObject.ApplyModifiedProperties();
-
             GUI.Box(new Rect(leftRect)
             {
                 height = usedHeight,
             }, GUIContent.none);
+
+            foreach ((Rect childRect, SerializedProperty childProperty) in propertyRects)
+            {
+                EditorGUI.PropertyField(childRect, childProperty, true);
+            }
+
+            serializedObject.ApplyModifiedProperties();
 
             return new Rect(leftRect)
             {
@@ -121,22 +129,24 @@ namespace SaintsField.Editor.Drawers
 
         private static IEnumerable<SerializedProperty> GetAllField(SerializedObject serializedScriptableObject)
         {
-            using SerializedProperty iterator = serializedScriptableObject.GetIterator();
-            if (!iterator.NextVisible(true))
+            using (SerializedProperty iterator = serializedScriptableObject.GetIterator())
             {
-                yield break;
-            }
-
-            do
-            {
-                SerializedProperty childProperty = serializedScriptableObject.FindProperty(iterator.name);
-                if (childProperty.name.Equals("m_Script", System.StringComparison.Ordinal))
+                if (!iterator.NextVisible(true))
                 {
-                    continue;
+                    yield break;
                 }
 
-                yield return childProperty;
-            } while (iterator.NextVisible(false));
+                do
+                {
+                    SerializedProperty childProperty = serializedScriptableObject.FindProperty(iterator.name);
+                    if (childProperty.name.Equals("m_Script", System.StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    yield return childProperty;
+                } while (iterator.NextVisible(false));
+            }
         }
     }
 }

@@ -32,7 +32,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            _axisNames ??= GetAxisNames();
+            if(_axisNames == null)
+            {
+                _axisNames = GetAxisNames();
+            }
 
             int index = IndexOf(_axisNames, property.stringValue);
             // ReSharper disable once ConvertToUsingDeclaration

@@ -160,32 +160,33 @@ namespace SaintsField.Editor.Drawers
             }
 
             // (Rect popupRect, Rect popupLeftRect) = RectUtils.SplitHeightRect(position, GetLabelFieldHeight(property, label, saintsAttribute));
-            using EditorGUI.ChangeCheckScope popupChanged = new EditorGUI.ChangeCheckScope();
-            curIndex = EditorGUI.Popup(
-                position,
-                label,
-                curIndex,
-                animatorStates.Select(each => new GUIContent(each.ToString())).ToArray(),
-                EditorStyles.popup);
-
-            // ReSharper disable once InvertIf
-            if (popupChanged.changed)
+            using (EditorGUI.ChangeCheckScope popupChanged = new EditorGUI.ChangeCheckScope())
             {
-                AnimatorState animatorState = animatorStates[curIndex];
-                if (property.propertyType == SerializedPropertyType.String)
+                curIndex = EditorGUI.Popup(
+                    position,
+                    label,
+                    curIndex,
+                    animatorStates.Select(each => new GUIContent(each.ToString())).ToArray(),
+                    EditorStyles.popup);
+
+                // ReSharper disable once InvertIf
+                if (popupChanged.changed)
                 {
-                    property.stringValue = animatorState.stateName;
-                }
-                else
-                {
-                    curLayerIndexProp.intValue = animatorState.layerIndex;
-                    curStateNameHashProp.intValue = animatorState.stateNameHash;
-                    curStateNameProp.stringValue = animatorState.stateName;
-                    curStateSpeedProp.floatValue = animatorState.stateSpeed;
-                    curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
+                    AnimatorState animatorState = animatorStates[curIndex];
+                    if (property.propertyType == SerializedPropertyType.String)
+                    {
+                        property.stringValue = animatorState.stateName;
+                    }
+                    else
+                    {
+                        curLayerIndexProp.intValue = animatorState.layerIndex;
+                        curStateNameHashProp.intValue = animatorState.stateNameHash;
+                        curStateNameProp.stringValue = animatorState.stateName;
+                        curStateSpeedProp.floatValue = animatorState.stateSpeed;
+                        curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
+                    }
                 }
             }
-
             // RenderSubRow(popupLeftRect, property);
         }
 
@@ -193,14 +194,16 @@ namespace SaintsField.Editor.Drawers
         {
             if (property.propertyType == SerializedPropertyType.String)
             {
-                using EditorGUI.ChangeCheckScope onChange = new EditorGUI.ChangeCheckScope();
-                string newContent = EditorGUI.TextField(position, GUIContent.none, property.stringValue);
-                if (onChange.changed)
+                using (EditorGUI.ChangeCheckScope onChange = new EditorGUI.ChangeCheckScope())
                 {
-                    property.stringValue = newContent;
-                }
+                    string newContent = EditorGUI.TextField(position, GUIContent.none, property.stringValue);
+                    if (onChange.changed)
+                    {
+                        property.stringValue = newContent;
+                    }
 
-                return;
+                    return;
+                }
             }
 
             SerializedProperty curStateNameProp = property.FindPropertyRelative("stateName");
