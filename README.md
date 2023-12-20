@@ -1385,6 +1385,25 @@ public class GetPrefabWithComponentExample: MonoBehaviour
 
 ![get_prefab_with_component](https://github.com/TylerTemp/SaintsField/assets/6391063/07eae93c-d2fc-4641-b71f-55a98f17b360)
 
+#### `GetScriptableObject` ####
+
+Automatically sign a `ScriptableObject` file to this field. (First one found will be used)
+
+Recommended to use it with `Expandable`!
+
+*   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only sign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
+*   AllowMultiple: No
+
+```csharp
+public class GetScriptableObjectExample: MonoBehaviour
+{
+    [GetScriptableObject] public Scriptable mySo;
+    [GetScriptableObject("RawResources/ScriptableIns")] public Scriptable mySoSuffix;
+}
+```
+
+![GetScriptableObject](https://github.com/TylerTemp/SaintsField/assets/6391063/191c3b4b-a58a-4475-80cd-3dbc809a9511)
+
 #### `AddComponent` ####
 
 Automatically add a component to the current target if the target does not have this component. (This will not sign the component added)
@@ -1411,7 +1430,7 @@ public class AddComponentExample: MonoBehaviour
 
 ![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
 
-### Third Partly Tools ###
+### Third Party Tools ###
 
 #### Addressable ####
 
@@ -1444,7 +1463,7 @@ A picker to select an addressable address (key).
 
     If it requires multiple labels, use `A && B`, then only entries with both labels will be shown.
 
-    If it requires any of the labels, just pass them seperatly, then entries with either label will be shown. For example, pass `"A && B", "C"` will show entries with both `A` and `B` label, or with `C` label.
+    If it requires any of the labels, just pass them separately, then entries with either label will be shown. For example, pass `"A && B", "C"` will show entries with both `A` and `B` label, or with `C` label.
 
 *   Allow Multiple: No
 
