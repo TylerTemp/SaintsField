@@ -100,7 +100,7 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
         
     *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
 
-        `clear`,`pink`,`indigo`,`violet` 
+        `clear`, `pink`, `indigo`, `violet` 
 
     *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
 
