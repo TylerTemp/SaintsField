@@ -13,10 +13,10 @@ Unity: 2019.1 or higher
 
 ## Highlights ##
 
-1.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
-2.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
-3.  Allow dynamic arguments in many cases
-4.  Works on deep nested fields too!
+1.  Works on deep nested fields!
+2.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
+3.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
+4.  Allow dynamic arguments in many cases
 
 ## Installation ##
 
@@ -62,6 +62,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 *   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
 *   Add `AddressableAddress`. This only works if you have `Addressable` installed in your project.
 *   Add `GetScriptableObject`
+*   `Expandable` now can be used on anything that is serializable as long as the target can use used by `SerializedObject`, no longer limited to `ScriptableObject`.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -522,7 +523,7 @@ public class ColorToggleImage: MonoBehaviour
 
 #### `Expandable` ####
 
-Make scriptable objects expandable.
+Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
 *   AllowMultiple: No
 

@@ -316,7 +316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   my:
-    myInt: 0
+    myInt: 2
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -3066,6 +3066,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  _dropdownExample: {fileID: 90550607}
 --- !u!1 &1670516892
 GameObject:
   m_ObjectHideFlags: 0

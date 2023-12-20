@@ -33,29 +33,36 @@ namespace SaintsField.Editor.Drawers
                 return basicHeight;
             }
 
-            ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
-            SerializedObject serializedObject = new SerializedObject(scriptableObject);
+            // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
+            SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
             float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
                 GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName))).Sum();
 
             return basicHeight + expandedHeight;
         }
 
+        // private UnityEditor.Editor _editor;
+
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
-            if (property.propertyType != SerializedPropertyType.ObjectReference)
-            {
-                _error = $"Expected ScriptableObject type, get {property.propertyType}";
-            }
-            else if (!(property.objectReferenceValue is ScriptableObject))
-            {
-                _error = $"Expected ScriptableObject type, get {property.objectReferenceValue.GetType()}";
-            }
-            else
-            {
-                _error = "";
-            }
+            Object scriptableObject = property.objectReferenceValue;
+            _error = property.propertyType != SerializedPropertyType.ObjectReference
+                ? $"Expected ScriptableObject type, get {property.propertyType}"
+                : "";
+            // else if (!(property.objectReferenceValue is ScriptableObject))
+            // {
+            //     _error = $"Expected ScriptableObject type, get {property.objectReferenceValue.GetType()}";
+            // }
+            //
+            //
+            // if (_editor == null)
+            // {
+            //     _editor = UnityEditor.Editor.CreateEditor(scriptableObject);
+            // }
+            //
+            // _editor.DrawDefaultInspector();
+            //
+            // return position;
 
             Rect leftRect = position;
 

@@ -1,8 +1,11 @@
 ## 1.1.4 ##
 
+*   Now we supports Unity `2019.1+`!
 *   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
 *   Add `AddressableAddress`. This only works if you have `Addressable` installed in your project.
 *   Add `GetScriptableObject`
+*   `Expandable` now can be used on anything that is serializable as long as the target can use used by `SerializedObject`, no longer limited to `ScriptableObject`.
+*   Fix `Expandable` background covers the fields on Unity 2019.
 
 ## 1.1.3 ##
 
