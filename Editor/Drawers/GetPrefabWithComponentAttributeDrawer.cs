@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers
             string[] guids = AssetDatabase.FindAssets("t:Prefab");
             foreach (string guid in guids)
             {
-                var path = AssetDatabase.GUIDToAssetPath(guid);
+                string path = AssetDatabase.GUIDToAssetPath(guid);
                 GameObject toCheck = AssetDatabase.LoadAssetAtPath<GameObject>(path);
                 if (toCheck is null)
                 {

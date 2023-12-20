@@ -61,6 +61,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 *   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
 *   Add `AddressableAddress`. This only works if you have `Addressable` installed in your project.
+*   Add `GetScriptableObject`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
