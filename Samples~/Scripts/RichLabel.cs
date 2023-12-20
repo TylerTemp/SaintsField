@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts
 
         [RichLabel(nameof(LabelCallback), true)]
         public bool _callbackToggle;
-        private string LabelCallback() => _callbackToggle ? "<color=green><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
+        private string LabelCallback() => _callbackToggle ? "<color=" + EColor.Green + "><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
 
         [RichLabel(nameof(ArrayLabels), true)]
         public string[] arrayLabels;
@@ -21,18 +21,36 @@ namespace SaintsField.Samples.Scripts
         [RichLabel(nameof(_propertyLabel), true)]
         public string _propertyLabel;
 
-        [RichLabel("<color=clear>██</color> Clear")] public string colorClear;
-        [RichLabel("<color=white>██</color> White")] public string colorWhite;
-        [RichLabel("<color=black>██</color> Black")] public string colorBlack;
-        [RichLabel("<color=gray>██</color> Gray")] public string colorGray;
-        [RichLabel("<color=red>██</color> Red")] public string colorRed;
-        [RichLabel("<color=pink>██</color> Pink")] public string colorPink;
-        [RichLabel("<color=orange>██</color> Orange")] public string colorOrange;
-        [RichLabel("<color=yellow>██</color> Yellow")] public string colorYellow;
-        [RichLabel("<color=green>██</color> Green")] public string colorGreen;
-        [RichLabel("<color=blue>██</color> Blue")] public string colorBlue;
-        [RichLabel("<color=indigo>██</color> Indigo")] public string colorIndigo;
-        [RichLabel("<color=violet>██</color> Violet")] public string colorViolet;
+        [Space]
+
+        [RichLabel("<color=aqua>██ EColor.</color>Aqua")] public string colorAqua;
+        [RichLabel("<color=black>██ EColor.</color>Black")] public string colorBlack;
+        [RichLabel("<color=blue>██ EColor.</color>Blue")] public string colorBlue;
+        [RichLabel("<color=brown>██ EColor.</color>Brown")] public string colorBrown;
+        [RichLabel("<color=cyan>██ EColor.</color>Cyan")] public string colorCyan;
+        [RichLabel("<color=darkblue>██ EColor.</color>DarkBlue")] public string colorDarkBlue;
+        [RichLabel("<color=fuchsia>██ EColor.</color>Fuchsia")] public string colorFuchsia;
+        [RichLabel("<color=green>██ EColor.</color>Green")] public string colorGreen;
+        [RichLabel("<color=gray>██ EColor.</color>Gray")] public string colorGray;
+        [RichLabel("<color=grey>██ EColor.</color>Grey")] public string colorGrey;
+        [RichLabel("<color=lightblue>██ EColor.</color>LightBlue")] public string colorLightBlue;
+        [RichLabel("<color=lime>██ EColor.</color>Lime")] public string colorLime;
+        [RichLabel("<color=magenta>██ EColor.</color>Magenta")] public string colorMagenta;
+        [RichLabel("<color=maroon>██ EColor.</color>Maroon")] public string colorMaroon;
+        [RichLabel("<color=navy>██ EColor.</color>Navy")] public string colorNavy;
+        [RichLabel("<color=olive>██ EColor.</color>Olive")] public string colorOlive;
+        [RichLabel("<color=orange>██ EColor.</color>Orange")] public string colorOrange;
+        [RichLabel("<color=purple>██ EColor.</color>Purple")] public string colorPurple;
+        [RichLabel("<color=red>██ EColor.</color>Red")] public string colorRed;
+        [RichLabel("<color=silver>██ EColor.</color>Silver")] public string colorSilver;
+        [RichLabel("<color=teal>██ EColor.</color>Teal")] public string colorTeal;
+        [RichLabel("<color=white>██ EColor.</color>White")] public string colorWhite;
+        [RichLabel("<color=yellow>██ EColor.</color>Yellow")] public string colorYellow;
+        [RichLabel("<color=clear>██ EColor.</color>Clear")] public string colorClear;
+        [RichLabel("<color=pink>██ EColor.</color>Pink")] public string colorPink;
+        [RichLabel("<color=indigo>██ EColor.</color>Indigo")] public string colorIndigo;
+        [RichLabel("<color=violet>██ EColor.</color>Violet")] public string colorViolet;
+
         [Serializable]
         private struct MyStruct
         {

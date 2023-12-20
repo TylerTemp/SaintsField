@@ -21,7 +21,7 @@ namespace SaintsField.Samples.Scripts
         [BelowButton(nameof(ClickErrorButton), "Below <color=green><icon='eye.png' /></color>!")]
         public int _someInt;
 
-        private void ClickErrorButton() => Debug.Log("CLICKED!");
+        private void ClickErrorButton() => Debug.Log("<color=GrEeN>CLICKED!</color>");
 
         private string GetButtonLabel() =>
             _errorOut

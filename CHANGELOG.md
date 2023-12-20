@@ -1,4 +1,4 @@
-## 1.1.4 ##
+## 1.2.0 ##
 
 *   Now we supports Unity `2019.1+`!
 *   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
@@ -6,6 +6,9 @@
 *   Add `GetScriptableObject`
 *   `Expandable` now can be used on anything that is serializable as long as the target can use used by `SerializedObject`, no longer limited to `ScriptableObject`.
 *   Fix `Expandable` background covers the fields on Unity 2019.
+*   `<color>` label now use the same color as [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) plus some extra colors.
+*   Fix `clear` color in `RichLabel` actually got white color. 
+*   Colors name is now case insensitive in `RichLabel`. 
 
 ## 1.1.3 ##
 

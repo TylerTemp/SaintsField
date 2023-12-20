@@ -57,12 +57,17 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**1.1.4**
+**1.2.0**
 
+*   Now we supports Unity `2019.1+`!
 *   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
 *   Add `AddressableAddress`. This only works if you have `Addressable` installed in your project.
 *   Add `GetScriptableObject`
 *   `Expandable` now can be used on anything that is serializable as long as the target can use used by `SerializedObject`, no longer limited to `ScriptableObject`.
+*   Fix `Expandable` background covers the fields on Unity 2019.
+*   `<color>` label now use the same color as [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) plus some extra colors.
+*   Fix `clear` color in `RichLabel` actually got white color.
+*   Colors name is now case insensitive in `RichLabel`.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -89,11 +94,17 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
     for `color` it supports:
 
-    *   `clear`, `white`, `black`, `gray`, `red`, `pink`, `orange`, `yellow`, `green`, `blue`, `indigo`, `violet` (all in lower case)
+    *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
 
-         ![color_list](https://github.com/TylerTemp/SaintsField/assets/6391063/24638017-58ab-4f34-843b-3c76a9d012f2)
+        `aqua`, `black`, `blue`, `brown`, `cyan`, `darkblue`, `fuchsia`, `green`, `gray`, `grey`, `lightblue`, `lime`, `magenta`, `maroon`, `navy`, `olive`, `orange`, `purple`, `red`, `silver`, `teal`, `white`, `yellow`
+        
+    *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
+
+        `clear`,`pink`,`indigo`,`violet` 
 
     *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
+
+    ![color_list](https://github.com/TylerTemp/SaintsField/assets/6391063/d9457df6-3434-4e4b-8fd7-e08a7295cd4d)
 
 *   `bool isCallback=false`
 

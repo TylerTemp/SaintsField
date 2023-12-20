@@ -118,9 +118,11 @@ namespace SaintsField.Editor.Core
                     if (parsedResult.content == "color")
                     {
                         colors.Add(parsedResult.value);
-                        richText.Append(Colors.ColorNameSupported(parsedResult.value)
-                            ? part
-                            : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
+                        // richText.Append(Colors.ColorNameSupported(parsedResult.value)
+                        //     ? part
+                        //     : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
+                        richText.Append(
+                            $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
                     }
                     else
                     {
