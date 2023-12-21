@@ -16,49 +16,71 @@ namespace SaintsField.Editor.Drawers
 
     public class SaintsAdvancedDropdown : UnityAdvancedDropdown
     {
-        private readonly IAdvancedDropdownList DropdownListValue;
+        private readonly IAdvancedDropdownList _dropdownListValue;
 
-        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, AdvancedDropdownState state) : base(state)
+        private readonly Dictionary<UnityAdvancedDropdownItem, object> _itemToValue = new Dictionary<UnityAdvancedDropdownItem, object>();
+        private readonly Action<object> _setValueCallback;
+
+        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, AdvancedDropdownState state, Action<object> setValueCallback) : base(state)
         {
-            DropdownListValue = dropdownListValue;
+            _dropdownListValue = dropdownListValue;
+            _setValueCallback = setValueCallback;
         }
 
         protected override UnityAdvancedDropdownItem BuildRoot()
         {
-            AdvancedDropdownItem root = new UnityAdvancedDropdownItem("DropDown Here!");
+            AdvancedDropdownItem root = new UnityAdvancedDropdownItem(_dropdownListValue.displayName);
 
-            MakeChildren(root, DropdownListValue.Cast<object>().ToList());
+            if(_dropdownListValue.children.Count == 0)
+            {
+                // root.AddChild(new UnityAdvancedDropdownItem("Empty"));
+                return root;
+            }
+
+            MakeChildren(root, _dropdownListValue.children);
 
             return root;
         }
 
-        private void MakeChildren(AdvancedDropdownItem parent, List<object> children)
+        private void MakeChildren(AdvancedDropdownItem parent, IEnumerable<IAdvancedDropdownList> children)
         {
             // List<(string name, object value, List<object> children, bool disabled, string icon, bool isSeparator)>
             //     childrenCasted =
             //         (List<(string name, object value, List<object> children, bool disabled, string icon, bool
             //             isSeparator)>)children;
 
-            foreach (object childItem in children)
+            foreach (IAdvancedDropdownList childItem in children)
             {
-                (string name, object value, List<object> grandChildren, bool disabled, string icon, bool isSeparator) =
-                    ((string name, object value, List<object> children, bool disabled, string icon, bool isSeparator))childItem;
-
-                if (grandChildren == null || grandChildren.Count == 0)
+                // (string name, object value, List<object> grandChildren, bool disabled, string icon, bool isSeparator) =
+                //     ((string name, object value, List<object> children, bool disabled, string icon, bool isSeparator))childItem;
+                if (childItem.isSeparator)
                 {
-                    Debug.Log($"{parent.name}/{name}");
-                    parent.AddChild(new AdvancedDropdownItem(name));
+                    parent.AddSeparator();
+                }
+                else if (childItem.children.Count == 0)
+                {
+                    // Debug.Log($"{parent.name}/{childItem.displayName}");
+                    AdvancedDropdownItem item = new AdvancedDropdownItem(childItem.displayName);
+                    _itemToValue[item] = childItem.value;
+                    parent.AddChild(item);
                 }
                 else
                 {
-                    AdvancedDropdownItem subParent = new AdvancedDropdownItem(name);
-                    Debug.Log($"{parent.name}/{name}[...]");
-                    MakeChildren(subParent, grandChildren);
+                    AdvancedDropdownItem subParent = new AdvancedDropdownItem(childItem.displayName);
+                    // Debug.Log($"{parent.name}/{childItem.displayName}[...]");
+                    MakeChildren(subParent, childItem.children);
                     parent.AddChild(subParent);
                 }
             }
+        }
 
-
+        protected override void ItemSelected(UnityAdvancedDropdownItem item)
+        {
+            // Debug.Log($"select {item.name}: {(_itemToValue.TryGetValue(item, out object result) ? result.ToString() : "[NULL]")}");
+            if (_itemToValue.TryGetValue(item, out object result))
+            {
+                _setValueCallback(result);
+            }
         }
     }
 
@@ -74,40 +96,40 @@ namespace SaintsField.Editor.Drawers
             return EditorGUIUtility.singleLineHeight;
         }
 
-        private IEnumerable<(string, object)> FlattenChild(List<(string, object, List<object>, bool, string, bool)> children)
+        private static IEnumerable<(string, object)> FlattenChild(string prefix, IEnumerable<IAdvancedDropdownList> children)
         {
-            foreach ((string, object, List<object>, bool, string, bool) child in children)
+            foreach (IAdvancedDropdownList child in children)
             {
-                if (child.Item3 != null && child.Item3.Count > 0)
+                if (child.children.Count > 0)
                 {
-                    List<(string, object, List<object>, bool, string, bool)> grandChildren = child.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((string, object) grandChild in FlattenChild(grandChildren))
+                    // List<(string, object, List<object>, bool, string, bool)> grandChildren = child.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
+                    foreach ((string, object) grandChild in FlattenChild(prefix, child.children))
                     {
                         yield return grandChild;
                     }
                 }
                 else
                 {
-                    yield return (child.Item1, child.Item2);
+                    yield return (Prefix(prefix, child.displayName), child.value);
                 }
             }
         }
 
-        private IEnumerable<(string, object)> Flatten(IAdvancedDropdownList roots)
+        private static IEnumerable<(string, object)> Flatten(string prefix, IAdvancedDropdownList roots)
         {
-            foreach ((string, object, List<object>, bool, string, bool) root in roots)
+            foreach (IAdvancedDropdownList root in roots)
             {
-                if (root.Item3 != null && root.Item3.Count > 0)
+                if (root.children.Count > 0)
                 {
-                    List<(string, object, List<object>, bool, string, bool)> children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((string, object) child in FlattenChild(children))
+                    // IAdvancedDropdownList children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
+                    foreach ((string, object) child in FlattenChild(Prefix(prefix, root.displayName), root.children))
                     {
                         yield return child;
                     }
                 }
                 else
                 {
-                    yield return (root.Item1, root.Item2);
+                    yield return (Prefix(prefix, root.displayName), root.value);
                 }
             }
 
@@ -119,6 +141,8 @@ namespace SaintsField.Editor.Drawers
             //
             // return result;
         }
+
+        private static string Prefix(string prefix, string value) => string.IsNullOrEmpty(prefix)? value : $"{prefix}/{value}";
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
@@ -228,7 +252,7 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             string curDisplay = "";
             Debug.Assert(dropdownListValue != null);
-            foreach ((string, object) itemInfos in Flatten(dropdownListValue))
+            foreach ((string, object) itemInfos in Flatten("", dropdownListValue))
             {
                 string name = itemInfos.Item1;
                 object itemValue = itemInfos.Item2;
@@ -259,9 +283,14 @@ namespace SaintsField.Editor.Drawers
             #region Dropdown
 
             GUI.SetNextControlName(FieldControlName);
+            // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(position, new GUIContent(curDisplay), FocusType.Keyboard))
             {
-                SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(dropdownListValue, new AdvancedDropdownState());
+                SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(dropdownListValue, new AdvancedDropdownState(),
+                    curItem =>
+                    {
+                        Util.SetValue(property, curItem, parentObj, parentType, field);
+                    });
                 dropdown.Show(position);
             }
 

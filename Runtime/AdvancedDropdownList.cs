@@ -8,33 +8,49 @@ namespace SaintsField
 {
     public class AdvancedDropdownList<T> : IAdvancedDropdownList
     {
-        // name, value, disabled, icon, separator
-        private readonly List<ValueTuple<string, object, List<object>, bool, string, bool>> _values;
+        public string displayName { get; set; }
 
-        public AdvancedDropdownList() => _values = new List<ValueTuple<string, object, List<object>, bool, string, bool>>();
+        public T typeValue;
 
-        public AdvancedDropdownList(IEnumerable<ValueTuple<string, T>> value) =>
-            _values = value.Select(each => (each.Item1, (object)each.Item2, new List<object>(), false, (string)null, false)).ToList();
+        public object value => typeValue;
 
-        public AdvancedDropdownList(IEnumerable<ValueTuple<string, T, bool>> value) => _values =
-            value.Select(each => (each.Item1, (object)each.Item2, new List<object>(), each.Item3, (string)null, false)).ToList();
+        public List<AdvancedDropdownList<T>> typeChildren;
 
-        public void Add(string displayName, T value) => _values.Add((displayName, value, new List<object>(), false, null, false));
+        public IReadOnlyList<IAdvancedDropdownList> children =>
+            typeChildren.Select(each => (IAdvancedDropdownList)each).ToList();
 
-        public void Add(string displayName, T value, bool disabled) =>
-            _values.Add((displayName, value, new List<object>(), disabled, null, false));
-        public void Add(string displayName, T value, bool disabled, string icon) =>
-            _values.Add((displayName, value, new List<object>(), disabled, icon, false));
+        public bool disabled { get; set; }
+        public string icon { get; set; }
+        public bool isSeparator { get; set; }
 
-        public void Add(string displayName, object value, List<object> children, bool disabled, string icon, bool isSep) => _values.Add((
-            displayName, value, children, disabled, icon, isSep));
+        public AdvancedDropdownList(string displayName, T value, bool disabled = false, string icon = null,
+            bool isSeparator = false)
+        {
+            this.displayName = displayName;
+            this.typeValue = value;
+            this.typeChildren = new List<AdvancedDropdownList<T>>();
+            this.disabled = disabled;
+            this.icon = icon;
+            this.isSeparator = isSeparator;
+        }
 
-        public void Add((string, object, List<object>, bool, string, bool) tuple) => _values.Add(tuple);
+        public AdvancedDropdownList(string displayName, IEnumerable<AdvancedDropdownList<T>> children, bool disabled = false, string icon = null,
+            bool isSeparator = false)
+        {
+            this.displayName = displayName;
+            // this.value = value;
+            typeChildren = children.ToList();
+            this.disabled = disabled;
+            this.icon = icon;
+            this.isSeparator = isSeparator;
+        }
 
-        public void AddSeparator(string separator = "") => _values.Add((separator, default, new List<object>(),  default, default, true));
+        public void Add(AdvancedDropdownList<T> child) => typeChildren.Add(child);
 
-        public static (string, object, bool, string, bool) Separator(string separatorPath = "") =>
-            (separatorPath, default, default, null, true);
+        public void AddSeparator() => typeChildren.Add(Separator());
+
+        public static AdvancedDropdownList<T> Separator() =>
+            new AdvancedDropdownList<T>("", (T)default, false, null, true);
 
         // public static (string, object, bool, string, bool) Item(string name, T item) => (name, item, false, null, false);
         //
@@ -55,7 +71,15 @@ namespace SaintsField
         // public void AddRange(IEnumerable<ValueTuple<string, T, bool>> pairs) =>
         //     AddRange(pairs.Select(each => (each.Item1, each.Item2, each.Item3, (string)null, false)));
 
-        public IEnumerator<ValueTuple<string, object, List<object>, bool, string, bool>> GetEnumerator() => _values.GetEnumerator();
+        // public IEnumerator<AdvancedDropdownList<T>> GetEnumerator() => children.GetEnumerator();
+
+        public IEnumerator<IAdvancedDropdownList> GetEnumerator()
+        {
+            foreach (AdvancedDropdownList<T> child in typeChildren)
+            {
+                yield return child;
+            }
+        }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -69,8 +93,9 @@ namespace SaintsField
         //
         //     return result;
         // }
-        public int Count => _values.Count;
+        public int Count => typeChildren.Count;
 
-        public (string, object, List<object>, bool, string, bool) this[int index] => _values[index];
+        public AdvancedDropdownList<T> this[int index] => typeChildren[index];
+        IAdvancedDropdownList IReadOnlyList<IAdvancedDropdownList>.this[int index] => typeChildren[index];
     }
 }
