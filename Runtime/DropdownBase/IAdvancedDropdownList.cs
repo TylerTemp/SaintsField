@@ -12,5 +12,8 @@ namespace SaintsField.DropdownBase
         bool disabled { get; }
         string icon { get; }
         bool isSeparator { get; }
+
+        public int ChildCount();
+        public int SepCount();
     }
 }

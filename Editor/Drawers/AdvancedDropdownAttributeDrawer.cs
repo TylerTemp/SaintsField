@@ -90,6 +90,11 @@ namespace SaintsField.Editor.Drawers
 
         protected override void ItemSelected(UnityAdvancedDropdownItem item)
         {
+            if (!item.enabled)
+            {
+                return;
+            }
+
             // Debug.Log($"select {item.name}: {(_itemToValue.TryGetValue(item, out object r) ? r.ToString() : "[NULL]")}");
             if (_itemToValue.TryGetValue(item, out object result))
             {
@@ -306,9 +311,11 @@ namespace SaintsField.Editor.Drawers
 
             #region Dropdown
 
+            Rect leftRect = EditorGUI.PrefixLabel(position, label);
+
             GUI.SetNextControlName(FieldControlName);
             // ReSharper disable once InvertIf
-            if (EditorGUI.DropdownButton(position, new GUIContent(curDisplay), FocusType.Keyboard))
+            if (EditorGUI.DropdownButton(leftRect, new GUIContent(curDisplay), FocusType.Keyboard))
             {
                 float minHeight = advancedDropdownAttribute.MinHeight;
                 float itemHeight = advancedDropdownAttribute.ItemHeight > 0
@@ -316,14 +323,23 @@ namespace SaintsField.Editor.Drawers
                     : EditorGUIUtility.singleLineHeight;
                 float titleHeight = advancedDropdownAttribute.TitleHeight;
                 Vector2 size;
-                if (minHeight > 0)
+                if (minHeight < 0)
                 {
-                    size = new Vector2(position.width, minHeight);
+                    if(advancedDropdownAttribute.UseTotalItemCount)
+                    {
+                        float totalItemCount = GetValueItemCounts(dropdownListValue);
+                        // Debug.Log(totalItemCount);
+                        size = new Vector2(position.width, totalItemCount * itemHeight + titleHeight);
+                    }
+                    else
+                    {
+                        float maxChildCount = GetDropdownPageHeight(dropdownListValue, itemHeight, advancedDropdownAttribute.SepHeight).Max();
+                        size = new Vector2(position.width, maxChildCount + titleHeight);
+                    }
                 }
                 else
                 {
-                    int maxChildCount = GetChildCount(dropdownListValue).Max();
-                    size = new Vector2(position.width, maxChildCount * itemHeight + titleHeight);
+                    size = new Vector2(position.width, minHeight);
                 }
 
                 // Vector2 size = new Vector2(position.width, maxChildCount * EditorGUIUtility.singleLineHeight + 31f);
@@ -343,9 +359,9 @@ namespace SaintsField.Editor.Drawers
             #endregion
         }
 
-        private IEnumerable<int> GetChildCount(IAdvancedDropdownList dropdownList)
+        private static IEnumerable<float> GetDropdownPageHeight(IAdvancedDropdownList dropdownList, float itemHeight, float sepHeight)
         {
-            if (dropdownList.Count == 0)
+            if (dropdownList.ChildCount() == 0)
             {
                 // Debug.Log($"yield 0");
                 yield return 0;
@@ -353,14 +369,56 @@ namespace SaintsField.Editor.Drawers
             }
 
             // Debug.Log($"yield {dropdownList.children.Count}");
-            yield return dropdownList.Count;
-            foreach (IEnumerable<int> ints in dropdownList.children.Select(GetChildCount))
+            yield return dropdownList.ChildCount() * itemHeight + dropdownList.SepCount() * sepHeight;
+            foreach (IEnumerable<float> eachChildHeight in dropdownList.children.Select(child => GetDropdownPageHeight(child, itemHeight, sepHeight)))
             {
-                foreach (int i in ints)
+                foreach (int i in eachChildHeight)
                 {
                     yield return i;
                 }
             }
+        }
+
+        private static int GetValueItemCounts(IAdvancedDropdownList dropdownList)
+        {
+            if (dropdownList.isSeparator)
+            {
+                return 0;
+            }
+
+            if(dropdownList.ChildCount() == 0)
+            {
+                return 1;
+            }
+
+            int count = 0;
+            foreach (IAdvancedDropdownList child in dropdownList.children)
+            {
+                count += GetValueItemCounts(child);
+            }
+
+            return count;
+
+            // if(dropdownList.ChildCount() == 0)
+            // {
+            //     Debug.Log(1);
+            //     yield return 1;
+            //     yield break;
+            // }
+            //
+            // // Debug.Log(dropdownList.ChildCount());
+            // // yield return dropdownList.children.Count(each => each.ChildCount() == 0);
+            // foreach (IAdvancedDropdownList eachChild in dropdownList.children)
+            // {
+            //     foreach (int subChildCount in GetChildCounts(eachChild))
+            //     {
+            //         if(subChildCount > 0)
+            //         {
+            //             Debug.Log(subChildCount);
+            //             yield return subChildCount;
+            //         }
+            //     }
+            // }
         }
 
         private Texture2D GetIcon(string icon)

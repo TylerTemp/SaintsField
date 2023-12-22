@@ -49,6 +49,9 @@ namespace SaintsField
 
         public void AddSeparator() => _typeChildren.Add(Separator());
 
+        public int ChildCount() => _typeChildren.Count(each => !each.isSeparator);
+        public int SepCount() => _typeChildren.Count(each => each.isSeparator);
+
         public static AdvancedDropdownList<T> Separator() =>
             new AdvancedDropdownList<T>("", (T)default, false, null, true);
 
@@ -73,13 +76,7 @@ namespace SaintsField
 
         // public IEnumerator<AdvancedDropdownList<T>> GetEnumerator() => children.GetEnumerator();
 
-        public IEnumerator<IAdvancedDropdownList> GetEnumerator()
-        {
-            foreach (AdvancedDropdownList<T> child in _typeChildren)
-            {
-                yield return child;
-            }
-        }
+        public IEnumerator<IAdvancedDropdownList> GetEnumerator() => _typeChildren.Cast<IAdvancedDropdownList>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

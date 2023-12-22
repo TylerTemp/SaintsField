@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -9,7 +8,6 @@ namespace SaintsField.Samples.Scripts
     {
         [AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
 
-        [CanBeNull]
         public AdvancedDropdownList<int> AdvDropdown()
         {
             return new AdvancedDropdownList<int>("Select One!", new List<AdvancedDropdownList<int>>
@@ -24,6 +22,7 @@ namespace SaintsField.Samples.Scripts
                     new AdvancedDropdownList<int>("Wednesday", 3),
                     new AdvancedDropdownList<int>("Thursday", 4, icon: "eye.png"),
                 }),
+                AdvancedDropdownList<int>.Separator(),
                 new AdvancedDropdownList<int>("Friday", 5, true),
                 AdvancedDropdownList<int>.Separator(),
                 new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),

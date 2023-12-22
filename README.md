@@ -675,10 +675,14 @@ dropdownList.AddSeparator();  // add a separator
 
 A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
 
+**Known Issue**: Unity's `AdvancedDropdown` allows you to click the disabled item and close the popup, thus you can still click the disable item (but will not change to the disabled value). This is not fixable unless Unity decide to fix it.
+
 *   `string funcName` callback function. Must return a `AdvancedDropdownList<T>`.
 *   `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will be used to decide the dropdown height.
-*   `float titleHeight=31f` height of the title. This will be used to decide the dropdown height.
-*   `float minHeight=-1f` minimum height of the dropdown. `< 0` means no limit. Otherwise, ignore the item counts and use this as the dropdown height instead.
+*   `float titleHeight=Default` height of the title. This will be used to decide the dropdown height.
+*   `float sepHeight=Default` height of separator. This will be used to decide the dropdown height.
+*   `bool useTotalItemCount=false` if true, the dropdown height will be decided using the number of all value item, thus the search result will always fit in the position without scroll. Otherwise, it'll be decided by the max height of every item page.
+*   `float minHeight=-1f` minimum height of the dropdown. `< 0` means no limit. Otherwise, use this as the dropdown height and ignore all the other auto height config.
 *   AllowMultiple: No
 
 **`AdvancedDropdownList<T>`**
