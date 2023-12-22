@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class AdvancedDropdownExample: MonoBehaviour
     {
-        [AdvancedDropdown(nameof(AdvDropdown))] public int drops;
+        [AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
 
         [CanBeNull]
         public AdvancedDropdownList<int> AdvDropdown()
@@ -21,18 +21,18 @@ namespace SaintsField.Samples.Scripts
             {
                 new AdvancedDropdownList<int>("First half", new List<AdvancedDropdownList<int>>()
                 {
-                    new AdvancedDropdownList<int>("Monday", 1),
+                    new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
                     new AdvancedDropdownList<int>("Tuesday", 2),
-                }),
+                }, icon: "eye.png"),
                 new AdvancedDropdownList<int>("Second half", new List<AdvancedDropdownList<int>>()
                 {
                     new AdvancedDropdownList<int>("Wednesday", 3),
                     new AdvancedDropdownList<int>("Thursday", 4),
-                }),
+                }, icon: "eye.png"),
                 new AdvancedDropdownList<int>("Friday", 5),
                 AdvancedDropdownList<int>.Separator(),
                 new AdvancedDropdownList<int>("Saturday", 6),
-                new AdvancedDropdownList<int>("Sunday", 0),
+                new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
             });
 
             // return new AdvancedDropdownList<int>

@@ -20,16 +20,21 @@ namespace SaintsField.Editor.Drawers
 
         private readonly Dictionary<UnityAdvancedDropdownItem, object> _itemToValue = new Dictionary<UnityAdvancedDropdownItem, object>();
         private readonly Action<object> _setValueCallback;
+        private readonly Func<string, Texture2D> _getIconCallback;
 
-        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, AdvancedDropdownState state, Action<object> setValueCallback) : base(state)
+        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, AdvancedDropdownState state, Action<object> setValueCallback, Func<string, Texture2D> getIconCallback) : base(state)
         {
             _dropdownListValue = dropdownListValue;
             _setValueCallback = setValueCallback;
+            _getIconCallback = getIconCallback;
         }
 
         protected override UnityAdvancedDropdownItem BuildRoot()
         {
-            AdvancedDropdownItem root = new UnityAdvancedDropdownItem(_dropdownListValue.displayName);
+            AdvancedDropdownItem root = new UnityAdvancedDropdownItem(_dropdownListValue.displayName)
+            {
+                icon = string.IsNullOrEmpty(_dropdownListValue.icon) ? null : _getIconCallback(_dropdownListValue.icon),
+            };
 
             if(_dropdownListValue.children.Count == 0)
             {
@@ -60,13 +65,19 @@ namespace SaintsField.Editor.Drawers
                 else if (childItem.children.Count == 0)
                 {
                     // Debug.Log($"{parent.name}/{childItem.displayName}");
-                    AdvancedDropdownItem item = new AdvancedDropdownItem(childItem.displayName);
+                    AdvancedDropdownItem item = new AdvancedDropdownItem(childItem.displayName) {
+                        icon = string.IsNullOrEmpty(childItem.icon) ? null : _getIconCallback(childItem.icon),
+                    };
                     _itemToValue[item] = childItem.value;
+                    Debug.Log($"add {childItem.displayName} => {childItem.value}");
                     parent.AddChild(item);
                 }
                 else
                 {
-                    AdvancedDropdownItem subParent = new AdvancedDropdownItem(childItem.displayName);
+                    AdvancedDropdownItem subParent = new AdvancedDropdownItem(childItem.displayName)
+                    {
+                        icon = string.IsNullOrEmpty(childItem.icon) ? null : _getIconCallback(childItem.icon),
+                    };
                     // Debug.Log($"{parent.name}/{childItem.displayName}[...]");
                     MakeChildren(subParent, childItem.children);
                     parent.AddChild(subParent);
@@ -76,7 +87,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void ItemSelected(UnityAdvancedDropdownItem item)
         {
-            // Debug.Log($"select {item.name}: {(_itemToValue.TryGetValue(item, out object result) ? result.ToString() : "[NULL]")}");
+            Debug.Log($"select {item.name}: {(_itemToValue.TryGetValue(item, out object r) ? r.ToString() : "[NULL]")}");
             if (_itemToValue.TryGetValue(item, out object result))
             {
                 _setValueCallback(result);
@@ -89,6 +100,16 @@ namespace SaintsField.Editor.Drawers
     public class AdvancedDropdownAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";
+
+        private readonly Dictionary<string, Texture2D> _iconCache = new Dictionary<string, Texture2D>();
+
+        ~AdvancedDropdownAttributeDrawer()
+        {
+            foreach (Texture2D iconCacheValue in _iconCache.Values)
+            {
+                UnityEngine.Object.DestroyImmediate(iconCacheValue);
+            }
+        }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool hasLabelWidth)
@@ -290,11 +311,32 @@ namespace SaintsField.Editor.Drawers
                     curItem =>
                     {
                         Util.SetValue(property, curItem, parentObj, parentType, field);
-                    });
+                    },
+                    icon => GetIcon(icon));
                 dropdown.Show(position);
             }
 
             #endregion
+        }
+
+        private Texture2D GetIcon(string icon)
+        {
+            if (_iconCache.TryGetValue(icon, out Texture2D result))
+            {
+                return result;
+            }
+
+            result = RichTextDrawer.LoadTexture(icon);
+            if (result == null)
+            {
+                return null;
+            }
+            if (result.width == 1 && result.height == 1)
+            {
+                return null;
+            }
+            _iconCache[icon] = result;
+            return result;
         }
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
