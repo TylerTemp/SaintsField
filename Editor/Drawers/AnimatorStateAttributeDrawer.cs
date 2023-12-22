@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute)
         {
             float errorHeight = _errorMsg == "" ? 0 : HelpBox.GetHeight(_errorMsg, width, MessageType.Error);
-            float subRowHeight = EditorGUIUtility.singleLineHeight * (property.propertyType == SerializedPropertyType.String ? 1 : 2);
+            float subRowHeight = EditorGUIUtility.singleLineHeight * (property.propertyType == SerializedPropertyType.String ? 0 : 2);
             return errorHeight + subRowHeight;
         }
 
@@ -225,7 +225,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            return true;
+            return property.propertyType != SerializedPropertyType.String;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
@@ -234,12 +234,12 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log(_targetIsString);
             if(property.propertyType == SerializedPropertyType.String)
             {
-                (Rect valueRect, Rect leftRect) =
-                    RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
-                using (new EditorGUI.DisabledGroupScope(true)) {
-                    EditorGUI.TextField(valueRect, "┗Value", property.stringValue);
-                }
-                return leftRect;
+                // (Rect valueRect, Rect leftRect) =
+                //     RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+                // using (new EditorGUI.DisabledGroupScope(true)) {
+                //     EditorGUI.TextField(valueRect, "┗Value", property.stringValue);
+                // }
+                return position;
             }
 
             SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
