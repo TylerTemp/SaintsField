@@ -692,7 +692,7 @@ A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/
 *   `bool disabled = false` if item is disabled
 *   `string icon = null` the icon for the item.
 
-    Note: you can set an icon for parent group, but Unity will not scale it. For this case you need to ensure the icon is small enough in pixel size, otherwise it'll block the child items. 
+    Note: you can set an icon for parent group, but it'll be displayed as title when you get into the sub page and Unity will not scale it. For this case you need to ensure the icon is small enough in pixel size, otherwise it'll block the child items. 
 
 *   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
 
@@ -729,7 +729,7 @@ public class AdvancedDropdownExample: MonoBehaviour
 }
 ```
 
-
+![advanced_dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/d22d56b1-39c2-4ec9-bfbb-5e61dfe1b8a2)
 
 To control the separator and disabled item
 
