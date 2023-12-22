@@ -203,7 +203,7 @@ namespace SaintsField.Editor.Utils
                         break;
 #if UNITY_2019_3_OR_NEWER
                     case SerializedPropertyType.ManagedReference:
-                        property.managedReferenceValue = (Object) curItem;
+                        property.managedReferenceValue = (UnityEngine.Object) curItem;
                         break;
 #endif
                     case SerializedPropertyType.Gradient:

@@ -31,10 +31,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override UnityAdvancedDropdownItem BuildRoot()
         {
-            AdvancedDropdownItem root = new UnityAdvancedDropdownItem(_dropdownListValue.displayName)
-            {
-                icon = string.IsNullOrEmpty(_dropdownListValue.icon) ? null : _getIconCallback(_dropdownListValue.icon),
-            };
+            AdvancedDropdownItem root = MakeUnityAdvancedDropdownItem(_dropdownListValue);
 
             if(_dropdownListValue.children.Count == 0)
             {
@@ -47,17 +44,24 @@ namespace SaintsField.Editor.Drawers
             return root;
         }
 
+        private UnityAdvancedDropdownItem MakeUnityAdvancedDropdownItem(IAdvancedDropdownList item)
+        {
+            // if (item.isSeparator)
+            // {
+            //     return new UnityAdvancedDropdownItem("SEPARATOR");
+            // }
+
+            return new UnityAdvancedDropdownItem(item.displayName)
+            {
+                icon = string.IsNullOrEmpty(item.icon) ? null : _getIconCallback(item.icon),
+                enabled = !item.disabled,
+            };
+        }
+
         private void MakeChildren(AdvancedDropdownItem parent, IEnumerable<IAdvancedDropdownList> children)
         {
-            // List<(string name, object value, List<object> children, bool disabled, string icon, bool isSeparator)>
-            //     childrenCasted =
-            //         (List<(string name, object value, List<object> children, bool disabled, string icon, bool
-            //             isSeparator)>)children;
-
             foreach (IAdvancedDropdownList childItem in children)
             {
-                // (string name, object value, List<object> grandChildren, bool disabled, string icon, bool isSeparator) =
-                //     ((string name, object value, List<object> children, bool disabled, string icon, bool isSeparator))childItem;
                 if (childItem.isSeparator)
                 {
                     parent.AddSeparator();
@@ -65,19 +69,14 @@ namespace SaintsField.Editor.Drawers
                 else if (childItem.children.Count == 0)
                 {
                     // Debug.Log($"{parent.name}/{childItem.displayName}");
-                    AdvancedDropdownItem item = new AdvancedDropdownItem(childItem.displayName) {
-                        icon = string.IsNullOrEmpty(childItem.icon) ? null : _getIconCallback(childItem.icon),
-                    };
+                    AdvancedDropdownItem item = MakeUnityAdvancedDropdownItem(childItem);
                     _itemToValue[item] = childItem.value;
-                    Debug.Log($"add {childItem.displayName} => {childItem.value}");
+                    // Debug.Log($"add {childItem.displayName} => {childItem.value}");
                     parent.AddChild(item);
                 }
                 else
                 {
-                    AdvancedDropdownItem subParent = new AdvancedDropdownItem(childItem.displayName)
-                    {
-                        icon = string.IsNullOrEmpty(childItem.icon) ? null : _getIconCallback(childItem.icon),
-                    };
+                    AdvancedDropdownItem subParent = MakeUnityAdvancedDropdownItem(childItem);
                     // Debug.Log($"{parent.name}/{childItem.displayName}[...]");
                     MakeChildren(subParent, childItem.children);
                     parent.AddChild(subParent);
