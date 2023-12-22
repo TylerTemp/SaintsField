@@ -22,12 +22,16 @@ namespace SaintsField.Editor.Drawers
         private readonly Action<object> _setValueCallback;
         private readonly Func<string, Texture2D> _getIconCallback;
 
-        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, AdvancedDropdownState state, Action<object> setValueCallback, Func<string, Texture2D> getIconCallback) : base(state)
+        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, Vector2 size, AdvancedDropdownState state, Action<object> setValueCallback, Func<string, Texture2D> getIconCallback) : base(state)
         {
             _dropdownListValue = dropdownListValue;
             _setValueCallback = setValueCallback;
             _getIconCallback = getIconCallback;
+
+            minimumSize = size;
         }
+
+
 
         protected override UnityAdvancedDropdownItem BuildRoot()
         {
@@ -86,7 +90,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void ItemSelected(UnityAdvancedDropdownItem item)
         {
-            Debug.Log($"select {item.name}: {(_itemToValue.TryGetValue(item, out object r) ? r.ToString() : "[NULL]")}");
+            // Debug.Log($"select {item.name}: {(_itemToValue.TryGetValue(item, out object r) ? r.ToString() : "[NULL]")}");
             if (_itemToValue.TryGetValue(item, out object result))
             {
                 _setValueCallback(result);
@@ -120,7 +124,7 @@ namespace SaintsField.Editor.Drawers
         {
             foreach (IAdvancedDropdownList child in children)
             {
-                if (child.children.Count > 0)
+                if (child.Count > 0)
                 {
                     // List<(string, object, List<object>, bool, string, bool)> grandChildren = child.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
                     foreach ((string, object) grandChild in FlattenChild(prefix, child.children))
@@ -139,7 +143,7 @@ namespace SaintsField.Editor.Drawers
         {
             foreach (IAdvancedDropdownList root in roots)
             {
-                if (root.children.Count > 0)
+                if (root.Count > 0)
                 {
                     // IAdvancedDropdownList children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
                     foreach ((string, object) child in FlattenChild(Prefix(prefix, root.displayName), root.children))
@@ -306,16 +310,57 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(position, new GUIContent(curDisplay), FocusType.Keyboard))
             {
-                SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(dropdownListValue, new AdvancedDropdownState(),
+                float minHeight = advancedDropdownAttribute.MinHeight;
+                float itemHeight = advancedDropdownAttribute.ItemHeight > 0
+                    ? advancedDropdownAttribute.ItemHeight
+                    : EditorGUIUtility.singleLineHeight;
+                float titleHeight = advancedDropdownAttribute.TitleHeight;
+                Vector2 size;
+                if (minHeight > 0)
+                {
+                    size = new Vector2(position.width, minHeight);
+                }
+                else
+                {
+                    int maxChildCount = GetChildCount(dropdownListValue).Max();
+                    size = new Vector2(position.width, maxChildCount * itemHeight + titleHeight);
+                }
+
+                // Vector2 size = new Vector2(position.width, maxChildCount * EditorGUIUtility.singleLineHeight + 31f);
+                SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(
+                    dropdownListValue,
+                    size,
+                    new AdvancedDropdownState(),
                     curItem =>
                     {
                         Util.SetValue(property, curItem, parentObj, parentType, field);
+                        SetValueChanged(property);
                     },
-                    icon => GetIcon(icon));
+                    GetIcon);
                 dropdown.Show(position);
             }
 
             #endregion
+        }
+
+        private IEnumerable<int> GetChildCount(IAdvancedDropdownList dropdownList)
+        {
+            if (dropdownList.Count == 0)
+            {
+                // Debug.Log($"yield 0");
+                yield return 0;
+                yield break;
+            }
+
+            // Debug.Log($"yield {dropdownList.children.Count}");
+            yield return dropdownList.Count;
+            foreach (IEnumerable<int> ints in dropdownList.children.Select(GetChildCount))
+            {
+                foreach (int i in ints)
+                {
+                    yield return i;
+                }
+            }
         }
 
         private Texture2D GetIcon(string icon)

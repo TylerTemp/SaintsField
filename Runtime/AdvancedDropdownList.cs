@@ -10,14 +10,14 @@ namespace SaintsField
     {
         public string displayName { get; set; }
 
-        public T typeValue;
+        private readonly T _typeValue;
 
-        public object value => typeValue;
+        public object value => _typeValue;
 
-        public List<AdvancedDropdownList<T>> typeChildren;
+        private readonly List<AdvancedDropdownList<T>> _typeChildren;
 
         public IReadOnlyList<IAdvancedDropdownList> children =>
-            typeChildren.Select(each => (IAdvancedDropdownList)each).ToList();
+            _typeChildren.Select(each => (IAdvancedDropdownList)each).ToList();
 
         public bool disabled { get; set; }
         public string icon { get; set; }
@@ -27,8 +27,8 @@ namespace SaintsField
             bool isSeparator = false)
         {
             this.displayName = displayName;
-            this.typeValue = value;
-            this.typeChildren = new List<AdvancedDropdownList<T>>();
+            this._typeValue = value;
+            this._typeChildren = new List<AdvancedDropdownList<T>>();
             this.disabled = disabled;
             this.icon = icon;
             this.isSeparator = isSeparator;
@@ -39,15 +39,15 @@ namespace SaintsField
         {
             this.displayName = displayName;
             // this.value = value;
-            typeChildren = children.ToList();
+            _typeChildren = children.ToList();
             this.disabled = disabled;
             this.icon = icon;
             this.isSeparator = isSeparator;
         }
 
-        public void Add(AdvancedDropdownList<T> child) => typeChildren.Add(child);
+        public void Add(AdvancedDropdownList<T> child) => _typeChildren.Add(child);
 
-        public void AddSeparator() => typeChildren.Add(Separator());
+        public void AddSeparator() => _typeChildren.Add(Separator());
 
         public static AdvancedDropdownList<T> Separator() =>
             new AdvancedDropdownList<T>("", (T)default, false, null, true);
@@ -75,7 +75,7 @@ namespace SaintsField
 
         public IEnumerator<IAdvancedDropdownList> GetEnumerator()
         {
-            foreach (AdvancedDropdownList<T> child in typeChildren)
+            foreach (AdvancedDropdownList<T> child in _typeChildren)
             {
                 yield return child;
             }
@@ -93,9 +93,9 @@ namespace SaintsField
         //
         //     return result;
         // }
-        public int Count => typeChildren.Count;
+        public int Count => _typeChildren.Count;
 
-        public AdvancedDropdownList<T> this[int index] => typeChildren[index];
-        IAdvancedDropdownList IReadOnlyList<IAdvancedDropdownList>.this[int index] => typeChildren[index];
+        public AdvancedDropdownList<T> this[int index] => _typeChildren[index];
+        IAdvancedDropdownList IReadOnlyList<IAdvancedDropdownList>.this[int index] => _typeChildren[index];
     }
 }

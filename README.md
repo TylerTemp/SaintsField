@@ -603,6 +603,7 @@ public class FieldTypeExample: MonoBehaviour
 
 A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
 
+*   `string funcName` callback function. Must return a `DropdownList<T>`.
 *   AllowMultiple: No
 
 ```csharp
@@ -635,6 +636,96 @@ public class DropdownExample : MonoBehaviour
 ```
 
 ![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
+
+To control the separator and disabled item
+
+```csharp
+    [Dropdown(nameof(GetAdvancedDropdownItems))]
+    public Color color;
+
+    private DropdownList<Color> GetAdvancedDropdownItems()
+    {
+        return new DropdownList<Color>
+        {
+            { "Black", Color.black },
+            { "White", Color.white },
+            DropdownList<Color>.Separator(),
+            { "Basic/Red", Color.red, true },  // the third arg means it's disabled
+            { "Basic/Green", Color.green },
+            { "Basic/Blue", Color.blue },
+            DropdownList<Color>.Separator("Basic/"),
+            { "Basic/Magenta", Color.magenta },
+            { "Basic/Cyan", Color.cyan },
+        };
+    }
+```
+
+And you can always manually add it:
+
+```csharp
+DropdownList<Color> dropdownList = new DropdownList<Color>();
+dropdownList.Add("Black", Color.black);  // add an item
+dropdownList.Add("White", Color.white, true);  // and a disabled item
+dropdownList.AddSeparator();  // add a separator
+```
+
+![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
+
+#### `AdvancedDropdown` ####
+
+A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
+
+*   `string funcName` callback function. Must return a `AdvancedDropdownList<T>`.
+*   `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will be used to decide the dropdown height.
+*   `float titleHeight=31f` height of the title. This will be used to decide the dropdown height.
+*   `float minHeight=-1f` minimum height of the dropdown. `< 0` means no limit. Otherwise, ignore the item counts and use this as the dropdown height instead.
+*   AllowMultiple: No
+
+**`AdvancedDropdownList<T>`**
+
+*   `string displayName` item name to display
+*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise it's a group of items, which the values are specified by `children`
+*   `bool disabled = false` if item is disabled
+*   `string icon = null` the icon for the item.
+
+    Note: you can set an icon for parent group, but Unity will not scale it. For this case you need to ensure the icon is small enough in pixel size, otherwise it'll block the child items. 
+
+*   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
+
+```csharp
+public class AdvancedDropdownExample: MonoBehaviour
+{
+    [AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
+
+    [CanBeNull]
+    public AdvancedDropdownList<int> AdvDropdown()
+    {
+        return new AdvancedDropdownList<int>("Select One!", new List<AdvancedDropdownList<int>>()
+        {
+            // a grouped value
+            new AdvancedDropdownList<int>("First half", new List<AdvancedDropdownList<int>>()
+            {
+                // with icon
+                new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+                // no icon
+                new AdvancedDropdownList<int>("Tuesday", 2),
+            }),
+            new AdvancedDropdownList<int>("Second half", new List<AdvancedDropdownList<int>>()
+            {
+                new AdvancedDropdownList<int>("Wednesday", 3),
+                new AdvancedDropdownList<int>("Thursday", 4, icon: "eye.png"),
+            }),
+            // direct value
+            new AdvancedDropdownList<int>("Friday", 5, true),  // disabled
+            AdvancedDropdownList<int>.Separator(),
+            new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
+            new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
+        });
+    }
+}
+```
+
+
 
 To control the separator and disabled item
 
