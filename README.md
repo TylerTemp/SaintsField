@@ -97,10 +97,10 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
 
         `aqua`, `black`, `blue`, `brown`, `cyan`, `darkblue`, `fuchsia`, `green`, `gray`, `grey`, `lightblue`, `lime`, `magenta`, `maroon`, `navy`, `olive`, `orange`, `purple`, `red`, `silver`, `teal`, `white`, `yellow`
-        
+
     *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
 
-        `clear`, `pink`, `indigo`, `violet` 
+        `clear`, `pink`, `indigo`, `violet`
 
     *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
 
@@ -671,6 +671,40 @@ dropdownList.AddSeparator();  // add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
+To control the separator and disabled item
+
+```csharp
+    [Dropdown(nameof(GetDropdownItems))]
+    public Color color;
+
+    private DropdownList<Color> GetDropdownItems()
+    {
+        return new DropdownList<Color>
+        {
+            { "Black", Color.black },
+            { "White", Color.white },
+            DropdownList<Color>.Separator(),
+            { "Basic/Red", Color.red, true },  // the third arg means it's disabled
+            { "Basic/Green", Color.green },
+            { "Basic/Blue", Color.blue },
+            DropdownList<Color>.Separator("Basic/"),
+            { "Basic/Magenta", Color.magenta },
+            { "Basic/Cyan", Color.cyan },
+        };
+    }
+```
+
+And you can always manually add it:
+
+```csharp
+DropdownList<Color> dropdownList = new DropdownList<Color>();
+dropdownList.Add("Black", Color.black);  // add an item
+dropdownList.Add("White", Color.white, true);  // and a disabled item
+dropdownList.AddSeparator();  // add a separator
+```
+
+![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
+
 #### `AdvancedDropdown` ####
 
 A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
@@ -692,7 +726,7 @@ A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/
 *   `bool disabled = false` if item is disabled
 *   `string icon = null` the icon for the item.
 
-    Note: you can set an icon for parent group, but it'll be displayed as title when you get into the sub page and Unity will not scale it. For this case you need to ensure the icon is small enough in pixel size, otherwise it'll block the child items. 
+    Note: you can set an icon for parent group, but it'll be displayed as title when you get into the sub page and Unity will not scale it. For this case you need to ensure the icon is small enough in pixel size, otherwise it'll block the child items.
 
 *   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
 
@@ -730,40 +764,6 @@ public class AdvancedDropdownExample: MonoBehaviour
 ```
 
 ![advanced_dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/d22d56b1-39c2-4ec9-bfbb-5e61dfe1b8a2)
-
-To control the separator and disabled item
-
-```csharp
-    [Dropdown(nameof(GetAdvancedDropdownItems))]
-    public Color color;
-
-    private DropdownList<Color> GetAdvancedDropdownItems()
-    {
-        return new DropdownList<Color>
-        {
-            { "Black", Color.black },
-            { "White", Color.white },
-            DropdownList<Color>.Separator(),
-            { "Basic/Red", Color.red, true },  // the third arg means it's disabled
-            { "Basic/Green", Color.green },
-            { "Basic/Blue", Color.blue },
-            DropdownList<Color>.Separator("Basic/"),
-            { "Basic/Magenta", Color.magenta },
-            { "Basic/Cyan", Color.cyan },
-        };
-    }
-```
-
-And you can always manually add it:
-
-```csharp
-DropdownList<Color> dropdownList = new DropdownList<Color>();
-dropdownList.Add("Black", Color.black);  // add an item
-dropdownList.Add("White", Color.white, true);  // and a disabled item
-dropdownList.AddSeparator();  // add a separator
-```
-
-![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
 #### `PropRange` ####
 
