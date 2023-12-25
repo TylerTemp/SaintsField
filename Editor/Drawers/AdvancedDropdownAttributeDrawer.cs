@@ -21,17 +21,17 @@ namespace SaintsField.Editor.Drawers
         private readonly Dictionary<UnityAdvancedDropdownItem, object> _itemToValue = new Dictionary<UnityAdvancedDropdownItem, object>();
         private readonly Action<object> _setValueCallback;
         private readonly Func<string, Texture2D> _getIconCallback;
+        private readonly Rect _showRect;
 
-        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, Vector2 size, AdvancedDropdownState state, Action<object> setValueCallback, Func<string, Texture2D> getIconCallback) : base(state)
+        public SaintsAdvancedDropdown(IAdvancedDropdownList dropdownListValue, Vector2 size, Rect showRect, AdvancedDropdownState state, Action<object> setValueCallback, Func<string, Texture2D> getIconCallback) : base(state)
         {
             _dropdownListValue = dropdownListValue;
             _setValueCallback = setValueCallback;
             _getIconCallback = getIconCallback;
+            _showRect = showRect;
 
             minimumSize = size;
         }
-
-
 
         protected override UnityAdvancedDropdownItem BuildRoot()
         {
@@ -90,8 +90,33 @@ namespace SaintsField.Editor.Drawers
 
         protected override void ItemSelected(UnityAdvancedDropdownItem item)
         {
-            if (!item.enabled)
+            if (!item.enabled)  // WTF Unity?
             {
+                // Show(new Rect(_showRect)
+                // {
+                //     y = 0,
+                //     height = 0,
+                // });
+                // Show(new Rect(_showRect)
+                // {
+                //     x = 0,
+                //     y = -_showRect.y - _showRect.height,
+                //     height = 0,
+                // });
+
+                // ReSharper disable once InvertIf
+                if(_bindWindowPos)
+                {
+                    Show(_showRect);
+                    EditorWindow curFocusedWindow = EditorWindow.focusedWindow;
+                    if (curFocusedWindow == null || curFocusedWindow.GetType().ToString() !=
+                        "UnityEditor.IMGUI.Controls.AdvancedDropdownWindow")
+                    {
+                        return;
+                    }
+                    curFocusedWindow.position = _windowPosition;
+                }
+
                 return;
             }
 
@@ -100,6 +125,28 @@ namespace SaintsField.Editor.Drawers
             {
                 _setValueCallback(result);
             }
+        }
+
+        private bool _bindWindowPos;
+        // private EditorWindow _thisEditorWindow;
+        private Rect _windowPosition;
+
+        // hack for Unity allow to click on disabled item...
+        public void BindWindowPosition()
+        {
+            if (_bindWindowPos)
+            {
+                return;
+            }
+
+            EditorWindow window = EditorWindow.focusedWindow;
+            if (window == null || window.GetType().ToString() != "UnityEditor.IMGUI.Controls.AdvancedDropdownWindow")
+            {
+                return;
+            }
+
+            _bindWindowPos = true;
+            _windowPosition = window.position;
         }
     }
 
@@ -346,6 +393,7 @@ namespace SaintsField.Editor.Drawers
                 SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(
                     dropdownListValue,
                     size,
+                    position,
                     new AdvancedDropdownState(),
                     curItem =>
                     {
@@ -354,6 +402,7 @@ namespace SaintsField.Editor.Drawers
                     },
                     GetIcon);
                 dropdown.Show(position);
+                dropdown.BindWindowPosition();
             }
 
             #endregion

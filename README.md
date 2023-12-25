@@ -640,40 +640,6 @@ public class DropdownExample : MonoBehaviour
 To control the separator and disabled item
 
 ```csharp
-    [Dropdown(nameof(GetAdvancedDropdownItems))]
-    public Color color;
-
-    private DropdownList<Color> GetAdvancedDropdownItems()
-    {
-        return new DropdownList<Color>
-        {
-            { "Black", Color.black },
-            { "White", Color.white },
-            DropdownList<Color>.Separator(),
-            { "Basic/Red", Color.red, true },  // the third arg means it's disabled
-            { "Basic/Green", Color.green },
-            { "Basic/Blue", Color.blue },
-            DropdownList<Color>.Separator("Basic/"),
-            { "Basic/Magenta", Color.magenta },
-            { "Basic/Cyan", Color.cyan },
-        };
-    }
-```
-
-And you can always manually add it:
-
-```csharp
-DropdownList<Color> dropdownList = new DropdownList<Color>();
-dropdownList.Add("Black", Color.black);  // add an item
-dropdownList.Add("White", Color.white, true);  // and a disabled item
-dropdownList.AddSeparator();  // add a separator
-```
-
-![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
-
-To control the separator and disabled item
-
-```csharp
     [Dropdown(nameof(GetDropdownItems))]
     public Color color;
 
@@ -705,11 +671,46 @@ dropdownList.AddSeparator();  // add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
+To control the separator and disabled item
+
+```csharp
+[Dropdown(nameof(GetDropdownItems))]
+public Color color;
+
+private DropdownList<Color> GetDropdownItems()
+{
+    return new DropdownList<Color>
+    {
+        { "Black", Color.black },
+        { "White", Color.white },
+        DropdownList<Color>.Separator(),
+        { "Basic/Red", Color.red, true },  // the third arg means it's disabled
+        { "Basic/Green", Color.green },
+        { "Basic/Blue", Color.blue },
+        DropdownList<Color>.Separator("Basic/"),
+        { "Basic/Magenta", Color.magenta },
+        { "Basic/Cyan", Color.cyan },
+    };
+}
+```
+
+And you can always manually add it:
+
+```csharp
+DropdownList<Color> dropdownList = new DropdownList<Color>();
+dropdownList.Add("Black", Color.black);  // add an item
+dropdownList.Add("White", Color.white, true);  // and a disabled item
+dropdownList.AddSeparator();  // add a separator
+```
+
+![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
+
 #### `AdvancedDropdown` ####
 
 A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
 
-**Known Issue**: Unity's `AdvancedDropdown` allows you to click the disabled item and close the popup, thus you can still click the disable item (but will not change to the disabled value). This is not fixable unless Unity decide to fix it.
+**Known Issue**: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
+This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup. This issue is not fixable unless Unity fixes it.
 
 *   `string funcName` callback function. Must return a `AdvancedDropdownList<T>`.
 *   `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will be used to decide the dropdown height.
