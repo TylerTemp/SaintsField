@@ -1,3 +1,9 @@
+## 1.2.1 ##
+
+1.  Add `CurveRange`
+2.  Add `AdvancedDropdown`
+3.  Fix `EColor.Green` incorrect color present
+
 ## 1.2.0 ##
 
 *   Now we supports Unity `2019.1+`!

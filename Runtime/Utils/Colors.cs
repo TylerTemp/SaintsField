@@ -38,7 +38,7 @@ namespace SaintsField.Utils
                 case "red":
                     return Color.red;
                 case "green":  // this is not error:  https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames
-                    return new Color(0, 128, 0, 255);
+                    return new Color32(0, 128, 0, 255);
                 case "blue":
                     return Color.blue;
                 case "white":

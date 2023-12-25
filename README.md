@@ -57,17 +57,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**1.2.0**
+**1.2.1**
 
-*   Now we supports Unity `2019.1+`!
-*   Add `AddressableLabel`. This only works if you have `Addressable` installed in your project.
-*   Add `AddressableAddress`. This only works if you have `Addressable` installed in your project.
-*   Add `GetScriptableObject`
-*   `Expandable` now can be used on anything that is serializable as long as the target can use used by `SerializedObject`, no longer limited to `ScriptableObject`.
-*   Fix `Expandable` background covers the fields on Unity 2019.
-*   `<color>` label now use the same color as [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) plus some extra colors.
-*   Fix `clear` color in `RichLabel` actually got white color.
-*   Colors name is now case insensitive in `RichLabel`.
+1.  Add `CurveRange`
+2.  Add `AdvancedDropdown`
+3.  Fix `EColor.Green` incorrect color present
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1058,6 +1052,38 @@ public class LeftToggleExample: MonoBehaviour
 ```
 
 ![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
+
+#### `CurveRange` ####
+
+A curve drawer for `AnimationCurve` which allow to set bounds and color
+
+Override 1:
+
+*   `Vector2 min = Vector2.zero` bottom left for bounds
+*   `Vector2 max = Vector2.one` top right for bounds
+*   `EColor color = EColor.Green` curve line color
+
+Override 2:
+
+*   `float minX = 0f` bottom left x for bounds
+*   `float minY = 0f` bottom left y for bounds
+*   `float maxX = 1f` top right x for bounds
+*   `float maxY = 1f` top right y for bounds
+*   `EColor color = EColor.Green` curve line color
+
+```csharp
+public class CurveRangeExample: MonoBehaviour
+{
+    [CurveRange(-1, -1, 1, 1)]
+    public AnimationCurve curve;
+
+    [CurveRange(EColor.Orange)]
+    public AnimationCurve curve1;
+
+    [CurveRange(0, 0, 5, 5, EColor.Red)]
+    public AnimationCurve curve2;
+}
+```
 
 ### Field Utilities ###
 
