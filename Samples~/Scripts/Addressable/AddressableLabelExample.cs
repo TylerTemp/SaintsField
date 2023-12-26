@@ -1,4 +1,4 @@
-#if SAINTSFIELD_ADDRESSABLE
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using SaintsField.Addressable;
 #endif
 using UnityEngine;
@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.Addressable
 {
     public class AddressableLabelExample : MonoBehaviour
     {
-#if SAINTSFIELD_ADDRESSABLE
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
         [AddressableLabel]
 #else
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]

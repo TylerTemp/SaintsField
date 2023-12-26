@@ -1560,6 +1560,8 @@ These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.un
 
 Namespace: `SaintsField.Addressable`
 
+If you encounter issue because of version incompatible with your installation, you can add a macro `SAINTSFIELD_ADDRESSABLE_DISABLE` to disable this component 
+
 ##### `AddressableLabel` #####
 
 A picker to select an addressable label.

@@ -1,4 +1,4 @@
-﻿#if SAINTSFIELD_ADDRESSABLE
+﻿#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Addressable;
