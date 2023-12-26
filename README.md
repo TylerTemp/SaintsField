@@ -62,6 +62,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 1.  Add `CurveRange`
 2.  Add `AdvancedDropdown`
 3.  Fix `EColor.Green` incorrect color present
+4.  Allow `SAINTSFIELD_ADDRESSABLE_DISABLE` macro to disable `Addressable` related attributes
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
