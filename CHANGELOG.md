@@ -1,3 +1,9 @@
+## 1.2.2 ##
+
+1.  No longer need `read/write` enabled when using a picture as icon
+2.  `AboveImage`/`BelowImage` now will try to get the image from the field when no `name` is given
+3.  Change how the scale of `AssetPreview` handled
+
 ## 1.2.1 ##
 
 1.  Add `CurveRange`

@@ -15,7 +15,7 @@ namespace SaintsField
         public readonly EAlign Align;
 
         // ReSharper disable once MemberCanBeProtected.Global
-        public ShowImageAttribute(string image, int maxWidth = -1, int maxHeight = -1, EAlign align = EAlign.Start, bool above = false,
+        public ShowImageAttribute(string image = null, int maxWidth = -1, int maxHeight = -1, EAlign align = EAlign.Start, bool above = false,
             string groupBy = "")
         {
             GroupBy = groupBy;

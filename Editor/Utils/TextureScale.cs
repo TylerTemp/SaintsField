@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SaintsField.Utils
+namespace SaintsField.Editor.Utils
 {
     public static class TextureScale
     {

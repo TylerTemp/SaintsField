@@ -53,16 +53,15 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy only image files (no `.meta` files) from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
-*   Select all the image files you copied, and enable the `Advanced - Read/Write` option for these icons.
+*   (No longer needed:) ~~Select all the image files you copied, and enable the `Advanced - Read/Write` option for these icons.~~
 
 ## Change Log ##
 
-**1.2.1**
+**1.2.2**
 
-1.  Add `CurveRange`
-2.  Add `AdvancedDropdown`
-3.  Fix `EColor.Green` incorrect color present
-4.  Allow `SAINTSFIELD_ADDRESSABLE_DISABLE` macro to disable `Addressable` related attributes
+1.  No longer need `read/write` enabled when using a picture as icon
+2.  `AboveImage`/`BelowImage` now will try to get the image from the field when no `name` is given
+3.  Change how the scale of `AssetPreview` handled
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -722,7 +721,7 @@ This is a BUG from Unity. I managed to "hack" it around to show again the popup 
 *   `bool disabled = false` if item is disabled
 *   `string icon = null` the icon for the item.
 
-    Note: you can set an icon for parent group, but it'll be displayed as title when you get into the sub page and Unity will not scale it. For this case you need to ensure the icon is small enough in pixel size, otherwise it'll block the child items.
+    Note: setting an icon for a parent group will result an weird issue on it's sub page's title and block the items. This is not fixable unless Unity decide to fix it.
 
 *   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
 
@@ -1092,6 +1091,11 @@ public class CurveRangeExample: MonoBehaviour
 
 Show an image preview for prefabs, Sprite, Texture2D, etc. (Internally use `AssetPreview.GetAssetPreview`)
 
+Note: Sometimes `AssetPreview.GetAssetPreview` simply does not return a correct preview image or returns an empty image. When no image returns, nothing is shown. If an empty image returns, an empty rect is shown.
+This can not be fixed unless Unity decides to fix it.
+
+Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D. 
+
 *   `int maxWidth=-1`
 
     preview max-width, -1 for original image size that returned by Unity. If it's greater than current view width, it'll be scaled down to fit the view. Use `int.MaxValue` to always fit the view width.
@@ -1129,9 +1133,11 @@ public class AssetPreviewExample: MonoBehaviour
 
 Show an image above/below the field.
 
-*   `string image`
+*   `string image = null`
 
-    An image to display. This can be a property or a callback, which returns a `Sprite`, `Texture2D`, `SpriteRenderer`, `UI.Image`, `UI.RawImage` or `UI.Button`
+    An image to display. This can be a property or a callback, which returns a `Sprite`, `Texture2D`, `SpriteRenderer`, `UI.Image`, `UI.RawImage` or `UI.Button`.
+
+    If it's null, it'll try to get the image from the field itself.
 
 *   `string maxWidth=-1`
 

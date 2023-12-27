@@ -11,9 +11,9 @@ namespace SaintsField.Editor.Drawers
     public class AssetPreviewAttributeDrawer : SaintsPropertyDrawer
     {
         private Texture2D _previewTexture;
-        private int _cachedWidth;
-        private int _cachedHeight;
-        private Texture2D _cachedWidthTexture;
+        // private int _cachedWidth;
+        // private int _cachedHeight;
+        // private Texture2D _cachedWidthTexture;
 
         ~AssetPreviewAttributeDrawer()
         {
@@ -22,13 +22,13 @@ namespace SaintsField.Editor.Drawers
                 Object.DestroyImmediate(_previewTexture);
             }
 
-            if (_cachedWidthTexture)
-            {
-                Object.DestroyImmediate(_cachedWidthTexture);
-            }
+            // if (_cachedWidthTexture)
+            // {
+            //     Object.DestroyImmediate(_cachedWidthTexture);
+            // }
         }
 
-        private Texture2D GetPreview(int width, int maxHeight, float viewWidth, Object target)
+        private Texture2D GetPreview(float viewWidth, Object target)
         {
             if (viewWidth < 0)
             {
@@ -44,6 +44,10 @@ namespace SaintsField.Editor.Drawers
             if(_previewTexture == null || _previewTexture.width == 1)
             {
                 // Debug.Log($"load preview {target}");
+                if(AssetPreview.IsLoadingAssetPreview(target.GetInstanceID()))
+                {
+                    return null;
+                }
                 _previewTexture = AssetPreview.GetAssetPreview(target);
             }
 
@@ -52,33 +56,41 @@ namespace SaintsField.Editor.Drawers
                 return null;
             }
 
-            bool widthOk = width == -1 || _previewTexture.width <= viewWidth;
-            bool heightOk = maxHeight == -1 && _previewTexture.height <= maxHeight;
-            if (widthOk && heightOk)
-            {
-                return _cachedWidthTexture = _previewTexture;
-            }
+            return _previewTexture;
 
-            // Debug.Log($"viewWidth={viewWidth}, width={width}, maxHeight={maxHeight}, _previewTexture.width={_previewTexture.width}, _previewTexture.height={_previewTexture.height}");
-            (int scaleWidth, int scaleHeight) = SaintsField.Utils.Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, _previewTexture.width, _previewTexture.height);
-            // Debug.Log($"scaleWidth={scaleWidth}, scaleHeight={scaleHeight}");
+            // bool widthOk = width == -1 || _previewTexture.width <= viewWidth;
+            // bool heightOk = maxHeight == -1 && _previewTexture.height <= maxHeight;
+            // if (widthOk && heightOk)
+            // {
+            //     return _cachedWidthTexture = _previewTexture;
+            // }
+            //
+            // // Debug.Log($"viewWidth={viewWidth}, width={width}, maxHeight={maxHeight}, _previewTexture.width={_previewTexture.width}, _previewTexture.height={_previewTexture.height}");
+            // (int scaleWidth, int scaleHeight) = Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, _previewTexture.width, _previewTexture.height);
+            // // Debug.Log($"scaleWidth={scaleWidth}, scaleHeight={scaleHeight}");
+            //
+            // if (_cachedWidth == scaleWidth && _cachedHeight == scaleHeight && _cachedWidthTexture != null && _cachedWidthTexture.width != 1 && _cachedWidthTexture.height != 1)
+            // {
+            //     return _cachedWidthTexture;
+            // }
+            // _cachedWidth = scaleWidth;
+            // _cachedHeight = scaleHeight;
+            // // return _cachedWidthTexture = formatted;
+            //
+            // // _cachedWidthTexture = Tex.TextureTo(_previewTexture, scaleWidth, scaleHeight);
+            // _cachedWidthTexture = _previewTexture;
+            //
+            // if (_cachedWidthTexture.width == 1)
+            // {
+            //     return _previewTexture;
+            // }
+            //
+            // return _cachedWidthTexture;
+        }
 
-            if (_cachedWidth == scaleWidth && _cachedHeight == scaleHeight && _cachedWidthTexture != null && _cachedWidthTexture.width != 1 && _cachedWidthTexture.height != 1)
-            {
-                return _cachedWidthTexture;
-            }
-            _cachedWidth = scaleWidth;
-            _cachedHeight = scaleHeight;
-            // return _cachedWidthTexture = formatted;
-
-            _cachedWidthTexture = SaintsField.Utils.Tex.TextureTo(_previewTexture, scaleWidth, scaleHeight);
-
-            if (_cachedWidthTexture.width == 1)
-            {
-                return _previewTexture;
-            }
-
-            return _cachedWidthTexture;
+        private static (int width, int height) GetPreviewScaleSize(int width, int maxHeight, float viewWidth, Texture previewTexture)
+        {
+            return Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, previewTexture.width, previewTexture.height);
         }
 
         protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
@@ -150,9 +162,17 @@ namespace SaintsField.Editor.Drawers
             // int useWidth = maxWidth == -1? Mathf.FloorToInt(width): Mathf.Min(maxWidth, Mathf.FloorToInt(width));
             int maxHeight = assetPreviewAttribute.MaxHeight;
 
-            Texture2D previewTexture = GetPreview(maxWidth, maxHeight, width, property.objectReferenceValue);
+            Texture2D previewTexture = GetPreview(width, property.objectReferenceValue);
+            if (previewTexture == null)
+            {
+                return 0;
+            }
+
+            var size = GetPreviewScaleSize(maxWidth, maxHeight, width, previewTexture);
             // ReSharper disable once Unity.NoNullPropagation
-            return previewTexture?.height ?? 0;
+            float result = size.height;
+            // Debug.Log($"GetExtraHeight: {result}");
+            return result;
         }
 
         private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -163,12 +183,17 @@ namespace SaintsField.Editor.Drawers
             // int maxHeight = Mathf.Min(assetPreviewAttribute.MaxHeight, Mathf.FloorToInt(position.height));
             int maxHeight = assetPreviewAttribute.MaxHeight;
 
-            Texture2D previewTexture = GetPreview(maxWidth, maxHeight, position.width, property.objectReferenceValue);
+            // return position;
+
+            Texture2D previewTexture = GetPreview(position.width, property.objectReferenceValue);
 
             if (previewTexture == null || previewTexture.width == 1)
             {
                 return position;
             }
+
+            // Debug.Log($"render texture {previewTexture.width}x{previewTexture.height} @ {position}");
+            (int scaleWidth, int scaleHeight) = GetPreviewScaleSize(maxWidth, maxHeight, position.width, previewTexture);
 
             EAlign align = assetPreviewAttribute.Align;
             float xOffset;
@@ -179,10 +204,10 @@ namespace SaintsField.Editor.Drawers
                     xOffset = 0;
                     break;
                 case EAlign.Center:
-                    xOffset = (position.width - previewTexture.width) / 2;
+                    xOffset = (position.width - scaleWidth) / 2;
                     break;
                 case EAlign.End:
-                    xOffset = position.width - previewTexture.width;
+                    xOffset = position.width - scaleWidth;
                     break;
                 case EAlign.FieldStart:
                     xOffset = EditorGUIUtility.labelWidth;
@@ -194,12 +219,20 @@ namespace SaintsField.Editor.Drawers
             Rect previewRect = new Rect(position)
             {
                 x = position.x + xOffset,
-                height = previewTexture.height,
+                height = scaleHeight,
+                width = scaleWidth,
             };
 
-            GUI.Label(previewRect, previewTexture);
+            // GUI.Label(previewRect, previewTexture);
+            GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
 
-            return RectUtils.SplitHeightRect(position, previewTexture.height).leftRect;
+            // EditorGUI.DrawRect(previewRect, Color.blue);
+
+            Rect leftOutRect = RectUtils.SplitHeightRect(position, scaleHeight).leftRect;
+            // Debug.Log($"leftOutRect={leftOutRect}");
+
+            // return leftOutRect;
+            return leftOutRect;
         }
 
         private static string MismatchError(SerializedProperty property)

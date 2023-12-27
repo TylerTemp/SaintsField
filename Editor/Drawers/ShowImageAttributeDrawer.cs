@@ -45,82 +45,88 @@ namespace SaintsField.Editor.Drawers
 
             _error = "";
 
-            // bool targetChanged;
-            SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
-            if (prop != null)
+            if (string.IsNullOrEmpty(name))
             {
-                if(prop.propertyType != SerializedPropertyType.ObjectReference)
-                {
-                    _error = $"Expect ObjectReference for `{name}`, get {prop.propertyType}";
-                    return (null, 0, 0);
-                }
-
-                // targetChanged = CheckSetOriginalTextureAndError(prop.objectReferenceValue);
-                CheckSetOriginalTextureAndError(prop.objectReferenceValue);
-
-                if(_error != "")
-                {
-                    return (null, 0, 0);
-                }
+                CheckSetOriginalTextureAndError(property.objectReferenceValue);
             }
             else
             {
-                _error = "";
-                object target = GetParentTarget(property);
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                    ReflectUtils.GetProp(target.GetType(), name);
-                switch (getPropType)
+                SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
+                if (prop != null)
                 {
-                    case ReflectUtils.GetPropType.Field:
+                    if(prop.propertyType != SerializedPropertyType.ObjectReference)
                     {
-                        // targetChanged = CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
-                        CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
-                        break;
-                    }
-
-                    case ReflectUtils.GetPropType.Property:
-                    {
-                        // targetChanged = CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
-                        CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
-                        break;
-                    }
-                    case ReflectUtils.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                        ParameterInfo[] methodParams = methodInfo.GetParameters();
-                        Debug.Assert(methodParams.All(p => p.IsOptional));
-                        Object result;
-                        try
-                        {
-                            result = (Object)methodInfo.Invoke(target,
-                                methodParams.Select(p => p.DefaultValue).ToArray());
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            Debug.Assert(e.InnerException != null);
-                            _error = e.InnerException.Message;
-                            Debug.LogException(e);
-                            return (null, 0, 0);
-                        }
-                        catch (Exception e)
-                        {
-                            _error = e.Message;
-                            return (null, 0, 0);
-                        }
-
-                        // targetChanged = CheckSetOriginalTextureAndError(result);
-                        CheckSetOriginalTextureAndError(result);
-
-                        break;
-                    }
-                    case ReflectUtils.GetPropType.NotFound:
-                    {
-                        _error =
-                            $"not found `{name}` on `{target}`";
+                        _error = $"Expect ObjectReference for `{name}`, get {prop.propertyType}";
                         return (null, 0, 0);
                     }
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+
+                    // targetChanged = CheckSetOriginalTextureAndError(prop.objectReferenceValue);
+                    CheckSetOriginalTextureAndError(prop.objectReferenceValue);
+
+                    if(_error != "")
+                    {
+                        return (null, 0, 0);
+                    }
+                }
+                else
+                {
+                    _error = "";
+                    object target = GetParentTarget(property);
+                    (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                        ReflectUtils.GetProp(target.GetType(), name);
+                    switch (getPropType)
+                    {
+                        case ReflectUtils.GetPropType.Field:
+                        {
+                            // targetChanged = CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
+                            CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
+                            break;
+                        }
+
+                        case ReflectUtils.GetPropType.Property:
+                        {
+                            // targetChanged = CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
+                            CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
+                            break;
+                        }
+                        case ReflectUtils.GetPropType.Method:
+                        {
+                            MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                            ParameterInfo[] methodParams = methodInfo.GetParameters();
+                            Debug.Assert(methodParams.All(p => p.IsOptional));
+                            Object result;
+                            try
+                            {
+                                result = (Object)methodInfo.Invoke(target,
+                                    methodParams.Select(p => p.DefaultValue).ToArray());
+                            }
+                            catch (TargetInvocationException e)
+                            {
+                                Debug.Assert(e.InnerException != null);
+                                _error = e.InnerException.Message;
+                                Debug.LogException(e);
+                                return (null, 0, 0);
+                            }
+                            catch (Exception e)
+                            {
+                                _error = e.Message;
+                                return (null, 0, 0);
+                            }
+
+                            // targetChanged = CheckSetOriginalTextureAndError(result);
+                            CheckSetOriginalTextureAndError(result);
+
+                            break;
+                        }
+                        case ReflectUtils.GetPropType.NotFound:
+                        {
+                            _error =
+                                $"not found `{name}` on `{target}`";
+                            return (null, 0, 0);
+                        }
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                    }
                 }
             }
 
@@ -159,7 +165,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             // fixed width / overflow height
-            (int scaleWidth, int scaleHeight) = SaintsField.Utils.Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), maxWidth, maxHeight, _originTexture.width, _originTexture.height);
+            (int scaleWidth, int scaleHeight) = Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), maxWidth, maxHeight, _originTexture.width, _originTexture.height);
             // Debug.Log($"scale to {scaleWidth}x{scaleHeight}; from {_originTexture.width}x{_originTexture.height}; viewWidth={viewWidth}, fitTo={maxWidth}x{maxHeight}");
             return (_originTexture, scaleWidth, scaleHeight);
             // _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, scaleWidth, scaleHeight);
