@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers
                         resultGo = gameObject;
                         break;
                     default:
-                        _error = "GetComponentAttribute can only be used on Component or GameObject";
+                        _error = "GetComponent can only be used on Component or GameObject";
                         return false;
                 }
 
@@ -63,14 +63,14 @@ namespace SaintsField.Editor.Drawers
                     transform = gameObject.transform;
                     break;
                 default:
-                    _error = "GetComponentInChildrenAttribute can only be used on Component or GameObject";
+                    _error = "GetComponent can only be used on Component or GameObject";
                     return false;
             }
 
             Component componentOnSelf = transform.GetComponent(type);
             if (componentOnSelf == null)
             {
-                _error = $"No {type} found in children";
+                _error = $"No {type} found on {transform.name}";
                 return false;
             }
 
