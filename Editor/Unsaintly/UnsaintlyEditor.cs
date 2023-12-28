@@ -240,17 +240,17 @@ namespace SaintsField.Editor.Unsaintly
         private IEnumerable<string> GetSerializedProperties()
         {
             // outSerializedProperties.Clear();
-            using SerializedProperty iterator = serializedObject.GetIterator();
-
-            // ReSharper disable once InvertIf
-            if (iterator.NextVisible(true))
+            using (SerializedProperty iterator = serializedObject.GetIterator())
             {
-                do
+                // ReSharper disable once InvertIf
+                if (iterator.NextVisible(true))
                 {
-                    // outSerializedProperties.Add(serializedObject.FindProperty(iterator.name));
-                    yield return iterator.name;
+                    do
+                    {
+                        // outSerializedProperties.Add(serializedObject.FindProperty(iterator.name));
+                        yield return iterator.name;
+                    } while (iterator.NextVisible(false));
                 }
-                while (iterator.NextVisible(false));
             }
         }
 
