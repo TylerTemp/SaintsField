@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
 
-namespace SaintsField.Editor.Saintless
+namespace SaintsField.Editor.Unsaintly
 {
-    public struct SaintlessFieldWithInfo
+    public struct UnsaintlyFieldWithInfo
     {
         public int inherentDepth;
         public int order;
 
-        public SaintlessRenderType renderType;
+        public UnsaintlyRenderType renderType;
 
         public FieldInfo fieldInfo;
         public MethodInfo methodInfo;

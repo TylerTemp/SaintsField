@@ -6,11 +6,11 @@ using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace SaintsField.Editor.Saintless.Renderer
+namespace SaintsField.Editor.Unsaintly.Renderer
 {
     public class MethodRenderer: AbsRenderer
     {
-        public MethodRenderer(UnityEditor.Editor editor, SaintlessFieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
+        public MethodRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
         {
         }
 

@@ -1,10 +1,10 @@
 ﻿using UnityEditor;
 
-namespace SaintsField.Editor.Saintless.Renderer
+namespace SaintsField.Editor.Unsaintly.Renderer
 {
     public class NonSerializedFieldRenderer: AbsRenderer
     {
-        public NonSerializedFieldRenderer(UnityEditor.Editor editor, SaintlessFieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
+        public NonSerializedFieldRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
         {
         }
 

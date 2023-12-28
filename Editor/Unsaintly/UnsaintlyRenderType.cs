@@ -1,6 +1,6 @@
-﻿namespace SaintsField.Editor.Saintless
+﻿namespace SaintsField.Editor.Unsaintly
 {
-    public enum SaintlessRenderType
+    public enum UnsaintlyRenderType
     {
         None,
         SerializedField,

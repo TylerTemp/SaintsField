@@ -1,10 +1,10 @@
 ﻿using UnityEditor;
 
-namespace SaintsField.Editor.Saintless.Renderer
+namespace SaintsField.Editor.Unsaintly.Renderer
 {
     public class NativePropertyRenderer: AbsRenderer
     {
-        public NativePropertyRenderer(UnityEditor.Editor editor, SaintlessFieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
+        public NativePropertyRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
         {
         }
 

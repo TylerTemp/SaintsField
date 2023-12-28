@@ -2,14 +2,14 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Saintless.Renderer
+namespace SaintsField.Editor.Unsaintly.Renderer
 {
     public abstract class AbsRenderer: IDisposable
     {
-        protected readonly SaintlessFieldWithInfo fieldWithInfo;
+        protected readonly UnsaintlyFieldWithInfo fieldWithInfo;
         protected readonly SerializedObject serializedObject;
 
-        protected AbsRenderer(UnityEditor.Editor editor, SaintlessFieldWithInfo fieldWithInfo)
+        protected AbsRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo)
         {
             this.fieldWithInfo = fieldWithInfo;
             serializedObject = editor.serializedObject;
