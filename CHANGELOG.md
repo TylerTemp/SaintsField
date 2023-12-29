@@ -1,7 +1,8 @@
 ## 1.2.3 ##
 
 1.  Add `FindComponent`
-2.  Add `UnsaintlyEditor`
+2.  Add `ButtonAddOnClick`
+3.  Add `UnsaintlyEditor`
 
 ## 1.2.2 ##
 
@@ -25,8 +26,8 @@
 *   `Expandable` now can be used on anything that is serializable as long as the target can use used by `SerializedObject`, no longer limited to `ScriptableObject`.
 *   Fix `Expandable` background covers the fields on Unity 2019.
 *   `<color>` label now use the same color as [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) plus some extra colors.
-*   Fix `clear` color in `RichLabel` actually got white color. 
-*   Colors name is now case insensitive in `RichLabel`. 
+*   Fix `clear` color in `RichLabel` actually got white color.
+*   Colors name is now case insensitive in `RichLabel`.
 
 ## 1.1.3 ##
 

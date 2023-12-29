@@ -57,11 +57,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**1.2.2**
+**1.2.3**
 
-1.  No longer need `read/write` enabled when using a picture as icon
-2.  `AboveImage`/`BelowImage` now will try to get the image from the field when no `name` is given
-3.  Change how the scale of `AssetPreview` handled
+1.  Add `FindComponent`
+2.  Add `ButtonAddOnClick`
+3.  Add `UnsaintlyEditor`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -665,40 +665,6 @@ dropdownList.AddSeparator();  // add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
-To control the separator and disabled item
-
-```csharp
-[Dropdown(nameof(GetDropdownItems))]
-public Color color;
-
-private DropdownList<Color> GetDropdownItems()
-{
-    return new DropdownList<Color>
-    {
-        { "Black", Color.black },
-        { "White", Color.white },
-        DropdownList<Color>.Separator(),
-        { "Basic/Red", Color.red, true },  // the third arg means it's disabled
-        { "Basic/Green", Color.green },
-        { "Basic/Blue", Color.blue },
-        DropdownList<Color>.Separator("Basic/"),
-        { "Basic/Magenta", Color.magenta },
-        { "Basic/Cyan", Color.cyan },
-    };
-}
-```
-
-And you can always manually add it:
-
-```csharp
-DropdownList<Color> dropdownList = new DropdownList<Color>();
-dropdownList.Add("Black", Color.black);  // add an item
-dropdownList.Add("White", Color.white, true);  // and a disabled item
-dropdownList.AddSeparator();  // add a separator
-```
-
-![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
-
 #### `AdvancedDropdown` ####
 
 A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
@@ -1094,7 +1060,7 @@ Show an image preview for prefabs, Sprite, Texture2D, etc. (Internally use `Asse
 Note: Sometimes `AssetPreview.GetAssetPreview` simply does not return a correct preview image or returns an empty image. When no image returns, nothing is shown. If an empty image returns, an empty rect is shown.
 This can not be fixed unless Unity decides to fix it.
 
-Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D. 
+Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
 
 *   `int maxWidth=-1`
 
@@ -1559,7 +1525,58 @@ public class AddComponentExample: MonoBehaviour
 
 ![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
 
-### Third Party Tools ###
+#### `FindComponent` ####
+
+Automatically add a component to the current target. This is very similar to Unity's [`transform.Find`](https://docs.unity3d.com/ScriptReference/Transform.Find.html), except it accepts many paths, and it's returning value is not limited to `transform`
+
+*   `string path` a path to search
+*   `params string[] paths` more paths to search
+*   AllowMultiple: Yes but not necessary
+
+```csharp
+public class FindComponentExample: MonoBehaviour
+{
+    [FindComponent("sub/dummy")] public Dummy subDummy;
+    [FindComponent("sub/dummy")] public GameObject subDummyGo;
+    [FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
+}
+```
+
+![find_component](https://github.com/TylerTemp/SaintsField/assets/6391063/6620e643-3f8a-4c33-a136-6cbfc889d2ac)
+
+#### `ButtonAddOnClick` ####
+
+Add a callback to a button's `onClick` event. Note this at this point does only supports callback with no arguments.
+
+*   `string funcName` the callback function name
+*   `string buttonComp=null` the button component name.
+
+    If null, it'll try to get the button component by this order:
+
+    1.  the field itself
+    2.  get the `Button` component from the field itself
+    3.  get the `Button` component from the current target
+
+    If it's not null, the search order will be:
+
+    1.  get the field of this name from current target
+    2.  call a function of this name from current target
+
+```csharp
+public class ButtonAddOnClickExample: MonoBehaviour
+{
+    [GetComponent, ButtonAddOnClick(nameof(OnClick))] public Button button;
+
+    private void OnClick()
+    {
+        Debug.Log("Button clicked!");
+    }
+}
+```
+
+![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
+
+### Other Tools ###
 
 #### Addressable ####
 
@@ -1567,7 +1584,7 @@ These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.un
 
 Namespace: `SaintsField.Addressable`
 
-If you encounter issue because of version incompatible with your installation, you can add a macro `SAINTSFIELD_ADDRESSABLE_DISABLE` to disable this component 
+If you encounter issue because of version incompatible with your installation, you can add a macro `SAINTSFIELD_ADDRESSABLE_DISABLE` to disable this component
 
 ##### `AddressableLabel` #####
 
@@ -1618,6 +1635,112 @@ public class AddressableAddressExample: MonoBehaviour
 ```
 
 ![addressable_address](https://github.com/TylerTemp/SaintsField/assets/6391063/5646af00-c167-4131-be06-7e0b8e9b102e)
+
+#### UnsaintlyEditor ####
+
+Even though `SaintsField` is designed to focus on `field` only, I still find it's necessary to use a `UnityEditor.Editor` level component, because of: showing a button, or showing a non-field property.
+
+So here is the `UnsaintlyEditor`. It provides the minimal functions I think that is needed. Here is some comparison with `NaughtyAttributes` and `MarkupAttributes`:
+
+1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`.
+2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
+3.  `UnsaintlyEditor` has no layout at all. It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`). It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
+
+If you are interested, here is how to use it.
+
+##### SetUp UnsaintlyEditor #####
+
+Put this in any one of your `Editor` folders:
+
+```csharp
+using SaintsField.Editor.Unsaintly;
+using UnityEditor;
+
+[CanEditMultipleObjects]
+[CustomEditor(typeof(UnityEngine.Object), true)]
+public class MyEditor : UnsaintlyEditor
+{
+}
+```
+
+Change the value of `typeof` if you only want to apply to a specific type, like a `MonoBehavior` or `ScriptableObject`.
+
+##### `Button` #####
+
+Draw a button for a function.
+
+Compared to `NaughtyAttributes`, this does not allow to specific for editing and playing mode. It also does not handle an `IEnumerator` function, it just `Invoke` the target function.
+
+*   `string buttonLabel = null` the button label. If null, it'll use the function name.
+
+```csharp
+[Button]
+private void EditorButton()
+{
+    Debug.Log("EditorButton");
+}
+
+[Button("Label")]
+private void EditorLabeledButton()
+{
+    Debug.Log("EditorLabeledButton");
+}
+```
+
+![button](https://github.com/TylerTemp/SaintsField/assets/6391063/2f32336d-ca8b-46e0-9ac8-7bc44aada54b)
+
+##### `ShowInInspector` #####
+
+Show a non-field property.
+
+```csharp
+// const
+[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
+// static
+[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+
+// auto-property
+[ShowInInspector, Ordered]
+public Color AutoColor
+{
+    get => Color.green;
+    set {}
+}
+```
+
+![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
+
+##### `Ordered` #####
+
+`UnsanitlyEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
+
+Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
+
+*   `[CallerLineNumber] int order = 0` the order of this field. `[CallerLineNumber]` will use the line number as the order.
+
+```csharp
+[Ordered] public string myStartField;
+
+[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
+[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+
+[ShowInInspector, Ordered]
+public Color AutoColor
+{
+    get => Color.green;
+    set {}
+}
+
+[Button, Ordered]
+private void EditorButton()
+{
+    Debug.Log("EditorButton");
+}
+
+[Ordered] public string myOtherFieldUnderneath;
+```
+
+![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
 
 ## GroupBy ##
 

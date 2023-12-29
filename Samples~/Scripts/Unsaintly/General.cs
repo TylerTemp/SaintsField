@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts.Unsaintly
 {
     public class General : MonoBehaviour
     {
+        [Ordered] public string myStartField;
         [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
         [ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
 
@@ -19,16 +20,18 @@ namespace SaintsField.Samples.Scripts.Unsaintly
             }
         }
 
+        [Button, Ordered]
+        private void EditorButton()
+        {
+            Debug.Log("EditorButton");
+        }
+
         [Button("Label"), Ordered]
         private void EditorLabeledButton()
         {
             Debug.Log("EditorLabeledButton");
         }
 
-        [Button, Ordered]
-        private void EditorButton()
-        {
-            Debug.Log("EditorButton");
-        }
+        [Ordered] public string myOtherFieldUnderneath;
     }
 }
