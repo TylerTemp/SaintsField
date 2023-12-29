@@ -1,3 +1,8 @@
+## 1.2.3 ##
+
+1.  Add `FindComponent`
+2.  Add `UnsaintlyEditor`
+
 ## 1.2.2 ##
 
 1.  No longer need `read/write` enabled when using a picture as icon

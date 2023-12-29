@@ -1,7 +1,7 @@
-using SaintsField.Saintless;
+using SaintsField.Unsaintly;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.Saintless
+namespace SaintsField.Samples.Scripts.Unsaintly
 {
     public class General : MonoBehaviour
     {

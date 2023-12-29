@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
