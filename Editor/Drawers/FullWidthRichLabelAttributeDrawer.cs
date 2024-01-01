@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers
             return Draw(position, property, label, saintsAttribute);
         }
 
-        private Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        public Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
 

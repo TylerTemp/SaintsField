@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Core
 {
@@ -98,7 +101,9 @@ namespace SaintsField.Editor.Core
                                 attrToDrawers[attr] = attrList = new HashSet<Type>();
                             }
 
-                            // Debug.Log($"Found drawer: {attr} -> {saintsSubDrawer}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_INIT
+                            Debug.Log($"Found drawer: {attr} -> {saintsSubDrawer}");
+#endif
 
                             attrList.Add(saintsSubDrawer);
                         }
@@ -786,6 +791,58 @@ namespace SaintsField.Editor.Core
             SetValueChanged(property, false);
         }
 
+        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        {
+            // Create property container element.
+            VisualElement container = new VisualElement();
+
+            // Debug.Log($"raw pos={position.y} height={position.height}");
+            _cachedPropPath = property.propertyPath;
+
+            if (!PropertyPathToShared.ContainsKey(property.propertyPath))
+            {
+                PropertyPathToShared[property.propertyPath] = new SharedInfo();
+            }
+
+            // if (SubCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
+            // {
+            //     // Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
+            //     // EditorGUI.PropertyField(position, property, label, true);
+            //     UnityDraw(position, property, label);
+            //     return;
+            // }
+
+            (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
+            PropertyPathToShared[property.propertyPath].ParentTarget = parent;
+
+            IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
+                .Select((each, index) => new SaintsWithIndex
+                {
+                    SaintsAttribute = each,
+                    Index = index,
+                })
+                .ToArray();
+
+            AboveRichLabelAttribute aboveRichLabel =
+                allSaintsAttributes.First(each => each.SaintsAttribute is AboveRichLabelAttribute).SaintsAttribute as AboveRichLabelAttribute;
+
+            var imGuiContainer = new IMGUIContainer(() =>
+            {
+                var drawer = new FullWidthRichLabelAttributeDrawer();
+                GUI.BeginGroup(new Rect(0, 0, 500, 500));
+                drawer.Draw(new Rect(0, 0, 500, 500), property, new GUIContent("Test"), aboveRichLabel);
+                GUI.EndGroup();
+            });
+
+            imGuiContainer.style.height = 50f;
+
+            container.Add(imGuiContainer);
+
+            container.Add(new PropertyField(property));
+
+            return container;
+        }
+
         // ReSharper disable once MemberCanBeMadeStatic.Local
         private Type GetFirstSaintsDrawerType(Type attributeType)
         {
@@ -934,7 +991,9 @@ namespace SaintsField.Editor.Core
 
                         // UnityEditor.RangeDrawer
                         // Debug.Log($"fallback drawerInstance={drawerInstance} for {propertyAttribute}");
-                        // Debug.Log($"drawerInstance {drawerInstance}={label?.text.Length}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_DRAW_PROCESS
+                        Debug.Log($"drawerInstance {drawerInstance}={label?.text.Length}");
+#endif
                         drawerInstance.OnGUI(position, property, label ?? GUIContent.none);
                         // Debug.Log($"finished drawerInstance={drawerInstance}");
                         return;
@@ -945,8 +1004,11 @@ namespace SaintsField.Editor.Core
             // fallback to pure unity one (unity default attribute not included)
             // MethodInfo defaultDraw = typeof(EditorGUI).GetMethod("DefaultPropertyField", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             // defaultDraw!.Invoke(null, new object[] { position, property, GUIContent.none });
-            // Debug.Log($"use unity draw: {property.propertyType}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_DRAW_PROCESS
+            Debug.Log($"use unity draw: {property.propertyType}");
+#endif
             UnityDraw(position, property, label);
+
             // EditorGUI.PropertyField(position, property, GUIContent.none, true);
             // if (property.propertyType == SerializedPropertyType.Generic)
             // {
