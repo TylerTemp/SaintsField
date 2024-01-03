@@ -11,7 +11,7 @@ public class UIKitExample : MonoBehaviour
 
     public int sth;
 
-    [AboveRichLabel("<color=green>SaintsField")]
+    // [AboveRichLabel("<color=green>SaintsField")]
     [UIKitPropDec] public string content;
 
     // [Button]

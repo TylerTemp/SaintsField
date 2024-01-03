@@ -11,10 +11,10 @@ public class UIKitPropDecDrawer : PropertyDrawer
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         // Create property container element.
-        var container = new VisualElement();
+        VisualElement container = new VisualElement();
 
         // Create property fields.
-        var amountField = new PropertyField(property);
+        PropertyField amountField = new PropertyField(property);
 
         // Add fields to the container.
         container.Add(amountField);
