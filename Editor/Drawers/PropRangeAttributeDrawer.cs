@@ -12,6 +12,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+            Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}");
+#endif
+
             PropRangeAttribute propRangeAttribute = (PropRangeAttribute) saintsAttribute;
 
             object parentTarget = GetParentTarget(property);
@@ -58,6 +62,9 @@ namespace SaintsField.Editor.Drawers
             {
                 bool isFloat = property.propertyType == SerializedPropertyType.Float;
                 float curValue = isFloat ? property.floatValue : property.intValue;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+                Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}: {minValue}~{maxValue} {curValue}");
+#endif
                 float newValue = EditorGUI.Slider(position, label, curValue, minValue, maxValue);
                 // ReSharper disable once InvertIf
                 if (changed.changed)
@@ -87,6 +94,12 @@ namespace SaintsField.Editor.Drawers
                             property.intValue = Util.BoundIntStep(newValue, minValue, maxValue, (int)step);
                         }
                     }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+                    Debug.Log($"#PropRange# #DrawField# changed {curValue}->{newValue}");
+#endif
+
+                    property.serializedObject.ApplyModifiedProperties();
                 }
             }
         }
