@@ -1,22 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
-using SaintsField;
-// using NaughtyAttributes;
 using UnityEngine;
+// using NaughtyAttributes;
 
-public class UIKitExample : MonoBehaviour
+namespace SaintsField.Samples.Scripts.UIKit
 {
-    // [ShowNonSerializedField] public static readonly Color red = Color.red;
-    // [ShowNativeProperty] public Color blue => Color.blue;
+    public class UIKitExample : MonoBehaviour
+    {
+        // [ShowNonSerializedField] public static readonly Color red = Color.red;
+        // [ShowNativeProperty] public Color blue => Color.blue;
 
-    public int sth;
+        public int sth;
 
-    // [AboveRichLabel("<color=green>SaintsField")]
-    [UIKitPropDec] public string content;
+        [AboveRichLabel("<color=green>SaintsField")]
+        [UIKitPropDec] public string content;
 
-    // [Button]
-    // private void EditorButton()
-    // {
-    //     Debug.Log("EditorButton");
-    // }
+        // [Button]
+        // private void EditorButton()
+        // {
+        //     Debug.Log("EditorButton");
+        // }
+    }
 }
