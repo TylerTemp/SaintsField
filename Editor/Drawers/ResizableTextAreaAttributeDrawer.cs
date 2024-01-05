@@ -40,7 +40,8 @@ namespace SaintsField.Editor.Drawers
             ) + (hasLabelWidth ? EditorGUIUtility.singleLineHeight : 0f);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             // EditorGUI.DrawRect(position, Color.blue);
 
@@ -110,7 +111,7 @@ namespace SaintsField.Editor.Drawers
         //     return lines.Length;
         // }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) => _error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
 

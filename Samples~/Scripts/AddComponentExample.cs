@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class AddComponentExample: MonoBehaviour
     {
-        [AddComponent, GetComponent] public Dummy dummy;
-        [AddComponent(typeof(BoxCollider)), GetComponent] public GameObject thisObj;
+        [AddComponent, GetComponent] public Dummy myDummy;
+        [AddComponent(typeof(BoxCollider)), GetComponent] public GameObject myObj;
     }
 }

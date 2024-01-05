@@ -6,6 +6,8 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using HelpBox = SaintsField.Editor.Utils.HelpBox;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -33,7 +35,7 @@ namespace SaintsField.Editor.Drawers
         //     ISaintsAttribute saintsAttribute) =>
         //     EditorGUIUtility.singleLineHeight;
 
-        protected override bool WillDrawLabel(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
             bool result = GetLabelXml(property, targetAttribute) != null;
@@ -56,6 +58,17 @@ namespace SaintsField.Editor.Drawers
             // EditorGUI.DrawRect(position, _backgroundColor);
             _richTextDrawer.DrawChunks(position, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
             // LabelMouseProcess(position, property);
+        }
+
+        protected override IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
+
+            string labelXml = GetLabelXml(property, targetAttribute);
+
+            return labelXml is null
+                ? Array.Empty<VisualElement>()
+                : _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(labelXml, property.displayName));
         }
 
         private string GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute)
@@ -168,7 +181,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return _error != "";
         }

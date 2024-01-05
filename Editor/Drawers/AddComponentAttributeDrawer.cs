@@ -1,22 +1,26 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(AddComponentAttribute))]
     public class AddComponentAttributeDrawer: SaintsPropertyDrawer
     {
-        private string _error = "";
-
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => 0;
 
-        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool valueChanged)
         {
-            _error = "";
+            return DoCheckComponent(property, saintsAttribute);
+        }
 
+        private static bool DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
             if (property.objectReferenceValue != null)
             {
                 return false;
@@ -24,15 +28,18 @@ namespace SaintsField.Editor.Drawers
 
             AddComponentAttribute getComponentAttribute = (AddComponentAttribute) saintsAttribute;
             Object target = property.serializedObject.targetObject;
+            // Type fieldType = SerializedUtils.GetType(property);
+            Type type = getComponentAttribute.CompType ?? SerializedUtils.GetType(property);
 
             Component foundComponent = null;
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (target)
             {
                 case GameObject gameObject:
-                    foundComponent = gameObject.GetComponent(getComponentAttribute.CompType);
+                    foundComponent = gameObject.GetComponent(type);
                     break;
                 case Component component:
-                    foundComponent = component.GetComponent(getComponentAttribute.CompType);
+                    foundComponent = component.GetComponent(type);
                     break;
             }
 
@@ -42,15 +49,15 @@ namespace SaintsField.Editor.Drawers
             }
 
             GameObject obj = target as GameObject ?? ((Component) target).gameObject;
-            obj.AddComponent(getComponentAttribute.CompType);
+            obj.AddComponent(type);
 
             return true;
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute) => _error != "";
-
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: HelpBox.GetHeight(_error, width, EMessageType.Error);
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: HelpBox.Draw(position, _error, EMessageType.Error);
+        protected override VisualElement CreateAboveUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            DoCheckComponent(property, saintsAttribute);
+            return new VisualElement();
+        }
     }
 }

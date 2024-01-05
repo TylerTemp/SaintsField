@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers
             return _richTextDrawer.GetWidth(label, position.height, _payloads) + targetAttribute.Padding;
         }
 
-        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, bool valueChanged)
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, bool valueChanged)
         {
             if (_error != "")
             {
@@ -127,7 +127,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return _error != "";
         }

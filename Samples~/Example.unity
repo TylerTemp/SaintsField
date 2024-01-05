@@ -767,10 +767,7 @@ MonoBehaviour:
     stateName: Idle
     stateSpeed: 3
     animationClip: {fileID: 0}
-  animStateName: FromTest
-  animParamName: Some Bool
-  animParamHash: -707381567
-  animParamHashes: c136d6d572017303
+  animStateName: Idle
 --- !u!95 &380193380
 Animator:
   serializedVersion: 5
@@ -2722,8 +2719,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1271404091}
   - component: {fileID: 1271404090}
-  - component: {fileID: 1271404089}
   - component: {fileID: 1271404092}
+  - component: {fileID: 1271404093}
   m_Layer: 0
   m_Name: AddComponent
   m_TagString: Untagged
@@ -2731,18 +2728,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1271404089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1271404088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1833c50b28d4d34b507e6d12f466f5e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1271404090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2755,8 +2740,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa88ae97cb014113a58b2133637da902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dummy: {fileID: 1271404089}
-  thisObj: {fileID: 1271404088}
+  myDummy: {fileID: 1271404092}
+  myObj: {fileID: 1271404088}
 --- !u!4 &1271404091
 Transform:
   m_ObjectHideFlags: 0
@@ -2772,7 +2757,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1271404092
+--- !u!114 &1271404092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271404088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1833c50b28d4d34b507e6d12f466f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &1271404093
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2791,7 +2788,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2}
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1350909637
 GameObject:

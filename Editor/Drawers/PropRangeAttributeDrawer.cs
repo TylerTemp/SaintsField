@@ -1,7 +1,10 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using HelpBox = SaintsField.Editor.Utils.HelpBox;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -10,15 +13,22 @@ namespace SaintsField.Editor.Drawers
     {
         private string _error = "";
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        private struct MetaInfo
         {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
-            Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}");
-#endif
+            public bool IsFloat;
+            public float MinValue;
+            public float MaxValue;
+            public float Step;
+            public string Error;
+        }
 
+        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, object parentTarget)
+        {
             PropRangeAttribute propRangeAttribute = (PropRangeAttribute) saintsAttribute;
 
-            object parentTarget = GetParentTarget(property);
+            bool isFloat = property.propertyType == SerializedPropertyType.Float;
+            // object parentTarget = GetParentTarget(property);
+            string error = "";
 
             float minValue;
             if (propRangeAttribute.MinCallback == null)
@@ -28,7 +38,7 @@ namespace SaintsField.Editor.Drawers
             else
             {
                 (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MinCallback);
-                _error = getError;
+                error = getError;
                 minValue = getValue;
             }
 
@@ -40,19 +50,49 @@ namespace SaintsField.Editor.Drawers
             else
             {
                 (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MaxCallback);
-                _error = getError;
+                error = getError;
                 maxValue = getValue;
             }
 
-            if (_error != "")
+            if (error != "")
             {
-                DefaultDrawer(position, property, label);
-                return;
+                return new MetaInfo
+                {
+                    IsFloat = isFloat,
+                    Error = error,
+                };
             }
 
-            if (maxValue <= minValue)
+            if (maxValue < minValue)
             {
-                _error = $"max({maxValue}) should be greater than min({minValue})";
+                return new MetaInfo
+                {
+                    IsFloat = isFloat,
+                    Error = $"max({maxValue}) should be greater than min({minValue})",
+                };
+            }
+
+            return new MetaInfo
+            {
+                IsFloat = isFloat,
+                MinValue = minValue,
+                MaxValue = maxValue,
+                Step = propRangeAttribute.Step,
+                Error = error,
+            };
+        }
+
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parentTarget)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+            Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}");
+#endif
+
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parentTarget);
+            if(metaInfo.Error != "")
+            {
+                _error = metaInfo.Error;
                 DefaultDrawer(position, property, label);
                 return;
             }
@@ -60,8 +100,10 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                bool isFloat = property.propertyType == SerializedPropertyType.Float;
+                bool isFloat = metaInfo.IsFloat;
                 float curValue = isFloat ? property.floatValue : property.intValue;
+                float minValue = metaInfo.MinValue;
+                float maxValue = metaInfo.MaxValue;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
                 Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}: {minValue}~{maxValue} {curValue}");
 #endif
@@ -69,43 +111,99 @@ namespace SaintsField.Editor.Drawers
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
-                    // property.floatValue = newValue;
-                    float step = propRangeAttribute.Step;
-                    // Debug.Log(step);
-                    if (step <= 0)
+                    float parsedValue = GetValue(metaInfo, newValue);
+                    if (isFloat)
                     {
-                        if (isFloat)
-                        {
-                            property.floatValue = newValue;
-                        }
-                        else
-                        {
-                            property.intValue = (int)newValue;
-                        }
+                        property.floatValue = parsedValue;
                     }
                     else
                     {
-                        if (isFloat)
-                        {
-                            property.floatValue = Util.BoundFloatStep(newValue, minValue, maxValue, step);
-                        }
-                        else
-                        {
-                            property.intValue = Util.BoundIntStep(newValue, minValue, maxValue, (int)step);
-                        }
+                        property.intValue = (int)parsedValue;
                     }
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
-                    Debug.Log($"#PropRange# #DrawField# changed {curValue}->{newValue}");
-#endif
-
-                    property.serializedObject.ApplyModifiedProperties();
                 }
             }
         }
 
+        private float GetValue(MetaInfo metaInfo, float newValue)
+        {
+            // property.floatValue = newValue;
+            float step = metaInfo.Step;
+            bool isFloat = metaInfo.IsFloat;
+            // Debug.Log(step);
+            if (step <= 0)
+            {
+                return newValue;
+            }
+            else
+            {
+                if (isFloat)
+                {
+                    return Util.BoundFloatStep(newValue, metaInfo.MinValue, metaInfo.MaxValue, step);
+                }
+                else
+                {
+                    return Util.BoundIntStep(newValue, metaInfo.MinValue, metaInfo.MaxValue, (int)step);
+                }
+            }
+        }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error != "";
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent, Action<object> onChange)
+        {
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);
+            if(metaInfo.Error != "")
+            {
+                _error = metaInfo.Error;
+                // return DefaultDrawerUIToolKit(property, labelState);
+                return new VisualElement();
+            }
+
+            // VisualElement container = new VisualElement();
+
+            bool isFloat = metaInfo.IsFloat;
+            float curValue = isFloat ? property.floatValue : property.intValue;
+            float minValue = metaInfo.MinValue;
+            float maxValue = metaInfo.MaxValue;
+
+            // string label;
+            // // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            // switch (labelState)
+            // {
+            //     case LabelState.AsIs:
+            //         label = null;
+            //         break;
+            //     case LabelState.None:
+            //         label = "";
+            //         break;
+            //     case LabelState.EmptySpace:
+            //         label = " ";
+            //         break;
+            //     default:
+            //         throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
+            // }
+
+            // return container;
+            Slider element = new Slider(property.displayName, minValue, maxValue, SliderDirection.Horizontal, curValue);
+            element.RegisterValueChangedCallback(changed =>
+            {
+                float parsedValue = GetValue(metaInfo, changed.newValue);
+                if (isFloat)
+                {
+                    property.floatValue = parsedValue;
+                    onChange?.Invoke(parsedValue);
+                }
+                else
+                {
+                    int intValue = (int)parsedValue;
+                    property.intValue = intValue;
+                    onChange?.Invoke(intValue);
+                }
+
+            });
+
+            return element;
+        }
+
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) => _error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
 

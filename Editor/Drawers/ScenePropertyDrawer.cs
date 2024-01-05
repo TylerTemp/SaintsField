@@ -22,7 +22,8 @@ namespace SaintsField.Editor.Drawers
             return EditorGUIUtility.singleLineHeight;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             string[] scenes = GetScenes();
             bool anySceneInBuildSettings = scenes.Length > 0;
@@ -101,7 +102,7 @@ namespace SaintsField.Editor.Drawers
             return index == -1? 0: index;
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return _error != "";
         }

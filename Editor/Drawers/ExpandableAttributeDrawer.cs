@@ -14,13 +14,13 @@ namespace SaintsField.Editor.Drawers
 
         private bool _expanded;
 
-        protected override (bool isActive, Rect position) DrawPreLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             _expanded = EditorGUI.Foldout(position, _expanded, GUIContent.none, true);
             return (true, position);
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return true;
         }

@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Drawers
     {
         private string _error = "";
 
-        protected override (bool isActive, Rect position) DrawPreLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             if(IsDisabled(property, (ReadOnlyAttribute)saintsAttribute))
             {
@@ -22,14 +22,14 @@ namespace SaintsField.Editor.Drawers
             return (true, position);
         }
 
-        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool valueChanged)
         {
             EditorGUI.EndDisabledGroup();
             return true;
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return _error != "";
         }

@@ -214,4 +214,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6046fd5c7377274aad49737c20eb210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intDrag: 147
+  intDrag: 191
+  textArea: long warp long warp long warp long warp long warp long warp long warp
+    long warp long warp long warp long warp long warp long warp long warp long warp
+    long warp long warp long warp long warp long warp long warp long warp long warp
+    long wrap long warp

@@ -229,7 +229,7 @@ namespace SaintsField.Editor.Drawers
             // return targetChanged;
         }
 
-        protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return ((ShowImageAttribute)saintsAttribute).Above;
         }
@@ -245,7 +245,7 @@ namespace SaintsField.Editor.Drawers
             return ((ShowImageAttribute)saintsAttribute).Above? GetImageHeight(property, width, saintsAttribute): 0;
         }
 
-        protected override Rect DrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             if (_error != "")
             {
@@ -255,7 +255,7 @@ namespace SaintsField.Editor.Drawers
             return Draw(position, property, saintsAttribute);
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             // Debug.Log($"{((ShowImageAttribute)saintsAttribute).Above}/{_error}");
             bool willDrawBelow = !((ShowImageAttribute)saintsAttribute).Above || _error != "";

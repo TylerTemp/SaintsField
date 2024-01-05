@@ -5,6 +5,8 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using HelpBox = SaintsField.Editor.Utils.HelpBox;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -14,9 +16,9 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         private bool _overrideMessageType;
-        private EMessageType _messageType;
+        private MessageType _messageType;
 
-        protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
@@ -33,17 +35,50 @@ namespace SaintsField.Editor.Drawers
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
             return ((InfoBoxAttribute)saintsAttribute).Above
-                ? HelpBox.GetHeight(GetContent(property, (InfoBoxAttribute) saintsAttribute), width, _overrideMessageType? _messageType: infoboxAttribute.MessageType)
+                ? HelpBox.GetHeight(GetContent(property, (InfoBoxAttribute) saintsAttribute), width, _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType())
                 : 0;
         }
 
-        protected override Rect DrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            return HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType);
+            return HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType());
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateAboveUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
+
+            HelpBoxMessageType messageType;
+            MessageType imGuiMessageType = _overrideMessageType ? _messageType : infoboxAttribute.MessageType.GetMessageType();
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (imGuiMessageType)
+            {
+                case MessageType.None:
+                    messageType = HelpBoxMessageType.None;
+                    break;
+                case MessageType.Info:
+                    messageType = HelpBoxMessageType.Info;
+                    break;
+                case MessageType.Warning:
+                    messageType = HelpBoxMessageType.Warning;
+                    break;
+                case MessageType.Error:
+                    messageType = HelpBoxMessageType.Error;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(imGuiMessageType), imGuiMessageType, null);
+            }
+
+            return new UnityEngine.UIElements.HelpBox(GetContent(property, infoboxAttribute), messageType);
+            // return HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType);
+        }
+
+        protected override VisualElement
+            DrawBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute) =>
+            CreateAboveUIToolKit(property, saintsAttribute);
+
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             if (_error != "")
             {
@@ -66,7 +101,7 @@ namespace SaintsField.Editor.Drawers
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
             float boxHeight = !infoboxAttribute.Above && WillDraw(property, (InfoBoxAttribute)saintsAttribute)
-                ? HelpBox.GetHeight(GetContent(property, (InfoBoxAttribute)saintsAttribute), width, _overrideMessageType ? _messageType : infoboxAttribute.MessageType)
+                ? HelpBox.GetHeight(GetContent(property, (InfoBoxAttribute)saintsAttribute), width, _overrideMessageType ? _messageType : infoboxAttribute.MessageType.GetMessageType())
                 : 0f;
 
             float errorHeight = _error != "" ? HelpBox.GetHeight(_error, width, EMessageType.Error) : 0f;
@@ -76,7 +111,7 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            Rect leftRect = HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType);
+            Rect leftRect = HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType());
 
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (_error == "")
@@ -267,7 +302,7 @@ namespace SaintsField.Editor.Drawers
                 if (propertyValue is ValueTuple<EMessageType, string> resultTuple)
                 {
                     _overrideMessageType = true;
-                    _messageType = resultTuple.Item1;
+                    _messageType = resultTuple.Item1.GetMessageType();
                     return resultTuple.Item2;
                 }
                 else
@@ -282,7 +317,7 @@ namespace SaintsField.Editor.Drawers
                 if (fieldValue is ValueTuple<EMessageType, string> resultTuple)
                 {
                     _overrideMessageType = true;
-                    _messageType = resultTuple.Item1;
+                    _messageType = resultTuple.Item1.GetMessageType();
                     return resultTuple.Item2;
                 }
                 else
@@ -299,7 +334,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     (EMessageType messageType, string content) = ((EMessageType, string))methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
                     _overrideMessageType = true;
-                    _messageType = messageType;
+                    _messageType = messageType.GetMessageType();
                     return content;
                 }
                 else

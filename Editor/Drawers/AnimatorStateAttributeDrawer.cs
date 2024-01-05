@@ -5,7 +5,10 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.Animations;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
+using HelpBox = SaintsField.Editor.Utils.HelpBox;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -33,9 +36,220 @@ namespace SaintsField.Editor.Drawers
             return errorHeight + subRowHeight;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
+            List<AnimatorState> animatorStates = GetStates(property, saintsAttribute);
 
+            if (_errorMsg != "")
+            {
+                RenderErrorFallback(position, property);
+                return;
+            }
+
+            SerializedProperty curLayerIndexProp = property.FindPropertyRelative("layerIndex");
+            SerializedProperty curStateNameHashProp = property.FindPropertyRelative("stateNameHash");
+
+            string[] optionStrings = animatorStates.Select(each => each.stateName).ToArray();
+
+            int curIndex;
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                curIndex = Array.IndexOf(optionStrings, property.stringValue);
+            }
+            else
+            {
+                int curLayerIndex = curLayerIndexProp.intValue;
+                int curStateNameHash = curStateNameHashProp.intValue;
+                curIndex = animatorStates.FindIndex((each) =>
+                    each.layerIndex == curLayerIndex && each.stateNameHash == curStateNameHash);
+            }
+            if (curIndex == -1)
+            {
+                curIndex = 0;
+            }
+
+            if (!_onEnableChecked)  // check whether external source changed, to avoid caching an old value
+            {
+                _onEnableChecked = true;
+                SetPropValue(property, animatorStates[curIndex]);
+            }
+
+            // (Rect popupRect, Rect popupLeftRect) = RectUtils.SplitHeightRect(position, GetLabelFieldHeight(property, label, saintsAttribute));
+            // ReSharper disable once ConvertToUsingDeclaration
+            using (EditorGUI.ChangeCheckScope popupChanged = new EditorGUI.ChangeCheckScope())
+            {
+                curIndex = EditorGUI.Popup(
+                    position,
+                    label,
+                    curIndex,
+                    animatorStates.Select(each => new GUIContent(each.ToString())).ToArray(),
+                    EditorStyles.popup);
+
+                // ReSharper disable once InvertIf
+                if (popupChanged.changed)
+                {
+                    SetPropValue(property, animatorStates[curIndex]);
+                }
+            }
+            // RenderSubRow(popupLeftRect, property);
+        }
+
+        private static void SetPropValue(SerializedProperty property, AnimatorState animatorState)
+        {
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                property.stringValue = animatorState.stateName;
+            }
+            else
+            {
+                SerializedProperty curLayerIndexProp = property.FindPropertyRelative("layerIndex");
+                SerializedProperty curStateNameHashProp = property.FindPropertyRelative("stateNameHash");
+                SerializedProperty curStateNameProp = property.FindPropertyRelative("stateName");
+                SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
+                SerializedProperty curAnimationClipProp = property.FindPropertyRelative("animationClip");
+
+                curLayerIndexProp.intValue = animatorState.layerIndex;
+                curStateNameHashProp.intValue = animatorState.stateNameHash;
+                curStateNameProp.stringValue = animatorState.stateName;
+                curStateSpeedProp.floatValue = animatorState.stateSpeed;
+                curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
+            }
+        }
+
+        private DropdownField _dropdownField;
+        private FloatField _speedField;
+        private ObjectField _animationClipField;
+        private UnityEngine.UIElements.HelpBox _helpBoxElement;
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent, Action<object> onChange)
+        {
+            VisualElement container = new VisualElement();
+
+            _dropdownField = new DropdownField(property.displayName)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            _dropdownField.RegisterValueChangedCallback(v =>
+            {
+                AnimatorState selectedState = _curAnimatorStates[_dropdownField.index];
+                SetPropValue(property, selectedState);
+                property.serializedObject.ApplyModifiedProperties();
+                onChange?.Invoke(selectedState);
+                UpdateDisplay(property);
+            });
+            container.Add(_dropdownField);
+
+            if(property.propertyType != SerializedPropertyType.String)
+            {
+                SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
+                SerializedProperty curAnimationClipProp = property.FindPropertyRelative("animationClip");
+                // using (new EditorGUI.IndentLevelScope(1))
+                _speedField = new FloatField($"┣{curStateSpeedProp.displayName}")
+                {
+                    value = curStateSpeedProp.floatValue,
+                };
+                _speedField.SetEnabled(false);
+                container.Add(_speedField);
+                _animationClipField = new ObjectField($"┗{curAnimationClipProp.displayName}")
+                {
+                    value = curAnimationClipProp.objectReferenceValue,
+                };
+                _animationClipField.SetEnabled(false);
+                container.Add(_animationClipField);
+            }
+
+            _helpBoxElement = new UnityEngine.UIElements.HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+            container.Add(_helpBoxElement);
+
+            return container;
+        }
+
+        private void UpdateDisplay(SerializedProperty property)
+        {
+            if (_speedField == null)
+            {
+                return;
+            }
+
+            SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
+            SerializedProperty curAnimationClipProp = property.FindPropertyRelative("animationClip");
+            _speedField.value = curStateSpeedProp.floatValue;
+            _animationClipField.value = curAnimationClipProp.objectReferenceValue;
+        }
+
+        private string _preError = "";
+        private List<AnimatorState> _preAnimatorStates = new List<AnimatorState>();
+        private List<AnimatorState> _curAnimatorStates = new List<AnimatorState>();
+
+        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            List<AnimatorState> newAnimatorStates = _curAnimatorStates = GetStates(property, saintsAttribute);
+            // Debug.Log($"AnimatorStateAttributeDrawer: {newAnimatorStates}");
+            if (_errorMsg != _preError)
+            {
+                _preError = _errorMsg;
+                // _helpBoxElement.visible = _errorMsg != "";
+                _helpBoxElement.style.display = _errorMsg == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                _helpBoxElement.text = _errorMsg;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+                Debug.Log(_errorMsg);
+#endif
+            }
+
+            if (newAnimatorStates == null)
+            {
+                // _dropdownField.value = "-";
+                _dropdownField.choices = new List<string>();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+                Debug.Log("AnimatorStateAttributeDrawer: newAnimatorStates == null");
+#endif
+                return;
+            }
+
+            if(!_preAnimatorStates.SequenceEqual(newAnimatorStates))
+            {
+                _preAnimatorStates = newAnimatorStates;
+                _dropdownField.choices = newAnimatorStates.Select(each => each.ToString()).ToList();
+                int curSelect;
+                if (property.propertyType == SerializedPropertyType.String)
+                {
+                    curSelect = Util.ListIndexOfAction(newAnimatorStates, each => each.stateName == property.stringValue);
+                }
+                else
+                {
+                    curSelect = Util.ListIndexOfAction(newAnimatorStates, each =>
+                        each.stateNameHash == property.FindPropertyRelative("stateNameHash").intValue
+                        && each.layerIndex == property.FindPropertyRelative("layerIndex").intValue
+                    );
+                }
+
+                // _dropdownField.index = curSelect;
+                if(curSelect >= 0)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+                    Debug.Log($"AnimatorStateAttributeDrawer: set to = {_dropdownField.choices[curSelect]}");
+#endif
+                    _dropdownField.SetValueWithoutNotify(_dropdownField.choices[curSelect]);
+                    // _dropdownField.text = _dropdownField.choices[curSelect];
+                }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+                Debug.Log($"AnimatorStateAttributeDrawer: options={string.Join(",", _dropdownField.choices)}");
+#endif
+            }
+        }
+
+        private List<AnimatorState> GetStates(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
             AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute) saintsAttribute;
             string animFieldName = animatorStateAttribute.AnimFieldName;
 
@@ -54,8 +268,7 @@ namespace SaintsField.Editor.Drawers
                         break;
                     default:
                         _errorMsg = $"Animator controller not found in {targetObj}. Try specific a name instead.";
-                        DefaultDrawer(position, property, label);
-                        return;
+                        return null;
                 }
             }
             else
@@ -68,8 +281,7 @@ namespace SaintsField.Editor.Drawers
                 if (animProp == null)
                 {
                     _errorMsg = $"Can't find Animator {animFieldName}";
-                    RenderErrorFallback(position, property);
-                    return;
+                    return null;
                 }
                 animator = (Animator)animProp.objectReferenceValue;
             }
@@ -79,8 +291,7 @@ namespace SaintsField.Editor.Drawers
             {
                 _errorMsg = $"Animator {animFieldName} is null";
                 // Debug.Log(_errorMsg);
-                RenderErrorFallback(position, property);
-                return;
+                return null;
             }
 
             AnimatorController controller = (AnimatorController)animator.runtimeAnimatorController;
@@ -110,90 +321,17 @@ namespace SaintsField.Editor.Drawers
             if (animatorStates.Count == 0)
             {
                 _errorMsg = $"Animator {animFieldName} has no states";
-                RenderErrorFallback(position, property);
-                return;
+                return null;
             }
 
-            _errorMsg = "";
-
-            SerializedProperty curLayerIndexProp = property.FindPropertyRelative("layerIndex");
-            SerializedProperty curStateNameHashProp = property.FindPropertyRelative("stateNameHash");
-            SerializedProperty curStateNameProp = property.FindPropertyRelative("stateName");
-            SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
-            SerializedProperty curAnimationClipProp = property.FindPropertyRelative("animationClip");
-
-            string[] optionStrings = animatorStates.Select(each => each.stateName).ToArray();
-
-            int curIndex;
-            if (property.propertyType == SerializedPropertyType.String)
-            {
-                curIndex = Array.IndexOf(optionStrings, property.stringValue);
-            }
-            else
-            {
-                int curLayerIndex = curLayerIndexProp.intValue;
-                int curStateNameHash = curStateNameHashProp.intValue;
-                curIndex = animatorStates.FindIndex((each) =>
-                    each.layerIndex == curLayerIndex && each.stateNameHash == curStateNameHash);
-            }
-            if (curIndex == -1)
-            {
-                curIndex = 0;
-            }
-
-            if (!_onEnableChecked)  // check whether external source changed, to avoid caching an old value
-            {
-                _onEnableChecked = true;
-                AnimatorState animatorState = animatorStates[curIndex];
-                if (property.propertyType == SerializedPropertyType.String)
-                {
-                    property.stringValue = animatorState.stateName;
-                }
-                else
-                {
-                    curLayerIndexProp.intValue = animatorState.layerIndex;
-                    curStateNameHashProp.intValue = animatorState.stateNameHash;
-                    curStateNameProp.stringValue = animatorState.stateName;
-                    curStateSpeedProp.floatValue = animatorState.stateSpeed;
-                    curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
-                }
-            }
-
-            // (Rect popupRect, Rect popupLeftRect) = RectUtils.SplitHeightRect(position, GetLabelFieldHeight(property, label, saintsAttribute));
-            using (EditorGUI.ChangeCheckScope popupChanged = new EditorGUI.ChangeCheckScope())
-            {
-                curIndex = EditorGUI.Popup(
-                    position,
-                    label,
-                    curIndex,
-                    animatorStates.Select(each => new GUIContent(each.ToString())).ToArray(),
-                    EditorStyles.popup);
-
-                // ReSharper disable once InvertIf
-                if (popupChanged.changed)
-                {
-                    AnimatorState animatorState = animatorStates[curIndex];
-                    if (property.propertyType == SerializedPropertyType.String)
-                    {
-                        property.stringValue = animatorState.stateName;
-                    }
-                    else
-                    {
-                        curLayerIndexProp.intValue = animatorState.layerIndex;
-                        curStateNameHashProp.intValue = animatorState.stateNameHash;
-                        curStateNameProp.stringValue = animatorState.stateName;
-                        curStateSpeedProp.floatValue = animatorState.stateSpeed;
-                        curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
-                    }
-                }
-            }
-            // RenderSubRow(popupLeftRect, property);
+            return animatorStates;
         }
 
         private static void RenderErrorFallback(Rect position, SerializedProperty property)
         {
             if (property.propertyType == SerializedPropertyType.String)
             {
+                // ReSharper disable once ConvertToUsingDeclaration
                 using (EditorGUI.ChangeCheckScope onChange = new EditorGUI.ChangeCheckScope())
                 {
                     string newContent = EditorGUI.TextField(position, GUIContent.none, property.stringValue);
@@ -223,7 +361,7 @@ namespace SaintsField.Editor.Drawers
             // RenderSubRow(popupLeftRect, property);
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return property.propertyType != SerializedPropertyType.String;
         }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -8,6 +9,8 @@ using UnityEngine.UIElements;
 [CustomPropertyDrawer(typeof(UIKitPropDec))]
 public class UIKitPropDecDrawer : PropertyDrawer
 {
+    // private RichTextDrawer
+
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         // Create property container element.

@@ -9,17 +9,17 @@ namespace SaintsField.Samples.Scripts
 
         [AnimatorState]
         public AnimatorState animatorState;
+        //
+        // [AnimatorState(nameof(Animator))]
+        // public string animStateName;
 
-        [AnimatorState(nameof(Animator))]
-        public string animStateName;
-
-        [AnimatorParam]
-        public string animParamName;
-
-        [AnimatorParam(nameof(Animator))]
-        public int animParamHash;
-
-        [AnimatorParam(nameof(Animator))]
-        public int[] animParamHashes;
+        // [AnimatorParam]
+        // public string animParamName;
+        //
+        // [AnimatorParam(nameof(Animator))]
+        // public int animParamHash;
+        //
+        // [AnimatorParam(nameof(Animator))]
+        // public int[] animParamHashes;
     }
 }

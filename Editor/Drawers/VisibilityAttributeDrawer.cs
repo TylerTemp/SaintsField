@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Drawers
 
         private readonly List<string> _errors = new List<string>();
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return _errors.Count > 0;
         }

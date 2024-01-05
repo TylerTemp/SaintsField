@@ -93,7 +93,7 @@ namespace SaintsField.Editor.Drawers
             return Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, previewTexture.width, previewTexture.height);
         }
 
-        protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return ((AssetPreviewAttribute)saintsAttribute).Above;
         }
@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Drawers
             return ((AssetPreviewAttribute)saintsAttribute).Above? GetExtraHeight(property, width, saintsAttribute): 0;
         }
 
-        protected override Rect DrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             string error = MismatchError(property);
             if (error != null)
@@ -122,7 +122,7 @@ namespace SaintsField.Editor.Drawers
         }
 
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             if (MismatchError(property) != null)
             {

@@ -3,6 +3,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using HelpBox = SaintsField.Editor.Utils.HelpBox;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -13,14 +16,49 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => 0;
 
-        protected override bool DrawPostField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool valueChanged)
+        {
+            if (!DoCheckComponent(property, saintsAttribute))
+            {
+                return false;
+            }
+            SetValueChanged(property);
+            return true;
+        }
+
+        protected override VisualElement DrawPostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, Action<object> onChange)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+            Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
+#endif
+            Object added = DoCheckComponent(property, saintsAttribute);
+            if (!added)
+            {
+                return null;
+            }
+
+            property.serializedObject.ApplyModifiedProperties();
+
+            onChange?.Invoke(added);
+
+            return new VisualElement
+            {
+                style =
+                {
+                    width = 0,
+                },
+            };
+        }
+
+        private Object DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             _error = "";
 
             if (property.objectReferenceValue != null)
             {
-                return false;
+                return null;
             }
 
             GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
@@ -45,12 +83,15 @@ namespace SaintsField.Editor.Drawers
                         break;
                     default:
                         _error = "GetComponent can only be used on Component or GameObject";
-                        return false;
+                        return null;
                 }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+                Debug.Log($"GetComponent Add {resultGo} for {property.propertyPath}");
+#endif
+
                 property.objectReferenceValue = resultGo;
-                SetValueChanged(property);
-                return true;
+                return resultGo;
             }
 
             Transform transform;
@@ -64,17 +105,17 @@ namespace SaintsField.Editor.Drawers
                     break;
                 default:
                     _error = "GetComponent can only be used on Component or GameObject";
-                    return false;
+                    return null;
             }
 
             Component componentOnSelf = transform.GetComponent(type);
             if (componentOnSelf == null)
             {
                 _error = $"No {type} found on {transform.name}";
-                return false;
+                return null;
             }
 
-            UnityEngine.Object result = componentOnSelf;
+            Object result = componentOnSelf;
 
             // if (fieldType != type)
             // {
@@ -88,15 +129,28 @@ namespace SaintsField.Editor.Drawers
             //     }
             // }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+            Debug.Log($"GetComponent Add {result} for {property.propertyPath}");
+#endif
+
             property.objectReferenceValue = result;
-            SetValueChanged(property);
-            return true;
+            return result;
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool WillDrawBelow(SerializedProperty property,
             ISaintsAttribute saintsAttribute) => _error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: HelpBox.GetHeight(_error, width, EMessageType.Error);
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: HelpBox.Draw(position, _error, EMessageType.Error);
+
+        protected override VisualElement DrawBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+            Debug.Log($"GetComponent error {_error}");
+#endif
+            return _error != ""
+                ? new UnityEngine.UIElements.HelpBox(_error, HelpBoxMessageType.Error)
+                : null;
+        }
     }
 }

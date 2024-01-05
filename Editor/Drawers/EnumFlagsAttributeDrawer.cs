@@ -87,7 +87,8 @@ namespace SaintsField.Editor.Drawers
             return EditorGUIUtility.singleLineHeight * (valueCount + 1);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
             if (!_initExpandState)

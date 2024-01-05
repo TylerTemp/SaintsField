@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -21,7 +20,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override (bool willDraw, Rect drawPosition) DrawOverlay(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel, IReadOnlyCollection<Rect> takenPositions)
+            ISaintsAttribute saintsAttribute, bool hasLabel)
         {
             string inputContent = GetContent(property);
             if (inputContent == null)  // null=error
@@ -151,7 +150,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             SerializedPropertyType propType = property.propertyType;
             bool notOk = propType != SerializedPropertyType.Integer && propType != SerializedPropertyType.Float && propType != SerializedPropertyType.String;

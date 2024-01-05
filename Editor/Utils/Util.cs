@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Utils
 {
@@ -216,6 +219,67 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static string GetLabelString(SaintsPropertyDrawer.LabelState labelState)
+        {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (labelState)
+            {
+                case SaintsPropertyDrawer.LabelState.None:
+                    return "";
+                    break;
+                case SaintsPropertyDrawer.LabelState.AsIs:
+                    return null;
+                    break;
+                case SaintsPropertyDrawer.LabelState.EmptySpace:
+                    return " ";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
+            }
+        }
 
+        public static Label PrefixLabelUIToolKit(SaintsPropertyDrawer.LabelState labelState, string label)
+        {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (labelState)
+            {
+                case SaintsPropertyDrawer.LabelState.None:
+                    return null;
+                case SaintsPropertyDrawer.LabelState.AsIs:
+                    return new Label(label)
+                    {
+                        style =
+                        {
+                            flexShrink = 0,
+                            width = SaintsPropertyDrawer.LabelBaseWidth,
+                            left = SaintsPropertyDrawer.LabelLeftSpace,
+                        },
+                    };
+                case SaintsPropertyDrawer.LabelState.EmptySpace:
+                    return new Label(" ")                    {
+                        style =
+                        {
+                            flexShrink = 0,
+                            width = SaintsPropertyDrawer.LabelBaseWidth,
+                            left = SaintsPropertyDrawer.LabelLeftSpace,
+                        },
+                    };
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
+            }
+        }
+
+        public static int ListIndexOfAction<T>(IReadOnlyList<T> lis, Func<T, bool> callback)
+        {
+            foreach (int index in Enumerable.Range(0, lis.Count))
+            {
+                if (callback(lis[index]))
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
     }
 }

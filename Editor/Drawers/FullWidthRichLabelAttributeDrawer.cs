@@ -5,6 +5,8 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using HelpBox = SaintsField.Editor.Utils.HelpBox;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -21,7 +23,7 @@ namespace SaintsField.Editor.Drawers
             _richTextDrawer.Dispose();
         }
 
-        protected override bool WillDrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             // Debug.Log("ABOVE!");
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
@@ -34,12 +36,17 @@ namespace SaintsField.Editor.Drawers
             return fullWidthRichLabelAttribute.Above? EditorGUIUtility.singleLineHeight: 0;
         }
 
-        protected override Rect DrawAbove(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            return Draw(position, property, label, saintsAttribute);
+            return DrawImGui(position, property, label, saintsAttribute);
         }
 
-        public Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateAboveUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            return DrawUIToolKit(property, saintsAttribute);
+        }
+
+        private Rect DrawImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
 
@@ -54,6 +61,37 @@ namespace SaintsField.Editor.Drawers
 
             _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
             return leftRect;
+        }
+
+        private VisualElement DrawUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
+
+            string labelXml = GetLabelXml(property, fullWidthRichLabelAttribute);
+
+            if (labelXml is null)
+            {
+                return new VisualElement();
+            }
+
+            VisualElement container = new VisualElement
+            {
+                style =
+                {
+                    // height = EditorGUIUtility.singleLineHeight,
+                    flexDirection = FlexDirection.Row,
+                    flexWrap = Wrap.Wrap,
+                    // alignItems = Align.Center, // vertical
+                    // overflow = Overflow.Hidden,
+                },
+                pickingMode = PickingMode.Ignore,
+            };
+            foreach (VisualElement variable in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(labelXml, property.displayName)))
+            {
+                container.Add(variable);
+            }
+
+            return container;
         }
 
         private string GetLabelXml(SerializedProperty property, FullWidthRichLabelAttribute targetAttribute)
@@ -122,7 +160,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override bool WillDrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             return !fullWidthRichLabelAttribute.Above || _error != "";
@@ -143,11 +181,30 @@ namespace SaintsField.Editor.Drawers
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
             {
-                useRect = Draw(position, property, label, fullWidthRichLabelAttribute);
+                useRect = DrawImGui(position, property, label, fullWidthRichLabelAttribute);
             }
             return _error == ""
                 ? useRect
                 : HelpBox.Draw(useRect, _error, MessageType.Error);
+        }
+
+        protected override VisualElement DrawBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            VisualElement container = new VisualElement();
+
+            FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute) saintsAttribute;
+            if (!fullWidthRichLabelAttribute.Above)
+            {
+                // useRect = DrawImGui(position, property, label, fullWidthRichLabelAttribute);
+                container.Add(DrawUIToolKit(property, fullWidthRichLabelAttribute));
+            }
+
+            if (_error != "")
+            {
+                container.Add(new UnityEngine.UIElements.HelpBox(_error, HelpBoxMessageType.Error));
+            }
+
+            return container;
         }
     }
 }

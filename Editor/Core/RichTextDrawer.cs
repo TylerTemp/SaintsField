@@ -7,6 +7,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Core
 {
@@ -372,6 +373,54 @@ namespace SaintsField.Editor.Core
                 GUI.Label(textRect, curGUIContent, textStyle);
 
                 labelRect = leftRect;
+            }
+        }
+
+        public IEnumerable<VisualElement> DrawChunksUIToolKit(string oldLabel, IEnumerable<RichTextChunk> payloads)
+        {
+            foreach(RichTextChunk curChunk in payloads)
+            {
+                if (!curChunk.IsIcon)
+                {
+                    yield return new Label(oldLabel)
+                    {
+                        style =
+                        {
+                            flexShrink = 0,
+                        },
+                    };
+                }
+                else
+                {
+                    TextureCacheKey cacheKey = new TextureCacheKey
+                    {
+                        ColorPresent = "",
+                        IconPath = curChunk.Content,
+                    };
+
+                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
+                    {
+                        texture = LoadTexture(curChunk.Content);
+                        if (texture.width != 1 && texture.height != 1)
+                        {
+                            _textureCache.Add(cacheKey, texture);
+                        }
+                    }
+
+                    Image img = new Image
+                    {
+                        image = texture,
+                        scaleMode = ScaleMode.ScaleToFit,
+                        tintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
+                    };
+                    img.style.width = img.style.height = EditorGUIUtility.singleLineHeight - 2;
+                    img.style.flexShrink = 0;
+
+#if EXT_INSPECTOR_LOG
+                    Debug.Log($"#draw# icon <{curChunk.Content} {curChunk.IconColor}/>");
+#endif
+                    yield return img;
+                }
             }
         }
 
