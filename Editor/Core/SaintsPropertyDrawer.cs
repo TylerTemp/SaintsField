@@ -581,11 +581,9 @@ namespace SaintsField.Editor.Core
 
             #region post field
 
-            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in _saintsPropertyDrawers)
             {
-                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-
-                VisualElement postFieldElement = drawerInstance.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.SaintsAttribute, Debug.Log);
+                VisualElement postFieldElement = eachAttributeWithIndex.Drawer.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent, Debug.Log);
                 if (postFieldElement != null)
                 {
                     postFieldElement.style.flexShrink = 0;
@@ -1443,7 +1441,8 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, Action<object> onChange)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
+            Action<object> onChange)
         {
             return null;
         }

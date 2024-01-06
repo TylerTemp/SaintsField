@@ -1,7 +1,9 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -10,6 +12,8 @@ namespace SaintsField.Editor.Drawers
     public class PostFieldButtonAttributeDrawer: DecButtonAttributeDrawer
     {
         private const float PaddingWidth = 3f;
+
+        #region IMGUI
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute)
@@ -45,5 +49,34 @@ namespace SaintsField.Editor.Drawers
             DisplayError == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, DisplayError, MessageType.Error);
+        #endregion
+
+        #region UIToolkit
+
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
+            Action<object> onChange)
+        {
+            VisualElement element = DrawUIToolkit(property, saintsAttribute, index, parent, container);
+            element.style.flexGrow = StyleKeyword.Null;
+            return element;
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            VisualElement visualElement = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            visualElement.Add(DrawLabelError(property, index));
+            visualElement.Add(DrawExecError(property, index));
+            return visualElement;
+        }
+
+        #endregion
     }
 }
