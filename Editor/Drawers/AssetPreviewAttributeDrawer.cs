@@ -250,7 +250,8 @@ namespace SaintsField.Editor.Drawers
 
         private static string ClassImage(SerializedProperty property) => $"{property.propertyPath}__Image";
 
-        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             if (!assetPreviewAttribute.Above)
@@ -263,7 +264,8 @@ namespace SaintsField.Editor.Drawers
             return image;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             if (assetPreviewAttribute.Above)
@@ -276,7 +278,9 @@ namespace SaintsField.Editor.Drawers
             return image;
         }
 
-        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement containerElement)
+        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement containerElement, object parent)
         {
             Image image = containerElement.Query<Image>(className: ClassImage(property)).First();
             int preInstanceId = (int)image.userData;

@@ -15,7 +15,8 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute)
         {
             object target = property.serializedObject.targetObject;
-            string labelXml = GetButtonLabelXml((DecButtonAttribute)saintsAttribute, target, target.GetType());
+            (string error, string labelXml) = GetButtonLabelXml((DecButtonAttribute)saintsAttribute, target, target.GetType());
+            _error = error;
             return PaddingWidth*2 + Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(labelXml, label.text))));
         }
 

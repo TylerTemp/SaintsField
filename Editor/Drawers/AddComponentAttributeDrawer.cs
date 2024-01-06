@@ -54,7 +54,8 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             DoCheckComponent(property, saintsAttribute);
             return new VisualElement();

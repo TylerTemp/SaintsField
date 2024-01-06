@@ -1,6 +1,7 @@
 ﻿using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -29,5 +30,25 @@ namespace SaintsField.Editor.Drawers
 
             return leftRect;
         }
+
+        #region UIToolkit
+
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            VisualElement visualElement = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            visualElement.Add(DrawUIToolkit(property, saintsAttribute, index, parent, container));
+            visualElement.Add(DrawLabelError(property, index));
+            visualElement.Add(DrawExecError(property, index));
+            return visualElement;
+        }
+
+        #endregion
     }
 }

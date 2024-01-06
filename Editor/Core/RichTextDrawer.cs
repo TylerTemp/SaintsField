@@ -382,7 +382,7 @@ namespace SaintsField.Editor.Core
             {
                 if (!curChunk.IsIcon)
                 {
-                    yield return new Label(oldLabel)
+                    yield return new Label(curChunk.Content)
                     {
                         style =
                         {

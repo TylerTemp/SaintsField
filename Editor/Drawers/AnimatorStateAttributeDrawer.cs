@@ -197,7 +197,8 @@ namespace SaintsField.Editor.Drawers
             return container;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -215,7 +216,8 @@ namespace SaintsField.Editor.Drawers
         // private List<AnimatorState> _curAnimatorStates = new List<AnimatorState>();
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement containerElement)
+            int index,
+            VisualElement containerElement, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
             DropdownField dropdownField = containerElement.Query<DropdownField>(className: ClassDropdownField(property))

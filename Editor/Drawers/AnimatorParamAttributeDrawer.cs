@@ -284,7 +284,8 @@ namespace SaintsField.Editor.Drawers
             return dropdownField;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -301,7 +302,9 @@ namespace SaintsField.Editor.Drawers
         private static bool ParamNameEquals(AnimatorControllerParameter param, SerializedProperty prop) => param.name == prop.stringValue;
         private static bool ParamHashEquals(AnimatorControllerParameter param, SerializedProperty prop) => param.nameHash == prop.intValue;
 
-        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement containerElement)
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int element,
+            VisualElement containerElement, object parent)
         {
             DropdownField dropdownField = containerElement.Query<DropdownField>(className: ClassDropdownField(property)).First();
             MetaInfo metaInfo = (MetaInfo)dropdownField.userData;
@@ -315,7 +318,8 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement containerElement)
+            int index,
+            VisualElement containerElement, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
 

@@ -504,6 +504,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute) => new HelpBox(_error, HelpBoxMessageType.Error);
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox(_error, HelpBoxMessageType.Error);
     }
 }
