@@ -175,18 +175,18 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement containerElement, object parent)
+            VisualElement container, object parent)
         {
             if (parent == null)
             {
                 return;
             }
 
-            VisualElement labelContainer = containerElement.Query<VisualElement>(className: ClassLabelContainer(property, index)).First();
+            VisualElement labelContainer = container.Query<VisualElement>(className: ClassLabelContainer(property, index)).First();
             string oldXml = (string)labelContainer.userData;
             (string error, string newXml) = GetButtonLabelXml((DecButtonAttribute) saintsAttribute, parent, parent.GetType());
 
-            HelpBox helpBox = containerElement.Query<HelpBox>(className: ClassLabelError(property, index)).First();
+            HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
             helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
             helpBox.text = error;
 

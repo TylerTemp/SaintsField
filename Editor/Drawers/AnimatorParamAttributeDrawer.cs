@@ -319,11 +319,11 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement containerElement, object parent)
+            VisualElement container, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
 
-            DropdownField dropdownField = containerElement.Query<DropdownField>(className: ClassDropdownField(property)).First();
+            DropdownField dropdownField = container.Query<DropdownField>(className: ClassDropdownField(property)).First();
 
             MetaInfo curMetaInfo = (MetaInfo) dropdownField.userData;
             dropdownField.userData = metaInfo;
@@ -333,7 +333,7 @@ namespace SaintsField.Editor.Drawers
 
             if(!errorEqual)
             {
-                HelpBox helpBoxElement = containerElement.Query<HelpBox>(className: ClassHelpBox(property)).First();
+                HelpBox helpBoxElement = container.Query<HelpBox>(className: ClassHelpBox(property)).First();
                 helpBoxElement.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
                 helpBoxElement.text = metaInfo.Error;
             }

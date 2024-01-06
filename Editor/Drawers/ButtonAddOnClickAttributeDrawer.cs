@@ -7,7 +7,8 @@ using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -22,13 +23,16 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool valueChanged)
         {
-            _error = "";
+            _error = BindButtonEvent(property, saintsAttribute, GetParentTarget(property));
+            return true;
+        }
 
+        private static string BindButtonEvent(SerializedProperty property, ISaintsAttribute saintsAttribute, object objTarget)
+        {
             ButtonAddOnClickAttribute buttonAddOnClickAttribute = (ButtonAddOnClickAttribute) saintsAttribute;
 
             string funcName = buttonAddOnClickAttribute.FuncName;
             string buttonComp = buttonAddOnClickAttribute.ButtonComp;
-            object objTarget = GetParentTarget(property);
 
             #region Button
 
@@ -44,16 +48,14 @@ namespace SaintsField.Editor.Drawers
                 {
                     if (objTarget == null)
                     {
-                        _error = "Can not find parent target";
-                        return false;
+                        return "Can not find parent target";
                     }
 
                     uiButton = GetUiButton(objTarget);
 
                     if (uiButton is null)
                     {
-                        _error = "Parent target is not GameObject or Component";
-                        return false;
+                        return "Parent target is not GameObject or Component";
                     }
                 }
             }
@@ -61,8 +63,7 @@ namespace SaintsField.Editor.Drawers
             {
                 if (objTarget == null)
                 {
-                    _error = "Can not find parent target";
-                    return false;
+                    return "Can not find parent target";
                 }
 
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
@@ -84,9 +85,8 @@ namespace SaintsField.Editor.Drawers
                         Debug.Assert(methodParams.All(p => p.IsOptional));
                         if (methodInfo.ReturnType != typeof(Button))
                         {
-                            _error =
+                            return
                                 $"Expect returning Button from `{buttonComp}`, get {methodInfo.ReturnType}";
-                            return false;
                         }
 
                         try
@@ -97,23 +97,19 @@ namespace SaintsField.Editor.Drawers
                         catch (TargetInvocationException e)
                         {
                             Debug.Assert(e.InnerException != null);
-                            _error = e.InnerException.Message;
                             Debug.LogException(e);
-                            return false;
+                            return e.InnerException.Message;
                         }
                         catch (Exception e)
                         {
-                            _error = e.Message;
                             Debug.LogException(e);
-                            return false;
+                            return e.Message;
                         }
                     }
                         break;
                     case ReflectUtils.GetPropType.NotFound:
                     {
-                        _error =
-                            $"not found `{buttonComp}` on `{objTarget}`";
-                        return false;
+                        return $"not found `{buttonComp}` on `{objTarget}`";
                     }
                     default:
                         throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
@@ -122,12 +118,7 @@ namespace SaintsField.Editor.Drawers
 
             if (uiButton == null)
             {
-                if (_error == "")
-                {
-                    _error = "Can not find Button";
-                }
-
-                return false;
+                return "Can not find Button";
             }
 
             #endregion
@@ -138,8 +129,7 @@ namespace SaintsField.Editor.Drawers
 
             if (objTarget == null)
             {
-                _error = "Can not find parent target";
-                return false;
+                return "Can not find parent target";
             }
 
             // ReSharper disable once LoopCanBeConvertedToQuery
@@ -152,7 +142,7 @@ namespace SaintsField.Editor.Drawers
                     // _error = $"`{funcName}` already added to `{uiButton}`";
                     // already there
                     // Debug.Log($"`{funcName}` already added to `{uiButton}`");
-                    return false;
+                    return "";
                 }
             }
             #endregion
@@ -161,8 +151,7 @@ namespace SaintsField.Editor.Drawers
             UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), objTarget, funcName);
 
             UnityEventTools.AddPersistentListener(uiButton.onClick, action);
-
-            return true;
+            return "";
         }
 
         private static Button GetUiButton(object objTarget)
@@ -187,5 +176,16 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+
+        #region UIToolkit
+
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            BindButtonEvent(property, saintsAttribute, parent);
+            return null;
+        }
+
+        #endregion
     }
 }

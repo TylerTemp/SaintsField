@@ -217,10 +217,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement containerElement, object parent)
+            VisualElement container, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
-            DropdownField dropdownField = containerElement.Query<DropdownField>(className: ClassDropdownField(property))
+            DropdownField dropdownField = container.Query<DropdownField>(className: ClassDropdownField(property))
                 .First();
 
             MetaInfo curMetaInfo = (MetaInfo) dropdownField.userData;
@@ -230,7 +230,7 @@ namespace SaintsField.Editor.Drawers
             if (curMetaInfo.Error != metaInfo.Error)
             {
                 // _helpBoxElement.visible = _errorMsg != "";
-                HelpBox helpBoxElement = containerElement.Query<HelpBox>(className: ClassHelpBox(property)).First();
+                HelpBox helpBoxElement = container.Query<HelpBox>(className: ClassHelpBox(property)).First();
                 helpBoxElement.style.display = _errorMsg == "" ? DisplayStyle.None : DisplayStyle.Flex;
                 helpBoxElement.text = metaInfo.Error;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_STATE_DRAW_PROCESS

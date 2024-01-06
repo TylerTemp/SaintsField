@@ -280,9 +280,9 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement containerElement, object parent)
+            VisualElement container, object parent)
         {
-            Image image = containerElement.Query<Image>(className: ClassImage(property)).First();
+            Image image = container.Query<Image>(className: ClassImage(property)).First();
             int preInstanceId = (int)image.userData;
             int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
 

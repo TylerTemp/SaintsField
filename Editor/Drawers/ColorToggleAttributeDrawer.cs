@@ -5,7 +5,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UI.Image;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -26,6 +28,7 @@ namespace SaintsField.Editor.Drawers
 
         private struct Container
         {
+            public string Error;
             public FieldType FieldType;
             public Image Image;
             public SpriteRenderer SpriteRenderer;
@@ -45,121 +48,11 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            ColorToggleAttribute toggleAttribute = (ColorToggleAttribute)saintsAttribute;
-            string imageCompName = toggleAttribute.CompName;
+            _container = GetContainer(saintsAttribute, GetParentTarget(property));
 
-            Object targetObject = (Object) GetParentTarget(property);
-            SerializedObject targetSer = new SerializedObject(targetObject);
-
-            _error = "";
-            if(imageCompName != null)
+            if (_container.Error != "")
             {
-                SerializedProperty targetProperty =
-                    targetSer.FindProperty(imageCompName) ??
-                    SerializedUtils.FindPropertyByAutoPropertyName(targetSer, imageCompName);
-
-                if (targetProperty != null)
-                {
-                    SignObject(targetProperty.objectReferenceValue);
-                }
-                else
-                {
-                    Type targetType = targetObject.GetType();
-
-                    // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) propInfo =
-                    //     ReflectUtils.GetProp(targetType, imageCompName);
-                    // switch (propInfo)
-                    // {
-                    //     case (ReflectUtils.GetPropType.NotFound, _):
-                    //         _error = $"target {imageCompName} not found";
-                    //         return 0;
-                    //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                    //         SignObject(foundFieldInfo.GetValue(targetObject));
-                    //         break;
-                    //     case (ReflectUtils.GetPropType.Property, PropertyInfo foundPropertyInfo):
-                    //         SignObject(foundPropertyInfo.GetValue(targetObject));
-                    //         break;
-                    //     case (ReflectUtils.GetPropType.Method, MethodInfo foundMethodInfo):
-                    //         SignObject(foundMethodInfo.Invoke(targetObject, null));
-                    //         break;
-                    // }
-
-                    (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) propInfo =
-                        ReflectUtils.GetProp(targetType, imageCompName);
-
-                    if (propInfo.Item1 == ReflectUtils.GetPropType.NotFound)
-                    {
-                        _error = $"target {imageCompName} not found";
-                        return 0;
-                    }
-                    else if (propInfo.Item1 == ReflectUtils.GetPropType.Field && propInfo.Item2 is FieldInfo foundFieldInfo)
-                    {
-                        SignObject(foundFieldInfo.GetValue(targetObject));
-                    }
-                    else if (propInfo.Item1 == ReflectUtils.GetPropType.Property && propInfo.Item2 is PropertyInfo foundPropertyInfo)
-                    {
-                        SignObject(foundPropertyInfo.GetValue(targetObject));
-                    }
-                    else if (propInfo.Item1 == ReflectUtils.GetPropType.Method && propInfo.Item2 is MethodInfo foundMethodInfo)
-                    {
-                        SignObject(foundMethodInfo.Invoke(targetObject, null));
-                    }
-
-                }
-            }
-            else
-            {
-                Component thisComponent;
-                try
-                {
-                    thisComponent = (Component)targetObject;
-                }
-                catch (InvalidCastException e)
-                {
-                    Debug.LogException(e);
-                    _error = $"target {targetObject} is not a Component";
-                    return 0;
-                }
-
-                Image image = thisComponent.GetComponent<Image>();
-                if (image != null)
-                {
-                    SignObject(image);
-                }
-                else
-                {
-                    Button button = thisComponent.GetComponent<Button>();
-                    if (button)
-                    {
-                        SignObject(button);
-                    }
-
-                    else
-                    {
-                        SpriteRenderer spriteRenderer = thisComponent.GetComponent<SpriteRenderer>();
-                        if (spriteRenderer)
-                        {
-                            SignObject(spriteRenderer);
-                        }
-                        else
-                        {
-                            Renderer renderer = thisComponent.GetComponent<Renderer>();
-                            if (renderer)
-                            {
-                                SignObject(renderer);
-                            }
-                            else
-                            {
-                                _error = $"target {targetObject} has no Image, SpriteRenderer, Button or Renderer";
-                                return 0;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (_error != "")
-            {
+                _error = _container.Error;
                 return 0;
             }
 
@@ -170,42 +63,139 @@ namespace SaintsField.Editor.Drawers
             return width;
         }
 
-        private void SignObject(object foundObj)
+        private static Container GetContainer(ISaintsAttribute saintsAttribute, object parent)
+        {
+            ColorToggleAttribute toggleAttribute = (ColorToggleAttribute)saintsAttribute;
+            string imageCompName = toggleAttribute.CompName;
+
+            Object targetObject = (Object) parent;
+            SerializedObject targetSer = new SerializedObject(targetObject);
+
+            if(imageCompName != null)
+            {
+                SerializedProperty targetProperty =
+                    targetSer.FindProperty(imageCompName) ??
+                    SerializedUtils.FindPropertyByAutoPropertyName(targetSer, imageCompName);
+
+                if (targetProperty != null)
+                {
+                    return SignObject(targetProperty.objectReferenceValue);
+                }
+
+                Type targetType = targetObject.GetType();
+
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) propInfo =
+                    ReflectUtils.GetProp(targetType, imageCompName);
+
+                // ReSharper disable once ConvertIfStatementToSwitchStatement
+                if (propInfo.Item1 == ReflectUtils.GetPropType.NotFound)
+                {
+                    return new Container
+                    {
+                        Error = $"target {imageCompName} not found",
+                    };
+                }
+
+                if (propInfo.Item1 == ReflectUtils.GetPropType.Field && propInfo.Item2 is FieldInfo foundFieldInfo)
+                {
+                    return SignObject(foundFieldInfo.GetValue(targetObject));
+                }
+                if (propInfo.Item1 == ReflectUtils.GetPropType.Property && propInfo.Item2 is PropertyInfo foundPropertyInfo)
+                {
+                    return SignObject(foundPropertyInfo.GetValue(targetObject));
+                }
+                if (propInfo.Item1 == ReflectUtils.GetPropType.Method && propInfo.Item2 is MethodInfo foundMethodInfo)
+                {
+                    return SignObject(foundMethodInfo.Invoke(targetObject, null));
+                }
+
+                throw new Exception("Should not reach here");
+            }
+
+            Component thisComponent;
+            try
+            {
+                thisComponent = (Component)targetObject;
+            }
+            catch (InvalidCastException e)
+            {
+                Debug.LogException(e);
+                return new Container
+                {
+                    Error = $"target {targetObject} is not a Component",
+                };
+            }
+
+            Image image = thisComponent.GetComponent<Image>();
+            if (image != null)
+            {
+                return SignObject(image);
+            }
+
+            Button button = thisComponent.GetComponent<Button>();
+            if (button)
+            {
+                return SignObject(button);
+            }
+
+            SpriteRenderer spriteRenderer = thisComponent.GetComponent<SpriteRenderer>();
+            if (spriteRenderer)
+            {
+                return SignObject(spriteRenderer);
+            }
+
+            Renderer renderer = thisComponent.GetComponent<Renderer>();
+            if (renderer)
+            {
+                return SignObject(renderer);
+            }
+
+            return new Container
+            {
+                Error = $"target {targetObject} has no Image, SpriteRenderer, Button or Renderer",
+            };
+        }
+
+        private static Container SignObject(object foundObj)
         {
             switch (foundObj)
             {
                 case Image image:
-                    _container = new Container
+                    return new Container
                     {
                         FieldType = FieldType.Image,
                         Image = image,
+                        Error = "",
                     };
-                    break;
                 case SpriteRenderer spriteRenderer:
-                    _container = new Container
+                    return new Container
                     {
                         FieldType = FieldType.SpriteRenderer,
                         SpriteRenderer = spriteRenderer,
+                        Error = "",
                     };
-                    break;
                 case Button button:
-                    _container = new Container
+                    return new Container
                     {
                         FieldType = FieldType.Button,
                         Button = button,
+                        Error = "",
                     };
-                    break;
                 case Renderer renderer:
-                    _container = new Container
+                    return new Container
                     {
                         FieldType = FieldType.Renderer,
                         Renderer = renderer,
+                        Error = "",
                     };
-                    break;
                 default:
-                    _error = $"Not supported type: {(foundObj == null ? "null" : foundObj.GetType().ToString())}";
-                    _container = new Container { FieldType = FieldType.NotFoundOrValid };
-                    break;
+                    string error = $"Not supported type: {(foundObj == null ? "null" : foundObj.GetType().ToString())}";
+                    return new Container
+                    {
+                        FieldType = FieldType.NotFoundOrValid,
+                        Error = error,
+                    };
+                    // break;
             }
         }
 
@@ -305,5 +295,90 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+
+        #region UIToolkit
+
+        private static string ClassLabelError(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__LabelError";
+        private static string ClassButton(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__Button";
+        private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ButtonLabel";
+
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
+            Action<object> onChange)
+        {
+            UnityEngine.UIElements.Button button = new UnityEngine.UIElements.Button(() =>
+            {
+                Container dataContainer = GetContainer(saintsAttribute, parent);
+                string error = dataContainer.Error;
+                HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
+                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
+                helpBox.text = error;
+
+                if (error == "")
+                {
+                    SetColor(dataContainer, property.colorValue, ((ColorToggleAttribute)saintsAttribute).Index);
+                    container.Query<Label>(className: ClassButtonLabel(property, index)).First().text = SelectedStr;
+                    // Debug.Log(SelectedStr);
+                    // onChange?.Invoke(property.colorValue);
+                }
+            })
+            {
+                style =
+                {
+                    height = EditorGUIUtility.singleLineHeight,
+                },
+            };
+            button.AddToClassList(ClassButton(property, index));
+
+            VisualElement labelContainer = new Label(NonSelectedStr)
+            {
+                userData = null,
+            };
+            labelContainer.AddToClassList(ClassButtonLabel(property, index));
+            // labelContainer.Add(new Label("test label"));
+
+            button.Add(labelContainer);
+            // button.AddToClassList();
+            return button;
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+            helpBox.AddToClassList(ClassLabelError(property, index));
+            return helpBox;
+        }
+
+        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            Container dataContainer = GetContainer(saintsAttribute, parent);
+            string error = dataContainer.Error;
+            HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
+            helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
+            helpBox.text = error;
+
+            if (error != "")
+            {
+                return;
+            }
+
+            ColorToggleAttribute toggleAttribute = (ColorToggleAttribute)saintsAttribute;
+
+            Color thisColor = property.colorValue;
+            Color usingColor = GetColor(dataContainer, toggleAttribute.Index);
+
+            bool isToggled = thisColor == usingColor;
+            container.Query<Label>(className: ClassButtonLabel(property, index)).First().text = isToggled? SelectedStr: NonSelectedStr;
+        }
+
+        #endregion
     }
 }
