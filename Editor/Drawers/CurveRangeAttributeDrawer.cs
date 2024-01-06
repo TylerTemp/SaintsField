@@ -1,7 +1,10 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -19,7 +22,8 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, object parent)
         {
-            if (CheckHasError(property))
+            _error = CheckHasError(property);
+            if (_error != "")
             {
                 DefaultDrawer(position, property, label);
                 return;
@@ -41,16 +45,18 @@ namespace SaintsField.Editor.Drawers
                 label);
         }
 
-        private bool CheckHasError(SerializedProperty property)
+        private static Rect GetRanges(CurveRangeAttribute curveRangeAttribute)
         {
-            if (property.propertyType != SerializedPropertyType.AnimationCurve)
-            {
-                _error = $"Requires AnimationCurve type, got {property.propertyType}";
-                return true;
-            }
+            return new Rect(
+                curveRangeAttribute.Min.x,
+                curveRangeAttribute.Min.y,
+                curveRangeAttribute.Max.x - curveRangeAttribute.Min.x,
+                curveRangeAttribute.Max.y - curveRangeAttribute.Min.y);
+        }
 
-            _error = "";
-            return false;
+        private static string CheckHasError(SerializedProperty property)
+        {
+            return property.propertyType != SerializedPropertyType.AnimationCurve ? $"Requires AnimationCurve type, got {property.propertyType}" : "";
         }
 
 
@@ -62,5 +68,34 @@ namespace SaintsField.Editor.Drawers
             _error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+
+
+        #region UIToolkit
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent,
+            Action<object> onChange)
+        {
+            CurveField element = new CurveField(property.displayName)
+            {
+                value = property.animationCurveValue,
+                ranges = GetRanges((CurveRangeAttribute) saintsAttribute),
+                // color wont work for it
+                // style =
+                // {
+                //     color = Color.red,
+                // },
+            };
+
+            element.RegisterValueChangedCallback(v =>
+            {
+                property.animationCurveValue = v.newValue;
+                property.serializedObject.ApplyModifiedProperties();
+                onChange?.Invoke(v.newValue);
+            });
+
+            return element;
+        }
+
+        #endregion
     }
 }
