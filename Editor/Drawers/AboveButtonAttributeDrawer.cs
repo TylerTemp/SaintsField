@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers
     {
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width, MessageType.Error));
+            ISaintsAttribute saintsAttribute) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: ImGuiHelpBox.GetHeight(DisplayError, width, MessageType.Error));
 
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers
 
             if (DisplayError != "")
             {
-                leftRect = HelpBox.Draw(leftRect, DisplayError, MessageType.Error);
+                leftRect = ImGuiHelpBox.Draw(leftRect, DisplayError, MessageType.Error);
             }
 
             return leftRect;

@@ -6,7 +6,6 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HelpBox = SaintsField.Editor.Utils.HelpBox;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -35,14 +34,14 @@ namespace SaintsField.Editor.Drawers
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
             return ((InfoBoxAttribute)saintsAttribute).Above
-                ? HelpBox.GetHeight(GetContent(property, (InfoBoxAttribute) saintsAttribute), width, _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType())
+                ? ImGuiHelpBox.GetHeight(GetContent(property, (InfoBoxAttribute) saintsAttribute), width, _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType())
                 : 0;
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            return HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType());
+            return ImGuiHelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType());
         }
 
         protected override VisualElement CreateAboveUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -70,12 +69,12 @@ namespace SaintsField.Editor.Drawers
                     throw new ArgumentOutOfRangeException(nameof(imGuiMessageType), imGuiMessageType, null);
             }
 
-            return new UnityEngine.UIElements.HelpBox(GetContent(property, infoboxAttribute), messageType);
+            return new HelpBox(GetContent(property, infoboxAttribute), messageType);
             // return HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType);
         }
 
         protected override VisualElement
-            DrawBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute) =>
+            CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute) =>
             CreateAboveUIToolKit(property, saintsAttribute);
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -101,17 +100,17 @@ namespace SaintsField.Editor.Drawers
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
             float boxHeight = !infoboxAttribute.Above && WillDraw(property, (InfoBoxAttribute)saintsAttribute)
-                ? HelpBox.GetHeight(GetContent(property, (InfoBoxAttribute)saintsAttribute), width, _overrideMessageType ? _messageType : infoboxAttribute.MessageType.GetMessageType())
+                ? ImGuiHelpBox.GetHeight(GetContent(property, (InfoBoxAttribute)saintsAttribute), width, _overrideMessageType ? _messageType : infoboxAttribute.MessageType.GetMessageType())
                 : 0f;
 
-            float errorHeight = _error != "" ? HelpBox.GetHeight(_error, width, EMessageType.Error) : 0f;
+            float errorHeight = _error != "" ? ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error) : 0f;
             return boxHeight + errorHeight;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            Rect leftRect = HelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType());
+            Rect leftRect = ImGuiHelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType());
 
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (_error == "")
@@ -119,7 +118,7 @@ namespace SaintsField.Editor.Drawers
                 return leftRect;
             }
 
-            return HelpBox.Draw(leftRect, _error, EMessageType.Error);
+            return ImGuiHelpBox.Draw(leftRect, _error, EMessageType.Error);
         }
 
         private bool WillDraw(SerializedProperty property, InfoBoxAttribute infoboxAttribute)

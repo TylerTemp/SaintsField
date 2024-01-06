@@ -41,8 +41,8 @@ namespace SaintsField.Editor.Drawers
                 return position;
             }
 
-            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(_error, position.width, MessageType.Error));
-            HelpBox.Draw(errorRect, _error, MessageType.Error);
+            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, ImGuiHelpBox.GetHeight(_error, position.width, MessageType.Error));
+            ImGuiHelpBox.Draw(errorRect, _error, MessageType.Error);
             return leftRect;
         }
 
@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             // Debug.Log(HelpBox.GetHeight(_error));
-            return HelpBox.GetHeight(_error, width, MessageType.Error);
+            return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
         private bool IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute)

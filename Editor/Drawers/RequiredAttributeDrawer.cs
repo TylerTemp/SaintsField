@@ -76,9 +76,9 @@ namespace SaintsField.Editor.Drawers
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) => ValidateType(property) != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => ValidateType(property) == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => ValidateType(property) == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => ValidateType(property) == "" ? position : HelpBox.Draw(position, _error, MessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => ValidateType(property) == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
         private string ValidateType(SerializedProperty property)
         {

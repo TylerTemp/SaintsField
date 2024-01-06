@@ -7,7 +7,6 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HelpBox = SaintsField.Editor.Utils.HelpBox;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -188,12 +187,12 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            return _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
+            return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            return HelpBox.Draw(position, _error, MessageType.Error);
+            return ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         }
     }
 }

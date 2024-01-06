@@ -270,7 +270,7 @@ namespace SaintsField.Editor.Drawers
 
             if (_error != "")
             {
-                return HelpBox.GetHeight(_error, width, MessageType.Error);
+                return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
             }
 
             float height = ((ShowImageAttribute)saintsAttribute).Above? 0: GetImageHeight(property, width, saintsAttribute);
@@ -282,7 +282,7 @@ namespace SaintsField.Editor.Drawers
         {
             if (_error != "")
             {
-                return HelpBox.Draw(position, _error, MessageType.Error);
+                return ImGuiHelpBox.Draw(position, _error, MessageType.Error);
             }
 
             // EditorGUI.DrawRect(position, Color.blue);

@@ -6,7 +6,6 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HelpBox = SaintsField.Editor.Utils.HelpBox;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -169,7 +168,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
-            float errorHeight = _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
+            float errorHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
             return fullWidthRichLabelAttribute.Above
                 ? errorHeight
                 : errorHeight + EditorGUIUtility.singleLineHeight;
@@ -185,10 +184,10 @@ namespace SaintsField.Editor.Drawers
             }
             return _error == ""
                 ? useRect
-                : HelpBox.Draw(useRect, _error, MessageType.Error);
+                : ImGuiHelpBox.Draw(useRect, _error, MessageType.Error);
         }
 
-        protected override VisualElement DrawBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             VisualElement container = new VisualElement();
 
@@ -201,7 +200,7 @@ namespace SaintsField.Editor.Drawers
 
             if (_error != "")
             {
-                container.Add(new UnityEngine.UIElements.HelpBox(_error, HelpBoxMessageType.Error));
+                container.Add(new HelpBox(_error, HelpBoxMessageType.Error));
             }
 
             return container;

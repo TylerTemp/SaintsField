@@ -112,8 +112,8 @@ namespace SaintsField.Editor.Drawers
 
             string error = string.Join("\n\n", _errors);
 
-            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, HelpBox.GetHeight(error, position.width, MessageType.Error));
-            HelpBox.Draw(errorRect, error, MessageType.Error);
+            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, ImGuiHelpBox.GetHeight(error, position.width, MessageType.Error));
+            ImGuiHelpBox.Draw(errorRect, error, MessageType.Error);
             return leftRect;
         }
 
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             // Debug.Log(HelpBox.GetHeight(_error));
-            return HelpBox.GetHeight(string.Join("\n\n", _errors), width, MessageType.Error);
+            return ImGuiHelpBox.GetHeight(string.Join("\n\n", _errors), width, MessageType.Error);
         }
     }
 }

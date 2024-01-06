@@ -4,7 +4,6 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HelpBox = SaintsField.Editor.Utils.HelpBox;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -140,16 +139,16 @@ namespace SaintsField.Editor.Drawers
         protected override bool WillDrawBelow(SerializedProperty property,
             ISaintsAttribute saintsAttribute) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: HelpBox.GetHeight(_error, width, EMessageType.Error);
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: HelpBox.Draw(position, _error, EMessageType.Error);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
 
-        protected override VisualElement DrawBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
             Debug.Log($"GetComponent error {_error}");
 #endif
             return _error != ""
-                ? new UnityEngine.UIElements.HelpBox(_error, HelpBoxMessageType.Error)
+                ? new HelpBox(_error, HelpBoxMessageType.Error)
                 : null;
         }
     }

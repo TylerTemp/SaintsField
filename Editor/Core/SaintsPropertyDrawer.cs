@@ -372,7 +372,7 @@ namespace SaintsField.Editor.Core
             None,
         }
 
-        protected VisualElement containerElement { get; private set; }
+        // protected VisualElement ContainerElement { get; private set; }
         private VisualElement _rootElement;
         private SaintsPropertyDrawer _saintsLabelDrawer;
         private SaintsPropertyDrawer _saintsFieldDrawer;
@@ -383,7 +383,7 @@ namespace SaintsField.Editor.Core
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            containerElement = new VisualElement();
+            VisualElement containerElement = new VisualElement();
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
 
@@ -628,7 +628,7 @@ namespace SaintsField.Editor.Core
                 foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
                 {
                     // belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
-                    groupByContainer.Add(drawerInstance.DrawBelowUIToolkit(property, eachAttribute));
+                    groupByContainer.Add(drawerInstance.CreateBelowUIToolkit(property, eachAttribute));
                 }
 
             }
@@ -636,11 +636,20 @@ namespace SaintsField.Editor.Core
 
             _rootElement = new VisualElement();
             _rootElement.Add(containerElement);
-            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property));
+
+            // Debug.Log($"ContainerElement={containerElement}");
+            // _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property));
+            // _rootElement.schedule.Execute(() => OnAwakeUiToolKitInternal(property));
+            _rootElement.RegisterCallback<AttachToPanelEvent>(evt => OnAttachToPanelUiToolKitInternal(evt, property, containerElement));
             return _rootElement;
         }
 
-        protected virtual VisualElement DrawBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private void OnAttachToPanelUiToolKitInternal(AttachToPanelEvent evt, SerializedProperty property, VisualElement containerElement)
+        {
+            OnAwakeUiToolKitInternal(property, containerElement);
+        }
+
+        protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return null;
         }
@@ -1100,17 +1109,33 @@ namespace SaintsField.Editor.Core
         //     throw new NotImplementedException();
         // }
 
-        private void OnUpdateUiToolKitInternal(SerializedProperty property)
+        private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement)
         {
             foreach ((SaintsPropertyDrawer saintsPropertyDrawer, ISaintsAttribute saintsAttribute) in _saintsPropertyDrawers)
             {
-                saintsPropertyDrawer.OnUpdateUiToolKit(property, saintsAttribute);
+                saintsPropertyDrawer.OnAwakeUiToolKit(property, saintsAttribute, containerElement);
             }
 
-            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property)).StartingIn(500);
+            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement));
         }
 
-        protected virtual void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement containerElement)
+        {
+            foreach ((SaintsPropertyDrawer saintsPropertyDrawer, ISaintsAttribute saintsAttribute) in _saintsPropertyDrawers)
+            {
+                saintsPropertyDrawer.OnUpdateUiToolKit(property, saintsAttribute, containerElement);
+            }
+
+            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement)).StartingIn(500);
+        }
+
+        protected virtual void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            VisualElement containerElement)
+        {
+        }
+
+        protected virtual void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            VisualElement containerElement)
         {
         }
 

@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            float basicHeight = _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
+            float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
             if (!_expanded)
             {
                 return basicHeight;
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers
 
             if (_error != "")
             {
-                leftRect = HelpBox.Draw(position, _error, MessageType.Error);
+                leftRect = ImGuiHelpBox.Draw(position, _error, MessageType.Error);
             }
 
             if (!_expanded || scriptableObject == null)

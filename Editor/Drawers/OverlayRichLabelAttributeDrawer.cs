@@ -164,12 +164,12 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
-            return _error == "" ? 0 : HelpBox.GetHeight(_error, width, MessageType.Error);
+            return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) =>
             _error == ""
                 ? position
-                : HelpBox.Draw(position, _error, MessageType.Error);
+                : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
     }
 }

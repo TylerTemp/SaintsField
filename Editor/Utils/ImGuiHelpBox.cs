@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
-    public static class HelpBox
+    public static class ImGuiHelpBox
     {
         public static float GetHeight(string content, float width, EMessageType messageType) => GetHeight(content, width, messageType.GetMessageType());
 

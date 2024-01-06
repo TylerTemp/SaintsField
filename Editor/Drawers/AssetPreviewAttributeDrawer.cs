@@ -138,7 +138,7 @@ namespace SaintsField.Editor.Drawers
             string error = MismatchError(property);
             if (error != null)
             {
-                return HelpBox.GetHeight(error, width, MessageType.Error);
+                return ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
             }
 
             return ((AssetPreviewAttribute)saintsAttribute).Above? 0: GetExtraHeight(property, width, saintsAttribute);
@@ -149,7 +149,7 @@ namespace SaintsField.Editor.Drawers
             string error = MismatchError(property);
             if (error != null)
             {
-                return HelpBox.Draw(position, error, MessageType.Error);
+                return ImGuiHelpBox.Draw(position, error, MessageType.Error);
             }
 
             return Draw(position, property, saintsAttribute);
@@ -168,7 +168,7 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            var size = GetPreviewScaleSize(maxWidth, maxHeight, width, previewTexture);
+            (int width, int height) size = GetPreviewScaleSize(maxWidth, maxHeight, width, previewTexture);
             // ReSharper disable once Unity.NoNullPropagation
             float result = size.height;
             // Debug.Log($"GetExtraHeight: {result}");
