@@ -3,6 +3,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -28,13 +29,12 @@ namespace SaintsField.Editor.Drawers
             // }
         }
 
-        private Texture2D GetPreview(float viewWidth, Object target)
+        private Texture2D GetPreview(Object target)
         {
-            if (viewWidth < 0)
+            if (!target)
             {
                 return null;
             }
-
             // if (property.propertyType != SerializedPropertyType.ObjectReference ||
             //     property.objectReferenceValue == null)
             // {
@@ -92,6 +92,8 @@ namespace SaintsField.Editor.Drawers
         {
             return Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, previewTexture.width, previewTexture.height);
         }
+
+        #region IMGUI
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
@@ -162,7 +164,12 @@ namespace SaintsField.Editor.Drawers
             // int useWidth = maxWidth == -1? Mathf.FloorToInt(width): Mathf.Min(maxWidth, Mathf.FloorToInt(width));
             int maxHeight = assetPreviewAttribute.MaxHeight;
 
-            Texture2D previewTexture = GetPreview(width, property.objectReferenceValue);
+            if (width < 0)
+            {
+                return 0;
+            }
+
+            Texture2D previewTexture = GetPreview(property.objectReferenceValue);
             if (previewTexture == null)
             {
                 return 0;
@@ -185,7 +192,12 @@ namespace SaintsField.Editor.Drawers
 
             // return position;
 
-            Texture2D previewTexture = GetPreview(position.width, property.objectReferenceValue);
+            if (position.width < 0)
+            {
+                return position;
+            }
+
+            Texture2D previewTexture = GetPreview(property.objectReferenceValue);
 
             if (previewTexture == null || previewTexture.width == 1)
             {
@@ -233,6 +245,124 @@ namespace SaintsField.Editor.Drawers
 
             // return leftOutRect;
             return leftOutRect;
+        }
+        #endregion
+
+        private static string ClassImage(SerializedProperty property) => $"{property.propertyPath}__Image";
+
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
+            if (!assetPreviewAttribute.Above)
+            {
+                return null;
+            }
+
+            Texture2D preview = GetPreview(property.objectReferenceValue);
+            Image image = CreateImage(property, preview, assetPreviewAttribute);
+            return image;
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
+            if (assetPreviewAttribute.Above)
+            {
+                return null;
+            }
+
+            Texture2D preview = GetPreview(property.objectReferenceValue);
+            Image image = CreateImage(property, preview, assetPreviewAttribute);
+            return image;
+        }
+
+        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement containerElement)
+        {
+            Image image = containerElement.Query<Image>(className: ClassImage(property)).First();
+            int preInstanceId = (int)image.userData;
+            int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
+
+            // Debug.Log($"cur={curInstanceId}, pre={preInstanceId}");
+            if (image.image != null && preInstanceId == curInstanceId)
+            {
+                return;
+            }
+
+            _previewTexture = null;
+            image.style.display = DisplayStyle.None;
+
+            Texture2D preview = GetPreview(property.objectReferenceValue);
+
+            UpdateImage(image, preview, (AssetPreviewAttribute)saintsAttribute);
+            if (preview != null)
+            {
+                image.userData = curInstanceId;
+            }
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static Image CreateImage(SerializedProperty property, Texture2D preview, AssetPreviewAttribute assetPreviewAttribute)
+        {
+            Image image = new Image
+            {
+                scaleMode = ScaleMode.ScaleToFit,
+                userData = property.objectReferenceValue?.GetInstanceID() ?? int.MinValue ,
+            };
+
+            switch (assetPreviewAttribute.Align)
+            {
+                case EAlign.Start:
+                    // image.style.alignSelf = Align.Start;
+                    break;
+                case EAlign.Center:
+                    image.style.alignSelf = Align.Center;
+                    break;
+                case EAlign.End:
+                    image.style.alignSelf = Align.FlexEnd;
+                    break;
+                case EAlign.FieldStart:
+                    // image.style.alignSelf = Align.FlexStart;
+                    image.style.left = LabelBaseWidth;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(assetPreviewAttribute.Align), assetPreviewAttribute.Align, null);
+            }
+
+            UpdateImage(image, preview, assetPreviewAttribute);
+
+            image.AddToClassList(ClassImage(property));
+            return image;
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static void UpdateImage(Image image, Texture2D preview, AssetPreviewAttribute assetPreviewAttribute)
+        {
+            image.image = preview;
+            if (preview == null)
+            {
+                image.style.display = DisplayStyle.None;
+                return;
+            }
+
+            image.style.display = DisplayStyle.Flex;
+
+            if (assetPreviewAttribute.MaxWidth > 0 || assetPreviewAttribute.MaxHeight > 0)
+            {
+                int imageWidth = preview.width;
+                int imageHeight = preview.height;
+                int maxHeight = assetPreviewAttribute.MaxHeight > 0? assetPreviewAttribute.MaxHeight: imageWidth;
+                int maxWidth = assetPreviewAttribute.MaxWidth > 0? assetPreviewAttribute.MaxWidth: imageHeight;
+
+                (int fittedWidth, int fittedHeight) = Tex.FitScale(maxWidth, maxHeight, imageWidth, imageHeight);
+
+                image.style.maxWidth = fittedWidth;
+                image.style.maxHeight = fittedHeight;
+            }
+            else
+            {
+                image.style.maxWidth = image.style.maxHeight = StyleKeyword.Null;
+            }
+
         }
 
         private static string MismatchError(SerializedProperty property)

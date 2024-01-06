@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers
             return ImGuiHelpBox.Draw(position, GetContent(property, infoboxAttribute), _overrideMessageType? _messageType: infoboxAttribute.MessageType.GetMessageType());
         }
 
-        protected override VisualElement CreateAboveUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement
             CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute) =>
-            CreateAboveUIToolKit(property, saintsAttribute);
+            CreateAboveUIToolkit(property, saintsAttribute);
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {

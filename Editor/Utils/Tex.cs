@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Utils
             return colored;
         }
 
-        private static (int width, int height) FitScale(int widthLimit, int heightLimit, int oriWidth, int oriHeight)
+        public static (int width, int height) FitScale(int widthLimit, int heightLimit, int oriWidth, int oriHeight)
         {
             if (widthLimit != -1 && heightLimit != -1)  // scale to rect
             {
