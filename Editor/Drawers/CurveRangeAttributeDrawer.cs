@@ -72,7 +72,8 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent,
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, VisualElement container, object parent,
             Action<object> onChange)
         {
             CurveField element = new CurveField(property.displayName)

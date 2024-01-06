@@ -62,20 +62,37 @@ namespace SaintsField.Samples.Scripts
 
         // dropdown under stuck
 
+        public int normal;
+
+        // [OnValueChanged(nameof(OnChanged))]
+        [Dropdown(nameof(MyStructValues))]
+        // [BelowRichLabel(nameof(GetValue), true)]
+        public int myInt;
+
+        private DropdownList<int> MyStructValues => new DropdownList<int>
+        {
+            { "v0", 0 },
+            { "v1", 1 },
+            { "v2", 2 },
+            { "v3", 3 },
+        };
+
         [Serializable]
         private struct MyData
         {
-            [OnValueChanged(nameof(OnChanged))]
+            public int normal;
+
+            // [OnValueChanged(nameof(OnChanged))]
             [Dropdown(nameof(MyStructValues))]
-            [BelowRichLabel(nameof(GetValue), true)]
+            // [BelowRichLabel(nameof(GetValue), true)]
             public int myInt;
 
             private DropdownList<int> MyStructValues => new DropdownList<int>
             {
-                { "0", 0 },
-                { "1", 1 },
-                { "2", 2 },
-                { "3", 3 },
+                { "v0", 0 },
+                { "v1", 1 },
+                { "v2", 2 },
+                { "v3", 3 },
             };
 
             // private string GetValue() => myInt;

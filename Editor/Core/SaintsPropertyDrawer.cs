@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Core
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
         public const int LabelLeftSpace = 3;
-        public const int LabelBaseWidth = 121;
+        public const int LabelBaseWidth = 120;
 
         // public static bool IsSubDrawer = false;
         public static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
@@ -251,7 +251,7 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"hasSaintsLabel={hasSaintsLabel}");
 
             bool saintsDrawNoLabel = hasSaintsLabel &&
-                                     !labelFound.drawer.WillDrawLabel(property, label, labelFound.iSaintsAttribute);
+                                     !labelFound.drawer.WillDrawLabel(property, labelFound.iSaintsAttribute);
 
             bool hasSaintsField = fieldFound.iSaintsAttribute != null;
 
@@ -569,7 +569,7 @@ namespace SaintsField.Editor.Core
                 Debug.Log($"add field ui toolkit drawer {_saintsFieldDrawer}");
 #endif
                 VisualElement fieldElement = _saintsFieldDrawer.CreateFieldUIToolKit(property,
-                    fieldAttributeWithIndex.SaintsAttribute, parent, Debug.Log);
+                    fieldAttributeWithIndex.SaintsAttribute, containerElement, parent, Debug.Log);
                 // fieldElement.style.flexShrink = 1;
                 fieldElement.style.flexGrow = 1;
                 // fieldElement.RegisterValueChangeCallback(_ => SetValueChanged(property, true));
@@ -709,27 +709,6 @@ namespace SaintsField.Editor.Core
             propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
         }
-
-        protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
-        {
-            return null;
-        }
-
-        protected virtual VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
-        {
-            return null;
-        }
-
-        protected virtual VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent, Action<object> onChange)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected virtual IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
-        {
-            return Array.Empty<VisualElement>();
-        }
 #else
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -791,7 +770,7 @@ namespace SaintsField.Editor.Core
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
 
                 // ReSharper disable once InvertIf
-                if (drawerInstance.WillDrawAbove(aboveRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute))
+                if (drawerInstance.WillDrawAbove(property, eachAttributeWithIndex.SaintsAttribute))
                 {
                     if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
                             out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
@@ -818,7 +797,7 @@ namespace SaintsField.Editor.Core
                 {
                     foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
                     {
-                        Rect newAboveRect = drawerInstance.DrawAbove(aboveRect, property, bugFixCopyLabel, eachAttribute);
+                        Rect newAboveRect = drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute);
                         aboveUsedHeight = newAboveRect.y - aboveInitY;
                         aboveRect = newAboveRect;
                     }
@@ -836,7 +815,7 @@ namespace SaintsField.Editor.Core
                             x = aboveRect.x + eachWidth * index,
                             width = eachWidth,
                         };
-                        Rect leftRect = drawerInstance.DrawAbove(eachRect, property, bugFixCopyLabel, eachAttribute);
+                        Rect leftRect = drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute);
                         height = Mathf.Max(height, leftRect.y - eachRect.y);
                         // Debug.Log($"height={height}");
                     }
@@ -887,7 +866,7 @@ namespace SaintsField.Editor.Core
             {
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                 (bool isActive, Rect newLabelRect) =
-                    drawerInstance.DrawPreLabel(labelRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute);
+                    drawerInstance.DrawPreLabelImGui(labelRect, property, eachAttributeWithIndex.SaintsAttribute);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
@@ -921,7 +900,7 @@ namespace SaintsField.Editor.Core
                 SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
                 UsedAttributesTryAdd(labelAttributeWithIndex, labelDrawerInstance);
                 // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
-                bool hasLabelSpace = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
+                bool hasLabelSpace = labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute);
                 if (hasLabelSpace)
                 {
                     // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
@@ -995,7 +974,7 @@ namespace SaintsField.Editor.Core
                     // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                     // GUI.SetNextControlName(_fieldControlName);
                     fieldDrawerInstance.DrawField(fieldUseRect, property, useGuiContent,
-                        fieldAttributeWithIndex.SaintsAttribute);
+                        fieldAttributeWithIndex.SaintsAttribute, parent);
                     // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
                     UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
@@ -1035,7 +1014,7 @@ namespace SaintsField.Editor.Core
                 postFieldAccWidth += width;
 
                 // Debug.Log($"DrawPostField, valueChange={_valueChange}");
-                bool isActive = drawer.DrawPostField(eachRect, property, label, attributeWithIndex.SaintsAttribute, PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result)? result.Changed: false);
+                bool isActive = drawer.DrawPostFieldImGui(eachRect, property, label, attributeWithIndex.SaintsAttribute, PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result)? result.Changed: false);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
@@ -1058,18 +1037,18 @@ namespace SaintsField.Editor.Core
 
             #region Overlay
 
-            List<Rect> overlayTakenPositions = new List<Rect>();
+            // List<Rect> overlayTakenPositions = new List<Rect>();
             bool hasLabelWidth = !string.IsNullOrEmpty(useGuiContent.text);
             foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
             {
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                 (bool isActive, Rect newLabelRect) =
-                    drawerInstance.DrawOverlay(fieldUseRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute, hasLabelWidth, overlayTakenPositions);
+                    drawerInstance.DrawOverlay(fieldUseRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute, hasLabelWidth);
                 // ReSharper disable once InvertIf
                 if (isActive)
                 {
                     UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
-                    overlayTakenPositions.Add(newLabelRect);
+                    // overlayTakenPositions.Add(newLabelRect);
                 }
             }
 
@@ -1093,7 +1072,7 @@ namespace SaintsField.Editor.Core
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                 // Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
                 // ReSharper disable once InvertIf
-                if (drawerInstance.WillDrawBelow(belowRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute))
+                if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute))
                 {
                     if(!groupedDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy, out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
                     {
@@ -1165,6 +1144,28 @@ namespace SaintsField.Editor.Core
             SetValueChanged(property, false);
         }
 #endif
+
+        protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            return null;
+        }
+
+        protected virtual VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            return null;
+        }
+
+        protected virtual VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, VisualElement container, object parent, Action<object> onChange)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
+            return Array.Empty<VisualElement>();
+        }
 
         // protected virtual VisualElement CreateSaintsPropertyGUI(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent, LabelState labelState)
         // {

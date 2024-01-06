@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Utils
             }
             else  // hack struct :(
             {
-                // Debug.Log($"{property.propertyType}: {curItem}");
+                // Debug.Log($"SetValue {property.propertyType}: {curItem}");
                 switch (property.propertyType)
                 {
                     case SerializedPropertyType.Generic:
@@ -139,7 +139,7 @@ namespace SaintsField.Editor.Utils
                     case SerializedPropertyType.Integer:
                     case SerializedPropertyType.Enum:
                         property.intValue = (int) curItem;
-                        // Debug.Log($"{property.propertyType}: set, ={property.intValue}");
+                        Debug.Log($"{property.propertyType}: set ={property.intValue}");
                         break;
                     case SerializedPropertyType.Boolean:
                         property.boolValue = (bool) curItem;
@@ -238,35 +238,25 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static Label PrefixLabelUIToolKit(SaintsPropertyDrawer.LabelState labelState, string label)
+        public static Label PrefixLabelUIToolKit(SaintsPropertyDrawer.LabelState labelState, string label, int indentLevel)
         {
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (labelState)
+            if (labelState == SaintsPropertyDrawer.LabelState.None)
             {
-                case SaintsPropertyDrawer.LabelState.None:
-                    return null;
-                case SaintsPropertyDrawer.LabelState.AsIs:
-                    return new Label(label)
-                    {
-                        style =
-                        {
-                            flexShrink = 0,
-                            width = SaintsPropertyDrawer.LabelBaseWidth,
-                            left = SaintsPropertyDrawer.LabelLeftSpace,
-                        },
-                    };
-                case SaintsPropertyDrawer.LabelState.EmptySpace:
-                    return new Label(" ")                    {
-                        style =
-                        {
-                            flexShrink = 0,
-                            width = SaintsPropertyDrawer.LabelBaseWidth,
-                            left = SaintsPropertyDrawer.LabelLeftSpace,
-                        },
-                    };
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
+                return null;
             }
+
+            string useLabel = labelState == SaintsPropertyDrawer.LabelState.AsIs ? label : " ";
+
+            return new Label(useLabel)
+            {
+                style =
+                {
+                    flexShrink = 0,
+                    flexGrow = 0,
+                    minWidth = SaintsPropertyDrawer.LabelBaseWidth - indentLevel * 15,
+                    left = SaintsPropertyDrawer.LabelLeftSpace,
+                },
+            };
         }
 
         public static int ListIndexOfAction<T>(IReadOnlyList<T> lis, Func<T, bool> callback)

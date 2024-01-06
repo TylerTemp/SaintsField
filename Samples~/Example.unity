@@ -327,8 +327,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b547be381cef1e4f8fc59d2557887d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normal: 0
+  myInt: 0
   my:
-    myInt: 2
+    normal: 0
+    myInt: 1
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -1353,6 +1356,7 @@ GameObject:
   - component: {fileID: 673204054}
   - component: {fileID: 673204055}
   - component: {fileID: 673204056}
+  - component: {fileID: 673204057}
   m_Layer: 0
   m_Name: UIKit
   m_TagString: Untagged
@@ -1387,8 +1391,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c136e3f4a3c5a8441b0e3aa1a443ed4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sth: 0
+  normal: 0
   content: 
+  testStruct:
+    normal: 
+    content: 
 --- !u!114 &673204056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1409,6 +1416,20 @@ MonoBehaviour:
   - name: 
     amount: 0
     unit: 0
+--- !u!114 &673204057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 673204053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6046fd5c7377274aad49737c20eb210, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intDrag: 0
+  textArea: 
 --- !u!1 &679680717
 GameObject:
   m_ObjectHideFlags: 0
