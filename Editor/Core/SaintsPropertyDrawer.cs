@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Core
     {
         public const int LabelLeftSpace = 3;
         public const int LabelBaseWidth = 120;
+        public const int IndentWidth = 15;
 
         // public static bool IsSubDrawer = false;
         public static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
@@ -401,7 +402,9 @@ namespace SaintsField.Editor.Core
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_DRAW_PROCESS
             Debug.Log($"Create property gui {property.propertyPath}/{this}");
+#endif
             // InsideSaintsFieldScoop.PropertyKey insideKey = InsideSaintsFieldScoop.MakeKey(property);
             object serTarget = property.serializedObject.targetObject;
             string propPath = property.propertyPath;
@@ -409,7 +412,9 @@ namespace SaintsField.Editor.Core
             if (nestInfo != null && nestInfo.count > 0)
             {
                 nestInfo.count -= 1;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_DRAW_PROCESS
                 Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{nestInfo.count}");
+#endif
 
                 if (nestInfo.count <= 0)
                 {
@@ -419,7 +424,14 @@ namespace SaintsField.Editor.Core
                 return DefaultDrawerUIToolkit(property);
             }
 
-            VisualElement containerElement = new VisualElement();
+            VisualElement containerElement = new VisualElement
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                },
+                name = $"{property.propertyPath}__SaintsFieldContainer",
+            };
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
 
@@ -442,7 +454,9 @@ namespace SaintsField.Editor.Core
 
             if(fieldAttributeWithIndex.SaintsAttribute == null)
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_DRAW_PROCESS
                 Debug.Log($"no field attribute {property.propertyPath}: {_saintsPropertyDrawers.Count}");
+#endif
                 // PropertyToDrawCount[insideKey] = _saintsPropertyDrawers.Count - 1;
                 PropertyNestInfo.Add(new NestInfo
                 {
@@ -546,9 +560,8 @@ namespace SaintsField.Editor.Core
                 {
                     flexDirection = FlexDirection.Row,
                 },
+                name = $"{property.propertyPath}__SaintsFieldField",
             };
-            containerElement.Add(fieldContainer);
-            containerElement.Add(_overlayLabelContainer);
 
             Type fieldDrawer = fieldAttributeWithIndex.SaintsAttribute == null
                 ? null
@@ -600,16 +613,20 @@ namespace SaintsField.Editor.Core
                 style =
                 {
                     position = Position.Absolute,
-                    left = LabelLeftSpace,
+                    left = 0,
                     top = 0,
                     height = EditorGUIUtility.singleLineHeight,
+                    width = Length.Percent(100),
                     flexDirection = FlexDirection.Row,
                     flexWrap = Wrap.NoWrap,
                     alignItems = Align.Center, // vertical
                     overflow = Overflow.Hidden,
                 },
-                pickingMode = PickingMode.Ignore,
+                // pickingMode = PickingMode.Ignore,
+                name = $"{property.propertyPath}__SaintsFieldOverlay",
             };
+
+            overlayContainer.Add(new Label(" "));
 
             fieldContainer.Add(overlayContainer);
 
@@ -618,7 +635,7 @@ namespace SaintsField.Editor.Core
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
 
                 VisualElement element =
-                    drawerInstance.CreateOverlayUIKit(property, eachAttributeWithIndex.SaintsAttribute);
+                    drawerInstance.CreateOverlayUIKit(property, eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index, containerElement, overlayContainer, parent);
                 // ReSharper disable once InvertIf
                 if (element != null)
                 {
@@ -627,6 +644,9 @@ namespace SaintsField.Editor.Core
             }
 
             #endregion
+
+            containerElement.Add(fieldContainer);
+            containerElement.Add(_overlayLabelContainer);
 
             #region below
 
@@ -652,14 +672,28 @@ namespace SaintsField.Editor.Core
                 VisualElement groupByContainer;
                 if (groupBy == "")
                 {
-                    groupByContainer = new VisualElement();
+                    groupByContainer = new VisualElement
+                    {
+                        style =
+                        {
+                            width = Length.Percent(100),
+                        },
+                        name = $"{property.propertyPath}__Below",
+                    };
                     containerElement.Add(groupByContainer);
                 }
                 else
                 {
                     if(!belowGroupByVisualElement.TryGetValue(groupBy, out groupByContainer))
                     {
-                        belowGroupByVisualElement[groupBy] = groupByContainer = new VisualElement();
+                        belowGroupByVisualElement[groupBy] = groupByContainer = new VisualElement
+                        {
+                            style =
+                            {
+                                width = Length.Percent(100),
+                            },
+                            name = $"{property.propertyPath}__SaintsFieldBelow",
+                        };
                         groupByContainer.style.flexDirection = FlexDirection.Row;
                         containerElement.Add(groupByContainer);
                     }
@@ -674,7 +708,14 @@ namespace SaintsField.Editor.Core
             }
             #endregion
 
-            _rootElement = new VisualElement();
+            _rootElement = new VisualElement
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                },
+                name = $"{property.propertyPath}__SaintsField",
+            };
             _rootElement.Add(containerElement);
 
             // Debug.Log($"ContainerElement={containerElement}");
@@ -682,7 +723,9 @@ namespace SaintsField.Editor.Core
             // _rootElement.schedule.Execute(() => OnAwakeUiToolKitInternal(property));
             _rootElement.RegisterCallback<AttachToPanelEvent>(evt => OnAwakeUiToolKitInternal(property, containerElement, parent));
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_DRAW_PROCESS
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
+#endif
 
             return _rootElement;
         }
@@ -1151,7 +1194,7 @@ namespace SaintsField.Editor.Core
             return null;
         }
 
-        protected virtual VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected virtual VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, VisualElement overlay, object parent)
         {
             return null;
         }

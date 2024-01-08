@@ -3,13 +3,20 @@ using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(ExpandableAttribute))]
     public class ExpandableAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
+
+
+
+
         private string _error = "";
 
         private bool _expanded;
@@ -133,8 +140,11 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
+        #endregion
+
         private static IEnumerable<SerializedProperty> GetAllField(SerializedObject serializedScriptableObject)
         {
+            // ReSharper disable once ConvertToUsingDeclaration
             using (SerializedProperty iterator = serializedScriptableObject.GetIterator())
             {
                 if (!iterator.NextVisible(true))
@@ -154,5 +164,71 @@ namespace SaintsField.Editor.Drawers
                 } while (iterator.NextVisible(false));
             }
         }
+
+        #region UIToolkit
+
+        protected override VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, VisualElement overlay, object parent)
+        {
+            return new Foldout
+            {
+                style =
+                {
+                    // backgroundColor = Color.green,
+                    // left = -5,
+                    // position = Position.Absolute,
+                    // height = EditorGUIUtility.singleLineHeight,
+                    // width = 20,
+                },
+                name = $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout",
+            };
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            Object scriptableObject = property.objectReferenceValue;
+            SerializedObject serializedObject = new SerializedObject(scriptableObject);
+            serializedObject.Update();
+
+            VisualElement visualElement = new VisualElement
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                },
+                name = $"{property.propertyPath}__ExpandableAttributeDrawer_Props",
+            };
+            visualElement.Add(new Foldout
+            {
+                // style =
+                // {
+                //     backgroundColor = Color.green,
+                //     // left = -5,
+                //     position = Position.Absolute,
+                //     height = EditorGUIUtility.singleLineHeight,
+                //     width = 20,
+                // },
+                // name = $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout",
+            });
+
+            foreach (SerializedProperty childProperty in GetAllField(serializedObject))
+            {
+                PropertyField prop = new PropertyField(childProperty)
+                {
+                    style =
+                    {
+                        left = IndentWidth,
+                    },
+                };
+                prop.Bind(serializedObject);
+                visualElement.Add(prop);
+            }
+
+            // Debug.Log("CreateBelowUIToolkit.ExpandableAttributeDrawer");
+            return visualElement;
+        }
+
+        #endregion
     }
 }

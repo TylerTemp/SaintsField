@@ -11,6 +11,7 @@ namespace SaintsField.Samples.Scripts
 
         public int publicValue;
 
-        [RichLabel(null)] public string noLabel;
+        [RichLabel(null)]
+        public string noLabel;
     }
 }
