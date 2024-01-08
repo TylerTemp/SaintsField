@@ -606,46 +606,48 @@ namespace SaintsField.Editor.Core
 
             #endregion
 
+            containerElement.Add(fieldContainer);
+
             #region Overlay
 
-            VisualElement overlayContainer = new VisualElement
-            {
-                style =
-                {
-                    position = Position.Absolute,
-                    left = 0,
-                    top = 0,
-                    height = EditorGUIUtility.singleLineHeight,
-                    width = Length.Percent(100),
-                    flexDirection = FlexDirection.Row,
-                    flexWrap = Wrap.NoWrap,
-                    alignItems = Align.Center, // vertical
-                    overflow = Overflow.Hidden,
-                },
-                // pickingMode = PickingMode.Ignore,
-                name = $"{property.propertyPath}__SaintsFieldOverlay",
-            };
+            // VisualElement overlayContainer = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         position = Position.Absolute,
+            //         left = 0,
+            //         top = 0,
+            //         height = EditorGUIUtility.singleLineHeight,
+            //         width = Length.Percent(100),
+            //         flexDirection = FlexDirection.Row,
+            //         flexWrap = Wrap.NoWrap,
+            //         alignItems = Align.Center, // vertical
+            //         overflow = Overflow.Hidden,
+            //     },
+            //     // pickingMode = PickingMode.Ignore,
+            //     name = $"{property.propertyPath}__SaintsFieldOverlay",
+            // };
 
-            overlayContainer.Add(new Label(" "));
+            // overlayContainer.Add(new Label(" "));
 
-            fieldContainer.Add(overlayContainer);
+            // fieldContainer.Add(overlayContainer);
 
             foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
             {
                 SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
 
                 VisualElement element =
-                    drawerInstance.CreateOverlayUIKit(property, eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index, containerElement, overlayContainer, parent);
+                    drawerInstance.CreateOverlayUIKit(property, eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index, containerElement, parent);
                 // ReSharper disable once InvertIf
                 if (element != null)
                 {
-                    overlayContainer.Add(element);
+                    fieldContainer.Add(element);
                 }
             }
 
             #endregion
 
-            containerElement.Add(fieldContainer);
+
             containerElement.Add(_overlayLabelContainer);
 
             #region below
@@ -1194,7 +1196,8 @@ namespace SaintsField.Editor.Core
             return null;
         }
 
-        protected virtual VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, VisualElement overlay, object parent)
+        protected virtual VisualElement CreateOverlayUIKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             return null;
         }

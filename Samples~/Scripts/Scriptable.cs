@@ -6,8 +6,11 @@ namespace SaintsField.Samples.Scripts
     public class Scriptable : ScriptableObject
     {
         [SerializeField]
-        [RichLabel("<color=red><label /></color>"), PropRange(0, 100)]
+        // [RichLabel("<color=red><label /></color>")]
+        [PropRange(0, 100)]
         private int _intRange;
+
+        [Range(0, 100)] public int normalRange;
 
         public int publicValue;
 

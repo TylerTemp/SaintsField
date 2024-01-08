@@ -167,21 +167,32 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        protected override VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, VisualElement overlay, object parent)
+        private static string ClassProps(SerializedProperty property) =>
+            $"{property.propertyPath}__ExpandableAttributeDrawer_Props";
+
+        protected override VisualElement CreateOverlayUIKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
         {
-            return new Foldout
+            Foldout foldOut = new Foldout
             {
                 style =
                 {
                     // backgroundColor = Color.green,
                     // left = -5,
-                    // position = Position.Absolute,
+                    position = Position.Absolute,
                     // height = EditorGUIUtility.singleLineHeight,
                     // width = 20,
                 },
                 name = $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout",
             };
+
+            foldOut.RegisterValueChangedCallback(v =>
+            {
+                container.Q<VisualElement>(ClassProps(property)).style.display = v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+            });
+
+            return foldOut;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -197,20 +208,8 @@ namespace SaintsField.Editor.Drawers
                 {
                     width = Length.Percent(100),
                 },
-                name = $"{property.propertyPath}__ExpandableAttributeDrawer_Props",
+                name = ClassProps(property),
             };
-            visualElement.Add(new Foldout
-            {
-                // style =
-                // {
-                //     backgroundColor = Color.green,
-                //     // left = -5,
-                //     position = Position.Absolute,
-                //     height = EditorGUIUtility.singleLineHeight,
-                //     width = 20,
-                // },
-                // name = $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout",
-            });
 
             foreach (SerializedProperty childProperty in GetAllField(serializedObject))
             {
@@ -218,9 +217,10 @@ namespace SaintsField.Editor.Drawers
                 {
                     style =
                     {
-                        left = IndentWidth,
+                        paddingLeft = IndentWidth,
                     },
                 };
+                prop.AddToClassList($"{property.propertyPath}__ExpandableAttributeDrawer_Prop");
                 prop.Bind(serializedObject);
                 visualElement.Add(prop);
             }
