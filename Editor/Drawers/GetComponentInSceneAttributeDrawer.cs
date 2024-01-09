@@ -4,12 +4,14 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(GetComponentInSceneAttribute))]
     public class GetComponentInSceneAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private string _error = "";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => 0;
@@ -17,11 +19,31 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool valueChanged)
         {
-            _error = "";
+            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
+            if (error != "")
+            {
+                _error = error;
+                return false;
+            }
+            if(result != null)
+            {
+                SetValueChanged(property);
+            }
+            return true;
+        }
 
+        protected override bool WillDrawBelow(SerializedProperty property,
+            ISaintsAttribute saintsAttribute) => _error != "";
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+        #endregion
+
+        private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
             if (property.objectReferenceValue != null)
             {
-                return false;
+                return ("", null);
             }
 
             GetComponentInSceneAttribute getComponentInSceneAttribute = (GetComponentInSceneAttribute) saintsAttribute;
@@ -29,8 +51,7 @@ namespace SaintsField.Editor.Drawers
 
             if (getComponentInSceneAttribute.CompType == typeof(GameObject))
             {
-                _error = "You can not use GetComponentInChildrenAttribute with GameObject type";
-                return false;
+                return ("You can not use GetComponentInChildrenAttribute with GameObject type", null);
             }
 
             Type type = getComponentInSceneAttribute.CompType ?? fieldType;
@@ -64,8 +85,7 @@ namespace SaintsField.Editor.Drawers
 
             if (componentInScene == null)
             {
-                _error = $"No {type} found in scene";
-                return false;
+                return ($"No {type} found in scene", null);
             }
 
             UnityEngine.Object result = componentInScene;
@@ -83,14 +103,62 @@ namespace SaintsField.Editor.Drawers
             }
 
             property.objectReferenceValue = result;
-            SetValueChanged(property);
-            return true;
+            return ("", result);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property,
-            ISaintsAttribute saintsAttribute) => _error != "";
+        #region UIToolkit
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+        private static string NamePlaceholder(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__GetComponentInScene";
+
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
+            Action<object> onChange)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT_IN_SCENE
+            Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
+#endif
+            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
+            if (error != "")
+            {
+                return new VisualElement
+                {
+                    style =
+                    {
+                        width = 0,
+                    },
+                    name = NamePlaceholder(property, index),
+                    userData = error,
+                };
+            }
+
+            property.serializedObject.ApplyModifiedProperties();
+
+            onChange?.Invoke(result);
+
+            return new VisualElement
+            {
+                style =
+                {
+                    width = 0,
+                },
+                name = NamePlaceholder(property, index),
+                userData = "",
+            };
+        }
+
+        // NOTE: ensure the post field is added to the container!
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            string error = (string)(container.Q<VisualElement>(NamePlaceholder(property, index))!.userData ?? "");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
+            Debug.Log($"GetComponentInScene error {error}");
+#endif
+            return string.IsNullOrEmpty(error)
+                ? null
+                : new HelpBox(_error, HelpBoxMessageType.Error);
+        }
+        #endregion
     }
 }

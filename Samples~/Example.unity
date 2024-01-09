@@ -837,8 +837,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b238c2db3d8410eb5a0f246c37ce53a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boxColliderInChildren: {fileID: 1047563474}
-  goWithBoxColliderInChildren: {fileID: 1047563472}
+  colliderInChildren: {fileID: 1047563474}
+  goWithColliderInChildren: {fileID: 1047563472}
 --- !u!1 &414579718
 GameObject:
   m_ObjectHideFlags: 0
@@ -1589,9 +1589,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cd68cd23c614bcab6f5007c1c403a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dummy: {fileID: 1516486913}
-  dummyTrans: {fileID: 1516486912}
-  dummyGo: {fileID: 1516486911}
+  myDummy: {fileID: 1271404092}
+  myDummyTrans: {fileID: 1271404091}
+  myDummyGo: {fileID: 1271404088}
 --- !u!4 &746735700
 Transform:
   m_ObjectHideFlags: 0
@@ -3168,9 +3168,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 096c642b46bf43e89f510b7fb7ff7d86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  childBoxCollider: {fileID: 556802674}
-  childBoxColliderGo: {fileID: 556802672}
-  childAnotherType: {fileID: 556802674}
+  myChildBoxCollider: {fileID: 556802674}
+  myChildBoxColliderGo: {fileID: 556802672}
+  myChildAnotherType: {fileID: 556802674}
 --- !u!4 &1474142944
 Transform:
   m_ObjectHideFlags: 0
