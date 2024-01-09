@@ -1,16 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(InputAxisAttribute))]
     public class InputAxisAttributeDrawer: SaintsPropertyDrawer
     {
-        private IReadOnlyList<string> _axisNames;
-
         private static IReadOnlyList<string> GetAxisNames()
         {
             SerializedObject inputAssetSettings = new SerializedObject(AssetDatabase.LoadAssetAtPath<Object>("ProjectSettings/InputManager.asset"));
@@ -23,6 +26,10 @@ namespace SaintsField.Editor.Drawers
 
             return axisNames;
         }
+
+        #region IMGUI
+
+        private IReadOnlyList<string> _axisNames;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool hasLabelWidth)
@@ -64,5 +71,95 @@ namespace SaintsField.Editor.Drawers
 
             return -1;
         }
+
+        #endregion
+
+        #region UIToolkit
+        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__InputAxis_Button";
+        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__InputAxis_ButtonLabel";
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            VisualElement container, object parent, Action<object> onChange)
+        {
+            IReadOnlyList<string> axisNames = GetAxisNames();
+            int selectedIndex = IndexOf(axisNames, property.stringValue);
+            string buttonLabel = selectedIndex == -1 ? "-" : axisNames[selectedIndex];
+
+            Button button = new Button(() => ShowDropdown(property, saintsAttribute, container, parent, onChange))
+            {
+                style =
+                {
+                    height = EditorGUIUtility.singleLineHeight,
+                    flexGrow = 1,
+                },
+                name = NameButtonField(property),
+            };
+
+            VisualElement buttonLabelContainer = new VisualElement
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                    flexDirection = FlexDirection.Row,
+                    alignItems = Align.Center,
+                    justifyContent = Justify.SpaceBetween,
+                },
+            };
+
+            buttonLabelContainer.Add(new Label(buttonLabel)
+            {
+                name = NameButtonLabelField(property),
+                userData = selectedIndex,
+            });
+            buttonLabelContainer.Add(new Label("▼"));
+
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
+            };
+
+            button.Add(buttonLabelContainer);
+
+            Debug.Log(EditorGUI.indentLevel);
+
+            root.Add(Util.PrefixLabelUIToolKit(LabelState.AsIs, property.displayName, 1));
+            root.Add(button);
+
+            return root;
+        }
+
+        private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            VisualElement container, object parent, Action<object> onChange)
+        {
+            IReadOnlyList<string> axisNames = GetAxisNames();
+
+            // Button button = container.Q<Button>(NameButtonField(property));
+            Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
+            GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+
+            int selectedIndex = IndexOf(axisNames, property.stringValue);
+
+            // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
+            foreach (int index in Enumerable.Range(0, axisNames.Count))
+            {
+                int curIndex = index;
+
+                genericDropdownMenu.AddItem(axisNames[index], index == selectedIndex, () =>
+                {
+                    property.stringValue = axisNames[curIndex];
+                    onChange(axisNames[curIndex]);
+                    buttonLabel.text = axisNames[curIndex];
+                    property.serializedObject.ApplyModifiedProperties();
+                });
+            }
+
+            Button button = container.Q<Button>(NameButtonField(property));
+            genericDropdownMenu.DropDown(button.worldBound, button, true);
+        }
+
+        #endregion
     }
 }

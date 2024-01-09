@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Drawers
     public class DropdownAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";
-        private const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+        private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                       BindingFlags.Public | BindingFlags.DeclaredOnly;
 
         #region IMGUI
@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             // Object target = property.serializedObject.targetObject;
             Type parentType = parent.GetType();
-            FieldInfo field = parentType.GetField(property.name, bindAttr);
+            FieldInfo field = parentType.GetField(property.name, BindAttr);
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
 
             if (metaInfo.Error != "")
@@ -273,8 +273,8 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__Field_Button";
-        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__Field_ButtonLabel";
+        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Button";
+        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_ButtonLabel";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Field_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -283,7 +283,7 @@ namespace SaintsField.Editor.Drawers
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             Type parentType = parent.GetType();
-            FieldInfo field = parentType.GetField(property.name, bindAttr);
+            FieldInfo field = parentType.GetField(property.name, BindAttr);
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
 
             string buttonLabel = metaInfo.SelectedIndex == -1? "-": metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
@@ -359,7 +359,7 @@ namespace SaintsField.Editor.Drawers
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             Type parentType = parent.GetType();
-            FieldInfo field = parentType.GetField(property.name, bindAttr);
+            FieldInfo field = parentType.GetField(property.name, BindAttr);
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));

@@ -255,6 +255,7 @@ namespace SaintsField.Editor.Utils
                     flexGrow = 0,
                     minWidth = SaintsPropertyDrawer.LabelBaseWidth - indentLevel * 15,
                     left = SaintsPropertyDrawer.LabelLeftSpace,
+                    unityTextAlign = TextAnchor.MiddleLeft,
                 },
             };
         }
