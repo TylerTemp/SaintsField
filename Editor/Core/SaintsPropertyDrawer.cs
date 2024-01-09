@@ -421,7 +421,7 @@ namespace SaintsField.Editor.Core
                     PropertyNestInfo.Remove(nestInfo);
                 }
 
-                return DefaultDrawerUIToolkit(property);
+                return UnityFallbackUIToolkit(property);
             }
 
             VisualElement containerElement = new VisualElement
@@ -452,20 +452,6 @@ namespace SaintsField.Editor.Core
             SaintsWithIndex labelAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Label);
             SaintsWithIndex fieldAttributeWithIndex = allSaintsAttributes.FirstOrDefault(each => each.SaintsAttribute.AttributeType == SaintsAttributeType.Field);
 
-            if(fieldAttributeWithIndex.SaintsAttribute == null)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_DRAW_PROCESS
-                Debug.Log($"no field attribute {property.propertyPath}: {_saintsPropertyDrawers.Count}");
-#endif
-                // PropertyToDrawCount[insideKey] = _saintsPropertyDrawers.Count - 1;
-                PropertyNestInfo.Add(new NestInfo
-                {
-                    targetObject = serTarget,
-                    propertyPath = propPath,
-                    count = _saintsPropertyDrawers.Count - 1,
-                });
-            }
-
             #region Above
 
             Dictionary<string, List<SaintsPropertyInfo>> groupedAboveDrawers =
@@ -486,7 +472,6 @@ namespace SaintsField.Editor.Core
             foreach (KeyValuePair<string, List<SaintsPropertyInfo>> drawerInfoKv in groupedAboveDrawers)
             {
                 string groupBy = drawerInfoKv.Key;
-                List<SaintsPropertyInfo> drawerInfos = drawerInfoKv.Value;
 
                 VisualElement groupByContainer;
                 if(groupBy == "")
@@ -571,8 +556,7 @@ namespace SaintsField.Editor.Core
             {
                 _saintsFieldDrawer = null;
 
-                fieldContainer.Add(DefaultDrawerUIToolkit(property));
-                // fieldContainer.Add(base.CreatePropertyGUI(property));
+                fieldContainer.Add(SaintsFallbackUIToolkit(property));
             }
             else
             {
@@ -732,16 +716,28 @@ namespace SaintsField.Editor.Core
             return _rootElement;
         }
 
-        private static VisualElement DefaultDrawerUIToolkit(SerializedProperty property)
+        protected VisualElement SaintsFallbackUIToolkit(SerializedProperty property)
         {
-            InsideSaintsFieldScoop.PropertyKey key = InsideSaintsFieldScoop.MakeKey(property);
-            if (!SubCounter.TryGetValue(key, out int count))
+            PropertyNestInfo.Add(new NestInfo
             {
-                count = 0;
-            }
+                targetObject = property.serializedObject.targetObject,
+                propertyPath = property.propertyPath,
+                count = _saintsPropertyDrawers.Count - 1,
+            });
 
-            // Debug.Log($"subCount {key} {count}+1");
-            SubCounter[key] = count + 1;
+            return UnityFallbackUIToolkit(property);
+        }
+
+        private static VisualElement UnityFallbackUIToolkit(SerializedProperty property)
+        {
+            // InsideSaintsFieldScoop.PropertyKey key = InsideSaintsFieldScoop.MakeKey(property);
+            // if (!SubCounter.TryGetValue(key, out int count))
+            // {
+            //     count = 0;
+            // }
+            //
+            // // Debug.Log($"subCount {key} {count}+1");
+            // SubCounter[key] = count + 1;
 
             PropertyField propertyField = new PropertyField(property)
             {
