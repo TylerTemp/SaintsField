@@ -474,9 +474,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3156588639542178f491383ab051ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  dummyPrefab: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  dummyPrefabFieldType: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  myDummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  myDummyPrefab: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  myDummyPrefabFieldType: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
 --- !u!1 &246861350
 GameObject:
   m_ObjectHideFlags: 0
@@ -506,10 +506,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63b9516b5d617ed458d446e946ef4fc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _show: 1
+  _show: 0
   _content: 0
-  _modInt: 32
-  _defaultInt: 4
+  _modInt: 72
+  _defaultInt: 32
 --- !u!4 &246861352
 Transform:
   m_ObjectHideFlags: 0
@@ -883,8 +883,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d203afd33a848568291ac12fdfaa4ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mySo: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
-  mySoSuffix: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  so: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  soSuffix: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
 --- !u!1 &417627789
 GameObject:
   m_ObjectHideFlags: 0

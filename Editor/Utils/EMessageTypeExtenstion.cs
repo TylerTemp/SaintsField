@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Utils
 {
@@ -7,6 +8,7 @@ namespace SaintsField.Editor.Utils
     {
         public static MessageType GetMessageType(this EMessageType messageType)
         {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (messageType)
             {
                 case EMessageType.None:
@@ -17,6 +19,24 @@ namespace SaintsField.Editor.Utils
                     return MessageType.Warning;
                 case EMessageType.Error:
                     return MessageType.Error;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
+            }
+        }
+
+        public static HelpBoxMessageType GetUIToolkitMessageType(this EMessageType messageType)
+        {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (messageType)
+            {
+                case EMessageType.None:
+                    return HelpBoxMessageType.None;
+                case EMessageType.Info:
+                    return HelpBoxMessageType.Info;
+                case EMessageType.Warning:
+                    return HelpBoxMessageType.Warning;
+                case EMessageType.Error:
+                    return HelpBoxMessageType.Error;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
             }

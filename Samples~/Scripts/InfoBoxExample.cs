@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
     {
         [field: SerializeField] private bool _show;
 
-        [Space]
+        // [Space]
         [InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None, above: true)]
         [InfoBox(nameof(DynamicMessage), EMessageType.Warning, contentIsCallback: true, above: true)]
         [InfoBox(nameof(DynamicMessageWithIcon), contentIsCallback: true)]
