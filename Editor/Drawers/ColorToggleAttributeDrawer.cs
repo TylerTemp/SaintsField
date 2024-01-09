@@ -298,9 +298,9 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string ClassLabelError(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__LabelError";
-        private static string ClassButton(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__Button";
-        private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ButtonLabel";
+        private static string ClassLabelError(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_LabelError";
+        private static string ClassButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_Button";
+        private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
