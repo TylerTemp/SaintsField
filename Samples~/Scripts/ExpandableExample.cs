@@ -9,6 +9,6 @@ namespace SaintsField.Samples.Scripts
         [Expandable, GetPrefabWithComponent]
         private Scriptable _scriptable;
 
-        // [SerializeField, Expandable] private DropdownExample _dropdownExample;
+        [SerializeField, Expandable] private DropdownExample _dropdownExample;
     }
 }

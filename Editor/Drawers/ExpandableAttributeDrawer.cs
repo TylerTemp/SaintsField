@@ -14,9 +14,6 @@ namespace SaintsField.Editor.Drawers
     {
         #region IMGUI
 
-
-
-
         private string _error = "";
 
         private bool _expanded;
@@ -167,8 +164,8 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string ClassProps(SerializedProperty property) =>
-            $"{property.propertyPath}__ExpandableAttributeDrawer_Props";
+        private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout";
+        private static string NameProps(SerializedProperty property) => $"{property.propertyPath}__ExpandableAttributeDrawer_Props";
 
         protected override VisualElement CreateOverlayUIKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
@@ -183,13 +180,15 @@ namespace SaintsField.Editor.Drawers
                     position = Position.Absolute,
                     // height = EditorGUIUtility.singleLineHeight,
                     // width = 20,
+                    width = LabelBaseWidth - IndentWidth,
                 },
-                name = $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout",
+                name = NameFoldout(property),
+                value = false,
             };
 
             foldOut.RegisterValueChangedCallback(v =>
             {
-                container.Q<VisualElement>(ClassProps(property)).style.display = v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                container.Q<VisualElement>(NameProps(property)).style.display = v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
             });
 
             return foldOut;
@@ -198,18 +197,31 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            Object scriptableObject = property.objectReferenceValue;
-            SerializedObject serializedObject = new SerializedObject(scriptableObject);
-            serializedObject.Update();
+            // Object scriptableObject = property.objectReferenceValue;
 
             VisualElement visualElement = new VisualElement
             {
                 style =
                 {
                     width = Length.Percent(100),
+                    display = DisplayStyle.None,
                 },
-                name = ClassProps(property),
+                name = NameProps(property),
+                userData = null,
             };
+
+            // if (scriptableObject == null)
+            // {
+            //     return visualElement;
+            // }
+
+            return visualElement;
+        }
+
+        private static IEnumerable<PropertyField> GetPropertyFields(SerializedProperty property, Object obj)
+        {
+            SerializedObject serializedObject = new SerializedObject(obj);
+            serializedObject.Update();
 
             foreach (SerializedProperty childProperty in GetAllField(serializedObject))
             {
@@ -222,11 +234,31 @@ namespace SaintsField.Editor.Drawers
                 };
                 prop.AddToClassList($"{property.propertyPath}__ExpandableAttributeDrawer_Prop");
                 prop.Bind(serializedObject);
-                visualElement.Add(prop);
+                // visualElement.Add(prop);
+                yield return prop;
             }
+        }
 
-            // Debug.Log("CreateBelowUIToolkit.ExpandableAttributeDrawer");
-            return visualElement;
+        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            Foldout foldOut = container.Q<Foldout>(NameFoldout(property));
+
+            VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
+            Object curObject = (Object) propsElement.userData;
+
+            if (ReferenceEquals(property.objectReferenceValue, curObject))
+            {
+                return;
+            }
+            foldOut.style.display = property.objectReferenceValue == null? DisplayStyle.None : DisplayStyle.Flex;
+
+            propsElement.userData = property.objectReferenceValue;
+            propsElement.Clear();
+            foreach (PropertyField propertyField in GetPropertyFields(property, property.objectReferenceValue))
+            {
+                propsElement.Add(propertyField);
+            }
         }
 
         #endregion
