@@ -1235,7 +1235,7 @@ namespace SaintsField.Editor.Core
                 saintsPropertyInfo.Drawer.OnUpdateUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
             }
 
-            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent)).StartingIn(500);
+            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent)).StartingIn(100);
         }
 
         protected virtual void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,

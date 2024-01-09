@@ -176,8 +176,10 @@ namespace SaintsField.Editor.Drawers
                     // height = EditorGUIUtility.singleLineHeight,
                     flexDirection = FlexDirection.Row,
                     flexWrap = Wrap.Wrap,
+                    // textOverflow = TextOverflow.wr
                     // alignItems = Align.Center, // vertical
-                    overflow = Overflow.Hidden,
+                    // overflow = Overflow.Hidden,
+                    // overflow = Overflow.
                 },
                 pickingMode = PickingMode.Ignore,
                 name = NameFullWidthLabelContainer(property, index),

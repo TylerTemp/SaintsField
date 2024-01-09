@@ -4117,9 +4117,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db27b88f55274cbdb08aded7eeb757fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subDummy: {fileID: 1631756501}
-  subDummyGo: {fileID: 1631756499}
-  subDummyTrans: {fileID: 1631756500}
+  myDummy: {fileID: 1631756501}
+  myDummyGo: {fileID: 1631756499}
+  myDummyTrans: {fileID: 1631756500}
 --- !u!1 &2045437327
 GameObject:
   m_ObjectHideFlags: 0
