@@ -255,6 +255,11 @@ namespace SaintsField.Editor.Drawers
 
             propsElement.userData = property.objectReferenceValue;
             propsElement.Clear();
+            if (property.objectReferenceValue == null)
+            {
+                return;
+            }
+
             foreach (PropertyField propertyField in GetPropertyFields(property, property.objectReferenceValue))
             {
                 propsElement.Add(propertyField);
