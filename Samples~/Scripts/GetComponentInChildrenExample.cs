@@ -4,8 +4,8 @@ namespace SaintsField.Samples.Scripts
 {
     public class GetComponentInChildrenExample: MonoBehaviour
     {
-        [GetComponentInChildren] public BoxCollider childBoxCollider;
-        [GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
-        [GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
+        [GetComponentInChildren] public BoxCollider myChildBoxCollider;
+        [GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject myChildBoxColliderGo;
+        [GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider myChildAnotherType;
     }
 }
