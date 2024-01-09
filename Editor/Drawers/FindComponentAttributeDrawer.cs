@@ -3,12 +3,15 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(FindComponentAttribute))]
     public class FindComponentAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private string _error = "";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => 0;
@@ -16,11 +19,32 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool valueChanged)
         {
-            _error = "";
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
+            if (error != "")
+            {
+                _error = error;
+                return false;
+            }
 
+            if(result != null)
+            {
+                SetValueChanged(property);
+            }
+            return true;
+        }
+
+        protected override bool WillDrawBelow(SerializedProperty property,
+            ISaintsAttribute saintsAttribute) => _error != "";
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+        #endregion
+
+        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        {
             if (property.objectReferenceValue != null)
             {
-                return false;
+                return ("", null);
             }
 
             FindComponentAttribute findComponentAttribute = (FindComponentAttribute) saintsAttribute;
@@ -38,13 +62,10 @@ namespace SaintsField.Editor.Drawers
                     transform = gameObject.transform;
                     break;
                 default:
-                    _error = "GetComponentInChildrenAttribute can only be used on Component or GameObject";
-                    return false;
+                    return ("GetComponentInChildrenAttribute can only be used on Component or GameObject", null);
             }
 
-            // var directChildren = transform.Cast<Transform>();
-
-            UnityEngine.Object componentInChildren = null;
+            Object componentInChildren = null;
             foreach (string findPath in findComponentAttribute.Paths)
             {
                 Transform findTarget = transform.Find(findPath);
@@ -74,19 +95,69 @@ namespace SaintsField.Editor.Drawers
 
             if (componentInChildren == null)
             {
-                _error = $"No {fieldType} found in paths: {string.Join(", ", findComponentAttribute.Paths)}";
-                return false;
+                return ($"No {fieldType} found in paths: {string.Join(", ", findComponentAttribute.Paths)}", null);
             }
 
             property.objectReferenceValue = componentInChildren;
-            SetValueChanged(property);
-            return true;
+
+            return ("", componentInChildren);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property,
-            ISaintsAttribute saintsAttribute) => _error != "";
+        #region UIToolkit
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+        private static string NamePlaceholder(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__FindComponent";
+
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
+            Action<object> onChange)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_FIND_COMPONENT
+
+            Debug.Log($"FindComponent DrawPostFieldUIToolkit for {property.propertyPath}");
+#endif
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
+            if (error != "")
+            {
+                return new VisualElement
+                {
+                    style =
+                    {
+                        width = 0,
+                    },
+                    name = NamePlaceholder(property, index),
+                    userData = error,
+                };
+            }
+
+            property.serializedObject.ApplyModifiedProperties();
+
+            onChange?.Invoke(result);
+
+            return new VisualElement
+            {
+                style =
+                {
+                    width = 0,
+                },
+                name = NamePlaceholder(property, index),
+                userData = "",
+            };
+        }
+
+        // NOTE: ensure the post field is added to the container!
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            string error = (string)(container.Q<VisualElement>(NamePlaceholder(property, index))!.userData ?? "");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_FIND_COMPONENT
+            Debug.Log($"FindComponent error {error}");
+#endif
+            return string.IsNullOrEmpty(error)
+                ? null
+                : new HelpBox(_error, HelpBoxMessageType.Error);
+        }
+
+        #endregion
     }
 }

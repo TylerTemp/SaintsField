@@ -11,6 +11,7 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(GetComponentAttribute))]
     public class GetComponentAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private string _error = "";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => 0;
@@ -18,47 +19,32 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool valueChanged)
         {
-            if (!DoCheckComponent(property, saintsAttribute))
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
+            if (error != "")
             {
+                _error = error;
                 return false;
             }
-            SetValueChanged(property);
+            if(result != null)
+            {
+                SetValueChanged(property);
+            }
             return true;
         }
 
-        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
-            Action<object> onChange)
+        protected override bool WillDrawBelow(SerializedProperty property,
+            ISaintsAttribute saintsAttribute) => _error != "";
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+
+        #endregion
+
+        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
-            Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
-#endif
-            Object added = DoCheckComponent(property, saintsAttribute);
-            if (!added)
-            {
-                return null;
-            }
-
-            property.serializedObject.ApplyModifiedProperties();
-
-            onChange?.Invoke(added);
-
-            return new VisualElement
-            {
-                style =
-                {
-                    width = 0,
-                },
-            };
-        }
-
-        private Object DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
-        {
-            _error = "";
-
             if (property.objectReferenceValue != null)
             {
-                return null;
+                return ("", null);
             }
 
             GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
@@ -69,7 +55,9 @@ namespace SaintsField.Editor.Drawers
             {
                 if (fieldType != typeof(GameObject))
                 {
-                    _error = $"You can not use GetComponent with field of {fieldType} type while looking for {type} type";
+                    return (
+                        $"You can not use GetComponent with field of {fieldType} type while looking for {type} type",
+                        null);
                 }
 
                 GameObject resultGo;
@@ -82,16 +70,15 @@ namespace SaintsField.Editor.Drawers
                         resultGo = gameObject;
                         break;
                     default:
-                        _error = "GetComponent can only be used on Component or GameObject";
-                        return null;
+                        return ("GetComponent can only be used on Component or GameObject", null);
                 }
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
                 Debug.Log($"GetComponent Add {resultGo} for {property.propertyPath}");
 #endif
 
                 property.objectReferenceValue = resultGo;
-                return resultGo;
+                return ("", resultGo);
             }
 
             Transform transform;
@@ -104,54 +91,79 @@ namespace SaintsField.Editor.Drawers
                     transform = gameObject.transform;
                     break;
                 default:
-                    _error = "GetComponent can only be used on Component or GameObject";
-                    return null;
+                    // _error = ;
+                    return ("GetComponent can only be used on Component or GameObject", null);
             }
 
             Component componentOnSelf = transform.GetComponent(type);
             if (componentOnSelf == null)
             {
-                _error = $"No {type} found on {transform.name}";
-                return null;
+                return ($"No {type} found on {transform.name}", null);
             }
 
             Object result = componentOnSelf;
 
-            // if (fieldType != type)
-            // {
-            //     if(fieldType == typeof(GameObject))
-            //     {
-            //         result = componentOnSelf.gameObject;
-            //     }
-            //     else
-            //     {
-            //         result = componentOnSelf.GetComponent(fieldType);
-            //     }
-            // }
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
             Debug.Log($"GetComponent Add {result} for {property.propertyPath}");
 #endif
 
             property.objectReferenceValue = result;
-            return result;
+            return ("", result);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property,
-            ISaintsAttribute saintsAttribute) => _error != "";
+        #region UIToolkit
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+        private static string NamePlaceholder(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__GetComponent";
 
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
+            Action<object> onChange)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
+            Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
+#endif
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
+            if (error != "")
+            {
+                return new VisualElement
+                {
+                    style =
+                    {
+                        width = 0,
+                    },
+                    name = NamePlaceholder(property, index),
+                    userData = error,
+                };
+            }
+
+            property.serializedObject.ApplyModifiedProperties();
+
+            onChange?.Invoke(result);
+
+            return new VisualElement
+            {
+                style =
+                {
+                    width = 0,
+                },
+                name = NamePlaceholder(property, index),
+                userData = "",
+            };
+        }
+
+        // NOTE: ensure the post field is added to the container!
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
-            Debug.Log($"GetComponent error {_error}");
+            string error = (string)(container.Q<VisualElement>(NamePlaceholder(property, index))!.userData ?? "");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
+            Debug.Log($"GetComponent error {error}");
 #endif
-            return _error != ""
-                ? new HelpBox(_error, HelpBoxMessageType.Error)
-                : null;
+            return string.IsNullOrEmpty(error)
+                ? null
+                : new HelpBox(_error, HelpBoxMessageType.Error);
         }
+        #endregion
     }
 }

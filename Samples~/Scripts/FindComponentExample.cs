@@ -4,8 +4,8 @@ namespace SaintsField.Samples.Scripts
 {
     public class FindComponentExample: MonoBehaviour
     {
-        [FindComponent("sub/dummy")] public Dummy subDummy;
-        [FindComponent("sub/dummy")] public GameObject subDummyGo;
-        [FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
+        [FindComponent("sub/dummy")] public Dummy myDummy;
+        [FindComponent("sub/dummy")] public GameObject myDummyGo;
+        [FindComponent("sub/noSuch", "sub/dummy")] public Transform myDummyTrans;
     }
 }

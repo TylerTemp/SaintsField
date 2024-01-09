@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
     {
         [SerializeField]
         [AboveRichLabel("┌<icon=eye.png/><label />┐")]
-        [RichLabel("├<icon=eye.png/><label />┤")]
+        // [RichLabel("├<icon=eye.png/><label />┤")]
         [BelowRichLabel(nameof(BelowLabel), true)]
         [BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
         [BelowRichLabel("==================================", groupBy: "example")]
