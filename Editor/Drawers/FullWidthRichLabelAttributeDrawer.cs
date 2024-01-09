@@ -40,69 +40,35 @@ namespace SaintsField.Editor.Drawers
             return DrawImGui(position, property, label, saintsAttribute);
         }
 
-        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
-        {
-            return DrawUIToolKit(property, saintsAttribute);
-        }
-
         private Rect DrawImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
 
-            string labelXml = GetLabelXml(property, fullWidthRichLabelAttribute);
+            (string error, string xml) = GetLabelXml(fullWidthRichLabelAttribute, GetParentTarget(property));
+            if(error != "")
+            {
+                _error = error;
+                return position;
+            }
 
-            if (labelXml is null)
+            if (xml is null)
             {
                 return position;
             }
 
             (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
-            _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
+            _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(xml, label.text));
             return leftRect;
         }
 
-        private VisualElement DrawUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
-        {
-            FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
-
-            string labelXml = GetLabelXml(property, fullWidthRichLabelAttribute);
-
-            if (labelXml is null)
-            {
-                return new VisualElement();
-            }
-
-            VisualElement container = new VisualElement
-            {
-                style =
-                {
-                    // height = EditorGUIUtility.singleLineHeight,
-                    flexDirection = FlexDirection.Row,
-                    flexWrap = Wrap.Wrap,
-                    // alignItems = Align.Center, // vertical
-                    // overflow = Overflow.Hidden,
-                },
-                pickingMode = PickingMode.Ignore,
-            };
-            foreach (VisualElement variable in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(labelXml, property.displayName)))
-            {
-                container.Add(variable);
-            }
-
-            return container;
-        }
-
-        private string GetLabelXml(SerializedProperty property, FullWidthRichLabelAttribute targetAttribute)
+        private static (string error, string xml) GetLabelXml(FullWidthRichLabelAttribute targetAttribute, object target)
         {
             if (!targetAttribute.IsCallback)
             {
-                return targetAttribute.RichTextXml;
+                return ("", targetAttribute.RichTextXml);
             }
 
-            _error = "";
-            object target = GetParentTarget(property);
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
                 ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
             switch (getPropType)
@@ -110,13 +76,13 @@ namespace SaintsField.Editor.Drawers
                 case ReflectUtils.GetPropType.Field:
                 {
                     object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-                    return result == null ? string.Empty : result.ToString();
+                    return ("", result == null ? string.Empty : result.ToString());
                 }
 
                 case ReflectUtils.GetPropType.Property:
                 {
                     object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                    return result == null ? string.Empty : result.ToString();
+                    return ("", result == null ? string.Empty : result.ToString());
                 }
                 case ReflectUtils.GetPropType.Method:
                 {
@@ -125,35 +91,32 @@ namespace SaintsField.Editor.Drawers
                     Debug.Assert(methodParams.All(p => p.IsOptional));
                     if (methodInfo.ReturnType != typeof(string))
                     {
-                        _error =
-                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}";
+                        return (
+                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}",
+                            "");
                     }
-                    else
+
+                    try
                     {
-                        try
-                        {
-                            return (string)methodInfo.Invoke(target,
-                                methodParams.Select(p => p.DefaultValue).ToArray());
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            Debug.Assert(e.InnerException != null);
-                            _error = e.InnerException.Message;
-                            Debug.LogException(e);
-                        }
-                        catch (Exception e)
-                        {
-                            _error = e.Message;
-                            Debug.LogException(e);
-                        }
+                        string xml = (string)methodInfo.Invoke(target,
+                            methodParams.Select(p => p.DefaultValue).ToArray());
+                        return ("", xml);
                     }
-                    return null;
+                    catch (TargetInvocationException e)
+                    {
+                        Debug.LogException(e);
+                        Debug.Assert(e.InnerException != null);
+                        return (e.InnerException.Message, null);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                        return (e.Message, null);
+                    }
                 }
                 case ReflectUtils.GetPropType.NotFound:
                 {
-                    _error =
-                        $"not found `{targetAttribute.RichTextXml}` on `{target}`";
-                    return null;
+                    return ($"not found `{targetAttribute.RichTextXml}` on `{target}`", null);
                 }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
@@ -188,6 +151,49 @@ namespace SaintsField.Editor.Drawers
                 : ImGuiHelpBox.Draw(useRect, _error, MessageType.Error);
         }
 
+        #region UI Toolkit
+
+        private static string NameFullWidthLabelContainer(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__FullWidthRichLabel_Container";
+        private static string NameHelpBox(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__FullWidthRichLabel_HelpBox";
+
+        private VisualElement DrawUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, object parent)
+        {
+            // FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
+            //
+            // (string error, string xml) = GetLabelXml(fullWidthRichLabelAttribute, parent);
+            //
+            // if (labelXml is null)
+            // {
+            //     return new VisualElement();
+            // }
+
+            return new VisualElement
+            {
+                style =
+                {
+                    // height = EditorGUIUtility.singleLineHeight,
+                    flexDirection = FlexDirection.Row,
+                    flexWrap = Wrap.Wrap,
+                    // alignItems = Align.Center, // vertical
+                    overflow = Overflow.Hidden,
+                },
+                pickingMode = PickingMode.Ignore,
+                name = NameFullWidthLabelContainer(property, index),
+                userData = null,
+            };
+        }
+
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
+            return fullWidthRichLabelAttribute.Above
+                ? DrawUIToolKit(property, saintsAttribute, index, parent)
+                : null;
+        }
+
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
@@ -196,16 +202,56 @@ namespace SaintsField.Editor.Drawers
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute) saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
             {
-                // useRect = DrawImGui(position, property, label, fullWidthRichLabelAttribute);
-                root.Add(DrawUIToolKit(property, fullWidthRichLabelAttribute));
+                root.Add(DrawUIToolKit(property, saintsAttribute, index, parent));
             }
 
-            if (_error != "")
+            root.Add(new HelpBox("", HelpBoxMessageType.Error)
             {
-                root.Add(new HelpBox(_error, HelpBoxMessageType.Error));
-            }
-
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NameHelpBox(property, index),
+                userData = "",
+            });
             return root;
         }
+
+        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            (string error, string xml) = GetLabelXml((FullWidthRichLabelAttribute)saintsAttribute, parent);
+
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            if ((string)helpBox.userData != error)
+            {
+                helpBox.userData = error;
+                helpBox.text = error;
+                helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+
+            VisualElement fullWidthLabelContainer = container.Q<VisualElement>(NameFullWidthLabelContainer(property, index));
+            if ((string)fullWidthLabelContainer.userData != xml)
+            {
+                fullWidthLabelContainer.userData = xml;
+                if (string.IsNullOrEmpty(xml))
+                {
+                    fullWidthLabelContainer.style.display = DisplayStyle.None;
+                }
+                else
+                {
+                    fullWidthLabelContainer.Clear();
+                    fullWidthLabelContainer.style.display = DisplayStyle.Flex;
+                    foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(xml, property.displayName)))
+                    {
+                        fullWidthLabelContainer.Add(rich);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+
     }
 }
