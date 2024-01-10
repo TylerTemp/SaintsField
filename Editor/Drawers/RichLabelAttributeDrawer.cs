@@ -206,7 +206,7 @@ namespace SaintsField.Editor.Drawers
         {
             return new Button(() =>
             {
-                OnLabelStateChangedUIToolkit(property, container, "");
+                OnLabelStateChangedUIToolkit(property, container, "wtf");
             })
             {
                 text = "Event it!"
