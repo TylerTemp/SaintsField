@@ -62,16 +62,16 @@ namespace SaintsField.Editor.Drawers
             // LabelMouseProcess(position, property);
         }
 
-        protected override IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
-        {
-            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-
-            string labelXml = GetLabelXml(property, targetAttribute);
-
-            return labelXml is null
-                ? Array.Empty<VisualElement>()
-                : _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(labelXml, property.displayName));
-        }
+        // protected override IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        // {
+        //     RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
+        //
+        //     string labelXml = GetLabelXml(property, targetAttribute);
+        //
+        //     return labelXml is null
+        //         ? Array.Empty<VisualElement>()
+        //         : _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(labelXml, property.displayName));
+        // }
 
         private string GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute)
         {
@@ -206,7 +206,7 @@ namespace SaintsField.Editor.Drawers
         {
             return new Button(() =>
             {
-                OnLabelStateChangedUIToolkit(property, container, " ");
+                OnLabelStateChangedUIToolkit(property, container, "");
             })
             {
                 text = "Event it!"

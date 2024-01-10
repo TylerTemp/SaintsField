@@ -5,18 +5,14 @@ namespace SaintsField.Samples.Scripts
 {
     public class RichLabel: MonoBehaviour
     {
-        // [InfoBox("1")]
-        // [InfoBox("2")]
-        // // [InfoBox("3")]
-        // // [InfoBox("4")]
-        // // [InfoBox("5")]
-        // // [RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
-        // public int _rainbow;
-
-        [SepTitle("test", EColor.Yellow)]
-        [InfoBox("another1")]
-        [InfoBox("another2")]
-        public int another;
+        [SepTitle("Rich Label", EColor.Green)]
+        [InfoBox("1")]
+        [InfoBox("2")]
+        // [InfoBox("3")]
+        // [InfoBox("4")]
+        // [InfoBox("5")]
+        [RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
+        public int _rainbow;
 
         // [RichLabel(nameof(LabelCallback), true)]
         // public bool _callbackToggle;

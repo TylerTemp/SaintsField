@@ -568,10 +568,10 @@ namespace SaintsField.Editor.Core
 #endif
                 _saintsFieldDrawer = null;
                 _saintsFieldFallback = SaintsFallbackUIToolkit(property);
-                _saintsFieldFallback.RegisterCallback<AttachToPanelEvent>(evt =>
-                {
-                    Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
-                });
+                // _saintsFieldFallback.RegisterCallback<AttachToPanelEvent>(evt =>
+                // {
+                //     Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
+                // });
                 fieldContainer.Add(_saintsFieldFallback);
             }
             else
@@ -668,7 +668,7 @@ namespace SaintsField.Editor.Core
 
             Dictionary<string, VisualElement> belowGroupByVisualElement = new Dictionary<string, VisualElement>();
 
-            foreach (KeyValuePair<string, List<SaintsPropertyInfo>> groupedDrawerInfo in groupedDrawers)
+            foreach ((KeyValuePair<string, List<SaintsPropertyInfo>> groupedDrawerInfo, int index) in groupedDrawers.WithIndex())
             {
                 string groupBy = groupedDrawerInfo.Key;
                 List<SaintsPropertyInfo> drawerInfo = groupedDrawerInfo.Value;
@@ -682,7 +682,7 @@ namespace SaintsField.Editor.Core
                         {
                             width = Length.Percent(100),
                         },
-                        name = $"{property.propertyPath}__Below",
+                        name = $"{property.propertyPath}__SaintsFieldBelow_{index}",
                     };
                     containerElement.Add(groupByContainer);
                 }
@@ -696,7 +696,7 @@ namespace SaintsField.Editor.Core
                             {
                                 width = Length.Percent(100),
                             },
-                            name = $"{property.propertyPath}__SaintsFieldBelow",
+                            name = $"{property.propertyPath}__SaintsFieldBelow_{index}_{groupBy}",
                         };
                         groupByContainer.style.flexDirection = FlexDirection.Row;
                         containerElement.Add(groupByContainer);
@@ -719,15 +719,13 @@ namespace SaintsField.Editor.Core
                     width = Length.Percent(100),
                 },
                 name = NameSaintsPropertyDrawerRoot(property),
-                userData = this,
+                // userData = this,
             };
             _rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
             _rootElement.Add(containerElement);
 
             // Debug.Log($"ContainerElement={containerElement}");
-            // _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property));
-            // _rootElement.schedule.Execute(() => OnAwakeUiToolKitInternal(property));
-            _rootElement.RegisterCallback<AttachToPanelEvent>(evt => OnAwakeUiToolKitInternal(property, containerElement, parent));
+            _rootElement.RegisterCallback<AttachToPanelEvent>(evt => OnAwakeUiToolKitInternal(property, containerElement, parent, _saintsFieldDrawer==null));
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
@@ -1253,10 +1251,10 @@ namespace SaintsField.Editor.Core
             throw new NotImplementedException();
         }
 
-        protected virtual IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
-        {
-            return Array.Empty<VisualElement>();
-        }
+        // protected virtual IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        // {
+        //     return Array.Empty<VisualElement>();
+        // }
 
         // protected virtual VisualElement CreateSaintsPropertyGUI(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent, LabelState labelState)
         // {
@@ -1264,45 +1262,96 @@ namespace SaintsField.Editor.Core
         // }
 
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
-            object parent)
+            object parent, bool usingFallbackField)
         {
-            var parentRoots = FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
-            if (parentRoots.Count > 0)
+            if(usingFallbackField)
             {
-                // parentRoots.RemoveAt(0);
-                foreach (VisualElement incorrectRootElement in parentRoots)
+                List<VisualElement> parentRoots = FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
+                Debug.Log($"usingFallbackField, parentRoots={parentRoots.Count}");
+                if (parentRoots.Count > 1)
                 {
-                    VisualElement incorrectParent = incorrectRootElement.parent;
-                    foreach (VisualElement incorrectChildren in incorrectParent.Children().ToArray())
-                    {
-                        if(incorrectChildren != incorrectRootElement)
-                        {
-                            Debug.Log($"remove child {string.Join(",", incorrectChildren.GetClasses())}");
-                            incorrectParent.Remove(incorrectChildren);
-                            // incorrectChildren.style.display = DisplayStyle.None;
-                            // incorrectChildren.AddToClassList("REMOVED");
-                        }
-                    }
+                    // VisualElement topRoot = parentRoots[parentRoots.Count - 1];
+                    // // topRoot.parent.Clear();
+                    // // topRoot.parent.Add(topRoot);
+                    //
+                    // // // this works WTF...
+                    // topRoot.Clear();
+                    // topRoot.Add(containerElement);
+                    //
+                    // var children = topRoot.Children().ToArray();
+                    // Debug.Log($"start to remove child {topRoot.Children().Count()}");
+                    // foreach (VisualElement child in children)
+                    // {
+                    //     if(child != containerElement)
+                    //     {
+                    //         child.RemoveFromHierarchy();
+                    //         // child.style.display = DisplayStyle.None;
+                    //     }
+                    //     // topRoot.schedule.Execute(() => child.RemoveFromHierarchy());
+                    //     // topRoot.Remove(child);
+                    //     // child.visible = false;
+                    //     // child.style.display = DisplayStyle.None;
+                    // }
+                    //
+                    // foreach (VisualElement topRootParentChild in topRoot.parent.Children().ToArray())
+                    // {
+                    //     if (topRootParentChild != topRoot)
+                    //     {
+                    //         // topRootParentChild.style.display = DisplayStyle.None;
+                    //         topRootParentChild.RemoveFromHierarchy();
+                    //     }
+                    // }
+                    //
+                    // // foreach (VisualElement children in topRoot.parent.Children().ToArray())
+                    // // {
+                    // //     if(children != containerElement)
+                    // //     {
+                    // //         // children.style.display = DisplayStyle.None;
+                    // //         children.RemoveFromHierarchy();
+                    // //     }
+                    // // }
+                    // //
+                    // // topRoot.schedule.Execute(() =>
+                    // // {
+                    // //     var children = topRoot.Children().ToArray();
+                    // //     Debug.Log($"start to remove child {topRoot.Children().Count()}");
+                    // //     foreach (VisualElement child in children)
+                    // //     {
+                    // //         if(child != containerElement)
+                    // //         {
+                    // //             // child.RemoveFromHierarchy();
+                    // //             child.style.display = DisplayStyle.None;
+                    // //         }
+                    // //         // topRoot.schedule.Execute(() => child.RemoveFromHierarchy());
+                    // //         // topRoot.Remove(child);
+                    // //         // child.visible = false;
+                    // //         // child.style.display = DisplayStyle.None;
+                    // //     }
+                    // // });
+                    // //
+                    // // // var children = topRoot.Children().ToArray();
+                    // // // Debug.Log($"start to remove child {topRoot.Children().Count()}");
+                    // // // foreach (VisualElement child in children)
+                    // // // {
+                    // // //     if(child != containerElement)
+                    // // //     {
+                    // // //         child.RemoveFromHierarchy();
+                    // // //     }
+                    // // //     // topRoot.schedule.Execute(() => child.RemoveFromHierarchy());
+                    // // //     // topRoot.Remove(child);
+                    // // //     // child.visible = false;
+                    // // //     // child.style.display = DisplayStyle.None;
+                    // // // }
+                    // //
+                    // containerElement.Q<PropertyField>().Bind(property.serializedObject);
+                    //
+                    // containerElement.parent.userData = this;
                 }
             }
-
-            // var rootElements = containerElement.Query<VisualElement>(className: NameSaintsPropertyDrawerRoot(property)).ToList();
-            // var count = rootElements.Count;
-            // if (count > 0)
-            // {
-            //     // foreach (VisualElement incorrectRootElement in rootElements)
-            //     // {
-            //     //     VisualElement incorrectParent = incorrectRootElement.parent;
-            //     //     foreach (VisualElement incorrectChildren in incorrectParent.Children().ToArray())
-            //     //     {
-            //     //         if(incorrectChildren != incorrectRootElement)
-            //     //         {
-            //     //             incorrectParent.Remove(incorrectChildren);
-            //     //         }
-            //     //     }
-            //     // }
-            // }
-            // Debug.Log($"OnAwakeUiToolKitInternal {count}: {property.propertyPath}/{parent}/{containerElement}");
+            else
+            {
+                containerElement.parent.userData = this;
+            }
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in _saintsPropertyDrawers)
             {
@@ -1546,10 +1595,29 @@ namespace SaintsField.Editor.Core
             return position;
         }
 
-        protected void OnLabelStateChangedUIToolkit(SerializedProperty property, VisualElement element, string toLabel)
+        protected static void OnLabelStateChangedUIToolkit(SerializedProperty property, VisualElement element, string toLabel)
         {
             SaintsPropertyDrawer mainDrawer = (SaintsPropertyDrawer)GetFirstAncestorName(element, NameSaintsPropertyDrawerRoot(property)).userData;
-            ChangeFieldLabelTo(toLabel);
+            Debug.Log(mainDrawer);
+            if (mainDrawer._saintsFieldFallback != null)
+            {
+                // mainDrawer._saintsFieldFallback.label = toLabel;
+                // element.Q<IntegerField>().label = toLabel;
+                Label label = element.Query(className: "saintsFieldFallback").First().Q<Label>();
+                if (label != null)
+                {
+                    label.text = toLabel;
+                    label.style.display = string.IsNullOrEmpty(toLabel)? DisplayStyle.None: DisplayStyle.Flex;
+                    Debug.Log(label.style.display);
+                }
+            }
+            else
+            {
+                Debug.Log(mainDrawer._saintsFieldDrawer);
+            }
+            // Debug.Log(mainDrawer._saintsFieldFallback);
+            // Debug.Log(mainDrawer._saintsFieldDrawer);
+            // ChangeFieldLabelTo(toLabel);
         }
 
         protected virtual void ChangeFieldLabelTo(string label)
