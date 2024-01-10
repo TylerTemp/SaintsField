@@ -14,7 +14,6 @@ namespace SaintsField.Editor.Drawers
     public class RichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
-        private string _error = "";
 
         // private readonly Color _backgroundColor;
         //
@@ -24,6 +23,10 @@ namespace SaintsField.Editor.Drawers
         //         ? new Color32(56, 56, 56, 255)
         //         : new Color32(194, 194, 194, 255);
         // }
+
+        #region IMGUI
+
+        private string _error = "";
 
         ~RichLabelAttributeDrawer()
         {
@@ -194,5 +197,22 @@ namespace SaintsField.Editor.Drawers
         {
             return ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         }
+        #endregion
+
+        #region UIToolkit
+
+        protected override VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new Button(() =>
+            {
+                OnLabelStateChangedUIToolkit(property, container, " ");
+            })
+            {
+                text = "Event it!"
+            };
+        }
+
+        #endregion
     }
 }

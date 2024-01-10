@@ -700,9 +700,6 @@ MonoBehaviour:
   min: -5
   max: 5
   rangeFloat: -4.67
-  rangeInt: -2
-  rangeFloatStep: 0.5
-  rangeIntStep: 3
 --- !u!4 &308851078
 Transform:
   m_ObjectHideFlags: 0
@@ -1355,8 +1352,6 @@ GameObject:
   m_Component:
   - component: {fileID: 673204054}
   - component: {fileID: 673204055}
-  - component: {fileID: 673204056}
-  - component: {fileID: 673204057}
   m_Layer: 0
   m_Name: UIKit
   m_TagString: Untagged
@@ -1375,7 +1370,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 812603484}
   m_Father: {fileID: 0}
   m_RootOrder: 59
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1391,45 +1387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c136e3f4a3c5a8441b0e3aa1a443ed4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normal: 0
   content: 
-  testStruct:
-    normal: 
-    content: 
---- !u!114 &673204056
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 673204053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3864089a44fa4aca966048d517c9254d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  potionResult:
-    name: 
-    amount: 20
-    unit: 2
-  potionIngredients:
-  - name: 
-    amount: 0
-    unit: 0
---- !u!114 &673204057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 673204053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6046fd5c7377274aad49737c20eb210, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  intDrag: 0
-  textArea: 
 --- !u!1 &679680717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1657,6 +1615,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 47
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &812603483
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 812603484}
+  - component: {fileID: 812603485}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &812603484
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812603483}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 673204054}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &812603485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812603483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17f50637e23e8474e87a71259d0ad5ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: 
 --- !u!1 &825514330
 GameObject:
   m_ObjectHideFlags: 0
@@ -3488,49 +3491,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rainbow: 22
-  _callbackToggle: 0
-  arrayLabels: []
-  _propertyLabel: <color=green>label dynamic
-  colorAqua: 
-  colorBlack: 
-  colorBlue: 
-  colorBrown: 
-  colorCyan: 
-  colorDarkBlue: 
-  colorFuchsia: 
-  colorGreen: 
-  colorGray: 
-  colorGrey: 
-  colorLightBlue: 
-  colorLime: 
-  colorMagenta: 
-  colorMaroon: 
-  colorNavy: 
-  colorOlive: 
-  colorOrange: 
-  colorPurple: 
-  colorRed: 
-  colorSilver: 
-  colorTeal: 
-  colorWhite: 
-  colorYellow: 
-  colorClear: 
-  colorPink: 
-  colorIndigo: 
-  colorViolet: 
-  _myStructWorkAround:
-    LabelFloat: 0
-    Scene: 0
-    SortingLayer: 
-    Slider: {x: 0, y: 0}
-    DefaultFloat: 0
-  _defaultDrawerForStruct:
-    LabelFloat: 0
-    Scene: 0
-    SortingLayer: 
-    Slider: {x: 0, y: 0}
-    DefaultFloat: 0
-  richLabel: 0
+  another: 0
 --- !u!1 &1621177995
 GameObject:
   m_ObjectHideFlags: 0

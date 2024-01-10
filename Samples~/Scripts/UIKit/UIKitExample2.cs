@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.UIKit
 {
-    public class UIKitExample : MonoBehaviour
+    public class UIKitExample2 : MonoBehaviour
     {
         // [ShowNonSerializedField] public static readonly Color red = Color.red;
         // [ShowNativeProperty] public Color blue => Color.blue;
