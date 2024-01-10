@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -243,7 +244,19 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
+            var payloads = RichTextDrawer.ParseRichXml(nowXml, property.displayName).ToArray();
+            foreach (RichTextDrawer.RichTextChunk richTextChunk in payloads)
+            {
+                Debug.Log($"Content=[{richTextChunk}]");
+                using(FileStream fs = new FileStream("D:\\log.txt", FileMode.Append))
+                {
+                    using(StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.WriteLine($"Content=[{richTextChunk}]");
+                    }
+                }
+            }
+            foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, new[]{payloads[2]}))
             {
                 root.Add(richChunk);
             }

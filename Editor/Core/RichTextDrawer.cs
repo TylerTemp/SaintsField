@@ -115,6 +115,7 @@ namespace SaintsField.Editor.Core
                 }
                 else if (parsedResult.partType == RichPartType.StartTag && !parsedResult.isSelfClose)
                 {
+                    // Debug.Log($"parse={parsedResult.content}, {parsedResult.value}");
                     openTags.Add((parsedResult.content, parsedResult.value, part));
                     if (parsedResult.content == "color")
                     {
@@ -122,8 +123,10 @@ namespace SaintsField.Editor.Core
                         // richText.Append(Colors.ColorNameSupported(parsedResult.value)
                         //     ? part
                         //     : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
+                        // richText.Append(
+                        //     $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");、
                         richText.Append(
-                            $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
+                            $"<color={parsedResult.value}>");
                     }
                     else
                     {
@@ -145,6 +148,7 @@ namespace SaintsField.Editor.Core
                             break;
                         case "color" when colors.Count > 0:
                             colors.RemoveAt(colors.Count - 1);
+                            Debug.Log($"Append={part}");
                             richText.Append(part);
                             break;
                         case "label":
@@ -263,6 +267,12 @@ namespace SaintsField.Editor.Core
             }
 
             string tagNameStrip = tagName.Trim();
+
+            if (tagNameStrip == "color")
+            {
+                tagValue = Colors.ToHtmlHexString(Colors.GetColorByStringPresent(tagValue));
+                // Debug.Log(tagValue);
+            }
             return (tagNameStrip, tagValue);
         }
 
