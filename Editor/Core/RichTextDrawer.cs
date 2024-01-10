@@ -109,6 +109,8 @@ namespace SaintsField.Editor.Core
             {
                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
+                Debug.Log($"parse: {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
+
                 if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
                 {
                     richText.Append(parsedResult.content);
@@ -148,7 +150,6 @@ namespace SaintsField.Editor.Core
                             break;
                         case "color" when colors.Count > 0:
                             colors.RemoveAt(colors.Count - 1);
-                            Debug.Log($"Append={part}");
                             richText.Append(part);
                             break;
                         case "label":
