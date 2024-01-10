@@ -201,16 +201,52 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
+        private static string NameRichLabelContainer(SerializedProperty property) => $"{property.propertyPath}__SaintsFieldRichLabelContainer";
+
         protected override VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            return new Button(() =>
+            return new VisualElement
             {
-                OnLabelStateChangedUIToolkit(property, container, "wtf");
-            })
-            {
-                text = "Event it!"
+                style =
+                {
+                    position = Position.Absolute,
+                    flexDirection = FlexDirection.Row,
+                    height = EditorGUIUtility.singleLineHeight,
+                    marginLeft = LabelLeftSpace,
+                    width = LabelBaseWidth,
+
+                    flexShrink = 0,
+                    flexGrow = 0,
+                    unityTextAlign = TextAnchor.MiddleLeft,
+                },
+                name = NameRichLabelContainer(property),
+                userData = " "
             };
+        }
+
+        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            VisualElement root = container.Q<VisualElement>(NameRichLabelContainer(property));
+            string curXml = (string)root.userData;
+            string nowXml = GetLabelXml(property, (RichLabelAttribute)saintsAttribute);
+            if (curXml == nowXml)
+            {
+                return;
+            }
+
+            root.userData = nowXml;
+            root.Clear();
+            if (nowXml is null)
+            {
+                return;
+            }
+
+            foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
+            {
+                root.Add(richChunk);
+            }
         }
 
         #endregion
