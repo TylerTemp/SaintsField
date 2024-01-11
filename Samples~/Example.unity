@@ -1606,9 +1606,9 @@ MonoBehaviour:
   _spriteImage: {fileID: 0}
   <Go>k__BackingField: {fileID: 0}
   _object: {fileID: 0}
-  _wontWork: 8.550002
-  wontWorkWontNoticeYou:
-    theInt: -8
+  _wontWork: 0.79
+  myStruct:
+    theInt: 0
 --- !u!4 &768079761
 Transform:
   m_ObjectHideFlags: 0

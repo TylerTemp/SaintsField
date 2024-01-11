@@ -18,6 +18,6 @@ namespace SaintsField.Samples.Scripts
         }
 
         [Required]
-        public MyStruct wontWorkWontNoticeYou;
+        public MyStruct myStruct;
     }
 }

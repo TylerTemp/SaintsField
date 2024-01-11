@@ -622,6 +622,7 @@ namespace SaintsField.Editor.Core
                         // alignItems = Align.Center, // vertical
                         unityTextAlign = TextAnchor.LowerLeft,
                     },
+                    pickingMode = PickingMode.Ignore,
                     // name = NameRichLabelContainer(property),
                 });
             }
