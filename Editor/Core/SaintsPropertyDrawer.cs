@@ -405,6 +405,7 @@ namespace SaintsField.Editor.Core
         //     PropertyNestInfo.Clear();
         // }
 
+        #region UI
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -599,7 +600,7 @@ namespace SaintsField.Editor.Core
 #endif
 
                 VisualElement fieldElement = fieldAttributeWithIndex.Drawer.CreateFieldUIToolKit(property,
-                    fieldAttributeWithIndex.Attribute, containerElement, parent, Debug.Log);
+                    fieldAttributeWithIndex.Attribute, containerElement, parent);
                 // fieldElement.style.flexShrink = 1;
                 fieldElement.style.flexGrow = 1;
                 // fieldElement.RegisterValueChangeCallback(_ => SetValueChanged(property, true));
@@ -807,7 +808,7 @@ namespace SaintsField.Editor.Core
                 },
             };
             propertyField.AddToClassList(SaintsFieldFallbackClass);
-            propertyField.RegisterValueChangeCallback(Debug.Log);
+            // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
         }
 
@@ -1247,20 +1248,21 @@ namespace SaintsField.Editor.Core
             SetValueChanged(property, false);
         }
 #endif
+        #endregion
 
         private static string NameSaintsPropertyDrawerRoot(SerializedProperty property) =>
             $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__SaintsFieldRoot";
 
-        private static VisualElement GetFirstAncestorName(VisualElement element, string name)
-        {
-            if (element == null)
-                return null;
-
-            if (element.name == name)
-                return element;
-
-            return GetFirstAncestorName(element.parent, name);
-        }
+        // private static VisualElement GetFirstAncestorName(VisualElement element, string name)
+        // {
+        //     if (element == null)
+        //         return null;
+        //
+        //     if (element.name == name)
+        //         return element;
+        //
+        //     return GetFirstAncestorName(element.parent, name);
+        // }
 
         private static IEnumerable<VisualElement> FindParentClass(VisualElement element, string className)
         {
@@ -1293,9 +1295,14 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, object parent, Action<object> onChange)
+            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
         {
             throw new NotImplementedException();
+        }
+
+        protected void OnChangedUIToolkit(object newValue)
+        {
+
         }
 
         // protected virtual IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -1309,22 +1316,34 @@ namespace SaintsField.Editor.Core
         // }
 
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
-            object parent, IReadOnlyList<SaintsPropertyInfo> _saintsPropertyDrawers, bool usingFallbackField)
+            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, bool usingFallbackField)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"On Awake");
+#endif
+
+            Action<object> onValueChangedCallback = obj =>
+            {
+                foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
+                {
+                    saintsPropertyInfo.Drawer.OnValueChanged(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent, obj);
+                }
+            };
 
             if(usingFallbackField)
             {
                 // containerElement.visible = true;
 
                 List<VisualElement> parentRoots = FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log($"usingFallbackField, parentRoots={parentRoots.Count}, {_saintsPropertyDrawers.Count}");
-                if (parentRoots.Count != _saintsPropertyDrawers.Count)
+#endif
+                if (parentRoots.Count != saintsPropertyDrawers.Count)
                 {
                     return;
                 }
 
-                if (parentRoots.Count == _saintsPropertyDrawers.Count)
+                if (parentRoots.Count == saintsPropertyDrawers.Count)
                 {
                     VisualElement topRoot = parentRoots[parentRoots.Count - 1];
 
@@ -1342,25 +1361,34 @@ namespace SaintsField.Editor.Core
                     topRoot.Clear();
                     topRoot.Add(containerElement);
 
-                    topRoot.userData = this;
+                    containerElement.userData = this;
 
                     containerElement.visible = true;
 
                     thisPropField.Bind(property.serializedObject);
+                    thisPropField.RegisterValueChangeCallback(_ => onValueChangedCallback(null));
                 }
             }
             else
             {
-                containerElement.parent.userData = this;
+                containerElement.userData = this;
             }
 
-            foreach (SaintsPropertyInfo saintsPropertyInfo in _saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnAwakeUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
+                saintsPropertyInfo.Drawer.OnAwakeUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
             }
 
-            containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, _saintsPropertyDrawers));
+            containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
 
+        }
+
+        protected virtual void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            object parent,
+            object newValue)
+        {
+            Debug.Log($"OK I got a new value {newValue}; {this}");
         }
 
         private void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
@@ -1375,8 +1403,8 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int element,
-            VisualElement containerElement, object parent)
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
         }
 
@@ -1422,67 +1450,6 @@ namespace SaintsField.Editor.Core
             Type drawerType = PropertyAttributeToDrawers[saintsAttribute.GetType()].First(each => each.isSaints).drawerType;
             return (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
         }
-
-
-        // private SaintsPropertyDrawer GetOrCreateDrawerInfo(Type drawerType)
-        // {
-        //     if (!_cachedDrawer.TryGetValue(drawerType, out SaintsPropertyDrawer drawer))
-        //     {
-        //         _cachedDrawer[drawerType] = drawer = (SaintsPropertyDrawer) Activator.CreateInstance(drawerType, false);
-        //     }
-        //
-        //     return drawer;
-        // }
-
-        // private bool DoDrawLabel(SaintsWithIndex labelAttributeWithIndex, Rect labelRect, SerializedProperty property, GUIContent label)
-        // {
-        //     // Type labelDrawer = labelAttributeWithIndex.SaintsAttribute == null
-        //     //     ? null
-        //     //     : GetFirstSaintsDrawerType(labelAttributeWithIndex.SaintsAttribute.GetType());
-        //     // // bool anyLabelDrew = false;
-        //     // if (labelDrawer == null)
-        //     // {
-        //     //     // anyLabelDrew = true;
-        //     //     // Debug.Log(labelRect);
-        //     //     // Debug.Log(_labelClickedMousePos);
-        //     //     // if(labelRect.Contains(_labelClickedMousePos))
-        //     //     // {
-        //     //     //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
-        //     //     // }
-        //     //     // default label drawer
-        //     //     EditorGUI.LabelField(labelRect, label);
-        //     //     // RichLabelAttributeDrawer.LabelMouseProcess(labelRect, property);
-        //     //     // fieldRect = leftPropertyRect;
-        //     //     // return (true, leftPropertyRect);
-        //     //     return true;
-        //     // }
-        //
-        //     SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
-        //
-        //     // add anyway, cus it decide draw or not, which affects the break line type field drawing
-        //     _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
-        //
-        //     // Debug.Log(labelAttribute);
-        //     if (!labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute))
-        //     {
-        //         return false;
-        //     }
-        //
-        //     // if(labelRect.Contains(_labelClickedMousePos))
-        //     // {
-        //     //     GUI.Box(labelRect, GUIContent.none, "SelectionRect");
-        //     // }
-        //
-        //     Rect indentedRect = EditorGUI.IndentedRect(labelRect);
-        //
-        //     labelDrawerInstance.DrawLabel(indentedRect, property, label,
-        //         labelAttributeWithIndex.SaintsAttribute);
-        //     // fieldRect = leftPropertyRect;
-        //     // newLabel = GUIContent.none;
-        //
-        //     // _usedAttributes.TryAdd(labelAttributeWithIndex, labelDrawerInstance);
-        //     return true;
-        // }
 
         protected void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -1633,7 +1600,8 @@ namespace SaintsField.Editor.Core
             // ChangeFieldLabelTo(toLabel);
         }
 
-        protected virtual void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
+        protected virtual void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
         {
             throw new NotImplementedException();
         }

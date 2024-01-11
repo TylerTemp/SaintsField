@@ -218,12 +218,11 @@ namespace SaintsField.Editor.Drawers
         //     AnimatorParameters = new List<AnimatorControllerParameter>(),
         // };
 
-        private static string ClassDropdownField(SerializedProperty property) => $"{property.propertyPath}:DropdownField";
-        private static string ClassHelpBox(SerializedProperty property) => $"{property.propertyPath}:HelpBox";
+        private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__AnimatorParam_DropdownField";
+        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AnimatorParam_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, object parent,
-            Action<object> onChange)
+            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
         {
             var curMetaInfo = GetMetaInfo(property, saintsAttribute);
 
@@ -234,25 +233,8 @@ namespace SaintsField.Editor.Drawers
                     flexGrow = 1,
                 },
                 userData = curMetaInfo,
+                name = NameDropdownField(property),
             };
-
-            dropdownField.AddToClassList(ClassDropdownField(property));
-
-            dropdownField.RegisterValueChangedCallback(v =>
-            {
-                MetaInfo nowMetaInfo = (MetaInfo)((VisualElement)v.target).userData;
-                AnimatorControllerParameter selectedState = nowMetaInfo.AnimatorParameters[dropdownField.index];
-                if(property.propertyType == SerializedPropertyType.String)
-                {
-                    property.stringValue = selectedState.name;
-                }
-                else
-                {
-                    property.intValue = selectedState.nameHash;
-                }
-                property.serializedObject.ApplyModifiedProperties();
-                onChange?.Invoke(selectedState);
-            });
 
             dropdownField.choices = curMetaInfo.AnimatorParameters.Select(GetParameterLabel).ToList();
 
@@ -294,9 +276,10 @@ namespace SaintsField.Editor.Drawers
                 {
                     display = DisplayStyle.None,
                 },
+                name = NameHelpBox(property),
             };
 
-            helpBoxElement.AddToClassList(ClassHelpBox(property));
+            // helpBoxElement.AddToClassList(ClassHelpBox(property));
             return helpBoxElement;
         }
 
@@ -304,18 +287,34 @@ namespace SaintsField.Editor.Drawers
         private static bool ParamHashEquals(AnimatorControllerParameter param, SerializedProperty prop) => param.nameHash == prop.intValue;
 
         protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int element,
-            VisualElement containerElement, object parent)
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
-            DropdownField dropdownField = containerElement.Query<DropdownField>(className: ClassDropdownField(property)).First();
+            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             MetaInfo metaInfo = (MetaInfo)dropdownField.userData;
             // ReSharper disable once InvertIf
             if (metaInfo.Error != "")
             {
-                HelpBox helpBoxElement = containerElement.Query<HelpBox>(className: ClassHelpBox(property)).First();
+                HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
                 helpBoxElement.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
                 helpBoxElement.text = metaInfo.Error;
             }
+
+            dropdownField.RegisterValueChangedCallback(v =>
+            {
+                MetaInfo nowMetaInfo = (MetaInfo)((VisualElement)v.target).userData;
+                AnimatorControllerParameter selectedState = nowMetaInfo.AnimatorParameters[dropdownField.index];
+                if(property.propertyType == SerializedPropertyType.String)
+                {
+                    property.stringValue = selectedState.name;
+                }
+                else
+                {
+                    property.intValue = selectedState.nameHash;
+                }
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(selectedState);
+            });
         }
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -324,7 +323,7 @@ namespace SaintsField.Editor.Drawers
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
 
-            DropdownField dropdownField = container.Query<DropdownField>(className: ClassDropdownField(property)).First();
+            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
 
             MetaInfo curMetaInfo = (MetaInfo) dropdownField.userData;
             dropdownField.userData = metaInfo;
@@ -334,7 +333,7 @@ namespace SaintsField.Editor.Drawers
 
             if(!errorEqual)
             {
-                HelpBox helpBoxElement = container.Query<HelpBox>(className: ClassHelpBox(property)).First();
+                HelpBox helpBoxElement = container.Query<HelpBox>(NameHelpBox(property)).First();
                 helpBoxElement.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
                 helpBoxElement.text = metaInfo.Error;
             }

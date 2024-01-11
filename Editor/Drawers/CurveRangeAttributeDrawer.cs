@@ -72,29 +72,30 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
+        private static string NameCurveField(SerializedProperty property) => $"{property.propertyPath}__CurveRange";
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, object parent,
-            Action<object> onChange)
+            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
         {
             CurveField element = new CurveField(property.displayName)
             {
                 value = property.animationCurveValue,
                 ranges = GetRanges((CurveRangeAttribute) saintsAttribute),
-                // color wont work for it
-                // style =
-                // {
-                //     color = Color.red,
-                // },
+                name = NameCurveField(property),
             };
 
-            element.RegisterValueChangedCallback(v =>
+            return element;
+        }
+
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
+        {
+            container.Q<CurveField>(NameCurveField(property)).RegisterValueChangedCallback(v =>
             {
                 property.animationCurveValue = v.newValue;
                 property.serializedObject.ApplyModifiedProperties();
-                onChange?.Invoke(v.newValue);
+                onValueChangedCallback.Invoke(v.newValue);
             });
-
-            return element;
         }
 
         #endregion

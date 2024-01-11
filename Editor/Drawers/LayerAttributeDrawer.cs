@@ -63,48 +63,41 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, object parent, Action<object> onChange)
+        private static string NameLayer(SerializedProperty property) => $"{property.propertyPath}__Layer";
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, object parent)
         {
             int curSelected = property.propertyType == SerializedPropertyType.Integer
                 ? property.intValue
                 : LayerMask.NameToLayer(property.stringValue);
 
-            LayerField layerField = new LayerField(property.displayName, curSelected);
-            layerField.RegisterValueChangedCallback(evt =>
+            LayerField layerField = new LayerField(property.displayName, curSelected)
+            {
+                name = NameLayer(property),
+            };
+
+            return layerField;
+        }
+
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            container.Q<LayerField>(NameLayer(property)).RegisterValueChangedCallback(evt =>
             {
                 if (property.propertyType == SerializedPropertyType.Integer)
                 {
                     property.intValue = evt.newValue;
-                    onChange?.Invoke(evt.newValue);
+                    onValueChangedCallback.Invoke(evt.newValue);
                 }
                 else
                 {
                     string newValue = LayerMask.LayerToName(evt.newValue);
                     property.stringValue = newValue;
-                    onChange?.Invoke(newValue);
+                    onValueChangedCallback.Invoke(newValue);
                 }
             });
-
-            return layerField;
-
-            // // ReSharper disable once ConvertToUsingDeclaration
-            // using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-            // {
-            //     int selectedLayer = EditorGUI.LayerField(position, label, curSelected);
-            //     // ReSharper disable once InvertIf
-            //     if (changed.changed)
-            //     {
-            //         if (property.propertyType == SerializedPropertyType.Integer)
-            //         {
-            //             property.intValue = selectedLayer;
-            //         }
-            //         else
-            //         {
-            //             // Debug.Log($"change index {selectedLayer} on {string.Join(", ", layers)}");
-            //             property.stringValue = LayerMask.LayerToName(selectedLayer);
-            //         }
-            //     }
         }
 
         #endregion

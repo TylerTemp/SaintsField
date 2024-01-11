@@ -279,8 +279,7 @@ namespace SaintsField.Editor.Drawers
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, object parent,
-            Action<object> onChange)
+            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             Type parentType = parent.GetType();
@@ -289,7 +288,7 @@ namespace SaintsField.Editor.Drawers
 
             string buttonLabel = metaInfo.SelectedIndex == -1? "-": metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
 
-            Button button = new Button(() => ShowDropdown(property, saintsAttribute, container, parent, onChange))
+            Button button = new Button
             {
                 // text = buttonLabel,
                 style =
@@ -353,6 +352,13 @@ namespace SaintsField.Editor.Drawers
                 },
                 name = NameHelpBox(property),
             };
+        }
+
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            container.Q<Button>(NameButtonField(property)).clicked += () =>
+                ShowDropdown(property, saintsAttribute, container, parent, onValueChangedCallback);
         }
 
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,

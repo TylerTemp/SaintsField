@@ -77,15 +77,17 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
         private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__InputAxis_Button";
         private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__InputAxis_ButtonLabel";
+        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__InputAxis_Label";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, object parent, Action<object> onChange)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, object parent)
         {
             IReadOnlyList<string> axisNames = GetAxisNames();
             int selectedIndex = IndexOf(axisNames, property.stringValue);
             string buttonLabel = selectedIndex == -1 ? "-" : axisNames[selectedIndex];
 
-            Button button = new Button(() => ShowDropdown(property, saintsAttribute, container, parent, onChange))
+            Button button = new Button
             {
                 style =
                 {
@@ -125,10 +127,19 @@ namespace SaintsField.Editor.Drawers
 
             Debug.Log(EditorGUI.indentLevel);
 
-            root.Add(Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 1));
+            var prefixLabel = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 1);
+            prefixLabel.name = NameLabel(property);
+            root.Add(prefixLabel);
             root.Add(button);
 
             return root;
+        }
+
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            container.Q<Button>(NameButtonField(property)).clicked += () =>
+                ShowDropdown(property, saintsAttribute, container, parent, onValueChangedCallback);
         }
 
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -158,6 +169,14 @@ namespace SaintsField.Editor.Drawers
 
             Button button = container.Q<Button>(NameButtonField(property));
             genericDropdownMenu.DropDown(button.worldBound, button, true);
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull)
+        {
+            Label buttonLabel = container.Q<Label>(NameLabel(property));
+            buttonLabel.text = labelOrNull ?? "";
+            buttonLabel.style.display = labelOrNull == null? DisplayStyle.None: DisplayStyle.Flex;
         }
 
         #endregion

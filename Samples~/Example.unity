@@ -706,9 +706,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ab24fcecf85459b8c5c812cbe6c7870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  min: -5
-  max: 5
-  rangeFloat: -4.67
+  min: 10
+  max: 21
+  rangeFloat: 10
+  rangeInt: 10
+  rangeFloatStep: 14
+  rangeIntStep: 20
+  normalRange: 7
 --- !u!4 &308851078
 Transform:
   m_ObjectHideFlags: 0
@@ -3301,7 +3305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 285828b4b0a19cb46804e478c7f9acf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _value: 47
+  _value: 9
 --- !u!4 &1484731013
 Transform:
   m_ObjectHideFlags: 0
@@ -3499,7 +3503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee51f7ab1caf4797aba008aceac3d374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rainbow: {fileID: 0}
+  _rainbow: {fileID: 1571298210}
   _callbackToggle: 0
   arrayLabels:
   - 

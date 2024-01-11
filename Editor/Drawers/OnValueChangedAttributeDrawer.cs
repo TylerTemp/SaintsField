@@ -5,12 +5,15 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(OnValueChangedAttribute))]
     public class OnValueChangedAttributeDrawer : SaintsPropertyDrawer
     {
+        #region IMGUI
+
         private string _error = "";
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
@@ -22,39 +25,7 @@ namespace SaintsField.Editor.Drawers
                 return true;
             }
 
-            property.serializedObject.ApplyModifiedProperties();
-
-            string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
-            object target = GetParentTarget(property);
-
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            MethodInfo methodInfo =  target.GetType().GetMethod(callback, bindAttr);
-            if (methodInfo == null)
-            {
-                _error = $"no method found `{callback}` on `{target}`";
-                return true;
-            }
-
-            _error = "";
-
-            ParameterInfo[] methodParams = methodInfo.GetParameters();
-            Debug.Assert(methodParams.All(p => p.IsOptional));
-            try
-            {
-                methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-            }
-            catch (TargetInvocationException e)
-            {
-                Debug.Assert(e.InnerException != null);
-                _error = e.InnerException.Message;
-                Debug.LogException(e);
-            }
-            catch (Exception e)
-            {
-                _error = e.Message;
-                Debug.LogException(e);
-            }
+            _error = InvokeCallback(saintsAttribute, GetParentTarget(property));
 
             return true;
         }
@@ -64,5 +35,72 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        #endregion
+
+        private static string InvokeCallback(ISaintsAttribute saintsAttribute, object target)
+        {
+            string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
+
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+            MethodInfo methodInfo =  target.GetType().GetMethod(callback, bindAttr);
+            if (methodInfo == null)
+            {
+                return $"No method found `{callback}` on `{target}`";
+            }
+
+            ParameterInfo[] methodParams = methodInfo.GetParameters();
+            Debug.Assert(methodParams.All(p => p.IsOptional));
+            try
+            {
+                methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+            }
+            catch (TargetInvocationException e)
+            {
+                Debug.LogException(e);
+                Debug.Assert(e.InnerException != null);
+                return e.InnerException.Message;
+
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return e.Message;
+            }
+
+            return "";
+        }
+
+        #region UIToolkit
+
+        private static string NameHelpBox(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__ONValueChanged_HelpBox";
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                name = NameHelpBox(property, index),
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+        }
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            object parent,
+            object newValue)
+        {
+            // Debug.Log($"OK I got a new value {newValue}; {this}");
+            var error = InvokeCallback(saintsAttribute, parent);
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            helpBox.text = error;
+            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+        }
+
+        #endregion
     }
 }

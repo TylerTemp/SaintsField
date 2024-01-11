@@ -35,8 +35,11 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, object parent, Action<object> onChange)
+        private static string NameLeftToggle(SerializedProperty property) => $"{property.propertyPath}__LeftToggle";
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, object parent)
         {
             VisualElement root = new VisualElement
             {
@@ -46,13 +49,10 @@ namespace SaintsField.Editor.Drawers
                 }
             };
 
-            Toggle toggle = new Toggle("");
-
-            toggle.RegisterValueChangedCallback(evt =>
+            Toggle toggle = new Toggle("")
             {
-                property.boolValue = evt.newValue;
-                onChange?.Invoke(evt.newValue);
-            });
+                name = NameLeftToggle(property),
+            };
 
             Label label = new Label(property.displayName)
             {
@@ -76,6 +76,16 @@ namespace SaintsField.Editor.Drawers
             root.Add(label);
 
             return root;
+        }
+
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            container.Q<Toggle>(NameLeftToggle(property)).RegisterValueChangedCallback(evt =>
+            {
+                property.boolValue = evt.newValue;
+                onValueChangedCallback.Invoke(evt.newValue);
+            });
         }
 
         #endregion

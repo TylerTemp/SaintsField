@@ -130,13 +130,13 @@ namespace SaintsField.Editor.Drawers
         // private FloatField _speedField;
         // private ObjectField _animationClipField;
         // private UnityEngine.UIElements.HelpBox _helpBoxElement;
-        private static string ClassDropdownField(SerializedProperty property) => $"{property.propertyPath}__DropdownField";
-        private static string ClassSpeedField(SerializedProperty property) => $"{property.propertyPath}__SpeedField";
-        private static string ClassClipField(SerializedProperty property) => $"{property.propertyPath}__ClipField";
-        private static string ClassHelpBox(SerializedProperty property) => $"{property.propertyPath}__HelpBox";
+        private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_DropdownField";
+        private static string NameSpeedField(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_SpeedField";
+        private static string NameClipField(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_ClipField";
+        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container1, object parent, Action<object> onChange)
+            ISaintsAttribute saintsAttribute, VisualElement container1, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
 
@@ -149,28 +149,12 @@ namespace SaintsField.Editor.Drawers
                     flexGrow = 1,
                 },
                 userData = metaInfo,
+                name = NameDropdownField(property),
             };
-            dropdownField.AddToClassList(ClassDropdownField(property));
+            // dropdownField.AddToClassList(ClassDropdownField(property));
             // dropdownField.choices = metaInfo.AnimatorStates.Select(each => each.ToString()).ToList();
             SetDropdownNoNotice(property, dropdownField, metaInfo);
-            dropdownField.RegisterValueChangedCallback(v =>
-            {
-                MetaInfo curMetaInfo = (MetaInfo) ((DropdownField) v.target).userData;
-                AnimatorState selectedState = curMetaInfo.AnimatorStates[dropdownField.index];
-                SetPropValue(property, selectedState);
-                property.serializedObject.ApplyModifiedProperties();
-                onChange?.Invoke(selectedState);
 
-                SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
-                if (curStateSpeedProp == null)
-                {
-                    return;
-                }
-
-                SerializedProperty curAnimationClipProp = property.FindPropertyRelative("animationClip");
-                container.Query<FloatField>(className: ClassSpeedField(property)).First().value = curStateSpeedProp.floatValue;
-                container.Query<ObjectField>(className: ClassClipField(property)).First().value = curAnimationClipProp.objectReferenceValue;
-            });
             container.Add(dropdownField);
 
             SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
@@ -182,15 +166,15 @@ namespace SaintsField.Editor.Drawers
                 FloatField speedField = new FloatField($"┣{curStateSpeedProp.displayName}")
                 {
                     value = curStateSpeedProp.floatValue,
+                    name = NameSpeedField(property),
                 };
-                speedField.AddToClassList(ClassSpeedField(property));
                 speedField.SetEnabled(false);
                 container.Add(speedField);
                 ObjectField animationClipField = new ObjectField($"┗{curAnimationClipProp.displayName}")
                 {
                     value = curAnimationClipProp.objectReferenceValue,
+                    name = NameClipField(property),
                 };
-                animationClipField.AddToClassList(ClassClipField(property));
                 animationClipField.SetEnabled(false);
                 container.Add(animationClipField);
             }
@@ -207,22 +191,41 @@ namespace SaintsField.Editor.Drawers
                 {
                     display = DisplayStyle.None,
                 },
+                name = NameHelpBox(property),
             };
-            helpBoxElement.AddToClassList(ClassHelpBox(property));
             return helpBoxElement;
         }
 
-        // private string _preError = "";
-        // private List<AnimatorState> _preAnimatorStates = new List<AnimatorState>();
-        // private List<AnimatorState> _curAnimatorStates = new List<AnimatorState>();
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
+        {
+            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
+            dropdownField.RegisterValueChangedCallback(v =>
+            {
+                MetaInfo curMetaInfo = (MetaInfo) ((DropdownField) v.target).userData;
+                AnimatorState selectedState = curMetaInfo.AnimatorStates[dropdownField.index];
+                SetPropValue(property, selectedState);
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(selectedState);
+
+                SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
+                if (curStateSpeedProp == null)
+                {
+                    return;
+                }
+
+                SerializedProperty curAnimationClipProp = property.FindPropertyRelative("animationClip");
+                container.Q<FloatField>(NameSpeedField(property)).value = curStateSpeedProp.floatValue;
+                container.Q<ObjectField>(NameClipField(property)).value = curAnimationClipProp.objectReferenceValue;
+            });
+        }
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
-            DropdownField dropdownField = container.Query<DropdownField>(className: ClassDropdownField(property))
-                .First();
+            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
 
             MetaInfo curMetaInfo = (MetaInfo) dropdownField.userData;
             dropdownField.userData = metaInfo;
@@ -231,7 +234,7 @@ namespace SaintsField.Editor.Drawers
             if (curMetaInfo.Error != metaInfo.Error)
             {
                 // _helpBoxElement.visible = _errorMsg != "";
-                HelpBox helpBoxElement = container.Query<HelpBox>(className: ClassHelpBox(property)).First();
+                HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
                 helpBoxElement.style.display = _errorMsg == "" ? DisplayStyle.None : DisplayStyle.Flex;
                 helpBoxElement.text = metaInfo.Error;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_STATE_DRAW_PROCESS
@@ -245,7 +248,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private void SetDropdownNoNotice(SerializedProperty property, DropdownField dropdownField, MetaInfo metaInfo)
+        private static void SetDropdownNoNotice(SerializedProperty property, DropdownField dropdownField, MetaInfo metaInfo)
         {
             dropdownField.choices = metaInfo.AnimatorStates.Select(each => each.ToString()).ToList();
             int curSelect;
