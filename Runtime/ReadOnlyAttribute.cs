@@ -12,7 +12,7 @@ namespace SaintsField
         public readonly bool ReadOnlyDirectValue;
         public readonly string[] ReadOnlyBys;
 
-        public ReadOnlyAttribute(bool directValue=true, string groupBy=null)
+        public ReadOnlyAttribute(bool directValue=true, string groupBy="")
         {
             ReadOnlyDirectValue = directValue;
             ReadOnlyBys = null;
@@ -22,9 +22,17 @@ namespace SaintsField
 
         public ReadOnlyAttribute(params string[] by)
         {
-            // Debug.Assert(!string.IsNullOrEmpty(by));
-            ReadOnlyDirectValue = default;
-            ReadOnlyBys = by;
+            if (by.Length == 0)
+            {
+                ReadOnlyDirectValue = true;
+                ReadOnlyBys = null;
+            }
+            else
+            {
+                // Debug.Assert(!string.IsNullOrEmpty(by));
+                ReadOnlyDirectValue = default;
+                ReadOnlyBys = by;
+            }
 
             GroupBy = "";
         }

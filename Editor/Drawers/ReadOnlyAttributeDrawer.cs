@@ -5,17 +5,21 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
     public class ReadOnlyAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private string _error = "";
 
         protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
-            if(IsDisabled(property, (ReadOnlyAttribute)saintsAttribute))
+            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, GetParentTarget(property));
+            _error = error;
+            if(disabled)
             {
                 EditorGUI.BeginDisabledGroup(true);
             }
@@ -60,15 +64,13 @@ namespace SaintsField.Editor.Drawers
             return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
-        private bool IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute)
+        private static (string error, bool disabled) IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute, object target)
         {
             string[] bys = targetAttribute.ReadOnlyBys;
             if(bys is null)
             {
-                return targetAttribute.ReadOnlyDirectValue;
+                return ("", targetAttribute.ReadOnlyDirectValue);
             }
-
-            object target = GetParentTarget(property);
 
             foreach (string by in bys)
             {
@@ -106,40 +108,57 @@ namespace SaintsField.Editor.Drawers
                 // }
 
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
-                bool result;
+                (string error, bool disabled) result;
 
                 if (found.getPropType == ReflectUtils.GetPropType.NotFound)
                 {
-                    _error = $"No field or method named `{by}` found on `{target}`";
-                    Debug.LogError(_error);
-                    result = false;
+                    var error = $"No field or method named `{by}` found on `{target}`";
+                    // Debug.LogError(_error);
+                    result = (error, false);
                 }
                 else if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
                 {
-                    result = ReflectUtils.Truly(propertyInfo.GetValue(target));
+                    result = ("", ReflectUtils.Truly(propertyInfo.GetValue(target)));
                 }
                 else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
                 {
-                    result = ReflectUtils.Truly(foundFieldInfo.GetValue(target));
+                    result = ("", ReflectUtils.Truly(foundFieldInfo.GetValue(target)));
                 }
                 else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
                 {
                     ParameterInfo[] methodParams = methodInfo.GetParameters();
                     Debug.Assert(methodParams.All(p => p.IsOptional));
                     // Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    result = ReflectUtils.Truly(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+                    result = ("", ReflectUtils.Truly(methodInfo.Invoke(target,
+                        methodParams.Select(p => p.DefaultValue).ToArray())));
                 }
                 else
                 {
                     throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
                 }
 
-                if (!result)
+                if (result.error != "")
                 {
-                    return false;
+                    return (result.error, false);
+                }
+
+                if (!result.disabled)
+                {
+                    return ("", false);
                 }
             }
-            return true;
+            return ("", true);
         }
+        #endregion
+
+        #region UIToolkit
+
+        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+
+        }
+
+        #endregion
     }
 }

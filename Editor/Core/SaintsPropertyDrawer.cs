@@ -1388,7 +1388,7 @@ namespace SaintsField.Editor.Core
             object parent,
             object newValue)
         {
-            Debug.Log($"OK I got a new value {newValue}; {this}");
+            // Debug.Log($"OK I got a new value {newValue}; {this}");
         }
 
         private void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
