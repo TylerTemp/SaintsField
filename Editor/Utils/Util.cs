@@ -238,16 +238,9 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static Label PrefixLabelUIToolKit(SaintsPropertyDrawer.LabelState labelState, string label, int indentLevel)
+        public static Label PrefixLabelUIToolKit(string label, int indentLevel)
         {
-            if (labelState == SaintsPropertyDrawer.LabelState.None)
-            {
-                return null;
-            }
-
-            string useLabel = labelState == SaintsPropertyDrawer.LabelState.AsIs ? label : " ";
-
-            return new Label(useLabel)
+            return new Label(label)
             {
                 style =
                 {

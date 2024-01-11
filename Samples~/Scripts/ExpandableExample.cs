@@ -5,8 +5,8 @@ namespace SaintsField.Samples.Scripts
     public class ExpandableExample : MonoBehaviour
     {
         [SerializeField]
-        // [InfoBox("Hi")]
-        [Expandable, GetPrefabWithComponent]
+        [InfoBox("Hi")]
+        [Expandable, GetScriptableObject]
         private Scriptable _scriptable;
 
         [SerializeField, Expandable] private DropdownExample _dropdownExample;

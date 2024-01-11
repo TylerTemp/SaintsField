@@ -125,7 +125,7 @@ namespace SaintsField.Editor.Drawers
 
             Debug.Log(EditorGUI.indentLevel);
 
-            root.Add(Util.PrefixLabelUIToolKit(LabelState.AsIs, property.displayName, 1));
+            root.Add(Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 1));
             root.Add(button);
 
             return root;

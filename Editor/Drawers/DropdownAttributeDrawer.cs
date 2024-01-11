@@ -275,7 +275,8 @@ namespace SaintsField.Editor.Drawers
 
         private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Button";
         private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_ButtonLabel";
-        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Field_HelpBox";
+        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Dropdown_HelpBox";
+        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, object parent,
@@ -333,9 +334,9 @@ namespace SaintsField.Editor.Drawers
 
             button.Add(buttonLabelContainer);
 
-            Debug.Log(EditorGUI.indentLevel);
-
-            root.Add(Util.PrefixLabelUIToolKit(LabelState.AsIs, property.displayName, 1));
+            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 1);
+            label.name = NameLabel(property);
+            root.Add(label);
             root.Add(button);
 
             return root;
@@ -352,6 +353,14 @@ namespace SaintsField.Editor.Drawers
                 },
                 name = NameHelpBox(property),
             };
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
+        {
+            Label label = container.Q<Label>(NameLabel(property));
+            label.text = labelOrNull ?? "";
+            label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,

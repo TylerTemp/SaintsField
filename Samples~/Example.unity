@@ -327,11 +327,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b547be381cef1e4f8fc59d2557887d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _label: <color=red>ok here
+  _float: 3.2
+  _go1: {fileID: 1188127893}
+  _go2: {fileID: 724537242}
+  _refs: {fileID: 0}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  uniq1: 1
+  uniq2: 
+  uniq3: 
   normal: 0
   myInt: 0
   my:
     normal: 0
-    myInt: 1
+    myInt: 0
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -3490,7 +3499,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee51f7ab1caf4797aba008aceac3d374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rainbow: {fileID: 1571298210}
+  _rainbow: {fileID: 0}
+  _callbackToggle: 0
+  arrayLabels:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  _propertyLabel: 
+  colorAqua: 
+  colorBlack: 
+  colorBlue: 
+  colorBrown: 
+  colorCyan: 
+  colorDarkBlue: 
+  colorFuchsia: 
+  colorGreen: 
+  colorGray: 
+  colorGrey: 
+  colorLightBlue: 
+  colorLime: 
+  colorMagenta: 
+  colorMaroon: 
+  colorNavy: 
+  colorOlive: 
+  colorOrange: 
+  colorPurple: 
+  colorRed: 
+  colorSilver: 
+  colorTeal: 
+  colorWhite: 
+  colorYellow: 
+  colorClear: 
+  colorPink: 
+  colorIndigo: 
+  colorViolet: 
+  _myStructWorkAround:
+    LabelFloat: 0.03
+    Scene: 0
+    SortingLayer: 
+    Slider: {x: 0, y: 0}
+    DefaultFloat: 0
+  _defaultDrawerForStruct:
+    LabelFloat: 0
+    Scene: 0
+    SortingLayer: 
+    Slider: {x: 0, y: 0}
+    DefaultFloat: 0
+  richLabel: 0
 --- !u!1 &1621177995
 GameObject:
   m_ObjectHideFlags: 0
@@ -3535,7 +3593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16b93420e64dc4344bb5175e401a2a00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scriptable: {fileID: 0}
+  _scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   _dropdownExample: {fileID: 90550607}
 --- !u!1 &1631756499
 GameObject:

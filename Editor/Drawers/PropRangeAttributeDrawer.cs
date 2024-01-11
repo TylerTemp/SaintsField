@@ -164,25 +164,8 @@ namespace SaintsField.Editor.Drawers
             float minValue = metaInfo.MinValue;
             float maxValue = metaInfo.MaxValue;
 
-            // string label;
-            // // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            // switch (labelState)
-            // {
-            //     case LabelState.AsIs:
-            //         label = null;
-            //         break;
-            //     case LabelState.None:
-            //         label = "";
-            //         break;
-            //     case LabelState.EmptySpace:
-            //         label = " ";
-            //         break;
-            //     default:
-            //         throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
-            // }
-
             // return container;
-            Slider element = new Slider(property.displayName, minValue, maxValue, SliderDirection.Horizontal, curValue);
+            Slider element = new Slider(new string(' ', property.displayName.Length), minValue, maxValue, SliderDirection.Horizontal, curValue);
             element.RegisterValueChangedCallback(changed =>
             {
                 float parsedValue = GetValue(metaInfo, changed.newValue);

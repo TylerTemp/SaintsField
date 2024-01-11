@@ -41,9 +41,12 @@ namespace SaintsField.Editor.Drawers
         protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-            bool result = GetLabelXml(property, targetAttribute) != null;
+            (string error, string _) = GetLabelXml(property, targetAttribute, GetParentTarget(property));
+            // bool result = GetLabelXml(property, targetAttribute) != null;
             // Debug.Log($"richLabel willDraw={result}");
-            return result;
+            // return result;
+            _error = error;
+            return error != null;
         }
 
         protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
@@ -51,7 +54,8 @@ namespace SaintsField.Editor.Drawers
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
 
-            string labelXml = GetLabelXml(property, targetAttribute);
+            (string error, string labelXml) = GetLabelXml(property, targetAttribute, GetParentTarget(property));
+            _error = error;
 
             if (labelXml is null)
             {
@@ -74,15 +78,15 @@ namespace SaintsField.Editor.Drawers
         //         : _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(labelXml, property.displayName));
         // }
 
-        private string GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute)
+        private static (string error, string xml) GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute, object target)
         {
             if (!targetAttribute.IsCallback)
             {
-                return targetAttribute.RichTextXml;
+                return ("", targetAttribute.RichTextXml);
             }
-
-            _error = "";
-            object target = GetParentTarget(property);
+            //
+            // _error = "";
+            // object target = GetParentTarget(property);
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
                 ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
             switch (getPropType)
@@ -90,13 +94,13 @@ namespace SaintsField.Editor.Drawers
                 case ReflectUtils.GetPropType.Field:
                 {
                     object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-                    return result == null ? string.Empty : result.ToString();
+                    return ("", result == null ? string.Empty : result.ToString());
                 }
 
                 case ReflectUtils.GetPropType.Property:
                 {
                     object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                    return result == null ? string.Empty : result.ToString();
+                    return ("", result == null ? string.Empty : result.ToString());
                 }
                 case ReflectUtils.GetPropType.Method:
                 {
@@ -107,77 +111,73 @@ namespace SaintsField.Editor.Drawers
                     Debug.Assert(requiredParams.Length <= 1);
                     if (methodInfo.ReturnType != typeof(string))
                     {
-                        _error =
-                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}";
+                        return (
+                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}", property.displayName);
+                    }
+
+                    int arrayIndex = 0;
+                    bool dataCallback = false;
+                    if (requiredParams.Length == 1)
+                    {
+                        Debug.Assert(requiredParams[0].ParameterType == typeof(int));
+                        string[] propPaths = property.propertyPath.Split('.');
+                        string lastPropPath = propPaths[propPaths.Length - 1];
+                        if(lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
+                        {
+                            dataCallback = true;
+                            arrayIndex = int.Parse(lastPropPath.Substring(5, lastPropPath.Length - 6));
+                        }
+                    }
+
+                    object[] passParams;
+                    if(dataCallback)
+                    {
+                        List<object> injectedParams = new List<object>();
+                        bool injected = false;
+                        foreach (ParameterInfo methodParam in methodParams)
+                        {
+                            if (!injected && methodParam.ParameterType == typeof(int))
+                            {
+                                injectedParams.Add(arrayIndex);
+                                injected = true;
+                            }
+                            else
+                            {
+                                injectedParams.Add(methodParam.DefaultValue);
+                            }
+                        }
+                        passParams = injectedParams.ToArray();
                     }
                     else
                     {
-                        int arrayIndex = 0;
-                        bool dataCallback = false;
-                        if (requiredParams.Length == 1)
-                        {
-                            Debug.Assert(requiredParams[0].ParameterType == typeof(int));
-                            string[] propPaths = property.propertyPath.Split('.');
-                            string lastPropPath = propPaths[propPaths.Length - 1];
-                            if(lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
-                            {
-                                dataCallback = true;
-                                arrayIndex = int.Parse(lastPropPath.Substring(5, lastPropPath.Length - 6));
-                            }
-                        }
-
-                        object[] passParams;
-                        if(dataCallback)
-                        {
-                            List<object> injectedParams = new List<object>();
-                            bool injected = false;
-                            foreach (ParameterInfo methodParam in methodParams)
-                            {
-                                if (!injected && methodParam.ParameterType == typeof(int))
-                                {
-                                    injectedParams.Add(arrayIndex);
-                                    injected = true;
-                                }
-                                else
-                                {
-                                    injectedParams.Add(methodParam.DefaultValue);
-                                }
-                            }
-                            passParams = injectedParams.ToArray();
-                        }
-                        else
-                        {
-                            passParams = methodParams
-                                .Select(p => p.DefaultValue)
-                                .ToArray();
-                        }
-
-                        try
-                        {
-                            return (string)methodInfo.Invoke(
-                                target,
-                                passParams
-                            );
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            Debug.Assert(e.InnerException != null);
-                            _error = e.InnerException.Message;
-                            Debug.LogException(e);
-                        }
-                        catch (Exception e)
-                        {
-                            _error = e.Message;
-                            Debug.LogException(e);
-                        }
+                        passParams = methodParams
+                            .Select(p => p.DefaultValue)
+                            .ToArray();
                     }
-                    return null;
+
+                    try
+                    {
+                        return ("", (string)methodInfo.Invoke(
+                            target,
+                            passParams
+                        ));
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        Debug.LogException(e);
+                        Debug.Assert(e.InnerException != null);
+                        return (e.InnerException.Message, property.displayName);
+                    }
+                    catch (Exception e)
+                    {
+                        // _error = e.Message;
+                        Debug.LogException(e);
+                        return (e.Message, property.displayName);
+                    }
                 }
                 case ReflectUtils.GetPropType.NotFound:
                 {
-                    _error =
-                        $"not found `{targetAttribute.RichTextXml}` on `{target}`";
-                    return null;
+                    return ($"not found `{targetAttribute.RichTextXml}` on `{target}`", property.displayName);
                 }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
@@ -202,7 +202,8 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameRichLabelContainer(SerializedProperty property) => $"{property.propertyPath}__SaintsFieldRichLabelContainer";
+        private static string NameRichLabelContainer(SerializedProperty property) => $"{property.propertyPath}__RichLabelContainer";
+        private static string NameRichLabelHelpBox(SerializedProperty property) => $"{property.propertyPath}__RichLabelHelpBox";
 
         protected override VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
@@ -216,50 +217,62 @@ namespace SaintsField.Editor.Drawers
                     height = EditorGUIUtility.singleLineHeight,
                     marginLeft = LabelLeftSpace,
                     width = LabelBaseWidth,
+                    textOverflow = TextOverflow.Clip,
+                    overflow = Overflow.Hidden,
 
                     flexShrink = 0,
                     flexGrow = 0,
-                    unityTextAlign = TextAnchor.MiddleLeft,
                 },
                 name = NameRichLabelContainer(property),
-                userData = " "
+                userData = new string(' ', property.displayName.Length),
+                pickingMode = PickingMode.Ignore,
+            };
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                name = NameRichLabelHelpBox(property),
+                userData = "",
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
             };
         }
 
         protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            VisualElement root = container.Q<VisualElement>(NameRichLabelContainer(property));
-            string curXml = (string)root.userData;
-            string nowXml = GetLabelXml(property, (RichLabelAttribute)saintsAttribute);
-            if (curXml == nowXml)
+            VisualElement labelContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
+            string curXml = (string)labelContainer.userData;
+            (string error, string nowXml) = GetLabelXml(property, (RichLabelAttribute)saintsAttribute, parent);
+            if (curXml != nowXml)
             {
-                return;
-            }
-
-            root.userData = nowXml;
-            root.Clear();
-            if (nowXml is null)
-            {
-                return;
-            }
-
-            var payloads = RichTextDrawer.ParseRichXml(nowXml, property.displayName).ToArray();
-            foreach (RichTextDrawer.RichTextChunk richTextChunk in payloads)
-            {
-                Debug.Log($"Content=[{richTextChunk}]");
-                using(FileStream fs = new FileStream("D:\\log.txt", FileMode.Append))
+                labelContainer.userData = nowXml;
+                labelContainer.Clear();
+                if (nowXml != null)
                 {
-                    using(StreamWriter sw = new StreamWriter(fs))
+                    foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
                     {
-                        sw.WriteLine($"Content=[{richTextChunk}]");
+                        labelContainer.Add(richChunk);
                     }
                 }
+
+                OnLabelStateChangedUIToolkit(property, container, nowXml);
             }
-            foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, new[]{payloads[2]}))
+
+            HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property));
+            string curError = (string)helpBox.userData;
+            if (curError != error)
             {
-                root.Add(richChunk);
+                helpBox.userData = error;
+                helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
             }
+
         }
 
         #endregion

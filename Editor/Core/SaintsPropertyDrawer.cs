@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Core
         public const int LabelLeftSpace = 3;
         public const int LabelBaseWidth = 120;
         public const int IndentWidth = 15;
+        // public const string EmptyRectLabel = "                ";
 
         // public static bool IsSubDrawer = false;
         public static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
@@ -375,8 +376,8 @@ namespace SaintsField.Editor.Core
         // protected VisualElement ContainerElement { get; private set; }
         private VisualElement _rootElement;
         // private SaintsPropertyDrawer _saintsLabelDrawer;
-        private SaintsPropertyDrawer _saintsFieldDrawer;
-        private PropertyField _saintsFieldFallback;
+        // private SaintsPropertyDrawer _saintsFieldDrawer;
+        // private PropertyField _saintsFieldFallback;
         private VisualElement _overlayLabelContainer;
 
         public struct SaintsPropertyInfo
@@ -389,12 +390,12 @@ namespace SaintsField.Editor.Core
         // private readonly List<SaintsPropertyInfo> _saintsPropertyDrawers = new List<SaintsPropertyInfo>();
 
         // private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> PropertyToDrawCount = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
-        private class NestInfo
-        {
-            public object targetObject;
-            public string propertyPath;
-            public int count;
-        }
+        // private class NestInfo
+        // {
+        //     public object targetObject;
+        //     public string propertyPath;
+        //     public int count;
+        // }
 
         // private static readonly List<NestInfo> PropertyNestInfo = new List<NestInfo>();
 
@@ -450,7 +451,7 @@ namespace SaintsField.Editor.Core
             //         Index = index,
             //     })
             //     .ToArray();
-            IReadOnlyList<SaintsPropertyInfo> _saintsPropertyDrawers = iSaintsAttributes
+            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers = iSaintsAttributes
                 .WithIndex()
                 .Select(each => new SaintsPropertyInfo
             {
@@ -459,14 +460,14 @@ namespace SaintsField.Editor.Core
                 Index = each.index,
             }).ToArray();
 
-            SaintsPropertyInfo labelAttributeWithIndex = _saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Label);
-            SaintsPropertyInfo fieldAttributeWithIndex = _saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
+            SaintsPropertyInfo labelAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Label);
+            SaintsPropertyInfo fieldAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
 
             #region Above
 
             Dictionary<string, List<SaintsPropertyInfo>> groupedAboveDrawers =
                 new Dictionary<string, List<SaintsPropertyInfo>>();
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in _saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
                 if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.Attribute.GroupBy,
                         out List<SaintsPropertyInfo> currentGroup))
@@ -555,7 +556,8 @@ namespace SaintsField.Editor.Core
                 {
                     flexDirection = FlexDirection.Row,
                 },
-                name = $"{property.propertyPath}__SaintsFieldField",
+                name = NameLabelFieldUIToolkit(property),
+                userData = null,
             };
 
             // VisualElement fakeLabelContainer = new VisualElement
@@ -576,35 +578,34 @@ namespace SaintsField.Editor.Core
             //     ? null
             //     : GetFirstSaintsDrawerType(fieldAttributeWithIndex.Attribute.GetType());
 
-            if (fieldAttributeWithIndex.Attribute == null)
+            bool fieldIsFallback = fieldAttributeWithIndex.Attribute == null;
+
+            if (fieldIsFallback)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log("fallback field drawer");
 #endif
-                _saintsFieldDrawer = null;
-                _saintsFieldFallback = SaintsFallbackUIToolkit(property);
                 // _saintsFieldFallback.RegisterCallback<AttachToPanelEvent>(evt =>
                 // {
                 //     Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
                 // });
-                fieldContainer.Add(_saintsFieldFallback);
+                fieldContainer.Add(SaintsFallbackUIToolkit(property));
+                containerElement.visible = false;
             }
             else
             {
-                _saintsFieldFallback = null;
-                _saintsFieldDrawer = fieldAttributeWithIndex.Drawer;
-
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"saints field drawer {_saintsFieldDrawer}");
+                Debug.Log($"saints field drawer {fieldAttributeWithIndex.Drawer}");
 #endif
 
-                VisualElement fieldElement = _saintsFieldDrawer.CreateFieldUIToolKit(property,
+                VisualElement fieldElement = fieldAttributeWithIndex.Drawer.CreateFieldUIToolKit(property,
                     fieldAttributeWithIndex.Attribute, containerElement, parent, Debug.Log);
                 // fieldElement.style.flexShrink = 1;
                 fieldElement.style.flexGrow = 1;
                 // fieldElement.RegisterValueChangeCallback(_ => SetValueChanged(property, true));
 
                 fieldContainer.Add(fieldElement);
+                fieldContainer.userData = fieldAttributeWithIndex;
             }
 
             if (labelAttributeWithIndex.Attribute == null)
@@ -617,6 +618,9 @@ namespace SaintsField.Editor.Core
                         height = EditorGUIUtility.singleLineHeight,
                         marginLeft = LabelLeftSpace,
                         width = LabelBaseWidth,
+
+                        // alignItems = Align.Center, // vertical
+                        unityTextAlign = TextAnchor.LowerLeft,
                     },
                     // name = NameRichLabelContainer(property),
                 });
@@ -627,7 +631,7 @@ namespace SaintsField.Editor.Core
 
             #region post field
 
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in _saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
                 VisualElement postFieldElement = eachAttributeWithIndex.Drawer.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent, Debug.Log);
                 if (postFieldElement != null)
@@ -665,7 +669,7 @@ namespace SaintsField.Editor.Core
 
             // fieldContainer.Add(overlayContainer);
 
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in _saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
                 SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.Drawer;
 
@@ -687,7 +691,7 @@ namespace SaintsField.Editor.Core
 
             Dictionary<string, List<SaintsPropertyInfo>> groupedDrawers =
                 new Dictionary<string, List<SaintsPropertyInfo>>();
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in _saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
                 if(!groupedDrawers.TryGetValue(eachAttributeWithIndex.Attribute.GroupBy, out List<SaintsPropertyInfo> currentGroup))
                 {
@@ -761,7 +765,7 @@ namespace SaintsField.Editor.Core
             // _rootElement.RegisterCallback<GeometryChangedEvent>(evt => Debug.Log($"GeometryChangedEvent"));
             // _rootElement.schedule.Execute(() => Debug.Log("Execute"));
             _rootElement.schedule.Execute(() =>
-                OnAwakeUiToolKitInternal(property, containerElement, parent, _saintsPropertyDrawers, _saintsFieldDrawer == null));
+                OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, fieldIsFallback));
 
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
@@ -770,6 +774,9 @@ namespace SaintsField.Editor.Core
 
             return _rootElement;
         }
+
+        private static string NameLabelFieldUIToolkit(SerializedProperty property) =>
+            $"{property.propertyPath}__SaintsField_LabelField";
 
         protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
         {
@@ -791,17 +798,19 @@ namespace SaintsField.Editor.Core
 
         private static PropertyField UnityFallbackUIToolkit(SerializedProperty property, string label=null)
         {
-            PropertyField propertyField = new PropertyField(property, " ")
+            PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
             {
                 style =
                 {
                     flexGrow = 1,
                 },
             };
-            propertyField.AddToClassList("saintsFieldFallback");
+            propertyField.AddToClassList(SaintsFieldFallbackClass);
             propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
         }
+
+        private const string SaintsFieldFallbackClass = "saintsFieldFallback";
 #else
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -1305,12 +1314,14 @@ namespace SaintsField.Editor.Core
 
             if(usingFallbackField)
             {
+                // containerElement.visible = true;
+
                 List<VisualElement> parentRoots = FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
                 Debug.Log($"usingFallbackField, parentRoots={parentRoots.Count}, {_saintsPropertyDrawers.Count}");
-                // if (parentRoots.Count != _saintsPropertyDrawers.Count)
-                // {
-                //     return;
-                // }
+                if (parentRoots.Count != _saintsPropertyDrawers.Count)
+                {
+                    return;
+                }
 
                 if (parentRoots.Count == _saintsPropertyDrawers.Count)
                 {
@@ -1318,12 +1329,13 @@ namespace SaintsField.Editor.Core
 
                     PropertyField thisPropField = containerElement.Q<PropertyField>();
 
-                    foreach (VisualElement child in thisPropField.Children().ToArray())
+                    foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
                     {
-                        if (!child.ClassListContains("unity-base-field"))
-                        {
-                            child.RemoveFromHierarchy();
-                        }
+                        // if (!child.ClassListContains("unity-base-field"))
+                        // {
+                        //     child.RemoveFromHierarchy();
+                        // }
+                        child.RemoveFromHierarchy();
                     }
 
                     topRoot.Clear();
@@ -1331,25 +1343,23 @@ namespace SaintsField.Editor.Core
 
                     topRoot.userData = this;
 
-                    foreach (SaintsPropertyInfo saintsPropertyInfo in _saintsPropertyDrawers)
-                    {
-                        saintsPropertyInfo.Drawer.OnAwakeUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
-                    }
+                    containerElement.visible = true;
 
-                    containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, _saintsPropertyDrawers));
+                    thisPropField.Bind(property.serializedObject);
                 }
             }
             else
             {
                 containerElement.parent.userData = this;
-
-                foreach (SaintsPropertyInfo saintsPropertyInfo in _saintsPropertyDrawers)
-                {
-                    saintsPropertyInfo.Drawer.OnAwakeUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
-                }
-
-                containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, _saintsPropertyDrawers));
             }
+
+            foreach (SaintsPropertyInfo saintsPropertyInfo in _saintsPropertyDrawers)
+            {
+                saintsPropertyInfo.Drawer.OnAwakeUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
+            }
+
+            containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, _saintsPropertyDrawers));
+
         }
 
         private void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
@@ -1594,33 +1604,37 @@ namespace SaintsField.Editor.Core
 
         protected static void OnLabelStateChangedUIToolkit(SerializedProperty property, VisualElement element, string toLabel)
         {
-            SaintsPropertyDrawer mainDrawer = (SaintsPropertyDrawer)GetFirstAncestorName(element, NameSaintsPropertyDrawerRoot(property)).userData;
-            Debug.Log(mainDrawer);
-            if (mainDrawer._saintsFieldFallback != null)
+            VisualElement saintsLabelField = element.Q<VisualElement>(NameLabelFieldUIToolkit(property));
+            object saintsLabelFieldDrawerData = saintsLabelField.userData;
+
+            // SaintsPropertyDrawer mainDrawer = (SaintsPropertyDrawer)GetFirstAncestorName(element, NameSaintsPropertyDrawerRoot(property)).userData;
+            // Debug.Log(mainDrawer);
+            if (saintsLabelFieldDrawerData == null)
             {
-                // mainDrawer._saintsFieldFallback.label = toLabel;
-                // element.Q<IntegerField>().label = toLabel;
-                Label label = element.Query(className: "saintsFieldFallback").First().Q<Label>();
+                Label label = element.Query(className: SaintsFieldFallbackClass).First().Q<Label>();
                 if (label != null)
                 {
-                    label.text = toLabel;
+                    // label.text = toLabel;
                     label.style.display = string.IsNullOrEmpty(toLabel)? DisplayStyle.None: DisplayStyle.Flex;
-                    Debug.Log(label.style.display);
+                    // Debug.Log(label.style.display);
                 }
             }
             else
             {
-                Debug.Log(mainDrawer._saintsFieldDrawer);
+                // Debug.Log(saintsLabelFieldDrawerData);
+                SaintsPropertyInfo drawerInfo = (SaintsPropertyInfo) saintsLabelFieldDrawerData;
+                string newLabel = toLabel == null ? null : new string(' ', property.displayName.Length);
+                drawerInfo.Drawer.ChangeFieldLabelToUIToolkit(property, drawerInfo.Attribute, drawerInfo.Index, element, newLabel);
+                // Debug.Log(mainDrawer._saintsFieldDrawer);
             }
             // Debug.Log(mainDrawer._saintsFieldFallback);
             // Debug.Log(mainDrawer._saintsFieldDrawer);
             // ChangeFieldLabelTo(toLabel);
         }
 
-        protected virtual void ChangeFieldLabelTo(string label)
+        protected virtual void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
         {
-            Debug.Assert(_saintsFieldFallback != null, "Override this!");
-            _saintsFieldFallback.label = label;
+            throw new NotImplementedException();
         }
 
         protected virtual VisualElement CreateAboveUIToolkit(SerializedProperty property,

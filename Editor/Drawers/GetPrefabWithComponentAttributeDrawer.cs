@@ -62,7 +62,7 @@ namespace SaintsField.Editor.Drawers
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 GameObject toCheck = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                if (toCheck is null)
+                if (toCheck == null)
                 {
                     continue;
                 }

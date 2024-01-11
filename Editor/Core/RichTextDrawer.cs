@@ -109,7 +109,7 @@ namespace SaintsField.Editor.Core
             {
                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
-                Debug.Log($"parse: {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
+                // Debug.Log($"parse: {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
 
                 if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
                 {
@@ -150,6 +150,7 @@ namespace SaintsField.Editor.Core
                             break;
                         case "color" when colors.Count > 0:
                             colors.RemoveAt(colors.Count - 1);
+
                             richText.Append(part);
                             break;
                         case "label":
@@ -177,7 +178,8 @@ namespace SaintsField.Editor.Core
                                 IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
                             };
 
-                            string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
+                            // string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
+                            string textOpeningTags = string.Join("", openTags.Select(each => $"<{each.tagName}{(each.tagValueOrNull==null? "": $"={each.tagValueOrNull}")}>"));
                             richText = new StringBuilder(textOpeningTags);
                         }
                             break;
@@ -398,7 +400,9 @@ namespace SaintsField.Editor.Core
                         style =
                         {
                             flexShrink = 0,
+                            unityTextAlign = TextAnchor.LowerLeft,
                         },
+                        pickingMode = PickingMode.Ignore,
                     };
                 }
                 else
@@ -423,6 +427,7 @@ namespace SaintsField.Editor.Core
                         image = texture,
                         scaleMode = ScaleMode.ScaleToFit,
                         tintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
+                        pickingMode = PickingMode.Ignore,
                     };
                     img.style.width = img.style.height = EditorGUIUtility.singleLineHeight - 2;
                     img.style.flexShrink = 0;

@@ -137,7 +137,7 @@ namespace SaintsField.Editor.Drawers
 
             // Debug.Log($"requiredValue={requiredValue}");
 
-            ObjectField objectField = new ObjectField(property.displayName)
+            ObjectField objectField = new ObjectField(new string(' ', property.displayName.Length))
             {
                 objectType = requiredComp,
                 allowSceneObjects = true,
