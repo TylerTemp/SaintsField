@@ -6,6 +6,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -13,12 +14,15 @@ namespace SaintsField.Editor.Drawers
     public class PostFieldRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
-        private string _error = "";
 
         ~PostFieldRichLabelAttributeDrawer()
         {
             _richTextDrawer.Dispose();
         }
+
+        #region IMGUI
+
+        private string _error = "";
 
         private IReadOnlyList<RichTextDrawer.RichTextChunk> _payloads;
 
@@ -141,5 +145,34 @@ namespace SaintsField.Editor.Drawers
             _error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        #endregion
+
+        #region UIToolkit
+
+        private static string NamePostFieldRichLabel(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__PostFieldRichLabel";
+
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent, Action<object> onChange)
+        {
+            return new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    height = EditorGUIUtility.singleLineHeight,
+                    marginLeft = LabelLeftSpace,
+                    unityTextAlign = TextAnchor.MiddleLeft,
+
+                    flexShrink = 0,
+                    flexGrow = 0,
+                },
+                name = NamePostFieldRichLabel(property, index),
+                userData = new string(' ', property.displayName.Length),
+                pickingMode = PickingMode.Ignore,
+            };
+        }
+
+        #endregion
     }
 }
