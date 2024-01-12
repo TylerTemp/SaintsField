@@ -4488,10 +4488,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00f63a6b6904472cb383cf99bccd752f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bool1: 0
-  _bool2: 0
-  _bool3: 0
-  _bool4: 0
+  _bool1: 1
+  _bool2: 1
+  _bool3: 1
+  _bool4: 1
   _showIf1Or2: 
   _showIf1And2: 
   _hideIf1Or2: 

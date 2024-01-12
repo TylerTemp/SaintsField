@@ -139,17 +139,26 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameReadOnly(SerializedProperty property, int index) => $"{property.propertyType}_{index}__Visibility";
-        private static string NameReadOnlyHelpBox(SerializedProperty property, int index) => $"{property.propertyType}_{index}__Visibility_HelpBox";
+        private static string NameVisibility(SerializedProperty property, int index) => $"{property.propertyType}_{index}__Visibility";
+        private static string ClassVisibility(SerializedProperty property) => $"{property.propertyType}__Visibility";
+        private static string NameVisibilityHelpBox(SerializedProperty property, int index) => $"{property.propertyType}_{index}__Visibility_HelpBox";
+
+        // private struct MetaInfo
+        // {
+        //     public bool Computed;
+        //     public VisibilityAttribute Attribute;
+        // }
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            return new VisualElement
+            VisualElement root = new VisualElement
             {
-                name = NameReadOnly(property, index),
-                userData = true,
+                name = NameVisibility(property, index),
+                userData = (VisibilityAttribute) saintsAttribute,
             };
+            root.AddToClassList(ClassVisibility(property));
+            return root;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -157,7 +166,7 @@ namespace SaintsField.Editor.Drawers
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {
-                name = NameReadOnlyHelpBox(property, index),
+                name = NameVisibilityHelpBox(property, index),
                 style =
                 {
                     display = DisplayStyle.None,
@@ -167,30 +176,70 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            VisualElement visibilityElement = container.Q<VisualElement>(NameReadOnly(property, index));
-            bool curShow = (bool)visibilityElement.userData;
-
-            (string error, bool show) = GetShow(saintsAttribute, parent.GetType(), parent);
-            // Debug.Log(show);
-            if (curShow != show)
+            IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassVisibility(property)).ToList();
+            VisualElement topElement = visibilityElements[0];
+            // Debug.Log($"top={topElement.name}; this={NameVisibility(property, index)}");
+            if (topElement.name != NameVisibility(property, index))
             {
-                // Debug.Log($"error={error}, disabled={disabled}");
-                visibilityElement.userData = show;
-                container.style.display = show? DisplayStyle.Flex: DisplayStyle.None;
+                return;
             }
 
-            HelpBox helpBox = container.Q<HelpBox>(NameReadOnlyHelpBox(property, index));
-            // ReSharper disable once InvertIf
-            if (helpBox.text != error)
+            // VisualElement thisElement = container.Q<VisualElement>(NameVisibility(property, index));
+            // if(!)
+            // MetaInfo topInfo = (Visu)topElement.userData;
+            // if (topInfo.Computed)
+            // {
+            //     return;
+            // }
+
+            bool curShow = container.style.display != DisplayStyle.None;
+
+            List<string> errors = new List<string>();
+            bool nowShow = false;
+            foreach ((string error, bool show) in visibilityElements.Select(each => GetShow(((VisibilityAttribute)each.userData), parent.GetType(), parent)))
             {
-                helpBox.text = error;
-                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                if (error != "")
+                {
+                    errors.Add(error);
+                }
+
+                if (show)
+                {
+                    nowShow = true;
+                }
+            }
+
+            if (curShow != nowShow)
+            {
+                container.style.display = nowShow ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            //
+            //
+            // bool curShow = (bool)visibilityElement.userData;
+            //
+            // (string error, bool show) = GetShow(saintsAttribute, parent.GetType(), parent);
+            // // Debug.Log(show);
+            // if (curShow != show)
+            // {
+            //     // Debug.Log($"error={error}, disabled={disabled}");
+            //     visibilityElement.userData = show;
+            //     container.style.display = show? DisplayStyle.Flex: DisplayStyle.None;
+            // }
+            //
+            HelpBox helpBox = container.Q<HelpBox>(NameVisibilityHelpBox(property, index));
+            // ReSharper disable once InvertIf
+            string joinedError = string.Join("\n\n", errors);
+            if (helpBox.text != joinedError)
+            {
+                helpBox.text = joinedError;
+                helpBox.style.display = joinedError == "" ? DisplayStyle.None : DisplayStyle.Flex;
             }
         }
 
-        private static (string error, bool visible) GetShow(ISaintsAttribute saintsAttribute, Type type, object target)
+        private static (string error, bool show) GetShow(VisibilityAttribute visibilityAttribute, Type type, object target)
         {
-            VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
+            // VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
 
             List<bool> callbackTruly = new List<bool>();
             List<string> errors = new List<string>();
