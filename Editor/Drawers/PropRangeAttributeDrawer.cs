@@ -258,7 +258,7 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, object parent)
         {
             Slider slider = container.Q<Slider>(NameSlider(property));
@@ -336,7 +336,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);

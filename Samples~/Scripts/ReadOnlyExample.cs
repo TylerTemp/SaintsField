@@ -19,10 +19,10 @@ namespace SaintsField.Samples.Scripts
         }
 
         [SerializeField, ReadOnly] private string _rTrue;
-        // [SerializeField, ReadOnly(nameof(_byBool))] private string _rBool;
-        // [SerializeField, ReadOnly(nameof(_byInt))] private string _rInt;
-        // [SerializeField, ReadOnly(nameof(_byReference))] private string _rRef;
-        // [SerializeField, ReadOnly(nameof(ByMethod))] private string _rMethod;
-        // [SerializeField, ReadOnly("No Such")] private string _rNoSuch;
+        [SerializeField, ReadOnly(nameof(_byBool))] private string _rBool;
+        [SerializeField, ReadOnly(nameof(_byInt))] private string _rInt;
+        [SerializeField, ReadOnly(nameof(_byReference))] private string _rRef;
+        [SerializeField, ReadOnly(nameof(ByMethod))] private string _rMethod;
+        [SerializeField, ReadOnly("No Such")] private string _rNoSuch;
     }
 }

@@ -278,7 +278,7 @@ namespace SaintsField.Editor.Drawers
             return image;
         }
 
-        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, object parent)
         {

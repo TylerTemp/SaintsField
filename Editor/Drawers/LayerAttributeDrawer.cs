@@ -81,7 +81,7 @@ namespace SaintsField.Editor.Drawers
             return layerField;
         }
 
-        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, object parent)
         {
             container.Q<LayerField>(NameLayer(property)).RegisterValueChangedCallback(evt =>

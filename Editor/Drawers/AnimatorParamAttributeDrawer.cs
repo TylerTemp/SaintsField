@@ -286,7 +286,7 @@ namespace SaintsField.Editor.Drawers
         private static bool ParamNameEquals(AnimatorControllerParameter param, SerializedProperty prop) => param.name == prop.stringValue;
         private static bool ParamHashEquals(AnimatorControllerParameter param, SerializedProperty prop) => param.nameHash == prop.intValue;
 
-        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
@@ -317,7 +317,7 @@ namespace SaintsField.Editor.Drawers
             });
         }
 
-        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, object parent)
         {

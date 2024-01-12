@@ -170,12 +170,12 @@ namespace SaintsField.Editor.Drawers
 
                 Undo.RecordObject(go, $"GameObjectActive: {property.propertyPath}");
                 go.SetActive(!go.activeSelf);
-                OnUpdateUiToolKit(property, saintsAttribute, index, container, parent);
+                OnUpdateUIToolkit(property, saintsAttribute, index, container, parent);
             };
             return button;
         }
 
-        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
             GameObject go;

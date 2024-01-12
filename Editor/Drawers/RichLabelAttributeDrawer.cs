@@ -244,7 +244,7 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
             VisualElement labelContainer = container.Q<VisualElement>(NameRichLabelContainer(property));

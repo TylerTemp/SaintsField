@@ -12,7 +12,7 @@ namespace SaintsField
         public readonly bool ReadOnlyDirectValue;
         public readonly string[] ReadOnlyBys;
 
-        public ReadOnlyAttribute(bool directValue=true, string groupBy="")
+        public ReadOnlyAttribute(bool directValue, string groupBy="")
         {
             ReadOnlyDirectValue = directValue;
             ReadOnlyBys = null;

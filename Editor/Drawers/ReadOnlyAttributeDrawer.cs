@@ -153,10 +153,53 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
-        {
+        private static string NameReadOnly(SerializedProperty property, int index) => $"{property.propertyType}_{index}__ReadOnly";
+        private static string NameReadOnlyHelpBox(SerializedProperty property, int index) => $"{property.propertyType}_{index}__ReadOnly_Helpbox";
 
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new VisualElement
+            {
+                name = NameReadOnly(property, index),
+                userData = false,
+            };
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                name = NameReadOnlyHelpBox(property, index),
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            VisualElement readOnlyElement = container.Q<VisualElement>(NameReadOnly(property, index));
+            bool curDisabled = (bool)readOnlyElement.userData;
+
+            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, parent);
+            bool nowDisabled = error == "" && disabled;
+            if (curDisabled != nowDisabled)
+            {
+                // Debug.Log($"error={error}, disabled={disabled}");
+                readOnlyElement.userData = nowDisabled;
+                container.SetEnabled(!nowDisabled);
+            }
+
+            HelpBox helpBox = container.Q<HelpBox>(NameReadOnlyHelpBox(property, index));
+            // ReSharper disable once InvertIf
+            if (helpBox.text != error)
+            {
+                helpBox.text = error;
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            }
         }
 
         #endregion

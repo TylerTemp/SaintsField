@@ -196,7 +196,7 @@ namespace SaintsField.Editor.Drawers
             return helpBoxElement;
         }
 
-        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
@@ -220,7 +220,7 @@ namespace SaintsField.Editor.Drawers
             });
         }
 
-        protected override void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, object parent)
         {

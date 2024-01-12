@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers
             return root;
         }
 
-        protected override void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, object parent)
         {
             container.Q<Toggle>(NameLeftToggle(property)).RegisterValueChangedCallback(evt =>

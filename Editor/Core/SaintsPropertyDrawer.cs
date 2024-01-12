@@ -1379,7 +1379,7 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnAwakeUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
+                saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
             }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
@@ -1400,19 +1400,19 @@ namespace SaintsField.Editor.Core
         {
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
             }
 
             _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers)).StartingIn(100);
         }
 
-        protected virtual void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
         }
 
-        protected virtual void OnUpdateUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, object parent)
         {

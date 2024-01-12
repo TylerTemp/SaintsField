@@ -1124,14 +1124,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 652b26060ca7d5d45b1250475013f45c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mixed: {x: 0.27947393, y: 0.5294739}
-  _float: 39.8
+  _mixed: {x: 0.34843946, y: 0.59843946}
+  _float: 37.8
   _sOnly: {x: -0.02, y: 0.37}
-  _selfField: {x: 0.24154574, y: 0.7115457}
-  _mixedNoLabel: {x: 0.2001268, y: 0.6509203}
+  _selfField: {x: 0.5158621, y: 0.71275866}
+  _mixedNoLabel: {x: 0.25185096, y: 0.7026444}
   _nested:
-    _mixed: {x: 0.31, y: 0.46426943}
-    normalInt: 0
+    _mixed: {x: 0.35608295, y: 0.5103524}
+    normalInt: 5
 --- !u!4 &440518747
 Transform:
   m_ObjectHideFlags: 0
@@ -3801,10 +3801,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bbfe1bcc242ef1488babf48be8ce34b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_byBool>k__BackingField: 1
-  <_byInt>k__BackingField: 1
+  <_byBool>k__BackingField: 0
+  <_byInt>k__BackingField: 0
   <_byReference>k__BackingField: {fileID: 0}
   _rTrue: 
+  _rBool: 
+  _rInt: 
+  _rRef: 
+  _rMethod: 
+  _rNoSuch: 
 --- !u!1 &1742714856
 GameObject:
   m_ObjectHideFlags: 0
