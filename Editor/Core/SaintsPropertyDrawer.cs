@@ -1386,24 +1386,16 @@ namespace SaintsField.Editor.Core
             OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers);
         }
 
-        protected virtual void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container,
-            object parent,
-            object newValue)
-        {
-            // Debug.Log($"OK I got a new value {newValue}; {this}");
-        }
-
-        private void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement containerElement, object parent,
+        private static void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement container, object parent,
             // ReSharper disable once ParameterTypeCanBeEnumerable.Local
             IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, parent);
             }
 
-            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers)).StartingIn(100);
+            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers)).StartingIn(100);
         }
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -1416,6 +1408,14 @@ namespace SaintsField.Editor.Core
             int index,
             VisualElement container, object parent)
         {
+        }
+
+        protected virtual void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            object parent,
+            object newValue)
+        {
+            // Debug.Log($"OK I got a new value {newValue}; {this}");
         }
 
 
