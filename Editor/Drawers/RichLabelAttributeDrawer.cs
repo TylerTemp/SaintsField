@@ -219,6 +219,7 @@ namespace SaintsField.Editor.Drawers
                     width = LabelBaseWidth,
                     textOverflow = TextOverflow.Clip,
                     overflow = Overflow.Hidden,
+                    unityTextAlign = TextAnchor.MiddleLeft,
 
                     flexShrink = 0,
                     flexGrow = 0,

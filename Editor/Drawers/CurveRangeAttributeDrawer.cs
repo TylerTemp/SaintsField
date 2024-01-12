@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers
         private static string NameCurveField(SerializedProperty property) => $"{property.propertyPath}__CurveRange";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, object parent)
         {
             CurveField element = new CurveField(property.displayName)
             {

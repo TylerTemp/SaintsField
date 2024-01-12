@@ -418,12 +418,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upLimit: 7
-  min0Max: 0
-  fMinMax10: 7
   <_maxValue>k__BackingField: 126
   <_minValue>k__BackingField: 80
-  <_range>k__BackingField: {x: 96.71, y: 119.667915}
+  <_range>k__BackingField: {x: 101.21552, y: 114.103455}
+  <intRange>k__BackingField: {x: 85, y: 109}
 --- !u!4 &185980176
 Transform:
   m_ObjectHideFlags: 0
@@ -2757,9 +2755,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <DynamicMin>k__BackingField: -5.87
-  <DynamicMax>k__BackingField: 10.94
-  _propRange: {x: 1.714384, y: 4.305299}
+  vector2Step03: {x: -0.099999964, y: 1.4000001}
+  vector2IntStep3: {x: 6, y: 12}
+  vector2Free: {x: -0.37931037, y: 0.8965516}
+  vector2IntFree: {x: 5, y: 11}
+  _autoWidth: {x: 11, y: 79}
+  _autoWidthFloat: {x: -56.03448, y: -11.206894}
+  <OuterRange>k__BackingField: {x: -26.724133, y: 73.27586}
+  _innerRange: {x: 15, y: 47}
+  <DynamicMin>k__BackingField: -5.28
+  <DynamicMax>k__BackingField: 12.26
+  _propRange: {x: -2.8992672, y: 2.3176289}
 --- !u!1 &1271404088
 GameObject:
   m_ObjectHideFlags: 0
@@ -3799,11 +3805,6 @@ MonoBehaviour:
   <_byInt>k__BackingField: 1
   <_byReference>k__BackingField: {fileID: 0}
   _rTrue: 
-  _rBool: 
-  _rInt: 
-  _rRef: 
-  _rMethod: 
-  _rNoSuch: 
 --- !u!1 &1742714856
 GameObject:
   m_ObjectHideFlags: 0

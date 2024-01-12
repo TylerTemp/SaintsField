@@ -207,7 +207,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            ColorToggleAttribute toggleAttribute = (ColorToggleAttribute)saintsAttribute;
+            MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
 
             Material thisMat = (Material) property.objectReferenceValue;
             Material usingMat = renderer.sharedMaterials[toggleAttribute.Index];

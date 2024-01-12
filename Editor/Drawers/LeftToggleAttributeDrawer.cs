@@ -36,10 +36,11 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         private static string NameLeftToggle(SerializedProperty property) => $"{property.propertyPath}__LeftToggle";
+        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__LeftToggle_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, object parent)
+            VisualElement container, Label fakeLabel, object parent)
         {
             VisualElement root = new VisualElement
             {
@@ -54,13 +55,26 @@ namespace SaintsField.Editor.Drawers
                 name = NameLeftToggle(property),
             };
 
-            Label label = new Label(property.displayName)
+            string labelText;
+            if (fakeLabel == null)
+            {
+                labelText = new string(' ', property.displayName.Length);
+            }
+            else
+            {
+                labelText = fakeLabel.text;
+                fakeLabel.style.display = DisplayStyle.None;
+                fakeLabel.AddToClassList($"{property.propertyPath}__LeftToggle_Disabled");
+            }
+
+            Label label = new Label(labelText)
             {
                 style =
                 {
                     marginLeft = 5,
                     flexGrow = 1,
                 },
+                name = NameLabel(property),
             };
             // label.RegisterCallback();
             label.AddManipulator(new Clickable(evt =>
@@ -86,6 +100,14 @@ namespace SaintsField.Editor.Drawers
                 property.boolValue = evt.newValue;
                 onValueChangedCallback.Invoke(evt.newValue);
             });
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull)
+        {
+            Label label = container.Q<Label>(NameLabel(property));
+            label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
+            label.text = labelOrNull ?? "";
         }
 
         #endregion

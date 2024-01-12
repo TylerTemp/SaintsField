@@ -400,7 +400,7 @@ namespace SaintsField.Editor.Core
                         style =
                         {
                             flexShrink = 0,
-                            unityTextAlign = TextAnchor.LowerLeft,
+                            unityTextAlign = TextAnchor.MiddleLeft,
                         },
                         pickingMode = PickingMode.Ignore,
                     };

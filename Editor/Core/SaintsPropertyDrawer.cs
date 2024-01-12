@@ -581,6 +581,24 @@ namespace SaintsField.Editor.Core
 
             bool fieldIsFallback = fieldAttributeWithIndex.Attribute == null;
 
+            Label fakeLabel = labelAttributeWithIndex.Attribute == null
+                ? new Label(property.displayName)
+                {
+                    style =
+                    {
+                        position = Position.Absolute,
+                        height = EditorGUIUtility.singleLineHeight,
+                        marginLeft = LabelLeftSpace,
+                        width = LabelBaseWidth,
+
+                        // alignItems = Align.Center, // vertical
+                        unityTextAlign = TextAnchor.LowerLeft,
+                    },
+                    pickingMode = PickingMode.Ignore,
+                    // name = NameRichLabelContainer(property),
+                }
+                : null;
+
             if (fieldIsFallback)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
@@ -598,36 +616,21 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log($"saints field drawer {fieldAttributeWithIndex.Drawer}");
 #endif
-
                 VisualElement fieldElement = fieldAttributeWithIndex.Drawer.CreateFieldUIToolKit(property,
-                    fieldAttributeWithIndex.Attribute, containerElement, parent);
+                    fieldAttributeWithIndex.Attribute, containerElement, fakeLabel, parent);
                 // fieldElement.style.flexShrink = 1;
                 fieldElement.style.flexGrow = 1;
                 // fieldElement.RegisterValueChangeCallback(_ => SetValueChanged(property, true));
 
                 fieldContainer.Add(fieldElement);
                 fieldContainer.userData = fieldAttributeWithIndex;
+
             }
 
-            if (labelAttributeWithIndex.Attribute == null)
+            if (fakeLabel != null)
             {
-                fieldContainer.Add(new Label(property.displayName)
-                {
-                    style =
-                    {
-                        position = Position.Absolute,
-                        height = EditorGUIUtility.singleLineHeight,
-                        marginLeft = LabelLeftSpace,
-                        width = LabelBaseWidth,
-
-                        // alignItems = Align.Center, // vertical
-                        unityTextAlign = TextAnchor.LowerLeft,
-                    },
-                    pickingMode = PickingMode.Ignore,
-                    // name = NameRichLabelContainer(property),
-                });
+                fieldContainer.Add(fakeLabel);
             }
-
 
             #endregion
 
@@ -1295,7 +1298,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, object parent)
         {
             throw new NotImplementedException();
         }
@@ -1379,8 +1382,8 @@ namespace SaintsField.Editor.Core
                 saintsPropertyInfo.Drawer.OnAwakeUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
             }
 
-            containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
-
+            // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
+            OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers);
         }
 
         protected virtual void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -1391,15 +1394,16 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"OK I got a new value {newValue}; {this}");
         }
 
-        private void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
-            object parent, IReadOnlyList<SaintsPropertyInfo> _saintsPropertyDrawers)
+        private void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement containerElement, object parent,
+            // ReSharper disable once ParameterTypeCanBeEnumerable.Local
+            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
-            foreach (SaintsPropertyInfo saintsPropertyInfo in _saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
                 saintsPropertyInfo.Drawer.OnUpdateUiToolKit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent);
             }
 
-            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, _saintsPropertyDrawers)).StartingIn(100);
+            _rootElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers)).StartingIn(100);
         }
 
         protected virtual void OnAwakeUiToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
