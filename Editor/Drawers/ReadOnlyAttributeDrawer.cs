@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -154,16 +155,19 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         private static string NameReadOnly(SerializedProperty property, int index) => $"{property.propertyType}_{index}__ReadOnly";
+        private static string ClassReadOnly(SerializedProperty property) => $"{property.propertyType}__ReadOnly";
         private static string NameReadOnlyHelpBox(SerializedProperty property, int index) => $"{property.propertyType}_{index}__ReadOnly_HelpBox";
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            return new VisualElement
+            VisualElement root = new VisualElement
             {
                 name = NameReadOnly(property, index),
-                userData = false,
+                userData = (ReadOnlyAttribute) saintsAttribute,
             };
+            root.AddToClassList(ClassReadOnly(property));
+            return root;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -181,24 +185,43 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            VisualElement readOnlyElement = container.Q<VisualElement>(NameReadOnly(property, index));
-            bool curDisabled = (bool)readOnlyElement.userData;
+            IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassReadOnly(property)).ToList();
+            VisualElement topElement = visibilityElements[0];
 
-            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, parent);
-            bool nowDisabled = error == "" && disabled;
-            if (curDisabled != nowDisabled)
+            if (topElement.name != NameReadOnly(property, index))
             {
-                // Debug.Log($"error={error}, disabled={disabled}");
-                readOnlyElement.userData = nowDisabled;
-                container.SetEnabled(!nowDisabled);
+                return;
+            }
+
+            bool curReadOnly = !container.enabledSelf;
+
+            List<string> errors = new List<string>();
+            bool nowReadOnly = false;
+            foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, ((ReadOnlyAttribute)each.userData), parent)))
+            {
+                if (error != "")
+                {
+                    errors.Add(error);
+                }
+
+                if (readOnly)
+                {
+                    nowReadOnly = true;
+                }
+            }
+
+            if (curReadOnly != nowReadOnly)
+            {
+                container.SetEnabled(false);
             }
 
             HelpBox helpBox = container.Q<HelpBox>(NameReadOnlyHelpBox(property, index));
+            string joinedError = string.Join("\n\n", errors);
             // ReSharper disable once InvertIf
-            if (helpBox.text != error)
+            if (helpBox.text != joinedError)
             {
-                helpBox.text = error;
-                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = joinedError;
+                helpBox.style.display = joinedError == "" ? DisplayStyle.None : DisplayStyle.Flex;
             }
         }
 

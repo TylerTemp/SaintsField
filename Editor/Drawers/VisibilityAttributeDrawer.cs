@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
         protected override (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
-            VisibilityAttribute visibilityAttribute = ((VisibilityAttribute)saintsAttribute);
+            VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
 
             object target = GetParentTarget(property);
             Type type = target.GetType();
@@ -178,25 +178,16 @@ namespace SaintsField.Editor.Drawers
         {
             IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassVisibility(property)).ToList();
             VisualElement topElement = visibilityElements[0];
-            // Debug.Log($"top={topElement.name}; this={NameVisibility(property, index)}");
             if (topElement.name != NameVisibility(property, index))
             {
                 return;
             }
 
-            // VisualElement thisElement = container.Q<VisualElement>(NameVisibility(property, index));
-            // if(!)
-            // MetaInfo topInfo = (Visu)topElement.userData;
-            // if (topInfo.Computed)
-            // {
-            //     return;
-            // }
-
             bool curShow = container.style.display != DisplayStyle.None;
 
             List<string> errors = new List<string>();
             bool nowShow = false;
-            foreach ((string error, bool show) in visibilityElements.Select(each => GetShow(((VisibilityAttribute)each.userData), parent.GetType(), parent)))
+            foreach ((string error, bool show) in visibilityElements.Select(each => GetShow((VisibilityAttribute)each.userData, parent.GetType(), parent)))
             {
                 if (error != "")
                 {
@@ -228,8 +219,8 @@ namespace SaintsField.Editor.Drawers
             // }
             //
             HelpBox helpBox = container.Q<HelpBox>(NameVisibilityHelpBox(property, index));
-            // ReSharper disable once InvertIf
             string joinedError = string.Join("\n\n", errors);
+            // ReSharper disable once InvertIf
             if (helpBox.text != joinedError)
             {
                 helpBox.text = joinedError;
