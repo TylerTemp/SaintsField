@@ -1,13 +1,16 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(ResizableTextAreaAttribute))]
     public class ResizableTextAreaAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private string _error = "";
 
         // private float _width = -1;
@@ -116,5 +119,50 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        #endregion
+
+        #region UIToolkit
+
+        private static string NameLabelPlaceholder(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea_LabelPlaceholder";
+        private static string NameTextArea(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea";
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, object parent)
+        {
+            VisualElement root = new VisualElement();
+            root.Add(new Label(" ")
+            {
+                name = NameLabelPlaceholder(property),
+                pickingMode = PickingMode.Ignore,
+            });
+            root.Add(new TextField
+            {
+                value = property.stringValue,
+                multiline = true,
+                name = NameTextArea(property),
+            });
+
+            return root;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            container.Q<TextField>(NameTextArea(property)).RegisterValueChangedCallback(changed =>
+            {
+                property.stringValue = changed.newValue;
+                property.serializedObject.ApplyModifiedProperties();
+
+                onValueChangedCallback?.Invoke(changed.newValue);
+            });
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull)
+        {
+            container.Q<Label>(NameLabelPlaceholder(property)).style.display = labelOrNull == null? DisplayStyle.None: DisplayStyle.Flex;
+        }
+
+        #endregion
     }
 }
