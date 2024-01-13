@@ -224,9 +224,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
-            // this is a bug that can not get correct index
-            // int selectedIndex = (int)buttonLabel.userData;
-            int selectedIndex = Array.IndexOf(scenes, property.stringValue);
+            (int selectedIndex, string _) = GetSelected(property);
 
             foreach (int index in Enumerable.Range(0, scenes.Length))
             {
@@ -256,7 +254,7 @@ namespace SaintsField.Editor.Drawers
             genericDropdownMenu.DropDown(button.worldBound, button, true);
         }
 
-        private (int index, string displayName) GetSelected(SerializedProperty property)
+        private static (int index, string displayName) GetSelected(SerializedProperty property)
         {
             string[] scenes = GetScenes();
             if(property.propertyType == SerializedPropertyType.String)
