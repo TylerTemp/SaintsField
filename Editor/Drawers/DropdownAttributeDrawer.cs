@@ -290,19 +290,12 @@ namespace SaintsField.Editor.Drawers
 
             Button button = new Button
             {
-                // text = buttonLabel,
                 style =
                 {
                     height = EditorGUIUtility.singleLineHeight,
                     flexGrow = 1,
                 },
                 name = NameButtonField(property),
-                // userData = new MetaInfo
-                // {
-                //     Error = "",
-                //     SelectedIndex = -1,
-                //     DropdownListValue = Array.Empty<(string, object, bool, bool)>(),
-                // },
             };
 
             VisualElement buttonLabelContainer = new VisualElement

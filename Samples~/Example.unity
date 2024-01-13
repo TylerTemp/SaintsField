@@ -707,7 +707,7 @@ MonoBehaviour:
   min: 10
   max: 21
   rangeFloat: 10
-  rangeInt: 10
+  rangeInt: 18
   rangeFloatStep: 14
   rangeIntStep: 20
   normalRange: 7
@@ -1291,7 +1291,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0
   eye: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
-  guess: 19
+  guess: 14
 --- !u!4 &622173743
 Transform:
   m_ObjectHideFlags: 0
