@@ -6,9 +6,8 @@ namespace SaintsField
     [AttributeUsage(AttributeTargets.Field)]
     public class RichLabelAttribute: PropertyAttribute, ISaintsAttribute
     {
+        public virtual SaintsAttributeType AttributeType => SaintsAttributeType.Label;
         public string GroupBy => "__LABEL_FIELD__";
-
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Label;
 
         public readonly string RichTextXml;
         public readonly bool IsCallback;

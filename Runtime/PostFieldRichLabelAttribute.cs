@@ -1,20 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SaintsField
 {
-    public class PostFieldRichLabelAttribute: PropertyAttribute, ISaintsAttribute
+    [AttributeUsage(AttributeTargets.Field)]
+    public class PostFieldRichLabelAttribute: RichLabelAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
+        public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
-        public readonly string RichTextXml;
-        public readonly bool IsCallback;
         public readonly float Padding;
 
-        public PostFieldRichLabelAttribute(string richTextXml, bool isCallback=false, float padding=5f, string groupBy="")
+        public PostFieldRichLabelAttribute(string richTextXml, bool isCallback=false, float padding=5f, string groupBy=""): base(richTextXml, isCallback)
         {
-            RichTextXml = richTextXml;
-            IsCallback = isCallback;
             Padding = padding;
             GroupBy = groupBy;
         }

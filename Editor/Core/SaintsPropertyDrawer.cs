@@ -1339,7 +1339,7 @@ namespace SaintsField.Editor.Core
 
                 List<VisualElement> parentRoots = FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"usingFallbackField, parentRoots={parentRoots.Count}, {_saintsPropertyDrawers.Count}");
+                Debug.Log($"usingFallbackField, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count}");
 #endif
                 if (parentRoots.Count != saintsPropertyDrawers.Count)
                 {

@@ -29,14 +29,17 @@ namespace SaintsField.Editor.Drawers
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
             PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
-            string labelXml = GetLabelXml(property, targetAttribute);
-            if (string.IsNullOrEmpty(labelXml))
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, GetParentTarget(property));
+
+            _error = error;
+
+            if (error != "" || string.IsNullOrEmpty(xml))
             {
                 _payloads = null;
                 return 0;
             }
 
-            _payloads = RichTextDrawer.ParseRichXml(labelXml, label.text).ToArray();
+            _payloads = RichTextDrawer.ParseRichXml(xml, label.text).ToArray();
             return _richTextDrawer.GetWidth(label, position.height, _payloads) + targetAttribute.Padding;
         }
 
@@ -65,72 +68,6 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        private string GetLabelXml(SerializedProperty property, PostFieldRichLabelAttribute targetAttribute)
-        {
-            if (!targetAttribute.IsCallback)
-            {
-                return targetAttribute.RichTextXml;
-            }
-
-            _error = "";
-            object target = GetParentTarget(property);
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
-            switch (getPropType)
-            {
-                case ReflectUtils.GetPropType.Field:
-                {
-                    object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-                    return result == null ? string.Empty : result.ToString();
-                }
-
-                case ReflectUtils.GetPropType.Property:
-                {
-                    object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                    return result == null ? string.Empty : result.ToString();
-                }
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    if (methodInfo.ReturnType != typeof(string))
-                    {
-                        _error =
-                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}";
-                    }
-                    else
-                    {
-                        try
-                        {
-                            return (string)methodInfo.Invoke(target,
-                                methodParams.Select(p => p.DefaultValue).ToArray());
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            Debug.Assert(e.InnerException != null);
-                            _error = e.InnerException.Message;
-                            Debug.LogException(e);
-                        }
-                        catch (Exception e)
-                        {
-                            _error = e.Message;
-                            Debug.LogException(e);
-                        }
-                    }
-                    return null;
-                }
-                case ReflectUtils.GetPropType.NotFound:
-                {
-                    _error =
-                        $"not found `{targetAttribute.RichTextXml}` on `{target}`";
-                    return null;
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            }
-        }
-
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return _error != "";
@@ -149,8 +86,8 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NamePostFieldRichLabel(SerializedProperty property, int index) =>
-            $"{property.propertyPath}_{index}__PostFieldRichLabel";
+        private static string NameRichLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__PostFieldRichLabel";
+        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__PostFieldRichLabel_HelpBox";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent, Action<object> onChange)
@@ -161,16 +98,63 @@ namespace SaintsField.Editor.Drawers
                 {
                     flexDirection = FlexDirection.Row,
                     height = EditorGUIUtility.singleLineHeight,
-                    marginLeft = LabelLeftSpace,
+                    marginLeft = LabelLeftSpace + ((PostFieldRichLabelAttribute)saintsAttribute).Padding,
                     unityTextAlign = TextAnchor.MiddleLeft,
 
                     flexShrink = 0,
                     flexGrow = 0,
                 },
-                name = NamePostFieldRichLabel(property, index),
-                userData = new string(' ', property.displayName.Length),
+                name = NameRichLabel(property, index),
                 pickingMode = PickingMode.Ignore,
+                userData = "",
             };
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                name = NameHelpBox(property, index),
+                userData = "",
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
+
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            string curError = (string)helpBox.userData;
+            if (curError != error)
+            {
+                helpBox.text = error;
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+
+            VisualElement richLabel = container.Q<VisualElement>(NameRichLabel(property, index));
+            string curXml = (string)richLabel.userData;
+            // ReSharper disable once InvertIf
+            if (curXml != xml)
+            {
+                richLabel.userData = xml;
+                richLabel.Clear();
+                // ReSharper disable once InvertIf
+                if (xml != null)
+                {
+                    IReadOnlyList<RichTextDrawer.RichTextChunk> payloads = RichTextDrawer.ParseRichXml(xml, property.displayName).ToArray();
+                    foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, payloads))
+                    {
+                        richLabel.Add(richChunk);
+                    }
+                }
+            }
         }
 
         #endregion

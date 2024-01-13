@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using SaintsField.Editor.Utils;
@@ -71,6 +72,112 @@ namespace SaintsField.Editor.Core
             // return iconPayload.IsEditorResource
             //     ? (Texture2D)EditorGUIUtility.Load(iconPayload.IconResourcePath)
             //     : (Texture2D)AssetDatabase.LoadAssetAtPath<Texture>(iconPayload.IconResourcePath);
+        }
+
+        public static (string error, string xml) GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute, object target)
+        {
+            if (!targetAttribute.IsCallback)
+            {
+                return ("", targetAttribute.RichTextXml);
+            }
+            //
+            // _error = "";
+            // object target = GetParentTarget(property);
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
+            switch (getPropType)
+            {
+                case ReflectUtils.GetPropType.Field:
+                {
+                    object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+                    return ("", result == null ? string.Empty : result.ToString());
+                }
+
+                case ReflectUtils.GetPropType.Property:
+                {
+                    object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                    return ("", result == null ? string.Empty : result.ToString());
+                }
+                case ReflectUtils.GetPropType.Method:
+                {
+                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    ParameterInfo[] requiredParams = methodParams.Where(p => !p.IsOptional).ToArray();
+                    // Debug.Assert(methodParams.All(p => p.IsOptional));
+                    Debug.Assert(requiredParams.Length <= 1);
+                    if (methodInfo.ReturnType != typeof(string))
+                    {
+                        return (
+                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}", property.displayName);
+                    }
+
+                    int arrayIndex = 0;
+                    bool dataCallback = false;
+                    if (requiredParams.Length == 1)
+                    {
+                        Debug.Assert(requiredParams[0].ParameterType == typeof(int));
+                        string[] propPaths = property.propertyPath.Split('.');
+                        string lastPropPath = propPaths[propPaths.Length - 1];
+                        if(lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
+                        {
+                            dataCallback = true;
+                            arrayIndex = int.Parse(lastPropPath.Substring(5, lastPropPath.Length - 6));
+                        }
+                    }
+
+                    object[] passParams;
+                    if(dataCallback)
+                    {
+                        List<object> injectedParams = new List<object>();
+                        bool injected = false;
+                        foreach (ParameterInfo methodParam in methodParams)
+                        {
+                            if (!injected && methodParam.ParameterType == typeof(int))
+                            {
+                                injectedParams.Add(arrayIndex);
+                                injected = true;
+                            }
+                            else
+                            {
+                                injectedParams.Add(methodParam.DefaultValue);
+                            }
+                        }
+                        passParams = injectedParams.ToArray();
+                    }
+                    else
+                    {
+                        passParams = methodParams
+                            .Select(p => p.DefaultValue)
+                            .ToArray();
+                    }
+
+                    try
+                    {
+                        return ("", (string)methodInfo.Invoke(
+                            target,
+                            passParams
+                        ));
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        Debug.LogException(e);
+                        Debug.Assert(e.InnerException != null);
+                        return (e.InnerException.Message, property.displayName);
+                    }
+                    catch (Exception e)
+                    {
+                        // _error = e.Message;
+                        Debug.LogException(e);
+                        return (e.Message, property.displayName);
+                    }
+                }
+                case ReflectUtils.GetPropType.NotFound:
+                {
+                    return ($"not found `{targetAttribute.RichTextXml}` on `{target}`", property.displayName);
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+            }
         }
 
         public struct RichTextChunk
