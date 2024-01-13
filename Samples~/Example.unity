@@ -387,7 +387,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ints: 0200000002000000
   myStructs:
-  - minMax: {x: 0.11, y: 0.68720365}
+  - minMax: {x: 0.14833865, y: 0.7255423}
     normalFloat: 0.21
 --- !u!1 &185980174
 GameObject:
@@ -773,9 +773,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Animator>k__BackingField: {fileID: 380193380}
   animatorState:
-    layerIndex: 0
-    stateNameHash: -1588485629
-    stateName: Example
+    layerIndex: 1
+    stateNameHash: 808375644
+    stateName: FromTest
     stateSpeed: 8
     animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
   animStateName: Idle
@@ -1558,7 +1558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cd68cd23c614bcab6f5007c1c403a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myDummy: {fileID: 1271404092}
+  myDummy: {fileID: 0}
   myDummyTrans: {fileID: 1271404091}
   myDummyGo: {fileID: 1271404088}
 --- !u!4 &746735700
@@ -2545,7 +2545,7 @@ MonoBehaviour:
   rawImageField: {fileID: 1404782763}
   imageField: {fileID: 1742714858}
   buttonField: {fileID: 1060634463}
-  emptyImage: {fileID: 1404782763}
+  emptyImage: {fileID: 0}
 --- !u!4 &1160369192
 Transform:
   m_ObjectHideFlags: 0
@@ -2776,8 +2776,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1271404091}
   - component: {fileID: 1271404090}
-  - component: {fileID: 1271404092}
   - component: {fileID: 1271404093}
+  - component: {fileID: 1271404094}
   m_Layer: 0
   m_Name: AddComponent
   m_TagString: Untagged
@@ -2797,7 +2797,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa88ae97cb014113a58b2133637da902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myDummy: {fileID: 1271404092}
+  myDummy: {fileID: 1271404094}
   myObj: {fileID: 1271404088}
 --- !u!4 &1271404091
 Transform:
@@ -2814,18 +2814,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1271404092
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1271404088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1833c50b28d4d34b507e6d12f466f5e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &1271404093
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2847,6 +2835,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1271404094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271404088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1833c50b28d4d34b507e6d12f466f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1350909637
 GameObject:
   m_ObjectHideFlags: 0

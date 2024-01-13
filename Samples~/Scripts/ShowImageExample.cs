@@ -19,13 +19,13 @@ namespace SaintsField.Samples.Scripts
         public string alignField;
 
         [Space]
-        [BelowImage(nameof(rawImageField), maxWidth: 20, align: EAlign.End)]
+        [BelowImage(maxWidth: 20, align: EAlign.End)]
         public RawImage rawImageField;
-        [BelowImage(nameof(imageField), maxWidth: 20, align: EAlign.End)]
+        [BelowImage(maxWidth: 20, align: EAlign.End)]
         public Image imageField;
-        [BelowImage(nameof(buttonField), maxWidth: 20, align: EAlign.End)]
+        [BelowImage(maxWidth: 20, align: EAlign.End)]
         public Button buttonField;
 
-        [BelowImage(nameof(emptyImage))] public RawImage emptyImage;
+        [BelowImage] public RawImage emptyImage;
     }
 }

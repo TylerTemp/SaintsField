@@ -6,6 +6,9 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UI.Image;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -15,6 +18,7 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(BelowImageAttribute))]
     public class ShowImageAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private Texture2D _originTexture;
         // private Texture2D _previewTexture;
 
@@ -43,115 +47,20 @@ namespace SaintsField.Editor.Drawers
                 return (null, maxWidth, maxWidth);
             }
 
-            _error = "";
-
-            if (string.IsNullOrEmpty(name))
-            {
-                CheckSetOriginalTextureAndError(property.objectReferenceValue);
-            }
-            else
-            {
-                SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
-                if (prop != null)
-                {
-                    if(prop.propertyType != SerializedPropertyType.ObjectReference)
-                    {
-                        _error = $"Expect ObjectReference for `{name}`, get {prop.propertyType}";
-                        return (null, 0, 0);
-                    }
-
-                    // targetChanged = CheckSetOriginalTextureAndError(prop.objectReferenceValue);
-                    CheckSetOriginalTextureAndError(prop.objectReferenceValue);
-
-                    if(_error != "")
-                    {
-                        return (null, 0, 0);
-                    }
-                }
-                else
-                {
-                    _error = "";
-                    object target = GetParentTarget(property);
-                    (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                        ReflectUtils.GetProp(target.GetType(), name);
-                    switch (getPropType)
-                    {
-                        case ReflectUtils.GetPropType.Field:
-                        {
-                            // targetChanged = CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
-                            CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
-                            break;
-                        }
-
-                        case ReflectUtils.GetPropType.Property:
-                        {
-                            // targetChanged = CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
-                            CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
-                            break;
-                        }
-                        case ReflectUtils.GetPropType.Method:
-                        {
-                            MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                            ParameterInfo[] methodParams = methodInfo.GetParameters();
-                            Debug.Assert(methodParams.All(p => p.IsOptional));
-                            Object result;
-                            try
-                            {
-                                result = (Object)methodInfo.Invoke(target,
-                                    methodParams.Select(p => p.DefaultValue).ToArray());
-                            }
-                            catch (TargetInvocationException e)
-                            {
-                                Debug.Assert(e.InnerException != null);
-                                _error = e.InnerException.Message;
-                                Debug.LogException(e);
-                                return (null, 0, 0);
-                            }
-                            catch (Exception e)
-                            {
-                                _error = e.Message;
-                                return (null, 0, 0);
-                            }
-
-                            // targetChanged = CheckSetOriginalTextureAndError(result);
-                            CheckSetOriginalTextureAndError(result);
-
-                            break;
-                        }
-                        case ReflectUtils.GetPropType.NotFound:
-                        {
-                            _error =
-                                $"not found `{name}` on `{target}`";
-                            return (null, 0, 0);
-                        }
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-                    }
-                }
-            }
+            (string error, Texture2D image) = GetImage(property, name, GetParentTarget(property));
+            _error = error;
 
             if(_error != "")
             {
                 return (null, 0, 0);
             }
 
-            // bool previewTextureNull = _previewTexture == null;
-            // if(!previewTextureNull && _previewTexture.width == 1 && _previewTexture.height == 1)
-            // {
-            //     targetChanged = true;
-            // }
-            //
-            // if (!previewTextureNull && !targetChanged)
-            // {
-            //     return _previewTexture;
-            // }
+            _originTexture = image;
 
             if (_originTexture == null)
             {
                 return (null, 0, 0);
             }
-
-            // CleanPreviewTexture(_previewTexture);
 
             bool widthOk = maxWidth == -1
                 ? _originTexture.width <= viewWidth
@@ -160,73 +69,12 @@ namespace SaintsField.Editor.Drawers
 
             if (widthOk && heightOk)  // original width & smaller than view width
             {
-                // Debug.Log($"_originTexture {_originTexture.width}x{_originTexture.height} <= viewWidth {viewWidth}; width={width}");
                 return (_originTexture, _originTexture.width, _originTexture.height);
             }
 
             // fixed width / overflow height
             (int scaleWidth, int scaleHeight) = Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), maxWidth, maxHeight, _originTexture.width, _originTexture.height);
-            // Debug.Log($"scale to {scaleWidth}x{scaleHeight}; from {_originTexture.width}x{_originTexture.height}; viewWidth={viewWidth}, fitTo={maxWidth}x{maxHeight}");
             return (_originTexture, scaleWidth, scaleHeight);
-            // _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, scaleWidth, scaleHeight);
-
-            // if (_originTexture.width <= width && (maxHeight == -1 || _previewTexture.height <= maxHeight))
-            // {
-            //     // _previewTexture = SaintsField.Utils.Tex.ConvertToCompatibleFormat(_originTexture);
-            //     // Debug.Log($"use original height {_originTexture.height}");
-            //     _previewTexture = _originTexture;
-            // }
-            // else
-            // {
-            //     // Debug.Log($"use original height {_originTexture.height}");
-            //     _previewTexture = SaintsField.Utils.Tex.TextureTo(_originTexture, width, maxHeight);
-            // }
-            //
-            // return _previewTexture;
-        }
-
-        private void CheckSetOriginalTextureAndError(object result)
-        {
-            // bool targetChanged;
-
-            _error = "";
-            switch (result)
-            {
-                case Sprite sprite:
-                    // targetChanged = !ReferenceEquals(_originTexture, sprite.texture);
-                    _originTexture = sprite.texture;
-                    break;
-                case Texture2D texture2D:
-                    // targetChanged = !ReferenceEquals(_originTexture, texture2D);
-                    _originTexture = texture2D;
-                    break;
-                // case Texture texture:
-                //     targetChanged = !ReferenceEquals(_originTexture, texture);
-                //     _originTexture = texture as Texture2D;
-                //     break;
-                case SpriteRenderer spriteRenderer:
-                    // targetChanged = !ReferenceEquals(_originTexture, spriteRenderer.sprite.texture);
-                    _originTexture = spriteRenderer.sprite.texture;
-                    break;
-                case Image image:
-                    // targetChanged = !ReferenceEquals(_originTexture, image.sprite.texture);
-                    _originTexture = image.sprite.texture;
-                    break;
-                case RawImage image:
-                    // targetChanged = !ReferenceEquals(_originTexture, image.texture);
-                    _originTexture = image.texture as Texture2D;
-                    break;
-                case Button button:
-                    // targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);
-                    _originTexture = button.targetGraphic.mainTexture as Texture2D;
-                    break;
-                default:
-                    _error = $"Expect Sprite or Texture2D, get {(result == null? "null": result.GetType().ToString())}";
-                    // return false;
-                    break;
-            }
-
-            // return targetChanged;
         }
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -386,5 +234,255 @@ namespace SaintsField.Editor.Drawers
 
             return RectUtils.SplitHeightRect(position, preferredHeight).leftRect;
         }
+        #endregion
+
+        private static (string error, Texture2D image) GetImage(SerializedProperty property, string name, object target)
+        {
+
+            if (string.IsNullOrEmpty(name))
+            {
+                if(property.propertyType != SerializedPropertyType.ObjectReference)
+                {
+                    return ($"Expect ObjectReference for `{name}`, get {property.propertyType}", null);
+                }
+
+                return GetImageFromTarget(property.objectReferenceValue);
+            }
+
+            SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
+            if (prop != null)
+            {
+                if(prop.propertyType != SerializedPropertyType.ObjectReference)
+                {
+                    return ($"Expect ObjectReference for `{name}`, get {prop.propertyType}", null);
+                }
+
+                return GetImageFromTarget(prop.objectReferenceValue);
+
+            }
+
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUtils.GetProp(target.GetType(), name);
+            switch (getPropType)
+            {
+                case ReflectUtils.GetPropType.Field:
+                {
+                    // targetChanged = CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
+                    return GetImageFromTarget(((FieldInfo)fieldOrMethodInfo).GetValue(target));
+                }
+
+                case ReflectUtils.GetPropType.Property:
+                {
+                    // targetChanged = CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
+                    return GetImageFromTarget(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
+                }
+                case ReflectUtils.GetPropType.Method:
+                {
+                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    Debug.Assert(methodParams.All(p => p.IsOptional));
+                    Object result;
+                    try
+                    {
+                        result = (Object)methodInfo.Invoke(target,
+                            methodParams.Select(p => p.DefaultValue).ToArray());
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        Debug.LogException(e);
+                        Debug.Assert(e.InnerException != null);
+                        return (e.InnerException.Message, null);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                        return (e.Message, null);
+                    }
+
+                    // targetChanged = CheckSetOriginalTextureAndError(result);
+                    return GetImageFromTarget(result);
+                }
+                case ReflectUtils.GetPropType.NotFound:
+                {
+                    return ($"not found `{name}` on `{target}`", null);
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+            }
+        }
+
+        private static (string error, Texture2D image) GetImageFromTarget(object result)
+        {
+            switch (result)
+            {
+                case Sprite sprite:
+                    return ("", sprite.texture);
+                case Texture2D texture2D:
+                    return ("", texture2D);
+                // case Texture texture:
+                //     targetChanged = !ReferenceEquals(_originTexture, texture);
+                //     _originTexture = texture as Texture2D;
+                //     break;
+                case SpriteRenderer spriteRenderer:
+                    return ("", spriteRenderer.sprite.texture);
+                case Image image:
+                    return ("", image.sprite.texture);
+                case RawImage image:
+                    return ("", image.texture as Texture2D);
+                case Button button:
+                    // targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);
+                    return button.targetGraphic?
+                        ("", button.targetGraphic.mainTexture as Texture2D):
+                        ("", null);
+                default:
+                    return (
+                        $"Unable to find image on {(result == null ? "null" : result.GetType().ToString())}",
+                        null);
+            }
+        }
+
+
+        #region UIToolkit
+
+        private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage";
+
+        private static string NameHelpBox(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__ShowImage_HelpBox";
+
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
+            if (!showImageAttribute.Above)
+            {
+                return null;
+            }
+
+            return CreateImage(property, index, null, showImageAttribute);
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            {
+                name = NameHelpBox(property, index),
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+
+            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
+            if (showImageAttribute.Above)
+            {
+                return helpBox;
+            }
+
+            VisualElement root = new VisualElement
+            {
+                name = NameImage(property, index) + "_root",
+            };
+            root.Add(CreateImage(property, index, null, showImageAttribute));
+            root.Add(helpBox);
+
+            return root;
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, object parent)
+        {
+            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
+
+            (string error, Texture2D preview) = GetImage(property, showImageAttribute.ImageCallback, parent);
+
+            UnityEngine.UIElements.Image image = container.Q<UnityEngine.UIElements.Image>(NameImage(property, index));
+            UpdateImage(image, preview, showImageAttribute);
+
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            // ReSharper disable once InvertIf
+            if (helpBox.text != error)
+            {
+                helpBox.text = error;
+                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
+            }
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static UnityEngine.UIElements.Image CreateImage(SerializedProperty property, int index, Texture2D preview,
+            ShowImageAttribute showImageAttribute)
+        {
+            UnityEngine.UIElements.Image image = new UnityEngine.UIElements.Image
+            {
+                scaleMode = ScaleMode.ScaleToFit,
+                name = NameImage(property, index),
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+
+            switch (showImageAttribute.Align)
+            {
+                case EAlign.Start:
+                    // image.style.alignSelf = Align.Start;
+                    break;
+                case EAlign.Center:
+                    image.style.alignSelf = Align.Center;
+                    break;
+                case EAlign.End:
+                    image.style.alignSelf = Align.FlexEnd;
+                    break;
+                case EAlign.FieldStart:
+                    // image.style.alignSelf = Align.FlexStart;
+                    image.style.left = LabelBaseWidth;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(showImageAttribute.Align), showImageAttribute.Align, null);
+            }
+
+            UpdateImage(image, preview, showImageAttribute);
+
+            return image;
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static void UpdateImage(UnityEngine.UIElements.Image image, Texture2D preview, ShowImageAttribute showImageAttribute)
+        {
+            if (ReferenceEquals(image.image, preview))
+            {
+                return;
+            }
+
+            image.image = preview;
+
+            bool isNull = preview == null;
+
+            image.style.display = isNull? DisplayStyle.None: DisplayStyle.Flex;
+            if (isNull)
+            {
+                return;
+            }
+
+            if (showImageAttribute.MaxWidth > 0 || showImageAttribute.MaxHeight > 0)
+            {
+                int imageWidth = preview.width;
+                int imageHeight = preview.height;
+                int maxHeight = showImageAttribute.MaxHeight > 0? showImageAttribute.MaxHeight: imageWidth;
+                int maxWidth = showImageAttribute.MaxWidth > 0? showImageAttribute.MaxWidth: imageHeight;
+
+                (int fittedWidth, int fittedHeight) = Tex.FitScale(maxWidth, maxHeight, imageWidth, imageHeight);
+
+                image.style.maxWidth = fittedWidth;
+                image.style.maxHeight = fittedHeight;
+            }
+            else
+            {
+                image.style.maxWidth = image.style.maxHeight = StyleKeyword.Null;
+            }
+
+        }
+        #endregion
     }
 }

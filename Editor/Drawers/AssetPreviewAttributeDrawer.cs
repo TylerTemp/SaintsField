@@ -248,7 +248,9 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
-        private static string ClassImage(SerializedProperty property) => $"{property.propertyPath}__Image";
+        #region UIToolkit
+
+        private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AssetPreview";
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
@@ -260,7 +262,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             Texture2D preview = GetPreview(property.objectReferenceValue);
-            Image image = CreateImage(property, preview, assetPreviewAttribute);
+            Image image = CreateImage(property, index, preview, assetPreviewAttribute);
             return image;
         }
 
@@ -274,7 +276,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             Texture2D preview = GetPreview(property.objectReferenceValue);
-            Image image = CreateImage(property, preview, assetPreviewAttribute);
+            Image image = CreateImage(property, index, preview, assetPreviewAttribute);
             return image;
         }
 
@@ -282,8 +284,9 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, object parent)
         {
-            Image image = container.Query<Image>(className: ClassImage(property)).First();
+            Image image = container.Query<Image>(className: NameImage(property, index)).First();
             int preInstanceId = (int)image.userData;
+            // ReSharper disable once Unity.NoNullPropagation
             int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
 
             // Debug.Log($"cur={curInstanceId}, pre={preInstanceId}");
@@ -305,11 +308,13 @@ namespace SaintsField.Editor.Drawers
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
-        private static Image CreateImage(SerializedProperty property, Texture2D preview, AssetPreviewAttribute assetPreviewAttribute)
+        private static Image CreateImage(SerializedProperty property, int index, Texture2D preview,
+            AssetPreviewAttribute assetPreviewAttribute)
         {
             Image image = new Image
             {
                 scaleMode = ScaleMode.ScaleToFit,
+                // ReSharper disable once Unity.NoNullPropagation
                 userData = property.objectReferenceValue?.GetInstanceID() ?? int.MinValue ,
             };
 
@@ -334,7 +339,7 @@ namespace SaintsField.Editor.Drawers
 
             UpdateImage(image, preview, assetPreviewAttribute);
 
-            image.AddToClassList(ClassImage(property));
+            image.AddToClassList(NameImage(property, index));
             return image;
         }
 
@@ -379,5 +384,6 @@ namespace SaintsField.Editor.Drawers
                 ? "field is null"
                 : null;
         }
+        #endregion
     }
 }
