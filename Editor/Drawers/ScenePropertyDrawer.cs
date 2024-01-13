@@ -152,7 +152,7 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            buttonLabelContainer.Add(new Label(property.stringValue)
+            buttonLabelContainer.Add(new Label
             {
                 name = NameButtonLabelField(property),
             });
@@ -238,15 +238,16 @@ namespace SaintsField.Editor.Drawers
                     if(property.propertyType == SerializedPropertyType.String)
                     {
                         property.stringValue = curItem;
+                        property.serializedObject.ApplyModifiedProperties();
+                        onChange.Invoke(curItem);
                     }
                     else
                     {
                         property.intValue = curIndex;
+                        property.serializedObject.ApplyModifiedProperties();
+                        onChange.Invoke(curIndex);
                     }
-                    property.serializedObject.ApplyModifiedProperties();
                     buttonLabel.text = curName;
-                    // buttonLabel.userData = curIndex;
-                    // property.serializedObject.ApplyModifiedProperties();
                 });
             }
 
