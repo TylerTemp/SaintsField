@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MinCallback);
+                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MinCallback);
                 error = getError;
                 minValue = getValue;
             }
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MaxCallback);
+                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MaxCallback);
                 error = getError;
                 maxValue = getValue;
             }
@@ -336,8 +336,9 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);
 

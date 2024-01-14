@@ -193,8 +193,9 @@ namespace SaintsField.Editor.Drawers
             return helpBox;
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
 

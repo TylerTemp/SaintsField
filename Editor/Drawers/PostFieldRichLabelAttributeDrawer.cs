@@ -124,8 +124,9 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
             (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);

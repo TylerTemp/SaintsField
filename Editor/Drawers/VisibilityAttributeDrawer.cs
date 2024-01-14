@@ -174,7 +174,8 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassVisibility(property)).ToList();
             VisualElement topElement = visibilityElements[0];

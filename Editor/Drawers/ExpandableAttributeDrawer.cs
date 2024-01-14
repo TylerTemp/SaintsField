@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -6,6 +7,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -239,8 +241,9 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             Foldout foldOut = container.Q<Foldout>(NameFoldout(property));
 

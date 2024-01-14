@@ -391,7 +391,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
 

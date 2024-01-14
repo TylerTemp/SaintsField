@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers
                 }
                 else
                 {
-                    (float getValueLimit, string getError) = Util.GetCallbackFloat(parentTarget, maxValueAttribute.ValueCallback);
+                    (string getError, float getValueLimit) = Util.GetCallbackFloat(parentTarget, maxValueAttribute.ValueCallback);
                     valueLimit = getValueLimit;
                     _error = getError;
                 }
@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers
                 }
                 else
                 {
-                    (float getValueLimit, string getError) = Util.GetCallbackFloat(parentTarget, maxValueAttribute.ValueCallback);
+                    (string getError, float getValueLimit) = Util.GetCallbackFloat(parentTarget, maxValueAttribute.ValueCallback);
                     valueLimit = getValueLimit;
                     _error = getError;
                 }

@@ -1,20 +1,18 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(MinValueAttribute))]
     public class MinValueAttributeDrawer : SaintsPropertyDrawer
     {
-        private string _error = "";
+        #region IMGUI
 
-        // protected override (bool isActive, Rect position) DrawPreLabel(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
-        // {
-        //     EditorGUI.BeginChangeCheck();
-        //     return (true, position);
-        // }
+        private string _error = "";
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool valueChanged)
@@ -26,56 +24,35 @@ namespace SaintsField.Editor.Drawers
 
             object parentTarget = GetParentTarget(property);
 
+            MinValueAttribute minValueAttribute = (MinValueAttribute)saintsAttribute;
+            (string error, float valueLimit) = GetLimitFloat(minValueAttribute, parentTarget);
+
+            _error = error;
+
+            if (_error != "")
+            {
+                return true;
+            }
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (property.propertyType == SerializedPropertyType.Float)
             {
                 float curValue = property.floatValue;
-                MinValueAttribute minValueAttribute = (MinValueAttribute)saintsAttribute;
-                float valueLimit;
-                if (minValueAttribute.ValueCallback == null)
-                {
-                    valueLimit = minValueAttribute.Value;
-                }
-                else
-                {
-                    (float getValueLimit, string getError) = Util.GetCallbackFloat(parentTarget, minValueAttribute.ValueCallback);
-                    valueLimit = getValueLimit;
-                    _error = getError;
-                }
-
-                if (_error != "")
-                {
-                    return true;
-                }
 
                 if (valueLimit > curValue)
                 {
                     property.floatValue = valueLimit;
+                    SetValueChanged(property);
                 }
             }
             else if (property.propertyType == SerializedPropertyType.Integer)
             {
                 int curValue = property.intValue;
-                MinValueAttribute minValueAttribute = (MinValueAttribute)saintsAttribute;
-                float valueLimit;
-                if (minValueAttribute.ValueCallback == null)
-                {
-                    valueLimit = minValueAttribute.Value;
-                }
-                else
-                {
-                    (float getValueLimit, string getError) = Util.GetCallbackFloat(parentTarget, minValueAttribute.ValueCallback);
-                    valueLimit = getValueLimit;
-                    _error = getError;
-                }
-
-                if (_error != "")
-                {
-                    return true;
-                }
 
                 if (valueLimit > curValue)
                 {
                     property.intValue = (int)valueLimit;
+                    SetValueChanged(property);
                 }
             }
             return true;
@@ -86,5 +63,66 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        #endregion
+
+        private static (string error, float valueLimit) GetLimitFloat(MinValueAttribute minValueAttribute, object parentTarget)
+        {
+            return minValueAttribute.ValueCallback == null
+                ? ("", minValueAttribute.Value)
+                : Util.GetCallbackFloat(parentTarget, minValueAttribute.ValueCallback);
+        }
+
+        #region UIToolkit
+
+        private static string NameHelpBox(SerializedProperty property, int index) =>
+            $"{property.propertyPath}_{index}__MinValue_HelpBox";
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                name = NameHelpBox(property, index),
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
+        {
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            MinValueAttribute minValueAttribute = (MinValueAttribute)saintsAttribute;
+            (string error, float valueLimit) = GetLimitFloat(minValueAttribute, parent);
+
+            if(helpBox.text != error)
+            {
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
+            }
+
+            if (error != "")
+            {
+                return;
+            }
+
+            if(property.propertyType == SerializedPropertyType.Float && property.floatValue < valueLimit)
+            {
+                property.floatValue = valueLimit;
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(valueLimit);
+            }
+            else if(property.propertyType == SerializedPropertyType.Integer && property.intValue < (int)valueLimit)
+            {
+                property.intValue = (int)valueLimit;
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke((int)valueLimit);
+            }
+        }
+
+        #endregion
     }
 }

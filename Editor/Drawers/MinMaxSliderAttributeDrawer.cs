@@ -179,7 +179,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MinCallback);
+                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MinCallback);
                 if (!string.IsNullOrEmpty(getError))
                 {
                     return new MetaInfo
@@ -199,7 +199,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (float getValue, string getError) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MaxCallback);
+                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MaxCallback);
                 if (!string.IsNullOrEmpty(getError))
                 {
                     return new MetaInfo
@@ -418,8 +418,9 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             // bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
 

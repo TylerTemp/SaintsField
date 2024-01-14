@@ -282,7 +282,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
             Image image = container.Query<Image>(className: NameImage(property, index)).First();
             int preInstanceId = (int)image.userData;

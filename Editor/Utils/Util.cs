@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
-        public static (float, string) GetCallbackFloat(object target, string by)
+        public static (string error, float value) GetCallbackFloat(object target, string by)
         {
             // SerializedProperty foundProperty = property.FindPropertyRelative(by) ??
             //                                    SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, by);
@@ -59,42 +59,42 @@ namespace SaintsField.Editor.Utils
 
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
 
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (found.Item1 == ReflectUtils.GetPropType.NotFound)
             {
-                return (-1, $"No field or method named `{by}` found on `{target}`");
+                return ($"No field or method named `{by}` found on `{target}`", -1f);
             }
-            else if (found.Item1 == ReflectUtils.GetPropType.Property && found.Item2 is PropertyInfo propertyInfo)
+
+            if (found.Item1 == ReflectUtils.GetPropType.Property)
             {
-                return ObjToFloat(propertyInfo.GetValue(target));
+                return ObjToFloat(((PropertyInfo)found.Item2).GetValue(target));
             }
-            else if (found.Item1 == ReflectUtils.GetPropType.Field && found.Item2 is FieldInfo foundFieldInfo)
+            if (found.Item1 == ReflectUtils.GetPropType.Field)
             {
-                return ObjToFloat(foundFieldInfo.GetValue(target));
+                return ObjToFloat(((FieldInfo)found.Item2).GetValue(target));
             }
-            else if (found.Item1 == ReflectUtils.GetPropType.Method && found.Item2 is MethodInfo methodInfo)
+            // ReSharper disable once InvertIf
+            if (found.Item1 == ReflectUtils.GetPropType.Method)
             {
+                MethodInfo methodInfo = (MethodInfo)found.Item2;
                 ParameterInfo[] methodParams = methodInfo.GetParameters();
                 Debug.Assert(methodParams.All(p => p.IsOptional));
                 // Debug.Assert(methodInfo.ReturnType == typeof(bool));
                 return ObjToFloat(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
             }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(found), found, null);
-            }
-
+            throw new ArgumentOutOfRangeException(nameof(found), found, null);
         }
 
-        private static (float, string) ObjToFloat(object result)
+        private static (string, float) ObjToFloat(object result)
         {
             switch (result)
             {
                 case int intValue:
-                    return (intValue, "");
+                    return ("", intValue);
                 case float floatValue:
-                    return (floatValue, "");
+                    return ("", floatValue);
                 default:
-                    return (-1, $"{result} is neither int or float");
+                    return ($"{result} is neither int or float", -1f);
             }
         }
 

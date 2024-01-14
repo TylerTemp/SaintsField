@@ -1399,19 +1399,21 @@ namespace SaintsField.Editor.Core
             }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
-            OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers);
+            OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, onValueChangedCallback);
         }
 
-        private static void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement container, object parent,
+        private static void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement container,
+            object parent,
             // ReSharper disable once ParameterTypeCanBeEnumerable.Local
-            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, Action<object> onValueChangedCallback
+        )
         {
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, parent);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, parent);
             }
 
-            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers)).StartingIn(100);
+            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers, onValueChangedCallback)).StartingIn(100);
         }
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -1428,7 +1430,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
         }
 
