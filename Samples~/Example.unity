@@ -1902,7 +1902,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54fdc29f5ce44e0a9750019eaf9cecdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _intValue: -22
+  _intValue: -35
+  _int2Value: 0
 --- !u!4 &887127789
 Transform:
   m_ObjectHideFlags: 0
@@ -4140,8 +4141,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f447d0d25d4a4bc19aaeac0ff720e887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rate0To5: 0
-  rate1To5: 3
+  rate0To5: 3
+  rate1To5: 2
   rate3To5: 4
 --- !u!4 &1881364801
 Transform:
