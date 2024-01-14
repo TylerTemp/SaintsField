@@ -1400,6 +1400,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normal: 0
   prop: 
+  propFix: ok wtf emmmm
   text: 
   testStruct:
     normal: 
@@ -1412,11 +1413,19 @@ MonoBehaviour:
       myStruct:
         normal: 
         prop: 
+        propFix: wtf unity you fucking broken?
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
       myStructList:
       - normal: 
         prop: 
+        propFix: 
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
     nest1List:
     - normal: 
       prop: 
@@ -1424,11 +1433,19 @@ MonoBehaviour:
       myStruct:
         normal: 
         prop: 
+        propFix: 
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
       myStructList:
       - normal: 
         prop: 
+        propFix: 
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
   testStructList:
   - normal: 
     prop: 
@@ -1440,11 +1457,19 @@ MonoBehaviour:
       myStruct:
         normal: 
         prop: 
+        propFix: 
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
       myStructList:
       - normal: 
         prop: 
+        propFix: 
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
     nest1List:
     - normal: 
       prop: 
@@ -1452,11 +1477,19 @@ MonoBehaviour:
       myStruct:
         normal: 
         prop: 
+        propFix: 
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
       myStructList:
       - normal: 
         prop: 
+        propFix: 
         text: 
+        mockKit: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
+        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
 --- !u!1 &679680717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1487,12 +1520,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: -1.7976931348623157e+308
-  text: open your eyes
-  count: -2147483648
-  longInt: -9223372036854775808
-  atEnd: always at the end
-  guess: 9
-  notSupported: {fileID: 0}
+  text: fuuuck111222333
 --- !u!4 &679680719
 Transform:
   m_ObjectHideFlags: 0

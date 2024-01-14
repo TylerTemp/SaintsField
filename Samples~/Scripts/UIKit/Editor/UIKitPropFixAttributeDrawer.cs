@@ -30,7 +30,7 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
 
             Debug.Log(property.propertyPath);
 
-            propertyField.schedule.Execute(() => FixUnityShit(property, propertyField));
+            propertyField.schedule.Execute(() => FixUnityShit(property, propertyField)).StartingIn(200);
 
             return propertyField;
             // return new TextField(property.displayName);
@@ -52,11 +52,18 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             // root.style.marginLeft = 0;
             // root.style.marginRight = 0;
             bool isNested = property.propertyPath.Contains(".");
+            if (root.childCount == 0)
+            {
+                return;
+            }
 
             VisualElement firstChild = root.Children().First();
             // firstChild.ClearClassList();
             firstChild.style.flexDirection = FlexDirection.Row;
-            firstChild.AddToClassList("unity-base-field");
+            // firstChild.AddToClassList("unity-base-field");
+
+            root.parent.Add(firstChild);
+            root.RemoveFromHierarchy();
 
             // firstChild.style.flexGrow = 1;
             // firstChild.AddToClassList("unity-base-field");
@@ -67,9 +74,15 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             // firstChild.style.marginRight = -2;
             // root.style.flexGrow = 1;
             Label label = root.Q<Label>();
+            if (label == null)
+            {
+                return;
+            }
+
             label.ClearClassList();
             label.style.borderLeftWidth = label.style.borderRightWidth = 1;
             label.style.borderLeftColor = label.style.borderRightColor = Color.blue;
+            label.style.width = StyleKeyword.Null;
             // Debug.Log(label.text);
             // label.AddToClassList("unity-text-element");
             // label.AddToClassList("unity-label");
@@ -77,7 +90,7 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             // label.AddToClassList("unity-base-text-field__label");
             // label.AddToClassList("unity-text-field__label");
 
-            label.AddToClassList("unity-base-field__label");
+            // label.AddToClassList("unity-base-field__label");
             // label.style.width = StyleKeyword.Null;
             // label.style.width = 1;
 

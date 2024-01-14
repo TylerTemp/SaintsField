@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Core
         public const int LabelLeftSpace = 3;
         public const int LabelBaseWidth = 120;
         public const int IndentWidth = 15;
+        public const float SingleLineHeight = 20f;
         // public const string EmptyRectLabel = "                ";
 
         // public static bool IsSubDrawer = false;
@@ -608,7 +609,9 @@ namespace SaintsField.Editor.Core
                 // {
                 //     Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
                 // });
-                fieldContainer.Add(SaintsFallbackUIToolkit(property));
+                var fallback = SaintsFallbackUIToolkit(property);
+                fallback.AddToClassList(ClassFieldUIToolkit(property));
+                fieldContainer.Add(fallback);
                 containerElement.visible = false;
             }
             else
@@ -620,6 +623,7 @@ namespace SaintsField.Editor.Core
                     fieldAttributeWithIndex.Attribute, containerElement, fakeLabel, parent);
                 // fieldElement.style.flexShrink = 1;
                 fieldElement.style.flexGrow = 1;
+                fieldElement.AddToClassList(ClassFieldUIToolkit(property));
                 // fieldElement.RegisterValueChangeCallback(_ => SetValueChanged(property, true));
 
                 fieldContainer.Add(fieldElement);
@@ -780,8 +784,8 @@ namespace SaintsField.Editor.Core
             return _rootElement;
         }
 
-        private static string NameLabelFieldUIToolkit(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsField_LabelField";
+        private static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_LabelField";
+        protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_Field";
 
         protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
         {
@@ -1303,11 +1307,6 @@ namespace SaintsField.Editor.Core
             throw new NotImplementedException();
         }
 
-        protected void OnChangedUIToolkit(object newValue)
-        {
-
-        }
-
         // protected virtual IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
         // {
         //     return Array.Empty<VisualElement>();
@@ -1368,12 +1367,18 @@ namespace SaintsField.Editor.Core
 
             containerElement.userData = this;
 
+
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
                 saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
             }
 
             containerElement.visible = true;
+
+            foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
+            {
+                saintsPropertyInfo.Drawer.OnStartUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
+            }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
             OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers);
@@ -1392,6 +1397,12 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
+        {
+        }
+
+        protected virtual void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, object parent)
         {

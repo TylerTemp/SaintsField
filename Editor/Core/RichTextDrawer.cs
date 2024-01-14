@@ -535,8 +535,14 @@ namespace SaintsField.Editor.Core
                         scaleMode = ScaleMode.ScaleToFit,
                         tintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
                         pickingMode = PickingMode.Ignore,
+                        style =
+                        {
+                            flexShrink = 0,
+                            marginTop = 1,
+                            marginBottom = 1,
+                        },
                     };
-                    img.style.width = img.style.height = EditorGUIUtility.singleLineHeight - 2;
+                    img.style.width = img.style.height = SaintsPropertyDrawer.SingleLineHeight - 2;
                     img.style.flexShrink = 0;
 
 #if EXT_INSPECTOR_LOG

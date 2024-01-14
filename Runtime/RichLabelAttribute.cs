@@ -7,7 +7,7 @@ namespace SaintsField
     public class RichLabelAttribute: PropertyAttribute, ISaintsAttribute
     {
         public virtual SaintsAttributeType AttributeType => SaintsAttributeType.Label;
-        public string GroupBy => "__LABEL_FIELD__";
+        public virtual string GroupBy => "__LABEL_FIELD__";
 
         public readonly string RichTextXml;
         public readonly bool IsCallback;
