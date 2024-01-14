@@ -328,16 +328,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _label: <color=red>ok here
-  _float: 3.2
+  _float: 2
   _go1: {fileID: 1188127893}
   _go2: {fileID: 724537242}
   _refs: {fileID: 0}
   color: {r: 1, g: 1, b: 1, a: 1}
   uniq1: 1
-  uniq2: 
-  uniq3: 
+  uniq2: 3
+  uniq3: 2
   normal: 0
-  myInt: 0
+  myInt: 1
   my:
     normal: 0
     myInt: 0

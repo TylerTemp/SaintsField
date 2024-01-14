@@ -1346,48 +1346,34 @@ namespace SaintsField.Editor.Core
                     return;
                 }
 
-                if (parentRoots.Count == saintsPropertyDrawers.Count)
+                VisualElement topRoot = parentRoots[parentRoots.Count - 1];
+
+                PropertyField thisPropField = containerElement.Q<PropertyField>();
+
+                foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
                 {
-                    VisualElement topRoot = parentRoots[parentRoots.Count - 1];
-
-                    PropertyField thisPropField = containerElement.Q<PropertyField>();
-
-                    foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
-                    {
-                        // if (!child.ClassListContains("unity-base-field"))
-                        // {
-                        //     child.RemoveFromHierarchy();
-                        // }
-                        child.RemoveFromHierarchy();
-                    }
-
-                    topRoot.Clear();
-                    topRoot.Add(containerElement);
-
-                    // Label label = containerElement.Query(className: SaintsFieldFallbackClass).First().Query<Label>(className: "unity-label").First();
-                    // Debug.Log($"label={label}");
-                    // if (label != null)
+                    // if (!child.ClassListContains("unity-base-field"))
                     // {
-                    //     label.text = new string(' ', property.displayName.Length);
+                    //     child.RemoveFromHierarchy();
                     // }
-
-                    containerElement.userData = this;
-
-                    containerElement.visible = true;
-
-                    thisPropField.Bind(property.serializedObject);
-                    thisPropField.RegisterValueChangeCallback(_ => onValueChangedCallback(null));
+                    child.RemoveFromHierarchy();
                 }
+
+                topRoot.Clear();
+                topRoot.Add(containerElement);
+
+                thisPropField.Bind(property.serializedObject);
+                thisPropField.RegisterValueChangeCallback(_ => onValueChangedCallback(null));
             }
-            else
-            {
-                containerElement.userData = this;
-            }
+
+            containerElement.userData = this;
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
                 saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
             }
+
+            containerElement.visible = true;
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
             OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers);
@@ -1591,10 +1577,18 @@ namespace SaintsField.Editor.Core
             if (saintsLabelFieldDrawerData == null)
             {
                 Label label = element.Query(className: SaintsFieldFallbackClass).First().Query<Label>(className: "unity-label");
+
+                // var fallbackContainer = element.Query(className: SaintsFieldFallbackClass).First()
+                //     .Q<PropertyField>();
+                // Debug.Log($"fallbackContainer count={fallbackContainer.Children().Count()}");
+                // Debug.Log($"fallbackContainer={fallbackContainer.Children().First().GetType()}");
+                // Debug.Log($"fallbackContainer={fallbackContainer.Query<Label>(className: "unity-label").First()}");
+                // Debug.Log($"fallbackContainer={fallbackContainer.Query<Label>(className: "unity-label").First()?.text}");
+                // Debug.Log($"fallbackContainer on label to {label}->{toLabel}");
                 if (label != null)
                 {
-                    // label.text = toLabel;
-                    label.style.display = string.IsNullOrEmpty(toLabel)? DisplayStyle.None: DisplayStyle.Flex;
+                    label.text = toLabel == null ? null : new string(' ', property.displayName.Length);
+                    label.style.display = toLabel == null ? DisplayStyle.None : DisplayStyle.Flex;
                     // Debug.Log(label.style.display);
                 }
             }
