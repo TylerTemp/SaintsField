@@ -11,6 +11,7 @@ namespace SaintsField.Samples.Scripts.UIKit
 
         public int normal;
         [UIKitPropDec] public string prop;
+        [UIKitPropFix] public string propFix;
         [UiKitTextDec] public string text;
 
         [Serializable]
@@ -18,6 +19,7 @@ namespace SaintsField.Samples.Scripts.UIKit
         {
             public string normal;
             [UIKitPropDec] public string prop;
+            [UIKitPropFix] public string propFix;
             [UiKitTextDec] public string text;
             [MockKit] public string mockKit;
             [UiKitTextDec] public string mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti;
