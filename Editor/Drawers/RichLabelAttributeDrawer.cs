@@ -97,9 +97,9 @@ namespace SaintsField.Editor.Drawers
                 {
                     position = Position.Absolute,
                     flexDirection = FlexDirection.Row,
-                    height = EditorGUIUtility.singleLineHeight,
+                    height = SingleLineHeight,
                     marginLeft = LabelLeftSpace,
-                    width = LabelBaseWidth,
+                    // width = LabelBaseWidth,
                     textOverflow = TextOverflow.Clip,
                     overflow = Overflow.Hidden,
                     unityTextAlign = TextAnchor.MiddleLeft,

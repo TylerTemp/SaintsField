@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Core
     // below-
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
-        public const int LabelLeftSpace = 3;
+        public const int LabelLeftSpace = 4;
         public const int LabelBaseWidth = 120;
         public const int IndentWidth = 15;
         public const float SingleLineHeight = 20f;

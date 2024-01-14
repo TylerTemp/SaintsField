@@ -128,9 +128,9 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string ClassLabelError(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_LabelError";
-        private static string ClassButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_Button";
-        private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_ButtonLabel";
+        private static string NameLabelError(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_LabelError";
+        private static string NameButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_Button";
+        private static string NameButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
@@ -142,7 +142,7 @@ namespace SaintsField.Editor.Drawers
             {
                 (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
 
-                HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
+                HelpBox helpBox = container.Q<HelpBox>(NameLabelError(property, index));
                 helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
                 helpBox.text = error;
 
@@ -154,25 +154,24 @@ namespace SaintsField.Editor.Drawers
 
                     renderer.sharedMaterials = sharedMats;
 
-                    container.Query<Label>(className: ClassButtonLabel(property, index)).First().text = SelectedStr;
+                    container.Q<Label>(NameButtonLabel(property, index)).text = SelectedStr;
                     // Debug.Log(SelectedStr);
                     // onChange?.Invoke(property.colorValue);
                 }
             })
             {
+                name = NameButton(property, index),
                 style =
                 {
                     height = EditorGUIUtility.singleLineHeight,
                 },
             };
-            button.AddToClassList(ClassButton(property, index));
 
             VisualElement labelContainer = new Label(NonSelectedStr)
             {
+                name = NameButtonLabel(property, index),
                 userData = null,
             };
-            labelContainer.AddToClassList(ClassButtonLabel(property, index));
-            // labelContainer.Add(new Label("test label"));
 
             button.Add(labelContainer);
             // button.AddToClassList();
@@ -184,12 +183,13 @@ namespace SaintsField.Editor.Drawers
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
+                name = NameLabelError(property, index),
                 style =
                 {
                     display = DisplayStyle.None,
                 },
             };
-            helpBox.AddToClassList(ClassLabelError(property, index));
+
             return helpBox;
         }
 
@@ -198,9 +198,12 @@ namespace SaintsField.Editor.Drawers
         {
             (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
 
-            HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
-            helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-            helpBox.text = error;
+            HelpBox helpBox = container.Q<HelpBox>(NameLabelError(property, index));
+            if(helpBox.text != error)
+            {
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
+            }
 
             if (error != "")
             {
@@ -213,7 +216,12 @@ namespace SaintsField.Editor.Drawers
             Material usingMat = renderer.sharedMaterials[toggleAttribute.Index];
 
             bool isToggled = thisMat == usingMat;
-            container.Query<Label>(className: ClassButtonLabel(property, index)).First().text = isToggled? SelectedStr: NonSelectedStr;
+            Label label = container.Q<Label>(NameButtonLabel(property, index));
+            string labelValue = isToggled ? SelectedStr : NonSelectedStr;
+            if (label.text != labelValue)
+            {
+                label.text = labelValue;
+            }
         }
 
         #endregion

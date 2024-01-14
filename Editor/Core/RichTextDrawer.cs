@@ -508,6 +508,8 @@ namespace SaintsField.Editor.Core
                         {
                             flexShrink = 0,
                             unityTextAlign = TextAnchor.MiddleLeft,
+                            paddingLeft = 0,
+                            paddingRight = 0,
                         },
                         pickingMode = PickingMode.Ignore,
                     };
@@ -540,9 +542,12 @@ namespace SaintsField.Editor.Core
                             flexShrink = 0,
                             marginTop = 1,
                             marginBottom = 1,
+                            paddingLeft = 1,
+                            paddingRight = 1,
                         },
                     };
-                    img.style.width = img.style.height = SaintsPropertyDrawer.SingleLineHeight - 2;
+                    img.style.width = SaintsPropertyDrawer.SingleLineHeight + 2;
+                    img.style.height = SaintsPropertyDrawer.SingleLineHeight - 2;
                     img.style.flexShrink = 0;
 
 #if EXT_INSPECTOR_LOG

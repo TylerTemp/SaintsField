@@ -73,7 +73,7 @@ namespace SaintsField.Editor.Drawers
                 ? property.intValue
                 : LayerMask.NameToLayer(property.stringValue);
 
-            LayerField layerField = new LayerField(property.displayName, curSelected)
+            LayerField layerField = new LayerField(new string(' ', property.displayName.Length), curSelected)
             {
                 name = NameLayer(property),
             };
@@ -98,6 +98,12 @@ namespace SaintsField.Editor.Drawers
                     onValueChangedCallback.Invoke(newValue);
                 }
             });
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull)
+        {
+            container.Q<LayerField>(NameLayer(property)).label = labelOrNull;
         }
 
         #endregion
