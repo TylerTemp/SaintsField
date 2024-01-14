@@ -13,9 +13,9 @@ public class UIKitPropDecDrawer : PropertyDrawer
 
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-        Debug.Log($"Create property gui {property.serializedObject.targetObject} {property.propertyPath}/{this}");
-#endif
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+//         Debug.Log($"Create property gui {property.serializedObject.targetObject} {property.propertyPath}/{this}");
+// #endif
 
         // // Create property container element.
         // VisualElement container = new VisualElement();
@@ -28,7 +28,7 @@ public class UIKitPropDecDrawer : PropertyDrawer
         //
         // return container;
 
-        // return new PropertyField(property);
-        return new TextField(property.displayName);
+        return new PropertyField(property);
+        // return new TextField(property.displayName);
     }
 }

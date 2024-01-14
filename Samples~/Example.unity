@@ -1398,7 +1398,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c136e3f4a3c5a8441b0e3aa1a443ed4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  content: 
+  normal: 0
+  prop: 
+  text: 
+  testStruct:
+    normal: 
+    prop: 
+    text: 
+    nest1:
+      normal: 
+      prop: 
+      text: 
+      myStruct:
+        normal: 
+        prop: 
+        text: 
+      myStructList:
+      - normal: 
+        prop: 
+        text: 
+    nest1List:
+    - normal: 
+      prop: 
+      text: 
+      myStruct:
+        normal: 
+        prop: 
+        text: 
+      myStructList:
+      - normal: 
+        prop: 
+        text: 
+  testStructList:
+  - normal: 
+    prop: 
+    text: 
+    nest1:
+      normal: 
+      prop: 
+      text: 
+      myStruct:
+        normal: 
+        prop: 
+        text: 
+      myStructList:
+      - normal: 
+        prop: 
+        text: 
+    nest1List:
+    - normal: 
+      prop: 
+      text: 
+      myStruct:
+        normal: 
+        prop: 
+        text: 
+      myStructList:
+      - normal: 
+        prop: 
+        text: 
 --- !u!1 &679680717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1558,7 +1616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cd68cd23c614bcab6f5007c1c403a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myDummy: {fileID: 0}
+  myDummy: {fileID: 1271404094}
   myDummyTrans: {fileID: 1271404091}
   myDummyGo: {fileID: 1271404088}
 --- !u!4 &746735700
