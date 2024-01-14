@@ -12,8 +12,8 @@ namespace SaintsField.Samples.Scripts
             Mask1 = 1,
             Mask2 = 1 << 1,
             Mask3 = 1 << 2,
-            // Mask4 = 1 << 3,
-            // Mask5 = 1 << 4,
+            Mask4 = 1 << 3,
+            Mask5 = 1 << 4,
             // Mask6 = 1 << 5,
         }
 

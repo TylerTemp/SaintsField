@@ -5,6 +5,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -12,12 +13,39 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(EnumFlagsAttribute))]
     public class EnumFlagsAttributeDrawer: SaintsPropertyDrawer
     {
-        private bool _unfold;
-        private bool _forceUnfold;
-
         private readonly Texture2D _checkboxCheckedTexture2D;
         private readonly Texture2D _checkboxEmptyTexture2D;
         private readonly Texture2D _checkboxIndeterminateTexture2D;
+
+        private struct MetaInfo
+        {
+            public IReadOnlyDictionary<int, string> BitValueToName;
+            public int AllCheckedInt;
+        }
+
+        private static MetaInfo GetMetaInfo(SerializedProperty property)
+        {
+
+            Dictionary<int, string> allIntToName = Enum
+                .GetValues(SerializedUtils.GetType(property))
+                .Cast<object>()
+                .ToDictionary(
+                    each => (int) each,
+                    each => each.ToString()
+                );
+
+            int allCheckedInt = allIntToName.Keys.Aggregate(0, (acc, value) => acc | value);
+            Dictionary<int, string> bitValueToName = allIntToName.Where(each => each.Key != 0 && each.Key != allCheckedInt).ToDictionary(each => each.Key, each => each.Value);
+            return new MetaInfo
+            {
+                BitValueToName = bitValueToName,
+                AllCheckedInt = allCheckedInt,
+            };
+        }
+
+        #region IMGUI
+        private bool _unfold;
+        private bool _forceUnfold;
 
         private readonly GUIContent _checkBoxCheckedContent;
         private readonly GUIContent _checkBoxEmptyContent;
@@ -97,7 +125,7 @@ namespace SaintsField.Editor.Drawers
                 _unfold = enumFlagsAttribute.DefaultExpanded;
             }
 
-            int[] allIntValues = Enum.GetValues(SerializedUtils.GetType(property)).Cast<int>().Where(each => each != 0).ToArray();
+            MetaInfo metaInfo = GetMetaInfo(property);
 
             #region label+button
             Rect headRect = new Rect(position)
@@ -126,8 +154,7 @@ namespace SaintsField.Editor.Drawers
             // };
 
             bool noneChecked = property.intValue == 0;
-            int allCheckedInt = allIntValues.Aggregate(0, (acc, value) => acc | value);
-            bool allChecked = property.intValue == allCheckedInt;
+            bool allChecked = property.intValue == metaInfo.AllCheckedInt;
 
             // Debug.Log($"property.intValue = {property.intValue}; noneChecked={noneChecked}, allChecked={allChecked}");
 
@@ -151,7 +178,7 @@ namespace SaintsField.Editor.Drawers
                         Label = _checkBoxCheckedContent,
                         LabelStyle = _iconButtonStyle,
                         LabelWidth = EditorGUIUtility.singleLineHeight,
-                        Action = () => property.intValue = allCheckedInt,
+                        Action = () => property.intValue = metaInfo.AllCheckedInt,
                         Disabled = false,
                         Toggled = allChecked,
                     },
@@ -179,7 +206,7 @@ namespace SaintsField.Editor.Drawers
                         Label = _checkBoxEmptyContent,
                         LabelStyle = _iconButtonStyle,
                         LabelWidth = EditorGUIUtility.singleLineHeight,
-                        Action = () => property.intValue = allCheckedInt,
+                        Action = () => property.intValue = metaInfo.AllCheckedInt,
                         Disabled = false,
                         Toggled = false,
                     };
@@ -199,11 +226,7 @@ namespace SaintsField.Editor.Drawers
 
                 List<BtnInfo> btnInfos = new List<BtnInfo>{toggleButton};
                 int curValue = property.intValue;
-                foreach ((int value, string name) in Enum.GetValues(SerializedUtils.GetType(property))
-                             .Cast<object>()
-                             .Select(each => ((int) each, each.ToString()))
-                             .Where(each => each.Item1 != 0 && each.Item1 != allCheckedInt)
-                         )
+                foreach ((int value, string name) in metaInfo.BitValueToName)
                 {
                     bool on = (curValue & value) != 0;
                     GUIContent btnLabel = new GUIContent(name);
@@ -229,10 +252,8 @@ namespace SaintsField.Editor.Drawers
             if(useUnfold)
             {
                 int curValue = property.intValue;
-                foreach ((int value, string name, int index) in Enum.GetValues(SerializedUtils.GetType(property))
-                             .Cast<object>()
-                             .Where(each => (int) each != 0 && (int) each != allCheckedInt)
-                             .Select((each, index) => ((int) each, each.ToString(), index)))
+                foreach ((int value, string name, int index) in metaInfo.BitValueToName
+                             .Select((each, index) => (each.Key, each.Value, index)))
                 {
                     bool on = (curValue & value) != 0;
 
@@ -349,6 +370,419 @@ namespace SaintsField.Editor.Drawers
             }
             // }
         }
+        #endregion
+
+        #region UIToolkit
+
+        private static string NameContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
+        private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
+        private static string NameInlineContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_InlineContainer";
+        private static string NameExpandContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ExpandContainer";
+        private static string NameToggleButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButton";
+        private static string NameToggleButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButtonImage";
+
+        private static string NameSetAllButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetAllButton";
+        private static string NameSetAllButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetAllButtonImage";
+
+        private static string NameSetNoneButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButton";
+        private static string NameSetNoneButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButtonImage";
+
+        private static string ClassToggleBitButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButton";
+        private static string ClassToggleBitButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButtonImage";
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, object parent)
+        {
+            MetaInfo metaInfo = GetMetaInfo(property);
+
+            float lineHeight = EditorGUIUtility.singleLineHeight;
+
+            VisualElement fieldContainer = new VisualElement
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                },
+            };
+
+            VisualElement inlineRowLayout = new VisualElement
+            {
+                name = NameInlineContainer(property),
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    overflow = Overflow.Hidden,
+                },
+            };
+
+
+            Button hToggleButton = new Button
+            {
+                name = NameToggleButton(property),
+                style =
+                {
+                    width = lineHeight,
+                    height = lineHeight,
+                    paddingTop = 0,
+                    paddingBottom = 0,
+                    paddingLeft = 0,
+                    paddingRight = 0,
+                },
+            };
+            hToggleButton.Add(new Image
+            {
+                name = NameToggleButtonImage(property),
+                image = _checkboxEmptyTexture2D,
+            });
+            inlineRowLayout.Add(hToggleButton);
+
+            foreach (KeyValuePair<int,string> bitValueToName in metaInfo.BitValueToName)
+            {
+                Button inlineToggleButton = new Button
+                {
+                    text = bitValueToName.Value,
+                    userData = bitValueToName.Key,
+                    style =
+                    {
+                        marginLeft = 0,
+                        marginRight = 0,
+                        paddingLeft = 2,
+                        paddingRight = 2,
+                    },
+                };
+                inlineToggleButton.AddToClassList(ClassToggleBitButton(property));
+                inlineRowLayout.Add(inlineToggleButton);
+            }
+
+            fieldContainer.Add(inlineRowLayout);
+
+            VisualElement expandControllerLayout = new VisualElement
+            {
+                name = NameExpandContainer(property),
+            };
+
+            VisualElement expandMajorToggles = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    height = lineHeight,
+                },
+            };
+            Button expandToggleNoneButton = new Button
+            {
+                name = NameSetNoneButton(property),
+                style =
+                {
+                    width = lineHeight,
+                    paddingTop = 0,
+                    paddingBottom = 0,
+                    paddingLeft = 0,
+                    paddingRight = 0,
+                },
+            };
+            expandToggleNoneButton.Add(new Image
+            {
+                image = _checkboxEmptyTexture2D,
+            });
+            Button expandToggleAllButton = new Button
+            {
+                name = NameSetAllButton(property),
+                style =
+                {
+                    width = lineHeight,
+                    paddingTop = 0,
+                    paddingBottom = 0,
+                    paddingLeft = 0,
+                    paddingRight = 0,
+                },
+            };
+            expandToggleAllButton.Add(new Image
+            {
+                image = _checkboxCheckedTexture2D,
+            });
+
+            expandMajorToggles.Add(expandToggleNoneButton);
+            expandMajorToggles.Add(expandToggleAllButton);
+            expandControllerLayout.Add(expandMajorToggles);
+
+            foreach (KeyValuePair<int,string> bitValueToName in metaInfo.BitValueToName)
+            {
+                Button bitButton = new Button
+                {
+                    // text = bitValueToName.Value,
+                    userData = bitValueToName.Key,
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                        // marginLeft = 0,
+                        // marginRight = 0,
+                        paddingLeft = 0,
+                        // paddingRight = 2,
+                        height = lineHeight,
+                    },
+                };
+                bitButton.AddToClassList(ClassToggleBitButton(property));
+
+                Image bitButtonImage = new Image
+                {
+                    image = _checkboxEmptyTexture2D,
+                    scaleMode = ScaleMode.ScaleToFit,
+                    style =
+                    {
+                        width = lineHeight - 2,
+                        // width = lineHeight,
+                    },
+                };
+                bitButtonImage.AddToClassList(ClassToggleBitButtonImage(property));
+                bitButton.Add(bitButtonImage);
+                bitButton.Add(new Label(bitValueToName.Value)
+                {
+                    style =
+                    {
+                        paddingLeft = 4,
+                    },
+                });
+                // bitButton.Add(new Image
+                // {
+                //     image = _checkboxCheckedTexture2D,
+                // });
+
+                expandControllerLayout.Add(bitButton);
+            }
+
+            fieldContainer.Add(expandControllerLayout);
+
+            VisualElement root = new VisualElement
+            {
+                name = NameContainer(property),
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
+                userData = -1f,
+            };
+            Label prefixLabel = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            root.Add(prefixLabel);
+            root.Add(fieldContainer);
+
+            return root;
+        }
+
+        protected override VisualElement CreateOverlayUIKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
+            // if (!enumFlagsAttribute.AutoExpand)
+            // {
+            //     return null;
+            // }
+
+            Foldout foldOut = new Foldout
+            {
+                value = enumFlagsAttribute.DefaultExpanded,
+                style =
+                {
+                    // backgroundColor = Color.green,
+                    // left = -5,
+                    position = Position.Absolute,
+                    // height = EditorGUIUtility.singleLineHeight,
+                    // width = 20,
+                    width = LabelBaseWidth - IndentWidth,
+                    display = enumFlagsAttribute.AutoExpand? DisplayStyle.Flex: DisplayStyle.None,
+                },
+                name = NameFoldout(property),
+                userData = false,  // processing
+            };
+
+            // foldOut.RegisterValueChangedCallback(v =>
+            // {
+            //     // container.Q<VisualElement>(NameInlineContainer(property)).style.display = v.newValue ? DisplayStyle.None : DisplayStyle.Flex;
+            //     // container.Q<VisualElement>(NameExpandContainer(property)).style.display = v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+            //     // container.Q<VisualElement>(NameFoldout(property)).userData = false;
+            //     SetExpandStatus(v.newValue, property, container);
+            // });
+
+            return foldOut;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            UpdateButtonDisplay(property.intValue, property, container);
+
+            EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
+
+            if (enumFlagsAttribute.AutoExpand)
+            {
+                bool firstExpand = enumFlagsAttribute.DefaultExpanded || GetShouldExpand(property, container);
+                SetExpandStatus(firstExpand, property, container);
+
+                EventCallback<GeometryChangedEvent> onGeometryChanged = (evt) => OnGeometryChanged(property, container);
+                container.RegisterCallback(onGeometryChanged);
+                container.Q<Foldout>(NameFoldout(property)).RegisterValueChangedCallback(changed =>
+                {
+                    container.UnregisterCallback(onGeometryChanged);
+                    SetExpandStatus(changed.newValue, property, container);
+                });
+            }
+            else
+            {
+                SetExpandStatus(enumFlagsAttribute.DefaultExpanded, property, container);
+            }
+
+            MetaInfo metaInfo = GetMetaInfo(property);
+            // VisualElement root = container.Q<VisualElement>(NameContainer(property));
+
+            // Image toggleButtonImage = container.Q<Image>(NameToggleButtonImage(property));
+            container.Q<Button>(NameToggleButton(property)).clicked += () =>
+            {
+                int curValue = property.intValue;
+                bool noneChecked = curValue == 0;
+                bool allChecked = curValue == metaInfo.AllCheckedInt;
+                int newValue;
+
+                if (allChecked)
+                {
+                    newValue = property.intValue = 0;
+                }
+                else if (noneChecked)
+                {
+                    newValue = property.intValue = metaInfo.AllCheckedInt;
+                }
+                else
+                {
+                    newValue = property.intValue = 0;
+                }
+
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(newValue);
+            };
+
+            container.Q<Button>(NameSetAllButton(property)).clicked += () =>
+            {
+                property.intValue = metaInfo.AllCheckedInt;
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(metaInfo.AllCheckedInt);
+            };
+
+            container.Q<Button>(NameSetNoneButton(property)).clicked += () =>
+            {
+                property.intValue = 0;
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(0);
+            };
+
+            foreach (Button bitButton in container.Query<Button>(className: ClassToggleBitButton(property)).ToList())
+            {
+                Button thisButton = bitButton;
+                bitButton.clicked += () =>
+                {
+                    int curValue = property.intValue;
+                    int bitValue = (int)thisButton.userData;
+
+                    int newValue = (property.intValue ^= bitValue);
+
+                    property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback.Invoke(newValue);
+                };
+            }
+        }
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            object parent, object newValue)
+        {
+            int newInt = (int)newValue;
+            UpdateButtonDisplay(newInt, property, container);
+        }
+
+        private void UpdateButtonDisplay(int newInt, SerializedProperty property, VisualElement container)
+        {
+            MetaInfo metaInfo = GetMetaInfo(property);
+
+            Image toggleButtonImage = container.Q<Image>(NameToggleButtonImage(property));
+            bool noneChecked = newInt == 0;
+            bool allChecked = newInt == metaInfo.AllCheckedInt;
+            if (noneChecked)
+            {
+                toggleButtonImage.image = _checkboxEmptyTexture2D;
+            }
+            else if (allChecked)
+            {
+                toggleButtonImage.image = _checkboxCheckedTexture2D;
+            }
+            else
+            {
+                toggleButtonImage.image = _checkboxIndeterminateTexture2D;
+            }
+
+            Button allButton = container.Q<Button>(NameSetAllButton(property));
+            allButton.SetEnabled(!allChecked);
+
+            Button noneButton = container.Q<Button>(NameSetNoneButton(property));
+            noneButton.SetEnabled(!noneChecked);
+
+            foreach (Button bitButton in container.Query<Button>(className: ClassToggleBitButton(property)).ToList())
+            {
+                int bitValue = (int)bitButton.userData;
+                bool on = (newInt & bitValue) != 0;
+
+                Image image = bitButton.Q<Image>(className: ClassToggleBitButtonImage(property));
+                if(image != null)
+                {
+                    image.image = on ? _checkboxCheckedTexture2D : _checkboxEmptyTexture2D;
+                }
+
+                if (on)
+                {
+                    const float gray = 0.15f;
+                    const float grayBorder = 0.45f;
+                    bitButton.style.backgroundColor = new Color(gray, gray, gray, 1f);
+                    bitButton.style.borderTopColor = bitButton.style.borderBottomColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
+                }
+                else
+                {
+                    bitButton.style.backgroundColor = StyleKeyword.Null;
+                    bitButton.style.borderTopColor = bitButton.style.borderBottomColor = StyleKeyword.Null;
+                }
+            }
+        }
+
+        private static void SetExpandStatus(bool expand, SerializedProperty property, VisualElement container)
+        {
+            container.Q<Foldout>(NameFoldout(property)).SetValueWithoutNotify(expand);
+
+            // container.Q<VisualElement>(NameInlineContainer(property)).style.display = expand ? DisplayStyle.None : DisplayStyle.Flex;
+            container.Q<VisualElement>(NameInlineContainer(property)).style.height = expand ? 0 : StyleKeyword.Null;
+            container.Q<VisualElement>(NameExpandContainer(property)).style.display = expand ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        private static bool GetShouldExpand(SerializedProperty property, VisualElement container)
+        {
+            VisualElement inlineContainer = container.Q<VisualElement>(NameInlineContainer(property));
+
+            float totalSpaceWidth = inlineContainer.resolvedStyle.width;
+            float totalBtnWidth = inlineContainer.Children().Sum(each => each.resolvedStyle.width);
+
+            return totalSpaceWidth < totalBtnWidth;
+        }
+        // Debug.Log(useExpand);
+
+        private static void OnGeometryChanged(SerializedProperty property, VisualElement container)
+        {
+
+            bool useExpand = GetShouldExpand(property, container);
+
+            Foldout foldout = container.Q<Foldout>(NameFoldout(property));
+            if (useExpand == foldout.value)
+            {
+                return;
+            }
+            SetExpandStatus(useExpand, property, container);
+        }
+
+        #endregion
 
     }
 }
