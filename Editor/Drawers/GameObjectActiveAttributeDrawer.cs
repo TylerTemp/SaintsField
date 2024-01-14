@@ -101,8 +101,9 @@ namespace SaintsField.Editor.Drawers
             public bool isNull;
         }
 
-        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent, Action<object> onChange)
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
         {
             Button button = new Button
             {
@@ -151,6 +152,14 @@ namespace SaintsField.Editor.Drawers
                 },
             });
 
+
+            return button;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            Button button = container.Q<Button>(NameButton(property, index));
             button.clicked += () =>
             {
                 GameObject go;
@@ -170,9 +179,8 @@ namespace SaintsField.Editor.Drawers
 
                 Undo.RecordObject(go, $"GameObjectActive: {property.propertyPath}");
                 go.SetActive(!go.activeSelf);
-                OnUpdateUIToolkit(property, saintsAttribute, index, container, onChange, parent);
+                OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, parent);
             };
-            return button;
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

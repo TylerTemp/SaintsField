@@ -133,8 +133,7 @@ namespace SaintsField.Editor.Drawers
         private static string NameButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
-            Action<object> onChange)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
 

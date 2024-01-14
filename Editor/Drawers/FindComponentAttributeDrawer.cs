@@ -108,56 +108,41 @@ namespace SaintsField.Editor.Drawers
         private static string NamePlaceholder(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__FindComponent";
 
-        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
-            Action<object> onChange)
-        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_FIND_COMPONENT
-
-            Debug.Log($"FindComponent DrawPostFieldUIToolkit for {property.propertyPath}");
-#endif
-            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
-            if (error != "")
-            {
-                return new VisualElement
-                {
-                    style =
-                    {
-                        width = 0,
-                    },
-                    name = NamePlaceholder(property, index),
-                    userData = error,
-                };
-            }
-
-            property.serializedObject.ApplyModifiedProperties();
-
-            onChange?.Invoke(result);
-
-            return new VisualElement
-            {
-                style =
-                {
-                    width = 0,
-                },
-                name = NamePlaceholder(property, index),
-                userData = "",
-            };
-        }
-
-        // NOTE: ensure the post field is added to the container!
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            string error = (string)(container.Q<VisualElement>(NamePlaceholder(property, index))!.userData ?? "");
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_FIND_COMPONENT
-            Debug.Log($"FindComponent error {error}");
-#endif
-            return string.IsNullOrEmpty(error)
-                ? null
-                : new HelpBox(_error, HelpBoxMessageType.Error);
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NamePlaceholder(property, index),
+            };
         }
 
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_FIND_COMPONENT
+            Debug.Log($"FindComponent DrawPostFieldUIToolkit for {property.propertyPath}");
+#endif
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
+            HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
+            if (error != helpBox.text)
+            {
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
+            }
+
+            // ReSharper disable once InvertIf
+            if (result)
+            {
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(result);
+            }
+        }
         #endregion
     }
 }

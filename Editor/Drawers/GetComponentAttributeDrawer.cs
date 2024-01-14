@@ -116,53 +116,41 @@ namespace SaintsField.Editor.Drawers
         private static string NamePlaceholder(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__GetComponent";
 
-        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
-            Action<object> onChange)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
             Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
             (string error, Object result) = DoCheckComponent(property, saintsAttribute);
-            if (error != "")
+            HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
+            if (error != helpBox.text)
             {
-                return new VisualElement
-                {
-                    style =
-                    {
-                        width = 0,
-                    },
-                    name = NamePlaceholder(property, index),
-                    userData = error,
-                };
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
             }
 
-            property.serializedObject.ApplyModifiedProperties();
-
-            onChange?.Invoke(result);
-
-            return new VisualElement
+            // ReSharper disable once InvertIf
+            if (result)
             {
-                style =
-                {
-                    width = 0,
-                },
-                name = NamePlaceholder(property, index),
-                userData = "",
-            };
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(result);
+            }
         }
 
         // NOTE: ensure the post field is added to the container!
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            string error = (string)(container.Q<VisualElement>(NamePlaceholder(property, index))!.userData ?? "");
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
-            Debug.Log($"GetComponent error {error}");
-#endif
-            return string.IsNullOrEmpty(error)
-                ? null
-                : new HelpBox(_error, HelpBoxMessageType.Error);
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NamePlaceholder(property, index),
+            };
         }
         #endregion
     }

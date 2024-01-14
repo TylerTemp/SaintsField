@@ -418,10 +418,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_maxValue>k__BackingField: 126
-  <_minValue>k__BackingField: 80
-  <_range>k__BackingField: {x: 101.21552, y: 114.103455}
-  <intRange>k__BackingField: {x: 85, y: 109}
+  <_maxValue>k__BackingField: 239
+  <_minValue>k__BackingField: 239
+  <_range>k__BackingField: {x: 231, y: 239}
+  <intRange>k__BackingField: {x: 1, y: 1}
 --- !u!4 &185980176
 Transform:
   m_ObjectHideFlags: 0

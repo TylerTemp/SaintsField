@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Drawers
         {
             string typeError = ValidateType(property);
 
-            Debug.Log(typeError);
+            // Debug.Log(typeError);
             return new HelpBox(typeError, HelpBoxMessageType.Error)
             {
                 style =
@@ -132,7 +132,7 @@ namespace SaintsField.Editor.Drawers
             if(isTruly != metaInfo.IsTruly)
             {
 
-                Debug.Log($"isTruly={isTruly}; meta.isTruly={metaInfo.IsTruly}");
+                // Debug.Log($"isTruly={isTruly}; meta.isTruly={metaInfo.IsTruly}");
                 helpBox.style.display = isTruly ? DisplayStyle.None : DisplayStyle.Flex;
 
                 string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;

@@ -367,7 +367,7 @@ namespace SaintsField.Editor.Drawers
             if(oriMetaInfo.MessageType != metaInfo.MessageType || oriMetaInfo.Content != metaInfo.Content || oriMetaInfo.WillDraw != metaInfo.WillDraw)
             {
 
-                Debug.Log($"change box {NameInfoBox(property, index)}: {metaInfo.MessageType} {metaInfo.Content} {metaInfo.WillDraw}");
+                // Debug.Log($"change box {NameInfoBox(property, index)}: {metaInfo.MessageType} {metaInfo.Content} {metaInfo.WillDraw}");
                 changed = true;
                 infoBox.style.display = metaInfo.WillDraw ? DisplayStyle.Flex : DisplayStyle.None;
                 infoBox.text = metaInfo.Content;

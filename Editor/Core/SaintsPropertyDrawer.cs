@@ -367,12 +367,12 @@ namespace SaintsField.Editor.Core
 
         // protected object DirectParentObject { get; private set; }
 
-        public enum LabelState
-        {
-            AsIs,
-            EmptySpace,
-            None,
-        }
+        // public enum LabelState
+        // {
+        //     AsIs,
+        //     EmptySpace,
+        //     None,
+        // }
 
         // protected VisualElement ContainerElement { get; private set; }
         private VisualElement _rootElement;
@@ -660,7 +660,7 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
-                VisualElement postFieldElement = eachAttributeWithIndex.Drawer.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent, Debug.Log);
+                VisualElement postFieldElement = eachAttributeWithIndex.Drawer.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent);
                 if (postFieldElement != null)
                 {
                     postFieldElement.style.flexShrink = 0;
@@ -1410,7 +1410,7 @@ namespace SaintsField.Editor.Core
         {
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback,1 parent);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, parent);
             }
 
             container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers, onValueChangedCallback)).StartingIn(100);
@@ -1430,7 +1430,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, object parent)
+            VisualElement container, Action<object> onValueChanged, object parent)
         {
         }
 
@@ -1665,8 +1665,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
-            Action<object> onChange)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             return null;
         }

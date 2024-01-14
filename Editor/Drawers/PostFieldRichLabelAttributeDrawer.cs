@@ -89,8 +89,9 @@ namespace SaintsField.Editor.Drawers
         private static string NameRichLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__PostFieldRichLabel";
         private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__PostFieldRichLabel_HelpBox";
 
-        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent, Action<object> onChange)
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
         {
             return new VisualElement
             {

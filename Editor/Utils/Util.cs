@@ -219,24 +219,23 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static string GetLabelString(SaintsPropertyDrawer.LabelState labelState)
-        {
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (labelState)
-            {
-                case SaintsPropertyDrawer.LabelState.None:
-                    return "";
-                    break;
-                case SaintsPropertyDrawer.LabelState.AsIs:
-                    return null;
-                    break;
-                case SaintsPropertyDrawer.LabelState.EmptySpace:
-                    return " ";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
-            }
-        }
+        // public static string GetLabelString(SaintsPropertyDrawer.LabelState labelState)
+        // {
+        //     // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+        //     switch (labelState)
+        //     {
+        //         case SaintsPropertyDrawer.LabelState.None:
+        //             return "";
+        //
+        //         case SaintsPropertyDrawer.LabelState.AsIs:
+        //             return null;
+        //
+        //         case SaintsPropertyDrawer.LabelState.EmptySpace:
+        //             return " ";
+        //         default:
+        //             throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
+        //     }
+        // }
 
         public static Label PrefixLabelUIToolKit(string label, int indentLevel)
         {

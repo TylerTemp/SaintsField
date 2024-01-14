@@ -54,8 +54,7 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent,
-            Action<object> onChange)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             VisualElement element = DrawUIToolkit(property, saintsAttribute, index, parent, container);
             element.style.flexGrow = StyleKeyword.Null;
