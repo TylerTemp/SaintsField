@@ -582,8 +582,26 @@ namespace SaintsField.Editor.Core
 
             bool fieldIsFallback = fieldAttributeWithIndex.Attribute == null;
 
-            Label fakeLabel = labelAttributeWithIndex.Attribute == null
-                ? new Label(property.displayName)
+            Label fakeLabel = null;
+            //     ? new Label(property.displayName)
+            //     {
+            //         style =
+            //         {
+            //             position = Position.Absolute,
+            //             height = EditorGUIUtility.singleLineHeight,
+            //             marginLeft = LabelLeftSpace,
+            //             width = LabelBaseWidth,
+            //
+            //             // alignItems = Align.Center, // vertical
+            //             unityTextAlign = TextAnchor.LowerLeft,
+            //         },
+            //         pickingMode = PickingMode.Ignore,
+            //         // name = NameRichLabelContainer(property),
+            //     }
+            //     : null;
+            if (labelAttributeWithIndex.Attribute == null)
+            {
+                fieldContainer.Add(fakeLabel = new Label(property.displayName)
                 {
                     style =
                     {
@@ -597,8 +615,8 @@ namespace SaintsField.Editor.Core
                     },
                     pickingMode = PickingMode.Ignore,
                     // name = NameRichLabelContainer(property),
-                }
-                : null;
+                });
+            }
 
             if (fieldIsFallback)
             {
@@ -609,7 +627,7 @@ namespace SaintsField.Editor.Core
                 // {
                 //     Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
                 // });
-                var fallback = SaintsFallbackUIToolkit(property);
+                PropertyField fallback = SaintsFallbackUIToolkit(property);
                 fallback.AddToClassList(ClassFieldUIToolkit(property));
                 fieldContainer.Add(fallback);
                 containerElement.visible = false;
@@ -631,10 +649,10 @@ namespace SaintsField.Editor.Core
 
             }
 
-            if (fakeLabel != null)
-            {
-                fieldContainer.Add(fakeLabel);
-            }
+            // if (fakeLabel != null)
+            // {
+            //     fieldContainer.Add(fakeLabel);
+            // }
 
             #endregion
 

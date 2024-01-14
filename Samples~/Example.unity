@@ -1520,7 +1520,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: -1.7976931348623157e+308
-  text: fuuuck111222333
+  text: 21 43214 3214 21242343243 co
+  count: -2147483648
+  longInt: -9223372036854775808
+  atEnd: 
+  guess: 12
+  notSupported: {fileID: 0}
 --- !u!4 &679680719
 Transform:
   m_ObjectHideFlags: 0
