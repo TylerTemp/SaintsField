@@ -64,13 +64,12 @@ namespace SaintsField.Samples.Scripts
             public float LabelFloat;
 
             [Space]
-            // [Scene]
             public int Scene;
-            // [AboveButton("", "above")]
-            // [SortingLayer]
+            [AboveButton("", "above")]
+            [SortingLayer]
             public string SortingLayer;
-            // [RichLabel(null)]
-            // [MinMaxSlider(0f, 10f, 0.1f)]
+            [RichLabel(null)]
+            [MinMaxSlider(0f, 10f, 0.1f)]
             public Vector2 Slider;
 
             public float DefaultFloat;

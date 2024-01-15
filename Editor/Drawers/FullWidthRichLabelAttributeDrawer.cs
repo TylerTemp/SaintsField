@@ -176,6 +176,7 @@ namespace SaintsField.Editor.Drawers
                     // height = EditorGUIUtility.singleLineHeight,
                     flexDirection = FlexDirection.Row,
                     flexWrap = Wrap.Wrap,
+                    marginLeft = 4,
                     // textOverflow = TextOverflow.wr
                     // alignItems = Align.Center, // vertical
                     // overflow = Overflow.Hidden,

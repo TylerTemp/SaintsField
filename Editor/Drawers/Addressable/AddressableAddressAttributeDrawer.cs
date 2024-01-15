@@ -146,11 +146,25 @@ namespace SaintsField.Editor.Drawers.Addressable
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             dropdownField.RegisterValueChangedCallback(v =>
             {
+                if (v.newValue == null)  // Apparently, modify the field's label is also a "ValueChanged" event. Good job unity.
+                {
+                    return;
+                }
+
                 IReadOnlyList<string> curMetaInfo = (IReadOnlyList<string>) ((DropdownField) v.target).userData;
-                string selectedKey = curMetaInfo[dropdownField.index];
-                property.stringValue = selectedKey;
+                // string selectedKey = curMetaInfo[dropdownField.index];
+                int selectedIndex = Util.ListIndexOfAction(curMetaInfo, each => UnityFuckedUpDropdownStringEscape(each) == v.newValue);
+                if (selectedIndex == -1)
+                {
+                    Debug.LogError($"failed to find {v.newValue} in {string.Join(",", curMetaInfo)}");
+                    return;
+                }
+
+                string newValue = curMetaInfo[selectedIndex];
+                // Debug.Log($"select {newValue}");
+                property.stringValue = newValue;
                 property.serializedObject.ApplyModifiedProperties();
-                onValueChangedCallback.Invoke(selectedKey);
+                onValueChangedCallback.Invoke(newValue);
             });
         }
 
@@ -166,10 +180,10 @@ namespace SaintsField.Editor.Drawers.Addressable
             if(!curKeys.SequenceEqual(keys))
             {
                 dropdownField.userData = keys;
-                dropdownField.choices = keys.Select(each => each.Replace('/', '\u2215').Replace('&', '＆')).ToList();
+                dropdownField.choices = keys.Select(UnityFuckedUpDropdownStringEscape).ToList();
                 // int curSelect = Util.ListIndexOfAction(keys, each => each == property.stringValue);
                 // dropdownField.index = curSelect;
-                dropdownField.SetValueWithoutNotify(property.stringValue);
+                dropdownField.SetValueWithoutNotify(UnityFuckedUpDropdownStringEscape(property.stringValue));
             }
 
             // Debug.Log($"AnimatorStateAttributeDrawer: {newAnimatorStates}");
@@ -188,6 +202,12 @@ namespace SaintsField.Editor.Drawers.Addressable
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             dropdownField.label = labelOrNull;
         }
+
+        private static string UnityFuckedUpDropdownStringEscape(string value) =>
+            value.Replace('/', '\u2215').Replace('&', '＆');
+        // private static string UnityFuckedUpDropdownStringReverse(string value) =>
+        //     value.Replace('/', '\u2215').Replace('&', '＆');
+
         #endregion
     }
 }

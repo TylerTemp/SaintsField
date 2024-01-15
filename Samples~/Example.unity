@@ -1570,7 +1570,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb2d5351d8f40d881d369e3b7bdc3a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  address: Assets/SaintsField/Samples/RawResources/Cube.prefab
+  address: Assets/SaintsField/Samples/RawResources/Toggle.mat
   addressInGroup: Assets/SaintsField/Samples/RawResources/eye-slash.png
   addressLabel1Or2: Assets/SaintsField/Samples/RawResources/ScriptableIns.asset
   addressLabelAnd: Assets/SaintsField/Samples/RawResources/ScriptableIns.asset
@@ -2758,7 +2758,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234ffe6968d5bb2418d803732892acbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  addressableLabel: Label1
+  addressableLabel: Label2
 --- !u!1 &1227266396
 GameObject:
   m_ObjectHideFlags: 0

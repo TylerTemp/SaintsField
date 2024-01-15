@@ -131,13 +131,22 @@ namespace SaintsField.Editor.Drawers
             root.Add(new Label(" ")
             {
                 name = NameLabelPlaceholder(property),
+                style =
+                {
+                    height = SingleLineHeight,
+                },
                 pickingMode = PickingMode.Ignore,
             });
             root.Add(new TextField
             {
                 value = property.stringValue,
-                multiline = true,
                 name = NameTextArea(property),
+                multiline = true,
+                style =
+                {
+                    whiteSpace = WhiteSpace.Normal,
+                    minHeight = 47,
+                },
             });
 
             return root;

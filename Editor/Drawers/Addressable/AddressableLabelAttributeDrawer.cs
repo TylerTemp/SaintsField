@@ -71,11 +71,11 @@ namespace SaintsField.Editor.Drawers.Addressable
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             dropdownField.RegisterValueChangedCallback(v =>
             {
-                IReadOnlyList<string> curMetaInfo = (IReadOnlyList<string>) ((DropdownField) v.target).userData;
-                string selectedKey = curMetaInfo[dropdownField.index];
-                property.stringValue = selectedKey;
+                // IReadOnlyList<string> curMetaInfo = (IReadOnlyList<string>) ((DropdownField) v.target).userData;
+                // string selectedKey = curMetaInfo[dropdownField.index];
+                property.stringValue = v.newValue;
                 property.serializedObject.ApplyModifiedProperties();
-                onValueChangedCallback.Invoke(selectedKey);
+                onValueChangedCallback.Invoke(v.newValue);
             });
         }
 
@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers.Addressable
             if(!curKeys.SequenceEqual(keys))
             {
                 dropdownField.userData = keys;
-                dropdownField.choices = keys.Select(each => each.Replace('/', '\u2215').Replace('&', '＆')).ToList();
+                dropdownField.choices = keys;
                 dropdownField.SetValueWithoutNotify(property.stringValue);
             }
 
