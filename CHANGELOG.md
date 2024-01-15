@@ -1,3 +1,7 @@
+## 2.0.1 ##
+
+Fix UI Toolkit breaks old Unity versions.
+
 ## 2.0.0 ##
 
 1.  Fix `GameObjectActive` won't save after change active state.
