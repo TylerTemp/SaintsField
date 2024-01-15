@@ -5,7 +5,6 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
 
