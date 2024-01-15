@@ -58,11 +58,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.0**
+**2.0.1**
 
-1.  Fix `GameObjectActive` won't save after change active state.
-2.  Experimental: support for UI Toolkit (Unity 2022.2+ uses UI Toolkit by default)
-3.  Fix `UnsaintlyEditor` incorrect fields order.
+Fix UI Toolkit breaks old Unity versions.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
