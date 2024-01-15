@@ -223,7 +223,7 @@ namespace SaintsField.Editor.Drawers
 
             Debug.Assert(field != null, $"{property.name}/{parentObj}");
             object curValue = field.GetValue(parentObj);
-            Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
+            // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             // string curDisplay = "";
             int selectedIndex = -1;
             Debug.Assert(dropdownListValue != null);

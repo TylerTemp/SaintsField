@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers
 
                 if (found.getPropType == ReflectUtils.GetPropType.NotFound)
                 {
-                    var error = $"No field or method named `{by}` found on `{target}`";
+                    string error = $"No field or method named `{by}` found on `{target}`";
                     // Debug.LogError(_error);
                     result = (error, false);
                 }

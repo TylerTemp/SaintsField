@@ -7,15 +7,101 @@ using SaintsField.Editor.Utils;
 using SaintsField.Unsaintly;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
+#else
+#endif
 
 namespace SaintsField.Editor.Unsaintly
 {
     public class UnsaintlyEditor: UnityEditor.Editor
     {
         private MonoScript _monoScript;
-        private readonly List<UnsaintlyFieldWithInfo> _fieldWithInfos = new List<UnsaintlyFieldWithInfo>();
+        private IReadOnlyList<UnsaintlyFieldWithInfo> _fieldWithInfos = new List<UnsaintlyFieldWithInfo>();
 
+        #region UI
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        #region UIToolkit
+        public override VisualElement CreateInspectorGUI()
+        {
+            Setup();
+            // return new Label("This is a Label in a Custom Editor");
+            if (target == null)
+            {
+                return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
+            }
+
+            VisualElement root = new VisualElement();
+
+            if(_monoScript)
+            {
+                ObjectField objectField = new ObjectField("Script")
+                {
+                    value = _monoScript,
+                    allowSceneObjects = false,
+                    objectType = typeof(MonoScript),
+                };
+                objectField.SetEnabled(false);
+                root.Add(objectField);
+            }
+
+            foreach (UnsaintlyFieldWithInfo fieldWithInfo in _fieldWithInfos)
+            {
+                AbsRenderer renderer = MakeRenderer(fieldWithInfo);
+                if(renderer != null)
+                {
+                    root.Add(renderer.Render());
+                }
+            }
+
+            return root;
+        }
+        #endregion
+#else
+
+        #region IMGUI
         public virtual void OnEnable()
+        {
+            Setup();
+        }
+
+        public override void OnInspectorGUI()
+        {
+            if (target == null)
+            {
+                Debug.LogError("The target object is null. Check for missing scripts.");
+                return;
+            }
+
+            if(_monoScript)
+            {
+                using(new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Script", _monoScript, typeof(MonoScript), false);
+                }
+            }
+
+            serializedObject.Update();
+
+            foreach (UnsaintlyFieldWithInfo fieldWithInfo in _fieldWithInfos)
+            {
+                // ReSharper disable once ConvertToUsingDeclaration
+                using(AbsRenderer renderer = MakeRenderer(fieldWithInfo))
+                {
+                    // Debug.Log($"gen renderer {renderer}");
+                    renderer?.Render();
+                    // renderer.AfterRender();
+                }
+            }
+
+            serializedObject.ApplyModifiedProperties();
+        }
+        #endregion
+#endif
+        #endregion
+
+        private void Setup()
         {
             if (serializedObject.targetObject)
             {
@@ -40,7 +126,8 @@ namespace SaintsField.Editor.Unsaintly
                 _monoScript = null;
             }
 
-            _fieldWithInfos.Clear();
+            // _fieldWithInfos.Clear();
+            List<UnsaintlyFieldWithInfo> fieldWithInfos = new List<UnsaintlyFieldWithInfo>();
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             string[] serializableFields = GetSerializedProperties().ToArray();
             foreach (int inherentDepth in Enumerable.Range(0, types.Count))
@@ -84,9 +171,9 @@ namespace SaintsField.Editor.Unsaintly
                     // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
                     // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
                     OrderedAttribute orderProp = fieldInfo.GetCustomAttribute<OrderedAttribute>();
-                    int order = orderProp?.Order ?? -4;
+                    int order = orderProp?.Order ?? int.MinValue;
 
-                    _fieldWithInfos.Add(new UnsaintlyFieldWithInfo
+                    fieldWithInfos.Add(new UnsaintlyFieldWithInfo
                     {
                         renderType = UnsaintlyRenderType.SerializedField,
                         fieldInfo = fieldInfo,
@@ -103,8 +190,8 @@ namespace SaintsField.Editor.Unsaintly
                 foreach (FieldInfo nonSerFieldInfo in nonSerFieldInfos)
                 {
                     OrderedAttribute orderProp = nonSerFieldInfo.GetCustomAttribute<OrderedAttribute>();
-                    int order = orderProp?.Order ?? -3;
-                    _fieldWithInfos.Add(new UnsaintlyFieldWithInfo
+                    int order = orderProp?.Order ?? int.MinValue;
+                    fieldWithInfos.Add(new UnsaintlyFieldWithInfo
                     {
                         renderType = UnsaintlyRenderType.NonSerializedField,
                         // memberType = nonSerFieldInfo.MemberType,
@@ -129,8 +216,8 @@ namespace SaintsField.Editor.Unsaintly
                 {
                     OrderedAttribute orderProp =
                         methodInfo.GetCustomAttribute<OrderedAttribute>();
-                    int order = orderProp?.Order ?? -2;
-                    _fieldWithInfos.Add(new UnsaintlyFieldWithInfo
+                    int order = orderProp?.Order ?? int.MinValue;
+                    fieldWithInfos.Add(new UnsaintlyFieldWithInfo
                     {
                         // memberType = MemberTypes.Method,
                         renderType = UnsaintlyRenderType.Method,
@@ -181,8 +268,8 @@ namespace SaintsField.Editor.Unsaintly
                 {
                     OrderedAttribute orderProp =
                         propertyInfo.GetCustomAttribute<OrderedAttribute>();
-                    int order = orderProp?.Order ?? -1;
-                    _fieldWithInfos.Add(new UnsaintlyFieldWithInfo
+                    int order = orderProp?.Order ?? int.MinValue;
+                    fieldWithInfos.Add(new UnsaintlyFieldWithInfo
                     {
                         // memberType = MemberTypes.Property,
                         renderType = UnsaintlyRenderType.NativeProperty,
@@ -194,47 +281,13 @@ namespace SaintsField.Editor.Unsaintly
                 #endregion
             }
 
-            _fieldWithInfos.Sort((a, b) =>
-            {
-                // Debug.Assert(a.inherentDepth != 0);
-                // Debug.Assert(b.inherentDepth != 0);
-                int firstResult = a.inherentDepth.CompareTo(b.inherentDepth);
-                return firstResult != 0
-                    ? firstResult
-                    : a.order.CompareTo(b.order);
-            });
-        }
-
-        public override void OnInspectorGUI()
-        {
-            if (target == null)
-            {
-                Debug.LogError("The target object is null. Check for missing scripts.");
-                return;
-            }
-
-            if(_monoScript)
-            {
-                using(new EditorGUI.DisabledScope(true))
-                {
-                    EditorGUILayout.ObjectField("Script", _monoScript, typeof(MonoScript), false);
-                }
-            }
-
-            serializedObject.Update();
-
-            foreach (UnsaintlyFieldWithInfo fieldWithInfo in _fieldWithInfos)
-            {
-                // ReSharper disable once ConvertToUsingDeclaration
-                using(AbsRenderer renderer = MakeRenderer(fieldWithInfo))
-                {
-                    // Debug.Log($"gen renderer {renderer}");
-                    renderer?.Render();
-                    // renderer.AfterRender();
-                }
-            }
-
-            serializedObject.ApplyModifiedProperties();
+            _fieldWithInfos = fieldWithInfos
+                .WithIndex()
+                .OrderBy(each => each.value.inherentDepth)
+                .ThenBy(each => each.value.order)
+                .ThenBy(each => each.index)
+                .Select(each => each.value)
+                .ToArray();
         }
 
         private IEnumerable<string> GetSerializedProperties()

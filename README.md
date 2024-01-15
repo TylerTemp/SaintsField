@@ -57,11 +57,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**1.2.3**
+**2.0.0**
 
-1.  Add `FindComponent`
-2.  Add `ButtonAddOnClick`
-3.  Add `UnsaintlyEditor`
+1.  Fix `GameObjectActive` won't save after change active state.
+2.  Experimental: support for UI Toolkit (Unity 2022.2+ will use UI Toolkit by default)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

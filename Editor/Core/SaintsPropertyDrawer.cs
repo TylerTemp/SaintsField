@@ -407,6 +407,42 @@ namespace SaintsField.Editor.Core
         // }
 
         #region UI
+        private static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_LabelField";
+        protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_Field";
+        protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
+        {
+//             var nestInfo = new NestInfo
+//             {
+//                 targetObject = property.serializedObject.targetObject,
+//                 propertyPath = property.propertyPath,
+//                 // count = _saintsPropertyDrawers.Count - 1,
+//                 count = _saintsPropertyDrawers.Count * 3 - 1,
+//             };
+//             PropertyNestInfo.Add(nestInfo);
+//
+// #if UNITY_EDITOR
+//             Debug.Log($"PropertyNestInfo Fallback {nestInfo.targetObject}.{nestInfo.propertyPath}.{nestInfo.count}");
+// #endif
+
+            return UnityFallbackUIToolkit(property);
+        }
+
+        private static PropertyField UnityFallbackUIToolkit(SerializedProperty property)
+        {
+            PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            propertyField.AddToClassList(SaintsFieldFallbackClass);
+            // propertyField.RegisterValueChangeCallback(Debug.Log);
+            return propertyField;
+        }
+
+        private const string SaintsFieldFallbackClass = "saintsFieldFallback";
+
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -773,43 +809,6 @@ namespace SaintsField.Editor.Core
 
             return _rootElement;
         }
-
-        private static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_LabelField";
-        protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_Field";
-
-        protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
-        {
-//             var nestInfo = new NestInfo
-//             {
-//                 targetObject = property.serializedObject.targetObject,
-//                 propertyPath = property.propertyPath,
-//                 // count = _saintsPropertyDrawers.Count - 1,
-//                 count = _saintsPropertyDrawers.Count * 3 - 1,
-//             };
-//             PropertyNestInfo.Add(nestInfo);
-//
-// #if UNITY_EDITOR
-//             Debug.Log($"PropertyNestInfo Fallback {nestInfo.targetObject}.{nestInfo.propertyPath}.{nestInfo.count}");
-// #endif
-
-            return UnityFallbackUIToolkit(property);
-        }
-
-        private static PropertyField UnityFallbackUIToolkit(SerializedProperty property)
-        {
-            PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
-            {
-                style =
-                {
-                    flexGrow = 1,
-                },
-            };
-            propertyField.AddToClassList(SaintsFieldFallbackClass);
-            // propertyField.RegisterValueChangeCallback(Debug.Log);
-            return propertyField;
-        }
-
-        private const string SaintsFieldFallbackClass = "saintsFieldFallback";
 #else
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -1345,14 +1344,25 @@ namespace SaintsField.Editor.Core
 
                 PropertyField thisPropField = containerElement.Q<PropertyField>();
 
-                foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
+                // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
+                // Debug.Log($"container={container.Count}");
+
+                // really... this delay is not predictable
+                containerElement.schedule.Execute(() =>
                 {
-                    // if (!child.ClassListContains("unity-base-field"))
-                    // {
-                    //     child.RemoveFromHierarchy();
-                    // }
-                    child.RemoveFromHierarchy();
-                }
+                    // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
+                    // Debug.Log($"container={container.Count}");
+                    thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ForEach(each => each.RemoveFromHierarchy());
+                });
+
+                // foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
+                // {
+                //     // if (!child.ClassListContains("unity-base-field"))
+                //     // {
+                //     //     child.RemoveFromHierarchy();
+                //     // }
+                //     child.RemoveFromHierarchy();
+                // }
 
                 topRoot.Clear();
                 topRoot.Add(containerElement);

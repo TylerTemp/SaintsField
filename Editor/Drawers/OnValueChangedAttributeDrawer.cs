@@ -95,7 +95,7 @@ namespace SaintsField.Editor.Drawers
             object newValue)
         {
             // Debug.Log($"OK I got a new value {newValue}; {this}");
-            var error = InvokeCallback(saintsAttribute, parent);
+            string error = InvokeCallback(saintsAttribute, parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             helpBox.text = error;
             helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;

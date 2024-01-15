@@ -3,6 +3,7 @@ using System.Reflection;
 using SaintsField.Unsaintly;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Unsaintly.Renderer
 {
@@ -12,6 +13,27 @@ namespace SaintsField.Editor.Unsaintly.Renderer
         {
         }
 
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        public override VisualElement Render()
+        {
+            Object target = serializedObject.targetObject;
+            MethodInfo methodInfo = fieldWithInfo.methodInfo;
+            Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
+            ButtonAttribute buttonAttribute = (ButtonAttribute)methodInfo.GetCustomAttributes(typeof(ButtonAttribute), true)[0];
+
+            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
+            object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+
+            return new Button(() =>
+            {
+                methodInfo.Invoke(target, defaultParams);
+            })
+            {
+                text = buttonText,
+                enableRichText = true,
+            };
+        }
+#else
         public override void Render()
         {
             Object target = serializedObject.targetObject;
@@ -61,5 +83,6 @@ namespace SaintsField.Editor.Unsaintly.Renderer
                 // }
             }
         }
+#endif
     }
 }

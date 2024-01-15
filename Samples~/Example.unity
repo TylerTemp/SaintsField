@@ -420,7 +420,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <_maxValue>k__BackingField: 239
   <_minValue>k__BackingField: 239
-  <_range>k__BackingField: {x: 231, y: 239}
+  <_range>k__BackingField: {x: 239, y: 239}
   <intRange>k__BackingField: {x: 1, y: 1}
 --- !u!4 &185980176
 Transform:
@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63b9516b5d617ed458d446e946ef4fc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _show: 0
+  _show: 1
   _content: 0
   _modInt: 72
   _defaultInt: 32
@@ -3610,8 +3610,6 @@ MonoBehaviour:
   - 
   - 
   - 
-  - 
-  - 
   _propertyLabel: 
   colorAqua: 
   colorBlack: 
@@ -3641,7 +3639,7 @@ MonoBehaviour:
   colorIndigo: 
   colorViolet: 
   _myStructWorkAround:
-    LabelFloat: 0.03
+    LabelFloat: 0
     Scene: 0
     SortingLayer: 
     Slider: {x: 0, y: 0}
@@ -4410,7 +4408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tag: GameController
-  _tag2: Finish
+  _tag2: 
 --- !u!1 &2118824042
 GameObject:
   m_ObjectHideFlags: 0
