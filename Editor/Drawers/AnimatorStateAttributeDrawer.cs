@@ -5,9 +5,11 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.Animations;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+using UnityEditor.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -296,6 +298,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
+#if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
         private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_DropdownField";
@@ -456,5 +459,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

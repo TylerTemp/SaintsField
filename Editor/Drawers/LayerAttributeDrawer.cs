@@ -1,10 +1,12 @@
-﻿using System;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
+#endif
+using UnityEngine;
+
 
 namespace SaintsField.Editor.Drawers
 {
@@ -61,6 +63,8 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => ImGuiHelpBox.Draw(position, $"Expect string or int, get {property.propertyType}", MessageType.Error);
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         private static string NameLayer(SerializedProperty property) => $"{property.propertyPath}__Layer";
@@ -107,5 +111,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

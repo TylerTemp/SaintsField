@@ -1,11 +1,11 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Component = UnityEngine.Component;
 using Object = UnityEngine.Object;
 
@@ -126,6 +126,8 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         private static string NameLabelError(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_LabelError";
@@ -225,5 +227,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

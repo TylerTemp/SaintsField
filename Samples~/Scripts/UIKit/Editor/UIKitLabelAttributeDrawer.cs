@@ -1,11 +1,14 @@
 ﻿using SaintsField.Editor.Core;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Samples.Scripts.UIKit.Editor
 {
+#if UNITY_2021_3_OR_NEWER
     [CustomPropertyDrawer(typeof(UIKitLabelAttribute))]
     public class UIKitLabelAttributeDrawer: PropertyDrawer
     {
@@ -92,4 +95,5 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             return root;
         }
     }
+#endif
 }

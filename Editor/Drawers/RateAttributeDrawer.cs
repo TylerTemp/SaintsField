@@ -245,6 +245,8 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Rate_Label";
@@ -428,5 +430,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

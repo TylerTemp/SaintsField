@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEditor;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Utils
 {
@@ -24,6 +26,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+#if UNITY_2021_3_OR_NEWER
         public static HelpBoxMessageType GetUIToolkitMessageType(this EMessageType messageType)
         {
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
@@ -41,5 +44,6 @@ namespace SaintsField.Editor.Utils
                     throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
             }
         }
+#endif
     }
 }

@@ -3,7 +3,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -103,6 +105,8 @@ namespace SaintsField.Editor.Drawers
             return ("", componentInChildren);
         }
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         private static string NamePlaceholder(SerializedProperty property, int index) =>
@@ -144,5 +148,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
         #endregion
+
+#endif
     }
 }

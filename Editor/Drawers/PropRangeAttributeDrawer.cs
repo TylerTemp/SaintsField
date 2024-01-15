@@ -1,9 +1,10 @@
-﻿using System;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -148,6 +149,8 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+
+#if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
 
@@ -380,5 +383,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

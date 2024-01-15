@@ -4,9 +4,11 @@ using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
+#endif
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -164,6 +166,8 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout";
@@ -270,5 +274,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

@@ -7,7 +7,9 @@ using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Button = UnityEngine.UI.Button;
 using Object = UnityEngine.Object;
 
@@ -177,6 +179,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
 
+#if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -187,5 +190,6 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+#endif
     }
 }

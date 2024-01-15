@@ -2,9 +2,11 @@
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -69,6 +71,7 @@ namespace SaintsField.Editor.Drawers
                 ? position
                 : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
+#if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
 
@@ -106,5 +109,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

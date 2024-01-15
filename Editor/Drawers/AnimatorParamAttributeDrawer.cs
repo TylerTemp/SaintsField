@@ -5,7 +5,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -210,6 +212,8 @@ namespace SaintsField.Editor.Drawers
 
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UI ToolKit
 
         // private MetaInfo _curMetaInfo = new MetaInfo
@@ -361,5 +365,7 @@ namespace SaintsField.Editor.Drawers
         private static string GetParameterLabel(AnimatorControllerParameter each) => $"{each.name} [{each.type}]";
 
         #endregion
+
+#endif
     }
 }

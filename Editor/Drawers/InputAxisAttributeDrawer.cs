@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -73,6 +72,8 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
         private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__InputAxis_Button";
@@ -180,5 +181,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

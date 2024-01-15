@@ -6,7 +6,9 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
 using Object = UnityEngine.Object;
@@ -341,7 +343,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-
+#if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
         private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage";
@@ -484,5 +486,6 @@ namespace SaintsField.Editor.Drawers
 
         }
         #endregion
+#endif
     }
 }

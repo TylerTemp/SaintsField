@@ -1,9 +1,10 @@
-﻿using System;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -70,7 +71,9 @@ namespace SaintsField.Editor.Drawers
                 : Util.GetCallbackFloat(parentTarget, maxValueAttribute.ValueCallback);
         }
 
-                #region UIToolkit
+#if UNITY_2021_3_OR_NEWER
+
+        #region UIToolkit
 
         private static string NameHelpBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__MaxValue_HelpBox";
@@ -122,5 +125,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

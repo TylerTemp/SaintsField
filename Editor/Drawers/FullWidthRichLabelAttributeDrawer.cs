@@ -5,7 +5,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -151,6 +153,8 @@ namespace SaintsField.Editor.Drawers
                 : ImGuiHelpBox.Draw(useRect, _error, MessageType.Error);
         }
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UI Toolkit
 
         private static string NameFullWidthLabelContainer(SerializedProperty property, int index) =>
@@ -256,6 +260,6 @@ namespace SaintsField.Editor.Drawers
 
         #endregion
 
-
+#endif
     }
 }

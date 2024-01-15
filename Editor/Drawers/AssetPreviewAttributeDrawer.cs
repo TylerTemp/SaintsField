@@ -3,7 +3,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
@@ -248,6 +250,18 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
+        private static string MismatchError(SerializedProperty property)
+        {
+            if (property.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return $"Expect string or int, get {property.propertyType}";
+            }
+            return property.objectReferenceValue == null
+                ? "field is null"
+                : null;
+        }
+
+#if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
         private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AssetPreview";
@@ -373,17 +387,8 @@ namespace SaintsField.Editor.Drawers
             }
 
         }
-
-        private static string MismatchError(SerializedProperty property)
-        {
-            if (property.propertyType != SerializedPropertyType.ObjectReference)
-            {
-                return $"Expect string or int, get {property.propertyType}";
-            }
-            return property.objectReferenceValue == null
-                ? "field is null"
-                : null;
-        }
         #endregion
+
+#endif
     }
 }

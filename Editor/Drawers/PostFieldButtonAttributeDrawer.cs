@@ -1,9 +1,10 @@
-﻿using System;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -51,6 +52,8 @@ namespace SaintsField.Editor.Drawers
                 : ImGuiHelpBox.Draw(position, DisplayError, MessageType.Error);
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
@@ -77,5 +80,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }

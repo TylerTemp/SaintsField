@@ -54,11 +54,15 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
+#if UNITY_2021_3_OR_NEWER
+
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             DoCheckComponent(property, saintsAttribute);
             return new VisualElement();
         }
+
+#endif
     }
 }

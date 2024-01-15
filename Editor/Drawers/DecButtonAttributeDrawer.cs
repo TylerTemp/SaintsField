@@ -6,7 +6,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -112,6 +114,8 @@ namespace SaintsField.Editor.Drawers
             return "";
         }
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         // private static string ClassButton(SerializedProperty property) => $"{property.propertyPath}__Button";
@@ -207,6 +211,8 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
 
         protected static (string error, string label) GetButtonLabelXml(DecButtonAttribute decButtonAttribute, object target, Type objType)
         {

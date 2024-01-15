@@ -1,8 +1,9 @@
 ﻿using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Accessibility;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -35,6 +36,8 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -53,5 +56,7 @@ namespace SaintsField.Editor.Drawers
             return visualElement;
         }
         #endregion
+
+#endif
     }
 }

@@ -140,6 +140,8 @@ namespace SaintsField.Editor.Unsaintly.Renderer
             }
         }
 
+#if UNITY_2021_3_OR_NEWER
+
         protected static VisualElement UIToolkitLayout(object value, string label)
         {
             Type valueType = value.GetType();
@@ -330,5 +332,6 @@ namespace SaintsField.Editor.Unsaintly.Renderer
             visualElement.SetEnabled(false);
             return visualElement;
         }
+#endif
     }
 }

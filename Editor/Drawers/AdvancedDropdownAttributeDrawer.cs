@@ -8,9 +8,11 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UnityAdvancedDropdown = UnityEditor.IMGUI.Controls.AdvancedDropdown;
 using UnityAdvancedDropdownItem = UnityEditor.IMGUI.Controls.AdvancedDropdownItem;
+#if UNITY_2021_3_OR_NEWER
+using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -501,6 +503,8 @@ namespace SaintsField.Editor.Drawers
 
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             VisualElement container,
@@ -512,6 +516,6 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);
-
+#endif
     }
 }
