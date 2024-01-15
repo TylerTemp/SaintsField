@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
     {
         [SerializeField]
         public SortingLayer sortingLayer;
-        [SerializeField, SortingLayer] private string _sortingLayerString;
+        [SerializeField, SortingLayer, RichLabel("<label />")] private string _sortingLayerString;
         [SerializeField, SortingLayer] private int _sortingLayerInt;
     }
 }

@@ -4,7 +4,7 @@ namespace SaintsField
 {
     public class FieldTypeExample: MonoBehaviour
     {
-        [SerializeField, FieldType(typeof(SpriteRenderer))]
+        [SerializeField, FieldType(typeof(SpriteRenderer))][RichLabel("<label />")]
         private GameObject _go;
 
         [SerializeField, FieldType(typeof(FieldTypeExample))]

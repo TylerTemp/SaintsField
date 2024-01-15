@@ -1337,7 +1337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneInt: 0
-  sceneStr: Example
+  sceneStr: SampleScene
 --- !u!4 &633783411
 Transform:
   m_ObjectHideFlags: 0
@@ -1570,10 +1570,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb2d5351d8f40d881d369e3b7bdc3a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  address: Resources
-  addressInGroup: NoLabel
-  addressLabel1Or2: 1&2
-  addressLabelAnd: Default&2
+  address: Assets/SaintsField/Samples/RawResources/Cube.prefab
+  addressInGroup: Assets/SaintsField/Samples/RawResources/eye-slash.png
+  addressLabel1Or2: Assets/SaintsField/Samples/RawResources/ScriptableIns.asset
+  addressLabelAnd: Assets/SaintsField/Samples/RawResources/ScriptableIns.asset
 --- !u!4 &724414865
 Transform:
   m_ObjectHideFlags: 0
@@ -2175,6 +2175,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggle: 0
+  richToggle2: 0
 --- !u!4 &1030583577
 Transform:
   m_ObjectHideFlags: 0
@@ -2220,6 +2221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myMask: 6
+  myMask2: 31
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0
@@ -4144,6 +4146,7 @@ MonoBehaviour:
   rate0To5: 3
   rate1To5: 2
   rate3To5: 4
+  rate0To5Rich: 0
 --- !u!4 &1881364801
 Transform:
   m_ObjectHideFlags: 0
@@ -4407,6 +4410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tag: GameController
+  _tag2: Finish
 --- !u!1 &2118824042
 GameObject:
   m_ObjectHideFlags: 0

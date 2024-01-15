@@ -382,13 +382,15 @@ namespace SaintsField.Editor.Drawers
         private static string NameToggleButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButtonImage";
 
         private static string NameSetAllButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetAllButton";
-        private static string NameSetAllButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetAllButtonImage";
+        // private static string NameSetAllButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetAllButtonImage";
 
         private static string NameSetNoneButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButton";
-        private static string NameSetNoneButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButtonImage";
+        // private static string NameSetNoneButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButtonImage";
 
         private static string ClassToggleBitButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButton";
         private static string ClassToggleBitButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButtonImage";
+
+        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, Label fakeLabel, object parent)
@@ -563,13 +565,14 @@ namespace SaintsField.Editor.Drawers
                 userData = -1f,
             };
             Label prefixLabel = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            prefixLabel.name = NameLabel(property);
             root.Add(prefixLabel);
             root.Add(fieldContainer);
 
             return root;
         }
 
-        protected override VisualElement CreateOverlayUIKit(SerializedProperty property,
+        protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
@@ -581,6 +584,8 @@ namespace SaintsField.Editor.Drawers
 
             Foldout foldOut = new Foldout
             {
+                text = new string(' ', property.displayName.Length),
+                // text = property.displayName,
                 value = enumFlagsAttribute.DefaultExpanded,
                 style =
                 {
@@ -589,8 +594,9 @@ namespace SaintsField.Editor.Drawers
                     position = Position.Absolute,
                     // height = EditorGUIUtility.singleLineHeight,
                     // width = 20,
-                    width = LabelBaseWidth - IndentWidth,
+                    // width = LabelBaseWidth - IndentWidth,
                     display = enumFlagsAttribute.AutoExpand? DisplayStyle.Flex: DisplayStyle.None,
+                    // color = Color.clear,
                 },
                 name = NameFoldout(property),
                 userData = false,  // processing
@@ -780,6 +786,17 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
             SetExpandStatus(useExpand, property, container);
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
+        {
+            Label target = container.Q<Label>(NameLabel(property));
+            target.text = labelOrNull;
+            target.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
+
+            Foldout foldout = container.Q<Foldout>(NameFoldout(property));
+            foldout.text = labelOrNull ?? "";
         }
 
         #endregion

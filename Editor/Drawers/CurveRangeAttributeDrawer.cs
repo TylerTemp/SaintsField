@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, object parent)
         {
-            CurveField element = new CurveField(property.displayName)
+            CurveField element = new CurveField(new string(' ', property.displayName.Length))
             {
                 value = property.animationCurveValue,
                 ranges = GetRanges((CurveRangeAttribute) saintsAttribute),
@@ -96,6 +96,13 @@ namespace SaintsField.Editor.Drawers
                 property.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(v.newValue);
             });
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
+        {
+            CurveField target = container.Q<CurveField>(NameCurveField(property));
+            target.label = labelOrNull;
         }
 
         #endregion

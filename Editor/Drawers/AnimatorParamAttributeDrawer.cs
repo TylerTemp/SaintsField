@@ -224,9 +224,9 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, object parent)
         {
-            var curMetaInfo = GetMetaInfo(property, saintsAttribute);
+            MetaInfo curMetaInfo = GetMetaInfo(property, saintsAttribute);
 
-            DropdownField dropdownField = new DropdownField(property.displayName)
+            DropdownField dropdownField = new DropdownField(new string(' ', property.displayName.Length))
             {
                 style =
                 {
@@ -234,9 +234,8 @@ namespace SaintsField.Editor.Drawers
                 },
                 userData = curMetaInfo,
                 name = NameDropdownField(property),
+                choices = curMetaInfo.AnimatorParameters.Select(GetParameterLabel).ToList(),
             };
-
-            dropdownField.choices = curMetaInfo.AnimatorParameters.Select(GetParameterLabel).ToList();
 
             Func<AnimatorControllerParameter, bool> predicate = property.propertyType == SerializedPropertyType.String
                 ? p => ParamNameEquals(p, property)
@@ -349,6 +348,14 @@ namespace SaintsField.Editor.Drawers
                     dropdownField.index = 0;
                 }
             }
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
+        {
+            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
+            dropdownField.label = labelOrNull;
+            // label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
         private static string GetParameterLabel(AnimatorControllerParameter each) => $"{each.name} [{each.type}]";

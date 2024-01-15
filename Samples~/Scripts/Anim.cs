@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
         [field: SerializeField]
         public Animator Animator { get; private set; }
 
-        [AnimatorState]
+        [AnimatorState][RichLabel("<label />")]
         public AnimatorState animatorState;
 
         [AnimatorState(nameof(Animator))]

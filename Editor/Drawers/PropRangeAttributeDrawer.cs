@@ -372,6 +372,13 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull)
+        {
+            Slider target = container.Q<Slider>(NameSlider(property));
+            target.label = labelOrNull;
+        }
+
         #endregion
     }
 }

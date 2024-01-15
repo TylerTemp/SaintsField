@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Drawers
 {
 
     [CustomPropertyDrawer(typeof(SceneAttribute))]
-    public class ScenePropertyDrawer : SaintsPropertyDrawer
+    public class SceneAttributeDrawer : SaintsPropertyDrawer
     {
         #region IMGUI
         private string _error = "";

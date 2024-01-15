@@ -112,6 +112,7 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
+        private static string NameObjectField(SerializedProperty property) => $"{property.propertyPath}__FieldType_ObjectField";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__FieldType_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -140,6 +141,7 @@ namespace SaintsField.Editor.Drawers
 
             ObjectField objectField = new ObjectField(new string(' ', property.displayName.Length))
             {
+                name = NameObjectField(property),
                 objectType = requiredComp,
                 allowSceneObjects = true,
                 value = requiredValue,
@@ -147,19 +149,26 @@ namespace SaintsField.Editor.Drawers
 
             objectField.Bind(property.serializedObject);
 
-            // HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
-            // {
-            //     style =
-            //     {
-            //         display = DisplayStyle.None,
-            //     },
-            // };
+            return objectField;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
+            Type requiredComp = fieldTypeAttribute.CompType;
+            Type fieldType = SerializedUtils.GetType(property);
+
+            ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
+
             objectField.RegisterValueChangedCallback(v =>
             {
                 Object result = GetNewValue(v.newValue, fieldType, requiredComp);
                 property.objectReferenceValue = result;
-                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(result);
 
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
                 if (v.newValue != null && result == null)
                 {
                     helpBox.style.display = DisplayStyle.Flex;
@@ -170,8 +179,6 @@ namespace SaintsField.Editor.Drawers
                     helpBox.style.display = DisplayStyle.None;
                 }
             });
-
-            return objectField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -185,6 +192,13 @@ namespace SaintsField.Editor.Drawers
                 },
                 name = NameHelpBox(property),
             };
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
+        {
+            ObjectField target = container.Q<ObjectField>(NameObjectField(property));
+            target.label = labelOrNull;
         }
 
         #endregion

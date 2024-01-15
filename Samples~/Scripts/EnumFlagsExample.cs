@@ -18,8 +18,8 @@ namespace SaintsField.Samples.Scripts
         }
 
         [EnumFlags] public BitMask myMask;
-        // [EnumFlags, RichLabel(null)] public BitMask myMask2;
+        [EnumFlags, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
 
-        // private void ValueChanged() => Debug.Log(myMask);
+        private void ValueChanged() => Debug.Log(myMask);
     }
 }

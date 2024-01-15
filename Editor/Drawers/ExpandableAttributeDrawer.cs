@@ -169,7 +169,7 @@ namespace SaintsField.Editor.Drawers
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout";
         private static string NameProps(SerializedProperty property) => $"{property.propertyPath}__ExpandableAttributeDrawer_Props";
 
-        protected override VisualElement CreateOverlayUIKit(SerializedProperty property,
+        protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {

@@ -466,6 +466,23 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull)
+        {
+            if (property.propertyType == SerializedPropertyType.Vector2)
+            {
+                FloatField target = container.Q<FloatField>(NameMinFloat(property));
+                target.label = labelOrNull;
+                target.style.width = labelOrNull == null ? InputWidth : InputWidth + LabelBaseWidth;target.label = labelOrNull;
+            }
+            else
+            {
+                IntegerField target = container.Q<IntegerField>(NameMinInteger(property));
+                target.label = labelOrNull;
+                target.style.width = labelOrNull == null ? InputWidth : InputWidth + LabelBaseWidth;target.label = labelOrNull;
+            }
+        }
+
         private static void ApplyIntValue(SerializedProperty property, float step, Vector2 sliderValue, int minValue, int maxValue, MinMaxSlider slider, IntegerField minField, IntegerField maxField, Action<object> onValueChangedCallback)
         {
             int actualStep = Mathf.Max(1, Mathf.RoundToInt(step));

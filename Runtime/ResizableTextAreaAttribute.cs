@@ -15,7 +15,6 @@ namespace SaintsField
         // public ResizableTextAreaAttribute()
         // {
         //     // FullWidth = fullWidth;
-        //     // GroupBy = fullWidth ? "ResizableTextAreaAttribute" : "__LABEL_FIELD__";
         // }
     }
 }

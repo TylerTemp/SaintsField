@@ -562,6 +562,23 @@ namespace SaintsField.Editor.Core
                 userData = null,
             };
 
+            #region Pre Overlay
+
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
+            {
+                SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.Drawer;
+
+                VisualElement element =
+                    drawerInstance.CreatePreOverlayUIKit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent);
+                // ReSharper disable once InvertIf
+                if (element != null)
+                {
+                    fieldContainer.Add(element);
+                }
+            }
+
+            #endregion
+
             // VisualElement fakeLabelContainer = new VisualElement
             // {
             //     style =
@@ -583,22 +600,6 @@ namespace SaintsField.Editor.Core
             bool fieldIsFallback = fieldAttributeWithIndex.Attribute == null;
 
             Label fakeLabel = null;
-            //     ? new Label(property.displayName)
-            //     {
-            //         style =
-            //         {
-            //             position = Position.Absolute,
-            //             height = EditorGUIUtility.singleLineHeight,
-            //             marginLeft = LabelLeftSpace,
-            //             width = LabelBaseWidth,
-            //
-            //             // alignItems = Align.Center, // vertical
-            //             unityTextAlign = TextAnchor.LowerLeft,
-            //         },
-            //         pickingMode = PickingMode.Ignore,
-            //         // name = NameRichLabelContainer(property),
-            //     }
-            //     : null;
             if (labelAttributeWithIndex.Attribute == null)
             {
                 fieldContainer.Add(fakeLabel = new Label(property.displayName)
@@ -646,13 +647,7 @@ namespace SaintsField.Editor.Core
 
                 fieldContainer.Add(fieldElement);
                 fieldContainer.userData = fieldAttributeWithIndex;
-
             }
-
-            // if (fakeLabel != null)
-            // {
-            //     fieldContainer.Add(fakeLabel);
-            // }
 
             #endregion
 
@@ -672,36 +667,14 @@ namespace SaintsField.Editor.Core
 
             containerElement.Add(fieldContainer);
 
-            #region Overlay
-
-            // VisualElement overlayContainer = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         position = Position.Absolute,
-            //         left = 0,
-            //         top = 0,
-            //         height = EditorGUIUtility.singleLineHeight,
-            //         width = Length.Percent(100),
-            //         flexDirection = FlexDirection.Row,
-            //         flexWrap = Wrap.NoWrap,
-            //         alignItems = Align.Center, // vertical
-            //         overflow = Overflow.Hidden,
-            //     },
-            //     // pickingMode = PickingMode.Ignore,
-            //     name = $"{property.propertyPath}__SaintsFieldOverlay",
-            // };
-
-            // overlayContainer.Add(new Label(" "));
-
-            // fieldContainer.Add(overlayContainer);
+            #region Post Overlay
 
             foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
                 SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.Drawer;
 
                 VisualElement element =
-                    drawerInstance.CreateOverlayUIKit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent);
+                    drawerInstance.CreatePostOverlayUIKit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent);
                 // ReSharper disable once InvertIf
                 if (element != null)
                 {
@@ -710,7 +683,6 @@ namespace SaintsField.Editor.Core
             }
 
             #endregion
-
 
             containerElement.Add(_overlayLabelContainer);
 
@@ -1313,7 +1285,13 @@ namespace SaintsField.Editor.Core
             return null;
         }
 
-        protected virtual VisualElement CreateOverlayUIKit(SerializedProperty property,
+        protected virtual VisualElement CreatePreOverlayUIKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+        {
+            return null;
+        }
+
+        protected virtual VisualElement CreatePostOverlayUIKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             return null;

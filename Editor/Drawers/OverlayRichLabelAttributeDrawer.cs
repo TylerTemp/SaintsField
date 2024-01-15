@@ -194,7 +194,7 @@ namespace SaintsField.Editor.Drawers
             // public string Error;
         }
 
-        protected override VisualElement CreateOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
             VisualElement root = new VisualElement

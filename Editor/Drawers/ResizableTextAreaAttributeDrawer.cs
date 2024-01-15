@@ -17,8 +17,6 @@ namespace SaintsField.Editor.Drawers
 
         // private bool _hasLabel = true;
 
-        // private static bool BreakLine(ISaintsAttribute saintsAttribute) => saintsAttribute.GroupBy != "__LABEL_FIELD__";
-
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
