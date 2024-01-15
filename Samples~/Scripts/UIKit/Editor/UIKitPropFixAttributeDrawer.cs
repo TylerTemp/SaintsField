@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if UNITY_2021_3_OR_NEWER
+using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -122,3 +123,4 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
         // }
     }
 }
+#endif

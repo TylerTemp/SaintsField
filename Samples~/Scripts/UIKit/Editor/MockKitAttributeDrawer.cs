@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿#if UNITY_2021_3_OR_NEWER
+using System.Drawing;
 using UnityEditor;
 using UnityEngine.UIElements;
 using Color = UnityEngine.Color;
@@ -81,3 +82,4 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
         }
     }
 }
+#endif
