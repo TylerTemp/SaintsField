@@ -15,6 +15,8 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(ColorToggleAttribute))]
     public class ColorToggleAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
+
         private string _error = "";
 
         private enum FieldType
@@ -96,17 +98,17 @@ namespace SaintsField.Editor.Drawers
                     };
                 }
 
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Field && propInfo.Item2 is FieldInfo foundFieldInfo)
+                if (propInfo.Item1 == ReflectUtils.GetPropType.Field)
                 {
-                    return SignObject(foundFieldInfo.GetValue(targetObject));
+                    return SignObject(((FieldInfo)propInfo.Item2).GetValue(targetObject));
                 }
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Property && propInfo.Item2 is PropertyInfo foundPropertyInfo)
+                if (propInfo.Item1 == ReflectUtils.GetPropType.Property)
                 {
-                    return SignObject(foundPropertyInfo.GetValue(targetObject));
+                    return SignObject(((PropertyInfo)propInfo.Item2).GetValue(targetObject));
                 }
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Method && propInfo.Item2 is MethodInfo foundMethodInfo)
+                if (propInfo.Item1 == ReflectUtils.GetPropType.Method)
                 {
-                    return SignObject(foundMethodInfo.Invoke(targetObject, null));
+                    return SignObject(((MethodInfo)propInfo.Item2).Invoke(targetObject, null));
                 }
 
                 throw new Exception("Should not reach here");
@@ -295,6 +297,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        #endregion
 
         #region UIToolkit
 
