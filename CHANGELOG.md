@@ -1,7 +1,8 @@
 ## 2.0.0 ##
 
 1.  Fix `GameObjectActive` won't save after change active state.
-2.  Experimental: support for UI Toolkit (Unity 2022.2+ will use UI Toolkit by default)
+2.  Experimental: support for UI Toolkit (Unity 2022.2+ uses UI Toolkit by default)
+3.  Fix `UnsaintlyEditor` incorrect fields order.
 
 ## 1.2.3 ##
 

@@ -4,7 +4,8 @@
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:9e24947de15b9834991c9d8411ea37cf",
-        "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178"
+        "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178",
+        "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -18,6 +19,11 @@
             "name": "com.unity.addressables",
             "expression": "",
             "define": "SAINTSFIELD_ADDRESSABLE"
+        },
+        {
+            "name": "com.dbrizov.naughtyattributes",
+            "expression": "",
+            "define": "SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES"
         }
     ],
     "noEngineReferences": false

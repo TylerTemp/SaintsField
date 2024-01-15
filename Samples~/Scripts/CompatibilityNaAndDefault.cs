@@ -12,12 +12,15 @@ namespace SaintsField.Samples.Scripts
         [Range(0, 5), RichLabel("<color=green>+Native</color>")]
         public float nativeRangeHandled;
 
-        // [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.Label(" "), NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
-        // public AnimationCurve naCurve;
-        // //
-        // // // this wont work too.
-        // // [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), RichLabel("<color=green>+NA</color>")]
-        // // public AnimationCurve naCurveHandled;
+#if SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES
+        // this works
+        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.Label(" "), NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
+        public AnimationCurve naCurve;
+
+        // this wont work too. Please put `SaintsField` before other drawers
+        [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), RichLabel("<color=green>+NA</color>")]
+        public AnimationCurve naCurveHandled;
+#endif
         //
         // [Tooltip("TT1")]
         // public int tt1;

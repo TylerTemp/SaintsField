@@ -14,9 +14,10 @@ Unity: 2019.1 or higher
 ## Highlights ##
 
 1.  Works on deep nested fields!
-2.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
-3.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
-4.  Allow dynamic arguments in many cases
+2.  Supports UI Toolkit (Experimental)! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
+3.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
+4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
+5.  Allow dynamic arguments in many cases
 
 ## Installation ##
 
@@ -60,7 +61,8 @@ If you're using `unitypackage` or git submodule but you put this project under a
 **2.0.0**
 
 1.  Fix `GameObjectActive` won't save after change active state.
-2.  Experimental: support for UI Toolkit (Unity 2022.2+ will use UI Toolkit by default)
+2.  Experimental: support for UI Toolkit (Unity 2022.2+ uses UI Toolkit by default)
+3.  Fix `UnsaintlyEditor` incorrect fields order.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -668,8 +670,13 @@ dropdownList.AddSeparator();  // add a separator
 
 A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
 
-**Known Issue**: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
-This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup. This issue is not fixable unless Unity fixes it.
+**Known Issue**:
+
+1.  This is IMGUI only. UI Toolkit does not provide an `AdvancedDropdown` or an alternative. I'll try to make one when I have time.
+2.  IMGUI: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
+    This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup. This issue is not fixable unless Unity fixes it.
+
+Arguments:
 
 *   `string funcName` callback function. Must return a `AdvancedDropdownList<T>`.
 *   `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will be used to decide the dropdown height.
@@ -760,8 +767,8 @@ For each argument:
 *   `int|float min` or `string minCallback`: the minimum value of the slider, or a property/callback name.
 *   `int|float max` or `string maxCallback`: the maximum value of the slider, or a property/callback name.
 *   `int|float step=1|-1f`: the step of the slider, `<= 0` means no limit. By default, int type use `1` and float type use `-1f`
-*   `float minWidth=50f`: the minimum width of the value label. `< 0` for auto size (not recommended)
-*   `float maxWidth=50f`: the maximum width of the value label. `< 0` for auto size (not recommended)
+*   `float minWidth=50f`: (IMGUI Only) the minimum width of the value label. `< 0` for auto size (not recommended)
+*   `float maxWidth=50f`: (IMGUI Only) the maximum width of the value label. `< 0` for auto size (not recommended)
 
 *   AllowMultiple: No
 
@@ -1752,7 +1759,7 @@ This only works for decorator draws above or below the field. The above drawer w
 
 ## Common Pitfalls & Compatibility ##
 
-**List/Array & Nesting**
+### List/Array & Nesting ###
 
 Directly using on list/array will apply to every direct element of the list, this is a limit from Unity.
 
@@ -1777,7 +1784,7 @@ public class ArrayLabelExample : MonoBehaviour
 }
 ```
 
-**Order Matters**
+### Order Matters ###
 
 `SaintsField` only uses `PropertyDrawer` to draw the field, and will properly fall back to the rest drawers if there is one.
 This works for both 3rd party drawer, your custom drawer, and Unity's default drawer.
@@ -1810,7 +1817,7 @@ public class CompatibilityNaAndDefault : MonoBehaviour
 }
 ```
 
-**Multiple Fields Handling**
+### Multiple Fields Handling ###
 
 Unlike `NaghthyAttributes`/`Odin`, `SaintsField` does not have a decorator like `Tag`, or `GroupBox` that puts several fields into one place
 because it does not inject a global `CustomEditor`.
@@ -1833,5 +1840,29 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 My (not full) test about compatibility:
 
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
-*   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
+*   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack. (NaughtyAttributes uses only IMGUI)
 *   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good for Odin's `EditorWindow`.
+
+### UI Toolkit ###
+
+The support for UI Toolkit is experimental. There are way too many issues with UI Toolkit that Unity does not give any guildline of how to do, and there are bugs that not fixed even in the newest Unity (Unity 2023.2.5f1 at this point)
+
+If you encounter any issue, please report it to the issue page. However, there are many issues that is just not fixable:
+
+1.  Label width. UI Toolkit uses a fixed label width 120px. However, this value is different when the field is nested and indented.
+
+    In IMGUI, we have `EditorGUIUtility.labelWidth`, `EditorGUI.indentLevel`, which is absolutly not avaliable in UI Toolkit, and there is no way to get the label width. `SaintsField` just use the fixed label width.
+
+2.  Even most UI Toolkit fields are fixed label width, there is one that the label width behavior exactly like IMGUI: `PropertyField`. This bug has been reported to Unity (Sorry I can't find the link now), but is never fixed.
+
+    `SaintsField` heavily relies on `PropertyField` to fallback the appearence. This is not even fixable at this point. If you try to obtain the info by query out the `PropertyField` element, you'll notice that Unity is internally using a script (rather than a uss style) to update it's label width.
+
+    Even without using any custom inspector, if you use your UI Toolkit `PropertyDrawer` with default fields, your inspector label will not aligned, and makes it look really rediculous.
+
+    This is not fixable.
+
+3.  `DropdownField` will tread a label's change as a value change... I have no idea why this happens and why only `DropdownField`. Luckily this change event will give a `newValue=null` so I can work around with it.
+
+4.  Again because the label width issue. `SaintsField`'s label won't take more place if the label gets super long. This is different from UI Toolkit.
+
+If you're in Unity 2022.2+ (from which Unity use UI Toolkit as default inspector), `SaintsField` will switch to UI Toolkit too. If you want to use the IMGUI version, you can add a macro `-define:SAINTSFIELD_UI_TOOLKIT_DISABLE` to disable UI Toolkit.
