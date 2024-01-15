@@ -2758,7 +2758,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234ffe6968d5bb2418d803732892acbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  addressableLabel: default
+  addressableLabel: Label1
 --- !u!1 &1227266396
 GameObject:
   m_ObjectHideFlags: 0

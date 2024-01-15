@@ -17,6 +17,7 @@ namespace SaintsField.Editor.Drawers
 
     public class SaintsAdvancedDropdown : UnityAdvancedDropdown
     {
+        #region IMGUI
         private readonly IAdvancedDropdownList _dropdownListValue;
 
         private readonly Dictionary<UnityAdvancedDropdownItem, object> _itemToValue = new Dictionary<UnityAdvancedDropdownItem, object>();
@@ -410,15 +411,6 @@ namespace SaintsField.Editor.Drawers
             #endregion
         }
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute,
-            VisualElement container,
-            Label fakeLabel,
-            object parent)
-        {
-            return new Label("Not supported yet");
-        }
-
         private static IEnumerable<float> GetDropdownPageHeight(IAdvancedDropdownList dropdownList, float itemHeight, float sepHeight)
         {
             if (dropdownList.ChildCount() == 0)
@@ -507,7 +499,19 @@ namespace SaintsField.Editor.Drawers
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
+        #endregion
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container,
+            Label fakeLabel,
+            object parent)
+        {
+            return new VisualElement();
+        }
+
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox(_error, HelpBoxMessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);
+
     }
 }

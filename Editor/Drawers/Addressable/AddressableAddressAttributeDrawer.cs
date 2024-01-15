@@ -174,6 +174,7 @@ namespace SaintsField.Editor.Drawers.Addressable
 
             // Debug.Log($"AnimatorStateAttributeDrawer: {newAnimatorStates}");
             HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
+            // ReSharper disable once InvertIf
             if (error != helpBoxElement.text)
             {
                 helpBoxElement.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
@@ -181,46 +182,12 @@ namespace SaintsField.Editor.Drawers.Addressable
             }
         }
 
-//         private static void SetDropdownNoNotice(SerializedProperty property, DropdownField dropdownField, MetaInfo metaInfo)
-//         {
-//             dropdownField.choices = metaInfo.AnimatorStates.Select(each => each.ToString()).ToList();
-//             int curSelect;
-//             SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
-//             if (curStateSpeedProp == null)
-//             {
-//                 curSelect = Util.ListIndexOfAction(metaInfo.AnimatorStates, each => each.stateName == property.stringValue);
-//             }
-//             else
-//             {
-//                 curSelect = Util.ListIndexOfAction(metaInfo.AnimatorStates, each =>
-//                     each.stateNameHash == property.FindPropertyRelative("stateNameHash").intValue
-//                     && each.layerIndex == property.FindPropertyRelative("layerIndex").intValue
-//                 );
-//             }
-//
-//             // _dropdownField.index = curSelect;
-//             if(curSelect >= 0)
-//             {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_STATE_DRAW_PROCESS
-//                     Debug.Log($"AnimatorStateAttributeDrawer: set to = {_dropdownField.choices[curSelect]}");
-// #endif
-//                 dropdownField.SetValueWithoutNotify(metaInfo.AnimatorStates[curSelect].ToString());
-//                 // _dropdownField.text = _dropdownField.choices[curSelect];
-//             }
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_STATE_DRAW_PROCESS
-//                 Debug.Log($"AnimatorStateAttributeDrawer: options={string.Join(",", _dropdownField.choices)}");
-// #endif
-//             // return curSelect;
-//         }
-
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
         {
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             dropdownField.label = labelOrNull;
         }
-
-
         #endregion
     }
 }
