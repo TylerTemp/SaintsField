@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
 
             Debug.Log(property.propertyPath);
 
-            propertyField.schedule.Execute(() => FixUnityShit(property, propertyField)).StartingIn(200);
+            propertyField.schedule.Execute(() => FixUnityShit(property, propertyField));
 
             return propertyField;
             // return new TextField(property.displayName);
@@ -39,11 +39,13 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
 
         private void FixUnityShit(SerializedProperty property, VisualElement root)
         {
-            root.ClearClassList();
-            foreach (VisualElement child in root.Children())
-            {
-                child.ClearClassList();
-            }
+            // root.schedule.Execute(() => FixUnityShit(property, root)).StartingIn(200);
+
+            // root.ClearClassList();
+            // foreach (VisualElement child in root.Children())
+            // {
+            //     child.ClearClassList();
+            // }
 
             // root.style.flexDirection = FlexDirection.Row;
             // CleanClasses(root);
@@ -52,19 +54,19 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             // root.AddToClassList("unity-base-field");
             // root.style.marginLeft = 0;
             // root.style.marginRight = 0;
-            bool isNested = property.propertyPath.Contains(".");
-            if (root.childCount == 0)
-            {
-                return;
-            }
-
-            VisualElement firstChild = root.Children().First();
-            // firstChild.ClearClassList();
-            firstChild.style.flexDirection = FlexDirection.Row;
-            // firstChild.AddToClassList("unity-base-field");
-
-            root.parent.Add(firstChild);
-            root.RemoveFromHierarchy();
+            // bool isNested = property.propertyPath.Contains(".");
+            // if (root.childCount == 0)
+            // {
+            //     return;
+            // }
+            //
+            // VisualElement firstChild = root.Children().First();
+            // // firstChild.ClearClassList();
+            // firstChild.style.flexDirection = FlexDirection.Row;
+            // // firstChild.AddToClassList("unity-base-field");
+            //
+            // root.parent.Add(firstChild);
+            // root.RemoveFromHierarchy();
 
             // firstChild.style.flexGrow = 1;
             // firstChild.AddToClassList("unity-base-field");
@@ -80,10 +82,10 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
                 return;
             }
 
-            label.ClearClassList();
+            // label.ClearClassList();
             label.style.borderLeftWidth = label.style.borderRightWidth = 1;
             label.style.borderLeftColor = label.style.borderRightColor = Color.blue;
-            label.style.width = StyleKeyword.Null;
+            // label.style.width = StyleKeyword.Null;
             // Debug.Log(label.text);
             // label.AddToClassList("unity-text-element");
             // label.AddToClassList("unity-label");
@@ -92,14 +94,15 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             // label.AddToClassList("unity-text-field__label");
 
             // label.AddToClassList("unity-base-field__label");
-            // label.style.width = StyleKeyword.Null;
+            label.style.width = StyleKeyword.Auto;
+            Debug.Log("width auto");
             // label.style.width = 1;
 
-            VisualElement input = label.parent.Q<VisualElement>(className: "unity-base-text-field__input");
-            input.ClearClassList();
-            input.style.borderLeftWidth = input.style.borderRightWidth = 1;
-            input.style.borderLeftColor = input.style.borderRightColor = Color.red;
-            input.style.flexGrow = 1;
+            // VisualElement input = label.parent.Q<VisualElement>(className: "unity-base-text-field__input");
+            // input.ClearClassList();
+            // input.style.borderLeftWidth = input.style.borderRightWidth = 1;
+            // input.style.borderLeftColor = input.style.borderRightColor = Color.red;
+            // input.style.flexGrow = 1;
             // input.style.flexGrow = 1;
             // input.AddToClassList("unity-base-text-field__input");
             // input.AddToClassList("unity-base-text-field__input--single-line");

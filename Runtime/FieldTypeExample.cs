@@ -9,5 +9,7 @@ namespace SaintsField
 
         [SerializeField, FieldType(typeof(FieldTypeExample))]
         private BoxCollider _collider;
+
+        public string normal;
     }
 }

@@ -1514,6 +1514,23 @@ namespace SaintsField.Editor.Core
                     // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
                     // Debug.Log($"container={container.Count}");
                     thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ForEach(each => each.RemoveFromHierarchy());
+                    Label label = thisPropField.Q<Label>(className: "unity-label");
+                    if (label != null)
+                    {
+                        label.style.width = StyleKeyword.Auto;
+                        Debug.Log(label.style.width);
+                        label.RegisterCallback<GeometryChangedEvent>(evt =>
+                        {
+                            Label targetLabel = (Label)evt.target;
+                            if(targetLabel.style.width != StyleKeyword.Auto)
+                            {
+                                targetLabel.style.width = StyleKeyword.Auto;
+                            }
+                            // Debug.Log(targetLabel.style.width);
+                            // Debug.Log(evt.target.sty);
+                        });
+                    }
+
                 });
 
                 // foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
