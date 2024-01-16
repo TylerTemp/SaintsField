@@ -4,9 +4,11 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Core
 {
@@ -809,7 +811,7 @@ namespace SaintsField.Editor.Core
 
             return _rootElement;
         }
-#else
+#endif
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // Debug.Log($"raw pos={position.y} height={position.height}");
@@ -1243,7 +1245,6 @@ namespace SaintsField.Editor.Core
             // PropertyPathToShared[property.propertyPath].changed = false;
             SetValueChanged(property, false);
         }
-#endif
         #endregion
 
 
