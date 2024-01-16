@@ -12,10 +12,17 @@ namespace SaintsField.Samples.Scripts.UIKit
 
         // public int normal;
         public string content;
-        [UIToolkit] public string contentFixed;
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        [UIToolkit]
+#endif
+        public string contentFixed;
 
         [field: SerializeField] public string AutoContent { get; private set; }
-        [field: SerializeField, UIToolkit] public string AutoContentFixed { get; private set; }
+        [field: SerializeField
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+                , UIToolkit
+#endif
+        ] public string AutoContentFixed { get; private set; }
 
         [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
         [ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;

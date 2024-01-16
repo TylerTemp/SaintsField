@@ -6,7 +6,6 @@ namespace SaintsField.Samples.Scripts
     {
         [AddComponent, GetComponent] public Dummy myDummy;
         [AddComponent(typeof(BoxCollider)), GetComponent] public GameObject myObj;
-        [UIToolkit]
         public string fallbackStyle;
     }
 }
