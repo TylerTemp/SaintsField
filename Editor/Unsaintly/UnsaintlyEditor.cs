@@ -38,10 +38,12 @@ namespace SaintsField.Editor.Unsaintly
             {
                 ObjectField objectField = new ObjectField("Script")
                 {
+                    bindingPath = "m_Script",
                     value = _monoScript,
                     allowSceneObjects = false,
                     objectType = typeof(MonoScript),
                 };
+                objectField.Bind(serializedObject);
                 objectField.SetEnabled(false);
                 root.Add(objectField);
             }
@@ -51,7 +53,7 @@ namespace SaintsField.Editor.Unsaintly
                 AbsRenderer renderer = MakeRenderer(fieldWithInfo, TryFixUIToolkit);
                 if(renderer != null)
                 {
-                    root.Add(renderer.Render());
+                    root.Add(renderer.CreateVisualElement());
                 }
             }
 
@@ -60,7 +62,7 @@ namespace SaintsField.Editor.Unsaintly
 
         protected virtual bool TryFixUIToolkit => true;
         #endregion
-#else
+#endif
 
         #region IMGUI
         public virtual void OnEnable()
@@ -89,10 +91,12 @@ namespace SaintsField.Editor.Unsaintly
             foreach (UnsaintlyFieldWithInfo fieldWithInfo in _fieldWithInfos)
             {
                 // ReSharper disable once ConvertToUsingDeclaration
-                using(AbsRenderer renderer = MakeRenderer(fieldWithInfo, false))
-                {
+                AbsRenderer renderer = MakeRenderer(fieldWithInfo, false);
+                // ReSharper disable once InvertIf
+                if(renderer != null){
                     // Debug.Log($"gen renderer {renderer}");
-                    renderer?.Render();
+                    renderer.Render();
+                    renderer.AfterRender();
                     // renderer.AfterRender();
                 }
             }
@@ -100,7 +104,7 @@ namespace SaintsField.Editor.Unsaintly
             serializedObject.ApplyModifiedProperties();
         }
         #endregion
-#endif
+
         #endregion
 
         private void Setup()

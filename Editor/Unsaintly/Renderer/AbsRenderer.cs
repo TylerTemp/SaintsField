@@ -9,10 +9,10 @@ using UnityEngine.UIElements;
 namespace SaintsField.Editor.Unsaintly.Renderer
 {
     public abstract class AbsRenderer
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-#else
-        : IDisposable
-#endif
+// #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+// #else
+//         : IDisposable
+// #endif
     {
         protected readonly UnsaintlyFieldWithInfo fieldWithInfo;
         protected readonly SerializedObject serializedObject;
@@ -26,18 +26,17 @@ namespace SaintsField.Editor.Unsaintly.Renderer
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public abstract VisualElement Render();
-#else
+        public abstract VisualElement CreateVisualElement();
+#endif
         public abstract void Render();
         public virtual void AfterRender()
         {
         }
 
-        public void Dispose()
-        {
-            AfterRender();
-        }
-#endif
+        // public void Dispose()
+        // {
+        //     AfterRender();
+        // }
 
         // NA: NaughtyEditorGUI
         protected static bool FieldLayout(object value, string label)

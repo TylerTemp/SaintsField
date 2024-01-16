@@ -1,8 +1,7 @@
-﻿#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+﻿using UnityEditor;
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-#else
-using UnityEditor;
 #endif
 
 namespace SaintsField.Editor.Unsaintly.Renderer
@@ -17,7 +16,7 @@ namespace SaintsField.Editor.Unsaintly.Renderer
 
         private PropertyField _result;
 
-        public override VisualElement Render()
+        public override VisualElement CreateVisualElement()
         {
             PropertyField result = new PropertyField(serializedObject.FindProperty(fieldWithInfo.fieldInfo.Name));
 
@@ -46,12 +45,12 @@ namespace SaintsField.Editor.Unsaintly.Renderer
             _result = null;
         }
 
-#else
+#endif
         public override void Render()
         {
             SerializedProperty property = serializedObject.FindProperty(fieldWithInfo.fieldInfo.Name);
             EditorGUILayout.PropertyField(property);
         }
-#endif
+
     }
 }

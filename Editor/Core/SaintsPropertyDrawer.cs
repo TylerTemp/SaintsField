@@ -1535,7 +1535,9 @@ namespace SaintsField.Editor.Core
                 topRoot.Clear();
                 topRoot.Add(containerElement);
 
-                thisPropField.Bind(property.serializedObject);
+                // thisPropField.Bind(property.serializedObject);
+                thisPropField.Unbind();
+                thisPropField.BindProperty(property.serializedObject);
                 thisPropField.RegisterValueChangeCallback(_ => onValueChangedCallback(null));
             }
 
