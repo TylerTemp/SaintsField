@@ -1,12 +1,13 @@
 ﻿using UnityEditor;
-using UnityEngine;
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Unsaintly.Renderer
 {
     public class NonSerializedFieldRenderer: AbsRenderer
     {
-        public NonSerializedFieldRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo) : base(editor, fieldWithInfo)
+        public NonSerializedFieldRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(editor, fieldWithInfo, tryFixUIToolkit)
         {
         }
 

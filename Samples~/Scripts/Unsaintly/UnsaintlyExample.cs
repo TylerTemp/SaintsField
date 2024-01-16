@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.Unsaintly
 {
-    public class General : MonoBehaviour
+    public class UnsaintlyExample : MonoBehaviour
     {
         [Ordered] public string myStartField;
         [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
@@ -33,5 +33,6 @@ namespace SaintsField.Samples.Scripts.Unsaintly
         }
 
         [Ordered] public string myOtherFieldUnderneath;
+        [Ordered] public string other;
     }
 }

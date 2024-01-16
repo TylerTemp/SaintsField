@@ -58,9 +58,12 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.1**
+**2.0.2**
 
-Fix UI Toolkit breaks old Unity versions.
+1.  When using UI Toolkit mixed with default field without a drawer, now you can add `[UIToolkit]` so `SaintsField` will try to align the label width the same way as UI Toolkit does.
+2.  `UnsaintlyEditor` will try to fix the label width issue when using UI Toolkit. If you're using `UnsaintlyEditor`, you do not need the `[UIToolkit]` attribute.
+
+UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1580,6 +1583,12 @@ public class ButtonAddOnClickExample: MonoBehaviour
 
 ![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
 
+#### `UIToolkit` ####
+
+Add this only to field that has not `SaintsField` attribute to make this field's label behave like UI Toolkit. This does not work for pure `IMGUI` drawer. This is a fix for Unity's bugged `PropertyField` label.
+
+This is only available if you have `UI Toolkit` enabled (Unity 2022.2+ with not custom `SAINTSFIELD_UI_TOOLKIT_DISABLE` marco)
+
 ### Other Tools ###
 
 #### Addressable ####
@@ -1648,7 +1657,13 @@ So here is the `UnsaintlyEditor`. It provides the minimal functions I think that
 
 1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`.
 2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
-3.  `UnsaintlyEditor` has no layout at all. It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`). It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
+3.  `UnsaintlyEditor` 
+
+    *   has no layout at all. I
+    *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`). 
+    *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
+    *   Supports both `UI Toolkit` and `IMGUI`.
+    *   When using `UI Toolkit`, it'll try to fix the old style field, change the label behavior like UI Toolkit. (This fix does not work if the fallback drawer is a pure `IMGUI` drawer)
 
 If you are interested, here is how to use it.
 
@@ -1664,10 +1679,36 @@ using UnityEditor;
 [CustomEditor(typeof(UnityEngine.Object), true)]
 public class MyEditor : UnsaintlyEditor
 {
+    // If you're using UI Toolkit and the label fix is buggy, turn it off by uncomment next line
+    // protected override bool TryFixUIToolkit => false;
 }
 ```
 
 Change the value of `typeof` if you only want to apply to a specific type, like a `MonoBehavior` or `ScriptableObject`.
+
+**About NaughtyAttributes**
+
+To work with `NaughtyAttributes`: 
+
+If you're using `IMGUI`, then do **NOT** use `UnsaintlyEditor`, and ensure `SaintsField` decorator above (or ahead) of any NA's attributes, and add `Label(" ")` when necessary.
+
+If you're using `UI Toolkit`, then do:
+
+```csharp
+[CanEditMultipleObjects]
+[CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
+public class UnsaintlySimpleMonoEditor : UnsaintlyEditor
+{
+}
+
+[CanEditMultipleObjects]
+[CustomEditor(typeof(UnityEngine.ScriptableObject), true)]
+public class UnsaintlySimpleScriptableObjectEditor : UnsaintlyEditor
+{
+}
+```
+
+And you're good to go.
 
 ##### `Button` #####
 
@@ -1835,6 +1876,9 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 
     NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
 
+Special Note: when using `UI Toolkit` but the fallback drawer is a pure `IMGUI`, because of the limitation from Unity, some drawers will not work. 
+For example: `SaintsField` can work with `NaughtyAttributes`'s `CurveRange`, `InputAxis`, etc. But not `ProgressBar` because it uses some special `IMGUI` features.
+
 My (not full) test about compatibility:
 
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
@@ -1849,15 +1893,15 @@ If you encounter any issue, please report it to the issue page. However, there a
 
 1.  Label width. UI Toolkit uses a fixed label width 120px. However, this value is different when the field is nested and indented.
 
-    In IMGUI, we have `EditorGUIUtility.labelWidth`, `EditorGUI.indentLevel`, which is absolutly not avaliable in UI Toolkit, and there is no way to get the label width. `SaintsField` just use the fixed label width.
+    In IMGUI, we have `EditorGUIUtility.labelWidth`, `EditorGUI.indentLevel`, which is absolutely not available in UI Toolkit, and there is no way to get the label width. `SaintsField` just use the fixed label width.
 
 2.  Even most UI Toolkit fields are fixed label width, there is one that the label width behavior exactly like IMGUI: `PropertyField`. This bug has been reported to Unity (Sorry I can't find the link now), but is never fixed.
 
-    `SaintsField` heavily relies on `PropertyField` to fallback the appearence. This is not even fixable at this point. If you try to obtain the info by query out the `PropertyField` element, you'll notice that Unity is internally using a script (rather than a uss style) to update it's label width.
+    `SaintsField` heavily relies on `PropertyField` to fallback the appearance. This is not even fixable at this point. If you try to obtain the info by query out the `PropertyField` element, you'll notice that Unity is internally using a script (rather than a uss style) to update it's label width.
 
-    Even without using any custom inspector, if you use your UI Toolkit `PropertyDrawer` with default fields, your inspector label will not aligned, and makes it look really rediculous.
+    Even without using any custom inspector, if you use your UI Toolkit `PropertyDrawer` with default fields, your inspector label will not aligned, and makes it looks really ridiculous.
 
-    This is not fixable.
+    `SaintsField` now will try to patch it but not guaranteed. You can also add a `[UIToolkit]` to apply this fix to non-saints fields.
 
 3.  `PropertyField` of an `Object` will give an error when click: `NullReferenceException: ... UnityEditor.ProjectBrower.FrameObject...`. Clicking will still lead you to active the target object, but I have no idea where this came from. Even official's example will have this error if you just add a `PropertyField` to it. Clicking on the error message will lead to the `Console` tab's layout got completely messed up.
 

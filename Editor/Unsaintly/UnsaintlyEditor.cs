@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Unsaintly
 
             foreach (UnsaintlyFieldWithInfo fieldWithInfo in _fieldWithInfos)
             {
-                AbsRenderer renderer = MakeRenderer(fieldWithInfo);
+                AbsRenderer renderer = MakeRenderer(fieldWithInfo, TryFixUIToolkit);
                 if(renderer != null)
                 {
                     root.Add(renderer.Render());
@@ -57,6 +57,8 @@ namespace SaintsField.Editor.Unsaintly
 
             return root;
         }
+
+        protected virtual bool TryFixUIToolkit => true;
         #endregion
 #else
 
@@ -87,7 +89,7 @@ namespace SaintsField.Editor.Unsaintly
             foreach (UnsaintlyFieldWithInfo fieldWithInfo in _fieldWithInfos)
             {
                 // ReSharper disable once ConvertToUsingDeclaration
-                using(AbsRenderer renderer = MakeRenderer(fieldWithInfo))
+                using(AbsRenderer renderer = MakeRenderer(fieldWithInfo, false))
                 {
                     // Debug.Log($"gen renderer {renderer}");
                     renderer?.Render();
@@ -293,6 +295,7 @@ namespace SaintsField.Editor.Unsaintly
         private IEnumerable<string> GetSerializedProperties()
         {
             // outSerializedProperties.Clear();
+            // ReSharper disable once ConvertToUsingDeclaration
             using (SerializedProperty iterator = serializedObject.GetIterator())
             {
                 // ReSharper disable once InvertIf
@@ -307,14 +310,14 @@ namespace SaintsField.Editor.Unsaintly
             }
         }
 
-        protected virtual AbsRenderer MakeRenderer(UnsaintlyFieldWithInfo fieldWithInfo)
+        protected virtual AbsRenderer MakeRenderer(UnsaintlyFieldWithInfo fieldWithInfo, bool tryFixUIToolkit)
         {
             // Debug.Log($"field {fieldWithInfo.fieldInfo?.Name}/{fieldWithInfo.fieldInfo?.GetCustomAttribute<ExtShowHideConditionBase>()}");
             switch (fieldWithInfo.renderType)
             {
                 case UnsaintlyRenderType.SerializedField:
                 {
-                    return new SerializedFieldRenderer(this, fieldWithInfo);
+                    return new SerializedFieldRenderer(this, fieldWithInfo, tryFixUIToolkit);
                 }
                 // case (FieldWithInfo.RenderType.GroupAttribute, FieldWithInfo.GroupedType.BoxGroup):
                 // {
@@ -329,13 +332,13 @@ namespace SaintsField.Editor.Unsaintly
                     // return IsVisible(fieldWithInfo.fieldInfo.GetCustomAttribute<ExtShowHideConditionBase>())
                     //     ? new NonSerializedFieldRenderer(this, fieldWithInfo)
                     //     : null;
-                    return new NonSerializedFieldRenderer(this, fieldWithInfo);
+                    return new NonSerializedFieldRenderer(this, fieldWithInfo, tryFixUIToolkit);
 
                 case UnsaintlyRenderType.Method:
                     // return IsVisible(fieldWithInfo.methodInfos[0].GetCustomAttribute<ExtShowHideConditionBase>())
                     //     ? new DOTweenRenderer(this, fieldWithInfo)
                     //     : null;
-                    return new MethodRenderer(this, fieldWithInfo);
+                    return new MethodRenderer(this, fieldWithInfo, tryFixUIToolkit);
 
                 // case (FieldWithInfo.RenderType.Method, _):
                 //     return IsVisible(fieldWithInfo.methodInfo.GetCustomAttribute<ExtShowHideConditionBase>())
@@ -346,7 +349,7 @@ namespace SaintsField.Editor.Unsaintly
                     // return IsVisible(fieldWithInfo.propertyInfo.GetCustomAttribute<ExtShowHideConditionBase>())
                     //     ? new NativeProperty(this, fieldWithInfo)
                     //     : null;
-                    return new NativePropertyRenderer(this, fieldWithInfo);
+                    return new NativePropertyRenderer(this, fieldWithInfo, tryFixUIToolkit);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.renderType), fieldWithInfo.renderType, null);
             }

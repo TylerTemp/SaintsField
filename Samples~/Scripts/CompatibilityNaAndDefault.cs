@@ -20,6 +20,12 @@ namespace SaintsField.Samples.Scripts
         // this wont work too. Please put `SaintsField` before other drawers
         [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), RichLabel("<color=green>+NA</color>")]
         public AnimationCurve naCurveHandled;
+
+        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.ProgressBar(100)]
+        public int progressBar;
+
+        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.InputAxis]
+        public string inputAxis;
 #endif
         //
         // [Tooltip("TT1")]

@@ -1517,18 +1517,7 @@ namespace SaintsField.Editor.Core
                     Label label = thisPropField.Q<Label>(className: "unity-label");
                     if (label != null)
                     {
-                        label.style.width = StyleKeyword.Auto;
-                        Debug.Log(label.style.width);
-                        label.RegisterCallback<GeometryChangedEvent>(evt =>
-                        {
-                            Label targetLabel = (Label)evt.target;
-                            if(targetLabel.style.width != StyleKeyword.Auto)
-                            {
-                                targetLabel.style.width = StyleKeyword.Auto;
-                            }
-                            // Debug.Log(targetLabel.style.width);
-                            // Debug.Log(evt.target.sty);
-                        });
+                        Util.FixLabelWidthLoopUIToolkit(label);
                     }
 
                 });

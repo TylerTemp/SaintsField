@@ -1,8 +1,10 @@
 ﻿using System;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Unsaintly.Renderer
 {
@@ -14,11 +16,13 @@ namespace SaintsField.Editor.Unsaintly.Renderer
     {
         protected readonly UnsaintlyFieldWithInfo fieldWithInfo;
         protected readonly SerializedObject serializedObject;
+        protected readonly bool TryFixUIToolkit;
 
-        protected AbsRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo)
+        protected AbsRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
         {
             this.fieldWithInfo = fieldWithInfo;
             serializedObject = editor.serializedObject;
+            TryFixUIToolkit = tryFixUIToolkit;
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE

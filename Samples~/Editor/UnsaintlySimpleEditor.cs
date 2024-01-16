@@ -21,6 +21,7 @@ namespace SaintsField.Samples.Editor
     [CustomEditor(typeof(UnityEngine.Object), true)]
     public class UnsaintlySimpleEditor : UnsaintlyEditor
     {
+        // protected override bool TryFixUIToolkit => false;
     }
 #endif
 }
