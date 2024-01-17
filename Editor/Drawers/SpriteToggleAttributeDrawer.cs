@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Drawers
         {
             public string Error;
             public FieldType FieldType;
-            public UnityEngine.UI.Image Image;
+            public Image Image;
             public SpriteRenderer SpriteRenderer;
             // public UnityEngine.UI.Button Button;
         }
@@ -273,20 +273,39 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameLabelError(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__SpriteToggle_LabelError";
+        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__SpriteToggle_HelpBox";
         private static string NameButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__SpriteToggle_Button";
-        private static string NameButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__SpriteToggle_ButtonLabel";
+        // private static string NameButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__SpriteToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            Button button = new Button(() =>
+            RadioButton button = new RadioButton
             {
+                name = NameButton(property, index),
+                style =
+                {
+                    height = EditorGUIUtility.singleLineHeight,
+                    paddingLeft = 1,
+                    paddingRight = 1,
+                },
+            };
+
+            button.RegisterValueChangedCallback(changed =>
+            {
+                if (!changed.newValue)
+                {
+                    return;
+                }
+
                 Container dataContainer = GetContainer(saintsAttribute, parent);
                 string error = dataContainer.Error;
-                HelpBox helpBox = container.Q<HelpBox>(NameLabelError(property, index));
-                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-                helpBox.text = error;
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+                if(helpBox.text != error)
+                {
+                    helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                    helpBox.text = error;
+                }
 
                 if (error == "")
                 {
@@ -302,24 +321,8 @@ namespace SaintsField.Editor.Drawers
                         Undo.RecordObject(dataContainer.SpriteRenderer, "SpriteToggle");
                         dataContainer.SpriteRenderer.sprite = thisSprite;
                     }
-                    container.Q<Label>(NameButtonLabel(property, index)).text = SelectedStr;
                 }
-            })
-            {
-                name = NameButton(property, index),
-                style =
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                },
-            };
-
-            VisualElement labelContainer = new Label(NonSelectedStr)
-            {
-                name = NameButtonLabel(property, index),
-                userData = null,
-            };
-
-            button.Add(labelContainer);
+            });
 
             return button;
         }
@@ -329,7 +332,7 @@ namespace SaintsField.Editor.Drawers
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {
-                name = NameLabelError(property, index),
+                name = NameHelpBox(property, index),
                 style =
                 {
                     display = DisplayStyle.None,
@@ -354,7 +357,7 @@ namespace SaintsField.Editor.Drawers
         {
             Container dataContainer = GetContainer(saintsAttribute, parent);
             string error = dataContainer.Error;
-            HelpBox helpBox = container.Q<HelpBox>(NameLabelError(property, index));
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if(helpBox.text != error)
             {
                 helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
@@ -372,11 +375,10 @@ namespace SaintsField.Editor.Drawers
                 : dataContainer.SpriteRenderer.sprite;
 
             bool isToggled = ReferenceEquals(thisSprite, usingSprite);
-            string expectedString = isToggled ? SelectedStr : NonSelectedStr;
-            Label label = container.Q<Label>(NameButtonLabel(property, index));
-            if (label.text != expectedString)
+            RadioButton radioButton = container.Q<RadioButton>(NameButton(property, index));
+            if (radioButton.value != isToggled)
             {
-                label.text = expectedString;
+                radioButton.SetValueWithoutNotify(isToggled);
             }
         }
 

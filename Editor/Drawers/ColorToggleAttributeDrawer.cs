@@ -305,72 +305,87 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string ClassLabelError(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_LabelError";
-        private static string ClassButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_Button";
+        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_HelpBox";
+        private static string NameButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_Button";
         private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            UnityEngine.UIElements.Button button = new UnityEngine.UIElements.Button(() =>
+            RadioButton button = new RadioButton
             {
+                name = NameButton(property, index),
+                style =
+                {
+                    height = EditorGUIUtility.singleLineHeight,
+                    paddingLeft = 1,
+                    paddingRight = 1,
+                },
+            };
+
+            button.RegisterValueChangedCallback(evt =>
+            {
+                if (!evt.newValue)
+                {
+                    return;
+                }
+
                 Container dataContainer = GetContainer(saintsAttribute, parent);
                 string error = dataContainer.Error;
-                HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
-                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-                helpBox.text = error;
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+                if(helpBox.text != error)
+                {
+                    helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                    helpBox.text = error;
+                }
 
                 if (error == "")
                 {
                     SetColor(dataContainer, property.colorValue, ((ColorToggleAttribute)saintsAttribute).Index);
-                    container.Query<Label>(className: ClassButtonLabel(property, index)).First().text = SelectedStr;
-                    // Debug.Log(SelectedStr);
-                    // onChange?.Invoke(property.colorValue);
                 }
-            })
-            {
-                style =
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                },
-            };
-            button.AddToClassList(ClassButton(property, index));
+            });
 
-            VisualElement labelContainer = new Label(NonSelectedStr)
-            {
-                userData = null,
-            };
-            labelContainer.AddToClassList(ClassButtonLabel(property, index));
-            // labelContainer.Add(new Label("test label"));
-
-            button.Add(labelContainer);
-            // button.AddToClassList();
             return button;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            return new HelpBox("", HelpBoxMessageType.Error)
             {
+                name = NameHelpBox(property, index),
                 style =
                 {
                     display = DisplayStyle.None,
                 },
             };
-            helpBox.AddToClassList(ClassLabelError(property, index));
-            return helpBox;
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
+            UpdateToggleDisplay(property, saintsAttribute, index, container, parent);
+        }
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            object parent, object newValue)
+        {
+            UpdateToggleDisplay(property, saintsAttribute, index, container, parent);
+        }
+
+        private static void UpdateToggleDisplay(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, object parent)
+        {
             Container dataContainer = GetContainer(saintsAttribute, parent);
             string error = dataContainer.Error;
-            HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
-            helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-            helpBox.text = error;
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            if (error != helpBox.text)
+            {
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
+            }
 
             if (error != "")
             {
@@ -383,7 +398,11 @@ namespace SaintsField.Editor.Drawers
             Color usingColor = GetColor(dataContainer, toggleAttribute.Index);
 
             bool isToggled = thisColor == usingColor;
-            container.Query<Label>(className: ClassButtonLabel(property, index)).First().text = isToggled? SelectedStr: NonSelectedStr;
+            RadioButton radioButton = container.Q<RadioButton>(NameButton(property, index));
+            if (radioButton.value != isToggled)
+            {
+                radioButton.SetValueWithoutNotify(isToggled);
+            }
         }
 
         #endregion

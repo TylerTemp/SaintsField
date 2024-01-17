@@ -131,77 +131,88 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameLabelError(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_LabelError";
+        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_HelpBox";
         private static string NameButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_Button";
-        private static string NameButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_ButtonLabel";
+        // private static string NameButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__MaterialToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
             MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
 
-            Button button = new Button(() =>
-            {
-                (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
-
-                HelpBox helpBox = container.Q<HelpBox>(NameLabelError(property, index));
-                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-                helpBox.text = error;
-
-                if (error == "")
-                {
-                    Undo.RecordObject(renderer, "MaterialToggle");
-                    Material[] sharedMats = renderer.sharedMaterials.ToArray();
-                    sharedMats[toggleAttribute.Index] = (Material) property.objectReferenceValue;
-
-                    renderer.sharedMaterials = sharedMats;
-
-                    container.Q<Label>(NameButtonLabel(property, index)).text = SelectedStr;
-                    // Debug.Log(SelectedStr);
-                    // onChange?.Invoke(property.colorValue);
-                }
-            })
+            RadioButton button = new RadioButton
             {
                 name = NameButton(property, index),
                 style =
                 {
                     height = EditorGUIUtility.singleLineHeight,
+                    paddingLeft = 1,
+                    paddingRight = 1,
                 },
             };
 
-            VisualElement labelContainer = new Label(NonSelectedStr)
+            button.RegisterValueChangedCallback(changed =>
             {
-                name = NameButtonLabel(property, index),
-                userData = null,
-            };
+                if (!changed.newValue)
+                {
+                    return;
+                }
 
-            button.Add(labelContainer);
-            // button.AddToClassList();
+                (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
+
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+                if (helpBox.text != error)
+                {
+                    helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                    helpBox.text = error;
+                }
+
+                // ReSharper disable once InvertIf
+                if (error == "")
+                {
+                    Material[] sharedMats = renderer.sharedMaterials.ToArray();
+                    sharedMats[toggleAttribute.Index] = (Material)property.objectReferenceValue;
+
+                    Undo.RecordObject(renderer, $"MaterialToggle {property.propertyPath} {index}");
+                    renderer.sharedMaterials = sharedMats;
+                }
+
+            });
             return button;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            return new HelpBox("", HelpBoxMessageType.Error)
             {
-                name = NameLabelError(property, index),
+                name = NameHelpBox(property, index),
                 style =
                 {
                     display = DisplayStyle.None,
                 },
             };
-
-            return helpBox;
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, object parent)
         {
+            UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
+        }
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            object parent, object newValue)
+        {
+            UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
+        }
+
+        private static void UpdateToggleDisplay(SerializedProperty property, int index,
+            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
+        {
             (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
 
-            HelpBox helpBox = container.Q<HelpBox>(NameLabelError(property, index));
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if(helpBox.text != error)
             {
                 helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
@@ -219,11 +230,10 @@ namespace SaintsField.Editor.Drawers
             Material usingMat = renderer.sharedMaterials[toggleAttribute.Index];
 
             bool isToggled = thisMat == usingMat;
-            Label label = container.Q<Label>(NameButtonLabel(property, index));
-            string labelValue = isToggled ? SelectedStr : NonSelectedStr;
-            if (label.text != labelValue)
+            RadioButton radioButton = container.Q<RadioButton>(NameButton(property, index));
+            if (radioButton.value != isToggled)
             {
-                label.text = labelValue;
+                radioButton.SetValueWithoutNotify(isToggled);
             }
         }
 

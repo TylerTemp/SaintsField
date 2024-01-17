@@ -58,10 +58,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.2**
+**2.0.3**
 
-1.  When using UI Toolkit mixed with default field without a drawer, now you can add `[UIToolkit]` so `SaintsField` will try to align the label width the same way as UI Toolkit does.
-2.  `UnsaintlyEditor` will try to fix the label width issue when using UI Toolkit. If you're using `UnsaintlyEditor`, you do not need the `[UIToolkit]` attribute.
+1.  Fix scene out of boundary when you remove a scene from build list
+2.  (UI Toolkit) Expandable use `InspectorElement` so it can use a custom editor if you have one
+3.  (UI Toolkit) Change all `Toggle` drawer to use `RadioButton` component
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 

@@ -1,3 +1,9 @@
+## 2.0.3 ##
+
+1.  Fix scene out of boundary when you remove a scene from build list
+2.  (UI Toolkit) Expandable use `InspectorElement` so it can use a custom editor if you have one
+3.  (UI Toolkit) Change all `Toggle` drawer to use `RadioButton` component
+
 ## 2.0.2 ##
 
 1.  When using UI Toolkit mixed with default field with no drawer, now you can add `[UIToolkit]` so `SaintsField` will try to align the label width the same way as UI Toolkit does.
