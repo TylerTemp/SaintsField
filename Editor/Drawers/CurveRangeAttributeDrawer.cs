@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -13,6 +14,7 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(CurveRangeAttribute))]
     public class CurveRangeAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private string _error;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
@@ -71,6 +73,8 @@ namespace SaintsField.Editor.Drawers
                 ? position
                 : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
+        #endregion
+
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
@@ -80,12 +84,24 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, object parent)
         {
+            CurveRangeAttribute curveRangeAttribute = (CurveRangeAttribute)saintsAttribute;
             CurveField element = new CurveField(new string(' ', property.displayName.Length))
             {
                 value = property.animationCurveValue,
-                ranges = GetRanges((CurveRangeAttribute) saintsAttribute),
+                ranges = GetRanges(curveRangeAttribute),
                 name = NameCurveField(property),
+                // style =
+                // {
+                //     unity
+                // }
             };
+
+            Type type = typeof(CurveField);
+            FieldInfo colorFieldInfo = type.GetField("m_CurveColor", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (colorFieldInfo != null)
+            {
+                colorFieldInfo.SetValue(element, curveRangeAttribute.Color.GetColor());
+            }
 
             return element;
         }

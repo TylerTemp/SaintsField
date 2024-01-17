@@ -21,10 +21,10 @@ namespace SaintsField.Samples.Scripts
         [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), RichLabel("<color=green>+NA</color>")]
         public AnimationCurve naCurveHandled;
 
-        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.ProgressBar(100)]
-        public int progressBar;
+        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.ProgressBar(100), NaughtyAttributes.Label(" ")]
+        public int naProgressBar = 30;
 
-        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.InputAxis]
+        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.InputAxis, NaughtyAttributes.Label(" ")]
         public string inputAxis;
 #endif
         //

@@ -54,7 +54,6 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy only image files (no `.meta` files) from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
-*   (No longer needed:) ~~Select all the image files you copied, and enable the `Advanced - Read/Write` option for these icons.~~
 
 ## Change Log ##
 
@@ -63,6 +62,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 1.  Fix scene out of boundary when you remove a scene from build list
 2.  (UI Toolkit) Expandable use `InspectorElement` so it can use a custom editor if you have one
 3.  (UI Toolkit) Change all `Toggle` drawer to use `RadioButton` component
+4.  (UI Toolkit) Fix `CurveRange` won't allow to set `m_CurveColor` by script
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
