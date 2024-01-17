@@ -471,9 +471,6 @@ namespace SaintsField.Editor.Core
                         }
                     }
 
-#if EXT_INSPECTOR_LOG
-                    Debug.Log($"#draw# icon <{curChunk.Content} {curChunk.IconColor}/>");
-#endif
                     curGUIContent = new GUIContent(oldLabel)
                     {
                         text = null,
@@ -500,6 +497,7 @@ namespace SaintsField.Editor.Core
 
         public const float ImageWidth = SaintsPropertyDrawer.SingleLineHeight + 2;
 
+#if UNITY_2021_3_OR_NEWER
         public IEnumerable<VisualElement> DrawChunksUIToolKit(IEnumerable<RichTextChunk> payloads)
         {
             foreach(RichTextChunk curChunk in payloads)
@@ -561,6 +559,7 @@ namespace SaintsField.Editor.Core
                 }
             }
         }
+#endif
 
         private Texture GetTexture2D(TextureCacheKey cacheKey, RichTextChunk curChunk, float height)
         {
@@ -583,18 +582,17 @@ namespace SaintsField.Editor.Core
             return texture;
         }
 
+#if UNITY_2021_3_OR_NEWER
         public static float TextLengthUIToolkit(TextElement calculator, string origin)
         {
-#if UNITY_2021_3_OR_NEWER
             // float spaceWidth = calculator.MeasureTextSize(" ", 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
             // float textWidth = calculator.MeasureTextSize(original, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
             // int spaceCount = Mathf.CeilToInt(textWidth / spaceWidth);
             // return new string(' ', spaceCount);
 
             return calculator.MeasureTextSize(origin, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
-#else
-            throw new System.NotImplementedException();
-#endif
+
         }
+#endif
     }
 }

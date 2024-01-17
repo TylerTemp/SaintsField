@@ -377,11 +377,6 @@ namespace SaintsField.Editor.Core
         // }
 
         // protected VisualElement ContainerElement { get; private set; }
-        private VisualElement _rootElement;
-        // private SaintsPropertyDrawer _saintsLabelDrawer;
-        // private SaintsPropertyDrawer _saintsFieldDrawer;
-        // private PropertyField _saintsFieldFallback;
-        private VisualElement _overlayLabelContainer;
 
         public struct SaintsPropertyInfo
         {
@@ -412,6 +407,7 @@ namespace SaintsField.Editor.Core
         private static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_LabelField";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_Field";
 
+#if UNITY_2021_3_OR_NEWER
         protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
         {
 //             var nestInfo = new NestInfo
@@ -443,6 +439,7 @@ namespace SaintsField.Editor.Core
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
         }
+#endif
 
         private const string SaintsFieldFallbackClass = "saintsFieldFallback";
 
@@ -561,7 +558,7 @@ namespace SaintsField.Editor.Core
             };
             containerElement.Add(labelFieldContainer);
 
-            _overlayLabelContainer = new VisualElement
+            VisualElement overlayLabelContainer = new VisualElement
             {
                 style =
                 {
@@ -723,7 +720,7 @@ namespace SaintsField.Editor.Core
 
             #endregion
 
-            containerElement.Add(_overlayLabelContainer);
+            containerElement.Add(overlayLabelContainer);
 
             #region below
 
@@ -785,7 +782,7 @@ namespace SaintsField.Editor.Core
             }
             #endregion
 
-            _rootElement = new VisualElement
+            VisualElement rootElement = new VisualElement
             {
                 style =
                 {
@@ -794,15 +791,15 @@ namespace SaintsField.Editor.Core
                 name = NameSaintsPropertyDrawerRoot(property),
                 // userData = this,
             };
-            _rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
-            _rootElement.Add(containerElement);
+            rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
+            rootElement.Add(containerElement);
 
             // Debug.Log($"ContainerElement={containerElement}");
             // _rootElement.RegisterCallback<AttachToPanelEvent>(evt => OnAwakeUiToolKitInternal(property, containerElement, parent, _saintsFieldDrawer==null));
             // _rootElement.RegisterCallback<AttachToPanelEvent>(evt => Debug.Log($"AttachToPanelEvent"));
             // _rootElement.RegisterCallback<GeometryChangedEvent>(evt => Debug.Log($"GeometryChangedEvent"));
             // _rootElement.schedule.Execute(() => Debug.Log("Execute"));
-            _rootElement.schedule.Execute(() =>
+            rootElement.schedule.Execute(() =>
                 OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, fieldIsFallback));
 
 
@@ -810,7 +807,7 @@ namespace SaintsField.Editor.Core
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
 #endif
 
-            return _rootElement;
+            return rootElement;
         }
 #endif
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
