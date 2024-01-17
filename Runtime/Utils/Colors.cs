@@ -56,6 +56,9 @@ namespace SaintsField.Utils
                 case "gray":
                 case "grey":
                     return Color.grey;
+                // ReSharper disable once StringLiteralTypo
+                case "charcoalgray":
+                    return new Color32(48, 48, 48, 255);
                 case "clear":
                     return Color.clear;
                 case "pink":
@@ -68,11 +71,13 @@ namespace SaintsField.Utils
                     return new Color32(128, 0, 255, 255);
                 case "brown":
                     return new Color32(165, 42, 42, 255);
+                // ReSharper disable once StringLiteralTypo
                 case "darkblue":
                     return new Color32(0, 0, 160, 255);
+                // ReSharper disable once StringLiteralTypo
                 case "lightblue":
                     return new Color32(173, 216, 230, 255);
-                case "lime":
+                case "lime":  // this is not error:  https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames
                     return Color.green;
                 case "maroon":
                     return new Color32(128, 0, 0, 255);
@@ -86,6 +91,11 @@ namespace SaintsField.Utils
                     return new Color32(192, 192, 192, 0);
                 case "teal":
                     return new Color32(0, 128, 128, 255);
+
+                // ReSharper disable once StringLiteralTypo
+                case "oceanicslate":
+                    return new Color32(44, 93, 135, 255);
+
 
                 default:
                     return Color.white;

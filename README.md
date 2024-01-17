@@ -1683,6 +1683,9 @@ public class MyEditor : UnsaintlyEditor
 {
     // If you're using UI Toolkit and the label fix is buggy, turn it off by uncomment next line
     // protected override bool TryFixUIToolkit => false;
+    
+    // If you're using IMGUI and it takes too much resources, turn `ConstantRepaint` off by uncomment next line
+    // public override bool RequiresConstantRepaint() => false;
 }
 ```
 

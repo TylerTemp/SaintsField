@@ -23,8 +23,8 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             object parent)
         {
-            var controlID = GUIUtility.GetControlID(FocusType.Passive, position);
-            Rect fieldRect = EditorGUI.PrefixLabel(position, controlID, label);
+            int controlId = GUIUtility.GetControlID(FocusType.Passive, position);
+            Rect fieldRect = EditorGUI.PrefixLabel(position, controlId, label);
             // EditorGUI.DrawRect(position, Color.yellow);
             EditorGUI.DrawRect(fieldRect, EColor.Blue.GetColor());
 
@@ -45,6 +45,8 @@ namespace SaintsField.Editor.Drawers
                 property.floatValue = newValue;
                 SetValueChanged(property);
             }
+
+            EditorGUI.DropShadowLabel(fieldRect, $"{curValue:0.00}%");
 
             // if(e.type == EventType.MouseDrag && )
 
@@ -70,7 +72,7 @@ namespace SaintsField.Editor.Drawers
 
                 style =
                 {
-                    color = EColor.Green.GetColor(),
+                    // color = EColor.Green.GetColor(),
                     // backgroundColor = EColor.Aqua.GetColor(),
                 },
             };
@@ -81,7 +83,7 @@ namespace SaintsField.Editor.Drawers
             {
                 VisualElement background = (VisualElement) backgroundFieldInfo.GetValue(progressBar);
                 Debug.Log(background);
-                background.style.backgroundColor = EColor.Aqua.GetColor();
+                // background.style.backgroundColor = EColor.Aqua.GetColor();
                 // backgroundFieldInfo.SetValue(element, curveRangeAttribute.Color.GetColor());
             }
 

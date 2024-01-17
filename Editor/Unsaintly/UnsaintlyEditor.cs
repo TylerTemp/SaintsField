@@ -65,6 +65,9 @@ namespace SaintsField.Editor.Unsaintly
 #endif
 
         #region IMGUI
+
+        public override bool RequiresConstantRepaint() => true;
+
         public virtual void OnEnable()
         {
             Setup();

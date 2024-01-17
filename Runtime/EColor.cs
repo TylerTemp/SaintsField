@@ -36,6 +36,10 @@ namespace SaintsField
         Pink,
         Indigo,
         Violet,
+
+        // this is extended from Unity UI Toolkit: ProgressBar
+        CharcoalGray,  // progressBar background
+        OceanicSlate,  // progressBar fill
     }
 
     public static class EColorExtensions
