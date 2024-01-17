@@ -42,5 +42,6 @@ namespace SaintsField.Samples.Scripts
         }
 
         [SerializeField] private Nested _nested;
+
     }
 }

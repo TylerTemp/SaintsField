@@ -203,47 +203,50 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            // Object scriptableObject = property.objectReferenceValue;
+            // InspectorElement visualElement = new InspectorElement
+            // {
+            //     style =
+            //     {
+            //         width = Length.Percent(100),
+            //         display = DisplayStyle.None,
+            //     },
+            //     name = NameProps(property),
+            //     userData = null,
+            // };
 
             VisualElement visualElement = new VisualElement
             {
                 style =
                 {
-                    width = Length.Percent(100),
                     display = DisplayStyle.None,
                 },
                 name = NameProps(property),
                 userData = null,
             };
 
-            // if (scriptableObject == null)
-            // {
-            //     return visualElement;
-            // }
-
             return visualElement;
         }
 
-        private static IEnumerable<PropertyField> GetPropertyFields(SerializedProperty property, Object obj)
-        {
-            SerializedObject serializedObject = new SerializedObject(obj);
-            serializedObject.Update();
-
-            foreach (SerializedProperty childProperty in GetAllField(serializedObject))
-            {
-                PropertyField prop = new PropertyField(childProperty)
-                {
-                    style =
-                    {
-                        paddingLeft = IndentWidth,
-                    },
-                };
-                prop.AddToClassList($"{property.propertyPath}__ExpandableAttributeDrawer_Prop");
-                prop.Bind(serializedObject);
-                // visualElement.Add(prop);
-                yield return prop;
-            }
-        }
+        // private static IEnumerable<PropertyField> GetPropertyFields(SerializedProperty property, Object obj)
+        // {
+        //     SerializedObject serializedObject = new SerializedObject(obj);
+        //     serializedObject.Update();
+        //
+        //     foreach (SerializedProperty childProperty in GetAllField(serializedObject))
+        //     {
+        //         PropertyField prop = new PropertyField(childProperty)
+        //         {
+        //             style =
+        //             {
+        //                 paddingLeft = IndentWidth,
+        //             },
+        //         };
+        //         prop.AddToClassList($"{property.propertyPath}__ExpandableAttributeDrawer_Prop");
+        //         prop.Bind(serializedObject);
+        //         // visualElement.Add(prop);
+        //         yield return prop;
+        //     }
+        // }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -267,10 +270,18 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            foreach (PropertyField propertyField in GetPropertyFields(property, property.objectReferenceValue))
+            propsElement.Add(new InspectorElement(property.objectReferenceValue)
             {
-                propsElement.Add(propertyField);
-            }
+                // style =
+                // {
+                //     width = Length.Percent(100),
+                // },
+            });
+
+            // foreach (PropertyField propertyField in GetPropertyFields(property, property.objectReferenceValue))
+            // {
+            //     propsElement.Add(propertyField);
+            // }
         }
 
         #endregion

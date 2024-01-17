@@ -10,5 +10,7 @@ namespace SaintsField.Samples.Scripts
         private Scriptable _scriptable;
 
         [SerializeField, Expandable] private DropdownExample _dropdownExample;
+
+        [SerializeField, Expandable] private SpriteRenderer _spriteRenderer;
     }
 }

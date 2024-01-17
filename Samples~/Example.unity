@@ -3248,7 +3248,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
-  m_Color: {r: 0, g: 1, b: 0.14357352, a: 1}
+  m_Color: {r: 0.119199276, g: 0, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3718,6 +3718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   _dropdownExample: {fileID: 90550607}
+  _spriteRenderer: {fileID: 1457332499}
 --- !u!1 &1631756499
 GameObject:
   m_ObjectHideFlags: 0
