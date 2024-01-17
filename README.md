@@ -63,7 +63,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 2.  (UI Toolkit) Expandable use `InspectorElement` so it can use a custom editor if you have one
 3.  (UI Toolkit) Change all `Toggle` drawer to use `RadioButton` component
 4.  (UI Toolkit) Fix `CurveRange` won't allow to set `m_CurveColor` by script
-5.  No longer disable IMGUI functions when UI Toolkit is active, to allow Unity (or your custom inspector) to use UI Toolkit or IMGUI when you have both available,
+5.  No longer disable IMGUI functions when UI Toolkit is active, to allow Unity (or your custom inspector) to use UI Toolkit or IMGUI when you have both available.
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
@@ -1659,17 +1659,17 @@ So here is the `UnsaintlyEditor`. It provides the minimal functions I think that
 
 1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`.
 2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
-3.  `UnsaintlyEditor` 
+3.  `UnsaintlyEditor`
 
     *   has no layout at all. I
-    *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`). 
+    *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
     *   When using `UI Toolkit`, it'll try to fix the old style field, change the label behavior like UI Toolkit. (This fix does not work if the fallback drawer is a pure `IMGUI` drawer)
 
 If you are interested, here is how to use it.
 
-##### SetUp UnsaintlyEditor #####
+##### Setup UnsaintlyEditor #####
 
 Put this in any one of your `Editor` folders:
 
@@ -1690,7 +1690,7 @@ Change the value of `typeof` if you only want to apply to a specific type, like 
 
 **About NaughtyAttributes**
 
-To work with `NaughtyAttributes`: 
+To work with `NaughtyAttributes`:
 
 If you're using `IMGUI`, then do **NOT** use `UnsaintlyEditor`, and ensure `SaintsField` decorator above (or ahead) of any NA's attributes, and add `Label(" ")` when necessary.
 
@@ -1878,7 +1878,7 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 
     NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
 
-Special Note: when using `UI Toolkit` but the fallback drawer is a pure `IMGUI`, because of the limitation from Unity, some drawers will not work. 
+Special Note: when using `UI Toolkit` but the fallback drawer is a pure `IMGUI`, because of the limitation from Unity, some drawers will not work.
 For example: `SaintsField` can work with `NaughtyAttributes`'s `CurveRange`, `InputAxis`, etc. But not `ProgressBar` because it uses some special `IMGUI` features.
 
 My (not full) test about compatibility:

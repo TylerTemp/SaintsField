@@ -4,7 +4,7 @@
 2.  (UI Toolkit) Expandable use `InspectorElement` so it can use a custom editor if you have one
 3.  (UI Toolkit) Change all `Toggle` drawer to use `RadioButton` component
 4.  (UI Toolkit) Fix `CurveRange` won't allow to set `m_CurveColor` by script
-5.  No longer disable IMGUI functions when UI Toolkit is active, to allow Unity (or your custom inspector) to use UI Toolkit or IMGUI when you have both available, 
+5.  No longer disable IMGUI functions when UI Toolkit is active, to allow Unity (or your custom inspector) to use UI Toolkit or IMGUI when you have both available.
 
 ## 2.0.2 ##
 
