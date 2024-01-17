@@ -411,6 +411,7 @@ namespace SaintsField.Editor.Core
         #region UI
         private static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_LabelField";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__SaintsField_Field";
+
         protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
         {
 //             var nestInfo = new NestInfo
@@ -1518,7 +1519,7 @@ namespace SaintsField.Editor.Core
                     Label label = thisPropField.Q<Label>(className: "unity-label");
                     if (label != null)
                     {
-                        Util.FixLabelWidthLoopUIToolkit(label);
+                        UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
                     }
 
                 });

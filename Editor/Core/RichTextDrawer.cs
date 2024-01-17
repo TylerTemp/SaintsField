@@ -8,11 +8,13 @@ using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Core
 {
-    public class RichTextDrawer: IDisposable
+    public class RichTextDrawer
     {
         // cache
         private struct TextureCacheKey
@@ -496,7 +498,9 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        public IEnumerable<VisualElement> DrawChunksUIToolKit(string oldLabel, IEnumerable<RichTextChunk> payloads)
+        public const float ImageWidth = SaintsPropertyDrawer.SingleLineHeight + 2;
+
+        public IEnumerable<VisualElement> DrawChunksUIToolKit(IEnumerable<RichTextChunk> payloads)
         {
             foreach(RichTextChunk curChunk in payloads)
             {
@@ -544,10 +548,10 @@ namespace SaintsField.Editor.Core
                             marginBottom = 1,
                             paddingLeft = 1,
                             paddingRight = 1,
+                            width = ImageWidth,
+                            height = SaintsPropertyDrawer.SingleLineHeight - 2,
                         },
                     };
-                    img.style.width = SaintsPropertyDrawer.SingleLineHeight + 2;
-                    img.style.height = SaintsPropertyDrawer.SingleLineHeight - 2;
                     img.style.flexShrink = 0;
 
 #if EXT_INSPECTOR_LOG
@@ -577,6 +581,20 @@ namespace SaintsField.Editor.Core
             }
 
             return texture;
+        }
+
+        public static float TextLengthUIToolkit(TextElement calculator, string origin)
+        {
+#if UNITY_2021_3_OR_NEWER
+            // float spaceWidth = calculator.MeasureTextSize(" ", 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
+            // float textWidth = calculator.MeasureTextSize(original, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
+            // int spaceCount = Mathf.CeilToInt(textWidth / spaceWidth);
+            // return new string(' ', spaceCount);
+
+            return calculator.MeasureTextSize(origin, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
+#else
+            throw new System.NotImplementedException();
+#endif
         }
     }
 }

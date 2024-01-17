@@ -64,6 +64,7 @@ namespace SaintsField.Samples.Scripts
             public float LabelFloat;
 
             [Space]
+            [Scene]
             public int Scene;
             [AboveButton("", "above")]
             [SortingLayer]
@@ -86,5 +87,8 @@ namespace SaintsField.Samples.Scripts
 
         [RichLabel("hi<b>!</b><color=red>some <color=\"green\"><b>[<color=yellow><icon='eye.png' /></color><label /></b>]</color>:su<color='yellow'> ff</color> ix</color> and long long long text")]
         public int richLabel;
+
+        [RichLabel("This is a long ride for people have nothing to")]
+        public int richLabel2;
     }
 }

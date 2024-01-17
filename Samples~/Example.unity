@@ -2809,6 +2809,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nativeRange: 2.1
   nativeRangeHandled: 1.05
+  naCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  naCurveHandled:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  progressBar: 0
+  inputAxis: 
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
@@ -3645,10 +3659,10 @@ MonoBehaviour:
   colorIndigo: 
   colorViolet: 
   _myStructWorkAround:
-    LabelFloat: 0
-    Scene: 0
+    LabelFloat: 0.14
+    Scene: 2
     SortingLayer: 
-    Slider: {x: 0, y: 0}
+    Slider: {x: 3.8, y: 5.7000003}
     DefaultFloat: 0
   _defaultDrawerForStruct:
     LabelFloat: 0
@@ -3657,6 +3671,7 @@ MonoBehaviour:
     Slider: {x: 0, y: 0}
     DefaultFloat: 0
   richLabel: 0
+  richLabel2: 0
 --- !u!1 &1621177995
 GameObject:
   m_ObjectHideFlags: 0

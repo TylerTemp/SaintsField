@@ -250,7 +250,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     fullWidthLabelContainer.Clear();
                     fullWidthLabelContainer.style.display = DisplayStyle.Flex;
-                    foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(xml, property.displayName)))
+                    foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(xml, property.displayName)))
                     {
                         fullWidthLabelContainer.Add(rich);
                     }

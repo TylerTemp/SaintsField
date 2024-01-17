@@ -1,9 +1,11 @@
-﻿using SaintsField.Editor.Core;
+﻿using System.Linq;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using UnityEngine.UIElements;
 #endif
 
@@ -139,10 +141,24 @@ namespace SaintsField.Editor.Drawers
                 labelContainer.Clear();
                 if (nowXml != null)
                 {
-                    foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
+                    foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
                     {
                         labelContainer.Add(richChunk);
                     }
+
+                    // this does not work...
+                    // float emptyWidth = RichTextDrawer.TextLengthUIToolkit(generateAnyLabel, " ");
+
+                    // this also not work...
+                    // float workAroundBugFullWidth = RichTextDrawer.TextLengthUIToolkit(generateAnyLabel, "F F");
+                    // float workAroundBugFWidth = RichTextDrawer.TextLengthUIToolkit(generateAnyLabel, "F");
+                    // float emptyWidth = workAroundBugFullWidth - workAroundBugFWidth * 2f;
+
+                    // const float emptyWidth = 3.52f;
+
+                    // int emptyCount = Mathf.CeilToInt(nowLength / emptyWidth);
+                    // Debug.Log($"nowLength={nowLength}, emptyWidth={emptyWidth}, emptyCount={emptyCount}");
+                    // emptyXml = new string(' ', emptyCount);
                 }
 
                 OnLabelStateChangedUIToolkit(property, container, nowXml);
@@ -150,6 +166,7 @@ namespace SaintsField.Editor.Drawers
 
             HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property));
             string curError = (string)helpBox.userData;
+            // ReSharper disable once InvertIf
             if (curError != error)
             {
                 helpBox.userData = error;

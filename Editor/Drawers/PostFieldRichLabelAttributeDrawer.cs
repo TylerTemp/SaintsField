@@ -154,7 +154,7 @@ namespace SaintsField.Editor.Drawers
                 if (xml != null)
                 {
                     IReadOnlyList<RichTextDrawer.RichTextChunk> payloads = RichTextDrawer.ParseRichXml(xml, property.displayName).ToArray();
-                    foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(property.displayName, payloads))
+                    foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(payloads))
                     {
                         richLabel.Add(richChunk);
                     }

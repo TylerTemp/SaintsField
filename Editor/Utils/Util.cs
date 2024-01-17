@@ -264,24 +264,5 @@ namespace SaintsField.Editor.Utils
 
             return -1;
         }
-
-        public static void FixLabelWidthLoopUIToolkit(Label label)
-        {
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-            FixLabelWidthUIToolkit(label);
-            label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
-#endif
-        }
-
-        // ReSharper disable once SuggestBaseTypeForParameter
-        private static void FixLabelWidthUIToolkit(Label label)
-        {
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-            if(label.style.width != StyleKeyword.Auto)
-            {
-                label.style.width = StyleKeyword.Auto;
-            }
-#endif
-        }
     }
 }

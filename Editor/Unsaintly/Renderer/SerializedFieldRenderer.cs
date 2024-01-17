@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Unsaintly.Renderer
 
             // Utils.Util.FixLabelWidthLoopUIToolkit(label);
             _result.UnregisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
-            Utils.Util.FixLabelWidthLoopUIToolkit(label);
+            Utils.UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
             _result = null;
         }
 

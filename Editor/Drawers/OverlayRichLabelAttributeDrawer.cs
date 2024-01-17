@@ -365,7 +365,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     element.RemoveFromHierarchy();
                 }
-                foreach (VisualElement visualElement in _richTextDrawer.DrawChunksUIToolKit(property.displayName, RichTextDrawer.ParseRichXml(xml, property.displayName)))
+                foreach (VisualElement visualElement in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(xml, property.displayName)))
                 {
                     // Debug.Log(visualElement);
                     visualElement.AddToClassList(ClassRichLabelElement(property, index));

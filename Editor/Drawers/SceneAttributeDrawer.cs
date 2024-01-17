@@ -271,6 +271,10 @@ namespace SaintsField.Editor.Drawers
             else
             {
                 int index = property.intValue;
+                if(index >= scenes.Length)
+                {
+                    return (-1, $"? [{index}]");
+                }
                 string scene = scenes[index];
                 return (index, $"{scene} [{index}]");
             }

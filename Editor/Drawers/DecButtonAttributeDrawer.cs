@@ -204,7 +204,7 @@ namespace SaintsField.Editor.Drawers
             labelContainer.userData = newXml;
             labelContainer.Clear();
             IEnumerable<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(newXml, property.displayName);
-            foreach (VisualElement visualElement in RichTextDrawer.DrawChunksUIToolKit(property.displayName, richChunks))
+            foreach (VisualElement visualElement in RichTextDrawer.DrawChunksUIToolKit(richChunks))
             {
                 labelContainer.Add(visualElement);
             }
