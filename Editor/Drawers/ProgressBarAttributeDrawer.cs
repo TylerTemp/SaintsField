@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,9 +13,190 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(ProgressBarAttribute))]
     public class ProgressBarAttributeDrawer: SaintsPropertyDrawer
     {
+        private struct MetaInfo
+        {
+            public string Error;
+
+            public float Min;  // dynamic
+            public float Max;  // dynamic
+            public Color Color;
+            public Color BackgroundColor;
+            public string Title;
+        }
+
+        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, float curValue, object parent)
+        {
+            ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute) saintsAttribute;
+
+            float min = progressBarAttribute.Min;
+            if(progressBarAttribute.MinCallback != null)
+            {
+                (string error, float value) = Util.GetCallbackFloat(parent, progressBarAttribute.MinCallback);
+                if (error != "")
+                {
+                    return new MetaInfo
+                    {
+                        Error = error,
+                        Max = 100f,
+                    };
+                }
+                min = value;
+            }
+
+            float max = progressBarAttribute.Max;
+            if(progressBarAttribute.MaxCallback != null)
+            {
+                (string error, float value) = Util.GetCallbackFloat(parent, progressBarAttribute.MaxCallback);
+                if (error != "")
+                {
+                    return new MetaInfo
+                    {
+                        Error = error,
+                        Max = 100f,
+                    };
+                }
+                max = value;
+            }
+
+            Color color = progressBarAttribute.Color.GetColor();
+
+            if(progressBarAttribute.ColorCallback != null)
+            {
+                (string error, Color value) = GetCallbackColor(parent, progressBarAttribute.ColorCallback);
+                if (error != "")
+                {
+                    return new MetaInfo
+                    {
+                        Error = error,
+                        Max = 100f,
+                    };
+                }
+                color = value;
+            }
+
+            Color backgroundColor = progressBarAttribute.BackgroundColor.GetColor();
+            if(progressBarAttribute.BackgroundColorCallback != null)
+            {
+                (string error, Color value) = GetCallbackColor(parent, progressBarAttribute.BackgroundColorCallback);
+                if (error != "")
+                {
+                    return new MetaInfo
+                    {
+                        Error = error,
+                        Max = 100f,
+                    };
+                }
+                backgroundColor = value;
+            }
+
+            string title;
+            if (progressBarAttribute.TitleCallback != null)
+            {
+                const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                              BindingFlags.Public | BindingFlags.DeclaredOnly;
+
+                MethodInfo methodInfo = parent.GetType().GetMethod(progressBarAttribute.TitleCallback, bindAttr);
+
+                if (methodInfo == null)
+                {
+                    return new MetaInfo
+                    {
+                        Error = $"Can not find method `{progressBarAttribute.TitleCallback}` on `{parent}`",
+                        Max = 100f,
+                    };
+                }
+
+                try
+                {
+                    title = (string)methodInfo.Invoke(parent,
+                        new object[]{curValue, property.displayName});
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.Assert(e.InnerException != null);
+                    Debug.LogException(e);
+                    return new MetaInfo
+                    {
+                        Error = e.InnerException.Message,
+                        Max = 100f,
+                    };
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return new MetaInfo
+                    {
+                        Error = e.Message,
+                        Max = 100f,
+                    };
+                }
+            }
+            else
+            {
+                title = $"{curValue} / {max}";
+            }
+
+            return new MetaInfo
+            {
+                Error = "",
+                Min = min,
+                Max = max,
+                Color = color,
+                BackgroundColor = backgroundColor,
+                Title = title,
+            };
+        }
+
+        public static (string error, Color value) GetCallbackColor(object target, string by)
+        {
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (found.Item1 == ReflectUtils.GetPropType.NotFound)
+            {
+                return ($"No field or method named `{by}` found on `{target}`", Color.white);
+            }
+
+            if (found.Item1 == ReflectUtils.GetPropType.Property)
+            {
+                return ObjToColor(((PropertyInfo)found.Item2).GetValue(target));
+            }
+            if (found.Item1 == ReflectUtils.GetPropType.Field)
+            {
+                return ObjToColor(((FieldInfo)found.Item2).GetValue(target));
+            }
+            // ReSharper disable once InvertIf
+            if (found.Item1 == ReflectUtils.GetPropType.Method)
+            {
+                MethodInfo methodInfo = (MethodInfo)found.Item2;
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                Debug.Assert(methodParams.All(p => p.IsOptional));
+                // Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                return ObjToColor(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+            }
+            throw new ArgumentOutOfRangeException(nameof(found), found, null);
+        }
+
+        private static (string error, Color color) ObjToColor(object obj)
+        {
+            if (obj is Color color)
+            {
+                return ("", color);
+            }
+            if (obj is string str)
+            {
+                return ("", Colors.GetColorByStringPresent(str));
+            }
+
+            if (obj is EColor eColor)
+            {
+                return ("", eColor.GetColor());
+            }
+
+            return ($"target is not a color: {obj}", Color.white);
+        }
 
         #region IMGUI
-
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool hasLabelWidth)
         {
@@ -55,56 +238,91 @@ namespace SaintsField.Editor.Drawers
             //     Debug.Log($"cap: {e.type} {e.isMouse}, {e.button}, {e.mousePosition}");
             // }
         }
-
         #endregion
 
-        // private struct
+        #region UI Toolkit
+
+        private class UIToolkitPayload
+        {
+            public bool isMouseDown;
+            public readonly VisualElement Background;
+            public readonly VisualElement Progress;
+            public MetaInfo metaInfo;
+
+            public UIToolkitPayload(VisualElement background, VisualElement progress, MetaInfo metaInfo)
+            {
+                Background = background;
+                Progress = progress;
+                isMouseDown = false;
+                this.metaInfo = metaInfo;
+            }
+        }
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, Label fakeLabel, object parent)
         {
+            MetaInfo metaInfo = GetMetaInfo(
+                property,
+                saintsAttribute,
+                property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue ,
+                parent);
+
             ProgressBar progressBar = new ProgressBar
             {
-                title = property.displayName,
-                lowValue = 0f,
-                highValue = 100f,
+                title = metaInfo.Title,
+                lowValue = 0,
+                highValue = metaInfo.Max - metaInfo.Min,
                 value = property.floatValue,
 
-                style =
-                {
-                    // color = EColor.Green.GetColor(),
-                    // backgroundColor = EColor.Aqua.GetColor(),
-                },
+                // style =
+                // {
+                //     color = EColor.Green.GetColor(),
+                //     backgroundColor = EColor.Green.GetColor(),
+                // },
             };
 
             Type type = typeof(AbstractProgressBar);
             FieldInfo backgroundFieldInfo = type.GetField("m_Background", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            VisualElement background = null;
             if (backgroundFieldInfo != null)
             {
-                VisualElement background = (VisualElement) backgroundFieldInfo.GetValue(progressBar);
-                Debug.Log(background);
+                background = (VisualElement) backgroundFieldInfo.GetValue(progressBar);
                 // background.style.backgroundColor = EColor.Aqua.GetColor();
-                // backgroundFieldInfo.SetValue(element, curveRangeAttribute.Color.GetColor());
+                background.style.backgroundColor = metaInfo.BackgroundColor;
             }
+
+            FieldInfo progressFieldInfo = type.GetField("m_Progress", BindingFlags.NonPublic | BindingFlags.Instance);
+            VisualElement progress = null;
+            if(progressFieldInfo != null)
+            {
+                progress = (VisualElement) progressFieldInfo.GetValue(progressBar);
+                progress.style.backgroundColor = metaInfo.Color;
+            }
+
+            progressBar.userData = new UIToolkitPayload(background, progress, metaInfo);
 
             progressBar.CapturePointer(0);
             progressBar.RegisterCallback<PointerDownEvent>(evt =>
             {
-                Debug.Log($"down: {evt.pointerId}");
+                ((UIToolkitPayload)progressBar.userData).isMouseDown = true;
+                // Debug.Log($"down: {evt.pointerId}");
             });
             progressBar.RegisterCallback<PointerUpEvent>(evt =>
             {
-                Debug.Log($"up: {evt.pointerId}");
+                ((UIToolkitPayload)progressBar.userData).isMouseDown = false;
+                // Debug.Log($"up: {evt.pointerId}");
             });
             progressBar.RegisterCallback<PointerLeaveEvent>(evt =>
             {
-                Debug.Log($"leave: {evt.pointerId}");
+                ((UIToolkitPayload)progressBar.userData).isMouseDown = true;
+                // Debug.Log($"leave: {evt.pointerId}");
             });
             progressBar.RegisterCallback<PointerMoveEvent>(evt =>
             {
-                Debug.Log(evt.localPosition);
-                Debug.Log(evt.pointerId);
-                Debug.Log(progressBar.HasPointerCapture(0));
+                // Debug.Log(evt.localPosition);
+                // Debug.Log(evt.pointerId);
+                // Debug.Log(progressBar.HasPointerCapture(0));
 
                 float curWidth = progressBar.resolvedStyle.width;
                 if(float.IsNaN(curWidth))
@@ -112,7 +330,13 @@ namespace SaintsField.Editor.Drawers
                     return;
                 }
 
-                float curValue = evt.localPosition.x / curWidth * 100f;
+                UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
+                if (!uiToolkitPayload.isMouseDown)
+                {
+                    return;
+                }
+
+                float curValue = evt.localPosition.x / curWidth * 100f + uiToolkitPayload.metaInfo.Min;
                 progressBar.value = curValue;
             });
 
@@ -135,5 +359,6 @@ namespace SaintsField.Editor.Drawers
 
             // return new Slider();
         }
+        #endregion
     }
 }

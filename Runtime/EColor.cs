@@ -102,6 +102,10 @@ namespace SaintsField
                     return Colors.GetColorByName("indigo");
                 case EColor.Violet:
                     return Colors.GetColorByName("violet");
+                case EColor.CharcoalGray:
+                    return Colors.GetColorByName("charcoalgray");
+                case EColor.OceanicSlate:
+                    return Colors.GetColorByName("oceanicslate");
                 default:
                     return Color.white;
             };
