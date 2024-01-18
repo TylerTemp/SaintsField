@@ -1,5 +1,6 @@
 // using MarkupAttributes;
 
+using SaintsField.Unsaintly;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -21,11 +22,29 @@ namespace SaintsField.Samples.Scripts
         [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green), RichLabel("<color=green>+NA</color>")]
         public AnimationCurve naCurveHandled;
 
+        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.InputAxis, NaughtyAttributes.Label(" ")]
+        public string inputAxis;
+
         [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.ProgressBar(100), NaughtyAttributes.Label(" ")]
         public int naProgressBar = 30;
 
-        [RichLabel("<color=green>+NA</color>"), NaughtyAttributes.InputAxis, NaughtyAttributes.Label(" ")]
-        public string inputAxis;
+        // here is the native one
+        [NaughtyAttributes.ProgressBar(100)]
+        public int naNativeProgressBar = 30;
+
+        // well, SaintsField has more function than NA's ProgressBar
+        [ProgressBar(100), RichLabel("<color=green>+SF</color>")]
+        public int sfProgressBar;
+
+        [NaughtyAttributes.BoxGroup("Integers")]
+        public int firstInt;
+
+        public int sepHere;
+
+        [NaughtyAttributes.BoxGroup("Integers")]
+        public int secondInt;
+
+        [ShowInInspector] public const float PI = 3.14f;
 #endif
         //
         // [Tooltip("TT1")]

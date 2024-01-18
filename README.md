@@ -1756,10 +1756,6 @@ Change the value of `typeof` if you only want to apply to a specific type, like 
 
 To work with `NaughtyAttributes`:
 
-If you're using `IMGUI`, then do **NOT** use `UnsaintlyEditor`, and ensure `SaintsField` decorator above (or ahead) of any NA's attributes, and add `Label(" ")` when necessary.
-
-If you're using `UI Toolkit`, then do:
-
 ```csharp
 [CanEditMultipleObjects]
 [CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
@@ -1774,7 +1770,7 @@ public class UnsaintlySimpleScriptableObjectEditor : UnsaintlyEditor
 }
 ```
 
-And you're good to go.
+Note: doing so will disable the editor level of `NaughtyAttribtues`, makes `BoxGroup`, `Foldout` unusable.
 
 ##### `Button` #####
 
