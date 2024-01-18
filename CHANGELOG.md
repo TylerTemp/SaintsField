@@ -1,7 +1,7 @@
 ## 2.0.4 ##
 
 1.  Add `ProgressBar`
-2.  Fix `RichLable(null)` not work in IMGUI
+2.  Fix `RichLable(null)` not work in IMGUI after the UI Toolkit refactor
 3.  Fix `IMGUI` `PropertyScope` not disposed issue
 
 ## 2.0.3 ##

@@ -22,7 +22,13 @@ namespace SaintsField
         public readonly string TitleCallback;
 
         public ProgressBarAttribute(): this(0, 100, -1) { }
+        public ProgressBarAttribute(EColor color=EColor.OceanicSlate, EColor backgroundColor=EColor.CharcoalGray, string colorCallback=null, string backgroundColorCallback=null)
+            : this(0, 100, -1, color, backgroundColor, colorCallback, backgroundColorCallback) { }
+
         public ProgressBarAttribute(float max): this(0, max, -1) { }
+        public ProgressBarAttribute(float max, EColor color=EColor.OceanicSlate, EColor backgroundColor=EColor.CharcoalGray, string colorCallback=null, string backgroundColorCallback=null)
+            : this(0, max, -1, color, backgroundColor, colorCallback, backgroundColorCallback) { }
+
         public ProgressBarAttribute(float max, float step): this(0, max, step) { }
 
         public ProgressBarAttribute(string maxCallback): this(0, maxCallback) { }

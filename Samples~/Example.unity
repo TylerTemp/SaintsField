@@ -4212,9 +4212,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f420c4e1d44beb9a9861f26742c404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minValue: -2
-  maxValue: 15
-  fValue: 12.6
+  myHp: 8
+  myMp: 65.85
+  minValue: -5
+  maxValue: 30
+  fValue: 24.550001
 --- !u!1 &1967770119
 GameObject:
   m_ObjectHideFlags: 0

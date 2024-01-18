@@ -223,7 +223,16 @@ namespace SaintsField.Editor.Drawers
             return ("", title);
         }
 
-        private static float BoundValue(float curValue, float minValue, float maxValue, float step) => step <= 0 ? Mathf.Clamp(curValue, minValue, maxValue) : Util.BoundFloatStep(curValue, minValue, maxValue, step);
+        private static float BoundValue(float curValue, float minValue, float maxValue, float step, bool isInt)
+        {
+            float wrapCurValue = isInt
+                ? Mathf.RoundToInt(curValue)
+                : curValue;
+
+            return step <= 0
+                ? Mathf.Clamp(wrapCurValue, minValue, maxValue)
+                : Util.BoundFloatStep(wrapCurValue, minValue, maxValue, step);
+        }
 
         #region IMGUI
 
@@ -245,6 +254,10 @@ namespace SaintsField.Editor.Drawers
             int controlId = GUIUtility.GetControlID(FocusType.Passive, position);
             // Debug.Log(label.text.Length);
             Rect fieldRect = EditorGUI.PrefixLabel(position, controlId, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - fieldRect.width,
+            };
             // EditorGUI.DrawRect(position, Color.yellow);
 
             MetaInfo metaInfo = GetMetaInfo(saintsAttribute, parent);
@@ -266,6 +279,12 @@ namespace SaintsField.Editor.Drawers
             };
 
             EditorGUI.DrawRect(fillRect, metaInfo.Color);
+
+            if (GUI.enabled)
+            {
+                EditorGUIUtility.AddCursorRect(labelRect, MouseCursor.Link);
+                EditorGUIUtility.AddCursorRect(fieldRect, MouseCursor.SlideArrow);
+            }
 
             Event e = Event.current;
             // Debug.Log($"{e.isMouse}, {e.mousePosition}");
@@ -298,7 +317,7 @@ namespace SaintsField.Editor.Drawers
             {
                 float newPercent = (e.mousePosition.x - fieldRect.x) / fieldRect.width;
                 float newValue = Mathf.Lerp(metaInfo.Min, metaInfo.Max, newPercent);
-                float boundValue = BoundValue(newValue, metaInfo.Min, metaInfo.Max, progressBarAttribute.Step);
+                float boundValue = BoundValue(newValue, metaInfo.Min, metaInfo.Max, progressBarAttribute.Step, isInt);
 
                 // Debug.Log($"boundValue={boundValue}, newValue={newValue}");
 
@@ -370,14 +389,18 @@ namespace SaintsField.Editor.Drawers
 
             #region ProgrssBar
 
+            float curValue = property.propertyType == SerializedPropertyType.Integer
+                ? property.intValue
+                : property.floatValue;
+
             ProgressBar progressBar = new ProgressBar
             {
                 name = NameProgressBar(property),
 
-                title = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue, metaInfo.Min, metaInfo.Max, parent).title,
+                title = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, metaInfo.Min, metaInfo.Max, parent).title,
                 lowValue = 0,
                 highValue = metaInfo.Max - metaInfo.Min,
-                value = property.floatValue,
+                value = curValue,
 
                 style =
                 {
@@ -545,6 +568,7 @@ namespace SaintsField.Editor.Drawers
             UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
 
             float curValue = Mathf.Lerp(uiToolkitPayload.metaInfo.Min, uiToolkitPayload.metaInfo.Max, mousePosition.x / curWidth);
+            // Debug.Log(curValue);
             ChangeValue(property, progressBarAttribute, container, progressBar, curValue, uiToolkitPayload.metaInfo.Min, uiToolkitPayload.metaInfo.Max, onValueChangedCallback, parent);
         }
 
@@ -552,10 +576,14 @@ namespace SaintsField.Editor.Drawers
         {
             // UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
 
-            float newValue = BoundValue(curValue, minValue, maxValue, progressBarAttribute.Step);
+            bool isInt = property.propertyType == SerializedPropertyType.Integer;
+
+            float newValue = BoundValue(curValue, minValue, maxValue, progressBarAttribute.Step, isInt);
+
+            // float wrapNewValue =
 
             // Debug.Log($"curValue={curValue}, newValue={newValue}");
-            float propValue = property.propertyType == SerializedPropertyType.Integer
+            float propValue = isInt
                 ? property.intValue
                 : property.floatValue;
 
@@ -566,21 +594,19 @@ namespace SaintsField.Editor.Drawers
                 return propValue;
             }
 
-            // Debug.Log($"update value to {newValue}");
-
-            progressBar.value = newValue - minValue;
-
             if (property.propertyType == SerializedPropertyType.Integer)
             {
                 int intValue = (int)newValue;
                 property.intValue = intValue;
                 property.serializedObject.ApplyModifiedProperties();
+                progressBar.SetValueWithoutNotify(intValue - minValue);
                 onValueChangedCallback.Invoke(intValue);
             }
             else
             {
                 property.floatValue = newValue;
                 property.serializedObject.ApplyModifiedProperties();
+                progressBar.SetValueWithoutNotify(newValue - minValue);
                 onValueChangedCallback.Invoke(newValue);
             }
 

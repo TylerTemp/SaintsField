@@ -57,13 +57,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.3**
+**2.0.4**
 
-1.  Fix scene out of boundary when you remove a scene from build list
-2.  (UI Toolkit) Expandable use `InspectorElement` so it can use a custom editor if you have one
-3.  (UI Toolkit) Change all `Toggle` drawer to use `RadioButton` component
-4.  (UI Toolkit) Fix `CurveRange` won't allow to set `m_CurveColor` by script
-5.  No longer disable IMGUI functions when UI Toolkit is active, to allow Unity (or your custom inspector) to use UI Toolkit or IMGUI when you have both available.
+1.  Add `ProgressBar`
+2.  Fix `RichLable(null)` not work in IMGUI after the UI Toolkit refactor
+3.  Fix `IMGUI` `PropertyScope` not disposed issue
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
@@ -549,7 +547,7 @@ public class ExpandableExample : MonoBehaviour
 
 This will change the look & behavior of a field.
 
-#### Rate ####
+#### `Rate` ####
 
 A rating stars tool for an `int` field.
 
@@ -945,6 +943,9 @@ public class LayerAttributeExample: MonoBehaviour
 {
     [Layer] public string layerString;
     [Layer] public int layerInt;
+
+    // Unity supports multiple layer selector
+    public LayerMask myLayerMask;
 }
 ```
 
@@ -992,7 +993,7 @@ A dropdown selector for a tag.
 ```csharp
 public class TagExample: MonoBehaviour
 {
-    [Tag] public string _tag;
+    [Tag] public string tag;
 }
 ```
 
@@ -1059,6 +1060,61 @@ public class CurveRangeExample: MonoBehaviour
     public AnimationCurve curve2;
 }
 ```
+
+#### `ProgressBar` ####
+
+A progress bar for `float` or `int` field. This behaves like a slider but more fancy.
+
+Note: Unlike NaughtyAttributes (which is read-only), this **is interactable**.
+
+Parameters:
+
+*   (Optional) `float minValue=0` | `string minCallback=null`: minimum value of the slider
+*   `float maxValue=100` | `string maxCallback=null`: maximum value of the slider
+*   `float step=-1`: the growth step of the slider, `<= 0` means no limit.
+*   `EColor color=EColor.OceanicSlate`: filler color
+*   `EColor backgroundColor=EColor.CharcoalGray`: background color
+*   `string colorCallback=null`: a callback or property name for the filler color. The function must return a `EColor`, `Color`, a name of `EColor`/`Color`, or a hex color string (starts with `#`). This will override `color` parameter.
+*   `string backgroundColorCallback=null`: a callback or property name for the background color.
+*   `string titleCallback=null`: a callback for displaying the title. The function sigunature is:
+
+    ```csharp
+    string TitleCallback(float curValue, float min, float max, string label);
+    ```
+
+    rich text is not supported here
+
+```csharp
+public class ProgressBarExample: MonoBehaviour
+{
+    [ProgressBar(10)] public int myHp;
+    // control step for float rather than free value
+    [ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)] public float myMp;
+
+    [Space]
+    public int minValue;
+    public int maxValue;
+
+    [ProgressBar(nameof(minValue)
+            , nameof(maxValue)  // dynamic min/max
+            , step: 0.05f
+            , backgroundColorCallback: nameof(BackgroundColor)  // dynamic background color
+            , colorCallback: nameof(FillColor)  // dynamic fill color
+            , titleCallback: nameof(Title)  // dynamic title, does not support rich label
+        ),
+    ]
+    [RichLabel(null)]  // make this full width
+    public float fValue;
+
+    private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
+
+    private Color FillColor() => Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
+
+    private string Title(float curValue, float min, float max, string label) => curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
+}
+```
+
+[![progress_bar](https://github.com/TylerTemp/SaintsField/assets/6391063/74085d85-e447-4b6b-a3ff-1bd2f26c5d73)](https://github.com/TylerTemp/SaintsField/assets/6391063/11ad0700-32ba-4280-ae7b-6b6994c9de83)
 
 ### Field Utilities ###
 
@@ -1683,7 +1739,7 @@ public class MyEditor : UnsaintlyEditor
 {
     // If you're using UI Toolkit and the label fix is buggy, turn it off by uncomment next line
     // protected override bool TryFixUIToolkit => false;
-    
+
     // If you're using IMGUI and it takes too much resources, turn `ConstantRepaint` off by uncomment next line
     // public override bool RequiresConstantRepaint() => false;
 }
