@@ -29,33 +29,35 @@ namespace SaintsField.Samples.Scripts
 
         [Space]
 
-        [RichLabel("<color=aqua>██ EColor.</color>Aqua")] public string colorAqua;
-        [RichLabel("<color=black>██ EColor.</color>Black")] public string colorBlack;
-        [RichLabel("<color=blue>██ EColor.</color>Blue")] public string colorBlue;
-        [RichLabel("<color=brown>██ EColor.</color>Brown")] public string colorBrown;
-        [RichLabel("<color=cyan>██ EColor.</color>Cyan")] public string colorCyan;
-        [RichLabel("<color=darkblue>██ EColor.</color>DarkBlue")] public string colorDarkBlue;
-        [RichLabel("<color=fuchsia>██ EColor.</color>Fuchsia")] public string colorFuchsia;
-        [RichLabel("<color=green>██ EColor.</color>Green")] public string colorGreen;
-        [RichLabel("<color=gray>██ EColor.</color>Gray")] public string colorGray;
-        [RichLabel("<color=grey>██ EColor.</color>Grey")] public string colorGrey;
-        [RichLabel("<color=lightblue>██ EColor.</color>LightBlue")] public string colorLightBlue;
-        [RichLabel("<color=lime>██ EColor.</color>Lime")] public string colorLime;
-        [RichLabel("<color=magenta>██ EColor.</color>Magenta")] public string colorMagenta;
-        [RichLabel("<color=maroon>██ EColor.</color>Maroon")] public string colorMaroon;
-        [RichLabel("<color=navy>██ EColor.</color>Navy")] public string colorNavy;
-        [RichLabel("<color=olive>██ EColor.</color>Olive")] public string colorOlive;
-        [RichLabel("<color=orange>██ EColor.</color>Orange")] public string colorOrange;
-        [RichLabel("<color=purple>██ EColor.</color>Purple")] public string colorPurple;
-        [RichLabel("<color=red>██ EColor.</color>Red")] public string colorRed;
-        [RichLabel("<color=silver>██ EColor.</color>Silver")] public string colorSilver;
-        [RichLabel("<color=teal>██ EColor.</color>Teal")] public string colorTeal;
-        [RichLabel("<color=white>██ EColor.</color>White")] public string colorWhite;
-        [RichLabel("<color=yellow>██ EColor.</color>Yellow")] public string colorYellow;
-        [RichLabel("<color=clear>██ EColor.</color>Clear")] public string colorClear;
-        [RichLabel("<color=pink>██ EColor.</color>Pink")] public string colorPink;
-        [RichLabel("<color=indigo>██ EColor.</color>Indigo")] public string colorIndigo;
-        [RichLabel("<color=violet>██ EColor.</color>Violet")] public string colorViolet;
+        [RichLabel("<color=aqua>██ EColor ██</color>")] public string colorAqua = "Aqua";
+        [RichLabel("<color=black>██ EColor ██</color>")] public string colorBlack = "Black";
+        [RichLabel("<color=blue>██ EColor ██</color>")] public string colorBlue = "Blue";
+        [RichLabel("<color=brown>██ EColor ██</color>")] public string colorBrown = "Brown";
+        [RichLabel("<color=cyan>██ EColor ██</color>")] public string colorCyan = "Cyan";
+        [RichLabel("<color=charcoalGray>██ EColor ██</color>")] public string colorCharcoalGray = "CharcoalGray";
+        [RichLabel("<color=darkBlue>██ EColor ██</color>")] public string colorDarkBlue = "DarkBlue";
+        [RichLabel("<color=fuchsia>██ EColor ██</color>")] public string colorFuchsia = "Fuchsia";
+        [RichLabel("<color=green>██ EColor ██</color>")] public string colorGreen = "Green";
+        [RichLabel("<color=gray>██ EColor ██</color>")] public string colorGray = "Gray";
+        [RichLabel("<color=grey>██ EColor ██</color>")] public string colorGrey = "Grey";
+        [RichLabel("<color=oceanicSlate>██ EColor ██</color>")] public string colorOceanicSlate = "OceanicSlate";
+        [RichLabel("<color=lightBlue>██ EColor ██</color>")] public string colorLightBlue = "LightBlue";
+        [RichLabel("<color=lime>██ EColor ██</color>")] public string colorLime = "Lime";
+        [RichLabel("<color=magenta>██ EColor ██</color>")] public string colorMagenta = "Magenta";
+        [RichLabel("<color=maroon>██ EColor ██</color>")] public string colorMaroon = "Maroon";
+        [RichLabel("<color=navy>██ EColor ██</color>")] public string colorNavy = "Navy";
+        [RichLabel("<color=olive>██ EColor ██</color>")] public string colorOlive = "Olive";
+        [RichLabel("<color=orange>██ EColor ██</color>")] public string colorOrange = "Orange";
+        [RichLabel("<color=purple>██ EColor ██</color>")] public string colorPurple = "Purple";
+        [RichLabel("<color=red>██ EColor ██</color>")] public string colorRed = "Red";
+        [RichLabel("<color=silver>██ EColor ██</color>")] public string colorSilver = "Silver";
+        [RichLabel("<color=teal>██ EColor ██</color>")] public string colorTeal = "Teal";
+        [RichLabel("<color=white>██ EColor ██</color>")] public string colorWhite = "White";
+        [RichLabel("<color=yellow>██ EColor ██</color>")] public string colorYellow = "Yellow";
+        [RichLabel("<color=clear>██ EColor ██</color>")] public string colorClear = "Clear";
+        [RichLabel("<color=pink>██ EColor ██</color>")] public string colorPink = "Pink";
+        [RichLabel("<color=indigo>██ EColor ██</color>")] public string colorIndigo = "Indigo";
+        [RichLabel("<color=violet>██ EColor ██</color>")] public string colorViolet = "Violet";
 
         [Serializable]
         private struct MyStruct

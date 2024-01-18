@@ -62,6 +62,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 1.  Add `ProgressBar`
 2.  Fix `RichLable(null)` not work in IMGUI after the UI Toolkit refactor
 3.  Fix `IMGUI` `PropertyScope` not disposed issue
+4.  Add color `charcoalGray`, `oceanicSlate`
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
@@ -98,9 +99,13 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
         `clear`, `pink`, `indigo`, `violet`
 
+    *   Some extra colors from UI Toolkit:
+
+        `charcoalGray`, `oceanicSlate`
+
     *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
 
-    ![color_list](https://github.com/TylerTemp/SaintsField/assets/6391063/d9457df6-3434-4e4b-8fd7-e08a7295cd4d)
+    ![color_list_ui_toolkit_add](https://github.com/TylerTemp/SaintsField/assets/6391063/50ec511b-b914-4395-8b42-793a4389c8da)
 
 *   `bool isCallback=false`
 

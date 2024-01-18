@@ -3,6 +3,7 @@
 1.  Add `ProgressBar`
 2.  Fix `RichLable(null)` not work in IMGUI after the UI Toolkit refactor
 3.  Fix `IMGUI` `PropertyScope` not disposed issue
+4.  Add color `charcoalGray`, `oceanicSlate`
 
 ## 2.0.3 ##
 

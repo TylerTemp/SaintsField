@@ -3609,46 +3609,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee51f7ab1caf4797aba008aceac3d374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rainbow: {fileID: 1571298210}
+  _rainbow: {fileID: 0}
   _callbackToggle: 0
-  arrayLabels:
-  - 
-  - 
-  - 
-  - 
-  _propertyLabel: dynamic
-  colorAqua: 
-  colorBlack: 
-  colorBlue: 
-  colorBrown: 
-  colorCyan: 
-  colorDarkBlue: 
-  colorFuchsia: 
-  colorGreen: 
-  colorGray: 
-  colorGrey: 
-  colorLightBlue: 
-  colorLime: 
-  colorMagenta: 
-  colorMaroon: 
-  colorNavy: 
-  colorOlive: 
-  colorOrange: 
-  colorPurple: 
-  colorRed: 
-  colorSilver: 
-  colorTeal: 
-  colorWhite: 
-  colorYellow: 
-  colorClear: 
-  colorPink: 
-  colorIndigo: 
-  colorViolet: 
+  arrayLabels: []
+  _propertyLabel: 
+  colorAqua: Aqua
+  colorBlack: Black
+  colorBlue: Blue
+  colorBrown: Brown
+  colorCyan: Cyan
+  colorCharcoalGray: CharcoalGray
+  colorDarkBlue: DarkBlue
+  colorFuchsia: Fuchsia
+  colorGreen: Green
+  colorGray: Gray
+  colorGrey: Grey
+  colorOceanicSlate: OceanicSlate
+  colorLightBlue: LightBlue
+  colorLime: Lime
+  colorMagenta: Magenta
+  colorMaroon: Maroon
+  colorNavy: Navy
+  colorOlive: Olive
+  colorOrange: Orange
+  colorPurple: Purple
+  colorRed: Red
+  colorSilver: Silver
+  colorTeal: Teal
+  colorWhite: White
+  colorYellow: Yellow
+  colorClear: Clear
+  colorPink: Pink
+  colorIndigo: Indigo
+  colorViolet: Violet
   _myStructWorkAround:
-    LabelFloat: 0.14
-    Scene: 2
+    LabelFloat: 0
+    Scene: 0
     SortingLayer: 
-    Slider: {x: 3.8, y: 5.7000003}
+    Slider: {x: 0, y: 0}
     DefaultFloat: 0
   _defaultDrawerForStruct:
     LabelFloat: 0
