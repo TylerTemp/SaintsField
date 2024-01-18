@@ -186,7 +186,8 @@ namespace SaintsField.Editor.Drawers
                     decimalPlaces = valueStr.Length - decimalPointIndex - 1;
                 }
 
-                string formatValue = curValue.ToString("F" + decimalPlaces);
+                // string formatValue = curValue.ToString("F" + decimalPlaces);
+                string formatValue = curValue.ToString($"0.{new string('#', decimalPlaces)}");
                 // Debug.Log($"curValue={curValue}, format={formatValue}");
 
                 return ("", $"{formatValue} / {maxValue}");
@@ -225,6 +226,11 @@ namespace SaintsField.Editor.Drawers
         private static float BoundValue(float curValue, float minValue, float maxValue, float step) => step <= 0 ? Mathf.Clamp(curValue, minValue, maxValue) : Util.BoundFloatStep(curValue, minValue, maxValue, step);
 
         #region IMGUI
+
+        private string _imGuiError = "";
+
+        private bool _imgGuiMousePressed;
+
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool hasLabelWidth)
         {
@@ -234,38 +240,98 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             object parent)
         {
+            ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
+
             int controlId = GUIUtility.GetControlID(FocusType.Passive, position);
-            Debug.Log(label.text.Length);
+            // Debug.Log(label.text.Length);
             Rect fieldRect = EditorGUI.PrefixLabel(position, controlId, label);
             // EditorGUI.DrawRect(position, Color.yellow);
-            EditorGUI.DrawRect(fieldRect, EColor.Blue.GetColor());
 
-            float curValue = property.floatValue;
-            float percent = curValue / 100f;
-            Rect fillRect = RectUtils.SplitWidthRect(fieldRect, fieldRect.width * percent).leftRect;
+            MetaInfo metaInfo = GetMetaInfo(saintsAttribute, parent);
+            _imGuiError = metaInfo.Error;
 
-            EditorGUI.DrawRect(fillRect, EColor.Green.GetColor());
+            EditorGUI.DrawRect(fieldRect, metaInfo.BackgroundColor);
+
+            bool isInt = property.propertyType == SerializedPropertyType.Integer;
+            float curValue = isInt
+                ? property.intValue
+                : property.floatValue;
+
+            // float percent = Mathf.Clamp01(curValue / (metaInfo.Max - metaInfo.Min));
+            float percent = Mathf.InverseLerp(metaInfo.Min, metaInfo.Max, curValue);
+            // Debug.Log($"percent={percent:P}");
+            Rect fillRect = new Rect(fieldRect)
+            {
+                width = fieldRect.width * percent,
+            };
+
+            EditorGUI.DrawRect(fillRect, metaInfo.Color);
 
             Event e = Event.current;
             // Debug.Log($"{e.isMouse}, {e.mousePosition}");
             // ReSharper disable once InvertIf
             // Debug.Log($"{e.type} {e.isMouse}, {e.button}, {e.mousePosition}");
 
-            if ((e.type == EventType.MouseDown || e.type == EventType.MouseDrag) && fieldRect.Contains(e.mousePosition))
+            if(e.type == EventType.MouseUp && e.button == 0)
             {
-                float newValue = (e.mousePosition.x - fieldRect.x) / fieldRect.width * 100f;
-                property.floatValue = newValue;
-                SetValueChanged(property);
+                // GUIUtility.hotControl = 0;
+                // Debug.Log($"UP!");
+                _imgGuiMousePressed = false;
+                // Debug.Log("mouse up");
             }
 
-            EditorGUI.DropShadowLabel(fieldRect, $"{curValue:0.00}%");
+            if (e.type == EventType.MouseDown && e.button == 0)
+            {
+                _imgGuiMousePressed = position.Contains(e.mousePosition);
+                // Debug.Log($"mouse down: {_imgGuiMousePressed}");
+            }
 
-            // if(e.type == EventType.MouseDrag && )
+            (string titleError, string title) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, metaInfo.Min, metaInfo.Max, parent);
+            if(_imGuiError == "")
+            {
+                _imGuiError = titleError;
+            }
 
-            // if (position.Contains(e.mousePosition))
-            // {
-            //     Debug.Log($"cap: {e.type} {e.isMouse}, {e.button}, {e.mousePosition}");
-            // }
+            // string title = null;
+
+            if (GUI.enabled && (e.type == EventType.MouseDown || e.type == EventType.MouseDrag) && _imgGuiMousePressed)
+            {
+                float newPercent = (e.mousePosition.x - fieldRect.x) / fieldRect.width;
+                float newValue = Mathf.Lerp(metaInfo.Min, metaInfo.Max, newPercent);
+                float boundValue = BoundValue(newValue, metaInfo.Min, metaInfo.Max, progressBarAttribute.Step);
+
+                // Debug.Log($"boundValue={boundValue}, newValue={newValue}");
+
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (boundValue != curValue)
+                {
+                    if (isInt)
+                    {
+                        property.intValue = (int)boundValue;
+                    }
+                    else
+                    {
+                        property.floatValue = boundValue;
+                    }
+                    SetValueChanged(property);
+
+                    (string titleError, string title) changedTitle = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, boundValue, metaInfo.Min, metaInfo.Max, parent);
+                    if (_imGuiError == "")
+                    {
+                        _imGuiError = changedTitle.titleError;
+                    }
+
+                    title = changedTitle.title;
+
+                    // Debug.Log($"value={newValue}, title={title}");
+                }
+            }
+
+            // _imGuiError = titleError;
+            if (!string.IsNullOrEmpty(title))
+            {
+                EditorGUI.DropShadowLabel(fieldRect, title);
+            }
         }
         #endregion
 

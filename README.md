@@ -1881,9 +1881,6 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 
     NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
 
-Special Note: when using `UI Toolkit` but the fallback drawer is a pure `IMGUI`, because of the limitation from Unity, some drawers will not work.
-For example: `SaintsField` can work with `NaughtyAttributes`'s `CurveRange`, `InputAxis`, etc. But not `ProgressBar` because it uses some special `IMGUI` features.
-
 My (not full) test about compatibility:
 
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.

@@ -994,13 +994,18 @@ namespace SaintsField.Editor.Core
                 {
                     // needFallbackLabel = true;
                     useGuiContent = new GUIContent(label);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                    Debug.Log($"use label empty: `{useGuiContent.text}`");
+#endif
                     // hasLabelSpace = false;
                 }
                 else if (labelAttributeWithIndex.SaintsAttribute == null) // has label, no saints label drawer
                 {
                     // needFallbackLabel = false;
                     useGuiContent = new GUIContent(label);
-                    // hasLabelSpace = false;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                    Debug.Log($"use label not saints label drawer: `{useGuiContent.text}`");
+#endif
                 }
                 else
                 {
@@ -1022,6 +1027,10 @@ namespace SaintsField.Editor.Core
                     useGuiContent = hasLabelSpace
                         ? new GUIContent(label) { text = "                 " }
                         : new GUIContent(label) { text = "" };
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                    Debug.Log($"use label saints label drawer hasLabelSpace={hasLabelSpace}: `{useGuiContent.text}`");
+#endif
 
                     // Debug.Log($"hasLabelSpace={hasLabelSpace}, guiContent.text.length={useGuiContent.text.Length}");
                 }

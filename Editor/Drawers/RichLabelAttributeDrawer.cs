@@ -41,12 +41,12 @@ namespace SaintsField.Editor.Drawers
         protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-            (string error, string _) = RichTextDrawer.GetLabelXml(property, targetAttribute, GetParentTarget(property));
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, GetParentTarget(property));
             // bool result = GetLabelXml(property, targetAttribute) != null;
             // Debug.Log($"richLabel willDraw={result}");
             // return result;
             _error = error;
-            return error != null;
+            return xml != null;
         }
 
         protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,

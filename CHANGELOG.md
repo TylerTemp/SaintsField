@@ -1,3 +1,9 @@
+## 2.0.4 ##
+
+1.  Add `ProgressBar`
+2.  Fix `RichLable(null)` not work in IMGUI
+3.  Fix `IMGUI` `PropertyScope` not disposed issue
+
 ## 2.0.3 ##
 
 1.  Fix scene out of boundary when you remove a scene from build list

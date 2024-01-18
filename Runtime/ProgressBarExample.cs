@@ -7,7 +7,14 @@ namespace SaintsField
         public int minValue;
         public int maxValue;
 
-        [ProgressBar(nameof(minValue), nameof(maxValue), step: 0.05f, backgroundColorCallback: nameof(BackgroundColor), colorCallback: nameof(FillColor), titleCallback: nameof(Title))]
+        [ProgressBar(nameof(minValue)
+                , nameof(maxValue)
+                , step: 0.05f
+                , backgroundColorCallback: nameof(BackgroundColor)
+                , colorCallback: nameof(FillColor)
+                , titleCallback: nameof(Title)
+            ),
+        ]
         [RichLabel(null)]
         public float fValue;
 
@@ -18,14 +25,12 @@ namespace SaintsField
 
         private Color FillColor()
         {
-            return Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(fValue / (maxValue - minValue), 2));
+            return Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
         }
 
         private string Title(float curValue, float min, float max, string label)
         {
-            // string percent = ;
-            string p = (curValue / max).ToString("P");
-            return curValue < 0 ? $"[{label}] Game Over" : $"[{label}] {p}";
+            return curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
         }
     }
 }
