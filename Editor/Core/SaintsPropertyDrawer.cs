@@ -852,396 +852,429 @@ namespace SaintsField.Editor.Core
 
             _usedAttributes.Clear();
 
-            EditorGUI.PropertyScope propertyScope = new EditorGUI.PropertyScope(position, label, property);
-            // propertyScope.Dispose();
-            // GUIContent propertyScoopLabel = propertyScope.content;
-            GUIContent bugFixCopyLabel = new GUIContent(label);
-
-            // Debug.Log($"above: {label.text}");
-
-            #region Above
-
-            Rect aboveRect = EditorGUI.IndentedRect(position);
-
-            Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedAboveDrawers =
-                new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
-            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+            using(new EditorGUI.PropertyScope(position, label, property))
             {
-                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                // propertyScope.Dispose();
+                // GUIContent propertyScoopLabel = propertyScope.content;
+                GUIContent bugFixCopyLabel = new GUIContent(label);
 
-                // ReSharper disable once InvertIf
-                if (drawerInstance.WillDrawAbove(property, eachAttributeWithIndex.SaintsAttribute))
+                // Debug.Log($"above: {label.text}");
+
+                #region Above
+
+                Rect aboveRect = EditorGUI.IndentedRect(position);
+
+                Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>
+                    groupedAboveDrawers =
+                        new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
+                foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
                 {
-                    if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
-                            out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
+                    SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+
+                    // ReSharper disable once InvertIf
+                    if (drawerInstance.WillDrawAbove(property, eachAttributeWithIndex.SaintsAttribute))
                     {
-                        currentGroup = new List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>();
-                        groupedAboveDrawers[eachAttributeWithIndex.SaintsAttribute.GroupBy] = currentGroup;
-                    }
-
-                    currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
-                    // _usedDrawerTypes.Add(eachDrawer[0]);
-                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
-                }
-            }
-
-            float aboveUsedHeight = 0;
-            float aboveInitY = aboveRect.y;
-
-            foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> drawerInfoKv in groupedAboveDrawers)
-            {
-                string groupBy = drawerInfoKv.Key;
-                List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfos = drawerInfoKv.Value;
-
-                if (groupBy == "")
-                {
-                    foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
-                    {
-                        Rect newAboveRect = drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute);
-                        aboveUsedHeight = newAboveRect.y - aboveInitY;
-                        aboveRect = newAboveRect;
-                    }
-                }
-                else
-                {
-                    float totalWidth = aboveRect.width;
-                    float eachWidth = totalWidth / drawerInfos.Count;
-                    float height = 0;
-                    for (int index = 0; index < drawerInfos.Count; index++)
-                    {
-                        (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfos[index];
-                        Rect eachRect = new Rect(aboveRect)
+                        if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
+                                out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
                         {
-                            x = aboveRect.x + eachWidth * index,
-                            width = eachWidth,
-                        };
-                        Rect leftRect = drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute);
-                        height = Mathf.Max(height, leftRect.y - eachRect.y);
-                        // Debug.Log($"height={height}");
-                    }
+                            currentGroup = new List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>();
+                            groupedAboveDrawers[eachAttributeWithIndex.SaintsAttribute.GroupBy] = currentGroup;
+                        }
 
-                    // aboveRect.height = height;
-                    aboveUsedHeight += height;
-                    aboveRect = new Rect(aboveRect)
-                    {
-                        y = aboveRect.y + height,
-                        height = aboveRect.height - height,
-                    };
-                }
-
-                // Debug.Log($"aboveUsedHeight={aboveUsedHeight}");
-            }
-
-            // if(Event.current.type == EventType.Repaint)
-            // {
-            // _aboveUsedHeight = aboveUsedHeight;
-            // }
-
-            // Debug.Log($"{Event.current} {aboveUsedHeight} / {_aboveUsedHeight}");
-
-            #endregion
-
-            Rect fieldRect = EditorGUI.IndentedRect(new Rect(position)
-            {
-                // y = aboveRect.y + (groupedAboveDrawers.Count == 0? 0: aboveRect.height),
-                y = position.y + aboveUsedHeight,
-                height = _labelFieldBasicHeight,
-            });
-
-            // Color backgroundColor = EditorGUIUtility.isProSkin
-            //     ? new Color32(56, 56, 56, 255)
-            //     : new Color32(194, 194, 194, 255);
-            // UnityDraw(fieldRect, property, propertyScoopLabel);
-            // EditorGUI.DrawRect(fieldRect, backgroundColor);
-
-            // GUIContent newLabel = propertyScoopLabel;
-            (Rect labelRect, Rect _) =
-                RectUtils.SplitWidthRect(fieldRect, EditorGUIUtility.labelWidth);
-
-            labelRect.height = EditorGUIUtility.singleLineHeight;
-
-            // Debug.Log($"pre label: {label.text}");
-            #region pre label
-            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
-            {
-                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                (bool isActive, Rect newLabelRect) =
-                    drawerInstance.DrawPreLabelImGui(labelRect, property, eachAttributeWithIndex.SaintsAttribute);
-                // ReSharper disable once InvertIf
-                if (isActive)
-                {
-                    labelRect = newLabelRect;
-                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
-                }
-            }
-            #endregion
-
-            #region label info
-
-            // bool completelyDisableLabel = string.IsNullOrEmpty(label.text);
-            GUIContent useGuiContent;
-
-            // Action saintsPropertyDrawerDrawLabelCallback = () => { };
-            if (string.IsNullOrEmpty(label.text))
-            {
-                // needFallbackLabel = true;
-                useGuiContent = new GUIContent(label);
-                // hasLabelSpace = false;
-            }
-            else if (labelAttributeWithIndex.SaintsAttribute == null)  // has label, no saints label drawer
-            {
-                // needFallbackLabel = false;
-                useGuiContent = new GUIContent(label);
-                // hasLabelSpace = false;
-            }
-            else
-            {
-                // needFallbackLabel = false;
-                SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
-                UsedAttributesTryAdd(labelAttributeWithIndex, labelDrawerInstance);
-                // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
-                bool hasLabelSpace = labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute);
-                if (hasLabelSpace)
-                {
-                    // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
-
-                    // saintsPropertyDrawerDrawLabelCallback = () =>
-                    labelDrawerInstance.DrawLabel(labelRect, property, label,
-                        labelAttributeWithIndex.SaintsAttribute);
-                }
-                useGuiContent = hasLabelSpace
-                    ? new GUIContent(label) {text = "                 "}
-                    : new GUIContent(label) {text = ""};
-
-                // Debug.Log($"hasLabelSpace={hasLabelSpace}, guiContent.text.length={useGuiContent.text.Length}");
-            }
-
-            #endregion
-
-            #region post field - width check
-            float postFieldWidth = 0;
-            List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)> postFieldInfoList =
-                new List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)>();
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
-            {
-                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                float curWidth =
-                    drawerInstance.GetPostFieldWidth(fieldRect, property, GUIContent.none, eachAttributeWithIndex.SaintsAttribute);
-                postFieldWidth += curWidth;
-                postFieldInfoList.Add((
-                    eachAttributeWithIndex,
-                    drawerInstance,
-                    curWidth
-                ));
-            }
-            #endregion
-
-            (Rect fieldUseRect, Rect fieldPostRect) = RectUtils.SplitWidthRect(fieldRect, fieldRect.width - postFieldWidth);
-
-            // Debug.Log($"field: {label.text}");
-
-            // if(!property.displayName)
-            // Debug.Log(property.name);
-            // if(property.name == "LabelFloat") {
-            //     EditorGUI.DrawRect(fieldUseRect, Color.black);
-            // }
-
-            #region field
-            Type fieldDrawer = fieldAttributeWithIndex.SaintsAttribute == null
-                ? null
-                : GetFirstSaintsDrawerType(fieldAttributeWithIndex.SaintsAttribute.GetType());
-            // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
-
-            // Debug.Log($"{label.text}={_fieldControlName}");
-
-            // EditorGUIUtility.labelWidth = ProperLabelWidth();
-            // Debug.Log($"{property.propertyPath}=false");
-            using(new AdaptLabelWidth())
-            using(new ResetIndentScoop())
-            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-            {
-                if (fieldDrawer == null)
-                {
-                    // GUI.SetNextControlName(_fieldControlName);
-                    // Debug.Log($"default drawer for {label.text}");
-                    DefaultDrawer(fieldUseRect, property, useGuiContent);
-                }
-                else
-                {
-                    // Debug.Log(fieldAttribute);
-                    SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
-                    // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
-                    // GUI.SetNextControlName(_fieldControlName);
-                    fieldDrawerInstance.DrawField(fieldUseRect, property, useGuiContent,
-                        fieldAttributeWithIndex.SaintsAttribute, parent);
-                    // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
-
-                    UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
-                }
-
-                if (changed.changed)
-                {
-                    PropertyPathToShared[property.propertyPath].Changed = true;
-                }
-            }
-
-            // Debug.Log($"after field: ValueChange={_valueChange}");
-            // saintsPropertyDrawerDrawLabelCallback?.Invoke();
-            #endregion
-
-            // #region label click
-
-            // if (anyLabelDrew)
-            // {
-            //     LabelMouseProcess(labelRect, property, _fieldControlName);
-            // }
-
-            // #endregion
-
-            // Debug.Log($"post field: {label.text}");
-
-            #region post field
-
-            float postFieldAccWidth = 0f;
-            foreach ((SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width) in postFieldInfoList)
-            {
-                Rect eachRect = new Rect(fieldPostRect)
-                {
-                    x = fieldPostRect.x + postFieldAccWidth,
-                    width = width,
-                };
-                postFieldAccWidth += width;
-
-                // Debug.Log($"DrawPostField, valueChange={_valueChange}");
-                bool isActive = drawer.DrawPostFieldImGui(eachRect, property, label, attributeWithIndex.SaintsAttribute, PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result)? result.Changed: false);
-                // ReSharper disable once InvertIf
-                if (isActive)
-                {
-                    UsedAttributesTryAdd(attributeWithIndex, drawer);
-                }
-            }
-            // foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
-            // {
-            //     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-            //     (bool isActive, Rect newPostFieldRect) = drawerInstance.DrawPostField(postFieldRect, property, propertyScoopLabel, eachAttributeWithIndex.SaintsAttribute);
-            //     // ReSharper disable once InvertIf
-            //     if (isActive)
-            //     {
-            //         postFieldRect = newPostFieldRect;
-            //         // _usedDrawerTypes.Add(eachDrawer[0]);
-            //         _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
-            //     }
-            // }
-            #endregion
-
-            #region Overlay
-
-            // List<Rect> overlayTakenPositions = new List<Rect>();
-            bool hasLabelWidth = !string.IsNullOrEmpty(useGuiContent.text);
-            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
-            {
-                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                (bool isActive, Rect newLabelRect) =
-                    drawerInstance.DrawOverlay(fieldUseRect, property, bugFixCopyLabel, eachAttributeWithIndex.SaintsAttribute, hasLabelWidth);
-                // ReSharper disable once InvertIf
-                if (isActive)
-                {
-                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
-                    // overlayTakenPositions.Add(newLabelRect);
-                }
-            }
-
-            #endregion
-
-            #region below
-            // Debug.Log($"pos.y={position.y}; pos.h={position.height}; fieldRect.y={fieldRect.y}; fieldRect.height={fieldRect.height}");
-            Rect belowRect = EditorGUI.IndentedRect(new Rect(position)
-            {
-                y = fieldRect.y + _labelFieldBasicHeight,
-                height = position.y + position.height - (fieldRect.y + fieldRect.height),
-            });
-
-            // Debug.Log($"belowRect={belowRect}");
-
-            Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawers =
-                new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
-            // Debug.Log($"allSaintsAttributes={allSaintsAttributes.Count}");
-            foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
-            {
-                SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                // Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
-                // ReSharper disable once InvertIf
-                if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute))
-                {
-                    if(!groupedDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy, out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
-                    {
-                        currentGroup = new List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>();
-                        groupedDrawers[eachAttributeWithIndex.SaintsAttribute.GroupBy] = currentGroup;
-                    }
-                    currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
-                    // _usedDrawerTypes.Add(eachDrawer[0]);
-                    UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
-                }
-            }
-
-            foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawerInfo in groupedDrawers)
-            {
-                string groupBy = groupedDrawerInfo.Key;
-                List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo = groupedDrawerInfo.Value;
-                // Debug.Log($"draw below: {groupBy}/{bugFixCopyLabel.text}/{label.text}");
-                if (groupBy == "")
-                {
-                    foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
-                    {
-                        belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
+                        currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
+                        // _usedDrawerTypes.Add(eachDrawer[0]);
+                        UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
                     }
                 }
-                else
+
+                float aboveUsedHeight = 0;
+                float aboveInitY = aboveRect.y;
+
+                foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>
+                             drawerInfoKv in groupedAboveDrawers)
                 {
-                    float totalWidth = belowRect.width;
-                    float eachWidth = totalWidth / drawerInfo.Count;
-                    float height = 0;
-                    for (int index = 0; index < drawerInfo.Count; index++)
+                    string groupBy = drawerInfoKv.Key;
+                    List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfos = drawerInfoKv.Value;
+
+                    if (groupBy == "")
                     {
-                        (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfo[index];
-                        Rect eachRect = new Rect(belowRect)
+                        foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
                         {
-                            x = belowRect.x + eachWidth * index,
-                            width = eachWidth,
+                            Rect newAboveRect =
+                                drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute);
+                            aboveUsedHeight = newAboveRect.y - aboveInitY;
+                            aboveRect = newAboveRect;
+                        }
+                    }
+                    else
+                    {
+                        float totalWidth = aboveRect.width;
+                        float eachWidth = totalWidth / drawerInfos.Count;
+                        float height = 0;
+                        for (int index = 0; index < drawerInfos.Count; index++)
+                        {
+                            (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfos[index];
+                            Rect eachRect = new Rect(aboveRect)
+                            {
+                                x = aboveRect.x + eachWidth * index,
+                                width = eachWidth,
+                            };
+                            Rect leftRect =
+                                drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute);
+                            height = Mathf.Max(height, leftRect.y - eachRect.y);
+                            // Debug.Log($"height={height}");
+                        }
+
+                        // aboveRect.height = height;
+                        aboveUsedHeight += height;
+                        aboveRect = new Rect(aboveRect)
+                        {
+                            y = aboveRect.y + height,
+                            height = aboveRect.height - height,
                         };
-                        Rect leftRect = drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, eachAttribute);
-                        height = Mathf.Max(height, leftRect.y - eachRect.y);
                     }
 
-                    // belowRect.height = height;
-                    belowRect = new Rect(belowRect)
-                    {
-                        y = belowRect.y + height,
-                        height = belowRect.height - height,
-                    };
+                    // Debug.Log($"aboveUsedHeight={aboveUsedHeight}");
                 }
-            }
-            #endregion
-            // foreach (ISaintsAttribute eachAttribute in allSaintsAttributes)
-            // {
-            //     // ReSharper disable once InvertIf
-            //     if (_propertyAttributeToDrawers.TryGetValue(eachAttribute.GetType(),
-            //             out IReadOnlyList<Type> eachDrawer))
-            //     {
-            //         (SaintsPropertyDrawer drawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(eachDrawer[0], eachAttribute);
-            //         // ReSharper disable once InvertIf
-            //         if (drawerInstance.WillDrawBelow(belowRect, property, propertyScoopLabel, eachAttribute))
-            //         {
-            //             belowRect = drawerInstance.DrawBelow(belowRect, property, propertyScoopLabel, eachAttribute);
-            //             _usedDrawerTypes.Add(eachDrawer[0]);
-            //         }
-            //     }
-            // }
 
-            // Debug.Log($"reset {property.propertyPath}=false");
-            // PropertyPathToShared[property.propertyPath].changed = false;
-            SetValueChanged(property, false);
+                // if(Event.current.type == EventType.Repaint)
+                // {
+                // _aboveUsedHeight = aboveUsedHeight;
+                // }
+
+                // Debug.Log($"{Event.current} {aboveUsedHeight} / {_aboveUsedHeight}");
+
+                #endregion
+
+                Rect fieldRect = EditorGUI.IndentedRect(new Rect(position)
+                {
+                    // y = aboveRect.y + (groupedAboveDrawers.Count == 0? 0: aboveRect.height),
+                    y = position.y + aboveUsedHeight,
+                    height = _labelFieldBasicHeight,
+                });
+
+                // Color backgroundColor = EditorGUIUtility.isProSkin
+                //     ? new Color32(56, 56, 56, 255)
+                //     : new Color32(194, 194, 194, 255);
+                // UnityDraw(fieldRect, property, propertyScoopLabel);
+                // EditorGUI.DrawRect(fieldRect, backgroundColor);
+
+                // GUIContent newLabel = propertyScoopLabel;
+                (Rect labelRect, Rect _) =
+                    RectUtils.SplitWidthRect(fieldRect, EditorGUIUtility.labelWidth);
+
+                labelRect.height = EditorGUIUtility.singleLineHeight;
+
+                // Debug.Log($"pre label: {label.text}");
+
+                #region pre label
+
+                foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+                {
+                    SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                    (bool isActive, Rect newLabelRect) =
+                        drawerInstance.DrawPreLabelImGui(labelRect, property, eachAttributeWithIndex.SaintsAttribute);
+                    // ReSharper disable once InvertIf
+                    if (isActive)
+                    {
+                        labelRect = newLabelRect;
+                        UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
+                    }
+                }
+
+                #endregion
+
+                #region label info
+
+                // bool completelyDisableLabel = string.IsNullOrEmpty(label.text);
+                GUIContent useGuiContent;
+
+                // Action saintsPropertyDrawerDrawLabelCallback = () => { };
+                if (string.IsNullOrEmpty(label.text))
+                {
+                    // needFallbackLabel = true;
+                    useGuiContent = new GUIContent(label);
+                    // hasLabelSpace = false;
+                }
+                else if (labelAttributeWithIndex.SaintsAttribute == null) // has label, no saints label drawer
+                {
+                    // needFallbackLabel = false;
+                    useGuiContent = new GUIContent(label);
+                    // hasLabelSpace = false;
+                }
+                else
+                {
+                    // needFallbackLabel = false;
+                    SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
+                    UsedAttributesTryAdd(labelAttributeWithIndex, labelDrawerInstance);
+                    // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
+                    bool hasLabelSpace =
+                        labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute);
+                    if (hasLabelSpace)
+                    {
+                        // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
+
+                        // saintsPropertyDrawerDrawLabelCallback = () =>
+                        labelDrawerInstance.DrawLabel(labelRect, property, label,
+                            labelAttributeWithIndex.SaintsAttribute);
+                    }
+
+                    useGuiContent = hasLabelSpace
+                        ? new GUIContent(label) { text = "                 " }
+                        : new GUIContent(label) { text = "" };
+
+                    // Debug.Log($"hasLabelSpace={hasLabelSpace}, guiContent.text.length={useGuiContent.text.Length}");
+                }
+
+                #endregion
+
+                #region post field - width check
+
+                float postFieldWidth = 0;
+                List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)> postFieldInfoList =
+                    new List<(SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width)>();
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+                {
+                    SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                    float curWidth =
+                        drawerInstance.GetPostFieldWidth(fieldRect, property, GUIContent.none,
+                            eachAttributeWithIndex.SaintsAttribute);
+                    postFieldWidth += curWidth;
+                    postFieldInfoList.Add((
+                        eachAttributeWithIndex,
+                        drawerInstance,
+                        curWidth
+                    ));
+                }
+
+                #endregion
+
+                (Rect fieldUseRect, Rect fieldPostRect) =
+                    RectUtils.SplitWidthRect(fieldRect, fieldRect.width - postFieldWidth);
+
+                // Debug.Log($"field: {label.text}");
+
+                // if(!property.displayName)
+                // Debug.Log(property.name);
+                // if(property.name == "LabelFloat") {
+                //     EditorGUI.DrawRect(fieldUseRect, Color.black);
+                // }
+
+                #region field
+
+                Type fieldDrawer = fieldAttributeWithIndex.SaintsAttribute == null
+                    ? null
+                    : GetFirstSaintsDrawerType(fieldAttributeWithIndex.SaintsAttribute.GetType());
+                // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
+
+                // Debug.Log($"{label.text}={_fieldControlName}");
+
+                // EditorGUIUtility.labelWidth = ProperLabelWidth();
+                // Debug.Log($"{property.propertyPath}=false");
+                using (new AdaptLabelWidth())
+                using (new ResetIndentScoop())
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    if (fieldDrawer == null)
+                    {
+                        // GUI.SetNextControlName(_fieldControlName);
+                        // Debug.Log($"default drawer for {label.text}");
+                        DefaultDrawer(fieldUseRect, property, useGuiContent);
+                    }
+                    else
+                    {
+                        // Debug.Log(fieldAttribute);
+                        SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
+                        // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
+                        // GUI.SetNextControlName(_fieldControlName);
+                        fieldDrawerInstance.DrawField(fieldUseRect, property, useGuiContent,
+                            fieldAttributeWithIndex.SaintsAttribute, parent);
+                        // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
+
+                        UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
+                    }
+
+                    if (changed.changed)
+                    {
+                        PropertyPathToShared[property.propertyPath].Changed = true;
+                    }
+                }
+
+                // Debug.Log($"after field: ValueChange={_valueChange}");
+                // saintsPropertyDrawerDrawLabelCallback?.Invoke();
+
+                #endregion
+
+                // #region label click
+
+                // if (anyLabelDrew)
+                // {
+                //     LabelMouseProcess(labelRect, property, _fieldControlName);
+                // }
+
+                // #endregion
+
+                // Debug.Log($"post field: {label.text}");
+
+                #region post field
+
+                float postFieldAccWidth = 0f;
+                foreach ((SaintsWithIndex attributeWithIndex, SaintsPropertyDrawer drawer, float width) in
+                         postFieldInfoList)
+                {
+                    Rect eachRect = new Rect(fieldPostRect)
+                    {
+                        x = fieldPostRect.x + postFieldAccWidth,
+                        width = width,
+                    };
+                    postFieldAccWidth += width;
+
+                    // Debug.Log($"DrawPostField, valueChange={_valueChange}");
+                    bool isActive = drawer.DrawPostFieldImGui(eachRect, property, label,
+                        attributeWithIndex.SaintsAttribute,
+                        PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result)
+                            ? result.Changed
+                            : false);
+                    // ReSharper disable once InvertIf
+                    if (isActive)
+                    {
+                        UsedAttributesTryAdd(attributeWithIndex, drawer);
+                    }
+                }
+
+                // foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+                // {
+                //     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                //     (bool isActive, Rect newPostFieldRect) = drawerInstance.DrawPostField(postFieldRect, property, propertyScoopLabel, eachAttributeWithIndex.SaintsAttribute);
+                //     // ReSharper disable once InvertIf
+                //     if (isActive)
+                //     {
+                //         postFieldRect = newPostFieldRect;
+                //         // _usedDrawerTypes.Add(eachDrawer[0]);
+                //         _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
+                //     }
+                // }
+
+                #endregion
+
+                #region Overlay
+
+                // List<Rect> overlayTakenPositions = new List<Rect>();
+                bool hasLabelWidth = !string.IsNullOrEmpty(useGuiContent.text);
+                foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+                {
+                    SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                    (bool isActive, Rect newLabelRect) =
+                        drawerInstance.DrawOverlay(fieldUseRect, property, bugFixCopyLabel,
+                            eachAttributeWithIndex.SaintsAttribute, hasLabelWidth);
+                    // ReSharper disable once InvertIf
+                    if (isActive)
+                    {
+                        UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
+                        // overlayTakenPositions.Add(newLabelRect);
+                    }
+                }
+
+                #endregion
+
+                #region below
+
+                // Debug.Log($"pos.y={position.y}; pos.h={position.height}; fieldRect.y={fieldRect.y}; fieldRect.height={fieldRect.height}");
+                Rect belowRect = EditorGUI.IndentedRect(new Rect(position)
+                {
+                    y = fieldRect.y + _labelFieldBasicHeight,
+                    height = position.y + position.height - (fieldRect.y + fieldRect.height),
+                });
+
+                // Debug.Log($"belowRect={belowRect}");
+
+                Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawers =
+                    new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
+                // Debug.Log($"allSaintsAttributes={allSaintsAttributes.Count}");
+                foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
+                {
+                    SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                    // Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
+                    // ReSharper disable once InvertIf
+                    if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute))
+                    {
+                        if (!groupedDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
+                                out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
+                        {
+                            currentGroup = new List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>();
+                            groupedDrawers[eachAttributeWithIndex.SaintsAttribute.GroupBy] = currentGroup;
+                        }
+
+                        currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
+                        // _usedDrawerTypes.Add(eachDrawer[0]);
+                        UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
+                    }
+                }
+
+                foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>
+                             groupedDrawerInfo in groupedDrawers)
+                {
+                    string groupBy = groupedDrawerInfo.Key;
+                    List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo =
+                        groupedDrawerInfo.Value;
+                    // Debug.Log($"draw below: {groupBy}/{bugFixCopyLabel.text}/{label.text}");
+                    if (groupBy == "")
+                    {
+                        foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
+                        {
+                            belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
+                        }
+                    }
+                    else
+                    {
+                        float totalWidth = belowRect.width;
+                        float eachWidth = totalWidth / drawerInfo.Count;
+                        float height = 0;
+                        for (int index = 0; index < drawerInfo.Count; index++)
+                        {
+                            (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfo[index];
+                            Rect eachRect = new Rect(belowRect)
+                            {
+                                x = belowRect.x + eachWidth * index,
+                                width = eachWidth,
+                            };
+                            Rect leftRect =
+                                drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, eachAttribute);
+                            height = Mathf.Max(height, leftRect.y - eachRect.y);
+                        }
+
+                        // belowRect.height = height;
+                        belowRect = new Rect(belowRect)
+                        {
+                            y = belowRect.y + height,
+                            height = belowRect.height - height,
+                        };
+                    }
+                }
+
+                #endregion
+
+                // foreach (ISaintsAttribute eachAttribute in allSaintsAttributes)
+                // {
+                //     // ReSharper disable once InvertIf
+                //     if (_propertyAttributeToDrawers.TryGetValue(eachAttribute.GetType(),
+                //             out IReadOnlyList<Type> eachDrawer))
+                //     {
+                //         (SaintsPropertyDrawer drawerInstance, ISaintsAttribute _) = GetOrCreateDrawerInfo(eachDrawer[0], eachAttribute);
+                //         // ReSharper disable once InvertIf
+                //         if (drawerInstance.WillDrawBelow(belowRect, property, propertyScoopLabel, eachAttribute))
+                //         {
+                //             belowRect = drawerInstance.DrawBelow(belowRect, property, propertyScoopLabel, eachAttribute);
+                //             _usedDrawerTypes.Add(eachDrawer[0]);
+                //         }
+                //     }
+                // }
+
+                // Debug.Log($"reset {property.propertyPath}=false");
+                // PropertyPathToShared[property.propertyPath].changed = false;
+                SetValueChanged(property, false);
+            }
         }
         #endregion
 

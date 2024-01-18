@@ -15,16 +15,17 @@ namespace SaintsField.Editor.Drawers
     {
         private struct MetaInfo
         {
+            // ReSharper disable InconsistentNaming
             public string Error;
 
             public float Min;  // dynamic
             public float Max;  // dynamic
             public Color Color;
             public Color BackgroundColor;
-            // public string Title;
+            // ReSharper enable InconsistentNaming
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, float curValue, object parent)
+        private static MetaInfo GetMetaInfo(ISaintsAttribute saintsAttribute, object parent)
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute) saintsAttribute;
 
@@ -75,6 +76,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             Color backgroundColor = progressBarAttribute.BackgroundColor.GetColor();
+            // ReSharper disable once InvertIf
             if(progressBarAttribute.BackgroundColorCallback != null)
             {
                 (string error, Color value) = GetCallbackColor(parent, progressBarAttribute.BackgroundColorCallback);
@@ -89,19 +91,19 @@ namespace SaintsField.Editor.Drawers
                 backgroundColor = value;
             }
 
-            (string titleError, string title) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, min, max, parent);
-            if (titleError != "")
-            {
-                return new MetaInfo
-                {
-                    Error = "",
-                    Min = min,
-                    Max = max,
-                    Color = color,
-                    BackgroundColor = backgroundColor,
-                    // Title = null,
-                };
-            }
+            // (string titleError, string _) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, min, max, parent);
+            // if (titleError != "")
+            // {
+            //     return new MetaInfo
+            //     {
+            //         Error = "",
+            //         Min = min,
+            //         Max = max,
+            //         Color = color,
+            //         BackgroundColor = backgroundColor,
+            //         // Title = null,
+            //     };
+            // }
 
             return new MetaInfo
             {
@@ -175,7 +177,7 @@ namespace SaintsField.Editor.Drawers
                 }
 
                 string valueStr = step.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                int decimalPointIndex = valueStr.IndexOf(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+                int decimalPointIndex = valueStr.IndexOf(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal);
 
                 int decimalPlaces = 0;
 
@@ -233,6 +235,7 @@ namespace SaintsField.Editor.Drawers
             object parent)
         {
             int controlId = GUIUtility.GetControlID(FocusType.Passive, position);
+            Debug.Log(label.text.Length);
             Rect fieldRect = EditorGUI.PrefixLabel(position, controlId, label);
             // EditorGUI.DrawRect(position, Color.yellow);
             EditorGUI.DrawRect(fieldRect, EColor.Blue.GetColor());
@@ -270,7 +273,9 @@ namespace SaintsField.Editor.Drawers
 
         private class UIToolkitPayload
         {
+            // ReSharper disable once InconsistentNaming
             public readonly VisualElement Background;
+            // ReSharper disable once InconsistentNaming
             public readonly VisualElement Progress;
             public MetaInfo metaInfo;
 
@@ -291,10 +296,7 @@ namespace SaintsField.Editor.Drawers
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
-            MetaInfo metaInfo = GetMetaInfo(
-                property,
-                progressBarAttribute,
-                property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue,
+            MetaInfo metaInfo = GetMetaInfo(progressBarAttribute,
                 parent);
 
             Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
@@ -395,10 +397,7 @@ namespace SaintsField.Editor.Drawers
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChanged, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(
-                property,
-                saintsAttribute,
-                property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue,
+            MetaInfo metaInfo = GetMetaInfo(saintsAttribute,
                 parent);
 
             ProgressBar progressBar = container.Q<ProgressBar>(NameProgressBar(property));
