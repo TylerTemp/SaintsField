@@ -1728,6 +1728,8 @@ So here is the `UnsaintlyEditor`. It provides the minimal functions I think that
     *   Supports both `UI Toolkit` and `IMGUI`.
     *   When using `UI Toolkit`, it'll try to fix the old style field, change the label behavior like UI Toolkit. (This fix does not work if the fallback drawer is a pure `IMGUI` drawer)
 
+Please note, any `Editor` is not compatible with each other (unless you manually apply it to only some classes). Which means, `OdinInspector`, `NaughtyAttributes`, `MarkupAttributes`, `UnsaintlyEditor` can not be used together.
+
 If you are interested, here is how to use it.
 
 ##### Setup UnsaintlyEditor #####
@@ -1751,26 +1753,6 @@ public class MyEditor : UnsaintlyEditor
 ```
 
 Change the value of `typeof` if you only want to apply to a specific type, like a `MonoBehavior` or `ScriptableObject`.
-
-**About NaughtyAttributes**
-
-To work with `NaughtyAttributes`:
-
-```csharp
-[CanEditMultipleObjects]
-[CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
-public class UnsaintlySimpleMonoEditor : UnsaintlyEditor
-{
-}
-
-[CanEditMultipleObjects]
-[CustomEditor(typeof(UnityEngine.ScriptableObject), true)]
-public class UnsaintlySimpleScriptableObjectEditor : UnsaintlyEditor
-{
-}
-```
-
-Note: doing so will disable the editor level of `NaughtyAttribtues`, makes `BoxGroup`, `Foldout` unusable.
 
 ##### `Button` #####
 
