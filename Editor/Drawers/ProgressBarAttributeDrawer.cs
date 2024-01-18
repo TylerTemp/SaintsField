@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers
             public float Max;  // dynamic
             public Color Color;
             public Color BackgroundColor;
-            public string Title;
+            // public string Title;
         }
 
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, float curValue, object parent)
@@ -89,51 +89,18 @@ namespace SaintsField.Editor.Drawers
                 backgroundColor = value;
             }
 
-            string title;
-            if (progressBarAttribute.TitleCallback != null)
+            (string titleError, string title) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, min, max, parent);
+            if (titleError != "")
             {
-                const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                              BindingFlags.Public | BindingFlags.DeclaredOnly;
-
-                MethodInfo methodInfo = parent.GetType().GetMethod(progressBarAttribute.TitleCallback, bindAttr);
-
-                if (methodInfo == null)
+                return new MetaInfo
                 {
-                    return new MetaInfo
-                    {
-                        Error = $"Can not find method `{progressBarAttribute.TitleCallback}` on `{parent}`",
-                        Max = 100f,
-                    };
-                }
-
-                try
-                {
-                    title = (string)methodInfo.Invoke(parent,
-                        new object[]{curValue, property.displayName});
-                }
-                catch (TargetInvocationException e)
-                {
-                    Debug.Assert(e.InnerException != null);
-                    Debug.LogException(e);
-                    return new MetaInfo
-                    {
-                        Error = e.InnerException.Message,
-                        Max = 100f,
-                    };
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    return new MetaInfo
-                    {
-                        Error = e.Message,
-                        Max = 100f,
-                    };
-                }
-            }
-            else
-            {
-                title = $"{curValue} / {max}";
+                    Error = "",
+                    Min = min,
+                    Max = max,
+                    Color = color,
+                    BackgroundColor = backgroundColor,
+                    // Title = null,
+                };
             }
 
             return new MetaInfo
@@ -143,11 +110,11 @@ namespace SaintsField.Editor.Drawers
                 Max = max,
                 Color = color,
                 BackgroundColor = backgroundColor,
-                Title = title,
+                // Title = title,
             };
         }
 
-        public static (string error, Color value) GetCallbackColor(object target, string by)
+        private static (string error, Color value) GetCallbackColor(object target, string by)
         {
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
 
@@ -179,22 +146,81 @@ namespace SaintsField.Editor.Drawers
 
         private static (string error, Color color) ObjToColor(object obj)
         {
-            if (obj is Color color)
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (obj)
             {
-                return ("", color);
+                case Color color:
+                    return ("", color);
+                case string str:
+                    return ("", Colors.GetColorByStringPresent(str));
+                case EColor eColor:
+                    return ("", eColor.GetColor());
+                default:
+                    return ($"target is not a color: {obj}", Color.white);
             }
-            if (obj is string str)
-            {
-                return ("", Colors.GetColorByStringPresent(str));
-            }
-
-            if (obj is EColor eColor)
-            {
-                return ("", eColor.GetColor());
-            }
-
-            return ($"target is not a color: {obj}", Color.white);
         }
+
+        private static (string error, string title) GetTitle(SerializedProperty property, string titleCallback, float step, float curValue, float minValue, float maxValue, object parent)
+        {
+            if (titleCallback == null)
+            {
+                if(property.propertyType == SerializedPropertyType.Integer)
+                {
+                    return ("", $"{(int)curValue} / {(int)maxValue}");
+                }
+
+                if (step <= 0)
+                {
+                    return ("", $"{curValue} / {maxValue}");
+                }
+
+                string valueStr = step.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                int decimalPointIndex = valueStr.IndexOf(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+
+                int decimalPlaces = 0;
+
+                if (decimalPointIndex >= 0)
+                {
+                    decimalPlaces = valueStr.Length - decimalPointIndex - 1;
+                }
+
+                string formatValue = curValue.ToString("F" + decimalPlaces);
+                // Debug.Log($"curValue={curValue}, format={formatValue}");
+
+                return ("", $"{formatValue} / {maxValue}");
+            }
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+
+            MethodInfo methodInfo = parent.GetType().GetMethod(titleCallback, bindAttr);
+
+            if (methodInfo == null)
+            {
+                return ($"Can not find method `{titleCallback}` on `{parent}`", null);
+            }
+
+            string title;
+            try
+            {
+                title = (string)methodInfo.Invoke(parent,
+                    new object[]{curValue, minValue, maxValue, property.displayName});
+            }
+            catch (TargetInvocationException e)
+            {
+                Debug.Assert(e.InnerException != null);
+                Debug.LogException(e);
+                return (e.InnerException.Message, null);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return (e.Message, null);
+            }
+
+            return ("", title);
+        }
+
+        private static float BoundValue(float curValue, float minValue, float maxValue, float step) => step <= 0 ? Mathf.Clamp(curValue, minValue, maxValue) : Util.BoundFloatStep(curValue, minValue, maxValue, step);
 
         #region IMGUI
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
@@ -244,7 +270,6 @@ namespace SaintsField.Editor.Drawers
 
         private class UIToolkitPayload
         {
-            public bool isMouseDown;
             public readonly VisualElement Background;
             public readonly VisualElement Progress;
             public MetaInfo metaInfo;
@@ -253,32 +278,43 @@ namespace SaintsField.Editor.Drawers
             {
                 Background = background;
                 Progress = progress;
-                isMouseDown = false;
                 this.metaInfo = metaInfo;
             }
         }
 
+        private static string NameProgressBar(SerializedProperty property) => $"{property.propertyPath}__ProgressBar";
+        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_Label";
+        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_HelpBox";
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, Label fakeLabel, object parent)
         {
+            ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
+
             MetaInfo metaInfo = GetMetaInfo(
                 property,
-                saintsAttribute,
-                property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue ,
+                progressBarAttribute,
+                property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue,
                 parent);
+
+            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            label.name = NameLabel(property);
+
+            #region ProgrssBar
 
             ProgressBar progressBar = new ProgressBar
             {
-                title = metaInfo.Title,
+                name = NameProgressBar(property),
+
+                title = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue, metaInfo.Min, metaInfo.Max, parent).title,
                 lowValue = 0,
                 highValue = metaInfo.Max - metaInfo.Min,
                 value = property.floatValue,
 
-                // style =
-                // {
-                //     color = EColor.Green.GetColor(),
-                //     backgroundColor = EColor.Green.GetColor(),
-                // },
+                style =
+                {
+                    flexGrow = 1,
+                },
             };
 
             Type type = typeof(AbstractProgressBar);
@@ -301,64 +337,207 @@ namespace SaintsField.Editor.Drawers
             }
 
             progressBar.userData = new UIToolkitPayload(background, progress, metaInfo);
+            #endregion
 
-            progressBar.CapturePointer(0);
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    flexGrow = 1,
+                },
+            };
+
+            root.Add(label);
+            root.Add(progressBar);
+
+            return root;
+
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                name = NameHelpBox(property),
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            };
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            ProgressBar progressBar = container.Q<ProgressBar>(NameProgressBar(property));
+
             progressBar.RegisterCallback<PointerDownEvent>(evt =>
             {
-                ((UIToolkitPayload)progressBar.userData).isMouseDown = true;
-                // Debug.Log($"down: {evt.pointerId}");
+                progressBar.CapturePointer(0);
+                OnProgressBarInteract(property, (ProgressBarAttribute)saintsAttribute, container, progressBar, evt.localPosition, onValueChangedCallback, parent);
             });
-            progressBar.RegisterCallback<PointerUpEvent>(evt =>
+            progressBar.RegisterCallback<PointerUpEvent>(_ =>
             {
-                ((UIToolkitPayload)progressBar.userData).isMouseDown = false;
-                // Debug.Log($"up: {evt.pointerId}");
-            });
-            progressBar.RegisterCallback<PointerLeaveEvent>(evt =>
-            {
-                ((UIToolkitPayload)progressBar.userData).isMouseDown = true;
-                // Debug.Log($"leave: {evt.pointerId}");
+                progressBar.ReleasePointer(0);
             });
             progressBar.RegisterCallback<PointerMoveEvent>(evt =>
             {
-                // Debug.Log(evt.localPosition);
-                // Debug.Log(evt.pointerId);
-                // Debug.Log(progressBar.HasPointerCapture(0));
-
-                float curWidth = progressBar.resolvedStyle.width;
-                if(float.IsNaN(curWidth))
+                if(progressBar.HasPointerCapture(0))
                 {
-                    return;
+                    OnProgressBarInteract(property, (ProgressBarAttribute)saintsAttribute, container, progressBar,
+                        evt.localPosition, onValueChangedCallback, parent);
                 }
-
-                UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
-                if (!uiToolkitPayload.isMouseDown)
-                {
-                    return;
-                }
-
-                float curValue = evt.localPosition.x / curWidth * 100f + uiToolkitPayload.metaInfo.Min;
-                progressBar.value = curValue;
             });
-
-            // Debug.Log(progressBar.resolvedStyle.width);
-            //
-            progressBar.RegisterValueChangedCallback(evt =>
-            {
-                property.floatValue = evt.newValue;
-                property.serializedObject.ApplyModifiedProperties();
-                progressBar.title = evt.newValue.ToString();
-                Debug.Log(evt.newValue);
-            });
-            //
-            // progressBar.schedule.Execute(() =>
-            // {
-            //     progressBar.value += 2f;
-            // }).Every(75).Until(() => progressBar.value >= 100f);
-            //
-            return progressBar;
-
-            // return new Slider();
         }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, object parent)
+        {
+            MetaInfo metaInfo = GetMetaInfo(
+                property,
+                saintsAttribute,
+                property.propertyType == SerializedPropertyType.Integer? property.intValue: property.floatValue,
+                parent);
+
+            ProgressBar progressBar = container.Q<ProgressBar>(NameProgressBar(property));
+            UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
+            MetaInfo oldMetaInfo = uiToolkitPayload.metaInfo;
+
+            bool changed = false;
+            string error = metaInfo.Error;
+
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if(metaInfo.Min != oldMetaInfo.Min
+               // ReSharper disable once CompareOfFloatsByEqualityOperator
+               || metaInfo.Max != oldMetaInfo.Max)
+            {
+                changed = true;
+                progressBar.highValue = metaInfo.Max - metaInfo.Min;
+                float propValue = property.propertyType == SerializedPropertyType.Integer
+                    ? property.intValue
+                    : property.floatValue;
+
+                ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
+
+                if(propValue < metaInfo.Min || propValue > metaInfo.Max)
+                {
+                    // Debug.Log($"update change: {metaInfo.Min} <= {propValue} <= {metaInfo.Max}");
+                    propValue = ChangeValue(property, progressBarAttribute, container, progressBar, Mathf.Clamp(propValue, metaInfo.Min, metaInfo.Max), metaInfo.Min, metaInfo.Max,
+                        onValueChanged, parent);
+                    // Debug.Log($"now prop = {propValue}");
+                }
+
+                progressBar.value = propValue - metaInfo.Min;
+
+                (string titleError, string title) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, propValue, metaInfo.Min, metaInfo.Max, parent);
+                // Debug.Log($"update change title {title}");
+                progressBar.title = title;
+                if (titleError != "")
+                {
+                    error = titleError;
+                }
+            }
+
+            if(metaInfo.Color != oldMetaInfo.Color && uiToolkitPayload.Progress != null)
+            {
+                changed = true;
+                uiToolkitPayload.Progress.style.backgroundColor = metaInfo.Color;
+            }
+
+            if(metaInfo.BackgroundColor != oldMetaInfo.BackgroundColor && uiToolkitPayload.Background != null)
+            {
+                changed = true;
+                uiToolkitPayload.Background.style.backgroundColor = metaInfo.BackgroundColor;
+            }
+
+            if (changed)
+            {
+                // progressBar.userData = metaInfo;
+                uiToolkitPayload.metaInfo = metaInfo;
+            }
+
+            UpdateHelpBox(property, container, error);
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull)
+        {
+            Label label = container.Q<Label>(NameLabel(property));
+            label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
+            label.text = labelOrNull ?? "";
+        }
+
+        private static void OnProgressBarInteract(SerializedProperty property, ProgressBarAttribute progressBarAttribute, VisualElement container, ProgressBar progressBar, Vector3 mousePosition, Action<object> onValueChangedCallback, object parent)
+        {
+            float curWidth = progressBar.resolvedStyle.width;
+            if(float.IsNaN(curWidth))
+            {
+                return;
+            }
+
+            UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
+
+            float curValue = Mathf.Lerp(uiToolkitPayload.metaInfo.Min, uiToolkitPayload.metaInfo.Max, mousePosition.x / curWidth);
+            ChangeValue(property, progressBarAttribute, container, progressBar, curValue, uiToolkitPayload.metaInfo.Min, uiToolkitPayload.metaInfo.Max, onValueChangedCallback, parent);
+        }
+
+        private static float ChangeValue(SerializedProperty property, ProgressBarAttribute progressBarAttribute, VisualElement container, ProgressBar progressBar, float curValue, float minValue, float maxValue, Action<object> onValueChangedCallback, object parent)
+        {
+            // UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
+
+            float newValue = BoundValue(curValue, minValue, maxValue, progressBarAttribute.Step);
+
+            // Debug.Log($"curValue={curValue}, newValue={newValue}");
+            float propValue = property.propertyType == SerializedPropertyType.Integer
+                ? property.intValue
+                : property.floatValue;
+
+            // Debug.Log($"curValue={curValue}, newValue={newValue}, propValue={propValue}");
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (propValue == newValue)
+            {
+                return propValue;
+            }
+
+            // Debug.Log($"update value to {newValue}");
+
+            progressBar.value = newValue - minValue;
+
+            if (property.propertyType == SerializedPropertyType.Integer)
+            {
+                int intValue = (int)newValue;
+                property.intValue = intValue;
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(intValue);
+            }
+            else
+            {
+                property.floatValue = newValue;
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(newValue);
+            }
+
+            (string error, string title) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, newValue, minValue, maxValue, parent);
+            // Debug.Log($"change title to {title}");
+            progressBar.title = title;
+            UpdateHelpBox(property, container, error);
+
+            return newValue;
+        }
+
+        private static void UpdateHelpBox(SerializedProperty property, VisualElement container, string error)
+        {
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+            if (helpBox.text == error)
+            {
+                return;
+            }
+            helpBox.text = error;
+            helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
+        }
+
         #endregion
     }
 }
