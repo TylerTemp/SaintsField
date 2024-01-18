@@ -6,7 +6,9 @@ using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -354,6 +356,8 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UI Toolkit
 
         private class UIToolkitPayload
@@ -630,5 +634,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
+
+#endif
     }
 }
