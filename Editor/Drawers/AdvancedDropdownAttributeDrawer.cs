@@ -162,10 +162,12 @@ namespace SaintsField.Editor.Drawers
     public class SaintsAdvancedDropdownUiToolkit : PopupWindowContent
     {
         private readonly float _width;
+        private readonly AdvancedDropdownAttributeDrawer.MetaInfo _metaInfo;
 
-        public SaintsAdvancedDropdownUiToolkit(float width)
+        public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width)
         {
             _width = width;
+            _metaInfo = metaInfo;
         }
 
         public override void OnGUI(Rect rect)
@@ -186,7 +188,7 @@ namespace SaintsField.Editor.Drawers
             editorWindow.rootVisualElement.Add(element);
         }
 
-        public static VisualElement CloneTree()
+        public static VisualElement CloneTree(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo)
         {
             StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
 
@@ -214,39 +216,44 @@ namespace SaintsField.Editor.Drawers
             Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
             Texture2D check = RichTextDrawer.LoadTexture("check.png");
 
-            foreach (int index in Enumerable.Range(0, 10))
+            foreach (IAdvancedDropdownList dropdownList in metaInfo.DropdownListValue)
             {
-                VisualElement item = itemAsset.CloneTree();
 
-                VisualElement itemContainer =
-                    item.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
-
-                item.Q<Label>("item-content").text = $"Item {index}";
-                item.Q<Image>("item-icon-image").image = icon;
-                item.Q<Image>("item-next-image").image = next;
-                item.Q<Image>("item-next-image").tintColor = EColor.Gray.GetColor();
-
-                if (index == 3)
-                {
-                    item.Q<Image>("item-checked-image").image = check;
-                    itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
-                    itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-                }
-
-                if (index == 6)
-                {
-                    itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
-                    itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-                }
-
-                scrollView.Add(item);
-
-                if (index == 2 || index == 8)
-                {
-                    VisualElement separator = separatorAsset.CloneTree();
-                    scrollView.Add(separator);
-                }
             }
+
+            // foreach (int index in Enumerable.Range(0, 10))
+            // {
+            //     VisualElement item = itemAsset.CloneTree();
+            //
+            //     VisualElement itemContainer =
+            //         item.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
+            //
+            //     item.Q<Label>("item-content").text = $"Item {index}";
+            //     item.Q<Image>("item-icon-image").image = icon;
+            //     item.Q<Image>("item-next-image").image = next;
+            //     item.Q<Image>("item-next-image").tintColor = EColor.Gray.GetColor();
+            //
+            //     if (index == 3)
+            //     {
+            //         item.Q<Image>("item-checked-image").image = check;
+            //         itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
+            //         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+            //     }
+            //
+            //     if (index == 6)
+            //     {
+            //         itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
+            //         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+            //     }
+            //
+            //     scrollView.Add(item);
+            //
+            //     if (index == 2 || index == 8)
+            //     {
+            //         VisualElement separator = separatorAsset.CloneTree();
+            //         scrollView.Add(separator);
+            //     }
+            // }
 
             return root;
         }
@@ -275,7 +282,7 @@ namespace SaintsField.Editor.Drawers
 
         #region Util
 
-        private struct MetaInfo
+        public struct MetaInfo
         {
             // ReSharper disable InconsistentNaming
             public string Error;
