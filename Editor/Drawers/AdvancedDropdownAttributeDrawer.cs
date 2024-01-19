@@ -8,7 +8,6 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using TreeView = UnityEngine.UIElements.TreeView;
 using UnityAdvancedDropdown = UnityEditor.IMGUI.Controls.AdvancedDropdown;
 using UnityAdvancedDropdownItem = UnityEditor.IMGUI.Controls.AdvancedDropdownItem;
 #if UNITY_2021_3_OR_NEWER
@@ -18,10 +17,11 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
+    #region IMGUI Pop
 
     public class SaintsAdvancedDropdown : UnityAdvancedDropdown
     {
-        #region IMGUI
+
         private readonly IAdvancedDropdownList _dropdownListValue;
 
         private readonly Dictionary<UnityAdvancedDropdownItem, object> _itemToValue = new Dictionary<UnityAdvancedDropdownItem, object>();
@@ -156,6 +156,107 @@ namespace SaintsField.Editor.Drawers
         }
     }
 
+    #endregion
+
+    #region UIToolkit Pop
+    public class SaintsAdvancedDropdownUiToolkit : PopupWindowContent
+    {
+        private readonly float _width;
+
+        public SaintsAdvancedDropdownUiToolkit(float width)
+        {
+            _width = width;
+        }
+
+        public override void OnGUI(Rect rect)
+        {
+            // Intentionally left empty
+        }
+
+        //Set the window size
+        public override Vector2 GetWindowSize()
+        {
+            return new Vector2(_width, 200);
+        }
+
+        public override void OnOpen()
+        {
+            VisualElement element = CloneTree();
+            // VisualElement root = editorWindow.rootVisualElement;
+            editorWindow.rootVisualElement.Add(element);
+        }
+
+        public static VisualElement CloneTree()
+        {
+            StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
+
+            VisualTreeAsset popUpAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
+            VisualElement root = popUpAsset.CloneTree();
+
+            root.styleSheets.Add(ussStyle);
+
+            // root.Q<TemplateContainer>("itemRow").RemoveFromHierarchy();
+
+            ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
+            toolbarBreadcrumbs.PushItem("myItemGrandParent", () => Debug.Log("1"));
+            toolbarBreadcrumbs.PushItem("myItemParent", () => Debug.Log("2"));
+            toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
+            toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
+            toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
+
+            VisualTreeAsset separatorAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
+
+            VisualTreeAsset itemAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
+
+            ScrollView scrollView = root.Q<ScrollView>();
+
+            Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
+            Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
+            Texture2D check = RichTextDrawer.LoadTexture("check.png");
+
+            foreach (int index in Enumerable.Range(0, 10))
+            {
+                VisualElement item = itemAsset.CloneTree();
+
+                VisualElement itemContainer =
+                    item.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
+
+                item.Q<Label>("item-content").text = $"Item {index}";
+                item.Q<Image>("item-icon-image").image = icon;
+                item.Q<Image>("item-next-image").image = next;
+                item.Q<Image>("item-next-image").tintColor = EColor.Gray.GetColor();
+
+                if (index == 3)
+                {
+                    item.Q<Image>("item-checked-image").image = check;
+                    itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
+                    itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                }
+
+                if (index == 6)
+                {
+                    itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
+                    itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                }
+
+                scrollView.Add(item);
+
+                if (index == 2 || index == 8)
+                {
+                    VisualElement separator = separatorAsset.CloneTree();
+                    scrollView.Add(separator);
+                }
+            }
+
+            return root;
+        }
+
+        public override void OnClose()
+        {
+            Debug.Log("Popup closed: " + this);
+        }
+    }
+    #endregion
 
     [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute))]
     public class AdvancedDropdownAttributeDrawer: SaintsPropertyDrawer
@@ -171,6 +272,159 @@ namespace SaintsField.Editor.Drawers
                 UnityEngine.Object.DestroyImmediate(iconCacheValue);
             }
         }
+
+        #region Util
+
+        private struct MetaInfo
+        {
+            // ReSharper disable InconsistentNaming
+            public string Error;
+            public string CurDisplay;
+            public object CurValue;
+            public IAdvancedDropdownList DropdownListValue;
+            // ReSharper enable InconsistentNaming
+        }
+
+        private static MetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, object parentObj)
+        {
+            string funcName = advancedDropdownAttribute.FuncName;
+            Debug.Assert(parentObj != null);
+            Type parentType = parentObj.GetType();
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                ReflectUtils.GetProp(parentType, funcName);
+
+            #region Get List Items
+            IAdvancedDropdownList dropdownListValue;
+
+            switch (getPropType)
+            {
+                case ReflectUtils.GetPropType.NotFound:
+                    return new MetaInfo
+                    {
+                        Error = $"not found `{funcName}` on target `{parentObj}`",
+                    };
+                case ReflectUtils.GetPropType.Property:
+                {
+                    PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
+                    dropdownListValue = foundPropertyInfo.GetValue(parentObj) as IAdvancedDropdownList;
+                    if (dropdownListValue == null)
+                    {
+                        return new MetaInfo
+                        {
+                            Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
+                        };
+                    }
+                }
+                    break;
+                case ReflectUtils.GetPropType.Field:
+                {
+                    FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
+                    dropdownListValue = foundFieldInfo.GetValue(parentObj) as IAdvancedDropdownList;
+                    if (dropdownListValue == null)
+                    {
+                        return new MetaInfo
+                        {
+                            Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
+                        };
+                    }
+                }
+                    break;
+                case ReflectUtils.GetPropType.Method:
+                {
+                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    Debug.Assert(methodParams.All(p => p.IsOptional));
+
+                    try
+                    {
+                        dropdownListValue =
+                            methodInfo.Invoke(parentObj, methodParams.Select(p => p.DefaultValue).ToArray()) as IAdvancedDropdownList;
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        Debug.LogException(e);
+                        Debug.Assert(e.InnerException != null);
+                        return new MetaInfo
+                        {
+                            Error = e.InnerException.Message,
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                        return new MetaInfo
+                        {
+                            Error = e.Message,
+                        };
+                    }
+
+                    if (dropdownListValue == null)
+                    {
+                        return new MetaInfo
+                        {
+                            Error = $"dropdownListValue is null from `{funcName}()` on target `{parentObj}`",
+                        };
+                    }
+                }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+            }
+
+            #endregion
+
+            #region Get Cur Value
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+            // Object target = property.serializedObject.targetObject;
+            FieldInfo field = parentType.GetField(property.name, bindAttr);
+            Debug.Assert(field != null, $"{property.name}/{parentObj}");
+            object curValue = field.GetValue(parentObj);
+            // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
+            // string curDisplay = "";
+            string curDisplay = "-";
+            // object curValue;
+            Debug.Assert(dropdownListValue != null);
+            foreach ((string, object) itemInfos in Flatten("", dropdownListValue))
+            {
+                string name = itemInfos.Item1;
+                object itemValue = itemInfos.Item2;
+
+                if (curValue == null && itemValue == null)
+                {
+                    curDisplay = name;
+                    break;
+                }
+                if (curValue is UnityEngine.Object curValueObj
+                    && curValueObj == itemValue as UnityEngine.Object)
+                {
+                    curDisplay = name;
+                    break;
+                }
+                if (itemValue == null)
+                {
+                    // nothing
+                }
+                else if (itemValue.Equals(curValue))
+                {
+                    curDisplay = name;
+                    break;
+                }
+            }
+            #endregion
+
+            return new MetaInfo
+            {
+                Error = "",
+                CurDisplay = curDisplay,
+                CurValue = curValue,
+                DropdownListValue = dropdownListValue,
+            };
+        }
+
+        #endregion
+
+        #region IMGUI
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool hasLabelWidth)
@@ -506,104 +760,6 @@ namespace SaintsField.Editor.Drawers
         #endregion
 
 #if UNITY_2021_3_OR_NEWER
-
-        public class SaintsAdvancedDropdownUiToolkit : PopupWindowContent
-        {
-            private readonly float _width;
-
-            public SaintsAdvancedDropdownUiToolkit(float width)
-            {
-                _width = width;
-            }
-
-            public override void OnGUI(Rect rect)
-            {
-                // Intentionally left empty
-            }
-
-            //Set the window size
-            public override Vector2 GetWindowSize()
-            {
-                return new Vector2(_width, 200);
-            }
-
-            public override void OnOpen()
-            {
-                VisualElement element = CloneTree();
-                // VisualElement root = editorWindow.rootVisualElement;
-                editorWindow.rootVisualElement.Add(element);
-            }
-
-            public static VisualElement CloneTree()
-            {
-                StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
-
-                VisualTreeAsset popUpAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
-                VisualElement root = popUpAsset.CloneTree();
-
-                root.styleSheets.Add(ussStyle);
-
-                // root.Q<TemplateContainer>("itemRow").RemoveFromHierarchy();
-
-                ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
-                toolbarBreadcrumbs.PushItem("myItemGrandParent", () => Debug.Log("1"));
-                toolbarBreadcrumbs.PushItem("myItemParent", () => Debug.Log("2"));
-                toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
-                toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
-                toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
-
-                VisualTreeAsset separatorAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
-
-                VisualTreeAsset itemAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
-
-                ScrollView scrollView = root.Q<ScrollView>();
-
-                Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
-                Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
-                Texture2D check = RichTextDrawer.LoadTexture("check.png");
-
-                foreach (int index in Enumerable.Range(0, 10))
-                {
-                    VisualElement item = itemAsset.CloneTree();
-
-                    VisualElement itemContainer =
-                        item.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
-
-                    item.Q<Label>("item-content").text = $"Item {index}";
-                    item.Q<Image>("item-icon-image").image = icon;
-                    item.Q<Image>("item-next-image").image = next;
-                    item.Q<Image>("item-next-image").tintColor = EColor.Gray.GetColor();
-
-                    if (index == 3)
-                    {
-                        item.Q<Image>("item-checked-image").image = check;
-                        itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
-                        itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-                    }
-
-                    if (index == 6)
-                    {
-                        itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
-                        itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-                    }
-
-                    scrollView.Add(item);
-
-                    if (index == 2 || index == 8)
-                    {
-                        VisualElement separator = separatorAsset.CloneTree();
-                        scrollView.Add(separator);
-                    }
-                }
-
-                return root;
-            }
-
-            public override void OnClose()
-            {
-                Debug.Log("Popup closed: " + this);
-            }
-        }
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
