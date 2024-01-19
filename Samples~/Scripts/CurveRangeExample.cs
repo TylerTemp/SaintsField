@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -12,5 +13,20 @@ namespace SaintsField.Samples.Scripts
 
         [CurveRange(0, 0, 5, 5, EColor.Red)]
         public AnimationCurve curve2;
+
+        [Serializable]
+        public struct Nest2
+        {
+            [CurveRange(0, 0, 5, 5, EColor.Red)]
+            public AnimationCurve nested;
+        }
+
+        [Serializable]
+        public struct Nest1
+        {
+            public Nest2 nest2;
+        }
+
+        public Nest1 nest1;
     }
 }

@@ -8,9 +8,11 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using TreeView = UnityEngine.UIElements.TreeView;
 using UnityAdvancedDropdown = UnityEditor.IMGUI.Controls.AdvancedDropdown;
 using UnityAdvancedDropdownItem = UnityEditor.IMGUI.Controls.AdvancedDropdownItem;
 #if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 
@@ -505,17 +507,158 @@ namespace SaintsField.Editor.Drawers
 
 #if UNITY_2021_3_OR_NEWER
 
+        public class SaintsAdvancedDropdownUiToolkit : PopupWindowContent
+        {
+            private readonly float _width;
+
+            public SaintsAdvancedDropdownUiToolkit(float width)
+            {
+                _width = width;
+            }
+
+            public override void OnGUI(Rect rect)
+            {
+                // Intentionally left empty
+            }
+
+            //Set the window size
+            public override Vector2 GetWindowSize()
+            {
+                return new Vector2(_width, 200);
+            }
+
+            public override void OnOpen()
+            {
+                VisualElement element = CloneTree();
+                // VisualElement root = editorWindow.rootVisualElement;
+                editorWindow.rootVisualElement.Add(element);
+            }
+
+            public static VisualElement CloneTree()
+            {
+                StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
+
+                VisualTreeAsset popUpAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
+                VisualElement root = popUpAsset.CloneTree();
+
+                root.styleSheets.Add(ussStyle);
+
+                // root.Q<TemplateContainer>("itemRow").RemoveFromHierarchy();
+
+                ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
+                toolbarBreadcrumbs.PushItem("myItemGrandParent", () => Debug.Log("1"));
+                toolbarBreadcrumbs.PushItem("myItemParent", () => Debug.Log("2"));
+                toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
+                toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
+                toolbarBreadcrumbs.PushItem("myItem", () => Debug.Log("3"));
+
+                VisualTreeAsset separatorAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
+
+                VisualTreeAsset itemAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
+
+                ScrollView scrollView = root.Q<ScrollView>();
+
+                Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
+                Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
+                Texture2D check = RichTextDrawer.LoadTexture("check.png");
+
+                foreach (int index in Enumerable.Range(0, 10))
+                {
+                    VisualElement item = itemAsset.CloneTree();
+
+                    VisualElement itemContainer =
+                        item.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
+
+                    item.Q<Label>("item-content").text = $"Item {index}";
+                    item.Q<Image>("item-icon-image").image = icon;
+                    item.Q<Image>("item-next-image").image = next;
+                    item.Q<Image>("item-next-image").tintColor = EColor.Gray.GetColor();
+
+                    if (index == 3)
+                    {
+                        item.Q<Image>("item-checked-image").image = check;
+                        itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
+                        itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                    }
+
+                    if (index == 6)
+                    {
+                        itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
+                        itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                    }
+
+                    scrollView.Add(item);
+
+                    if (index == 2 || index == 8)
+                    {
+                        VisualElement separator = separatorAsset.CloneTree();
+                        scrollView.Add(separator);
+                    }
+                }
+
+                return root;
+            }
+
+            public override void OnClose()
+            {
+                Debug.Log("Popup closed: " + this);
+            }
+        }
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             VisualElement container,
             Label fakeLabel,
             object parent)
         {
-            return new VisualElement();
+            VisualElement root = new VisualElement();
+
+            VisualElement popContainer = new VisualElement
+            {
+                style =
+                {
+                    borderLeftColor = Color.green,
+                    borderRightColor = Color.green,
+                    borderTopColor = Color.green,
+                    borderBottomColor = Color.green,
+
+                    borderLeftWidth = 1,
+                    borderRightWidth = 1,
+                    borderTopWidth = 1,
+                    borderBottomWidth = 1,
+                },
+            };
+            popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree());
+
+            root.Add(new Button(() =>
+            {
+                popContainer.Clear();
+                popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree());
+                Debug.Log("Done");
+            })
+            {
+                text = "Reload",
+            });
+            root.Add(popContainer);
+
+            return root;
+
+            // Button button = new Button
+            // {
+            //     text = "Open",
+            //     style =
+            //     {
+            //         flexGrow = 1,
+            //     },
+            // };
+            //
+            // button.clicked += () => UnityEditor.PopupWindow.Show(button.worldBound, new SaintsAdvancedDropdownUiToolkit(button.worldBound.width));
+
+            // return button;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);
+        // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);
 #endif
     }
 }

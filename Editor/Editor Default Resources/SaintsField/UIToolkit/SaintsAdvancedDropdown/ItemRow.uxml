@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Button name="item-template" class="saintsfield-advanced-dropdown-item saintsfield-advanced-dropdown-item-active" style="flex-direction: row; justify-content: space-between; height: 20px;">
+        <ui:VisualElement style="flex-direction: row; align-items: center;">
+            <ui:Image name="item-checked-image" style="width: 15px;" />
+            <ui:Image name="item-icon-image" style="width: 16px; height: 16px; margin-right: 2px;" />
+            <ui:Label name="item-content" />
+        </ui:VisualElement>
+        <ui:Image name="item-next-image" style="width: 6px; margin-right: 4px" />
+    </ui:Button>
+</ui:UXML>

@@ -1,0 +1,50 @@
+/* Main Panel */
+ToolbarSearchField {
+    width: 100%;
+}
+
+ToolbarBreadcrumbs {
+    flex-wrap: wrap;
+}
+
+/* Item */
+
+Button.saintsfield-advanced-dropdown-item {
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+
+    background-color: rgba(0, 0, 0, 0);
+    margin: 0;
+    padding: 0;
+
+    cursor: link;
+}
+
+.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-active:hover {
+    background-color: #595959;
+}
+
+.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-selected {
+    background-color: #303030;
+    cursor: arrow;
+}
+
+.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-selected.active:hover {
+    background-color: #303030;
+}
+
+.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-disabled > * > Label {
+    color: #595959;
+}
+
+.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-disabled {
+    cursor: arrow;
+}
+
+/* Separator */
+.saintsfield-advanced-dropdown-separator {
+    height: 2px;
+    background-color: #595959;
+}
