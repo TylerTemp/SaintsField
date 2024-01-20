@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts
         public int place2;
         public int place3;
         public int place4;
-        [AdvancedDropdown(nameof(AdvDropdown)), AboveRichLabel(nameof(drops), true)] public int drops;
+        [AdvancedDropdown(nameof(AdvDropdown)), AboveRichLabel(nameof(drops2), true)] public int drops2 = 4;
 
         public AdvancedDropdownList<int> AdvDropdown()
         {

@@ -8,6 +8,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityAdvancedDropdown = UnityEditor.IMGUI.Controls.AdvancedDropdown;
 using UnityAdvancedDropdownItem = UnityEditor.IMGUI.Controls.AdvancedDropdownItem;
 #if UNITY_2021_3_OR_NEWER
@@ -183,7 +184,7 @@ namespace SaintsField.Editor.Drawers
 
         public override void OnOpen()
         {
-            VisualElement element = CloneTree();
+            VisualElement element = CloneTree(_metaInfo);
             // VisualElement root = editorWindow.rootVisualElement;
             editorWindow.rootVisualElement.Add(element);
         }
@@ -212,50 +213,93 @@ namespace SaintsField.Editor.Drawers
 
             ScrollView scrollView = root.Q<ScrollView>();
 
-            Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
+            // Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
             Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
             Texture2D check = RichTextDrawer.LoadTexture("check.png");
 
-            foreach (IAdvancedDropdownList dropdownList in metaInfo.DropdownListValue)
+            IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack = metaInfo.SelectStacks;
+            IReadOnlyList<IAdvancedDropdownList> displayPage = metaInfo.DropdownListValue.children;
+            if (selectStack.Count > 0)
             {
-
+                Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
+                displayPage = GetPage(metaInfo.DropdownListValue, selectStack);
             }
 
-            // foreach (int index in Enumerable.Range(0, 10))
-            // {
-            //     VisualElement item = itemAsset.CloneTree();
-            //
-            //     VisualElement itemContainer =
-            //         item.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
-            //
-            //     item.Q<Label>("item-content").text = $"Item {index}";
-            //     item.Q<Image>("item-icon-image").image = icon;
-            //     item.Q<Image>("item-next-image").image = next;
-            //     item.Q<Image>("item-next-image").tintColor = EColor.Gray.GetColor();
-            //
-            //     if (index == 3)
-            //     {
-            //         item.Q<Image>("item-checked-image").image = check;
-            //         itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
-            //         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-            //     }
-            //
-            //     if (index == 6)
-            //     {
-            //         itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
-            //         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-            //     }
-            //
-            //     scrollView.Add(item);
-            //
-            //     if (index == 2 || index == 8)
-            //     {
-            //         VisualElement separator = separatorAsset.CloneTree();
-            //         scrollView.Add(separator);
-            //     }
-            // }
-
+            SwapPage(scrollView, displayPage, selectStack, separatorAsset, itemAsset, next, check);
             return root;
+        }
+
+        private static void SwapPage(
+            ScrollView scrollView,
+            IReadOnlyList<IAdvancedDropdownList> displayPage,
+            IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack,
+            VisualTreeAsset separatorAsset,
+            VisualTreeAsset itemAsset,
+            Texture2D next,
+            Texture2D check)
+        {
+            scrollView.Clear();
+
+            foreach ((IAdvancedDropdownList dropdownItem, int index) in displayPage.WithIndex())
+            {
+                if (dropdownItem.isSeparator)
+                {
+                    VisualElement separator = separatorAsset.CloneTree();
+                    scrollView.Add(separator);
+                    continue;
+                }
+
+                VisualElement elementItem = itemAsset.CloneTree();
+
+                VisualElement itemContainer =
+                    elementItem.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
+
+                Image selectImage = itemContainer.Q<Image>("item-checked-image");
+                selectImage.image = check;
+
+                itemContainer.Q<Label>("item-content").text = dropdownItem.displayName;
+
+                if(!string.IsNullOrEmpty(dropdownItem.icon))
+                {
+                    itemContainer.Q<Image>("item-icon-image").image = RichTextDrawer.LoadTexture(dropdownItem.icon);
+                }
+
+                if(dropdownItem.children.Count > 0)
+                {
+                    itemContainer.Q<Image>("item-next-image").image = next;
+                }
+                else
+                {
+                    bool isSelected = selectStack.Count > 0 && selectStack[selectStack.Count - 1].Index == index;
+                    Debug.Log($"isSelected={isSelected}, {index}");
+                    if (isSelected)
+                    {
+                        selectImage.visible = true;
+                        itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
+                    }
+
+                    if (dropdownItem.disabled)
+                    {
+                        itemContainer.SetEnabled(false);
+                        itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
+                        itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                    }
+                }
+
+                scrollView.Add(elementItem);
+            }
+        }
+
+        private static IReadOnlyList<IAdvancedDropdownList> GetPage(IAdvancedDropdownList dropdownList, IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack)
+        {
+            if (selectStack.Count <= 1)
+            {
+                return dropdownList.children;
+            }
+
+            int index = selectStack[0].Index;
+            // ReSharper disable once TailRecursiveCall
+            return GetPage(dropdownList.children[index], selectStack.Skip(1).ToArray());
         }
 
         public override void OnClose()
@@ -282,6 +326,15 @@ namespace SaintsField.Editor.Drawers
 
         #region Util
 
+        public struct SelectStack
+        {
+            // ReSharper disable InconsistentNaming
+            public int Index;
+            public string Display;
+            // public object Value;
+            // ReSharper enable InconsistentNaming
+        }
+
         public struct MetaInfo
         {
             // ReSharper disable InconsistentNaming
@@ -289,6 +342,7 @@ namespace SaintsField.Editor.Drawers
             public string CurDisplay;
             public object CurValue;
             public IAdvancedDropdownList DropdownListValue;
+            public IReadOnlyList<SelectStack> SelectStacks;
             // ReSharper enable InconsistentNaming
         }
 
@@ -389,44 +443,77 @@ namespace SaintsField.Editor.Drawers
             object curValue = field.GetValue(parentObj);
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             // string curDisplay = "";
-            string curDisplay = "-";
-            // object curValue;
-            Debug.Assert(dropdownListValue != null);
-            foreach ((string, object) itemInfos in Flatten("", dropdownListValue))
-            {
-                string name = itemInfos.Item1;
-                object itemValue = itemInfos.Item2;
-
-                if (curValue == null && itemValue == null)
-                {
-                    curDisplay = name;
-                    break;
-                }
-                if (curValue is UnityEngine.Object curValueObj
-                    && curValueObj == itemValue as UnityEngine.Object)
-                {
-                    curDisplay = name;
-                    break;
-                }
-                if (itemValue == null)
-                {
-                    // nothing
-                }
-                else if (itemValue.Equals(curValue))
-                {
-                    curDisplay = name;
-                    break;
-                }
-            }
+            IReadOnlyList<SelectStack> curSelected = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
             #endregion
 
             return new MetaInfo
             {
                 Error = "",
-                CurDisplay = curDisplay,
+                // CurDisplay = curDisplay,
                 CurValue = curValue,
                 DropdownListValue = dropdownListValue,
+                SelectStacks = curSelected,
             };
+        }
+
+        private static IReadOnlyList<SelectStack> GetSelected(object curValue, IReadOnlyList<SelectStack> curStacks, IReadOnlyList<IAdvancedDropdownList> dropdownPage)
+        {
+            foreach ((IAdvancedDropdownList item, int index) in dropdownPage.WithIndex())
+            {
+                if (item.isSeparator)
+                {
+                    continue;
+                }
+
+                if (item.children.Count > 0)  // it's a group
+                {
+                    Debug.Log($"GetSelected group {item.displayName}");
+                    var subResult = GetSelected(curValue, curStacks.Append(new SelectStack
+                    {
+                        Display = item.displayName,
+                        Index = index,
+                    }).ToArray(), item.children);
+                    if (subResult.Count > 0)
+                    {
+                        return subResult;
+                    }
+
+                    continue;
+                }
+
+                IEnumerable<SelectStack> thisLoopResult = curStacks.Append(new SelectStack
+                {
+                    Display = item.displayName,
+                    Index = index,
+                });
+
+                // ReSharper disable once ConvertIfStatementToSwitchStatement
+                if (curValue == null && item.value == null)
+                {
+                    Debug.Log($"GetSelected null {item.displayName}/{index}");
+                    return thisLoopResult.ToArray();
+                }
+                if (curValue is UnityEngine.Object curValueObj
+                    && curValueObj == item.value as UnityEngine.Object)
+                {
+                    Debug.Log($"GetSelected {curValue} {item.displayName}/{index}");
+                    return thisLoopResult.ToArray();
+                }
+                if (item.value == null)
+                {
+                    Debug.Log($"GetSelected nothing null {item.displayName}/{index}");
+                    // nothing
+                }
+                else if (item.value.Equals(curValue))
+                {
+                    Debug.Log($"GetSelected {curValue} {item.displayName}/{index}");
+                    return thisLoopResult.ToArray();
+                }
+            }
+
+            Debug.Log($"GetSelected end in empty");
+            // nothing selected
+            return Array.Empty<SelectStack>();
         }
 
         #endregion
@@ -791,12 +878,13 @@ namespace SaintsField.Editor.Drawers
                     borderBottomWidth = 1,
                 },
             };
-            popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree());
+
+            popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent)));
 
             root.Add(new Button(() =>
             {
                 popContainer.Clear();
-                popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree());
+                popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent)));
                 Debug.Log("Done");
             })
             {
