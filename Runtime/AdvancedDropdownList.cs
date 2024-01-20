@@ -27,8 +27,8 @@ namespace SaintsField
             bool isSeparator = false)
         {
             this.displayName = displayName;
-            this._typeValue = value;
-            this._typeChildren = new List<AdvancedDropdownList<T>>();
+            _typeValue = value;
+            _typeChildren = new List<AdvancedDropdownList<T>>();
             this.disabled = disabled;
             this.icon = icon;
             this.isSeparator = isSeparator;

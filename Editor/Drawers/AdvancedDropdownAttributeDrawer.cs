@@ -164,11 +164,13 @@ namespace SaintsField.Editor.Drawers
     {
         private readonly float _width;
         private readonly AdvancedDropdownAttributeDrawer.MetaInfo _metaInfo;
+        private readonly Action<object> _setValue;
 
-        public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width)
+        public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width, Action<object> setValue)
         {
             _width = width;
             _metaInfo = metaInfo;
+            _setValue = setValue;
         }
 
         public override void OnGUI(Rect rect)
@@ -184,12 +186,12 @@ namespace SaintsField.Editor.Drawers
 
         public override void OnOpen()
         {
-            VisualElement element = CloneTree(_metaInfo);
+            VisualElement element = CloneTree(_metaInfo, _setValue);
             // VisualElement root = editorWindow.rootVisualElement;
             editorWindow.rootVisualElement.Add(element);
         }
 
-        public static VisualElement CloneTree(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo)
+        public static VisualElement CloneTree(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, Action<object> setValue)
         {
             StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
 
@@ -211,7 +213,8 @@ namespace SaintsField.Editor.Drawers
 
             VisualTreeAsset itemAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
 
-            ScrollView scrollView = root.Q<ScrollView>();
+            VisualElement scrollViewContainer = root.Q<VisualElement>("saintsfield-advanced-dropdown-scollview-container");
+            // ScrollView scrollView = root.Q<ScrollView>();
 
             // Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
             Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
@@ -225,20 +228,36 @@ namespace SaintsField.Editor.Drawers
                 displayPage = GetPage(metaInfo.DropdownListValue, selectStack);
             }
 
-            SwapPage(scrollView, displayPage, selectStack, separatorAsset, itemAsset, next, check);
+            SwapPage(scrollViewContainer, displayPage, selectStack, separatorAsset, itemAsset, next, check, setValue);
             return root;
         }
 
-        private static void SwapPage(
-            ScrollView scrollView,
+        private static void SwapPage(VisualElement scrollViewContainer,
             IReadOnlyList<IAdvancedDropdownList> displayPage,
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack,
             VisualTreeAsset separatorAsset,
             VisualTreeAsset itemAsset,
             Texture2D next,
-            Texture2D check)
+            Texture2D check, Action<object> setValue)
         {
+            ScrollView scrollView = scrollViewContainer.Q<ScrollView>();
+
+            VisualElement fadeOutOriChildren = new VisualElement();
+            foreach (VisualElement scrollViewChildren in scrollView.Children().ToArray())
+            {
+                fadeOutOriChildren.Add(scrollViewChildren);
+            }
+
+            fadeOutOriChildren.AddToClassList("saintsfield-advanced-dropdown-fade-out-container");
+            fadeOutOriChildren.AddToClassList("saintsfield-advanced-dropdown-anim");
+            fadeOutOriChildren.RegisterCallback<GeometryChangedEvent>(GeoAnimOutLeftDestroy);
+            scrollViewContainer.Add(fadeOutOriChildren);
+
             scrollView.Clear();
+
+            VisualElement scrollContent = new VisualElement();
+            scrollContent.AddToClassList("saintsfield-advanced-dropdown-anim");
+            scrollContent.AddToClassList("saintsfield-advanced-dropdown-anim-right");
 
             foreach ((IAdvancedDropdownList dropdownItem, int index) in displayPage.WithIndex())
             {
@@ -251,8 +270,8 @@ namespace SaintsField.Editor.Drawers
 
                 VisualElement elementItem = itemAsset.CloneTree();
 
-                VisualElement itemContainer =
-                    elementItem.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
+                Button itemContainer =
+                    elementItem.Q<Button>(className: "saintsfield-advanced-dropdown-item");
 
                 Image selectImage = itemContainer.Q<Image>("item-checked-image");
                 selectImage.image = check;
@@ -267,9 +286,12 @@ namespace SaintsField.Editor.Drawers
                 if(dropdownItem.children.Count > 0)
                 {
                     itemContainer.Q<Image>("item-next-image").image = next;
+                    itemContainer.clicked += () => SwapPage(scrollViewContainer, dropdownItem.children, selectStack, separatorAsset, itemAsset, next, check, setValue);
                 }
                 else
                 {
+                    itemContainer.clicked += () => setValue(dropdownItem.value);
+
                     bool isSelected = selectStack.Count > 0 && selectStack[selectStack.Count - 1].Index == index;
                     Debug.Log($"isSelected={isSelected}, {index}");
                     if (isSelected)
@@ -286,9 +308,51 @@ namespace SaintsField.Editor.Drawers
                     }
                 }
 
-                scrollView.Add(elementItem);
+                // itemContainer.RegisterCallback<GeometryChangedEvent>(GeoAnimIntoView);
+
+                scrollContent.Add(elementItem);
             }
+
+            scrollContent.RegisterCallback<GeometryChangedEvent>(GeoAnimIntoView);;
+
+            scrollView.Add(scrollContent);
         }
+
+        private static void GeoAnimIntoView(GeometryChangedEvent evt)
+        {
+            VisualElement targetItem = (VisualElement)evt.target;
+            targetItem.UnregisterCallback<GeometryChangedEvent>(GeoAnimIntoView);
+            // VisualElement targetItem = targetRoot.Q<VisualElement>(className: "saintsfield-advanced-dropdown-item");
+            // Debug.Log($"attached: {targetRoot}");
+            targetItem.RemoveFromClassList("saintsfield-advanced-dropdown-anim-right");
+            targetItem.RemoveFromClassList("saintsfield-advanced-dropdown-anim-left");
+            targetItem.AddToClassList("saintsfield-advanced-dropdown-anim-in-view");
+        }
+
+        private static void GeoAnimOutLeftDestroy(GeometryChangedEvent evt)
+        {
+            GeoAnimOutDestroy(evt, "saintsfield-advanced-dropdown-anim-left");
+        }
+
+        private static void GeoAnimOutRightDestroy(GeometryChangedEvent evt)
+        {
+            GeoAnimOutDestroy(evt, "saintsfield-advanced-dropdown-anim-right");
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static void GeoAnimOutDestroy(GeometryChangedEvent evt, string className)
+        {
+            VisualElement targetItem = (VisualElement)evt.target;
+            targetItem.UnregisterCallback<GeometryChangedEvent>(GeoAnimOutLeftDestroy);
+            targetItem.UnregisterCallback<GeometryChangedEvent>(GeoAnimOutRightDestroy);
+
+            targetItem.RemoveFromClassList("saintsfield-advanced-dropdown-anim-in-view");
+            targetItem.AddToClassList(className);
+            targetItem.RegisterCallback<TransitionEndEvent>(TransitionDestroy);
+        }
+
+        private static void TransitionDestroy(TransitionEndEvent evt) =>
+            ((VisualElement)evt.target).RemoveFromHierarchy();
 
         private static IReadOnlyList<IAdvancedDropdownList> GetPage(IAdvancedDropdownList dropdownList, IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack)
         {
@@ -339,6 +403,9 @@ namespace SaintsField.Editor.Drawers
         {
             // ReSharper disable InconsistentNaming
             public string Error;
+
+            public FieldInfo FieldInfo;
+
             public string CurDisplay;
             public object CurValue;
             public IAdvancedDropdownList DropdownListValue;
@@ -449,6 +516,7 @@ namespace SaintsField.Editor.Drawers
             return new MetaInfo
             {
                 Error = "",
+                FieldInfo = field,
                 // CurDisplay = curDisplay,
                 CurValue = curValue,
                 DropdownListValue = dropdownListValue,
@@ -865,6 +933,7 @@ namespace SaintsField.Editor.Drawers
 
             VisualElement popContainer = new VisualElement
             {
+                name = "PopContainer",
                 style =
                 {
                     borderLeftColor = Color.green,
@@ -879,17 +948,58 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent)));
+            MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
+            popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree(metaInfo, curItem => Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo)));
+
+            // root.Add(new Button(() =>
+            // {
+            //     popContainer.Clear();
+            //     Debug.Log("Done");
+            // })
+            // {
+            //     text = "Remove",
+            // });
 
             root.Add(new Button(() =>
             {
                 popContainer.Clear();
-                popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent)));
+                MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
+                popContainer.Add(SaintsAdvancedDropdownUiToolkit.CloneTree(metaInfo, curItem => Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo)));
+                
                 Debug.Log("Done");
             })
             {
                 text = "Reload",
             });
+
+            // root.Add(new Button(() =>
+            // {
+            //     // child.AddToClassList("saintsfield-advanced-dropdown-in-from-right");
+            //     popContainer.Query<VisualElement>(className: "saintsfield-advanced-dropdown-item").ForEach(each =>
+            //     {
+            //         Debug.Log(each);
+            //         each.RemoveFromClassList("saintsfield-advanced-dropdown-item-right");
+            //     });
+            //
+            //     Debug.Log("Done");
+            // })
+            // {
+            //     text = "Translate",
+            // });
+
+            // root.Add(new Button(() =>
+            // {
+            //     popContainer.Query<VisualElement>(className: "saintsfield-advanced-dropdown-item").ForEach(each =>
+            //     {
+            //         each.RemoveFromClassList("saintsfield-advanced-dropdown-item-right");
+            //         // each.style.translate = new Translate(Length.Percent(-100), 0);
+            //     });
+            //
+            //     Debug.Log("Done");
+            // })
+            // {
+            //     text = "Add Class",
+            // });
             root.Add(popContainer);
 
             return root;
