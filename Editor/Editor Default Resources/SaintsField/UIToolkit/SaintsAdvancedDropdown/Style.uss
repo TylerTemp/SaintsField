@@ -45,8 +45,8 @@ Button.saintsfield-advanced-dropdown-item {
 
 
 .saintsfield-advanced-dropdown-anim {
-    transition-duration: 0.15s;
-    /*transition-duration: 3s;*/
+    transition-duration: 0.2s;
+    /*transition-duration: 30s;*/
     transition-delay: 0;
     transition-timing-function: ease;
     transition-property: translate;
@@ -67,3 +67,13 @@ Button.saintsfield-advanced-dropdown-item {
 .saintsfield-advanced-dropdown-fade-out-container {
     position: absolute;
 }
+
+/* hack around... */
+.unity-scroller__slider, .unity-scroller__low-button, .unity-scroller__high-button {
+    display: none;
+}
+
+/* This does not work */
+/*Scroller {*/
+/*    display: none;*/
+/*}*/

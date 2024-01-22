@@ -3460,7 +3460,7 @@ MonoBehaviour:
   place2: 0
   place3: 0
   place4: 0
-  drops: 3
+  drops7: 3
 --- !u!4 &1509173913
 Transform:
   m_ObjectHideFlags: 0
