@@ -330,7 +330,7 @@ namespace SaintsField.Editor.Drawers
 
             button.Add(buttonLabelContainer);
 
-            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 1);
+            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
             label.name = NameLabel(property);
             root.Add(label);
             root.Add(button);

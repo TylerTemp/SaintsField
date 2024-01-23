@@ -852,21 +852,21 @@ namespace SaintsField.Editor.Drawers
             object curValue = field.GetValue(parentObj);
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             // string curDisplay = "";
-            IReadOnlyList<SelectStack> curSelected = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
+            (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
             #endregion
 
             return new MetaInfo
             {
                 Error = "",
                 FieldInfo = field,
-                // CurDisplay = curDisplay,
+                CurDisplay = display,
                 CurValue = curValue,
                 DropdownListValue = dropdownListValue,
                 SelectStacks = curSelected,
             };
         }
 
-        private static IReadOnlyList<SelectStack> GetSelected(object curValue, IReadOnlyList<SelectStack> curStacks, IAdvancedDropdownList dropdownPage)
+        private static (IReadOnlyList<SelectStack> stack, string display) GetSelected(object curValue, IReadOnlyList<SelectStack> curStacks, IAdvancedDropdownList dropdownPage)
         {
             foreach ((IAdvancedDropdownList item, int index) in dropdownPage.children.WithIndex())
             {
@@ -878,14 +878,14 @@ namespace SaintsField.Editor.Drawers
                 if (item.children.Count > 0)  // it's a group
                 {
                     Debug.Log($"GetSelected group {dropdownPage.displayName}");
-                    IReadOnlyList<SelectStack> subResult = GetSelected(curValue, curStacks.Append(new SelectStack
+                    (IReadOnlyList<SelectStack> subResult, string display) = GetSelected(curValue, curStacks.Append(new SelectStack
                     {
                         Display = dropdownPage.displayName,
                         Index = index,
                     }).ToArray(), item);
                     if (subResult.Count > 0)
                     {
-                        return subResult;
+                        return (subResult, display);
                     }
 
                     continue;
@@ -900,7 +900,7 @@ namespace SaintsField.Editor.Drawers
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (GetIsEqual(curValue, item.value))
                 {
-                    return thisLoopResult.ToArray();
+                    return (thisLoopResult.ToArray(), item.displayName);
                 }
                 // if (curValue == null && item.value == null)
                 // {
@@ -927,7 +927,7 @@ namespace SaintsField.Editor.Drawers
 
             // Debug.Log($"GetSelected end in empty");
             // nothing selected
-            return Array.Empty<SelectStack>();
+            return (Array.Empty<SelectStack>(), "");
         }
 
         public static bool GetIsEqual(object curValue, object itemValue)
@@ -1291,6 +1291,8 @@ namespace SaintsField.Editor.Drawers
 
 #if UNITY_2021_3_OR_NEWER
 
+        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Label";
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             VisualElement container,
@@ -1344,14 +1346,81 @@ namespace SaintsField.Editor.Drawers
             //
             // return root;
 
+            // Button button = new Button
+            // {
+            //     text = "Open",
+            //     style =
+            //     {
+            //         flexGrow = 1,
+            //
+            //     },
+            // };
+            //
+            // button.clicked += () =>
+            // {
+            //     MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
+            //     UnityEditor.PopupWindow.Show(button.worldBound, new SaintsAdvancedDropdownUiToolkit(
+            //         metaInfo,
+            //         button.worldBound.width,
+            //         (newDisplay, curItem) =>
+            //         {
+            //             Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo);
+            //             button.text = newDisplay;
+            //         }
+            //     ));
+            // };
+            //
+            // return button;
+
             Button button = new Button
             {
-                text = "Open",
                 style =
                 {
+                    // height = EditorGUIUtility.singleLineHeight,
                     flexGrow = 1,
                 },
+                // name = NameButtonField(property),
             };
+
+            VisualElement buttonLabelContainer = new VisualElement
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                    flexDirection = FlexDirection.Row,
+                    alignItems = Align.Center,
+                    justifyContent = Justify.SpaceBetween,
+                },
+            };
+
+            MetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
+
+            string labelDisplay = initMetaInfo.SelectStacks.Count == 0
+                ? "-"
+                : string.Join("/", initMetaInfo.SelectStacks.Skip(1).Select(each => each.Display).Append(initMetaInfo.CurDisplay));
+
+            Label buttonLabel = new Label(labelDisplay)
+            {
+                // name = NameButtonLabelField(property),
+                // userData = metaInfo.SelectedIndex,
+            };
+            buttonLabelContainer.Add(buttonLabel);
+            buttonLabelContainer.Add(new Label("▼"));
+
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
+            };
+
+            button.Add(buttonLabelContainer);
+
+            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            label.name = NameLabel(property);
+            root.Add(label);
+            root.Add(button);
 
             button.clicked += () =>
             {
@@ -1362,12 +1431,12 @@ namespace SaintsField.Editor.Drawers
                     (newDisplay, curItem) =>
                     {
                         Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo);
-                        button.text = newDisplay;
+                        buttonLabel.text = newDisplay;
                     }
                 ));
             };
 
-            return button;
+            return root;
         }
 
         // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
