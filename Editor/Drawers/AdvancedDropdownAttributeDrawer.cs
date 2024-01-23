@@ -164,13 +164,13 @@ namespace SaintsField.Editor.Drawers
     {
         private readonly float _width;
         private readonly AdvancedDropdownAttributeDrawer.MetaInfo _metaInfo;
-        private readonly Action<object> _setValue;
+        private readonly Action<string, object> _setValue;
 
         // ReSharper disable once InconsistentNaming
         private readonly UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> GoToStackEvent =
             new UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>>();
 
-        public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width, Action<object> setValue)
+        public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width, Action<string, object> setValue)
         {
             _width = width;
             _metaInfo = metaInfo;
@@ -267,9 +267,9 @@ namespace SaintsField.Editor.Drawers
                     checkGroup,
                     hackSliderStyle,
                     GoToStackEvent.Invoke,
-                    newValue =>
+                    (newDisplay, newValue) =>
                     {
-                        _setValue(newValue);
+                        _setValue(newDisplay, newValue);
                         editorWindow.Close();
                     });
 
@@ -354,7 +354,7 @@ namespace SaintsField.Editor.Drawers
                         {
                             itemContainer.clicked += () =>
                             {
-                                _setValue(value);
+                                _setValue(stackDisplay, value);
                                 editorWindow.Close();
                             };
                         }
@@ -467,7 +467,7 @@ namespace SaintsField.Editor.Drawers
             Texture2D check,
             Texture2D checkGroup,
             StyleSheet hackSliderStyle,
-            Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack, Action<object> setValue)
+            Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack, Action<string, object> setValue)
         {
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
             Debug.Log($"pageStack={string.Join("->", pageStack.Select(each => $"{each.Display}/{each.Index}"))}");
@@ -597,7 +597,9 @@ namespace SaintsField.Editor.Drawers
                     {
                         itemContainer.clicked += () =>
                         {
-                            setValue(dropdownItem.value);
+                            string newDisplay = string.Join("/",
+                                pageStack.Skip(1).Select(each => each.Display).Append(dropdownItem.displayName));
+                            setValue(newDisplay, dropdownItem.value);
                             // allSelectImage.ForEach(each => each.visible = false);
                             // selectImage.visible = true;
                         };
@@ -1357,7 +1359,11 @@ namespace SaintsField.Editor.Drawers
                 UnityEditor.PopupWindow.Show(button.worldBound, new SaintsAdvancedDropdownUiToolkit(
                     metaInfo,
                     button.worldBound.width,
-                    curItem => Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo)
+                    (newDisplay, curItem) =>
+                    {
+                        Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo);
+                        button.text = newDisplay;
+                    }
                 ));
             };
 
