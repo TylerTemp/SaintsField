@@ -1561,6 +1561,8 @@ namespace SaintsField.Editor.Core
                         UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
                     }
 
+                    containerElement.visible = true;
+
                 });
 
                 // foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
@@ -1580,16 +1582,17 @@ namespace SaintsField.Editor.Core
                 thisPropField.BindProperty(property.serializedObject);
                 thisPropField.RegisterValueChangeCallback(_ => onValueChangedCallback(null));
             }
+            else
+            {
+                containerElement.visible = true;
+            }
 
             containerElement.userData = this;
-
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
                 saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
             }
-
-            containerElement.visible = true;
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {

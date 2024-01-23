@@ -3456,11 +3456,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 198a6b59033942d7ad6d96fa848cb09d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  place1: 0
-  place2: 0
-  place3: 0
-  place4: 0
-  drops7: 3
+  place1: 9
+  place2: 45
+  place3: 19
+  place4: 33
+  strTyp:
+    dropIt: 3
 --- !u!4 &1509173913
 Transform:
   m_ObjectHideFlags: 0

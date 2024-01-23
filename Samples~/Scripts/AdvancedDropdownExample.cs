@@ -10,28 +10,49 @@ namespace SaintsField.Samples.Scripts
         public int place2;
         public int place3;
         public int place4;
-        [AdvancedDropdown(nameof(AdvDropdown)), AboveRichLabel(nameof(drops7), true)] public int drops7 = 1;
 
-        public AdvancedDropdownList<int> AdvDropdown()
+        [Serializable]
+        public struct MyStruct
         {
-            return new AdvancedDropdownList<int>("Root", new List<AdvancedDropdownList<int>>
+            [PostFieldButton(nameof(ShowNewValue), "Click")]
+            [OnValueChanged(nameof(ShowNewValue))]
+            [AboveRichLabel(nameof(dropIt), true)]
+            [AdvancedDropdown(nameof(AdvDropdown))] public int dropIt;
+
+            public AdvancedDropdownList<int> AdvDropdown()
             {
-                new AdvancedDropdownList<int>("First half", new List<AdvancedDropdownList<int>>
+                return new AdvancedDropdownList<int>("Days", new List<AdvancedDropdownList<int>>
                 {
-                    new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
-                    new AdvancedDropdownList<int>("Tuesday", 2),
-                }),
-                new AdvancedDropdownList<int>("Second half", new List<AdvancedDropdownList<int>>
-                {
-                    new AdvancedDropdownList<int>("Wednesday", 3),
-                    new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
-                }),
-                AdvancedDropdownList<int>.Separator(),
-                new AdvancedDropdownList<int>("Friday", 5, true),
-                AdvancedDropdownList<int>.Separator(),
-                new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
-                new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
-            });
+                    new AdvancedDropdownList<int>("First Half", new List<AdvancedDropdownList<int>>
+                    {
+                        new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+                        new AdvancedDropdownList<int>("Tuesday", 2),
+                    }),
+                    new AdvancedDropdownList<int>("Second Half", new List<AdvancedDropdownList<int>>
+                    {
+                        new AdvancedDropdownList<int>("Wednesday", new List<AdvancedDropdownList<int>>
+                        {
+                            new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
+                            new AdvancedDropdownList<int>("Afternoon", 8),
+                        }),
+                        new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
+                    }),
+                    AdvancedDropdownList<int>.Separator(),
+                    new AdvancedDropdownList<int>("Friday", 5, true),
+                    AdvancedDropdownList<int>.Separator(),
+                    new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
+                    new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
+                });
+            }
+
+            public void ShowNewValue()
+            {
+                Debug.Log($"dropIt new value: {dropIt}");
+            }
         }
+
+        public MyStruct strTyp;
+
+
     }
 }

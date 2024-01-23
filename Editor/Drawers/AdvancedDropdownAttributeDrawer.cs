@@ -196,7 +196,7 @@ namespace SaintsField.Editor.Drawers
 
         private IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> _curPageStack = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>();
 
-        public VisualElement CloneTree()
+        private VisualElement CloneTree()
         {
             StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
             StyleSheet hackSliderStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/HackSliderStyle.uss");
@@ -241,7 +241,9 @@ namespace SaintsField.Editor.Drawers
 
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack = _metaInfo.SelectStacks;
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
+#endif
             ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
 
             GoToStackEvent.AddListener(newStack =>
@@ -275,7 +277,13 @@ namespace SaintsField.Editor.Drawers
 
                 _curPageStack = newStack;
             });
-            GoToStackEvent.Invoke(_metaInfo.SelectStacks);
+            GoToStackEvent.Invoke(_metaInfo.SelectStacks.Count == 0
+                ? new []{new AdvancedDropdownAttributeDrawer.SelectStack
+                {
+                    Display = _metaInfo.DropdownListValue.displayName,
+                    Index = -1,
+                }}
+                : _metaInfo.SelectStacks);
 
             // search
             ToolbarSearchField toolbarSearchField = root.Q<ToolbarSearchField>();
@@ -329,7 +337,9 @@ namespace SaintsField.Editor.Drawers
                         itemContainer.Q<Label>("item-content").text = display;
 
                         bool curSelect = _metaInfo.SelectStacks.Count > 0 && AdvancedDropdownAttributeDrawer.GetIsEqual(_metaInfo.CurValue, value);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
                         Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValue}, value={value}, _metaInfo.CurValue == value: {_metaInfo.CurValue == value}");
+#endif
 
                         if(!string.IsNullOrEmpty(icon))
                         {
@@ -346,7 +356,9 @@ namespace SaintsField.Editor.Drawers
                         if (curSelect)
                         {
                             itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
                             Debug.Log($"cur selected: {value}");
+#endif
                             selectImage.visible = true;
                             itemContainer.pickingMode = PickingMode.Ignore;
                         }
@@ -446,7 +458,9 @@ namespace SaintsField.Editor.Drawers
             {
                 // int curStackDepth = stackDepth;
                 AdvancedDropdownAttributeDrawer.SelectStack[] curStack = pageStack.Take(stackDepth+1).ToArray();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
                 Debug.Log($"push {stack.Display}: {string.Join("->", curStack.Select(each => $"{each.Display}/{each.Index}"))}");
+#endif
                 toolbarBreadcrumbs.PushItem(stack.Display, () =>
                 {
                     goToStack(curStack);
@@ -469,8 +483,10 @@ namespace SaintsField.Editor.Drawers
             StyleSheet hackSliderStyle,
             Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack, Action<string, object> setValue)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
             Debug.Log($"pageStack={string.Join("->", pageStack.Select(each => $"{each.Display}/{each.Index}"))}");
+#endif
             (IReadOnlyList<IAdvancedDropdownList> displayPage, int selectIndex) = GetPage(
                 mainDropdownList,
                 new Queue<AdvancedDropdownAttributeDrawer.SelectStack>(pageStack.SkipLast(1)),
@@ -562,6 +578,7 @@ namespace SaintsField.Editor.Drawers
                     //     nextSelectIndex = selectStack[pageStack.Count].Index;
                     // }
 
+                    // ReSharper disable once UseIndexFromEndExpression
                     AdvancedDropdownAttributeDrawer.SelectStack curPage = pageStack[pageStack.Count - 1];
 
                     AdvancedDropdownAttributeDrawer.SelectStack[] nextPageStack = pageStack.SkipLast(1).Concat(new []
@@ -617,7 +634,7 @@ namespace SaintsField.Editor.Drawers
                 scrollContent.Add(elementItem);
             }
 
-            scrollContent.RegisterCallback<GeometryChangedEvent>(GeoAnimIntoView);;
+            scrollContent.RegisterCallback<GeometryChangedEvent>(GeoAnimIntoView);
 
             scrollView.Add(scrollContent);
         }
@@ -686,14 +703,17 @@ namespace SaintsField.Editor.Drawers
                 {
                     selectIndex = selectStack.Dequeue().Index;
                 }
-
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
                 Debug.Log($"return page {dropdownList.displayName}");
+#endif
                 return (dropdownList.children, selectIndex);
             }
 
             AdvancedDropdownAttributeDrawer.SelectStack first = pageStack.Dequeue();
             int index = first.Index;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
             Debug.Log($"check page {dropdownList.displayName}[{index}]->{dropdownList.children[index].displayName}");
+#endif
 
             if (selectStack.Count > 0)
             {
@@ -708,10 +728,12 @@ namespace SaintsField.Editor.Drawers
             return GetPage(dropdownList.children[index], pageStack, selectStack);
         }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
         public override void OnClose()
         {
             Debug.Log("Popup closed: " + this);
         }
+#endif
     }
     #endregion
 
@@ -835,6 +857,9 @@ namespace SaintsField.Editor.Drawers
                             Error = $"dropdownListValue is null from `{funcName}()` on target `{parentObj}`",
                         };
                     }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+                    Debug.Log($"method got dropdown {dropdownListValue.ChildCount()} from {funcName} on parent `{parentObj}`");
+#endif
                 }
                     break;
                 default:
@@ -844,12 +869,8 @@ namespace SaintsField.Editor.Drawers
             #endregion
 
             #region Get Cur Value
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            // Object target = property.serializedObject.targetObject;
-            FieldInfo field = parentType.GetField(property.name, bindAttr);
-            Debug.Assert(field != null, $"{property.name}/{parentObj}");
-            object curValue = field.GetValue(parentObj);
+
+            (FieldInfo field, object curValue) = GetCurValue(property, parentObj, parentType);
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             // string curDisplay = "";
             (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
@@ -866,6 +887,16 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
+        private static (FieldInfo field, object value) GetCurValue(SerializedProperty property, object parentObj, Type parentType)
+        {
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+            // Object target = property.serializedObject.targetObject;
+            FieldInfo field = parentType.GetField(property.name, bindAttr);
+            Debug.Assert(field != null, $"{property.name}/{parentObj}");
+            return (field, field.GetValue(parentObj));
+        }
+
         private static (IReadOnlyList<SelectStack> stack, string display) GetSelected(object curValue, IReadOnlyList<SelectStack> curStacks, IAdvancedDropdownList dropdownPage)
         {
             foreach ((IAdvancedDropdownList item, int index) in dropdownPage.children.WithIndex())
@@ -877,7 +908,9 @@ namespace SaintsField.Editor.Drawers
 
                 if (item.children.Count > 0)  // it's a group
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
                     Debug.Log($"GetSelected group {dropdownPage.displayName}");
+#endif
                     (IReadOnlyList<SelectStack> subResult, string display) = GetSelected(curValue, curStacks.Append(new SelectStack
                     {
                         Display = dropdownPage.displayName,
@@ -935,26 +968,26 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (curValue == null && itemValue == null)
             {
-                Debug.Log($"GetSelected null");
+                // Debug.Log($"GetSelected null");
                 return true;
             }
             if (curValue is UnityEngine.Object curValueObj
                 && itemValue is UnityEngine.Object itemValueObj
                 && curValueObj == itemValueObj)
             {
-                Debug.Log($"GetSelected Unity Object {curValue}");
+                // Debug.Log($"GetSelected Unity Object {curValue}");
                 return true;
             }
             if (itemValue == null)
             {
-                Debug.Log($"GetSelected nothing null");
+                // Debug.Log($"GetSelected nothing null");
                 // nothing
                 return false;
             }
             // ReSharper disable once InvertIf
             if (itemValue.Equals(curValue))
             {
-                Debug.Log($"GetSelected equal {curValue}");
+                // Debug.Log($"GetSelected equal {curValue}");
                 return true;
             }
 
@@ -1291,7 +1324,10 @@ namespace SaintsField.Editor.Drawers
 
 #if UNITY_2021_3_OR_NEWER
 
+        private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Button";
+        private static string NameButtonLabel(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_ButtonLabel";
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Label";
+        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
@@ -1371,6 +1407,7 @@ namespace SaintsField.Editor.Drawers
             // };
             //
             // return button;
+            MetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
 
             Button button = new Button
             {
@@ -1379,7 +1416,8 @@ namespace SaintsField.Editor.Drawers
                     // height = EditorGUIUtility.singleLineHeight,
                     flexGrow = 1,
                 },
-                // name = NameButtonField(property),
+                name = NameButton(property),
+                userData = initMetaInfo.CurValue,
             };
 
             VisualElement buttonLabelContainer = new VisualElement
@@ -1393,15 +1431,9 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            MetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
-
-            string labelDisplay = initMetaInfo.SelectStacks.Count == 0
-                ? "-"
-                : string.Join("/", initMetaInfo.SelectStacks.Skip(1).Select(each => each.Display).Append(initMetaInfo.CurDisplay));
-
-            Label buttonLabel = new Label(labelDisplay)
+            Label buttonLabel = new Label(GetMetaStackDisplay(initMetaInfo))
             {
-                // name = NameButtonLabelField(property),
+                name = NameButtonLabel(property),
                 // userData = metaInfo.SelectedIndex,
             };
             buttonLabelContainer.Add(buttonLabel);
@@ -1409,10 +1441,10 @@ namespace SaintsField.Editor.Drawers
 
             VisualElement root = new VisualElement
             {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
+                // style =
+                // {
+                //     flexDirection = FlexDirection.Row,
+                // },
             };
 
             button.Add(buttonLabelContainer);
@@ -1422,6 +1454,36 @@ namespace SaintsField.Editor.Drawers
             root.Add(label);
             root.Add(button);
 
+            ToolbarBreadcrumbs toolbarBreadcrumbs = new ToolbarBreadcrumbs
+            {
+                style =
+                {
+                    flexWrap = Wrap.Wrap,
+                }
+            };
+            toolbarBreadcrumbs.PushItem("root", () => { });
+            toolbarBreadcrumbs.PushItem("First Half", () => { });
+            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
+            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
+            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
+            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
+
+            root.Add(toolbarBreadcrumbs);
+
+            return root;
+        }
+
+        private static string GetMetaStackDisplay(MetaInfo metaInfo)
+        {
+            return metaInfo.SelectStacks.Count == 0
+                ? "-"
+                : string.Join("/", metaInfo.SelectStacks.Skip(1).Select(each => each.Display).Append(metaInfo.CurDisplay));
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, object parent)
+        {
+            Button button = container.Q<Button>(NameButton(property));
             button.clicked += () =>
             {
                 MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
@@ -1431,13 +1493,28 @@ namespace SaintsField.Editor.Drawers
                     (newDisplay, curItem) =>
                     {
                         Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo);
-                        buttonLabel.text = newDisplay;
+                        button.Q<Label>(NameButtonLabel(property)).text = newDisplay;
+                        button.userData = curItem;
+                        onValueChangedCallback(curItem);
                     }
                 ));
             };
-
-            return root;
         }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            return new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NameHelpBox(property),
+            };
+        }
+
+
 
         // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
         //     ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);

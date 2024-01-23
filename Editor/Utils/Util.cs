@@ -119,17 +119,19 @@ namespace SaintsField.Editor.Utils
 
         public static void SetValue(SerializedProperty property, object curItem, object parentObj, Type parentType, FieldInfo field)
         {
-            Undo.RecordObject(property.serializedObject.targetObject, "Dropdown");
             // object newValue = curItem;
             // Debug.Log($"set value {parentObj}->{field.Name} = {curItem}");
-            if(!parentType.IsValueType)  // reference type
+            Undo.RecordObject(property.serializedObject.targetObject, "Dropdown");
+            // Debug.Log($"not struct");
+            field.SetValue(parentObj, curItem);
+
+            if(parentType.IsValueType)  // hack struct :(
             {
-                // Debug.Log($"not struct");
-                field.SetValue(parentObj, curItem);
-            }
-            else  // hack struct :(
-            {
-                // Debug.Log($"SetValue {property.propertyType}: {curItem}");
+                // EditorUtility.SetDirty(property.serializedObject.targetObject);
+                // field.SetValue(parentObj, curItem);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
+                Debug.Log($"SetValue {property.propertyType}, {property.propertyPath} on {property.serializedObject.targetObject}: {curItem}");
+#endif
                 switch (property.propertyType)
                 {
                     case SerializedPropertyType.Generic:
@@ -139,7 +141,9 @@ namespace SaintsField.Editor.Utils
                     case SerializedPropertyType.Integer:
                     case SerializedPropertyType.Enum:
                         property.intValue = (int) curItem;
-                        Debug.Log($"{property.propertyType}: set ={property.intValue}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
+                        Debug.Log($"{property.propertyType}: set={property.intValue}");
+#endif
                         break;
                     case SerializedPropertyType.Boolean:
                         property.boolValue = (bool) curItem;
