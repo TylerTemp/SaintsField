@@ -166,6 +166,7 @@ namespace SaintsField.Editor.Drawers
         private readonly AdvancedDropdownAttributeDrawer.MetaInfo _metaInfo;
         private readonly Action<object> _setValue;
 
+        // ReSharper disable once InconsistentNaming
         private readonly UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> GoToStackEvent =
             new UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>>();
 
@@ -184,31 +185,52 @@ namespace SaintsField.Editor.Drawers
         //Set the window size
         public override Vector2 GetWindowSize()
         {
-            return new Vector2(_width, 200);
+            return new Vector2(_width, 90);
         }
 
         public override void OnOpen()
         {
             VisualElement element = CloneTree();
-            // VisualElement root = editorWindow.rootVisualElement;
             editorWindow.rootVisualElement.Add(element);
         }
 
         public VisualElement CloneTree()
         {
             StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
+            StyleSheet hackSliderStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/HackSliderStyle.uss");
 
             VisualTreeAsset popUpAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
             VisualElement root = popUpAsset.CloneTree();
 
+            // root.contentContainer.style.borderBottomWidth = 1;
+            // root.contentContainer.style.borderBottomColor = Color.red;
+
+            // var saintsRoot = root.Q<VisualElement>("saintsfield-advanced-dropdown-root");
+            // saintsRoot.contentContainer.style.borderBottomWidth = 1;
+            // saintsRoot.contentContainer.style.borderBottomColor = Color.red;
+
             root.styleSheets.Add(ussStyle);
+            // root.styleSheets.Remove()
+
+            // root.style.borderBottomWidth = 1;
+            // root.style.borderBottomColor = Color.red;
+            // root.userData = new DelayUpdateSize
+            // {
+            //     IsDelay = false,
+            //     Height = 0,
+            // };
+            // root.RegisterCallback<GeometryChangedEvent>(GeoUpdateWindowSize);
 
             VisualTreeAsset separatorAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
 
             VisualTreeAsset itemAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
 
             VisualElement scrollViewContainer = root.Q<VisualElement>("saintsfield-advanced-dropdown-scroll-view-container");
-            // ScrollView scrollView = root.Q<ScrollView>();
+            ScrollView scrollView = root.Q<ScrollView>();
+            scrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(GeoUpdateWindowSize);
+
+            // scrollView.contentContainer.style.borderBottomWidth = 1;
+            // scrollView.contentContainer.style.borderBottomColor = Color.green;
 
             // Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
             Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
@@ -216,30 +238,88 @@ namespace SaintsField.Editor.Drawers
             Texture2D check = RichTextDrawer.LoadTexture("check.png");
 
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack = _metaInfo.SelectStacks;
-            // IReadOnlyList<IAdvancedDropdownList> displayPage = _metaInfo.DropdownListValue.children;
-            // int selectedItemIndex = -1;
-            // int selectedPageIndex = 0;
-            // if (selectStack.Count > 0)
-            // {
-            //
-            //     displayPage = GetPage(_metaInfo.DropdownListValue, selectStack);
-            //     // ReSharper disable once UseIndexFromEndExpression
-            //     selectedItemIndex = selectStack[selectStack.Count - 1].Index;
-            //     selectedPageIndex = selectStack.Count - 1;
-            // }
 
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
             ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
-            // SwapToolbarBreadcrumbs(toolbarBreadcrumbs, _metaInfo.DropdownListValue, selectStack.SkipLast(1).ToArray());
-            // AdvancedDropdownAttributeDrawer.SelectStack[] pageStack = selectStack.SkipLast(1).ToArray();
-            // SwapPage(scrollViewContainer, displayPage, selectedPageIndex, selectedItemIndex, _metaInfo.SelectStacks, separatorAsset, itemAsset, next, check, _setValue);
+
             GoToStackEvent.AddListener(newStack =>
             {
                 SwapToolbarBreadcrumbs(toolbarBreadcrumbs, newStack, GoToStackEvent.Invoke);
-                SwapPage(_metaInfo.DropdownListValue, scrollViewContainer, _metaInfo.SelectStacks, newStack, separatorAsset, itemAsset, next, check, checkGroup, GoToStackEvent.Invoke, _setValue);
+                SwapPage(
+                    _metaInfo.DropdownListValue,
+                    scrollViewContainer,
+                    _metaInfo.SelectStacks,
+                    newStack,
+                    separatorAsset,
+                    itemAsset,
+                    next,
+                    check,
+                    checkGroup,
+                    hackSliderStyle,
+                    GoToStackEvent.Invoke,
+                    newValue =>
+                    {
+                        _setValue(newValue);
+                        editorWindow.Close();
+                    });
             });
             GoToStackEvent.Invoke(_metaInfo.SelectStacks);
             return root;
+        }
+
+        // private bool _delayUpdateSize;
+        // private float _delayUpdateHeight;
+
+        // private struct DelayUpdateSize
+        // {
+        //     public bool IsDelay;
+        //     public float Height;
+        // }
+
+        // Yep, hack around...
+        private void GeoUpdateWindowSize(GeometryChangedEvent evt)
+        {
+            ScrollView scrollView = editorWindow.rootVisualElement.Q<ScrollView>();
+            VisualElement contentContainer = scrollView.contentContainer;
+            // var height = contentContainer.resolvedStyle.height;
+
+            VisualElement toolbarSearchContainer = editorWindow.rootVisualElement.Q<VisualElement>("saintsfield-advanced-dropdown-search-container");
+            ToolbarBreadcrumbs toolbarBreadcrumbs = editorWindow.rootVisualElement.Q<ToolbarBreadcrumbs>();
+
+            float height = contentContainer.resolvedStyle.height + toolbarSearchContainer.resolvedStyle.height + toolbarBreadcrumbs.resolvedStyle.height + 5;
+
+            editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, height);
+            // VisualElement target = (VisualElement)evt.target;
+            // // float newHeight = evt.newRect.height + 5;
+            // float newHeight = target.resolvedStyle.height + 1;
+            //
+            // DelayUpdateSize delayUpdateSize = (DelayUpdateSize)target.userData;
+            //
+            // target.userData = new DelayUpdateSize
+            // {
+            //     IsDelay = true,
+            //     Height = newHeight,
+            // };
+            //
+            // if (delayUpdateSize.IsDelay)
+            // {
+            //     Debug.Log($"delay to {newHeight}");
+            //     return;
+            // }
+            //
+            // Debug.Log($"will update {newHeight}");
+            // ((VisualElement) evt.target).schedule.Execute(() =>
+            // {
+            //     DelayUpdateSize newSize = (DelayUpdateSize)target.userData;
+            //     Debug.Log($"start to update {newSize.Height}");
+            //     editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, newSize.Height);
+            //     // _delayUpdateSize = false;
+            //     target.userData = new DelayUpdateSize
+            //     {
+            //         IsDelay = false,
+            //         Height = newSize.Height,
+            //     };
+            // });
         }
 
         private static void SwapToolbarBreadcrumbs(ToolbarBreadcrumbs toolbarBreadcrumbs, IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> pageStack, Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack)
@@ -273,6 +353,7 @@ namespace SaintsField.Editor.Drawers
             Texture2D next,
             Texture2D check,
             Texture2D checkGroup,
+            StyleSheet hackSliderStyle,
             Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack, Action<object> setValue)
         {
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
@@ -281,6 +362,8 @@ namespace SaintsField.Editor.Drawers
                 mainDropdownList,
                 new Queue<AdvancedDropdownAttributeDrawer.SelectStack>(pageStack.SkipLast(1)),
                 new Queue<AdvancedDropdownAttributeDrawer.SelectStack>(selectStack));
+
+            scrollViewContainer.styleSheets.Add(hackSliderStyle);
 
             ScrollView scrollView = scrollViewContainer.Q<ScrollView>();
 
@@ -303,6 +386,8 @@ namespace SaintsField.Editor.Drawers
             // https://forum.unity.com/threads/how-to-refresh-scrollview-scrollbars-to-reflect-changed-content-width-and-height.1260920/
             scrollContent.RegisterCallback<TransitionEndEvent>(_ =>
             {
+                scrollViewContainer.styleSheets.Remove(hackSliderStyle);
+
                 Rect fakeOldRect = Rect.zero;
                 Rect fakeNewRect = scrollView.layout;
 
@@ -311,6 +396,7 @@ namespace SaintsField.Editor.Drawers
                     evt.target = scrollView.contentContainer;
                     scrollView.contentContainer.SendEvent(evt);
                 }
+                // editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, fakeNewRect.height);
             });
             scrollContent.AddToClassList("saintsfield-advanced-dropdown-anim");
             scrollContent.AddToClassList("saintsfield-advanced-dropdown-anim-right");
@@ -354,7 +440,7 @@ namespace SaintsField.Editor.Drawers
                     //     nextSelectIndex = selectStack[pageStack.Count].Index;
                     // }
 
-                    var curPage = pageStack[pageStack.Count - 1];
+                    AdvancedDropdownAttributeDrawer.SelectStack curPage = pageStack[pageStack.Count - 1];
 
                     AdvancedDropdownAttributeDrawer.SelectStack[] nextPageStack = pageStack.SkipLast(1).Concat(new []
                     {
@@ -482,7 +568,7 @@ namespace SaintsField.Editor.Drawers
 
             if (selectStack.Count > 0)
             {
-                var selectFirst = selectStack.Dequeue();
+                AdvancedDropdownAttributeDrawer.SelectStack selectFirst = selectStack.Dequeue();
                 if (selectFirst.Index != index)  // dis-match, not in the select chain
                 {
                     selectStack.Clear();

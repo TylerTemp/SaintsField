@@ -1,5 +1,11 @@
+.saintsfield-advanced-dropdown-search-container {
+    padding: 5px 5px 10px 5px;
+}
+
 ToolbarSearchField {
     width: 100%;
+    /*padding: 0 5px;*/
+    margin: 0;
 }
 
 ToolbarBreadcrumbs {
@@ -30,9 +36,9 @@ Button.saintsfield-advanced-dropdown-item {
     background-color: rgb(48, 48, 48);
 }
 
-.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-disabled > * > Label {
-    color: rgb(89, 89, 89);
-}
+/*.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-disabled > * > Label {*/
+/*    color: rgb(89, 89, 89);*/
+/*}*/
 
 .saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-disabled {
     cursor: arrow;
@@ -66,11 +72,6 @@ Button.saintsfield-advanced-dropdown-item {
 
 .saintsfield-advanced-dropdown-fade-out-container {
     position: absolute;
-}
-
-/* hack around... */
-.unity-scroller__slider, .unity-scroller__low-button, .unity-scroller__high-button {
-    display: none;
 }
 
 /* This does not work */

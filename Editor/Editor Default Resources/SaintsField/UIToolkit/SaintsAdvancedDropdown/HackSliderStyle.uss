@@ -1,0 +1,4 @@
+﻿/* hack around... */
+.unity-scroller__slider, .unity-scroller__low-button, .unity-scroller__high-button {
+    display: none;
+}
