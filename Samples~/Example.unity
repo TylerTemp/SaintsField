@@ -3461,7 +3461,7 @@ MonoBehaviour:
   place3: 19
   place4: 33
   strTyp:
-    dropIt: 3
+    dropIt: 1
 --- !u!4 &1509173913
 Transform:
   m_ObjectHideFlags: 0

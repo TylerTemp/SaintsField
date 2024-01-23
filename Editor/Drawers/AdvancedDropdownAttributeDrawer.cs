@@ -1413,62 +1413,49 @@ namespace SaintsField.Editor.Drawers
             {
                 style =
                 {
-                    // height = EditorGUIUtility.singleLineHeight,
                     flexGrow = 1,
+                    flexDirection = FlexDirection.Row,
+                    alignItems = Align.Center,
+                    justifyContent = Justify.SpaceBetween,
                 },
                 name = NameButton(property),
                 userData = initMetaInfo.CurValue,
             };
 
-            VisualElement buttonLabelContainer = new VisualElement
-            {
-                style =
-                {
-                    width = Length.Percent(100),
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.SpaceBetween,
-                },
-            };
+            // VisualElement buttonLabelContainer = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         // width = Length.Percent(100),
+            //         flexGrow = 1,
+            //         flexDirection = FlexDirection.Row,
+            //         alignItems = Align.Center,
+            //         justifyContent = Justify.SpaceBetween,
+            //     },
+            // };
 
             Label buttonLabel = new Label(GetMetaStackDisplay(initMetaInfo))
             {
                 name = NameButtonLabel(property),
                 // userData = metaInfo.SelectedIndex,
             };
-            buttonLabelContainer.Add(buttonLabel);
-            buttonLabelContainer.Add(new Label("▼"));
+            button.Add(buttonLabel);
+            button.Add(new Label("▼"));
 
             VisualElement root = new VisualElement
             {
-                // style =
-                // {
-                //     flexDirection = FlexDirection.Row,
-                // },
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
             };
 
-            button.Add(buttonLabelContainer);
+            // button.Add(buttonLabelContainer);
 
             Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
             label.name = NameLabel(property);
             root.Add(label);
             root.Add(button);
-
-            ToolbarBreadcrumbs toolbarBreadcrumbs = new ToolbarBreadcrumbs
-            {
-                style =
-                {
-                    flexWrap = Wrap.Wrap,
-                }
-            };
-            toolbarBreadcrumbs.PushItem("root", () => { });
-            toolbarBreadcrumbs.PushItem("First Half", () => { });
-            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
-            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
-            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
-            toolbarBreadcrumbs.PushItem("Wednesday", () => { });
-
-            root.Add(toolbarBreadcrumbs);
 
             return root;
         }
@@ -1498,6 +1485,15 @@ namespace SaintsField.Editor.Drawers
                         onValueChangedCallback(curItem);
                     }
                 ));
+
+                string curError = metaInfo.Error;
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+                // ReSharper disable once InvertIf
+                if (helpBox.text != curError)
+                {
+                    helpBox.text = curError;
+                    helpBox.style.display = curError == ""? DisplayStyle.None : DisplayStyle.Flex;
+                }
             };
         }
 
