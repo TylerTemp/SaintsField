@@ -21,6 +21,8 @@ Button.saintsfield-advanced-dropdown-item {
     margin: 0;
     padding: 0;
     cursor: link;
+
+    border-radius: 0;
 }
 
 .saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-active:hover {
