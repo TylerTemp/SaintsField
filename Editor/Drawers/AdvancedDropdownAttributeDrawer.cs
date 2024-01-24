@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.DropdownBase;
@@ -198,10 +199,10 @@ namespace SaintsField.Editor.Drawers
 
         private VisualElement CloneTree()
         {
-            StyleSheet ussStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss");
-            StyleSheet hackSliderStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/HackSliderStyle.uss");
+            StyleSheet ussStyle = Util.LoadResource<StyleSheet>("UIToolkit/SaintsAdvancedDropdown/Style.uss");
+            StyleSheet hackSliderStyle = Util.LoadResource<StyleSheet>("UIToolkit/SaintsAdvancedDropdown/HackSliderStyle.uss");
 
-            VisualTreeAsset popUpAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
+            VisualTreeAsset popUpAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
             VisualElement root = popUpAsset.CloneTree();
 
             // root.contentContainer.style.borderBottomWidth = 1;
@@ -223,9 +224,9 @@ namespace SaintsField.Editor.Drawers
             // };
             // root.RegisterCallback<GeometryChangedEvent>(GeoUpdateWindowSize);
 
-            VisualTreeAsset separatorAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
+            VisualTreeAsset separatorAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
 
-            VisualTreeAsset itemAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
+            VisualTreeAsset itemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
 
             VisualElement scrollViewContainer = root.Q<VisualElement>("saintsfield-advanced-dropdown-scroll-view-container");
             ScrollView scrollView = root.Q<ScrollView>();
@@ -235,9 +236,9 @@ namespace SaintsField.Editor.Drawers
             // scrollView.contentContainer.style.borderBottomColor = Color.green;
 
             // Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
-            Texture2D next = RichTextDrawer.LoadTexture("arrow-next.png");
-            Texture2D checkGroup = RichTextDrawer.LoadTexture("arrow-right.png");
-            Texture2D check = RichTextDrawer.LoadTexture("check.png");
+            Texture2D next = Util.LoadResource<Texture2D>("arrow-next.png");
+            Texture2D checkGroup = Util.LoadResource<Texture2D>("arrow-right.png");
+            Texture2D check = Util.LoadResource<Texture2D>("check.png");
 
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack = _metaInfo.SelectStacks;
 
@@ -343,7 +344,7 @@ namespace SaintsField.Editor.Drawers
 
                         if(!string.IsNullOrEmpty(icon))
                         {
-                            itemContainer.Q<Image>("item-icon-image").image = RichTextDrawer.LoadTexture(icon);
+                            itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(icon);
                         }
 
                         if (disabled)
@@ -565,7 +566,7 @@ namespace SaintsField.Editor.Drawers
 
                 if(!string.IsNullOrEmpty(dropdownItem.icon))
                 {
-                    itemContainer.Q<Image>("item-icon-image").image = RichTextDrawer.LoadTexture(dropdownItem.icon);
+                    itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(dropdownItem.icon);
                 }
 
                 if(dropdownItem.children.Count > 0)
@@ -1301,7 +1302,7 @@ namespace SaintsField.Editor.Drawers
                 return result;
             }
 
-            result = RichTextDrawer.LoadTexture(icon);
+            result = Util.LoadResource<Texture2D>(icon);
             if (result == null)
             {
                 return null;

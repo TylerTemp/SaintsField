@@ -128,8 +128,8 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            Texture2D active = RichTextDrawer.LoadTexture("eye.png");
-            Texture2D inactive = RichTextDrawer.LoadTexture("eye-slash.png");
+            Texture2D active = Util.LoadResource<Texture2D>("eye.png");
+            Texture2D inactive = Util.LoadResource<Texture2D>("eye-slash.png");
 
             button.Add(new Image
             {

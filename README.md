@@ -62,6 +62,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 1.  Add `AdvancedDropdown` for UI Toolkit
 2.  Fix a issue that when select a value from dropdown, the value is changed internally, but will get actually applied only when you finish inspect current object (like, to inspect another object, close Unity, etc)
+3.  Change the logic of finding resources
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
@@ -81,12 +82,13 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
     `null` means no label
 
-    for `icon` it will search the following path (This will always fallback to built-in editor resources by name, as it uses [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html)):
+    for `icon` it will search the following path:
 
-    *   `"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons),
-    *   `"Assets/Editor Default Resources/SaintsField/"`  (again for override)
+    *   ~~`"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons)~~
+    *   `"Assets/Editor Default Resources/SaintsField/"`  (You can override things here)
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
+    *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (useing [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
 
     for `color` it supports:
 
@@ -1750,7 +1752,7 @@ So here is the `UnsaintlyEditor`. It provides the minimal functions I think that
 2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
 3.  `UnsaintlyEditor`
 
-    *   has no layout at all. I
+    *   has no layout at all.
     *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
@@ -1833,7 +1835,7 @@ public Color AutoColor
 
 Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
 
-*   `[CallerLineNumber] int order = 0` the order of this field. `[CallerLineNumber]` will use the line number as the order.
+*   `[CallerLineNumber] int order = 0` the order of this field. By default it uses line number of the file. You may not want to override this.
 
 ```csharp
 [Ordered] public string myStartField;

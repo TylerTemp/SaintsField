@@ -1,4 +1,5 @@
 ﻿using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
@@ -49,7 +50,7 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             label.style.flexShrink = 0;
             overlayLabelContainer.Add(label);
 
-            _texture = RichTextDrawer.LoadTexture("eye.png");
+            _texture = Util.LoadResource<Texture2D>("eye.png");
             var img = new Image()
             {
                 image = _texture,

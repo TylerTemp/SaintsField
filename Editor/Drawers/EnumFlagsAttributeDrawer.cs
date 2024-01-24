@@ -69,9 +69,9 @@ namespace SaintsField.Editor.Drawers
 
         public EnumFlagsAttributeDrawer()
         {
-            _checkboxCheckedTexture2D = RichTextDrawer.LoadTexture("checkbox-checked.png");
-            _checkboxEmptyTexture2D = RichTextDrawer.LoadTexture("checkbox-outline-blank.png");
-            _checkboxIndeterminateTexture2D = RichTextDrawer.LoadTexture("checkbox-outline-indeterminate.png");
+            _checkboxCheckedTexture2D = Util.LoadResource<Texture2D>("checkbox-checked.png");
+            _checkboxEmptyTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
+            _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
 
             _checkBoxCheckedContent = new GUIContent(_checkboxCheckedTexture2D);
             _checkBoxEmptyContent = new GUIContent(_checkboxEmptyTexture2D);

@@ -11,6 +11,33 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
+        public static T LoadResource<T>(string iconPath) where T: UnityEngine.Object
+        {
+            string[] resourceSearchFolder = {
+                "Assets/Editor Default Resources/SaintsField",
+                "Assets/SaintsField/Editor/Editor Default Resources/SaintsField",  // unitypackage
+                // this is readonly, put it to last so user  can easily override it
+                "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField", // Unity UPM
+            };
+
+            T result = resourceSearchFolder
+                .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{iconPath}"))
+                // .Where(each => each != null)
+                // .DefaultIfEmpty((T)EditorGUIUtility.Load(relativePath))
+                .FirstOrDefault(result => result != null);
+            if (result == null)
+            {
+                result = (T)EditorGUIUtility.Load(iconPath);
+            }
+
+            // if (result == null)
+            // {
+            //     result = AssetDatabase.LoadAssetAtPath<T>(Path.Combine("Assets", iconPath).Replace("\\", "/"));
+            // }
+            Debug.Assert(result != null, $"{iconPath} not found in {string.Join(", ", resourceSearchFolder)}");
+            return result;
+        }
+
         public static (string error, float value) GetCallbackFloat(object target, string by)
         {
             // SerializedProperty foundProperty = property.FindPropertyRelative(by) ??

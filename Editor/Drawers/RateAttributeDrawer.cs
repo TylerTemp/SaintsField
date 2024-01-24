@@ -46,14 +46,14 @@ namespace SaintsField.Editor.Drawers
 
         public RateAttributeDrawer()
         {
-            _star = RichTextDrawer.LoadTexture("star.png");
+            _star = Util.LoadResource<Texture2D>("star.png");
 
             _starActive = Tex.ApplyTextureColor(_star, ActiveColor);
             _starIncrease = Tex.ApplyTextureColor(_star, WillActiveColor);
             _starDecrease = Tex.ApplyTextureColor(_star, WillInactiveColor);
             _starInactive = Tex.ApplyTextureColor(_star, InactiveColor);
 
-            _starSlash = RichTextDrawer.LoadTexture("star-slash.png");
+            _starSlash = Util.LoadResource<Texture2D>("star-slash.png");
             _starSlashActive = Tex.ApplyTextureColor(_starSlash, Color.red);
             _starSlashInactive = Tex.ApplyTextureColor(_starSlash, Color.grey);
 

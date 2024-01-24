@@ -2,6 +2,7 @@
 
 1.  Add `AdvancedDropdown` for UI Toolkit
 2.  Fix a issue that when select a value from dropdown, the value is changed internally, but will get actually applied only when you finish inspect current object (like, to inspect another object, close Unity, etc)
+3.  Change the logic of finding resources
 
 ## 2.0.4 ##
 

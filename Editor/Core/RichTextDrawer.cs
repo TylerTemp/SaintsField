@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -53,27 +54,6 @@ namespace SaintsField.Editor.Core
                 UnityEngine.Object.Destroy(cacheValue);
             }
             _textureCache.Clear();
-        }
-
-        public static Texture2D LoadTexture(string iconPath)
-        {
-            string[] paths = {
-                iconPath,
-                "SaintsField/" + iconPath,
-                "Assets/SaintsField/Editor/Editor Default Resources/SaintsField/" + iconPath,
-                // this is readonly, put it to last so user  can easily override it
-                "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/" + iconPath,
-            };
-
-            Texture2D result = paths
-                .Select(each => (Texture2D)EditorGUIUtility.Load(each))
-                .FirstOrDefault(each => each != null);
-
-            Debug.Assert(result != null, $"{iconPath} not found in {string.Join(", ", paths)}");
-            return result;
-            // return iconPayload.IsEditorResource
-            //     ? (Texture2D)EditorGUIUtility.Load(iconPayload.IconResourcePath)
-            //     : (Texture2D)AssetDatabase.LoadAssetAtPath<Texture>(iconPayload.IconResourcePath);
         }
 
         public static (string error, string xml) GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute, object target)
@@ -460,7 +440,7 @@ namespace SaintsField.Editor.Core
                     if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
                     {
                         texture = Tex.TextureTo(
-                            LoadTexture(curChunk.Content),
+                            Util.LoadResource<Texture2D>(curChunk.Content),
                             Colors.GetColorByStringPresent(curChunk.IconColor),
                             -1,
                             Mathf.FloorToInt(position.height)
@@ -526,7 +506,7 @@ namespace SaintsField.Editor.Core
 
                     if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
                     {
-                        texture = LoadTexture(curChunk.Content);
+                        texture = Util.LoadResource<Texture2D>(curChunk.Content);
                         if (texture.width != 1 && texture.height != 1)
                         {
                             _textureCache.Add(cacheKey, texture);
@@ -569,7 +549,7 @@ namespace SaintsField.Editor.Core
             }
 
             texture = Tex.TextureTo(
-                LoadTexture(curChunk.Content),
+                Util.LoadResource<Texture2D>(curChunk.Content),
                 Colors.GetColorByStringPresent(curChunk.IconColor),
                 -1,
                 Mathf.FloorToInt(height)
