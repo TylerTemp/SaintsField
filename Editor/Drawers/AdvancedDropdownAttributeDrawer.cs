@@ -338,7 +338,7 @@ namespace SaintsField.Editor.Drawers
 
                         itemContainer.Q<Label>("item-content").text = display;
 
-                        bool curSelect = _metaInfo.SelectStacks.Count > 0 && AdvancedDropdownAttributeDrawer.GetIsEqual(_metaInfo.CurValue, value);
+                        bool curSelect = _metaInfo.SelectStacks.Count > 0 && Util.GetIsEqual(_metaInfo.CurValue, value);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
                         Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValue}, value={value}, _metaInfo.CurValue == value: {_metaInfo.CurValue == value}");
 #endif
@@ -934,7 +934,7 @@ namespace SaintsField.Editor.Drawers
                 });
 
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (GetIsEqual(curValue, item.value))
+                if (Util.GetIsEqual(curValue, item.value))
                 {
                     return (thisLoopResult.ToArray(), item.displayName);
                 }
@@ -966,36 +966,7 @@ namespace SaintsField.Editor.Drawers
             return (Array.Empty<SelectStack>(), "");
         }
 
-        public static bool GetIsEqual(object curValue, object itemValue)
-        {
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if (curValue == null && itemValue == null)
-            {
-                // Debug.Log($"GetSelected null");
-                return true;
-            }
-            if (curValue is UnityEngine.Object curValueObj
-                && itemValue is UnityEngine.Object itemValueObj
-                && curValueObj == itemValueObj)
-            {
-                // Debug.Log($"GetSelected Unity Object {curValue}");
-                return true;
-            }
-            if (itemValue == null)
-            {
-                // Debug.Log($"GetSelected nothing null");
-                // nothing
-                return false;
-            }
-            // ReSharper disable once InvertIf
-            if (itemValue.Equals(curValue))
-            {
-                // Debug.Log($"GetSelected equal {curValue}");
-                return true;
-            }
 
-            return false;
-        }
 
         private static IEnumerable<(string stackDisplay, string display, string icon, bool disabled, object value)> FlattenChild(string prefix, IEnumerable<IAdvancedDropdownList> children)
         {

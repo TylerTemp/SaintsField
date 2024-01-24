@@ -295,5 +295,36 @@ namespace SaintsField.Editor.Utils
 
             return -1;
         }
+
+        public static bool GetIsEqual(object curValue, object itemValue)
+        {
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (curValue == null && itemValue == null)
+            {
+                // Debug.Log($"GetSelected null");
+                return true;
+            }
+            if (curValue is UnityEngine.Object curValueObj
+                && itemValue is UnityEngine.Object itemValueObj
+                && curValueObj == itemValueObj)
+            {
+                // Debug.Log($"GetSelected Unity Object {curValue}");
+                return true;
+            }
+            if (itemValue == null)
+            {
+                // Debug.Log($"GetSelected nothing null");
+                // nothing
+                return false;
+            }
+            // ReSharper disable once InvertIf
+            if (itemValue.Equals(curValue))
+            {
+                // Debug.Log($"GetSelected equal {curValue}");
+                return true;
+            }
+
+            return false;
+        }
     }
 }

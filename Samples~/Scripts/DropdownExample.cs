@@ -35,6 +35,8 @@ namespace SaintsField.Samples.Scripts
 
         [Dropdown(nameof(GetAdvancedDropdownItems))]
         public Color color;
+        [Dropdown(nameof(GetAdvancedDropdownItems), false)]
+        public Color colorNoSub;
 
         private DropdownList<Color> GetAdvancedDropdownItems()
         {

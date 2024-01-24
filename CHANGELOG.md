@@ -1,3 +1,8 @@
+## 2.0.6 ##
+
+1.  Fix `Dropdown` has not sub item for `/` in UI Toolkit
+2.  `Dropdown` Allow to disable `/` as a sub item
+
 ## 2.0.5 ##
 
 1.  Add `AdvancedDropdown` for UI Toolkit

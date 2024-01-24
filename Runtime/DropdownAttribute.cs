@@ -8,10 +8,12 @@ namespace SaintsField
         public string GroupBy => "__LABEL_FIELD__";
 
         public readonly string FuncName;
+        public readonly bool SlashAsSub;
 
-        public DropdownAttribute(string funcName)
+        public DropdownAttribute(string funcName, bool slashAsSub=true)
         {
             FuncName = funcName;
+            SlashAsSub = slashAsSub;
         }
     }
 }

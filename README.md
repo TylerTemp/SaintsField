@@ -59,11 +59,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.5**
+**2.0.6**
 
-1.  Add `AdvancedDropdown` for UI Toolkit
-2.  Fix a issue that when select a value from dropdown, the value is changed internally, but will get actually applied only when you finish inspect current object (like, to inspect another object, close Unity, etc)
-3.  Change the logic of finding resources
+1.  Fix `Dropdown` has not sub item for `/` in UI Toolkit
+2.  `Dropdown` Allow to disable `/` as a sub item
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
@@ -607,13 +606,11 @@ public class FieldTypeExample: MonoBehaviour
 A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
 
 *   `string funcName` callback function. Must return a `DropdownList<T>`.
+*   `bool slashAsSub=true` treat `/` as a sub item.
+
+    Note: In `IMGUI`, this just replace `/` to unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
+
 *   AllowMultiple: No
-
-**Known Issue**
-
-In IMGUI, `/` will be treated as a sub item, this feature can not be disabled, and is called ``GenericMenu`.
-
-However, in UI Toolkit, `/` will be displayed as a normal character. The "sub item" feature is just not there... the component is called `GenericDropdownMenu`. There is no `GenericMenu` in UI Toolkit. 
 
 **Example**
 
@@ -682,7 +679,7 @@ dropdownList.AddSeparator();  // add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
-The look in the UI Toolkit due to the issue:
+The look in the UI Toolkit with `slashAsSub: false`:
 
 ![dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/e6788204-ff04-4096-a37a-26d68e852737)
 
@@ -1268,12 +1265,12 @@ public class OnChangedExample : MonoBehaviour
 
 This has two overrides:
 
-*   `ReadOnlyAttribute(bool directValue)`
+*   `ReadOnlyAttribute(bool directValue=true, string groupBy="")`
 *   `ReadOnlyAttribute(params string[] by)`
 
 Each arguments:
 
-*   `bool directValue=false`
+*   `bool directValue=true`
 
     if true, the field will be read-only
 
@@ -1315,6 +1312,7 @@ public class ReadOnlyGroupExample: MonoBehaviour
     private string _ro1234;
 }
 ```
+
 [![readonly](https://github.com/TylerTemp/SaintsField/assets/6391063/e267567b-469c-4156-a82c-82f21fc43021)](https://github.com/TylerTemp/SaintsField/assets/6391063/6761a0f2-07c2-4252-9dd0-c1a60091a891)
 
 #### `Required` ####

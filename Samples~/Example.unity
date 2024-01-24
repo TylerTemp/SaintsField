@@ -332,12 +332,13 @@ MonoBehaviour:
   _go1: {fileID: 1188127893}
   _go2: {fileID: 724537242}
   _refs: {fileID: 0}
-  color: {r: 0, g: 1, b: 0, a: 1}
+  color: {r: 0, g: 1, b: 1, a: 1}
+  colorNoSub: {r: 0, g: 0, b: 1, a: 1}
   uniq1: 1
   uniq2: 3
   uniq3: 2
   normal: 0
-  myInt: 1
+  myInt: 2
   my:
     normal: 0
     myInt: 0
@@ -3461,7 +3462,7 @@ MonoBehaviour:
   place3: 19
   place4: 33
   strTyp:
-    selectIt: 3
+    selectIt: 8
 --- !u!4 &1509173913
 Transform:
   m_ObjectHideFlags: 0

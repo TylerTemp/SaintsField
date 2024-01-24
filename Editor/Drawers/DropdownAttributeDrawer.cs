@@ -21,6 +21,35 @@ namespace SaintsField.Editor.Drawers
         private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                       BindingFlags.Public | BindingFlags.DeclaredOnly;
 
+        private static void ShowGenericMenu(MetaInfo metaInfo, string curDisplay, Rect fieldRect, Action<string, object> onSelect, bool hackSlashNoSub)
+        {
+            // create the menu and add items to it
+            GenericMenu menu = new GenericMenu();
+
+            Debug.Assert(metaInfo.DropdownListValue != null);
+            foreach ((string curName, object curItem, bool disabled, bool curIsSeparator) in metaInfo.DropdownListValue)
+            {
+                string replacedCurName = curName.Replace('/', '\u2215');
+                if (curIsSeparator)
+                {
+                    menu.AddSeparator(hackSlashNoSub? "": curName);
+                }
+                else if (disabled)
+                {
+                    // Debug.Log($"disabled: {curName}");
+                    menu.AddDisabledItem(new GUIContent(hackSlashNoSub? replacedCurName: curName), curName == curDisplay);
+                }
+                else
+                {
+                    menu.AddItem(new GUIContent(hackSlashNoSub? replacedCurName: curName), curName == curDisplay, () => onSelect(curName, curItem));
+                }
+            }
+
+            // display the menu
+            // menu.ShowAsContext();
+            menu.DropDown(fieldRect);
+        }
+
         #region IMGUI
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
@@ -62,34 +91,11 @@ namespace SaintsField.Editor.Drawers
             string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
             if (EditorGUI.DropdownButton(fieldRect, new GUIContent(curDisplay), FocusType.Keyboard))
             {
-                // create the menu and add items to it
-                GenericMenu menu = new GenericMenu();
-
-                Debug.Assert(metaInfo.DropdownListValue != null);
-                foreach ((string curName, object curItem, bool disabled, bool curIsSeparator) in metaInfo.DropdownListValue)
+                ShowGenericMenu(metaInfo, curDisplay, fieldRect, (_, item) =>
                 {
-                    if (curIsSeparator)
-                    {
-                        menu.AddSeparator(curName);
-                    }
-                    else if (disabled)
-                    {
-                        // Debug.Log($"disabled: {curName}");
-                        menu.AddDisabledItem(new GUIContent(curName), curName == curDisplay);
-                    }
-                    else
-                    {
-                        menu.AddItem(new GUIContent(curName), curName == curDisplay, () =>
-                        {
-                            Util.SetValue(property, curItem, parent, parentType, field);
-                            SetValueChanged(property);
-                        });
-                    }
-                }
-
-                // display the menu
-                // menu.ShowAsContext();
-                menu.DropDown(fieldRect);
+                    Util.SetValue(property, item, parent, parentType, field);
+                    SetValueChanged(property);
+                }, !dropdownAttribute.SlashAsSub);
             }
 
             if(hasLabel)
@@ -302,6 +308,9 @@ namespace SaintsField.Editor.Drawers
                     flexGrow = 1,
                 },
                 name = NameButtonField(property),
+                userData = metaInfo.SelectedIndex == -1
+                    ? null
+                    : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2,
             };
 
             VisualElement buttonLabelContainer = new VisualElement
@@ -356,8 +365,31 @@ namespace SaintsField.Editor.Drawers
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, object parent)
         {
+            DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;
             container.Q<Button>(NameButtonField(property)).clicked += () =>
-                ShowDropdown(property, saintsAttribute, container, parent, onValueChangedCallback);
+                ShowDropdown(property, saintsAttribute, container, dropdownAttribute.SlashAsSub, parent, onValueChangedCallback);
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, object parent)
+        {
+            Type parentType = parent.GetType();
+            FieldInfo field = parentType.GetField(property.name, BindAttr);
+            if (field == null)
+            {
+                return;
+            }
+
+            object newValue = field.GetValue(parent);
+            object curValue = container.Q<Button>(NameButtonField(property)).userData;
+            if (Util.GetIsEqual(curValue, newValue))
+            {
+                return;
+            }
+
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, field, parent);
+            string display = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
+            container.Q<Label>(NameButtonLabelField(property)).text = display;
         }
 
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
@@ -369,7 +401,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, object parent, Action<object> onChange)
+            VisualElement container, bool slashAsSub, object parent, Action<object> onChange)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             Type parentType = parent.GetType();
@@ -377,8 +409,11 @@ namespace SaintsField.Editor.Drawers
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-            helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-            helpBox.text = metaInfo.Error;
+            if(helpBox.text != metaInfo.Error)
+            {
+                helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = metaInfo.Error;
+            }
 
             if (metaInfo.Error != "")
             {
@@ -387,40 +422,54 @@ namespace SaintsField.Editor.Drawers
 
             // Button button = container.Q<Button>(NameButtonField(property));
             Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
-            GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-            // FIXED: can not get correct index
-            // int selectedIndex = (int)buttonLabel.userData;
-            int selectedIndex = metaInfo.SelectedIndex;
-            // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
-            foreach (int index in Enumerable.Range(0, metaInfo.DropdownListValue.Count))
-            {
-                int curIndex = index;
-                (string curName, object curItem, bool disabled, bool curIsSeparator) =
-                    metaInfo.DropdownListValue[index];
-                if (curIsSeparator)
-                {
-                    genericDropdownMenu.AddSeparator(curName);
-                }
-                else if (disabled)
-                {
-                    // Debug.Log($"disabled: {curName}");
-                    genericDropdownMenu.AddDisabledItem(curName, index == selectedIndex);
-                }
-                else
-                {
-                    genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
-                    {
-                        Util.SetValue(property, curItem, parent, parentType, field);
-                        onChange(curItem);
-                        buttonLabel.text = curName;
-                        buttonLabel.userData = curIndex;
-                        // property.serializedObject.ApplyModifiedProperties();
-                    });
-                }
-            }
-
             Button button = container.Q<Button>(NameButtonField(property));
-            genericDropdownMenu.DropDown(button.worldBound, button, true);
+
+            if (slashAsSub)
+            {
+                string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
+                ShowGenericMenu(metaInfo, curDisplay, button.worldBound, (newName, item) =>
+                {
+                    Util.SetValue(property, item, parent, parentType, field);
+                    onChange(item);
+                    buttonLabel.text = newName;
+                    // property.serializedObject.ApplyModifiedProperties();
+                }, false);
+            }
+            else
+            {
+                GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+                // int selectedIndex = (int)buttonLabel.userData;
+                // FIXED: can not get correct index
+                int selectedIndex = metaInfo.SelectedIndex;
+                // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
+                foreach (int index in Enumerable.Range(0, metaInfo.DropdownListValue.Count))
+                {
+                    // int curIndex = index;
+                    (string curName, object curItem, bool disabled, bool curIsSeparator) =
+                        metaInfo.DropdownListValue[index];
+                    if (curIsSeparator)
+                    {
+                        genericDropdownMenu.AddSeparator(curName);
+                    }
+                    else if (disabled)
+                    {
+                        // Debug.Log($"disabled: {curName}");
+                        genericDropdownMenu.AddDisabledItem(curName, index == selectedIndex);
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
+                        {
+                            Util.SetValue(property, curItem, parent, parentType, field);
+                            onChange(curItem);
+                            buttonLabel.text = curName;
+                            // property.serializedObject.ApplyModifiedProperties();
+                        });
+                    }
+                }
+
+                genericDropdownMenu.DropDown(button.worldBound, button, true);
+            }
         }
 
         #endregion
