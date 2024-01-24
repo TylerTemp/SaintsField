@@ -58,12 +58,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.4**
+**2.0.5**
 
-1.  Add `ProgressBar`
-2.  Fix `RichLable(null)` not work in IMGUI after the UI Toolkit refactor
-3.  Fix `IMGUI` `PropertyScope` not disposed issue
-4.  Add color `charcoalGray`, `oceanicSlate`
+1.  Add `AdvancedDropdown` for UI Toolkit
+2.  Fix a issue that when select a value from dropdown, the value is changed internally, but will get actually applied only when you finish inspect current object (like, to inspect another object, close Unity, etc)
 
 UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
@@ -608,6 +606,14 @@ A dropdown selector. Supports reference type, sub-menu, separator, and disabled 
 *   `string funcName` callback function. Must return a `DropdownList<T>`.
 *   AllowMultiple: No
 
+**Known Issue**
+
+In IMGUI, `/` will be treated as a sub item, this feature can not be disabled, and is called ``GenericMenu`.
+
+However, in UI Toolkit, `/` will be displayed as a normal character. The "sub item" feature is just not there... the component is called `GenericDropdownMenu`. There is no `GenericMenu` in UI Toolkit. 
+
+**Example**
+
 ```csharp
 public class DropdownExample : MonoBehaviour
 {
@@ -673,24 +679,37 @@ dropdownList.AddSeparator();  // add a separator
 
 ![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
 
+The look in the UI Toolkit due to the issue:
+
+![dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/e6788204-ff04-4096-a37a-26d68e852737)
+
 #### `AdvancedDropdown` ####
 
 A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
 
 **Known Issue**:
 
-1.  This is IMGUI only. UI Toolkit does not provide an `AdvancedDropdown` or an alternative. I'll try to make one when I have time.
-2.  IMGUI: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
-    This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup. This issue is not fixable unless Unity fixes it.
+1.  IMGUI: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
+    This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup. 
 
-Arguments:
+    This issue is not fixable unless Unity fixes it.
+
+    This bug only exists in IMGUI
+
+2.  UI Toolkit:
+
+    The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not has the same layout even with same elements+style+boundary size.
+    
+    This issue is not fixable unless Unity fixes it. This issue might be different on different Unity (UI Toolkit) version.
+
+**Arguments**
 
 *   `string funcName` callback function. Must return a `AdvancedDropdownList<T>`.
-*   `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will be used to decide the dropdown height.
-*   `float titleHeight=Default` height of the title. This will be used to decide the dropdown height.
-*   `float sepHeight=Default` height of separator. This will be used to decide the dropdown height.
-*   `bool useTotalItemCount=false` if true, the dropdown height will be decided using the number of all value item, thus the search result will always fit in the position without scroll. Otherwise, it'll be decided by the max height of every item page.
-*   `float minHeight=-1f` minimum height of the dropdown. `< 0` means no limit. Otherwise, use this as the dropdown height and ignore all the other auto height config.
+*   (IMGUI) `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will not change the actual height of item, but to decide the dropdown height.
+*   (IMGUI) `float titleHeight=Default` height of the title. This will not change the actual height of title, but to decide the dropdown height.
+*   (IMGUI) `float sepHeight=Default` height of separator. This will not change the actual height of title, but to decide the dropdown height.
+*   (IMGUI) `bool useTotalItemCount=false` if true, the dropdown height will be decided using the number of all value item, thus the search result will always fit in the position without scroll. Otherwise, it'll be decided by the max height of every item page.
+*   (IMGUI) `float minHeight=-1f` minimum height of the dropdown. `< 0` means no limit. Otherwise, use this as the dropdown height and ignore all the other auto height config.
 *   AllowMultiple: No
 
 **`AdvancedDropdownList<T>`**
@@ -737,7 +756,13 @@ public class AdvancedDropdownExample: MonoBehaviour
 }
 ```
 
+**IMGUI**
+
 ![advanced_dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/d22d56b1-39c2-4ec9-bfbb-5e61dfe1b8a2)
+
+**UI Toolkit**
+
+[![advanced_dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/ad2f556b-7d98-4f49-a1ad-e2a5a52bf8f0)](https://github.com/TylerTemp/SaintsField/assets/6391063/157838e7-1f63-4b44-9503-bbb0004db7e8)
 
 #### `PropRange` ####
 

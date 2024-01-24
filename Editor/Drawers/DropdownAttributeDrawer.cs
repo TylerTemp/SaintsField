@@ -117,9 +117,11 @@ namespace SaintsField.Editor.Drawers
 
         private struct MetaInfo
         {
+            // ReSharper disable InconsistentNaming
             public string Error;
             public IReadOnlyList<ValueTuple<string, object, bool, bool>> DropdownListValue;
             public int SelectedIndex;
+            // ReSharper enable InconsistentNaming
         }
 
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -386,8 +388,9 @@ namespace SaintsField.Editor.Drawers
             // Button button = container.Q<Button>(NameButtonField(property));
             Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-            // this is a bug that can not get correct index
-            int selectedIndex = (int)buttonLabel.userData;
+            // FIXED: can not get correct index
+            // int selectedIndex = (int)buttonLabel.userData;
+            int selectedIndex = metaInfo.SelectedIndex;
             // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
             foreach (int index in Enumerable.Range(0, metaInfo.DropdownListValue.Count))
             {

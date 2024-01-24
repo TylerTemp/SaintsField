@@ -16,8 +16,8 @@ namespace SaintsField.Samples.Scripts
         {
             [PostFieldButton(nameof(ShowNewValue), "Click")]
             [OnValueChanged(nameof(ShowNewValue))]
-            [AboveRichLabel(nameof(dropIt), true)]
-            [AdvancedDropdown(nameof(AdvDropdown))] public int dropIt;
+            [AboveRichLabel(nameof(selectIt), true)]
+            [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
 
             public AdvancedDropdownList<int> AdvDropdown()
             {
@@ -47,7 +47,7 @@ namespace SaintsField.Samples.Scripts
 
             public void ShowNewValue()
             {
-                Debug.Log($"dropIt new value: {dropIt}");
+                Debug.Log($"dropIt new value: {selectIt}");
             }
         }
 
