@@ -442,7 +442,7 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private const string SaintsFieldFallbackClass = "saintsFieldFallback";
+        protected const string SaintsFieldFallbackClass = "saints-field-fallback-property-field";
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)

@@ -3781,18 +3781,18 @@ MonoBehaviour:
   itemWithInitValue:
     rid: -2
   item2:
-    rid: 4598335199311298705
+    rid: 4598335199311298949
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 4598335199311298705
+    - rid: 4598335199311298949
       type: {class: ReferenceExample/Orange, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:
         imInBase1: {fileID: 0}
-        m_Data: 0
-        m_IsRound: 0
+        base2: 0
+        orange: 0
 --- !u!4 &1638446596
 Transform:
   m_ObjectHideFlags: 0

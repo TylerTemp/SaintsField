@@ -15,28 +15,28 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
         [Serializable]
         public class Base2Fruit: Base1Fruit
         {
-            public int m_Data;
+            public int base2;
         }
 
         [Serializable]
         public class Apple : Base2Fruit
         {
-            public string m_Description;
-            public GameObject prefab;
+            public string apple;
+            public GameObject applePrefab;
         }
 
         [Serializable]
         public class Orange : Base2Fruit
         {
-            public bool m_IsRound;
+            public bool orange;
         }
 
         // Use SerializeReference if this field needs to hold both
         // Apples and Oranges.  Otherwise only m_Data from Base object would be serialized
-        [SerializeReference, Reference]
+        [SerializeReference, ReferencePicker]
         public Base2Fruit itemWithInitValue = new Apple();
 
-        [SerializeReference, Reference]
+        [SerializeReference, ReferencePicker]
         public Base2Fruit item2;
     }
 }
