@@ -98,8 +98,6 @@ __MACOSX
 *_log.txt
 /.vsconfig
 
-/.dist/*
-!/.dist/.placeholder
 /ProjectSettings/boot.config
 /ProjectSettings/ProjectVersion.txt
 /ProjectSettings/BurstAotSettings*

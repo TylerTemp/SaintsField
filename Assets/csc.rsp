@@ -1,5 +1,5 @@
 #"disable ext inspector as default (ENABLE IT WITH NaughtyAttributes!)"
--define:EXT_INSPECTOR_DISABLE
+#-define:EXT_INSPECTOR_DISABLE
 
 #"use dotween?"
 #-define:EXT_INSPECTOR_DOTWEEN
