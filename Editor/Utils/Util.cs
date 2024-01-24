@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Utils
                 .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{iconPath}"))
                 // .Where(each => each != null)
                 // .DefaultIfEmpty((T)EditorGUIUtility.Load(relativePath))
-                .FirstOrDefault(result => result != null);
+                .FirstOrDefault(each => each != null);
             if (result == null)
             {
                 result = (T)EditorGUIUtility.Load(iconPath);

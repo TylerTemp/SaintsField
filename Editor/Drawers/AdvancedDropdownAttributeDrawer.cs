@@ -161,6 +161,7 @@ namespace SaintsField.Editor.Drawers
     #endregion
 
     #region UIToolkit Pop
+#if UNITY_2021_3_OR_NEWER
     public class SaintsAdvancedDropdownUiToolkit : PopupWindowContent
     {
         private readonly float _width;
@@ -736,6 +737,7 @@ namespace SaintsField.Editor.Drawers
         }
 #endif
     }
+#endif
     #endregion
 
     [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute))]

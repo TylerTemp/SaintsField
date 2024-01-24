@@ -1941,9 +1941,9 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 
 `SaintsField` is designed to be compatible with other drawers if
 
-1.  the drawer itself respects the `GUIContent` argument in `OnGUI`
+1.  the drawer itself respects the `GUIContent` argument in `OnGUI` for IMGUI, or add `unity-label` class to Label for UI Toolkit
 
-    NOTE: `NaughtyAttributes` uses `property.displayName` instead of `GUIContent`. You need to set `Label(" ")` if you want to use `RichLabel`.
+    NOTE: `NaughtyAttributes` (IMGUI) uses `property.displayName` instead of `GUIContent`. You need to set `Label(" ")` if you want to use `RichLabel`.
     Also, `NaughtyAttributes` tread many Attribute as first-class citizen, so the compatibility is not guaranteed.
 
 2.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
