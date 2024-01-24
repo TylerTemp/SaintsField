@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using UnityEditor;
@@ -11,6 +12,69 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(ReferencePickerAttribute))]
     public class ReferencePickerAttributeDrawer: SaintsPropertyDrawer
     {
+        private static IEnumerable<Type> GetTypes(SerializedProperty property)
+        {
+            string typename = property.managedReferenceFieldTypename;
+            string[] typeSplitString = typename.Split(' ');
+            string typeClassName = typeSplitString[1];
+            string typeAssemblyName = typeSplitString[0];
+            Type realType = Type.GetType($"{typeClassName}, {typeAssemblyName}");
+
+            return TypeCache.GetTypesDerivedFrom(realType)
+                .Where(each => !each.IsSubclassOf(typeof(UnityEngine.Object)))
+                .Where(each => !each.IsAbstract) // abstract classes
+                .Where(each => !each.ContainsGenericParameters) // generic classes
+                .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null);
+        }
+
+        #region IMGUI
+
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            bool valueChanged)
+        {
+            Rect newPos = new Rect(position)
+            {
+                height = SingleLineHeight,
+            };
+            if (GUI.Button(newPos, "▼"))
+            {
+                object managedReferenceValue = property.managedReferenceValue;
+                GenericMenu genericDropdownMenu = new GenericMenu();
+                genericDropdownMenu.AddItem(new GUIContent("[Null]"), managedReferenceValue == null, () =>
+                {
+                    property.managedReferenceValue = null;
+                    property.serializedObject.ApplyModifiedProperties();
+                    SetValueChanged(property);
+                });
+                genericDropdownMenu.AddSeparator("");
+
+                foreach (Type type in GetTypes(property))
+                {
+                    // string assemblyName =  type.Assembly.ToString().Split('(', ',')[0];
+                    string displayName = $"{type.Name}: {type.Namespace}";
+
+                    genericDropdownMenu.AddItem(new GUIContent(displayName), managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
+                    {
+                        object instance = Activator.CreateInstance(type);
+                        property.managedReferenceValue = instance;
+                        property.serializedObject.ApplyModifiedProperties();
+                        // property.serializedObject.SetIsDifferentCacheDirty();
+                        SetValueChanged(property);
+                    });
+                }
+                genericDropdownMenu.DropDown(position);
+            }
+
+            return true;
+        }
+
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        {
+            return 20f;
+        }
+
+        #endregion
+
         #region UI Toolkit
         // private static string NamePropertyContainer(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField_Container";
         // private static string NamePropertyField(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField";
@@ -51,11 +115,11 @@ namespace SaintsField.Editor.Drawers
             // VisualElement propertyContainer = container.Q<VisualElement>(NamePropertyContainer(property));
             button.clicked += () =>
             {
-                string typename = property.managedReferenceFieldTypename;
-                string[] typeSplitString = typename.Split(' ');
-                string typeClassName = typeSplitString[1];
-                string typeAssemblyName = typeSplitString[0];
-                Type realType = Type.GetType($"{typeClassName}, {typeAssemblyName}");
+                // string typename = property.managedReferenceFieldTypename;
+                // string[] typeSplitString = typename.Split(' ');
+                // string typeClassName = typeSplitString[1];
+                // string typeAssemblyName = typeSplitString[0];
+                // Type realType = Type.GetType($"{typeClassName}, {typeAssemblyName}");
                 // Debug.Log(realType);
 
                 // GenericMenu menu = new GenericMenu();
@@ -68,11 +132,7 @@ namespace SaintsField.Editor.Drawers
                 });
                 genericDropdownMenu.AddSeparator("");
 
-                foreach (Type type in TypeCache.GetTypesDerivedFrom(realType)
-                             .Where(each => !each.IsSubclassOf(typeof(UnityEngine.Object)))
-                             .Where(each => !each.IsAbstract)  // abstract classes
-                             .Where(each => !each.ContainsGenericParameters)  // generic classes
-                             .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null)  // no public empty constructors
+                foreach (Type type in GetTypes(property)  // no public empty constructors
                         )
                 {
                     // string assemblyName =  type.Assembly.ToString().Split('(', ',')[0];
@@ -97,7 +157,7 @@ namespace SaintsField.Editor.Drawers
         private static void PropSetValue(VisualElement container, SerializedProperty property, object newValue)
         {
             property.serializedObject.Update();
-            property.managedReferenceValue = null;
+            // property.managedReferenceValue = null;
             property.managedReferenceValue = newValue;
             // property.managedReferenceId = -2L;
             property.serializedObject.ApplyModifiedProperties();

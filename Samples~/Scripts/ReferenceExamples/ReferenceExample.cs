@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
         [Serializable]
         public class Base1Fruit
         {
-            public GameObject imInBase1;
+            public GameObject base1;
         }
 
 
@@ -31,8 +31,6 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
             public bool orange;
         }
 
-        // Use SerializeReference if this field needs to hold both
-        // Apples and Oranges.  Otherwise only m_Data from Base object would be serialized
         [SerializeReference, ReferencePicker]
         public Base2Fruit itemWithInitValue = new Apple();
 
