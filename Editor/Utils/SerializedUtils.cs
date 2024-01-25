@@ -322,5 +322,18 @@ namespace SaintsField.Editor.Utils
         //     return field!.GetValue(targetObject);
         // }
 
+        public static int PropertyPathIndex(string propertyPath)
+        {
+            string[] propPaths = propertyPath.Split('.');
+            // ReSharper disable once UseIndexFromEndExpression
+            string lastPropPath = propPaths[propPaths.Length - 1];
+            if (lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
+            {
+                return int.Parse(lastPropPath.Substring(5, lastPropPath.Length - 6));
+            }
+
+            return -1;
+        }
+
     }
 }

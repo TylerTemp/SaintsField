@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers
 
         #endregion
 
-        private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             if (property.objectReferenceValue != null)
             {
@@ -54,8 +54,15 @@ namespace SaintsField.Editor.Drawers
             GetScriptableObjectAttribute getScriptableObjectAttribute = (GetScriptableObjectAttribute) saintsAttribute;
 
             Type fieldType = SerializedUtils.GetType(property);
+            string nameNoArray = fieldType.Name;
+            if(SerializedUtils.PropertyPathIndex(property.propertyPath) != -1)
+            {
+                fieldType = fieldType.GetElementType();
+                Debug.Assert(fieldType != null);
+                nameNoArray = fieldType.Name.Replace("[]", "");
+            }
 
-            IEnumerable<string> paths = AssetDatabase.FindAssets($"t:{fieldType.Name}")
+            IEnumerable<string> paths = AssetDatabase.FindAssets($"t:{nameNoArray}")
                 .Select(AssetDatabase.GUIDToAssetPath);
 
             if (getScriptableObjectAttribute.PathSuffix != null)
@@ -68,7 +75,7 @@ namespace SaintsField.Editor.Drawers
 
             if (result == null)
             {
-                return ($"Can not find {fieldType} type asset", null);
+                return ($"Can not find {nameNoArray} type asset", null);
             }
 
             property.objectReferenceValue = result;
@@ -89,7 +96,7 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_SCRIPTABLE_OBJECT
             Debug.Log($"GetScriptableObject DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
-            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)
             {

@@ -22,9 +22,58 @@ namespace SaintsField.Editor.Drawers
 
         private bool _expanded;
 
+        private static string KeyExpanded(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__Expandable_Expanded";
+
+        private bool GetExpand(SerializedProperty property) {
+            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+            if(isArray)
+            {
+                return EditorPrefs.GetBool(KeyExpanded(property));
+            }
+            else
+            {
+                return _expanded;
+            }
+        }
+
+        private void SetExpand(SerializedProperty property, bool value) {
+            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+            if(isArray)
+            {
+                EditorPrefs.SetBool(KeyExpanded(property), value);
+            }
+            else
+            {
+                _expanded = value;
+            }
+        }
+
         protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
-            _expanded = EditorGUI.Foldout(position, _expanded, GUIContent.none, true);
+            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+
+            Rect drawPos = isArray
+                ? new Rect(position)
+                {
+                    x = position.x - 12,
+                }
+                : position;
+
+            if(isArray)
+            {
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    bool newExpanded = EditorGUI.Foldout(drawPos, GetExpand(property), GUIContent.none, true);
+                    if (changed.changed)
+                    {
+                        SetExpand(property, newExpanded);
+                    }
+                }
+            }
+            else
+            {
+                _expanded = EditorGUI.Foldout(drawPos, _expanded, GUIContent.none, true);
+            }
             return (true, position);
         }
 
@@ -36,7 +85,8 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
         {
             float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
-            if (!_expanded)
+
+            if (!GetExpand(property))
             {
                 return basicHeight;
             }
@@ -79,7 +129,7 @@ namespace SaintsField.Editor.Drawers
                 leftRect = ImGuiHelpBox.Draw(position, _error, MessageType.Error);
             }
 
-            if (!_expanded || scriptableObject == null)
+            if (!GetExpand(property) || scriptableObject == null)
             {
                 return leftRect;
             }

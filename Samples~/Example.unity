@@ -3706,6 +3706,8 @@ MonoBehaviour:
   _scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   _dropdownExample: {fileID: 90550607}
   _spriteRenderer: {fileID: 1457332499}
+  _scriptables:
+  - {fileID: 0}
 --- !u!1 &1631756499
 GameObject:
   m_ObjectHideFlags: 0

@@ -93,17 +93,14 @@ namespace SaintsField.Editor.Core
                             $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}", property.displayName);
                     }
 
-                    int arrayIndex = 0;
+                    int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
                     bool dataCallback = false;
                     if (requiredParams.Length == 1)
                     {
                         Debug.Assert(requiredParams[0].ParameterType == typeof(int));
-                        string[] propPaths = property.propertyPath.Split('.');
-                        string lastPropPath = propPaths[propPaths.Length - 1];
-                        if(lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
+                        if(arrayIndex >= 0)
                         {
                             dataCallback = true;
-                            arrayIndex = int.Parse(lastPropPath.Substring(5, lastPropPath.Length - 6));
                         }
                     }
 
