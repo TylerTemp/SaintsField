@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts
 
         [SerializeField, Expandable, GetComponentInScene] private SpriteRenderer _spriteRenderer;
 
-        [GetScriptableObject, Expandable]
+        [Expandable]
         public Scriptable[] _scriptables;
     }
 }

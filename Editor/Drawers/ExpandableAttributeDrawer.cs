@@ -24,16 +24,12 @@ namespace SaintsField.Editor.Drawers
 
         private static string KeyExpanded(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__Expandable_Expanded";
 
-        private bool GetExpand(SerializedProperty property) {
+        private bool GetExpand(SerializedProperty property)
+        {
             bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-            if(isArray)
-            {
-                return EditorPrefs.GetBool(KeyExpanded(property));
-            }
-            else
-            {
-                return _expanded;
-            }
+            return isArray
+                ? EditorPrefs.GetBool(KeyExpanded(property))
+                : _expanded;
         }
 
         private void SetExpand(SerializedProperty property, bool value) {
@@ -50,6 +46,11 @@ namespace SaintsField.Editor.Drawers
 
         protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
+            if(property.objectReferenceValue == null)
+            {
+                return (false, position);
+            }
+
             bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
 
             Rect drawPos = isArray
@@ -86,7 +87,7 @@ namespace SaintsField.Editor.Drawers
         {
             float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-            if (!GetExpand(property))
+            if (!GetExpand(property) || property.objectReferenceValue == null)
             {
                 return basicHeight;
             }
