@@ -2496,7 +2496,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85b764bd76d94c66b2c0c2fe45d276aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _go: {fileID: 417627789}
+  _go: {fileID: 1457332497}
+  _sr: {fileID: 1457332497}
   _collider: {fileID: 1131818498}
   normal: 
 --- !u!4 &1131818497
@@ -3778,28 +3779,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c441f544051b481cb7b304e48b2db074, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemWithInitValue:
-    rid: 4598335217016504397
-  item2:
-    rid: 4598335217016504400
+  item:
+    rid: -2
   myInterface:
     rid: 4598335217016504494
   references:
     version: 2
     RefIds:
-    - rid: 4598335217016504397
-      type: {class: ReferenceExample/Apple, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        base1: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-        base2: 31
-        apple: 
-        applePrefab: {fileID: 0}
-    - rid: 4598335217016504400
-      type: {class: ReferenceExample/Orange, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        base1: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-        base2: 0
-        orange: 1
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 4598335217016504494
       type: {class: ReferenceExample/ClassDirectImpl, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:

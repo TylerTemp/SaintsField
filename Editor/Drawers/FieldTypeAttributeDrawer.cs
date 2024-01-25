@@ -149,6 +149,10 @@ namespace SaintsField.Editor.Drawers
                 objectType = requiredComp,
                 allowSceneObjects = true,
                 value = requiredValue,
+                style =
+                {
+                    flexShrink = 1,
+                },
             };
 
             objectField.Bind(property.serializedObject);
