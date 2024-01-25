@@ -59,16 +59,15 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.6**
+**2.0.7**
 
-1.  Fix `Dropdown` has not sub item for `/` in UI Toolkit
-2.  `Dropdown` Allow to disable `/` as a sub item
-
-UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
+Add `ReferencePicker` for Unity's [`SerializeReference`](https://docs.unity3d.com/ScriptReference/SerializeReference.html)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
 ## Document ##
+
+UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
 
 ### Label & Text ###
 
@@ -548,6 +547,98 @@ public class ExpandableExample : MonoBehaviour
 ```
 
 ![expandable](https://github.com/TylerTemp/SaintsField/assets/6391063/92fd1f45-82c5-4d5e-bbc4-c9a70fefe158)
+
+#### `ReferencePicker` ####
+
+A dropdown to pick a referenced value for Unity's [`SerializeReference`](https://docs.unity3d.com/ScriptReference/SerializeReference.html).
+
+You can use this to pick non UnityObject object like `interface` or polymorphism `class`. 
+
+Limitation:
+1.  The target must have a public constructor with no required arguments.
+2.  It'll try to copy field values when changing types but not guaranteed. `struct` will not get copied value (it's too tricky to deal a struct)
+
+*   Allow Multiple: No
+
+```csharp
+    public class ReferenceExample: MonoBehaviour
+    {
+        [Serializable]
+        public class Base1Fruit
+        {
+            public GameObject base1;
+        }
+
+        [Serializable]
+        public class Base2Fruit: Base1Fruit
+        {
+            public int base2;
+        }
+
+        [Serializable]
+        public class Apple : Base2Fruit
+        {
+            public string apple;
+            public GameObject applePrefab;
+        }
+
+        [Serializable]
+        public class Orange : Base2Fruit
+        {
+            public bool orange;
+        }
+
+        [SerializeReference, ReferencePicker]
+        public Base2Fruit item;
+
+        public interface IRefInterface
+        {
+            public int TheInt { get; }
+        }
+
+        // works for struct
+        [Serializable]
+        public struct StructImpl : IRefInterface
+        {
+            [field: SerializeField]
+            public int TheInt { get; set; }
+            public string myStruct;
+        }
+
+        [Serializable]
+        public class ClassDirect: IRefInterface
+        {
+            [field: SerializeField, Range(0, 10)]
+            public int TheInt { get; set; }
+        }
+
+        // abstruct type will be skipped
+        public abstract class ClassSubAbs : ClassDirect
+        {
+            public abstract string AbsValue { get; }
+        }
+
+        [Serializable]
+        public class ClassSub1 : ClassSubAbs
+        {
+            public string sub1;
+            public override string AbsValue => $"Sub1: {sub1}";
+        }
+
+        [Serializable]
+        public class ClassSub2 : ClassSubAbs
+        {
+            public string sub2;
+            public override string AbsValue => $"Sub2: {sub2}";
+        }
+
+        [SerializeReference, ReferencePicker]
+        public IRefInterface myInterface;
+
+    }
+```
+
+![reference_picker](https://github.com/TylerTemp/SaintsField/assets/6391063/06b1a8f6-806e-49c3-b491-a810bc885595)
 
 ### Field Re-Draw ###
 

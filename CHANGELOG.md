@@ -1,3 +1,7 @@
+## 2.0.7 ##
+
+Add `ReferencePicker` for Unity's [`SerializeReference`](https://docs.unity3d.com/ScriptReference/SerializeReference.html)
+
 ## 2.0.6 ##
 
 1.  Fix `Dropdown` has not sub item for `/` in UI Toolkit

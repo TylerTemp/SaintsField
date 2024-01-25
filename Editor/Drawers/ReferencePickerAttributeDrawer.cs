@@ -1,11 +1,15 @@
-﻿using System;
+﻿#if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers
 {
@@ -15,30 +19,108 @@ namespace SaintsField.Editor.Drawers
         private static IEnumerable<Type> GetTypes(SerializedProperty property)
         {
             string typename = property.managedReferenceFieldTypename;
+            // Debug.Log(typename);
             string[] typeSplitString = typename.Split(' ');
-            string typeClassName = typeSplitString[1];
             string typeAssemblyName = typeSplitString[0];
-            Type realType = Type.GetType($"{typeClassName}, {typeAssemblyName}");
+            string typeContainerSlashClass = typeSplitString[1];
+            Type realType = Type.GetType($"{typeContainerSlashClass}, {typeAssemblyName}");
+            // Debug.Log(realType);
 
             return TypeCache.GetTypesDerivedFrom(realType)
+                .Prepend(realType)
                 .Where(each => !each.IsSubclassOf(typeof(UnityEngine.Object)))
                 .Where(each => !each.IsAbstract) // abstract classes
                 .Where(each => !each.ContainsGenericParameters) // generic classes
                 .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null);
         }
 
+        private static object CopyObj(object oldObj, object newObj)
+        {
+            if (newObj == null || oldObj == null)
+            {
+                return newObj;
+            }
+            // MyObject copyObject = ...
+            Type type = oldObj.GetType();
+            while (type != null)
+            {
+                UpdateForType(type, oldObj, newObj);
+                type = type.BaseType;
+            }
+
+            return newObj;
+        }
+
+        private static void UpdateForType(Type type, object source, object destination)
+        {
+            FieldInfo[] myObjectFields = type.GetFields(
+                BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (FieldInfo fi in myObjectFields)
+            {
+                try
+                {
+                    fi.SetValue(destination, fi.GetValue(source));
+                }
+                catch (Exception)
+                {
+                    // do nothing
+                    // Debug.LogException(e);
+                }
+            }
+        }
+
         #region IMGUI
+
+        private const float ImGuiButtonWidth = 20f;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             bool valueChanged)
         {
-            Rect newPos = new Rect(position)
+            object managedReferenceValue = property.managedReferenceValue;
+
+            string displayLabel = managedReferenceValue == null
+                ? ""
+                : managedReferenceValue.GetType().Name;
+
+            GUIContent fullLabel = new GUIContent(displayLabel);
+            GUIStyle textStyle = new GUIStyle(EditorStyles.label)
+            {
+                richText = true,
+            };
+            float width = textStyle.CalcSize(fullLabel).x;
+            GUI.Label(new Rect(position)
+            {
+                x = position.x - width,
+                width = width,
+                height = SingleLineHeight,
+            }, fullLabel, textStyle);
+
+            // Rect newPos = new Rect(position)
+            // {
+            //     height = SingleLineHeight,
+            //     width = width,
+            //     x = position.x + position.width - width,
+            // };
+
+            // (Rect labelRect, Rect dropdownRect) = Utils.RectUtils.SplitWidthRect(new Rect(position)
+            // {
+            //     height = SingleLineHeight,
+            // }, position.width - 20);
+            //
+            // EditorGUI.DrawRect(labelRect, Color.yellow);
+            // EditorGUI.DrawRect(dropdownRect, Color.blue);
+            //
+            // GUI.Label(labelRect, displayLabel);
+
+            Rect dropdownRect = new Rect(position)
             {
                 height = SingleLineHeight,
             };
-            if (GUI.Button(newPos, "▼"))
+
+            // ReSharper disable once InvertIf
+            if (EditorGUI.DropdownButton(dropdownRect, new GUIContent(" "), FocusType.Keyboard))
             {
-                object managedReferenceValue = property.managedReferenceValue;
                 GenericMenu genericDropdownMenu = new GenericMenu();
                 genericDropdownMenu.AddItem(new GUIContent("[Null]"), managedReferenceValue == null, () =>
                 {
@@ -62,35 +144,58 @@ namespace SaintsField.Editor.Drawers
                         SetValueChanged(property);
                     });
                 }
-                genericDropdownMenu.DropDown(position);
+                genericDropdownMenu.DropDown(new Rect(position)
+                {
+                    x = 0,
+                    width = EditorGUIUtility.currentViewWidth,
+                    height = SingleLineHeight,
+                });
             }
+
+            // EditorGUI.DrawRect(new Rect(position)
+            // {
+            //     x = 0,
+            //     width = EditorGUIUtility.currentViewWidth,
+            // }, Color.red);
 
             return true;
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
         {
-            return 20f;
+            return ImGuiButtonWidth;
         }
 
         #endregion
+
+#if UNITY_2021_3_OR_NEWER
 
         #region UI Toolkit
         // private static string NamePropertyContainer(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField_Container";
         // private static string NamePropertyField(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField";
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__Reference_Button";
+        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Reference_Label";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
         {
-            return new Button
+            // VisualElement root = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         width = 40,
+            //     },
+            // };
+
+            Button button = new Button
             {
                 name = NameButton(property),
                 text = "▼",
                 style =
                 {
-                    minHeight = SingleLineHeight,
-                    maxHeight = SingleLineHeight,
+                    height = SingleLineHeight - 2,
+                    // maxHeight = SingleLineHeight,
+                    width = SingleLineHeight - 2,
                     borderLeftWidth = 0,
                     borderRightWidth = 0,
                     borderTopWidth = 0,
@@ -99,13 +204,52 @@ namespace SaintsField.Editor.Drawers
                     paddingRight = 0,
                     paddingTop = 0,
                     paddingBottom = 0,
-                    borderTopLeftRadius = 0,
-                    borderTopRightRadius = 0,
-                    borderBottomLeftRadius = 0,
-                    borderBottomRightRadius = 0,
-                    backgroundColor = Color.clear,
+                    // marginTop = 5,
+                    // borderTopLeftRadius = 0,
+                    // borderTopRightRadius = 0,
+                    // borderBottomLeftRadius = 0,
+                    // borderBottomRightRadius = 0,
+                    // backgroundColor = Color.clear,
+
+                    flexDirection = FlexDirection.Row,
+                    // justifyContent = Justify.FlexEnd,
+                    overflow = Overflow.Visible,
                 },
             };
+
+            object curValue = property.managedReferenceValue;
+            string labelName = curValue == null
+                ? ""
+                : curValue.GetType().Name;
+
+            Label label = new Label(labelName)
+            {
+                name = NameLabel(property),
+                // style =
+                // {
+                //     minWidth = 0,
+                // },
+                style =
+                {
+                    position = Position.Absolute,
+                    right = SingleLineHeight,
+                    // translate = new Translate(Length.Percent(-100), Length.Auto()),
+                    // paddingRight = 1,
+                },
+                pickingMode = PickingMode.Ignore,
+            };
+            button.Add(label);
+
+            // button.Add(new Label("▼")
+            // {
+            //     // style =
+            //     // {
+            //     //     flexShrink = 0,
+            //     // },
+            // });
+
+            // root.Add(button);
+            return button;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
@@ -140,7 +284,7 @@ namespace SaintsField.Editor.Drawers
 
                     genericDropdownMenu.AddItem(displayName, managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
                     {
-                        object instance = Activator.CreateInstance(type);
+                        object instance = CopyObj(managedReferenceValue, Activator.CreateInstance(type));
                         PropSetValue(container, property, instance);
 
                         onValueChangedCallback(instance);
@@ -154,6 +298,18 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            object parent, object newValue)
+        {
+            UpdateLabel(property, container, newValue);
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, object parent)
+        {
+            UpdateLabel(property, container, property.managedReferenceValue);
+        }
+
         private static void PropSetValue(VisualElement container, SerializedProperty property, object newValue)
         {
             property.serializedObject.Update();
@@ -164,12 +320,23 @@ namespace SaintsField.Editor.Drawers
             // property.serializedObject.SetIsDifferentCacheDirty();
 
             container.Query<PropertyField>(className: SaintsFieldFallbackClass).ForEach(each => each.BindProperty(property));
+        }
 
-            // PropertyField propertyField = container.Q<PropertyField>();
-            // propertyField.Unbind();
-            // propertyField.BindProperty(property);
-            // property.serializedObject.Update();
+        private static void UpdateLabel(SerializedProperty property, VisualElement container, object newValue)
+        {
+            Label label = container.Q<Label>(NameLabel(property));
+            string newLabel = newValue == null
+                ? ""
+                : newValue.GetType().Name;
+
+            if(label.text != newLabel)
+            {
+                label.text = newLabel;
+            }
         }
         #endregion
+
+#endif
     }
 }
+#endif

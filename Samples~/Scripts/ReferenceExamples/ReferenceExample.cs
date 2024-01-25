@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
 {
     public class ReferenceExample: MonoBehaviour
     {
+#if UNITY_2021_3_OR_NEWER
         [Serializable]
         public class Base1Fruit
         {
@@ -32,9 +33,57 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
         }
 
         [SerializeReference, ReferencePicker]
-        public Base2Fruit itemWithInitValue = new Apple();
+        public Base2Fruit item;
+
+        public interface IRefInterface
+        {
+            public int TheInt { get; }
+        }
+
+        [Serializable]
+        public struct StructImpl : IRefInterface
+        {
+            [field: SerializeField]
+            public int TheInt { get; set; }
+            public string myStruct;
+        }
+
+        [Serializable]
+        public class ClassDirect: IRefInterface
+        {
+            [field: SerializeField, Range(0, 10)]
+            public int TheInt { get; set; }
+        }
+
+        // [Serializable]
+        public abstract class ClassSubAbs : ClassDirect
+        {
+            public abstract string AbsValue { get; }
+        }
+
+        [Serializable]
+        public class ClassSub1 : ClassSubAbs
+        {
+            public string sub1;
+            public override string AbsValue => $"Sub1: {sub1}";
+        }
+
+        [Serializable]
+        public class ClassSub2 : ClassSubAbs
+        {
+            public string sub2;
+            public override string AbsValue => $"Sub2: {sub2}";
+        }
+
+        // [SerializeReference, ReferencePicker]
+        // public StructImpl structImpl;
 
         [SerializeReference, ReferencePicker]
-        public Base2Fruit item2;
+        public IRefInterface myInterface;
+#else
+        [InfoBox("This feature is only available in Unity 2021.3 or newer.")]
+        public string info;
+#endif
+
     }
 }

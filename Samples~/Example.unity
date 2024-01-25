@@ -3779,25 +3779,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemWithInitValue:
-    rid: 4598335199311298975
+    rid: 4598335217016504397
   item2:
-    rid: 4598335199311298972
+    rid: 4598335217016504400
+  myInterface:
+    rid: 4598335217016504494
   references:
     version: 2
     RefIds:
-    - rid: 4598335199311298972
-      type: {class: ReferenceExample/Orange, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        base1: {fileID: 0}
-        base2: 0
-        orange: 0
-    - rid: 4598335199311298975
+    - rid: 4598335217016504397
       type: {class: ReferenceExample/Apple, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:
-        base1: {fileID: 0}
-        base2: 0
+        base1: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+        base2: 31
         apple: 
         applePrefab: {fileID: 0}
+    - rid: 4598335217016504400
+      type: {class: ReferenceExample/Orange, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+        base2: 0
+        orange: 1
+    - rid: 4598335217016504494
+      type: {class: ReferenceExample/ClassDirectImpl, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
 --- !u!4 &1638446596
 Transform:
   m_ObjectHideFlags: 0
