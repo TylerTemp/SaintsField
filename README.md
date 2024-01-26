@@ -59,9 +59,17 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.7**
+**2.0.8**
 
-Add `ReferencePicker` for Unity's [`SerializeReference`](https://docs.unity3d.com/ScriptReference/SerializeReference.html)
+1.  Fix `Required` not work on nested case. Remove the limitation on int/float
+2.  Fix many attributes didn't find correct parent object and failed on some cases
+3.  IMGUI: Fix incorrect height for `InfoBox`
+4.  Fix incorrect height when you manually disable UI Toolkit
+5.  IMGUI: Fix `Expandable` not fold/expand correctly on array/list
+6.  Fix incorrect texture scale function
+7.  Fix `AssetPreview` won't scale up when give a bigger width/height value
+8.  Change `AssetPreview`'s parameters: `maxWidth`->`width`, `maxHeight`->`height`
+9.  UI Toolkit: Fix `AboveImage`/`BelowImage` has empty frame space when scale down
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -248,6 +248,7 @@ namespace SaintsField.Editor.Drawers
 
             if (string.IsNullOrEmpty(name))
             {
+                // ReSharper disable once ConvertIfStatementToReturnStatement
                 if(property.propertyType != SerializedPropertyType.ObjectReference)
                 {
                     return ($"Expect ObjectReference for `{name}`, get {property.propertyType}", null);
@@ -259,6 +260,7 @@ namespace SaintsField.Editor.Drawers
             SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
             if (prop != null)
             {
+                // ReSharper disable once ConvertIfStatementToReturnStatement
                 if(prop.propertyType != SerializedPropertyType.ObjectReference)
                 {
                     return ($"Expect ObjectReference for `{name}`, get {prop.propertyType}", null);
@@ -320,6 +322,7 @@ namespace SaintsField.Editor.Drawers
 
         private static (string error, Texture2D image) GetImageFromTarget(object result)
         {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (result)
             {
                 case Sprite sprite:
@@ -351,7 +354,9 @@ namespace SaintsField.Editor.Drawers
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
-        private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage";
+        private static string NameRoot(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage";
+        private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage_Image";
+        private static string NameFakePlaceholder(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage_Placeholder";
 
         private static string NameHelpBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__ShowImage_HelpBox";
@@ -365,7 +370,7 @@ namespace SaintsField.Editor.Drawers
                 return null;
             }
 
-            return CreateImage(property, index, null, showImageAttribute);
+            return CreateUIToolkitElement(property, index, null, showImageAttribute);
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -390,10 +395,18 @@ namespace SaintsField.Editor.Drawers
             {
                 name = NameImage(property, index) + "_root",
             };
-            root.Add(CreateImage(property, index, null, showImageAttribute));
+            root.Add(CreateUIToolkitElement(property, index, null, showImageAttribute));
             root.Add(helpBox);
 
             return root;
+        }
+
+        private struct Payload
+        {
+            // ReSharper disable InconsistentNaming
+            public Texture2D Image;
+            public float ProcessedWidth;
+            // ReSharper enable InconsistentNaming
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -404,9 +417,6 @@ namespace SaintsField.Editor.Drawers
 
             (string error, Texture2D preview) = GetImage(property, showImageAttribute.ImageCallback, parent);
 
-            UnityEngine.UIElements.Image image = container.Q<UnityEngine.UIElements.Image>(NameImage(property, index));
-            UpdateImage(image, preview, showImageAttribute);
-
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             // ReSharper disable once InvertIf
             if (helpBox.text != error)
@@ -414,81 +424,194 @@ namespace SaintsField.Editor.Drawers
                 helpBox.text = error;
                 helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
             }
+
+            VisualElement root = container.Q<VisualElement>(NameRoot(property, index));
+            UnityEngine.UIElements.Image image = root.Q<UnityEngine.UIElements.Image>(NameImage(property, index));
+            Payload payload = (Payload)image.userData;
+            // ReSharper disable once Unity.NoNullPropagation
+            // int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
+
+            // Debug.Log($"cur={curInstanceId}, pre={preInstanceId}");
+            if (ReferenceEquals(payload.Image, preview))
+            {
+                return;
+            }
+
+            root.style.display = DisplayStyle.None;
+
+            if(preview == null)
+            {
+                image.userData = new Payload
+                {
+                    Image = null,
+                    ProcessedWidth = payload.ProcessedWidth,
+                };
+                return;
+            }
+
+            // UpdateImage(image, preview, (AssetPreviewAttribute)saintsAttribute);
+            if (preview != null)
+            {
+                SetImage(root, image, preview);
+                OnRootGeoChanged(
+                    root,
+                    root.Q<Label>(NameFakePlaceholder(property, index)),
+                    root.Q<UnityEngine.UIElements.Image>(NameImage(property, index)),
+                    showImageAttribute.MaxWidth, showImageAttribute.MaxHeight);
+            }
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
-        private static UnityEngine.UIElements.Image CreateImage(SerializedProperty property, int index, Texture2D preview,
+        private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index, Texture2D preview,
             ShowImageAttribute showImageAttribute)
         {
-            UnityEngine.UIElements.Image image = new UnityEngine.UIElements.Image
+            VisualElement root = new VisualElement
             {
-                scaleMode = ScaleMode.ScaleToFit,
-                name = NameImage(property, index),
+                name = NameRoot(property, index),
                 style =
                 {
-                    display = DisplayStyle.None,
+                    flexDirection = FlexDirection.Row,
                 },
+            };
+            Label fakeLabel = Util.PrefixLabelUIToolKit(" ", 0);
+            fakeLabel.name = NameFakePlaceholder(property, index);
+
+            root.Add(fakeLabel);
+
+            UnityEngine.UIElements.Image image = new UnityEngine.UIElements.Image
+            {
+                name = NameImage(property, index),
+                scaleMode = ScaleMode.ScaleToFit,
             };
 
             switch (showImageAttribute.Align)
             {
                 case EAlign.Start:
                     // image.style.alignSelf = Align.Start;
+                    fakeLabel.style.display = DisplayStyle.None;
                     break;
                 case EAlign.Center:
-                    image.style.alignSelf = Align.Center;
+                    // image.style.alignSelf = Align.Center;
+                    fakeLabel.style.display = DisplayStyle.None;
                     break;
                 case EAlign.End:
-                    image.style.alignSelf = Align.FlexEnd;
+                    // image.style.alignSelf = Align.FlexEnd;
                     break;
                 case EAlign.FieldStart:
+                    fakeLabel.style.display = DisplayStyle.Flex;
                     // image.style.alignSelf = Align.FlexStart;
-                    image.style.left = LabelBaseWidth;
+                    // image.style.left = LabelBaseWidth;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(showImageAttribute.Align), showImageAttribute.Align, null);
             }
 
-            UpdateImage(image, preview, showImageAttribute);
+            // UpdateImage(image, preview, assetPreviewAttribute);
 
-            return image;
-        }
+            // image.AddToClassList(NameImage(property, index));
 
-        // ReSharper disable once SuggestBaseTypeForParameter
-        private static void UpdateImage(UnityEngine.UIElements.Image image, Texture2D preview, ShowImageAttribute showImageAttribute)
-        {
-            if (ReferenceEquals(image.image, preview))
+            SetImage(root, image, preview);
+            if (preview == null)
             {
-                return;
-            }
-
-            image.image = preview;
-
-            bool isNull = preview == null;
-
-            image.style.display = isNull? DisplayStyle.None: DisplayStyle.Flex;
-            if (isNull)
-            {
-                return;
-            }
-
-            if (showImageAttribute.MaxWidth > 0 || showImageAttribute.MaxHeight > 0)
-            {
-                int imageWidth = preview.width;
-                int imageHeight = preview.height;
-                int maxHeight = showImageAttribute.MaxHeight > 0? showImageAttribute.MaxHeight: imageWidth;
-                int maxWidth = showImageAttribute.MaxWidth > 0? showImageAttribute.MaxWidth: imageHeight;
-
-                (int fittedWidth, int fittedHeight) = Tex.FitScale(maxWidth, maxHeight, imageWidth, imageHeight);
-
-                image.style.maxWidth = fittedWidth;
-                image.style.maxHeight = fittedHeight;
+                image.userData = new Payload
+                {
+                    Image = null,
+                    ProcessedWidth = 0,
+                };
             }
             else
             {
-                image.style.maxWidth = image.style.maxHeight = StyleKeyword.Null;
+                image.style.width = preview.width;
+                image.style.height = preview.height;
+                image.userData = new Payload
+                {
+                    Image = preview,
+                    ProcessedWidth = 0,
+                };
             }
 
+            root.Add(image);
+
+            root.RegisterCallback<GeometryChangedEvent>(_ => OnRootGeoChanged(root, fakeLabel, image, showImageAttribute.MaxWidth, showImageAttribute.MaxHeight));
+
+            return root;
+        }
+
+        private static void SetImage(VisualElement root, UnityEngine.UIElements.Image image, Texture2D preview)
+        {
+            if (preview == null)
+            {
+                root.style.display = DisplayStyle.None;
+                return;
+            }
+
+            root.style.display = DisplayStyle.Flex;
+            image.image = preview;
+        }
+
+        private static void OnRootGeoChanged(VisualElement root, Label fakeLabel, UnityEngine.UIElements.Image image, int widthConfig, int heightConfig)
+        {
+            if(root.style.display == DisplayStyle.None)
+            {
+                return;
+            }
+
+            float rootWidth = root.resolvedStyle.width;
+
+            if(rootWidth < Mathf.Epsilon)
+            {
+                return;
+            }
+
+            float fakeLabelWidth = fakeLabel.style.display == DisplayStyle.None
+                ? 0
+                : fakeLabel.resolvedStyle.width;
+
+            float imageWidth = image.resolvedStyle.width;
+
+            if(new []{rootWidth, fakeLabelWidth, imageWidth}.Any(float.IsNaN))
+            {
+                return;
+            }
+
+            Payload payload = (Payload)image.userData;
+
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if(payload.ProcessedWidth == rootWidth)
+            {
+                return;
+            }
+
+            image.userData = new Payload
+            {
+                Image = payload.Image,
+                ProcessedWidth = rootWidth,
+            };
+
+            if (image.image == null)
+            {
+                return;
+            }
+
+            int maxWidth = Mathf.FloorToInt(rootWidth - fakeLabelWidth);
+            int width = 0;
+            int height = 0;
+            if (maxWidth > 0)
+            {
+                Texture2D preview = (Texture2D)image.image;
+                (width, height) = Tex.GetProperScaleRect(
+                    maxWidth,
+                    widthConfig, heightConfig, preview.width, preview.height);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ASSET_PREVIEW
+                Debug.Log($"{width}x{height}<-rootWidth={rootWidth}, fakeLabel={fakeLabelWidth}, widthConfig={widthConfig}, heightConfig={heightConfig}, preview={preview.width}x{preview.height}");
+#endif
+            }
+
+            root.schedule.Execute(() =>
+            {
+                image.style.width = Mathf.Max(width, 0);
+                image.style.height = Mathf.Max(height, 0);
+            });
         }
         #endregion
 #endif

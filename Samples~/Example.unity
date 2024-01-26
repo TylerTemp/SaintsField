@@ -3815,18 +3815,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item:
-    rid: -2
+    rid: 4598335247561785349
   myInterface:
-    rid: 4598335217016504494
+    rid: 4598335247561785348
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 4598335217016504494
-      type: {class: ReferenceExample/ClassDirectImpl, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+    - rid: 4598335247561785348
+      type: {class: ReferenceExample/ClassDirect, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:
         <TheInt>k__BackingField: 0
+    - rid: 4598335247561785349
+      type: {class: ReferenceExample/Base2Fruit, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
+        base2: 0
 --- !u!4 &1638446596
 Transform:
   m_ObjectHideFlags: 0

@@ -287,7 +287,6 @@ namespace SaintsField.Editor.Core
             float fullWidth = _filedWidthCache < 0
                 ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
                 : _filedWidthCache;
-            Debug.Log($"fullWidth={fullWidth}, EditorGUIUtility.currentViewWidth={EditorGUIUtility.currentViewWidth}, indent={EditorGUI.indentLevel}");
             // float fullWidth = 100;
 
             foreach (IGrouping<string, KeyValuePair<SaintsWithIndex, SaintsPropertyDrawer>> grouped in _usedAttributes.ToLookup(each => each.Key.SaintsAttribute.GroupBy))
