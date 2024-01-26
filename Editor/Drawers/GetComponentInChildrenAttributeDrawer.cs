@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -16,10 +17,12 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
         private string _error = "";
 
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => 0;
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent) => 0;
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            bool valueChanged)
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            bool valueChanged, FieldInfo info, object parent)
         {
             (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
             if (error != "")
@@ -35,10 +38,12 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
-            ISaintsAttribute saintsAttribute) => _error != "";
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
         #endregion
 
         private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
@@ -140,7 +145,7 @@ namespace SaintsField.Editor.Drawers
 
         // NOTE: ensure the post field is added to the container!
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {

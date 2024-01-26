@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged)
+            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
         {
             // Debug.Log($"OnValueChangedAttributeDrawer={valueChanged}");
             if (!valueChanged)
@@ -27,16 +27,20 @@ namespace SaintsField.Editor.Drawers
                 return true;
             }
 
-            _error = InvokeCallback(saintsAttribute, GetParentTarget(property));
+            _error = InvokeCallback(saintsAttribute, parent);
 
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) => _error != "";
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
         private static string InvokeCallback(ISaintsAttribute saintsAttribute, object target)
@@ -80,8 +84,9 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__ONValueChanged_HelpBox";
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {

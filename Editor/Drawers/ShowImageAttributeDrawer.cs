@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers
         //     }
         // }
 
-        private (Texture2D, float preferredWidth, float preferredHeight) GetPreview(SerializedProperty property, int maxWidth, int maxHeight, float viewWidth, string name)
+        private (Texture2D, float preferredWidth, float preferredHeight) GetPreview(SerializedProperty property, int maxWidth, int maxHeight, float viewWidth, string name, object parent)
         {
             // Debug.Log($"viewWidth={viewWidth}");
             if (viewWidth - 1f < Mathf.Epsilon)
@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Drawers
                 return (null, maxWidth, maxWidth);
             }
 
-            (string error, Texture2D image) = GetImage(property, name, GetParentTarget(property));
+            (string error, Texture2D image) = GetImage(property, name, parent);
             _error = error;
 
             if(_error != "")
@@ -79,33 +79,37 @@ namespace SaintsField.Editor.Drawers
             return (_originTexture, scaleWidth, scaleHeight);
         }
 
-        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             return ((ShowImageAttribute)saintsAttribute).Above;
         }
 
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             if (_error != "")
             {
                 return 0;
             }
 
-            return ((ShowImageAttribute)saintsAttribute).Above? GetImageHeight(property, width, saintsAttribute): 0;
+            return ((ShowImageAttribute)saintsAttribute).Above? GetImageHeight(property, width, saintsAttribute, parent): 0;
         }
 
-        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             if (_error != "")
             {
                 return position;
             }
 
-            return Draw(position, property, saintsAttribute);
+            return Draw(position, property, saintsAttribute, parent);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             // Debug.Log($"{((ShowImageAttribute)saintsAttribute).Above}/{_error}");
             bool willDrawBelow = !((ShowImageAttribute)saintsAttribute).Above || _error != "";
@@ -114,7 +118,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // Debug.Log($"draw below view width: {width}");
 
@@ -123,12 +127,13 @@ namespace SaintsField.Editor.Drawers
                 return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
             }
 
-            float height = ((ShowImageAttribute)saintsAttribute).Above? 0: GetImageHeight(property, width, saintsAttribute);
+            float height = ((ShowImageAttribute)saintsAttribute).Above? 0: GetImageHeight(property, width, saintsAttribute, parent);
             // Debug.Log($"GetBlowExtraHeight={height}");
             return height;
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             if (_error != "")
             {
@@ -138,10 +143,10 @@ namespace SaintsField.Editor.Drawers
             // EditorGUI.DrawRect(position, Color.blue);
             // Debug.Log($"DrawBelow height: {position.height}");
 
-            return Draw(position, property, saintsAttribute);
+            return Draw(position, property, saintsAttribute, parent);
         }
 
-        private float GetImageHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute)
+        private float GetImageHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute, object parent)
         {
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
             int maxWidth = showImageAttribute.MaxWidth;
@@ -149,7 +154,7 @@ namespace SaintsField.Editor.Drawers
             // int useWidth = maxWidth == -1? viewWidth: Mathf.Min(maxWidth, viewWidth);
             int maxHeight = showImageAttribute.MaxHeight;
 
-            (Texture2D _, float _, float preferredHeight) = GetPreview(property, maxWidth, maxHeight, width, showImageAttribute.ImageCallback);
+            (Texture2D _, float _, float preferredHeight) = GetPreview(property, maxWidth, maxHeight, width, showImageAttribute.ImageCallback, parent);
 
             // Debug.Log($"GetImageHeight viewWidth={width} -> {preferredHeight}");
             // if (previewTexture)
@@ -164,7 +169,7 @@ namespace SaintsField.Editor.Drawers
             return preferredHeight;
         }
 
-        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute, object parent)
         {
             // Debug.Log($"Draw height: {position.height}");
 
@@ -182,7 +187,7 @@ namespace SaintsField.Editor.Drawers
 
             // Debug.Log($"Draw height={position.height}");
 
-            (Texture2D previewTexture, float preferredWidth, float preferredHeight)  = GetPreview(property, maxWidth, maxHeight, position.width, showImageAttribute.ImageCallback);
+            (Texture2D previewTexture, float preferredWidth, float preferredHeight)  = GetPreview(property, maxWidth, maxHeight, position.width, showImageAttribute.ImageCallback, parent);
 
             // Debug.Log($"preview to {preferredWidth}x{preferredHeight}");
             // if (previewTexture)
@@ -364,7 +369,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {

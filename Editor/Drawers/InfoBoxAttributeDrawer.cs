@@ -20,7 +20,8 @@ namespace SaintsField.Editor.Drawers
         // private bool _overrideMessageType;
         // private EMessageType _messageType;
 
-        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
@@ -30,12 +31,13 @@ namespace SaintsField.Editor.Drawers
                 return false;
             }
 
-            (string error, bool willDraw) = WillDraw(infoboxAttribute, GetParentTarget(property));
+            (string error, bool willDraw) = WillDraw(infoboxAttribute, parent);
             _error = error;
             return willDraw;
         }
 
-        protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
             if (!infoboxAttribute.Above)
@@ -43,7 +45,7 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, GetParentTarget(property));
+            MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, parent);
             if (metaInfo.Error != "")
             {
                 return 0;
@@ -52,14 +54,17 @@ namespace SaintsField.Editor.Drawers
             return ImGuiHelpBox.GetHeight(metaInfo.Content, width, metaInfo.MessageType);
         }
 
-        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, GetParentTarget(property));
+            MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, parent);
             return ImGuiHelpBox.Draw(position, metaInfo.Content, metaInfo.MessageType);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             if (_error != "")
             {
@@ -74,19 +79,19 @@ namespace SaintsField.Editor.Drawers
                 return false;
             }
 
-            (string error, bool willDraw) = WillDraw(infoboxAttribute, GetParentTarget(property));
+            (string error, bool willDraw) = WillDraw(infoboxAttribute, parent);
             _error = error;
             return willDraw;
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
             float boxHeight = 0f;
             if (!infoboxAttribute.Above)
             {
-                object parent = GetParentTarget(property);
                 MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, parent);
                 _error = metaInfo.Error;
                 if (metaInfo.WillDraw)
@@ -99,10 +104,11 @@ namespace SaintsField.Editor.Drawers
             return boxHeight + errorHeight;
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, GetParentTarget(property));
+            MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, parent);
             Rect leftRect = ImGuiHelpBox.Draw(position, metaInfo.Content, metaInfo.MessageType);
             _error = metaInfo.Error;
 
@@ -310,9 +316,11 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-                VisualElement container,
-                object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
+            object parent)
         {
             HelpBox errorBox = new HelpBox
             {

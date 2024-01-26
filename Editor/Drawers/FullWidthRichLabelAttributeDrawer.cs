@@ -24,29 +24,32 @@ namespace SaintsField.Editor.Drawers
             _richTextDrawer.Dispose();
         }
 
-        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             // Debug.Log("ABOVE!");
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             return fullWidthRichLabelAttribute.Above;
         }
 
-        protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             return fullWidthRichLabelAttribute.Above? EditorGUIUtility.singleLineHeight: 0;
         }
 
-        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
-            return DrawImGui(position, property, label, saintsAttribute);
+            return DrawImGui(position, label, saintsAttribute, parent);
         }
 
-        private Rect DrawImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        private Rect DrawImGui(Rect position, GUIContent label, ISaintsAttribute saintsAttribute, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
 
-            (string error, string xml) = GetLabelXml(fullWidthRichLabelAttribute, GetParentTarget(property));
+            (string error, string xml) = GetLabelXml(fullWidthRichLabelAttribute, parent);
             if(error != "")
             {
                 _error = error;
@@ -125,13 +128,16 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             return !fullWidthRichLabelAttribute.Above || _error != "";
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             float errorHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
@@ -140,13 +146,14 @@ namespace SaintsField.Editor.Drawers
                 : errorHeight + EditorGUIUtility.singleLineHeight;
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             Rect useRect = position;
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
             {
-                useRect = DrawImGui(position, property, label, fullWidthRichLabelAttribute);
+                useRect = DrawImGui(position, label, fullWidthRichLabelAttribute, parent);
             }
             return _error == ""
                 ? useRect
@@ -202,7 +209,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement();
 

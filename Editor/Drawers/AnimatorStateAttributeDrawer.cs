@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -38,7 +39,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             float errorHeight = _errorMsg == "" ? 0 : ImGuiHelpBox.GetHeight(_errorMsg, width, MessageType.Error);
             float subRowHeight = EditorGUIUtility.singleLineHeight * (property.propertyType == SerializedPropertyType.String ? 0 : 2);
@@ -262,13 +263,15 @@ namespace SaintsField.Editor.Drawers
             // RenderSubRow(popupLeftRect, property);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             return property.propertyType != SerializedPropertyType.String;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute)
+            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // Debug.Log(_targetIsString);
             if(property.propertyType == SerializedPropertyType.String)
@@ -354,7 +357,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
             {

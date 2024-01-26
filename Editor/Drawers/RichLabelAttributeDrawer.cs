@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -38,10 +39,11 @@ namespace SaintsField.Editor.Drawers
         //     ISaintsAttribute saintsAttribute) =>
         //     EditorGUIUtility.singleLineHeight;
 
-        protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, GetParentTarget(property));
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
             // bool result = GetLabelXml(property, targetAttribute) != null;
             // Debug.Log($"richLabel willDraw={result}");
             // return result;
@@ -50,11 +52,11 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, object parent)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
 
-            (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute, GetParentTarget(property));
+            (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
             _error = error;
 
             if (labelXml is null)
@@ -67,17 +69,21 @@ namespace SaintsField.Editor.Drawers
             // LabelMouseProcess(position, property);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             return _error != "";
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         }
@@ -114,8 +120,9 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -44,7 +45,8 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             if(property.objectReferenceValue == null)
             {
@@ -78,12 +80,15 @@ namespace SaintsField.Editor.Drawers
             return (true, position);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             return true;
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
@@ -102,7 +107,8 @@ namespace SaintsField.Editor.Drawers
 
         // private UnityEditor.Editor _editor;
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             Object scriptableObject = property.objectReferenceValue;
             _error = property.propertyType != SerializedPropertyType.ObjectReference
@@ -251,8 +257,9 @@ namespace SaintsField.Editor.Drawers
             return foldOut;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             // InspectorElement visualElement = new InspectorElement
             // {

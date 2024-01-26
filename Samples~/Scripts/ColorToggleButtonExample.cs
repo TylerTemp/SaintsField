@@ -10,6 +10,8 @@ namespace SaintsField.Samples.Scripts
         [SerializeField, ColorToggle] private Color _onColor;
         [SerializeField, ColorToggle] private Color _offColor;
 
+        [SerializeField, ColorToggle] private Color[] _colors;
+
         // by name
         [Space]
         [SerializeField, ColorToggle(nameof(_button))] private Color _onColor2;

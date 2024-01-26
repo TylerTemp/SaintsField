@@ -1,4 +1,5 @@
-﻿using SaintsField.Editor.Core;
+﻿using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -12,21 +13,21 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(MaxValueAttribute))]
     public class MaxValueAttributeDrawer : SaintsPropertyDrawer
     {
-        #region UIToolkit
+        #region IMGUI
         private string _error = "";
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged)
+            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
         {
             if (!valueChanged)
             {
                 return true;
             }
 
-            object parentTarget = GetParentTarget(property);
+            // object parentTarget = GetParentTarget(property);
 
             MaxValueAttribute minValueAttribute = (MaxValueAttribute)saintsAttribute;
-            (string error, float valueLimit) = GetLimitFloat(minValueAttribute, parentTarget);
+            (string error, float valueLimit) = GetLimitFloat(minValueAttribute, parent);
 
             _error = error;
 
@@ -58,11 +59,15 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) => _error != "";
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
         private static (string error, float valueLimit) GetLimitFloat(MaxValueAttribute maxValueAttribute, object parentTarget)
@@ -79,8 +84,9 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__MaxValue_HelpBox";
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {

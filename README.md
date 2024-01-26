@@ -1412,9 +1412,11 @@ Remide a given reference type field to be required.
 
 This will check if the field value is a `truly` value, which means:
 
-1.  Won't work for int and float (It'll give an error, asking you to not use on int/float)
-2. The `struct` value will always be `truly` because `struct` is not nullable and Unity will fill a default value for it no matter what
-3.  It works on reference type and will NOT skip Unity's life-circle null check
+1.  `ValuedType` like `struct` will always be `truly` because `struct` is not nullable and Unity will fill a default value for it no matter what
+2.  It works on reference type and will NOT skip Unity's life-circle null check
+3.  You may not want to use it on `int`, `float` (because only `0` is not `truly`) or `bool`, but it's still allowed if you insist
+
+Parameters:
 
 *   `string errorMessage = null` Error message. Default is `{label} is required`
 *   AllowMultiple: No
@@ -1436,7 +1438,7 @@ public class RequiredExample: MonoBehaviour
     }
 
     [Required]
-    public MyStruct wontWorkWontNoticeYou;
+    public MyStruct warnsYouNow;
 }
 ```
 
@@ -2040,10 +2042,15 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 
     NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
 
+Special Note:
+
+NaughtyAttributes uses only IMGUI. If you're using Unity 2022.2+, `NaughtyAttributes`'s editor will try fallback default drawers and Unity will decide to use UI Toolkit rendering `SaintsField` and cause troubles.
+Please disable `SaintsField`'s UI Toolkit ability by adding marco `-define:SAINTSFIELD_UI_TOOLKIT_DISABLE` to your project.
+
 My (not full) test about compatibility:
 
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
-*   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack. (NaughtyAttributes uses only IMGUI)
+*   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
 *   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good for Odin's `EditorWindow`.
 
 ### UI Toolkit ###

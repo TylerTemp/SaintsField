@@ -74,8 +74,9 @@ namespace SaintsField.Editor.Drawers
 
         private const float ImGuiButtonWidth = 20f;
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            bool valueChanged)
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            bool valueChanged, FieldInfo info, object parent)
         {
             object managedReferenceValue = property.managedReferenceValue;
 
@@ -161,7 +162,8 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             return ImGuiButtonWidth;
         }

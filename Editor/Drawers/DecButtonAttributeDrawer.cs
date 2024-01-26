@@ -49,13 +49,13 @@ namespace SaintsField.Editor.Drawers
                                                           BindingFlags.Public | BindingFlags.DeclaredOnly;
 
         #region IMGUI
-        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, object target)
         {
             DecButtonAttribute aboveButtonAttribute = (DecButtonAttribute) saintsAttribute;
 
             (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
-            object target = GetParentTarget(property);
+            // object target = GetParentTarget(property);
             Type objType = target.GetType();
             (string error, string buttonLabelXml) = GetButtonLabelXml(aboveButtonAttribute, target, objType);
             _error = error;

@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
-        public static T LoadResource<T>(string iconPath) where T: UnityEngine.Object
+        public static T LoadResource<T>(string resourcePath) where T: UnityEngine.Object
         {
             string[] resourceSearchFolder = {
                 "Assets/Editor Default Resources/SaintsField",
@@ -21,20 +21,20 @@ namespace SaintsField.Editor.Utils
             };
 
             T result = resourceSearchFolder
-                .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{iconPath}"))
+                .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{resourcePath}"))
                 // .Where(each => each != null)
                 // .DefaultIfEmpty((T)EditorGUIUtility.Load(relativePath))
                 .FirstOrDefault(each => each != null);
             if (result == null)
             {
-                result = (T)EditorGUIUtility.Load(iconPath);
+                result = (T)EditorGUIUtility.Load(resourcePath);
             }
 
             // if (result == null)
             // {
             //     result = AssetDatabase.LoadAssetAtPath<T>(Path.Combine("Assets", iconPath).Replace("\\", "/"));
             // }
-            Debug.Assert(result != null, $"{iconPath} not found in {string.Join(", ", resourceSearchFolder)}");
+            Debug.Assert(result != null, $"{resourcePath} not found in {string.Join(", ", resourceSearchFolder)}");
             return result;
         }
 

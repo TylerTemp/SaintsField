@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers
         private bool _againRender;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged)
+            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
         {
             if (!valueChanged)
             {
@@ -34,14 +34,14 @@ namespace SaintsField.Editor.Drawers
             _againRender = true;
 
             string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
-            object target = GetParentTarget(property);
+            // object target = GetParentTarget(property);
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly;
-            MethodInfo methodInfo =  target.GetType().GetMethod(callback, bindAttr);
+            MethodInfo methodInfo = parent.GetType().GetMethod(callback, bindAttr);
             if (methodInfo == null)
             {
-                _error = $"no method found `{callback}` on `{target}`";
+                _error = $"no method found `{callback}` on `{parent}`";
                 return true;
             }
 
@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers
             ParameterInfo[] methodParams = methodInfo.GetParameters();
             Debug.Assert(methodParams.All(p => p.IsOptional));
 
-            string validateResult = "";
+            string validateResult;
             if(valueChanged)
             {
                 property.serializedObject.ApplyModifiedProperties();
@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log($"call on {property.intValue}");
             try
             {
-                validateResult = (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                validateResult = (string)methodInfo.Invoke(parent, methodParams.Select(p => p.DefaultValue).ToArray());
             }
             catch (TargetInvocationException e)
             {
@@ -81,11 +81,15 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) => _error != "";
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
 #if UNITY_2021_3_OR_NEWER
@@ -94,8 +98,9 @@ namespace SaintsField.Editor.Drawers
 
         private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ValidateInput";
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {

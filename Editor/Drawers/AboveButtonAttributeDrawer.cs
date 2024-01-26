@@ -1,4 +1,5 @@
-﻿using SaintsField.Editor.Utils;
+﻿using System.Reflection;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
@@ -12,18 +13,19 @@ namespace SaintsField.Editor.Drawers
     {
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: ImGuiHelpBox.GetHeight(DisplayError, width, MessageType.Error));
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: ImGuiHelpBox.GetHeight(DisplayError, width, MessageType.Error));
 
 
-        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             return true;
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, object parent)
         {
-            Rect leftRect = Draw(position, property, label, saintsAttribute);
+            Rect leftRect = Draw(position, property, label, saintsAttribute, parent);
 
             if (DisplayError != "")
             {

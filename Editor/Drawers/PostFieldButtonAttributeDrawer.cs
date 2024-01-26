@@ -1,4 +1,5 @@
-﻿using SaintsField.Editor.Core;
+﻿using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, object parent)
         {
             object target = property.serializedObject.targetObject;
             (string error, string labelXml) = GetButtonLabelXml((DecButtonAttribute)saintsAttribute, target, target.GetType());
@@ -26,27 +27,31 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged)
+            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
         {
             // Debug.Log($"draw below {position}");
             // return Draw(position, property, label, saintsAttribute);
             // float width = GetPostFieldWidth(position, property, label, saintsAttribute);
             // (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
-            Draw(position, property, label, saintsAttribute);
+            Draw(position, property, label, saintsAttribute, parent);
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             return DisplayError != "";
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return DisplayError == "" ? 0 : ImGuiHelpBox.GetHeight(DisplayError, width, MessageType.Error);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) =>
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) =>
             DisplayError == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, DisplayError, MessageType.Error);
@@ -65,7 +70,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             VisualElement visualElement = new VisualElement
             {

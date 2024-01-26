@@ -146,12 +146,12 @@ namespace SaintsField.Editor.Core
         private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
         protected virtual (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, object parent)
         {
             return (false, true);
         }
 
-        private bool GetVisibility(SerializedProperty property, IEnumerable<SaintsWithIndex> saintsAttributeWithIndexes)
+        private bool GetVisibility(SerializedProperty property, IEnumerable<SaintsWithIndex> saintsAttributeWithIndexes, object parent)
         {
             List<bool> showAndResults = new List<bool>();
             // List<bool> hideAndResults = new List<bool>();
@@ -169,7 +169,7 @@ namespace SaintsField.Editor.Core
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
                 SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
-                (bool isForHide, bool andResult) = drawer.GetAndVisibility(property, saintsAttributeWithIndex.SaintsAttribute);
+                (bool isForHide, bool andResult) = drawer.GetAndVisibility(property, saintsAttributeWithIndex.SaintsAttribute, parent);
                 if (isForHide)
                 {
                     // Debug.Log($"hide or: {orResult}");
@@ -210,7 +210,8 @@ namespace SaintsField.Editor.Core
         }
 
         #region GetPropertyHeight
-#if !UNITY_2022_2_OR_NEWER || SAINTSFIELD_UI_TOOLKIT_DISABLE
+        private float _filedWidthCache = -1;
+
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             // if (IsSubDrawer)
@@ -223,13 +224,19 @@ namespace SaintsField.Editor.Core
                 return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
             }
 
-            if (!GetVisibility(property, SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).attributes
-                    .Select((each, index) => new SaintsWithIndex
-                    {
-                        SaintsAttribute = each,
-                        Index = index,
-                    })
-                    .Where(each => each.SaintsAttribute is VisibilityAttribute)))
+            (ISaintsAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
+
+            if (!GetVisibility(
+                    property,
+                    SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).attributes
+                        .Select((each, index) => new SaintsWithIndex
+                        {
+                            SaintsAttribute = each,
+                            Index = index,
+                        })
+                        .Where(each => each.SaintsAttribute is VisibilityAttribute),
+                    parent
+                ))
             {
                 return 0f;
             }
@@ -256,7 +263,7 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"hasSaintsLabel={hasSaintsLabel}");
 
             bool saintsDrawNoLabel = hasSaintsLabel &&
-                                     !labelFound.drawer.WillDrawLabel(property, labelFound.iSaintsAttribute);
+                                     !labelFound.drawer.WillDrawLabel(property, labelFound.iSaintsAttribute, parent);
 
             bool hasSaintsField = fieldFound.iSaintsAttribute != null;
 
@@ -277,8 +284,11 @@ namespace SaintsField.Editor.Core
             float aboveHeight = 0;
             float belowHeight = 0;
 
-            // float fullWidth = EditorGUIUtility.currentViewWidth;
-            float fullWidth = 100;
+            float fullWidth = _filedWidthCache < 0
+                ?EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
+                : _filedWidthCache;
+            // float fullWidth = 100;
+
             foreach (IGrouping<string, KeyValuePair<SaintsWithIndex, SaintsPropertyDrawer>> grouped in _usedAttributes.ToLookup(each => each.Key.SaintsAttribute.GroupBy))
             {
                 float eachWidth = grouped.Key == ""
@@ -286,9 +296,9 @@ namespace SaintsField.Editor.Core
                     : fullWidth / grouped.Count();
 
                 IEnumerable<float> aboveHeights =
-                    grouped.Select(each => each.Value.GetAboveExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute));
+                    grouped.Select(each => each.Value.GetAboveExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute, fieldInfo, parent));
                 IEnumerable<float> belowHeights =
-                    grouped.Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute));
+                    grouped.Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute, fieldInfo, parent));
 
                 if (grouped.Key == "")
                 {
@@ -309,7 +319,6 @@ namespace SaintsField.Editor.Core
 
             return _labelFieldBasicHeight + aboveHeight + belowHeight;
         }
-#endif
 
         protected virtual float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, bool hasLabelWidth)
@@ -324,14 +333,14 @@ namespace SaintsField.Editor.Core
 
         protected virtual float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return 0;
         }
 
         protected virtual float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return 0;
         }
@@ -363,10 +372,10 @@ namespace SaintsField.Editor.Core
             sharedInfo.Changed = changed;
         }
 
-        protected object GetParentTarget(SerializedProperty property)
-        {
-            return PropertyPathToShared[property.propertyPath].ParentTarget;
-        }
+        // protected object GetParentTarget(SerializedProperty property)
+        // {
+        //     return PropertyPathToShared[property.propertyPath].ParentTarget;
+        // }
 
         // protected object DirectParentObject { get; private set; }
 
@@ -777,7 +786,7 @@ namespace SaintsField.Editor.Core
                 foreach (SaintsPropertyInfo saintsPropertyInfo in drawerInfo)
                 {
                     // belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
-                    groupByContainer.Add(saintsPropertyInfo.Drawer.CreateBelowUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent));
+                    groupByContainer.Add(saintsPropertyInfo.Drawer.CreateBelowUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent));
                 }
 
             }
@@ -811,8 +820,11 @@ namespace SaintsField.Editor.Core
             return rootElement;
         }
 #endif
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            _filedWidthCache = position.width;
+
             // Debug.Log($"raw pos={position.y} height={position.height}");
             _cachedPropPath = property.propertyPath;
 
@@ -843,7 +855,7 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"Saints: {property.displayName} found {allSaintsAttributes.Count}");
 
-            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is VisibilityAttribute)))
+            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is VisibilityAttribute), parent))
             {
                 return;
             }
@@ -873,7 +885,7 @@ namespace SaintsField.Editor.Core
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
 
                     // ReSharper disable once InvertIf
-                    if (drawerInstance.WillDrawAbove(property, eachAttributeWithIndex.SaintsAttribute))
+                    if (drawerInstance.WillDrawAbove(property, eachAttributeWithIndex.SaintsAttribute, parent))
                     {
                         if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
                                 out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
@@ -902,7 +914,7 @@ namespace SaintsField.Editor.Core
                         foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
                         {
                             Rect newAboveRect =
-                                drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute);
+                                drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute, parent);
                             aboveUsedHeight = newAboveRect.y - aboveInitY;
                             aboveRect = newAboveRect;
                         }
@@ -921,7 +933,7 @@ namespace SaintsField.Editor.Core
                                 width = eachWidth,
                             };
                             Rect leftRect =
-                                drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute);
+                                drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute, parent);
                             height = Mathf.Max(height, leftRect.y - eachRect.y);
                             // Debug.Log($"height={height}");
                         }
@@ -974,7 +986,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     (bool isActive, Rect newLabelRect) =
-                        drawerInstance.DrawPreLabelImGui(labelRect, property, eachAttributeWithIndex.SaintsAttribute);
+                        drawerInstance.DrawPreLabelImGui(labelRect, property, eachAttributeWithIndex.SaintsAttribute, parent);
                     // ReSharper disable once InvertIf
                     if (isActive)
                     {
@@ -1015,14 +1027,14 @@ namespace SaintsField.Editor.Core
                     UsedAttributesTryAdd(labelAttributeWithIndex, labelDrawerInstance);
                     // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
                     bool hasLabelSpace =
-                        labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute);
+                        labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute, parent);
                     if (hasLabelSpace)
                     {
                         // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
 
                         // saintsPropertyDrawerDrawLabelCallback = () =>
                         labelDrawerInstance.DrawLabel(labelRect, property, label,
-                            labelAttributeWithIndex.SaintsAttribute);
+                            labelAttributeWithIndex.SaintsAttribute, parent);
                     }
 
                     useGuiContent = hasLabelSpace
@@ -1049,7 +1061,7 @@ namespace SaintsField.Editor.Core
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     float curWidth =
                         drawerInstance.GetPostFieldWidth(fieldRect, property, GUIContent.none,
-                            eachAttributeWithIndex.SaintsAttribute);
+                            eachAttributeWithIndex.SaintsAttribute, parent);
                     postFieldWidth += curWidth;
                     postFieldInfoList.Add((
                         eachAttributeWithIndex,
@@ -1145,7 +1157,9 @@ namespace SaintsField.Editor.Core
                         attributeWithIndex.SaintsAttribute,
                         PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result)
                             ? result.Changed
-                            : false);
+                            : false,
+                        fieldInfo,
+                        parent);
                     // ReSharper disable once InvertIf
                     if (isActive)
                     {
@@ -1175,9 +1189,9 @@ namespace SaintsField.Editor.Core
                 foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
                 {
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                    (bool isActive, Rect newLabelRect) =
+                    bool isActive =
                         drawerInstance.DrawOverlay(fieldUseRect, property, bugFixCopyLabel,
-                            eachAttributeWithIndex.SaintsAttribute, hasLabelWidth);
+                            eachAttributeWithIndex.SaintsAttribute, hasLabelWidth, parent);
                     // ReSharper disable once InvertIf
                     if (isActive)
                     {
@@ -1207,7 +1221,7 @@ namespace SaintsField.Editor.Core
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     // Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
                     // ReSharper disable once InvertIf
-                    if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute))
+                    if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute, fieldInfo, parent))
                     {
                         if (!groupedDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
                                 out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
@@ -1233,7 +1247,7 @@ namespace SaintsField.Editor.Core
                     {
                         foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
                         {
-                            belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
+                            belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
                         }
                     }
                     else
@@ -1250,7 +1264,7 @@ namespace SaintsField.Editor.Core
                                 width = eachWidth,
                             };
                             Rect leftRect =
-                                drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, eachAttribute);
+                                drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
                             height = Mathf.Max(height, leftRect.y - eachRect.y);
                         }
 
@@ -1433,13 +1447,14 @@ namespace SaintsField.Editor.Core
         //     return (false, position);
         // }
 
-        protected virtual bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected virtual bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             return false;
         }
 
         protected virtual Rect DrawAboveImGui(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute)
+            GUIContent label, ISaintsAttribute saintsAttribute, object parent)
         {
             return position;
         }
@@ -1482,7 +1497,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             return null;
         }
@@ -1545,10 +1560,12 @@ namespace SaintsField.Editor.Core
 
                 VisualElement topRoot = parentRoots[parentRoots.Count - 1];
 
-                PropertyField thisPropField = containerElement.Q<PropertyField>();
+                PropertyField thisPropField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
 
                 // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
                 // Debug.Log($"container={container.Count}");
+
+                // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
 
                 // really... this delay is not predictable
                 containerElement.schedule.Execute(() =>
@@ -1562,8 +1579,7 @@ namespace SaintsField.Editor.Core
                         UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
                     }
 
-                    containerElement.visible = true;
-
+                    OnAwakeReady(property, containerElement, parent, saintsPropertyDrawers);
                 });
 
                 // foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
@@ -1585,8 +1601,25 @@ namespace SaintsField.Editor.Core
             }
             else
             {
-                containerElement.visible = true;
+                OnAwakeReady(property, containerElement, parent, saintsPropertyDrawers);
             }
+
+
+        }
+
+        private void OnAwakeReady(SerializedProperty property, VisualElement containerElement,
+            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+        {
+
+            Action<object> onValueChangedCallback = obj =>
+            {
+                foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
+                {
+                    saintsPropertyInfo.Drawer.OnValueChanged(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent, obj);
+                }
+            };
+
+            containerElement.visible = true;
 
             containerElement.userData = this;
 
@@ -1707,30 +1740,33 @@ namespace SaintsField.Editor.Core
 
         #endregion
 
-        protected virtual (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected virtual (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             return (false, position);
         }
 
 
-        protected virtual float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected virtual float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             return 0;
         }
 
         protected virtual bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged)
+            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
         {
             return false;
         }
 
-        protected virtual bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected virtual bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             return false;
         }
 
         protected virtual void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, object parent)
         {
             // return false;
         }
@@ -1740,20 +1776,22 @@ namespace SaintsField.Editor.Core
         {
         }
 
-        protected virtual bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected virtual bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             return false;
         }
 
-        protected virtual (bool willDraw, Rect drawPosition) DrawOverlay(Rect position,
+        protected virtual bool DrawOverlay(Rect position,
             SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            bool hasLabel)
+            bool hasLabel, object parent)
         {
-            return (false, default);
+            return false;
         }
 
         protected virtual Rect DrawBelow(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute)
+            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return position;
         }

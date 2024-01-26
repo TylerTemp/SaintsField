@@ -28,10 +28,12 @@ namespace SaintsField.Editor.Drawers
 
         private struct Container
         {
+            // ReSharper disable InconsistentNaming
             public string Error;
             public FieldType FieldType;
             public Image Image;
             public SpriteRenderer SpriteRenderer;
+            // ReSharper enable InconsistentNaming
             // public UnityEngine.UI.Button Button;
         }
 
@@ -40,7 +42,15 @@ namespace SaintsField.Editor.Drawers
             SpriteToggleAttribute toggleAttribute = (SpriteToggleAttribute)saintsAttribute;
             string imageCompName = toggleAttribute.CompName;
 
-            Object targetObject = (Object) parent;
+            if(parent is not Object targetObject)
+            {
+                return new Container
+                {
+                    Error = $"target {parent} is not a UnityEngine.Object",
+                };
+            }
+
+            // Object targetObject = (Object) parent;
             SerializedObject targetSer = new SerializedObject(targetObject);
 
             if(imageCompName != null)
@@ -174,29 +184,16 @@ namespace SaintsField.Editor.Drawers
         // private Image _image;
         // private SpriteRenderer _spriteRenderer;
 
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             // SpriteToggleAttribute toggleAttribute = (SpriteToggleAttribute)saintsAttribute;
             // string imageCompName = toggleAttribute.CompName;
 
             // Object targetObject = (Object)GetTargetObjectWithProperty(property);
-            Object targetObject = (Object)GetParentTarget(property);
-            // SerializedObject targetSer = new SerializedObject(targetObject);
+            // Object targetObject = (Object)GetParentTarget(property);
 
-            // _containerProperty =
-            //     targetSer.FindProperty(imageCompName) ?? targetSer.FindProperty($"<{imageCompName}>k__BackingField");
-            //
-            // if(_containerProperty == null)
-            // {
-            //     _error = $"target {imageCompName} not found";
-            //     return 0;
-            // }
-
-            // Debug.Log(_containerProperty.objectReferenceValue);
-            // Debug.Log(_containerProperty.objectReferenceValue is Image);
-            // Debug.Log(_containerProperty.objectReferenceValue is SpriteRenderer);
-
-            _container = GetContainer(saintsAttribute, targetObject);
+            _container = GetContainer(saintsAttribute, parent);
             _error = _container.Error;
 
             // Debug.Log(property.objectReferenceValue);
@@ -216,7 +213,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged)
+            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
         {
             // if (_containerProperty == null)
             // {
@@ -262,11 +259,15 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) => _error != "";
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent) => _error != "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
 #if UNITY_2021_3_OR_NEWER
@@ -328,7 +329,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {

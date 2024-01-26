@@ -1700,9 +1700,13 @@ MonoBehaviour:
   _spriteImage: {fileID: 0}
   <Go>k__BackingField: {fileID: 0}
   _object: {fileID: 0}
-  _wontWork: 0.79
+  _floatIsVauleType: 0
+  _intIsVauleType: 1
   myStruct:
     theInt: 0
+  nest:
+    nest2:
+      saints: {fileID: 0}
 --- !u!4 &768079761
 Transform:
   m_ObjectHideFlags: 0
@@ -2348,6 +2352,9 @@ MonoBehaviour:
   _button: {fileID: 1060634463}
   _onColor: {r: 0, g: 1, b: 0.14509805, a: 1}
   _offColor: {r: 1, g: 0.8117647, b: 0, a: 1}
+  _colors:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.083981514, a: 1}
   _onColor2: {r: 0, g: 0.92941177, b: 1, a: 1}
   _offColor2: {r: 0.11764706, g: 0, b: 1, a: 1}
 --- !u!114 &1060634463
@@ -2811,6 +2818,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nativeRange: 2.1
   nativeRangeHandled: 1.05
+  naCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  naCurveHandled:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  inputAxis: 
+  naProgressBar: 30
+  naNativeProgressBar: 30
+  sfProgressBar: 50
+  firstInt: 0
+  sepHere: 0
+  secondInt: 0
+  nest:
+    nest2:
+      saints: {fileID: 0}
+      na: {fileID: 0}
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
@@ -4024,7 +4054,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.11764706, g: 0, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4305,6 +4335,9 @@ MonoBehaviour:
   minValue: -5
   maxValue: 30
   fValue: 24.550001
+  stamina: 133
+  highStamina: 150
+  maxStamina: 200
 --- !u!1 &1967770119
 GameObject:
   m_ObjectHideFlags: 0

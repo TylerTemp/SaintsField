@@ -1,5 +1,6 @@
 // using MarkupAttributes;
 
+using System;
 using SaintsField.Unsaintly;
 using UnityEngine;
 
@@ -44,6 +45,26 @@ namespace SaintsField.Samples.Scripts
         [NaughtyAttributes.BoxGroup("Integers")]
         public int secondInt;
 
+        // https://github.com/dbrizov/NaughtyAttributes/issues/302
+
+        [Serializable]
+        public struct Nest2
+        {
+            [SaintsField.Required("SaintsField.Required: field is required")] public GameObject saints;
+            [NaughtyAttributes.Required("NaughtyAttributes.Required: field is required")] public GameObject na;
+        }
+
+        [Serializable]
+        public struct Nest1
+        {
+            public Nest2 nest2;
+        }
+
+        public Nest1 nest;
+
+#endif
+
+#if !SAINTSFIELD_SAMPLE_DISABLE_UNSAINTLY_EDITOR && !SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES
         [ShowInInspector] public const float PI = 3.14f;
 #endif
         //

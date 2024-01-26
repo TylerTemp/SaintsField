@@ -13,29 +13,12 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(RequiredAttribute))]
     public class RequiredAttributeDrawer: SaintsPropertyDrawer
     {
-        #region IMGUI
-        private string _error = "";
-
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged)
+        private static bool Truly(SerializedProperty property, object target)
         {
-            property.serializedObject.ApplyModifiedProperties();
-            if (Truly(property))
-            {
-                _error = "";
-                return true;
-            }
-
-            string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
-            _error = errorMessage ?? $"{property.displayName} is required";
-            return true;
-        }
-
-        private static bool Truly(SerializedProperty property)
-        {
-            UnityEngine.Object target = property.serializedObject.targetObject;
-
+            // UnityEngine.Object target = property.serializedObject.targetObject;
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), property.name);
+
+            // Debug.Log($"found={found.getPropType}; {found.fieldOrMethodInfo} / {property.name}, {target}");
 
             if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
             {
@@ -54,31 +37,129 @@ namespace SaintsField.Editor.Drawers
             throw new NotImplementedException("Unexpected case");
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute) =>
-            (_error = ValidateType(property)) != "";
+        #region IMGUI
+        // private string _error = "";
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute) =>
-            (_error = ValidateType(property)) == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+//         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+//             ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
+//         {
+//             _error = ValidateType(property, info.FieldType);
+//             if(_error != "")
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+//                 Debug.Log($"get error=`{_error}`");
+// #endif
+//
+//                 return true;
+//             }
+//
+//             property.serializedObject.ApplyModifiedProperties();
+//             bool isTruly = Truly(property, parent);
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+//             Debug.Log(isTruly);
+// #endif
+//             if (isTruly)
+//             {
+//                 _error = "";
+//                 return true;
+//             }
+//
+//             string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
+//             _error = errorMessage ?? $"{property.displayName} is required";
+//             return true;
+//         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) =>
-            (_error = ValidateType(property)) == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
-
-        private static string ValidateType(SerializedProperty property)
+        private static string GetErrorImGui(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info, object parent)
         {
-            if (property.propertyType == SerializedPropertyType.Integer)
+            string error = ValidateType(property, info.FieldType);
+            if(error != "")
             {
-                return $"`{property.displayName}` can not be a valued type: int";
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+                Debug.Log($"get error=`{error}`");
+#endif
+
+                return error;
             }
-            if (property.propertyType == SerializedPropertyType.Float)
+
+            // property.serializedObject.ApplyModifiedProperties();
+            bool isTruly = Truly(property, parent);
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+//             Debug.Log($"truly?={isTruly}");
+// #endif
+            if (isTruly)
             {
-                return $"`{property.displayName}` can not be a valued type: float";
+                return "";
             }
+
+            string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
+            return errorMessage ?? $"{property.displayName} is required";
+        }
+
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
+        {
+            string error = GetErrorImGui(property, saintsAttribute, info, parent);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+            Debug.Log($"WillDrawBelow error=`{error}`");
+#endif
+            return error != "";
+        }
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        {
+            string error = GetErrorImGui(property, saintsAttribute, info, parent);
+            float belowHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+            Debug.Log($"belowHeight={belowHeight}/{MessageType.Error}; width={width}");
+#endif
+            // return 50;
+            return belowHeight;
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        {
+            string error = GetErrorImGui(property, saintsAttribute, info, parent);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+            Debug.Log($"belowHeight has={position.height}/width={position.width}");
+#endif
+            // EditorGUI.DrawRect(new Rect(position)
+            // {
+            //     height = 50,
+            // }, new[]{Color.blue, Color.cyan, Color.magenta, }[UnityEngine.Random.Range(0, 3)]);
+            if (error == "")
+            {
+                return position;
+            }
+
+            Rect leftOut = ImGuiHelpBox.Draw(position, error, MessageType.Error);
+
+            // EditorGUI.DrawRect(leftOut, Color.yellow);
+
+            return leftOut;
+        }
+
+        private static string ValidateType(SerializedProperty property, Type fieldType)
+        {
+            // if (property.propertyType == SerializedPropertyType.Integer)
+            // {
+            //     return $"`{property.displayName}` can not be a valued type: int";
+            // }
+            // if (property.propertyType == SerializedPropertyType.Float)
+            // {
+            //     return $"`{property.displayName}` can not be a valued type: float";
+            // }
 
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            Type curType = SerializedUtils.GetType(property);
-            if (curType.IsValueType)
+            // Type curType = SerializedUtils.GetType(property);
+            // an array, list, struct or class && not struct
+            if (property.propertyType == SerializedPropertyType.Generic && fieldType.IsValueType)
             {
-                return $"`{property.displayName}` can not be a valued type: {curType}";
+                return $"`{property.displayName}` can not be a valued type: {fieldType}";
             }
 
             return "";
@@ -100,9 +181,9 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
-            string typeError = ValidateType(property);
+            string typeError = ValidateType(property, info.FieldType);
 
             // Debug.Log(typeError);
             return new HelpBox(typeError, HelpBoxMessageType.Error)
@@ -132,7 +213,10 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            bool isTruly = Truly(property);
+            bool isTruly = Truly(property, parent);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+            Debug.Log(isTruly);
+#endif
 
             // ReSharper disable once InvertIf
             if(isTruly != metaInfo.IsTruly)

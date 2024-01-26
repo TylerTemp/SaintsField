@@ -9,7 +9,9 @@ namespace SaintsField.Samples.Scripts
         // works for property field
         [field: SerializeField, Required] public GameObject Go { get; private set; }
         [Required] public UnityEngine.Object _object;
-        [SerializeField, Required] private float _wontWork;
+        [SerializeField, Required] private float _floatIsVauleType;
+
+        [SerializeField, Required, Range(-1, 1)] private int _intIsVauleType;
 
         [Serializable]
         public struct MyStruct
@@ -19,5 +21,19 @@ namespace SaintsField.Samples.Scripts
 
         [Required]
         public MyStruct myStruct;
+
+        [Serializable]
+        public struct Nest2
+        {
+            [Required] public GameObject saints;
+        }
+
+        [Serializable]
+        public struct Nest1
+        {
+            public Nest2 nest2;
+        }
+
+        public Nest1 nest;
     }
 }

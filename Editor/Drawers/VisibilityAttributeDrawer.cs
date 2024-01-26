@@ -18,19 +18,20 @@ namespace SaintsField.Editor.Drawers
     public class VisibilityAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI
-        protected override (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
 
-            object target = GetParentTarget(property);
-            Type type = target.GetType();
+            // object target = GetParentTarget(property);
+            Type type = parent.GetType();
 
             _errors.Clear();
             List<bool> callbackTruly = new List<bool>();
 
             foreach (string andCallback in visibilityAttribute.andCallbacks)
             {
-                (string error, bool isTruly) = IsTruly(target, type, andCallback);
+                (string error, bool isTruly) = IsTruly(parent, type, andCallback);
                 if (error != "")
                 {
                     _errors.Add(error);
@@ -104,12 +105,15 @@ namespace SaintsField.Editor.Drawers
 
         private readonly List<string> _errors = new List<string>();
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             return _errors.Count > 0;
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             if (_errors.Count == 0)
             {
@@ -125,7 +129,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // Debug.Log("check extra height!");
             if (_errors.Count == 0)
@@ -164,8 +168,9 @@ namespace SaintsField.Editor.Drawers
             return root;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {

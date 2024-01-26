@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -97,13 +98,14 @@ namespace SaintsField.Editor.Drawers
 
         #region IMGUI
 
-        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            object parent)
         {
             return ((AssetPreviewAttribute)saintsAttribute).Above;
         }
 
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             string error = MismatchError(property);
             if (error != null)
@@ -114,7 +116,8 @@ namespace SaintsField.Editor.Drawers
             return ((AssetPreviewAttribute)saintsAttribute).Above? GetExtraHeight(property, width, saintsAttribute): 0;
         }
 
-        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             string error = MismatchError(property);
             if (error != null)
@@ -126,7 +129,9 @@ namespace SaintsField.Editor.Drawers
         }
 
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             if (MismatchError(property) != null)
             {
@@ -137,7 +142,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             string error = MismatchError(property);
             if (error != null)
@@ -148,7 +153,8 @@ namespace SaintsField.Editor.Drawers
             return ((AssetPreviewAttribute)saintsAttribute).Above? 0: GetExtraHeight(property, width, saintsAttribute);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             string error = MismatchError(property);
             if (error != null)
@@ -281,7 +287,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             if (assetPreviewAttribute.Above)

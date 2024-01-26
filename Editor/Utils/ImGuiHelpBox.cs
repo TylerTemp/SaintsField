@@ -9,19 +9,34 @@ namespace SaintsField.Editor.Utils
 
         public static float GetHeight(string content, float width, MessageType messageType)
         {
-            float basicHeight = GUI.skin.box.CalcHeight(new GUIContent(content), width);
+            // var helpBoxStyle = GUI.skin.GetStyle("helpbox");
+            // return helpBoxStyle.CalcHeight(new GUIContent(content), width);
+            GUIStyle helpBoxStyle = messageType == MessageType.None
+                ? GUI.skin.box
+                : GUI.skin.GetStyle("helpbox");
+            float basicHeight = helpBoxStyle.CalcHeight(new GUIContent(content), width);
             return messageType == MessageType.None
                 ? basicHeight
                 : Mathf.Max(EditorGUIUtility.singleLineHeight * 2.0f, basicHeight);
+            // return basicHeight;
         }
 
         public static Rect Draw(Rect position, string content, EMessageType messageType) => Draw(position, content, messageType.GetMessageType());
 
         public static Rect Draw(Rect position, string content, MessageType messageType)
         {
-            (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, GetHeight(content, position.width, messageType));
+            float height = GetHeight(content, position.width, messageType);
+            // Debug.Log($"will draw height {height}/{messageType}, pos height={position.height}; content={content}");
+            (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, height);
             EditorGUI.HelpBox(curRect, content, messageType);
             return leftRect;
         }
+
+        // public static void DrawAt(Rect position, string content, EMessageType messageType) => DrawAt(position, content, messageType.GetMessageType());
+        //
+        // public static void DrawAt(Rect position, string content, MessageType messageType)
+        // {
+        //     EditorGUI.HelpBox(position, content, messageType);
+        // }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -11,10 +12,12 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(AddComponentAttribute))]
     public class AddComponentAttributeDrawer: SaintsPropertyDrawer
     {
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => 0;
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent) => 0;
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            bool valueChanged)
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            bool valueChanged, FieldInfo info, object parent)
         {
             return DoCheckComponent(property, saintsAttribute);
         }
