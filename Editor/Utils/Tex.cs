@@ -134,26 +134,33 @@ namespace SaintsField.Editor.Utils
             {
                 float aspectRatio = (float)oriWidth / oriHeight;
 
-                int newWidth = oriWidth;
-                int newHeight = oriHeight;
+                int newWidth;
+                int newHeight;
 
                 // ReSharper disable once InvertIf
-                if (oriWidth > widthLimit || oriHeight > heightLimit)
+                // if (oriWidth > widthLimit || oriHeight > heightLimit)
+                // {
+                //
+                // }
+                if (oriWidth / (float)widthLimit > oriHeight / (float)heightLimit)
                 {
-                    if (oriWidth / (float)widthLimit > oriHeight / (float)heightLimit)
-                    {
-                        newWidth = widthLimit;
-                        newHeight = Mathf.RoundToInt(widthLimit / aspectRatio);
-                    }
-                    else
-                    {
-                        newHeight = heightLimit;
-                        newWidth = Mathf.RoundToInt(heightLimit * aspectRatio);
-                    }
+                    newWidth = widthLimit;
+                    newHeight = Mathf.RoundToInt(widthLimit / aspectRatio);
+                }
+                else
+                {
+                    newHeight = heightLimit;
+                    newWidth = Mathf.RoundToInt(heightLimit * aspectRatio);
                 }
 
                 return (newWidth, newHeight);
             }
+
+            if(widthLimit == -1 && heightLimit == -1)
+            {
+                return (oriWidth, oriHeight);
+            }
+
             if(widthLimit == -1)
             {
                 int newWidth = Mathf.RoundToInt((float)oriWidth * heightLimit / oriHeight);
@@ -168,7 +175,9 @@ namespace SaintsField.Editor.Utils
                 return (widthLimit, newHeight);
             }
             // -1, -1
-            return (oriWidth, oriHeight);
+            // Debug.Log($"return ori {oriWidth}x{oriHeight}");
+            // return (oriWidth, oriHeight);
+            throw new System.Exception($"FitScale {widthLimit}x{heightLimit} {oriWidth}x{oriHeight}");
         }
 
         public static Texture2D TextureTo(Texture2D texture, int width=-1, int height=-1) {

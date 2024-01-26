@@ -25,12 +25,13 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public struct Nest2
         {
-            [Required] public GameObject saints;
+            [Required] public GameObject n2;
         }
 
         [Serializable]
         public struct Nest1
         {
+            [Required] public GameObject n1;
             public Nest2 nest2;
         }
 

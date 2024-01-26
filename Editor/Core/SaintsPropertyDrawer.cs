@@ -285,8 +285,9 @@ namespace SaintsField.Editor.Core
             float belowHeight = 0;
 
             float fullWidth = _filedWidthCache < 0
-                ?EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
+                ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
                 : _filedWidthCache;
+            Debug.Log($"fullWidth={fullWidth}, EditorGUIUtility.currentViewWidth={EditorGUIUtility.currentViewWidth}, indent={EditorGUI.indentLevel}");
             // float fullWidth = 100;
 
             foreach (IGrouping<string, KeyValuePair<SaintsWithIndex, SaintsPropertyDrawer>> grouped in _usedAttributes.ToLookup(each => each.Key.SaintsAttribute.GroupBy))
@@ -823,7 +824,12 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            _filedWidthCache = position.width;
+            // this is so weird... because of Unity's repaint, layout etc.
+            if(position.width - 1 > Mathf.Epsilon)
+            {
+                _filedWidthCache = position.width;
+            }
+            // Debug.Log($"OnGUI: pos={position}");
 
             // Debug.Log($"raw pos={position.y} height={position.height}");
             _cachedPropPath = property.propertyPath;

@@ -1705,8 +1705,9 @@ MonoBehaviour:
   myStruct:
     theInt: 0
   nest:
+    n1: {fileID: 0}
     nest2:
-      saints: {fileID: 0}
+      n2: {fileID: 0}
 --- !u!4 &768079761
 Transform:
   m_ObjectHideFlags: 0
@@ -4617,10 +4618,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _go: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  drawTexture2D: {fileID: 2800000, guid: 1ad95eac50418a04b907432ce24e77c2, type: 3}
+  drawTexture2D: {fileID: 2800000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   _sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   sprites:
-  - {fileID: 21300000, guid: f6dd782be9f6242428748582d3c70a63, type: 3}
+  - {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   - {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
 --- !u!4 &2118824044
 Transform:

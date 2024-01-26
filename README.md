@@ -1251,13 +1251,13 @@ This can not be fixed unless Unity decides to fix it.
 
 Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
 
-*   `int maxWidth=-1`
+*   `int width=-1`
 
-    preview max-width, -1 for original image size that returned by Unity. If it's greater than current view width, it'll be scaled down to fit the view. Use `int.MaxValue` to always fit the view width.
+    preview width, -1 for original image size that returned by Unity. If it's greater than current view width, it'll be scaled down to fit the view. Use `int.MaxValue` to always fit the view width.
 
-*   `int maxHeight=-1`
+*   `int height=-1`
 
-    preview max height, -1 for auto resize (with the same aspect) using the width
+    preview height, -1 for auto resize (with the same aspect) using the width
 
 *   `EAlign align=EAlign.End`
 
