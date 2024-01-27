@@ -18,16 +18,13 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
         private string _error = "";
 
-        protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property,
+        protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, object parent)
         {
             (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, parent);
             _error = error;
-            if(disabled)
-            {
-                EditorGUI.BeginDisabledGroup(true);
-            }
-            return (true, position);
+            EditorGUI.BeginDisabledGroup(disabled);
+            return -1;
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,

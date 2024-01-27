@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Core
         private class SharedInfo
         {
             public bool Changed;
-            public object ParentTarget;
+            // public object ParentTarget;
         }
 
         private static readonly Dictionary<string, SharedInfo> PropertyPathToShared = new Dictionary<string, SharedInfo>();
@@ -69,10 +69,14 @@ namespace SaintsField.Editor.Core
 
         private string _cachedPropPath;
 
+        protected static readonly Dictionary<object, object> inMemoryStorage = new Dictionary<object, object>();
+
         // ReSharper disable once PublicConstructorInAbstractClass
         public SaintsPropertyDrawer()
         {
-            // Debug.Log("new SaintsPropertyDrawer");
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+//             Debug.Log($"new SaintsPropertyDrawer {this}");
+// #endif
             // if (IsSubDrawer)
             // {
             //     return;
@@ -160,10 +164,7 @@ namespace SaintsField.Editor.Core
             string propPath = property.propertyPath;
             if(!PropertyPathToShared.ContainsKey(propPath))
             {
-                PropertyPathToShared[propPath] = new SharedInfo
-                {
-                    ParentTarget = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).parent,
-                };
+                PropertyPathToShared[propPath] = new SharedInfo();
             }
 
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
@@ -224,11 +225,11 @@ namespace SaintsField.Editor.Core
                 return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
             }
 
-            (ISaintsAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
+            (ISaintsAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
 
             if (!GetVisibility(
                     property,
-                    SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property).attributes
+                    attributes
                         .Select((each, index) => new SaintsWithIndex
                         {
                             SaintsAttribute = each,
@@ -848,7 +849,6 @@ namespace SaintsField.Editor.Core
             }
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
-            PropertyPathToShared[property.propertyPath].ParentTarget = parent;
 
             IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
                 .Select((each, index) => new SaintsWithIndex
@@ -964,7 +964,7 @@ namespace SaintsField.Editor.Core
 
                 #endregion
 
-                Rect fieldRect = EditorGUI.IndentedRect(new Rect(position)
+                Rect labelFieldRowRect = EditorGUI.IndentedRect(new Rect(position)
                 {
                     // y = aboveRect.y + (groupedAboveDrawers.Count == 0? 0: aboveRect.height),
                     y = position.y + aboveUsedHeight,
@@ -978,29 +978,36 @@ namespace SaintsField.Editor.Core
                 // EditorGUI.DrawRect(fieldRect, backgroundColor);
 
                 // GUIContent newLabel = propertyScoopLabel;
-                (Rect labelRect, Rect _) =
-                    RectUtils.SplitWidthRect(fieldRect, EditorGUIUtility.labelWidth);
+                // float originalLabelWidth = EditorGUIUtility.labelWidth;
 
-                labelRect.height = EditorGUIUtility.singleLineHeight;
+                // labelRect.height = EditorGUIUtility.singleLineHeight;
 
                 // Debug.Log($"pre label: {label.text}");
 
                 #region pre label
 
+                float preLabelWidth = 0;
+
                 foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
                 {
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
-                    (bool isActive, Rect newLabelRect) =
-                        drawerInstance.DrawPreLabelImGui(labelRect, property, eachAttributeWithIndex.SaintsAttribute, parent);
+                    float preLabelUseWidth =
+                        drawerInstance.DrawPreLabelImGui(new Rect(labelFieldRowRect)
+                        {
+                            width = EditorGUIUtility.labelWidth,
+                            height = EditorGUIUtility.singleLineHeight,
+                        }, property, eachAttributeWithIndex.SaintsAttribute, parent);
                     // ReSharper disable once InvertIf
-                    if (isActive)
+                    if (preLabelUseWidth > 0)
                     {
-                        labelRect = newLabelRect;
+                        preLabelWidth += preLabelUseWidth;
                         UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
                     }
                 }
 
                 #endregion
+
+                Rect fieldUseRectWithPost = RectUtils.SplitWidthRect(labelFieldRowRect, preLabelWidth).leftRect;
 
                 #region label info
 
@@ -1035,11 +1042,14 @@ namespace SaintsField.Editor.Core
                         labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute, parent);
                     if (hasLabelSpace)
                     {
-                        // labelDrawerInstance.DrawLabel(labelRect, property, label, labelAttributeWithIndex.SaintsAttribute);
-
-                        // saintsPropertyDrawerDrawLabelCallback = () =>
-                        labelDrawerInstance.DrawLabel(labelRect, property, label,
+                        // (Rect saintsLabelRect, Rect _) = RectUtils.SplitWidthRect(fieldUseRectWithPost, EditorGUIUtility.labelWidth - preLabelWidth);
+                        labelDrawerInstance.DrawLabel(new Rect(fieldUseRectWithPost)
+                            {
+                                width = EditorGUIUtility.labelWidth - preLabelWidth,
+                                height = EditorGUIUtility.singleLineHeight,
+                            }, property, label,
                             labelAttributeWithIndex.SaintsAttribute, parent);
+                        // fieldUseRectWithPost = fieldLeftRect;
                     }
 
                     useGuiContent = hasLabelSpace
@@ -1065,7 +1075,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     float curWidth =
-                        drawerInstance.GetPostFieldWidth(fieldRect, property, GUIContent.none,
+                        drawerInstance.GetPostFieldWidth(fieldUseRectWithPost, property, GUIContent.none,
                             eachAttributeWithIndex.SaintsAttribute, parent);
                     postFieldWidth += curWidth;
                     postFieldInfoList.Add((
@@ -1077,8 +1087,8 @@ namespace SaintsField.Editor.Core
 
                 #endregion
 
-                (Rect fieldUseRect, Rect fieldPostRect) =
-                    RectUtils.SplitWidthRect(fieldRect, fieldRect.width - postFieldWidth);
+                (Rect fieldUseRectNoPost, Rect fieldPostRect) =
+                    RectUtils.SplitWidthRect(fieldUseRectWithPost, fieldUseRectWithPost.width - postFieldWidth);
 
                 // Debug.Log($"field: {label.text}");
 
@@ -1107,7 +1117,7 @@ namespace SaintsField.Editor.Core
                     {
                         // GUI.SetNextControlName(_fieldControlName);
                         // Debug.Log($"default drawer for {label.text}");
-                        DefaultDrawer(fieldUseRect, property, useGuiContent);
+                        DefaultDrawer(fieldUseRectNoPost, property, useGuiContent);
                     }
                     else
                     {
@@ -1115,7 +1125,7 @@ namespace SaintsField.Editor.Core
                         SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
                         // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                         // GUI.SetNextControlName(_fieldControlName);
-                        fieldDrawerInstance.DrawField(fieldUseRect, property, useGuiContent,
+                        fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent,
                             fieldAttributeWithIndex.SaintsAttribute, parent);
                         // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
@@ -1160,9 +1170,7 @@ namespace SaintsField.Editor.Core
                     // Debug.Log($"DrawPostField, valueChange={_valueChange}");
                     bool isActive = drawer.DrawPostFieldImGui(eachRect, property, label,
                         attributeWithIndex.SaintsAttribute,
-                        PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result)
-                            ? result.Changed
-                            : false,
+                        PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result) && result.Changed,
                         fieldInfo,
                         parent);
                     // ReSharper disable once InvertIf
@@ -1195,7 +1203,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     bool isActive =
-                        drawerInstance.DrawOverlay(fieldUseRect, property, bugFixCopyLabel,
+                        drawerInstance.DrawOverlay(labelFieldRowRect, property, bugFixCopyLabel,
                             eachAttributeWithIndex.SaintsAttribute, hasLabelWidth, parent);
                     // ReSharper disable once InvertIf
                     if (isActive)
@@ -1212,8 +1220,8 @@ namespace SaintsField.Editor.Core
                 // Debug.Log($"pos.y={position.y}; pos.h={position.height}; fieldRect.y={fieldRect.y}; fieldRect.height={fieldRect.height}");
                 Rect belowRect = EditorGUI.IndentedRect(new Rect(position)
                 {
-                    y = fieldRect.y + _labelFieldBasicHeight,
-                    height = position.y + position.height - (fieldRect.y + fieldRect.height),
+                    y = labelFieldRowRect.y + labelFieldRowRect.height,
+                    height = position.y + position.height - (labelFieldRowRect.y + labelFieldRowRect.height),
                 });
 
                 // Debug.Log($"belowRect={belowRect}");
@@ -1745,10 +1753,11 @@ namespace SaintsField.Editor.Core
 
         #endregion
 
-        protected virtual (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property,
+        // <0 means not used
+        protected virtual float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, object parent)
         {
-            return (false, position);
+            return -1f;
         }
 
 

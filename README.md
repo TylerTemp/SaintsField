@@ -59,17 +59,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.8**
+**2.0.9**
 
-1.  Fix `Required` not work on nested case. Remove the limitation on int/float
-2.  Fix many attributes didn't find correct parent object and failed on some cases
-3.  IMGUI: Fix incorrect height for `InfoBox`
-4.  Fix incorrect height when you manually disable UI Toolkit
-5.  IMGUI: Fix `Expandable` not fold/expand correctly on array/list
-6.  Fix incorrect texture scale function
-7.  Fix `AssetPreview` won't scale up when give a bigger width/height value
-8.  Change `AssetPreview`'s parameters: `maxWidth`->`width`, `maxHeight`->`height`
-9.  UI Toolkit: Fix `AboveImage`/`BelowImage` has empty frame space when scale down
+1.  IMGUI: Fix `Expandable` foldout overlap with label, [Issue#1](https://github.com/TylerTemp/SaintsField/issues/1)
+2.  IMGUI: Fix `Expandable` may fail when expand a Unity component
+3.  IMGUI: Fix `ReadOnly` did not have `EditorGUI.BeginDisabledGroup`  and `EditorGUI.EndDisabledGroup` in pair
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -544,6 +538,10 @@ public class ColorToggleImage: MonoBehaviour
 #### `Expandable` ####
 
 Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
+
+Known issue: 
+1.  In IMGUI, a custom drawer won't work because `PropertyDrawer` is not allowed to create an `Editor` class, thus it'll list all fields in the object. If the field itself has a custom `PropertyDrawer`, the drawer WILL be used.
+2.  In IMGUI, the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable. 
 
 *   AllowMultiple: No
 

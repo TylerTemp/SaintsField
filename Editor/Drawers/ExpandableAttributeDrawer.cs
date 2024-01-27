@@ -21,63 +21,69 @@ namespace SaintsField.Editor.Drawers
 
         private string _error = "";
 
-        private bool _expanded;
+        // private bool _expanded;
+
+        // There is a issue that, unity will randomly change _expanded value for IMGUI when clicking.
+        // Plus Unity array uses same drawer instance for every element in an array,
+        // so just use EditorPrefs here.
 
         private static string KeyExpanded(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__Expandable_Expanded";
 
-        private bool GetExpand(SerializedProperty property)
+        private static bool GetExpand(SerializedProperty property)
         {
-            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-            return isArray
-                ? EditorPrefs.GetBool(KeyExpanded(property))
-                : _expanded;
+            // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+            // return isArray
+            //     ? EditorPrefs.GetBool(KeyExpanded(property))
+            //     : _expanded;
+            return inMemoryStorage.TryGetValue(KeyExpanded(property), out object value) && (bool)value;
         }
 
-        private void SetExpand(SerializedProperty property, bool value) {
-            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-            if(isArray)
-            {
-                EditorPrefs.SetBool(KeyExpanded(property), value);
-            }
-            else
-            {
-                _expanded = value;
-            }
+        private static void SetExpand(SerializedProperty property, bool value) {
+            // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+            // if(isArray)
+            // {
+            //     EditorPrefs.SetBool(KeyExpanded(property), value);
+            // }
+            // else
+            // {
+            //     _expanded = value;
+            // }
+            // EditorPrefs.SetBool(KeyExpanded(property), value);
+            inMemoryStorage[KeyExpanded(property)] = value;
         }
 
-        protected override (bool isActive, Rect position) DrawPreLabelImGui(Rect position, SerializedProperty property,
+        protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, object parent)
         {
             if(property.objectReferenceValue == null)
             {
-                return (false, position);
+                return -1;
             }
 
-            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+            // EditorGUI.DrawRect(position, Color.yellow);
 
-            Rect drawPos = isArray
-                ? new Rect(position)
-                {
-                    x = position.x - 12,
-                }
-                : position;
+            // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
 
-            if(isArray)
+            // Rect drawPos = new Rect(position)
+            // {
+            //     x = position.x - 13,
+            // };
+
+            bool curExpanded = GetExpand(property);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_EXPANDABLE
+            Debug.Log($"cur expand {curExpanded}/{KeyExpanded(property)}");
+#endif
+            // ReSharper disable once ConvertToUsingDeclaration
+            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                bool newExpanded = EditorGUI.Foldout(position, curExpanded, new GUIContent(new string(' ', property.displayName.Length)), true);
+                if (changed.changed)
                 {
-                    bool newExpanded = EditorGUI.Foldout(drawPos, GetExpand(property), GUIContent.none, true);
-                    if (changed.changed)
-                    {
-                        SetExpand(property, newExpanded);
-                    }
+                    SetExpand(property, newExpanded);
                 }
             }
-            else
-            {
-                _expanded = EditorGUI.Foldout(drawPos, _expanded, GUIContent.none, true);
-            }
-            return (true, position);
+
+            return 13;
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -99,8 +105,22 @@ namespace SaintsField.Editor.Drawers
 
             // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
             SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
+
+            // foreach (SerializedProperty serializedProperty in GetAllField(serializedObject))
+            // {
+            //     Debug.Log(serializedProperty);
+            // }
+
+            // SerializedProperty childProperty = GetAllField(serializedObject).First();
+            // Debug.Log(childProperty);
+            // Debug.Log(childProperty.displayName);
+            // Debug.Log(EditorGUI.GetPropertyHeight(childProperty, true));
+            //
+            // return basicHeight;
+
             float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
-                GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName))).Sum();
+                EditorGUI.GetPropertyHeight(childProperty, true)).Sum();
+            // float expandedHeight = 0;
 
             return basicHeight + expandedHeight;
         }
@@ -114,20 +134,6 @@ namespace SaintsField.Editor.Drawers
             _error = property.propertyType != SerializedPropertyType.ObjectReference
                 ? $"Expected ScriptableObject type, get {property.propertyType}"
                 : "";
-            // else if (!(property.objectReferenceValue is ScriptableObject))
-            // {
-            //     _error = $"Expected ScriptableObject type, get {property.objectReferenceValue.GetType()}";
-            // }
-            //
-            //
-            // if (_editor == null)
-            // {
-            //     _editor = UnityEditor.Editor.CreateEditor(scriptableObject);
-            // }
-            //
-            // _editor.DrawDefaultInspector();
-            //
-            // return position;
 
             Rect leftRect = position;
 
@@ -136,7 +142,9 @@ namespace SaintsField.Editor.Drawers
                 leftRect = ImGuiHelpBox.Draw(position, _error, MessageType.Error);
             }
 
-            if (!GetExpand(property) || scriptableObject == null)
+            bool isExpand = GetExpand(property);
+            // Debug.Log($"below expand = {isExpand}");
+            if (!isExpand || scriptableObject == null)
             {
                 return leftRect;
             }
@@ -163,7 +171,7 @@ namespace SaintsField.Editor.Drawers
             {
                 foreach (SerializedProperty childProperty in GetAllField(serializedObject))
                 {
-                    float childHeight = GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName));
+                    float childHeight = EditorGUI.GetPropertyHeight(childProperty, true);
                     Rect childRect = new Rect
                     {
                         x = indentedRect.x,
@@ -187,6 +195,7 @@ namespace SaintsField.Editor.Drawers
             foreach ((Rect childRect, SerializedProperty childProperty) in propertyRects)
             {
                 EditorGUI.PropertyField(childRect, childProperty, true);
+                // EditorGUI.DrawRect(childRect, Color.blue);
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -241,8 +250,6 @@ namespace SaintsField.Editor.Drawers
                     // backgroundColor = Color.green,
                     // left = -5,
                     position = Position.Absolute,
-                    // height = EditorGUIUtility.singleLineHeight,
-                    // width = 20,
                     width = LabelBaseWidth - IndentWidth,
                 },
                 name = NameFoldout(property),
@@ -261,17 +268,6 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            // InspectorElement visualElement = new InspectorElement
-            // {
-            //     style =
-            //     {
-            //         width = Length.Percent(100),
-            //         display = DisplayStyle.None,
-            //     },
-            //     name = NameProps(property),
-            //     userData = null,
-            // };
-
             VisualElement visualElement = new VisualElement
             {
                 style =
@@ -284,27 +280,6 @@ namespace SaintsField.Editor.Drawers
 
             return visualElement;
         }
-
-        // private static IEnumerable<PropertyField> GetPropertyFields(SerializedProperty property, Object obj)
-        // {
-        //     SerializedObject serializedObject = new SerializedObject(obj);
-        //     serializedObject.Update();
-        //
-        //     foreach (SerializedProperty childProperty in GetAllField(serializedObject))
-        //     {
-        //         PropertyField prop = new PropertyField(childProperty)
-        //         {
-        //             style =
-        //             {
-        //                 paddingLeft = IndentWidth,
-        //             },
-        //         };
-        //         prop.AddToClassList($"{property.propertyPath}__ExpandableAttributeDrawer_Prop");
-        //         prop.Bind(serializedObject);
-        //         // visualElement.Add(prop);
-        //         yield return prop;
-        //     }
-        // }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -319,7 +294,12 @@ namespace SaintsField.Editor.Drawers
             {
                 return;
             }
-            foldOut.style.display = property.objectReferenceValue == null? DisplayStyle.None : DisplayStyle.Flex;
+
+            DisplayStyle foldoutDisplay = property.objectReferenceValue == null ? DisplayStyle.None : DisplayStyle.Flex;
+            if(foldOut.style.display != foldoutDisplay)
+            {
+                foldOut.style.display = foldoutDisplay;
+            }
 
             propsElement.userData = property.objectReferenceValue;
             propsElement.Clear();

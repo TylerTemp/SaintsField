@@ -1,3 +1,9 @@
+## 2.0.9 ##
+
+1.  IMGUI: Fix `Expandable` foldout overlap with label, [Issue#1](https://github.com/TylerTemp/SaintsField/issues/1)
+2.  IMGUI: Fix `Expandable` may fail when expand a Unity component
+3.  IMGUI: Fix `ReadOnly` did not have `EditorGUI.BeginDisabledGroup`  and `EditorGUI.EndDisabledGroup` in pair
+
 ## 2.0.8 ##
 
 1.  Fix `Required` not work on nested case. Remove the limitation on int/float

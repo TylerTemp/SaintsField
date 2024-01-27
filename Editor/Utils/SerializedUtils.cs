@@ -34,7 +34,6 @@ namespace SaintsField.Editor.Utils
 
         public static (T[] attributes, object parent) GetAttributesAndDirectParent<T>(SerializedProperty property) where T : class
         {
-
             string originPath = property.propertyPath;
             string[] propPaths = originPath.Split('.');
             int usePathLength = propPaths.Length;
@@ -57,23 +56,6 @@ namespace SaintsField.Editor.Utils
             // {
             //     Debug.Log($"use normal length {originPath}");
             // }
-
-            // SerializedObject serObj = property.serializedObject;
-            // SerializedProperty targetProp = null;
-            //
-            // IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(targetObj);
-            // foreach (Type eachType in types)
-            // {
-            //     IEnumerable<FieldInfo> fieldInfos = eachType
-            //         .GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly);
-            //
-            //     foreach (FieldInfo fieldInfo in fieldInfos)
-            //     {
-            //         Debug.Log(fieldInfo.Name);
-            //     }
-            // }
-            //
-            // return null;
 
             object sourceObj = property.serializedObject.targetObject;
             FieldOrProp fieldOrProp = default;
