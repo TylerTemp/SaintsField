@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace SaintsField
 {
@@ -7,7 +6,7 @@ namespace SaintsField
     public class PostFieldRichLabelAttribute: RichLabelAttribute
     {
         public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy { get; }
+        public override string GroupBy { get; }
 
         public readonly float Padding;
 
