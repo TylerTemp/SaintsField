@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers
 
         private static (string error, Renderer renderer) GetRenderer(SerializedProperty property, ISaintsAttribute saintsAttribute, object target)
         {
-            if(target is not Object targetObject)
+            if(!(target is Object targetObject))
             {
                 return ("target is not UnityEngine.Object", null);
             }

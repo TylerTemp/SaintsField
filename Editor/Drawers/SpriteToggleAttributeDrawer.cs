@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers
             SpriteToggleAttribute toggleAttribute = (SpriteToggleAttribute)saintsAttribute;
             string imageCompName = toggleAttribute.CompName;
 
-            if(parent is not Object targetObject)
+            if(!(parent is Object targetObject))
             {
                 return new Container
                 {

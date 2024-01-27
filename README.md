@@ -541,7 +541,8 @@ Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
 Known issue: 
 1.  In IMGUI, a custom drawer won't work because `PropertyDrawer` is not allowed to create an `Editor` class, thus it'll list all fields in the object. If the field itself has a custom `PropertyDrawer`, the drawer WILL be used.
-2.  In IMGUI, the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable. 
+2.  In IMGUI, the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Tryng outside of the rect will make the target non-interactable.
+    But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect... so you may see different outcomes on different Unity version.
 
 *   AllowMultiple: No
 
