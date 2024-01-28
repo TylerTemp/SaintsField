@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Core
             // _propertyAttributeToDrawers.Clear();
 
             // ReSharper disable once InvertIf
-            if(PropertyAttributeToPropertyDrawers.Count == 0 || UnityEditorAssemble == null)
+            if(PropertyAttributeToPropertyDrawers.Count == 0)
             {
                 Dictionary<Type, HashSet<Type>> attrToDrawers = new Dictionary<Type, HashSet<Type>>();
 #if UNITY_2022_1_OR_NEWER
