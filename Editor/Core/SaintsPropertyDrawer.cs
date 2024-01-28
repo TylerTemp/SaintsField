@@ -30,8 +30,10 @@ namespace SaintsField.Editor.Core
 
         private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
+#if UNITY_2022_1_0_OR_NEWER
         private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> PropertyAttributeToDecoratorDrawers =
             new Dictionary<Type, IReadOnlyList<Type>>();
+#endif
 
         private class SharedInfo
         {
@@ -97,8 +99,10 @@ namespace SaintsField.Editor.Core
             if(PropertyAttributeToPropertyDrawers.Count == 0 || UnityEditorAssemble == null)
             {
                 Dictionary<Type, HashSet<Type>> attrToDrawers = new Dictionary<Type, HashSet<Type>>();
+#if UNITY_2022_1_0_OR_NEWER
                 Dictionary<Type, List<Type>> attrToDecoratorDrawers =
                     new Dictionary<Type, List<Type>>();
+#endif
 
                 foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
                 {
@@ -135,6 +139,7 @@ namespace SaintsField.Editor.Core
                         }
                     }
 
+#if UNITY_2022_1_0_OR_NEWER
                     List<Type> allSubDecoratorDrawers = allTypes
                         .Where(type => type.IsSubclassOf(typeof(DecoratorDrawer)))
                         .ToList();
@@ -162,6 +167,9 @@ namespace SaintsField.Editor.Core
                             }
                         }
                     }
+
+#endif
+
                 }
 
                 foreach (KeyValuePair<Type, HashSet<Type>> kv in attrToDrawers)
@@ -174,7 +182,9 @@ namespace SaintsField.Editor.Core
 #endif
                 }
 
+#if UNITY_2022_1_0_OR_NEWER
                 PropertyAttributeToDecoratorDrawers = attrToDecoratorDrawers.ToDictionary(each => each.Key, each => (IReadOnlyList<Type>)each.Value);
+#endif
             }
         }
 
@@ -1491,6 +1501,7 @@ namespace SaintsField.Editor.Core
         {
             using (new InsideSaintsFieldScoop(InsideSaintsFieldScoop.MakeKey(property)))
             {
+#if UNITY_2022_1_0_OR_NEWER
                 Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
                     .Select(propertyAttribute =>
                     {
@@ -1512,6 +1523,7 @@ namespace SaintsField.Editor.Core
                 {
                     return;
                 }
+#endif
 
                 // // Debug.Log($"UnityDraw: `{property.displayName}`");
                 //
