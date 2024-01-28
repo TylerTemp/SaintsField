@@ -64,6 +64,8 @@ If you're using `unitypackage` or git submodule but you put this project under a
 1.  IMGUI: Fix `DecoratorDrawer` got drawn more than once because Unity changes the behavior of `PropertyField` in 2022.1+
 2.  IMGUI: Fix `Texture2D` resize for Unity 2021.1
 
+The openUPM version 2.0.11 is the same as 2.0.10 here. As openUPM release can not be modified so pump a version here.
+
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
 ## Document ##
