@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Utils
             // Texture2D result = new Texture2D(newWidth, newHeight);
 
             // Debug.Log($"resize texture from {tex.width}x{tex.height} to {newWidth}x{newHeight}");
-#if UNITY_2021_1_OR_NEWER
+#if UNITY_2021_2_OR_NEWER
             tex.Reinitialize(newWidth, newHeight);
 #else
             tex.Resize(newWidth, newHeight);
