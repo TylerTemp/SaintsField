@@ -1558,6 +1558,7 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"UnityDraw exit, isSub={isSubDrawer}");
         }
 
+#if UNITY_2022_1_OR_NEWER
         private static bool ImGuiRemoveDecDraw(Rect position, SerializedProperty property, GUIContent label)
         {
             Assembly assembly = UnityEditorAssemble;
@@ -1616,6 +1617,7 @@ namespace SaintsField.Editor.Core
 
             return true;
         }
+#endif
 
         // public abstract void OnSaintsGUI(Rect position, SerializedProperty property, GUIContent label);
         // protected virtual (bool isActive, Rect position) DrawAbove(Rect position, SerializedProperty property,
