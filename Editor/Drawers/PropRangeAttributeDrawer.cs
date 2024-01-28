@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parentTarget)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parentTarget)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS
             Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}");
@@ -96,7 +96,7 @@ namespace SaintsField.Editor.Drawers
             if(metaInfo.Error != "")
             {
                 _error = metaInfo.Error;
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 

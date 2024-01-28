@@ -24,12 +24,12 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             _error = CheckHasError(property);
             if (_error != "")
             {
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 

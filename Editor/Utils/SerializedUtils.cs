@@ -27,8 +27,8 @@ namespace SaintsField.Editor.Utils
 
         private struct FieldOrProp
         {
-            public bool IsFile;
-            public FieldInfo FileInfo;
+            public bool IsField;
+            public FieldInfo FieldInfo;
             public PropertyInfo PropertyInfo;
         }
 
@@ -81,15 +81,15 @@ namespace SaintsField.Editor.Utils
 
                     object useObject;
 
-                    if(fieldOrProp.FileInfo is null && fieldOrProp.PropertyInfo is null)
+                    if(fieldOrProp.FieldInfo is null && fieldOrProp.PropertyInfo is null)
                     {
                         useObject = sourceObj;
                     }
                     else
                     {
-                        useObject = fieldOrProp.IsFile
+                        useObject = fieldOrProp.IsField
                             // ReSharper disable once PossibleNullReferenceException
-                            ? fieldOrProp.FileInfo.GetValue(sourceObj)
+                            ? fieldOrProp.FieldInfo.GetValue(sourceObj)
                             : fieldOrProp.PropertyInfo.GetValue(sourceObj);
                     }
 
@@ -109,15 +109,15 @@ namespace SaintsField.Editor.Utils
                 // }
 
                 // Debug.Log($"get obj {sourceObj}.{propSegName}");
-                if(fieldOrProp.FileInfo is null && fieldOrProp.PropertyInfo is null)
+                if(fieldOrProp.FieldInfo is null && fieldOrProp.PropertyInfo is null)
                 {
                     fieldOrProp = GetFileOrProp(sourceObj, propSegName);
                 }
                 else
                 {
-                    sourceObj = fieldOrProp.IsFile
+                    sourceObj = fieldOrProp.IsField
                         // ReSharper disable once PossibleNullReferenceException
-                        ? fieldOrProp.FileInfo.GetValue(sourceObj)
+                        ? fieldOrProp.FieldInfo.GetValue(sourceObj)
                         : fieldOrProp.PropertyInfo.GetValue(sourceObj);
                     fieldOrProp = GetFileOrProp(sourceObj, propSegName);
                 }
@@ -141,8 +141,8 @@ namespace SaintsField.Editor.Utils
             // }
 
             // Debug.Log($"return result for {property.propertyPath}: {fileOrProp.FileInfo?.Name ?? fileOrProp.PropertyInfo.Name}");
-            T[] attributes = fieldOrProp.IsFile
-                ? fieldOrProp.FileInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray()
+            T[] attributes = fieldOrProp.IsField
+                ? fieldOrProp.FieldInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray()
                 : fieldOrProp.PropertyInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray();
             return (attributes, sourceObj);
         }
@@ -160,9 +160,9 @@ namespace SaintsField.Editor.Utils
                     // Debug.Log($"return field {field.Name}");
                     return new FieldOrProp
                     {
-                        IsFile = true,
+                        IsField = true,
                         PropertyInfo = null,
-                        FileInfo = field,
+                        FieldInfo = field,
                     };
                 }
 
@@ -173,9 +173,9 @@ namespace SaintsField.Editor.Utils
                     // Debug.Log($"return prop {property.Name}");
                     return new FieldOrProp
                     {
-                        IsFile = false,
+                        IsField = false,
                         PropertyInfo = property,
-                        FileInfo = null,
+                        FieldInfo = null,
                     };
                 }
 

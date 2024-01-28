@@ -1,3 +1,7 @@
+## 2.0.10 ##
+
+IMGUI: Fix `DecoratorDrawer` got drawn more than once
+
 ## 2.0.9 ##
 
 1.  IMGUI: Fix `Expandable` foldout overlap with label, [Issue#1](https://github.com/TylerTemp/SaintsField/issues/1)

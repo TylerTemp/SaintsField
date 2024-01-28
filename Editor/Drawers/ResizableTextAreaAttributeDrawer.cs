@@ -45,14 +45,14 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // EditorGUI.DrawRect(position, Color.blue);
 
             if (property.propertyType != SerializedPropertyType.String)
             {
                 _error = $"expect string, get {property.propertyType}";
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 

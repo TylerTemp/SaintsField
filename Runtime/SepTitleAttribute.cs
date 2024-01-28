@@ -20,7 +20,7 @@ namespace SaintsField
 
         public SepTitleAttribute(EColor color, float gap = 2f, float height = 2f)
         {
-            this.title = null;
+            title = null;
             this.color = color;
             this.height = height;
             this.gap = gap;

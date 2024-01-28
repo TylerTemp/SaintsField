@@ -1018,7 +1018,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute) saintsAttribute;
 
@@ -1040,7 +1040,7 @@ namespace SaintsField.Editor.Drawers
                 case ReflectUtils.GetPropType.NotFound:
                 {
                     _error = $"not found `{funcName}` on target `{parent}`";
-                    DefaultDrawer(position, property, label);
+                    DefaultDrawer(position, property, label, info);
                 }
                     return;
                 case ReflectUtils.GetPropType.Property:
@@ -1050,7 +1050,7 @@ namespace SaintsField.Editor.Drawers
                     if (dropdownListValue == null)
                     {
                         _error = $"dropdownListValue is null from `{funcName}` on target `{parent}`";
-                        DefaultDrawer(position, property, label);
+                        DefaultDrawer(position, property, label, info);
                         return;
                     }
                 }
@@ -1062,7 +1062,7 @@ namespace SaintsField.Editor.Drawers
                     if (dropdownListValue == null)
                     {
                         _error = $"dropdownListValue is null from `{funcName}` on target `{parent}`";
-                        DefaultDrawer(position, property, label);
+                        DefaultDrawer(position, property, label, info);
                         return;
                     }
                 }
@@ -1105,7 +1105,7 @@ namespace SaintsField.Editor.Drawers
                     if (dropdownListValue == null)
                     {
                         _error = $"dropdownListValue is null from `{funcName}()` on target `{parent}`";
-                        DefaultDrawer(position, property, label);
+                        DefaultDrawer(position, property, label, info);
                         return;
                     }
                 }

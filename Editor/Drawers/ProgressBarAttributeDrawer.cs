@@ -248,7 +248,9 @@ namespace SaintsField.Editor.Drawers
             return EditorGUIUtility.singleLineHeight;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;

@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, bool hasLabelWidth) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;
@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers
             {
                 Debug.LogException(e);
                 _error = e.Message;
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 

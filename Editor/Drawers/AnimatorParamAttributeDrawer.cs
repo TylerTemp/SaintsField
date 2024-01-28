@@ -102,13 +102,13 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
             if (metaInfo.Error != "")
             {
                 _error = metaInfo.Error;
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 
@@ -125,7 +125,7 @@ namespace SaintsField.Editor.Drawers
                     break;
                 default:
                     _error = $"Invalid property type: expect integer or string, get {property.propertyType}";
-                    DefaultDrawer(position, property, label);
+                    DefaultDrawer(position, property, label, info);
                     break;
             }
         }

@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             string[] scenes = GetScenes();
             bool anySceneInBuildSettings = scenes.Length > 0;
@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Drawers
             {
                 // DrawDefaultPropertyAndHelpBox(rect, property, label, "No scenes in the build settings", MessageType.Warning);
                 _error = "No scenes in the build settings";
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers
                     break;
                 default:
                     _error = $"{property.name} must be an int or a string, get {property.propertyType}";
-                    DefaultDrawer(position, property, label);
+                    DefaultDrawer(position, property, label, info);
                     break;
             }
         }

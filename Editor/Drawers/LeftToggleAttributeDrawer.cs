@@ -1,4 +1,5 @@
-﻿using SaintsField.Editor.Core;
+﻿using System.Reflection;
+using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
@@ -20,7 +21,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())

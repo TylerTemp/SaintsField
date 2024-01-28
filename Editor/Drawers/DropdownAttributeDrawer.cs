@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             // Object target = property.serializedObject.targetObject;
@@ -70,7 +70,7 @@ namespace SaintsField.Editor.Drawers
             if (metaInfo.Error != "")
             {
                 _error = metaInfo.Error;
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 
