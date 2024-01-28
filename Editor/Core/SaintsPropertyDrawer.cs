@@ -75,7 +75,9 @@ namespace SaintsField.Editor.Core
         private string _cachedPropPath;
 
         protected static readonly Dictionary<object, object> inMemoryStorage = new Dictionary<object, object>();
+#if UNITY_2022_1_OR_NEWER
         private static Assembly UnityEditorAssemble;
+#endif
 
         // ReSharper disable once PublicConstructorInAbstractClass
         public SaintsPropertyDrawer()
@@ -106,10 +108,12 @@ namespace SaintsField.Editor.Core
 
                 foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
                 {
+#if UNITY_2022_1_OR_NEWER
                     if (asb.GetName().Name == "UnityEditor")
                     {
                         UnityEditorAssemble = asb;
                     }
+#endif
 
                     Type[] allTypes = asb.GetTypes();
 
