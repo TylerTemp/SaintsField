@@ -1,6 +1,7 @@
 ## 2.0.10 ##
 
-IMGUI: Fix `DecoratorDrawer` got drawn more than once
+1.  IMGUI: Fix `DecoratorDrawer` got drawn more than once because Unity changes the behavior of `PropertyField` in 2022.1+
+2.  IMGUI: Fix `Texture2D` resize for Unity 2021.1
 
 ## 2.0.9 ##
 
