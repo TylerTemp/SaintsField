@@ -103,17 +103,12 @@ namespace SaintsField.Editor
 
             serializedObject.Update();
 
-            foreach (SaintsFieldWithInfo fieldWithInfo in _fieldWithInfos)
+            List<SaintsFieldWithInfo> fieldWithInfoList = _fieldWithInfos.ToList();
+            while (fieldWithInfoList.Count > 0)
             {
-                // ReSharper disable once ConvertToUsingDeclaration
-                AbsRenderer renderer = MakeRenderer(fieldWithInfo, false);
-                // ReSharper disable once InvertIf
-                if(renderer != null){
-                    // Debug.Log($"gen renderer {renderer}");
-                    renderer.Render();
-                    renderer.AfterRender();
-                    // renderer.AfterRender();
-                }
+                ISaintsRenderer renderer = PopRenderer(fieldWithInfoList, false, serializedObject.targetObject);
+                renderer?.Render();
+                // renderer.AfterRender();
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -244,9 +239,7 @@ namespace SaintsField.Editor
 
                 foreach (MethodInfo methodInfo in methodInfos)
                 {
-                    Attribute[] allMethodAttributes = methodInfos
-                        .SelectMany(each => each.GetCustomAttributes<Attribute>())
-                        .ToArray();
+                    Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
 
                     if(allMethodAttributes.Any(each => each is ISaintsMethodAttribute))
                     {
@@ -255,7 +248,7 @@ namespace SaintsField.Editor
                         int order = orderProp?.Order ?? int.MinValue;
                         fieldWithInfos.Add(new SaintsFieldWithInfo
                         {
-                            groups = methodInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                            groups = allMethodAttributes.OfType<ISaintsGroup>().ToArray(),
 
                             // memberType = MemberTypes.Method,
                             RenderType = SaintsRenderType.Method,
@@ -337,6 +330,11 @@ namespace SaintsField.Editor
             }
         }
 
+#if SAINTSFIELD_DOTWEEN
+        // every inspector instance can only have ONE doTweenPlayGroup
+        private DOTweenPlayGroup _doTweenPlayGroup = null;
+#endif
+
         protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
             object parent)
         {
@@ -345,7 +343,9 @@ namespace SaintsField.Editor
             if (fieldWithInfo.groups.Count == 0)
             {
                 fieldWithInfos.RemoveAt(0);
-                return MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+                AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+                // Debug.Log($"{result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
+                return result;
             }
 
             // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
@@ -356,11 +356,14 @@ namespace SaintsField.Editor
                 .Where(each => each.groups.Contains(group))
                 .ToList();
 
-            // fieldWithInfos.RemoveAt(0);
-            DOTweenPlayGroup result = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
-                (DOTweenPlayAttribute)each.groups[0])), parent);
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if(_doTweenPlayGroup == null)
+            {
+                _doTweenPlayGroup = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
+                    (DOTweenPlayAttribute)each.groups[0])), parent);
+            }
             fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
-            return result;
+            return _doTweenPlayGroup;
 #else
             fieldWithInfos.RemoveAt(0);
             return MakeRenderer(fieldWithInfo, tryFixUIToolkit);

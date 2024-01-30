@@ -14,6 +14,7 @@ namespace SaintsField.Editor.Playa.Renderer
         // ReSharper disable InconsistentNaming
         protected readonly SaintsFieldWithInfo FieldWithInfo;
         protected readonly SerializedObject SerializedObject;
+        // ReSharper disable once MemberCanBePrivate.Global
         protected readonly bool TryFixUIToolkit;
         // ReSharper enable InconsistentNaming
 
@@ -28,9 +29,6 @@ namespace SaintsField.Editor.Playa.Renderer
         public abstract VisualElement CreateVisualElement();
 #endif
         public abstract void Render();
-        public virtual void AfterRender()
-        {
-        }
 
         // NA: NaughtyEditorGUI
         protected static bool FieldLayout(object value, string label)
@@ -137,8 +135,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-#if UNITY_2021_3_OR_NEWER
-
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected static VisualElement UIToolkitLayout(object value, string label)
         {
             Type valueType = value.GetType();
@@ -330,6 +327,5 @@ namespace SaintsField.Editor.Playa.Renderer
             return visualElement;
         }
 #endif
-        public bool IsDirectRenderer => true;
     }
 }

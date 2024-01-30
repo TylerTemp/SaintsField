@@ -13,6 +13,7 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         public MethodRenderer(UnityEditor.Editor editor, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(editor, fieldWithInfo, tryFixUIToolkit)
         {
+            Debug.Assert(FieldWithInfo.MethodInfo.GetParameters().All(p => p.IsOptional), $"{FieldWithInfo.MethodInfo.Name} has non-optional parameters");
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
@@ -47,10 +48,13 @@ namespace SaintsField.Editor.Playa.Renderer
             Object target = SerializedObject.targetObject;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
-            Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
+            ButtonAttribute[] buttonAttributes = methodInfo.GetCustomAttributes<ButtonAttribute>(true).ToArray();
+            if (buttonAttributes.Length == 0)
+            {
+                return;
+            }
 
-
-            ButtonAttribute buttonAttribute = (ButtonAttribute)methodInfo.GetCustomAttributes(typeof(ButtonAttribute), true)[0];
+            ButtonAttribute buttonAttribute = buttonAttributes[0];
 
             string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
 

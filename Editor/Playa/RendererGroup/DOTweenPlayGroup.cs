@@ -35,13 +35,165 @@ namespace SaintsField.Editor.Playa.RendererGroup
             public EDOTweenStop stop;
         }
 
+        // ReSharper disable once InconsistentNaming
+        private readonly DOTweenState[] _imGuiDOTweenStates;
+
+        // One inspector instance will only have ONE DOTweenPlayGroup
+        // IMGUI will only be created once, not repeatedly
+
         public DOTweenPlayGroup(IEnumerable<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> doTweenMethods, object target)
         {
             DOTweenMethods = doTweenMethods.ToList();
             // TryFixUIToolkit = tryFixUIToolkit;
             Target = target;
+            _imGuiDOTweenStates = DOTweenMethods
+                .Select(each => new DOTweenState
+                {
+                    stop = each.attribute.DOTweenStop,
+                })
+                .ToArray();
         }
 
+        ~DOTweenPlayGroup()
+        {
+            foreach (DOTweenState imGuiDoTweenState in _imGuiDOTweenStates)
+            {
+                StopTween(imGuiDoTweenState);
+            }
+        }
+
+        #region IMGUI
+        public void Render()
+        {
+            Debug.Assert(DOTweenMethods.Count > 0);
+            Rect labelTitleRect = EditorGUILayout.GetControlRect(false);
+            const string title = "DOTween Preview";
+
+            const float titleBtnWidth = 30f;
+
+            // float titleWidth = EditorStyles.label.CalcSize(new GUIContent(title)).x + 20f;
+            Rect titleRect = new Rect(labelTitleRect)
+            {
+                width = labelTitleRect.width - titleBtnWidth,
+            };
+
+            // EditorGUI.DrawRect(titleRect, Color.yellow);
+
+            EditorGUI.LabelField(titleRect, title, new GUIStyle("label")
+            {
+                fontStyle = FontStyle.Bold,
+            });
+            Rect titleBtnRect = new Rect(labelTitleRect)
+            {
+                x = titleRect.x + titleRect.width,
+                width = titleBtnWidth,
+            };
+
+            bool mainPreviewSwitchToPlay = false;
+            if (GUI.Button(titleBtnRect, DOTweenEditorPreview.isPreviewing? "■": "▶"))
+            {
+                if (DOTweenEditorPreview.isPreviewing)
+                {
+                    DOTweenEditorPreview.Stop();
+                    mainPreviewSwitchToPlay = true;
+
+                    foreach (DOTweenState imGuiDoTweenState in _imGuiDOTweenStates)
+                    {
+                        StopTween(imGuiDoTweenState);
+                    }
+                }
+                else
+                {
+                    DOTweenEditorPreview.Start();
+                }
+            }
+
+            foreach (((MethodInfo methodInfo, DOTweenPlayAttribute attribute), int index) in DOTweenMethods.WithIndex())
+            {
+                // ReSharper disable once InconsistentNaming
+                DOTweenState imGuiDOTweenStates = _imGuiDOTweenStates[index];
+                Rect lineRect = EditorGUILayout.GetControlRect(false);
+
+                float totalWidth = lineRect.width;
+                const float btnWidth = 30f;
+                float labelWidth = totalWidth - btnWidth * 2;
+
+                string previewText = string.IsNullOrEmpty(attribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : attribute.Label;
+
+                Rect labelRect = new Rect(lineRect)
+                {
+                    width = labelWidth,
+                };
+                imGuiDOTweenStates.autoPlay = EditorGUI.ToggleLeft(labelRect, previewText, imGuiDOTweenStates.autoPlay);
+
+                Rect playPauseBtnRect = new Rect(lineRect)
+                {
+                    x = lineRect.x + labelWidth,
+                    width = btnWidth,
+                };
+                Rect stopBtnRect = new Rect(lineRect)
+                {
+                    x = playPauseBtnRect.x + btnWidth,
+                    width = btnWidth,
+                };
+
+                // bool curIsPlaying = imGuiDOTweenStates.isPlaying;
+                bool needStartAutoPlay = mainPreviewSwitchToPlay && !imGuiDOTweenStates.isPlaying &&
+                                         imGuiDOTweenStates.autoPlay;
+                string buttonLabel;
+                if(imGuiDOTweenStates.isPlaying)
+                {
+                    buttonLabel = "‖ ‖";
+                }
+                else if (imGuiDOTweenStates.sequence != null)
+                {
+                    buttonLabel = "|▶";
+                }
+                else
+                {
+                    buttonLabel = "▶";
+                }
+                if (GUI.Button(playPauseBtnRect, buttonLabel) || needStartAutoPlay)
+                {
+                    DOTweenEditorPreview.Start();
+                    if (imGuiDOTweenStates.isPlaying)
+                    {
+                        imGuiDOTweenStates.sequence.Pause();
+                        imGuiDOTweenStates.isPlaying = false;
+                    }
+                    else
+                    {
+                        if (imGuiDOTweenStates.sequence == null)
+                        {
+                            imGuiDOTweenStates.sequence = (Sequence)methodInfo.Invoke(Target,
+                                methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray());
+
+                            DOTweenEditorPreview.PrepareTweenForPreview(imGuiDOTweenStates.sequence);
+                        }
+                        else
+                        {
+                            imGuiDOTweenStates.sequence.Play();
+                        }
+                        imGuiDOTweenStates.isPlaying = true;
+                    }
+                }
+
+                bool curDisableStop = imGuiDOTweenStates.sequence == null;
+                using(new EditorGUI.DisabledScope(curDisableStop))
+                {
+                    if (GUI.Button(stopBtnRect, "■"))
+                    {
+                        StopTween(imGuiDOTweenStates);
+                    }
+                }
+
+            }
+
+        }
+
+        #endregion
+
+        #region UI Toolkit
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         // ReSharper disable InconsistentNaming
@@ -72,7 +224,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             };
             Button mainPlayStopButton = new Button
             {
-                text = DOTweenEditorPreview.isPreviewing ? "Stop" : "Play",
+                text = DOTweenEditorPreview.isPreviewing ? "■" : "▶",
                 enableRichText = true,
                 userData = DOTweenEditorPreview.isPreviewing,
             };
@@ -150,13 +302,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
                 Button playPauseButton = new Button
                 {
-                    text = "Play",
+                    text = "▶",
                 };
-                playPauseButton.SetEnabled(false);
 
                 Button stopButton = new Button
                 {
-                    text = "Stop",
+                    text = "■",
                 };
                 stopButton.SetEnabled(false);
 
@@ -201,7 +352,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         doTweenState.sequence.Pause();
                         doTweenState.isPlaying = false;
-                        playPauseButton.text = "Resume";
+                        playPauseButton.text = "|▶";
                     }
                     else // create / resume
                     {
@@ -209,7 +360,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             doTweenState.sequence = (Sequence)methodInfo.Invoke(Target,
                                 methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray());
-                            doTweenState.isPlaying = true;
 
                             DOTweenEditorPreview.PrepareTweenForPreview(doTweenState.sequence);
                         }
@@ -217,7 +367,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             doTweenState.sequence.Play();
                         }
-                        playPauseButton.text = "Pause";
+                        doTweenState.isPlaying = true;
+
+                        playPauseButton.text = "‖ ‖";
                         stopButton.SetEnabled(true);
                     }
                 };
@@ -226,7 +378,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     StopTween(doTweenState);
                     stopButton.SetEnabled(false);
-                    playPauseButton.text = "Play";
+                    playPauseButton.text = "▶";
                 };
             }
 
@@ -249,7 +401,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 bool isPlaying = DOTweenEditorPreview.isPreviewing;
                 playButton.userData = isPlaying;
-                playButton.text = isPlaying ? "Stop" : "Play";
+                playButton.text = isPlaying ? "■" : "▶";
 
                 if (isPlaying)
                 {
@@ -262,10 +414,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     foreach (DOTweenToolkit doTweenToolkit in doTweenToolkits)
                     {
-                        doTweenToolkit.PlayPauseButton.text = "Play";
+                        doTweenToolkit.PlayPauseButton.text = "▶";
 
                         doTweenToolkit.StopButton.SetEnabled(false);
-                        doTweenToolkit.StopButton.text = "Stop";
+                        doTweenToolkit.StopButton.text = "■";
                         StopTween(doTweenToolkit.DoTweenState);
                     }
                 }
@@ -273,6 +425,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             root.schedule.Execute(() => OnUpdate(root, playButton, doTweenToolkits));
         }
+#endif
+        #endregion
 
         private static void StopTween(DOTweenState doTweenState)
         {
@@ -299,7 +453,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             doTweenState.sequence = null;
         }
-#endif
     }
 #endif
 }

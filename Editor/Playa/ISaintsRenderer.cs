@@ -9,5 +9,7 @@ namespace SaintsField.Editor.Playa
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public VisualElement CreateVisualElement();
 #endif
+
+        void Render();
     }
 }
