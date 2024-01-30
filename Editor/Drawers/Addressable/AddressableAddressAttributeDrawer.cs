@@ -124,10 +124,11 @@ namespace SaintsField.Editor.Drawers.Addressable
         {
             return new DropdownField(new string(' ', property.displayName.Length))
             {
-                // style =
-                // {
-                //     flexGrow = 1,
-                // },
+                style =
+                {
+                    flexGrow = 1,
+                    flexShrink = 1,
+                },
                 userData = Array.Empty<string>(),
                 name = NameDropdownField(property),
             };

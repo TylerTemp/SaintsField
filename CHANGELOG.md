@@ -1,3 +1,8 @@
+## 2.0.12 ##
+
+1.  Fix `Addressable` broken on last code refactor
+2.  UI Toolkit: Fix `Addressable` picker out of view when the item is long
+
 ## 2.0.10 ##
 
 1.  IMGUI: Fix `DecoratorDrawer` got drawn more than once because Unity changes the behavior of `PropertyField` in 2022.1+

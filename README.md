@@ -59,10 +59,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.10**
+**2.0.12**
 
-1.  IMGUI: Fix `DecoratorDrawer` got drawn more than once because Unity changes the behavior of `PropertyField` in 2022.1+
-2.  IMGUI: Fix `Texture2D` resize for Unity 2021.1
+1.  Fix `Addressable` broken on last code refactor
+2.  UI Toolkit: Fix `Addressable` picker out of view when the item is long
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
