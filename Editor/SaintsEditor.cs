@@ -52,7 +52,7 @@ namespace SaintsField.Editor
 
             while (_fieldWithInfos.Count > 0)
             {
-                ISaintsRenderer renderer = PopRenderer(_fieldWithInfos, TryFixUIToolkit);
+                ISaintsRenderer renderer = PopRenderer(_fieldWithInfos, TryFixUIToolkit, serializedObject.targetObject);
                 if(renderer != null)
                 {
                     root.Add(renderer.CreateVisualElement());
@@ -336,7 +336,8 @@ namespace SaintsField.Editor
             }
         }
 
-        protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit)
+        protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
+            object parent)
         {
             SaintsFieldWithInfo fieldWithInfo = fieldWithInfos[0];
             // let's deal with only 1 level of grouping first
@@ -356,7 +357,7 @@ namespace SaintsField.Editor
 
             // fieldWithInfos.RemoveAt(0);
             DOTweenPlayGroup result = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
-                (DOTweenPlayAttribute)each.groups[0])), tryFixUIToolkit);
+                (DOTweenPlayAttribute)each.groups[0])), parent);
             fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
             return result;
         }

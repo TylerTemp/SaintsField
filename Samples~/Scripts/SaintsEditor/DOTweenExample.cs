@@ -32,7 +32,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         private Sequence PlayTween2()
         {
             return DOTween.Sequence()
-                .Append(spriteRenderer.DOColor(Color.yellow, 1f));
+                .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
+            ;
         }
 
 #endif

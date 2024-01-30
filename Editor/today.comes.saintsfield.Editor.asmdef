@@ -3,8 +3,7 @@
     "rootNamespace": "",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
-        "GUID:69448af7b92c7f342b298e06a37122aa",
-        "GUID:4046315f12223a244b0701861e14ef48"
+        "GUID:69448af7b92c7f342b298e06a37122aa"
     ],
     "includePlatforms": [
         "Editor"
@@ -13,7 +12,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "DOTweenEditor.dll"
+        "DOTweenEditor.dll",
+        "DOTween.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

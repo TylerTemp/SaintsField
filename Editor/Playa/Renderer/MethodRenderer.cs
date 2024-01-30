@@ -21,7 +21,13 @@ namespace SaintsField.Editor.Playa.Renderer
             Object target = SerializedObject.targetObject;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
             Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
-            ButtonAttribute buttonAttribute = (ButtonAttribute)methodInfo.GetCustomAttributes(typeof(ButtonAttribute), true)[0];
+            ButtonAttribute[] buttonAttributes = methodInfo.GetCustomAttributes<ButtonAttribute>(true).ToArray();
+            if (buttonAttributes.Length == 0)
+            {
+                return null;
+            }
+
+            ButtonAttribute buttonAttribute = buttonAttributes[0];
 
             string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
             object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
