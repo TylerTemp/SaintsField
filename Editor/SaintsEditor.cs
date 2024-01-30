@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
+// ReSharper disable once RedundantUsingDirective
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -347,7 +348,7 @@ namespace SaintsField.Editor
             }
 
             // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
-
+#if SAINTSFIELD_DOTWEEN
             ISaintsGroup group = fieldWithInfo.groups[0];
             Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
             List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
@@ -359,6 +360,10 @@ namespace SaintsField.Editor
                 (DOTweenPlayAttribute)each.groups[0])), tryFixUIToolkit);
             fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
             return result;
+#else
+            fieldWithInfos.RemoveAt(0);
+            return MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+#endif
         }
     }
 }

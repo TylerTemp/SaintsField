@@ -12,10 +12,11 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [GetComponent]
         public SpriteRenderer spriteRenderer;
 
-#if SAINTSFIELD_DOTWEEN
+
         [Button("Tween under me")]
         private void Nothing1() {}
 
+#if SAINTSFIELD_DOTWEEN
         [DOTweenPlay]
         private Sequence PlayTween()
         {
@@ -24,17 +25,18 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 .Append(spriteRenderer.DOColor(Color.green, 1f))
                 .Append(spriteRenderer.DOColor(Color.blue, 1f));
         }
+#endif
 
         [Button("Tween above me")]
         private void Nothing2() {}
 
+#if SAINTSFIELD_DOTWEEN
         [DOTweenPlay]
         private Sequence PlayTween2()
         {
             return DOTween.Sequence()
                 .Append(spriteRenderer.DOColor(Color.yellow, 1f));
         }
-
 #endif
     }
 }
