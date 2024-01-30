@@ -8,20 +8,23 @@ using DG.Tweening;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
 
+#endif
+
+// ReSharper disable once EmptyNamespace
 namespace SaintsField.Editor.Playa.RendererGroup
 {
+#if SAINTSFIELD_DOTWEEN
     // ReSharper disable once InconsistentNaming
     public class DOTweenPlayGroup: ISaintsRenderer
     {
         // ReSharper disable once InconsistentNaming
-        public readonly IReadOnlyList<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> DOTweenMethods;
+        private readonly IReadOnlyList<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> DOTweenMethods;
         // ReSharper disable once InconsistentNaming
-        public readonly object Target;
+        private readonly object Target;
 
         // ReSharper disable once InconsistentNaming
         private class DOTweenState
@@ -53,10 +56,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public VisualElement CreateVisualElement()
         {
-            VisualElement root = new VisualElement
-            {
-
-            };
+            VisualElement root = new VisualElement();
 
             List<DOTweenToolkit> doTweenToolkits = new List<DOTweenToolkit>();
 
@@ -301,5 +301,5 @@ namespace SaintsField.Editor.Playa.RendererGroup
         }
 #endif
     }
-}
 #endif
+}
