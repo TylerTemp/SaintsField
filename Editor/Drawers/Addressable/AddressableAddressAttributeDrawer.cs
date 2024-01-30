@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -26,7 +27,8 @@ namespace SaintsField.Editor.Drawers.Addressable
             bool hasLabelWidth) =>
             EditorGUIUtility.singleLineHeight;
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
 
@@ -36,7 +38,7 @@ namespace SaintsField.Editor.Drawers.Addressable
             _targetKeys = keys;
             if (_error != "")
             {
-                DefaultDrawer(position, property, label);
+                DefaultDrawer(position, property, label, info);
                 return;
             }
 
@@ -53,7 +55,9 @@ namespace SaintsField.Editor.Drawers.Addressable
             }
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
             (string error, IReadOnlyList<string> _) = SetupAssetGroup(addressableAddressAttribute);
@@ -61,16 +65,19 @@ namespace SaintsField.Editor.Drawers.Addressable
             return _error != "";
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute)
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
+            float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
             (string error, IReadOnlyList<string> _) = SetupAssetGroup(addressableAddressAttribute);
             _error = error;
 
-            return _error == "" ? 0 : Utils.ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+            return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute) => _error == "" ? position : Utils.ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+        protected override Rect DrawBelow(Rect position, SerializedProperty property,
+            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
         private static (string error, IReadOnlyList<string> assetGroups) SetupAssetGroup(AddressableAddressAttribute addressableAddressAttribute)
         {
@@ -127,7 +134,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
             {
