@@ -1,7 +1,4 @@
 // using MarkupAttributes;
-
-using System;
-using SaintsField.Unsaintly;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -65,7 +62,7 @@ namespace SaintsField.Samples.Scripts
 #endif
 
 #if !SAINTSFIELD_SAMPLE_DISABLE_UNSAINTLY_EDITOR && !SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES
-        [ShowInInspector] public const float PI = 3.14f;
+        [Playa.ShowInInspector] public const float PI = 3.14f;
 #endif
         //
         // [Tooltip("TT1")]

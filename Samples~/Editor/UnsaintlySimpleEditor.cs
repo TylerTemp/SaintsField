@@ -1,5 +1,5 @@
 ﻿#if !SAINTSFIELD_SAMPLE_DISABLE_UNSAINTLY_EDITOR
-using SaintsField.Editor.Unsaintly;
+using SaintsField.Editor;
 using UnityEditor;
 
 namespace SaintsField.Samples.Editor
@@ -7,19 +7,19 @@ namespace SaintsField.Samples.Editor
 #if SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
-    public class UnsaintlySimpleMonoEditor : UnsaintlyEditor
+    public class SaintsSimpleMonoEditor : SaintsEditor
     {
     }
 
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.ScriptableObject), true)]
-    public class UnsaintlySimpleScriptableObjectEditor : UnsaintlyEditor
+    public class SaintsSimpleScriptableObjectEditor : SaintsEditor
     {
     }
 #else
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.Object), true)]
-    public class UnsaintlySimpleEditor : UnsaintlyEditor
+    public class SaintsSimpleEditor : SaintsEditor
     {
         // protected override bool TryFixUIToolkit => false;
     }

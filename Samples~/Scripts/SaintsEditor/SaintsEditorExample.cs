@@ -1,9 +1,9 @@
-using SaintsField.Unsaintly;
+using SaintsField.Playa;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.Unsaintly
+namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class UnsaintlyExample : MonoBehaviour
+    public class SaintsEditorExample : MonoBehaviour
     {
         [Ordered] public string myStartField;
         [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;

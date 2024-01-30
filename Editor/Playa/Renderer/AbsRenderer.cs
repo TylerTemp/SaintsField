@@ -1,27 +1,26 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 
-namespace SaintsField.Editor.Unsaintly.Renderer
+namespace SaintsField.Editor.Playa.Renderer
 {
-    public abstract class AbsRenderer
-// #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-// #else
-//         : IDisposable
-// #endif
+    public abstract class AbsRenderer: ISaintsRenderer
     {
-        protected readonly UnsaintlyFieldWithInfo fieldWithInfo;
-        protected readonly SerializedObject serializedObject;
-        protected readonly bool TryFixUIToolkit;
 
-        protected AbsRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
+        // ReSharper disable InconsistentNaming
+        protected readonly SaintsFieldWithInfo FieldWithInfo;
+        protected readonly SerializedObject SerializedObject;
+        protected readonly bool TryFixUIToolkit;
+        // ReSharper enable InconsistentNaming
+
+        protected AbsRenderer(UnityEditor.Editor editor, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
         {
-            this.fieldWithInfo = fieldWithInfo;
-            serializedObject = editor.serializedObject;
+            FieldWithInfo = fieldWithInfo;
+            SerializedObject = editor.serializedObject;
             TryFixUIToolkit = tryFixUIToolkit;
         }
 
@@ -32,11 +31,6 @@ namespace SaintsField.Editor.Unsaintly.Renderer
         public virtual void AfterRender()
         {
         }
-
-        // public void Dispose()
-        // {
-        //     AfterRender();
-        // }
 
         // NA: NaughtyEditorGUI
         protected static bool FieldLayout(object value, string label)
@@ -336,5 +330,6 @@ namespace SaintsField.Editor.Unsaintly.Renderer
             return visualElement;
         }
 #endif
+        public bool IsDirectRenderer => true;
     }
 }

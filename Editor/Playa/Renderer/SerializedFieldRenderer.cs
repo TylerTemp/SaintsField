@@ -4,11 +4,11 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 
-namespace SaintsField.Editor.Unsaintly.Renderer
+namespace SaintsField.Editor.Playa.Renderer
 {
     public class SerializedFieldRenderer: AbsRenderer
     {
-        public SerializedFieldRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(editor, fieldWithInfo, tryFixUIToolkit)
+        public SerializedFieldRenderer(UnityEditor.Editor editor, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(editor, fieldWithInfo, tryFixUIToolkit)
         {
         }
 
@@ -18,10 +18,10 @@ namespace SaintsField.Editor.Unsaintly.Renderer
 
         public override VisualElement CreateVisualElement()
         {
-            PropertyField result = new PropertyField(serializedObject.FindProperty(fieldWithInfo.fieldInfo.Name));
+            PropertyField result = new PropertyField(SerializedObject.FindProperty(FieldWithInfo.FieldInfo.Name));
 
             // ReSharper disable once InvertIf
-            if(TryFixUIToolkit && fieldWithInfo.fieldInfo.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
+            if(TryFixUIToolkit && FieldWithInfo.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
             {
                 // Debug.Log($"{fieldWithInfo.fieldInfo.Name} {arr.Length}");
                 _result = result;
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Unsaintly.Renderer
 #endif
         public override void Render()
         {
-            SerializedProperty property = serializedObject.FindProperty(fieldWithInfo.fieldInfo.Name);
+            SerializedProperty property = SerializedObject.FindProperty(FieldWithInfo.FieldInfo.Name);
             EditorGUILayout.PropertyField(property);
         }
 

@@ -1,25 +1,25 @@
 ﻿using System.Linq;
 using System.Reflection;
-using SaintsField.Unsaintly;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
 
-namespace SaintsField.Editor.Unsaintly.Renderer
+namespace SaintsField.Editor.Playa.Renderer
 {
     public class MethodRenderer: AbsRenderer
     {
-        public MethodRenderer(UnityEditor.Editor editor, UnsaintlyFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(editor, fieldWithInfo, tryFixUIToolkit)
+        public MethodRenderer(UnityEditor.Editor editor, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(editor, fieldWithInfo, tryFixUIToolkit)
         {
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreateVisualElement()
         {
-            Object target = serializedObject.targetObject;
-            MethodInfo methodInfo = fieldWithInfo.methodInfo;
+            Object target = SerializedObject.targetObject;
+            MethodInfo methodInfo = FieldWithInfo.MethodInfo;
             Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
             ButtonAttribute buttonAttribute = (ButtonAttribute)methodInfo.GetCustomAttributes(typeof(ButtonAttribute), true)[0];
 
@@ -38,8 +38,8 @@ namespace SaintsField.Editor.Unsaintly.Renderer
 #endif
         public override void Render()
         {
-            Object target = serializedObject.targetObject;
-            MethodInfo methodInfo = fieldWithInfo.methodInfo;
+            Object target = SerializedObject.targetObject;
+            MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
             Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 

@@ -1,8 +1,8 @@
-﻿namespace SaintsField.Editor.Unsaintly
+﻿namespace SaintsField.Editor.Playa
 {
-    public enum UnsaintlyRenderType
+    public enum SaintsRenderType
     {
-        None,
+        // None,
         SerializedField,
         NonSerializedField,
         Method,
