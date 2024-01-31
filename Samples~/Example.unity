@@ -1218,9 +1218,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ab45109167a42a49a02633e4f9f8b7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _errorOut: 1
+  _errorOut: 0
   _labelByField: Dynamic Label!
   _someInt: 33
+  testNoLabel: 0
 --- !u!1 &556802672
 GameObject:
   m_ObjectHideFlags: 0

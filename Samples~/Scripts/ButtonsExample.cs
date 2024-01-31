@@ -49,5 +49,11 @@ namespace SaintsField.Samples.Scripts
         }
 
         private void Toggle() => _errorOut = !_errorOut;
+
+        [Space]
+        [AboveButton(nameof(ClickButton))]
+        [BelowButton(nameof(ClickButton))]
+        [PostFieldButton(nameof(ClickButton))]
+        public int testNoLabel;
     }
 }

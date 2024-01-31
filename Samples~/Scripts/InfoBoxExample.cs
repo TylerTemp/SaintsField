@@ -8,8 +8,8 @@ namespace SaintsField.Samples.Scripts
 
         // [Space]
         [InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None, above: true)]
-        [InfoBox(nameof(DynamicMessage), EMessageType.Warning, contentIsCallback: true, above: true)]
-        [InfoBox(nameof(DynamicMessageWithIcon), contentIsCallback: true)]
+        [InfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true, above: true)]
+        [InfoBox(nameof(DynamicMessageWithIcon), isCallback: true)]
         [InfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
         public bool _content;
 

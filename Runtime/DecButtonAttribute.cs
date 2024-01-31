@@ -9,13 +9,13 @@ namespace SaintsField
 
         public readonly string FuncName;
         public readonly string ButtonLabel;
-        public readonly bool ButtonLabelIsCallback;
+        public readonly bool IsCallback;
 
-        protected DecButtonAttribute(string funcName, string buttonLabel, bool buttonLabelIsCallback=false, string groupBy = "")
+        protected DecButtonAttribute(string funcName, string buttonLabel=null, bool isCallback=false, string groupBy = "")
         {
             FuncName = funcName;
             ButtonLabel = buttonLabel;
-            ButtonLabelIsCallback = buttonLabelIsCallback;
+            IsCallback = isCallback;
             GroupBy = groupBy;
         }
     }

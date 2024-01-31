@@ -142,7 +142,7 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            if (!infoboxAttribute.ContentIsCallback)
+            if (!infoboxAttribute.isCallback)
             {
                 return new MetaInfo
                 {

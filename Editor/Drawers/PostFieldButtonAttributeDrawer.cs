@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -20,10 +22,32 @@ namespace SaintsField.Editor.Drawers
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, object parent)
         {
+            DecButtonAttribute decButtonAttribute = (DecButtonAttribute)saintsAttribute;
+
             object target = property.serializedObject.targetObject;
-            (string error, string labelXml) = GetButtonLabelXml((DecButtonAttribute)saintsAttribute, target, target.GetType());
+            (string error, string labelXml) = GetButtonLabelXml(decButtonAttribute, target, target.GetType());
             _error = error;
-            return PaddingWidth*2 + Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(labelXml, label.text))));
+
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (labelXml is null)
+            {
+                labelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
+                richChunks = new[]
+                {
+                    new RichTextDrawer.RichTextChunk
+                    {
+                        IsIcon = false,
+                        Content = labelXml,
+                    },
+                };
+            }
+            else
+            {
+                richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text).ToArray();
+            }
+
+            return PaddingWidth * 2 + Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, richChunks)));
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,

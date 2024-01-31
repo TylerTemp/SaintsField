@@ -59,10 +59,14 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.0.12**
+**2.1.0**
 
-1.  Fix `Addressable` broken on last code refactor
-2.  UI Toolkit: Fix `Addressable` picker out of view when the item is long
+1.  **Breaking Changes**: rename `UnsaintlyEditor` to `SaintsEditor`
+2.  `SatinsEditor` now supports `DOTweenPlay` to preview DOTween without entering play mode
+3.  Add `Windows/Saints` menu for quick function toggle
+4.  **Breaking Changes**: rename `InfoBox`'s `contentIsCallback` to `isCallback`
+5.  **Breaking Changes**: General Buttons rename parameter `buttonLabelIsCallback` to `isCallback`
+6.  General Buttons now will use function name as label when you omit the `buttonLabel` parameter
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -280,7 +284,7 @@ Draw an info box above/below the field.
 
     a callback name or property name for show or hide this info box.
 
-*   `bool contentIsCallback=false`
+*   `bool isCallback=false`
 
     if true, the `content` will be interpreted as a property/callback function.
 
@@ -303,8 +307,8 @@ public class InfoBoxExample : MonoBehaviour
 
     [Space]
     [InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None, above: true)]
-    [InfoBox(nameof(DynamicMessage), EMessageType.Warning, contentIsCallback: true, above: true)]
-    [InfoBox(nameof(DynamicMessageWithIcon), contentIsCallback: true)]
+    [InfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true, above: true)]
+    [InfoBox(nameof(DynamicMessageWithIcon), isCallback: true)]
     [InfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
     public bool _content;
 
@@ -352,11 +356,11 @@ All of them have the same arguments:
 
     called when you click the button
 
-*   `string buttonLabel`
+*   `string buttonLabel=null`
 
-    label of the button, support tags like `RichLabel`
+    label of the button, support tags like `RichLabel`. `null` means using function name as label
 
-*   `bool buttonLabelIsCallback = false`
+*   `bool isCallback = false`
 
     a callback or property name for button's label, same as `RichLabel`
 

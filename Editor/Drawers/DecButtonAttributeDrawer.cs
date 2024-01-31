@@ -51,23 +51,40 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
         protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, object target)
         {
-            DecButtonAttribute aboveButtonAttribute = (DecButtonAttribute) saintsAttribute;
+            DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
 
             (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
             // object target = GetParentTarget(property);
             Type objType = target.GetType();
-            (string error, string buttonLabelXml) = GetButtonLabelXml(aboveButtonAttribute, target, objType);
+            (string error, string buttonLabelXml) = GetButtonLabelXml(decButtonAttribute, target, objType);
             _error = error;
 
             if (GUI.Button(buttonRect, string.Empty))
             {
-                _execError = CallButtonFunc(aboveButtonAttribute, target, objType);
+                _execError = CallButtonFunc(decButtonAttribute, target, objType);
             }
 
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (buttonLabelXml is null)
+            {
+                buttonLabelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
+                richChunks = new[]
+                {
+                    new RichTextDrawer.RichTextChunk
+                    {
+                        IsIcon = false,
+                        Content = buttonLabelXml,
+                    },
+                };
+            }
+            else
+            {
+                richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text).ToArray();
+            }
 
             // GetWidth
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text).ToArray();
             float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
             Rect labelRect = buttonRect;
             if (textWidth < labelRect.width)
@@ -216,7 +233,7 @@ namespace SaintsField.Editor.Drawers
 
         protected static (string error, string label) GetButtonLabelXml(DecButtonAttribute decButtonAttribute, object target, Type objType)
         {
-            if (!decButtonAttribute.ButtonLabelIsCallback)
+            if (!decButtonAttribute.IsCallback)
             {
                 return ("", decButtonAttribute.ButtonLabel);
             }

@@ -1,3 +1,12 @@
+## 2.1.0 ##
+
+1.  **Breaking Changes**: rename `UnsaintlyEditor` to `SaintsEditor`
+2.  `SatinsEditor` now supports `DOTweenPlay` to preview DOTween without entering play mode
+3.  Add `Windows/Saints` menu for quick function toggle
+4.  **Breaking Changes**: rename `InfoBox`'s `contentIsCallback` to `isCallback`
+5.  **Breaking Changes**: General Buttons rename parameter `buttonLabelIsCallback` to `isCallback` 
+6.  General Buttons now will use function name as label when you omit the `buttonLabel` parameter 
+
 ## 2.0.12 ##
 
 1.  Fix `Addressable` broken on last code refactor

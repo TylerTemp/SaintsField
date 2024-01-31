@@ -11,17 +11,17 @@ namespace SaintsField
         public readonly bool Above;
         public readonly string Content;
         public readonly EMessageType MessageType;
-        public readonly bool ContentIsCallback;
+        public readonly bool isCallback;
         public readonly string ShowCallback;
 
-        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool contentIsCallback=false, bool above=false, string groupBy="")
+        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool above=false, string groupBy="")
         {
             GroupBy = groupBy;
 
             Above = above;
             Content = content;
             MessageType = messageType;
-            ContentIsCallback = contentIsCallback;
+            this.isCallback = isCallback;
             ShowCallback = show;
         }
     }
