@@ -84,10 +84,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public void Render()
         {
-            _iconButtonStyle ??= new GUIStyle(EditorStyles.miniButton)
+            if (_iconButtonStyle == null)
             {
-                padding = new RectOffset(0, 0, 0, 0),
-            };
+                _iconButtonStyle = new GUIStyle(EditorStyles.miniButton)
+                {
+                    padding = new RectOffset(0, 0, 0, 0),
+                };
+            }
 
             Debug.Assert(_doTweenMethods.Count > 0);
 

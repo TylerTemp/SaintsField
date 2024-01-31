@@ -69,7 +69,14 @@ namespace SaintsField.Editor.Utils
                         defines += ";";
 
                     defines += newDefineCompileConstant;
-                    PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, defines);
+                    try
+                    {
+                        PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, defines);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
                 }
             }
         }
@@ -98,7 +105,14 @@ namespace SaintsField.Editor.Utils
 
                 // Debug.Log(result);
 
-                PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, result);
+                try
+                {
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, result);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
         }
     }
