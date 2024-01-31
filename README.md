@@ -1907,7 +1907,6 @@ public class DOTweenExample : MonoBehaviour
     [GetComponent]
     public SpriteRenderer spriteRenderer;
 
-#if SAINTSFIELD_DOTWEEN
     [DOTweenPlay]
     private Sequence PlayColor()
     {
@@ -1929,7 +1928,6 @@ public class DOTweenExample : MonoBehaviour
             .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
         ;
     }
-#endif
 }
 ```
 
@@ -1941,7 +1939,7 @@ The check of each row means auto play when you click the start in the global con
 
 **Set Up**
 
-`DOTween` is [not a standard Unity package](https://github.com/Demigiant/dotween/issues/673), so `SaintsField` can NOT detect if it's installed.
+`DOTween` is [not a standard Unity package](https://github.com/Demigiant/dotween/issues/673), so `SaintsField` can **NOT** detect if it's installed.
 
 To use `DOTweenPlay`:
 
