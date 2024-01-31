@@ -167,7 +167,7 @@ namespace SaintsField.Editor.Drawers
                     justifyContent = Justify.Center,  // horizontal
                     alignItems = Align.Center,  // vertical
                 },
-                userData = null,
+                userData = "",
             };
             labelContainer.AddToClassList(ClassLabelContainer(property, index));
             // labelContainer.Add(new Label("test label"));
@@ -205,7 +205,14 @@ namespace SaintsField.Editor.Drawers
 
             VisualElement labelContainer = container.Query<VisualElement>(className: ClassLabelContainer(property, index)).First();
             string oldXml = (string)labelContainer.userData;
-            (string error, string newXml) = GetButtonLabelXml((DecButtonAttribute) saintsAttribute, parent, parent.GetType());
+            DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
+            (string error, string newXml) = GetButtonLabelXml(decButtonAttribute, parent, parent.GetType());
+
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (newXml == null)
+            {
+                newXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
+            }
 
             HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
             helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
