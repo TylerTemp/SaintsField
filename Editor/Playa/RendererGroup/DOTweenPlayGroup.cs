@@ -131,10 +131,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
             // if (GUI.Button(titleBtnRect, DOTweenEditorPreview.isPreviewing? "■": "▶"))
             if (GUI.Button(titleBtnRect, DOTweenEditorPreview.isPreviewing ? _stopIcon : _playIcon, _iconButtonStyle))
             {
+                // Debug.Log($"DOTweenEditorPreview.isPreviewing={DOTweenEditorPreview.isPreviewing}");
                 if (DOTweenEditorPreview.isPreviewing)
                 {
                     DOTweenEditorPreview.Stop();
-                    mainPreviewSwitchToPlay = true;
 
                     foreach (DOTweenState imGuiDoTweenState in _imGuiDOTweenStates)
                     {
@@ -143,10 +143,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
                 else
                 {
+                    mainPreviewSwitchToPlay = true;
                     DOTweenEditorPreview.Start();
                 }
+                // Debug.Log($"now DOTweenEditorPreview.isPreviewing={DOTweenEditorPreview.isPreviewing}");
             }
 
+            // Debug.Log($"check isPreviewing={DOTweenEditorPreview.isPreviewing}, switchToPlay={mainPreviewSwitchToPlay}");
             foreach (((MethodInfo methodInfo, DOTweenPlayAttribute attribute), int index) in _doTweenMethods.WithIndex())
             {
                 // ReSharper disable once InconsistentNaming

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
