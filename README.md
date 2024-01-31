@@ -1887,7 +1887,7 @@ public class MyEditor : SaintsEditor
 
 Change the value of `typeof` if you only want to apply to a specific type, like a `MonoBehavior` or `ScriptableObject`.
 
-#### `DOTweenPlay` ####
+### `DOTweenPlay` ###
 
 A method decorator to play a `DOTween` animation returned by the method.
 
@@ -1949,7 +1949,7 @@ To use `DOTweenPlay`:
 2.  manually add a macro `SAINTSFIELD_DOTWEEN` to your project.
     Please read "Add a Macro" section for more information.
 
-#### `Button` ####
+### `Button` ###
 
 Draw a button for a function.
 
@@ -1973,7 +1973,7 @@ private void EditorLabeledButton()
 
 ![button](https://github.com/TylerTemp/SaintsField/assets/6391063/2f32336d-ca8b-46e0-9ac8-7bc44aada54b)
 
-#### `ShowInInspector` ####
+### `ShowInInspector` ###
 
 Show a non-field property.
 
@@ -1994,7 +1994,7 @@ public Color AutoColor
 
 ![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
 
-#### `Ordered` ####
+### `Ordered` ###
 
 `UnsanitlyEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
 
