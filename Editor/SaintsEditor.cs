@@ -14,6 +14,9 @@ using UnityEngine;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
+#if SAINTSFIELD_DOTWEEN
+using DG.DOTweenEditor;
+#endif
 
 
 namespace SaintsField.Editor
@@ -23,9 +26,23 @@ namespace SaintsField.Editor
         private MonoScript _monoScript;
         private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
 
+#if SAINTSFIELD_DOTWEEN
+        private static readonly HashSet<SaintsEditor> AliveInstances = new HashSet<SaintsEditor>();
+        private void RemoveInstance()
+        {
+            AliveInstances.Remove(this);
+            if (AliveInstances.Count == 0)
+            {
+                DOTweenEditorPreview.Stop();
+            }
+        }
+#endif
+
         #region UI
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+
         #region UIToolkit
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+
         public override VisualElement CreateInspectorGUI()
         {
             Setup();
@@ -36,6 +53,11 @@ namespace SaintsField.Editor
             }
 
             VisualElement root = new VisualElement();
+
+#if SAINTSFIELD_DOTWEEN
+            root.RegisterCallback<AttachToPanelEvent>(_ => AliveInstances.Add(this));
+            root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance());
+#endif
 
             if(_monoScript)
             {
@@ -73,8 +95,9 @@ namespace SaintsField.Editor
         }
 
         protected virtual bool TryFixUIToolkit => true;
-        #endregion
+
 #endif
+        #endregion
 
         #region IMGUI
 
@@ -83,6 +106,16 @@ namespace SaintsField.Editor
         public virtual void OnEnable()
         {
             Setup();
+#if SAINTSFIELD_DOTWEEN
+            AliveInstances.Add(this);
+#endif
+        }
+
+        public virtual void OnDestroy()
+        {
+#if SAINTSFIELD_DOTWEEN
+            RemoveInstance();
+#endif
         }
 
         public override void OnInspectorGUI()
@@ -103,10 +136,27 @@ namespace SaintsField.Editor
 
             serializedObject.Update();
 
+            // _doTweenPlayGroup = null;
             List<SaintsFieldWithInfo> fieldWithInfoList = _fieldWithInfos.ToList();
+#if SAINTSFIELD_DOTWEEN
+            DOTweenPlayGroup preDoTweenPlayGroup = _doTweenPlayGroup;
+            _doTweenPlayGroup = null;
+#endif
+            // if (_doTweenPlayGroup != null)
+            // {
+            //     fieldWithInfoList.RemoveAll(each => each.groups.Any(eachGroup => eachGroup.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy));
+            // }
             while (fieldWithInfoList.Count > 0)
             {
                 ISaintsRenderer renderer = PopRenderer(fieldWithInfoList, false, serializedObject.targetObject);
+#if SAINTSFIELD_DOTWEEN
+                if(renderer is DOTweenPlayGroup doTweenPlayGroup)
+                {
+                    _doTweenPlayGroup = preDoTweenPlayGroup ?? doTweenPlayGroup;
+                    _doTweenPlayGroup.Render();
+                    continue;
+                }
+#endif
                 renderer?.Render();
                 // renderer.AfterRender();
             }
@@ -339,35 +389,32 @@ namespace SaintsField.Editor
             object parent)
         {
             SaintsFieldWithInfo fieldWithInfo = fieldWithInfos[0];
-            // let's deal with only 1 level of grouping first
-            if (fieldWithInfo.groups.Count == 0)
-            {
-                fieldWithInfos.RemoveAt(0);
-                AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
-                // Debug.Log($"{result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
-                return result;
-            }
 
             // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
 #if SAINTSFIELD_DOTWEEN
-            ISaintsGroup group = fieldWithInfo.groups[0];
-            Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
-            List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
-                .Where(each => each.groups.Contains(group))
-                .ToList();
-
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if(_doTweenPlayGroup == null)
+            if(fieldWithInfo.groups.Count > 0)
             {
+                ISaintsGroup group = fieldWithInfo.groups[0];
+                Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
+                List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
+                    .Where(each => each.groups.Any(eachGroup => eachGroup.GroupBy == group.GroupBy))
+                    .ToList();
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_DOTWEEN
+                Debug.Assert(_doTweenPlayGroup == null, "doTweenPlayGroup should only be created once");
+#endif
+                // Debug.Log($"create doTween play: {groupFieldWithInfos.Count}, {fieldWithInfo.MethodInfo.Name}");
                 _doTweenPlayGroup = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
                     (DOTweenPlayAttribute)each.groups[0])), parent);
+                fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
+                return _doTweenPlayGroup;
             }
-            fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
-            return _doTweenPlayGroup;
-#else
-            fieldWithInfos.RemoveAt(0);
-            return MakeRenderer(fieldWithInfo, tryFixUIToolkit);
 #endif
+
+            fieldWithInfos.RemoveAt(0);
+            AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+            // Debug.Log($"{result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
+            return result;
         }
     }
 }

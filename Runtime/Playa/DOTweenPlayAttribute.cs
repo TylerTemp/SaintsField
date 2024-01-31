@@ -8,13 +8,17 @@ namespace SaintsField.Playa
     {
         // ReSharper disable InconsistentNaming
         public readonly string Label;
-        public readonly EDOTweenStop DOTweenStop;
+        public readonly ETweenStop DOTweenStop;
         // ReSharper enable InconsistentNaming
 
-        public DOTweenPlayAttribute(string label = null, EDOTweenStop stopAction = EDOTweenStop.Rewind)
+        public DOTweenPlayAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind)
         {
             Label = label;
             DOTweenStop = stopAction;
+        }
+
+        public DOTweenPlayAttribute(ETweenStop stopAction): this(null, stopAction)
+        {
         }
 
         public const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";

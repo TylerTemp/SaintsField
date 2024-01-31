@@ -1883,7 +1883,69 @@ public class MyEditor : SaintsEditor
 
 Change the value of `typeof` if you only want to apply to a specific type, like a `MonoBehavior` or `ScriptableObject`.
 
-##### `Button` #####
+#### `DOTweenPlay` ####
+
+A method decorator to play a `DOTween` animation returned by the method.
+
+The method should not have required parameters, and need to return a `Tween` or a `Sequence` (`Sequence` is atually also a tween).
+
+Parameters:
+
+*   `[Optional] string label = null` the label of the button. Use method name if null. Rich label not supported. 
+*   `ETweenStop stopAction = ETweenStop.Rewind` the action after the tween is finished or killed. Options are:
+    *   `None`: do nothing
+    *   `Complete`: complete the tween. This only works if the tween get killed
+    *   `Rewind`: rewind to the start state
+
+```csharp
+public class DOTweenExample : MonoBehaviour
+{
+    [GetComponent]
+    public SpriteRenderer spriteRenderer;
+
+#if SAINTSFIELD_DOTWEEN
+    [DOTweenPlay]
+    private Sequence PlayColor()
+    {
+        return DOTween.Sequence()
+            .Append(spriteRenderer.DOColor(Color.red, 1f))
+            .Append(spriteRenderer.DOColor(Color.green, 1f))
+            .Append(spriteRenderer.DOColor(Color.blue, 1f))
+            .SetLoops(-1);  // Yes you can make it a loop
+    }
+
+    [DOTweenPlay("Position")]
+    private Sequence PlayTween2()
+    {
+        return DOTween.Sequence()
+            .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
+            .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
+            .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
+            .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
+            .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
+        ;
+    }
+#endif
+}
+```
+
+The first row is global control. Stop it there will stop all preview.
+
+The check of each row means auto play when you click the start in the global control.
+
+[![dotween_play](https://github.com/TylerTemp/SaintsField/assets/6391063/d9479943-b254-4819-af91-c390a9fb2268)](https://github.com/TylerTemp/SaintsField/assets/6391063/34f36f5d-6697-4b68-9773-ce37672b850c)
+
+**Set Up**
+
+`DOTween` is [not a standard Unity package](https://github.com/Demigiant/dotween/issues/673), so `SaintsField` can NOT detect if it's installed.
+
+To use `DOTweenPlay`:
+
+1.  `Tools`-`Demigaint`-`DOTween Utility Panel`, click `Create ASMDEF`
+2.  manually add a macro `SAINTSFIELD_DOTWEEN` to your project.
+    Please read "Add a Macro" section for more information.
+
+#### `Button` ####
 
 Draw a button for a function.
 
@@ -1907,7 +1969,7 @@ private void EditorLabeledButton()
 
 ![button](https://github.com/TylerTemp/SaintsField/assets/6391063/2f32336d-ca8b-46e0-9ac8-7bc44aada54b)
 
-##### `ShowInInspector` #####
+#### `ShowInInspector` ####
 
 Show a non-field property.
 
@@ -1928,7 +1990,7 @@ public Color AutoColor
 
 ![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
 
-##### `Ordered` #####
+#### `Ordered` ####
 
 `UnsanitlyEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
 
@@ -1960,7 +2022,7 @@ private void EditorButton()
 
 ![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
 
-## GroupBy ##
+## About GroupBy ##
 
 group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
 
@@ -1968,6 +2030,31 @@ This only works for decorator draws above or below the field. The above drawer w
 
 `""` means no group.
 
+## Add a Macro ##
+
+Pick a way that is most convenient for you:
+
+**Using Saints Menu**
+
+Go to `Window` - `Saints` to enable/disable functions you want
+
+**Using csc.rsp**
+
+1.  Create file `Assets/csc.rsp`
+2.  Write marcos like this:
+
+    ```
+    #"Enable DOTween"
+    -define:SAINTSFIELD_DOTWEEN
+    
+    #"Disable Addressable"
+    -define:SAINTSFIELD_ADDRESSABLE_DISABLE
+    
+    #"Disable UI Toolkit"
+    -define:SAINTSFIELD_UI_TOOLKIT_DISABLE
+    ```
+
+Note: `csc.rsp` can override settings by Saints Menu.
 
 ## Common Pitfalls & Compatibility ##
 

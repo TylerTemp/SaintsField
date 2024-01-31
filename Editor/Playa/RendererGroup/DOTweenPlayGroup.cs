@@ -5,10 +5,13 @@ using System.Linq;
 using System.Reflection;
 using DG.DOTweenEditor;
 using DG.Tweening;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using FontStyle = UnityEngine.FontStyle;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using SaintsField.Editor.Core;
 using UnityEngine.UIElements;
 #endif
 
@@ -21,37 +24,45 @@ namespace SaintsField.Editor.Playa.RendererGroup
     // ReSharper disable once InconsistentNaming
     public class DOTweenPlayGroup: ISaintsRenderer
     {
-        // ReSharper disable once InconsistentNaming
-        private readonly IReadOnlyList<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> DOTweenMethods;
-        // ReSharper disable once InconsistentNaming
-        private readonly object Target;
+        private readonly IReadOnlyList<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods;
+        private readonly object _target;
 
         // ReSharper disable once InconsistentNaming
         private class DOTweenState
         {
             public bool autoPlay;
-            public Sequence sequence;
+            public Tween tween;
             public bool isPlaying;
-            public EDOTweenStop stop;
+            public ETweenStop stop;
         }
 
         // ReSharper disable once InconsistentNaming
         private readonly DOTweenState[] _imGuiDOTweenStates;
+
+        private readonly Texture2D _playIcon;
+        private readonly Texture2D _pauseIcon;
+        private readonly Texture2D _resumeIcon;
+        private readonly Texture2D _stopIcon;
 
         // One inspector instance will only have ONE DOTweenPlayGroup
         // IMGUI will only be created once, not repeatedly
 
         public DOTweenPlayGroup(IEnumerable<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> doTweenMethods, object target)
         {
-            DOTweenMethods = doTweenMethods.ToList();
+            _doTweenMethods = doTweenMethods.ToList();
             // TryFixUIToolkit = tryFixUIToolkit;
-            Target = target;
-            _imGuiDOTweenStates = DOTweenMethods
+            _target = target;
+            _imGuiDOTweenStates = _doTweenMethods
                 .Select(each => new DOTweenState
                 {
                     stop = each.attribute.DOTweenStop,
                 })
                 .ToArray();
+
+            _playIcon = Util.LoadResource<Texture2D>("play.png");
+            _pauseIcon = Util.LoadResource<Texture2D>("pause.png");
+            _resumeIcon = Util.LoadResource<Texture2D>("resume.png");
+            _stopIcon = Util.LoadResource<Texture2D>("stop.png");
         }
 
         ~DOTweenPlayGroup()
@@ -60,12 +71,36 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 StopTween(imGuiDoTweenState);
             }
+
+            UnityEngine.Object.DestroyImmediate(_playIcon);
+            UnityEngine.Object.DestroyImmediate(_pauseIcon);
+            UnityEngine.Object.DestroyImmediate(_resumeIcon);
+            UnityEngine.Object.DestroyImmediate(_stopIcon);
         }
 
         #region IMGUI
+
+        private GUIStyle _iconButtonStyle;
+
         public void Render()
         {
-            Debug.Assert(DOTweenMethods.Count > 0);
+            _iconButtonStyle ??= new GUIStyle(EditorStyles.miniButton)
+            {
+                padding = new RectOffset(0, 0, 0, 0),
+            };
+
+            Debug.Assert(_doTweenMethods.Count > 0);
+
+            // ReSharper disable once InconsistentNaming
+            // foreach (DOTweenState imGuiDOTweenStates in _imGuiDOTweenStates)
+            // {
+            //     // Debug.Log(imGuiDOTweenStates.tween?.IsComplete());
+            //     if (imGuiDOTweenStates.tween?.IsComplete() ?? false)
+            //     {
+            //         StopTween(imGuiDOTweenStates);
+            //     }
+            // }
+
             Rect labelTitleRect = EditorGUILayout.GetControlRect(false);
             const string title = "DOTween Preview";
 
@@ -90,7 +125,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
             };
 
             bool mainPreviewSwitchToPlay = false;
-            if (GUI.Button(titleBtnRect, DOTweenEditorPreview.isPreviewing? "■": "▶"))
+            // if (GUI.Button(titleBtnRect, DOTweenEditorPreview.isPreviewing? "■": "▶"))
+            if (GUI.Button(titleBtnRect, DOTweenEditorPreview.isPreviewing ? _stopIcon : _playIcon, _iconButtonStyle))
             {
                 if (DOTweenEditorPreview.isPreviewing)
                 {
@@ -108,7 +144,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
             }
 
-            foreach (((MethodInfo methodInfo, DOTweenPlayAttribute attribute), int index) in DOTweenMethods.WithIndex())
+            foreach (((MethodInfo methodInfo, DOTweenPlayAttribute attribute), int index) in _doTweenMethods.WithIndex())
             {
                 // ReSharper disable once InconsistentNaming
                 DOTweenState imGuiDOTweenStates = _imGuiDOTweenStates[index];
@@ -137,51 +173,53 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     width = btnWidth,
                 };
 
-                // bool curIsPlaying = imGuiDOTweenStates.isPlaying;
-                bool needStartAutoPlay = mainPreviewSwitchToPlay && !imGuiDOTweenStates.isPlaying &&
+                bool curIsPlaying = imGuiDOTweenStates.tween?.IsPlaying() ?? false;
+                bool needStartAutoPlay = mainPreviewSwitchToPlay && !curIsPlaying &&
                                          imGuiDOTweenStates.autoPlay;
-                string buttonLabel;
-                if(imGuiDOTweenStates.isPlaying)
+                Texture2D buttonLabel;
+                if(curIsPlaying)
                 {
-                    buttonLabel = "‖ ‖";
+                    buttonLabel = _pauseIcon;
                 }
-                else if (imGuiDOTweenStates.sequence != null)
+                else if (imGuiDOTweenStates.tween != null)
                 {
-                    buttonLabel = "|▶";
+                    buttonLabel = _resumeIcon;
                 }
                 else
                 {
-                    buttonLabel = "▶";
+                    buttonLabel = _playIcon;
                 }
-                if (GUI.Button(playPauseBtnRect, buttonLabel) || needStartAutoPlay)
+                // Debug.Log($"tween={imGuiDOTweenStates.tween}, curIsPlaying={curIsPlaying}, icon={buttonLabel}");
+                if (GUI.Button(playPauseBtnRect, buttonLabel, _iconButtonStyle) || needStartAutoPlay)
                 {
                     DOTweenEditorPreview.Start();
-                    if (imGuiDOTweenStates.isPlaying)
+                    if (curIsPlaying)
                     {
-                        imGuiDOTweenStates.sequence.Pause();
-                        imGuiDOTweenStates.isPlaying = false;
+                        imGuiDOTweenStates.tween.Pause();
+                        // imGuiDOTweenStates.isPlaying = false;
                     }
                     else
                     {
-                        if (imGuiDOTweenStates.sequence == null)
+                        if (imGuiDOTweenStates.tween == null)
                         {
-                            imGuiDOTweenStates.sequence = (Sequence)methodInfo.Invoke(Target,
+                            imGuiDOTweenStates.tween = (Tween)methodInfo.Invoke(_target,
                                 methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray());
 
-                            DOTweenEditorPreview.PrepareTweenForPreview(imGuiDOTweenStates.sequence);
+                            DOTweenEditorPreview.PrepareTweenForPreview(imGuiDOTweenStates.tween);
                         }
                         else
                         {
-                            imGuiDOTweenStates.sequence.Play();
+                            imGuiDOTweenStates.tween.Play();
                         }
-                        imGuiDOTweenStates.isPlaying = true;
+                        // imGuiDOTweenStates.isPlaying = true;
+                        // Debug.Log($"set isPlaying to true {imGuiDOTweenStates.isPlaying}");
                     }
                 }
 
-                bool curDisableStop = imGuiDOTweenStates.sequence == null;
+                bool curDisableStop = imGuiDOTweenStates.tween == null;
                 using(new EditorGUI.DisabledScope(curDisableStop))
                 {
-                    if (GUI.Button(stopBtnRect, "■"))
+                    if (GUI.Button(stopBtnRect, _stopIcon, _iconButtonStyle))
                     {
                         StopTween(imGuiDOTweenStates);
                     }
@@ -224,9 +262,19 @@ namespace SaintsField.Editor.Playa.RendererGroup
             };
             Button mainPlayStopButton = new Button
             {
-                text = DOTweenEditorPreview.isPreviewing ? "■" : "▶",
+                // text = DOTweenEditorPreview.isPreviewing ? "■" : "▶",
                 enableRichText = true,
                 userData = DOTweenEditorPreview.isPreviewing,
+                style =
+                {
+                    width = SaintsPropertyDrawer.SingleLineHeight + 5,
+                    height = SaintsPropertyDrawer.SingleLineHeight,
+                    backgroundImage = DOTweenEditorPreview.isPreviewing ? _stopIcon : _playIcon,
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+                },
             };
 
             mainPlayStopButton.clicked += () =>
@@ -250,10 +298,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             doTweenToolkit.PlayPauseButton.SetEnabled(true);
                             // ReSharper disable once ConvertToUsingDeclaration
-                            using (NavigationSubmitEvent e = new NavigationSubmitEvent() { target = doTweenToolkit.PlayPauseButton } )
-                            {
-                                doTweenToolkit.PlayPauseButton.SendEvent(e);
-                            }
+                            UIToolkitClickButton(doTweenToolkit.PlayPauseButton);
                         }
                     }
                 }
@@ -271,7 +316,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             #endregion
 
-            foreach ((MethodInfo methodInfo, DOTweenPlayAttribute attribute) in DOTweenMethods)
+            foreach ((MethodInfo methodInfo, DOTweenPlayAttribute attribute) in _doTweenMethods)
             {
                 VisualElement methodRoot = new VisualElement
                 {
@@ -302,12 +347,30 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
                 Button playPauseButton = new Button
                 {
-                    text = "▶",
+                    style =
+                    {
+                        backgroundImage = _playIcon,
+                        width = SaintsPropertyDrawer.SingleLineHeight + 5,
+                        height = SaintsPropertyDrawer.SingleLineHeight,
+                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                        backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+                    },
                 };
 
                 Button stopButton = new Button
                 {
-                    text = "■",
+                    style =
+                    {
+                        backgroundImage = _stopIcon,
+                        width = SaintsPropertyDrawer.SingleLineHeight + 5,
+                        height = SaintsPropertyDrawer.SingleLineHeight,
+                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                        backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+                    },
                 };
                 stopButton.SetEnabled(false);
 
@@ -350,26 +413,26 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                     if (doTweenState.isPlaying)  // pause
                     {
-                        doTweenState.sequence.Pause();
+                        doTweenState.tween.Pause();
                         doTweenState.isPlaying = false;
-                        playPauseButton.text = "|▶";
+                        playPauseButton.style.backgroundImage = _resumeIcon;
                     }
                     else // create / resume
                     {
-                        if (doTweenState.sequence == null) // create
+                        if (doTweenState.tween == null) // create
                         {
-                            doTweenState.sequence = (Sequence)methodInfo.Invoke(Target,
+                            doTweenState.tween = (Tween)methodInfo.Invoke(_target,
                                 methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray());
 
-                            DOTweenEditorPreview.PrepareTweenForPreview(doTweenState.sequence);
+                            DOTweenEditorPreview.PrepareTweenForPreview(doTweenState.tween);
                         }
                         else  // resume
                         {
-                            doTweenState.sequence.Play();
+                            doTweenState.tween.Play();
                         }
                         doTweenState.isPlaying = true;
 
-                        playPauseButton.text = "‖ ‖";
+                        playPauseButton.style.backgroundImage = _pauseIcon;
                         stopButton.SetEnabled(true);
                     }
                 };
@@ -378,7 +441,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     StopTween(doTweenState);
                     stopButton.SetEnabled(false);
-                    playPauseButton.text = "▶";
+                    playPauseButton.style.backgroundImage = _playIcon;
                 };
             }
 
@@ -394,14 +457,23 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return root;
         }
 
-        private static void OnUpdate(VisualElement root, Button playButton, IReadOnlyCollection<DOTweenToolkit> doTweenToolkits)
+        private static void UIToolkitClickButton(IEventHandler button)
+        {
+            // ReSharper disable once ConvertToUsingDeclaration
+            using (NavigationSubmitEvent e = new NavigationSubmitEvent { target = button } )
+            {
+                button.SendEvent(e);
+            }
+        }
+
+        private void OnUpdate(VisualElement root, Button playButton, IReadOnlyCollection<DOTweenToolkit> doTweenToolkits)
         {
             bool dataIsPlaying = (bool)playButton.userData;
             if (dataIsPlaying != DOTweenEditorPreview.isPreviewing)
             {
                 bool isPlaying = DOTweenEditorPreview.isPreviewing;
                 playButton.userData = isPlaying;
-                playButton.text = isPlaying ? "■" : "▶";
+                playButton.style.backgroundImage = isPlaying ? _stopIcon : _playIcon;
 
                 if (isPlaying)
                 {
@@ -414,12 +486,21 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     foreach (DOTweenToolkit doTweenToolkit in doTweenToolkits)
                     {
-                        doTweenToolkit.PlayPauseButton.text = "▶";
+                        doTweenToolkit.PlayPauseButton.style.backgroundImage = _playIcon;
 
                         doTweenToolkit.StopButton.SetEnabled(false);
-                        doTweenToolkit.StopButton.text = "■";
+                        doTweenToolkit.StopButton.style.backgroundImage = _stopIcon;
                         StopTween(doTweenToolkit.DoTweenState);
                     }
+                }
+            }
+
+            foreach (DOTweenToolkit doTweenToolkit in doTweenToolkits)
+            {
+                // Debug.Log(doTweenToolkit.DoTweenState.tween?.IsComplete());
+                if (doTweenToolkit.DoTweenState.tween?.IsComplete() ?? false)
+                {
+                    UIToolkitClickButton(doTweenToolkit.StopButton);
                 }
             }
 
@@ -431,27 +512,27 @@ namespace SaintsField.Editor.Playa.RendererGroup
         private static void StopTween(DOTweenState doTweenState)
         {
             doTweenState.isPlaying = false;
-            if (doTweenState.sequence == null)
+            if (doTweenState.tween == null)
             {
                 return;
             }
 
             switch (doTweenState.stop)
             {
-                case EDOTweenStop.None:
-                    doTweenState.sequence.Kill();
+                case ETweenStop.None:
+                    doTweenState.tween.Kill();
                     break;
-                case EDOTweenStop.Complete:
-                    doTweenState.sequence.Complete();
+                case ETweenStop.Complete:
+                    doTweenState.tween.Complete();
                     break;
-                case EDOTweenStop.Rewind:
-                    doTweenState.sequence.Rewind();
+                case ETweenStop.Rewind:
+                    doTweenState.tween.Rewind();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(doTweenState.stop), doTweenState.stop, null);
             }
 
-            doTweenState.sequence = null;
+            doTweenState.tween = null;
         }
     }
 #endif

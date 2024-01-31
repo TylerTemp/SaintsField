@@ -18,12 +18,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
 #if SAINTSFIELD_DOTWEEN
         [DOTweenPlay]
-        private Sequence PlayTween()
+        private Sequence PlayColor()
         {
             return DOTween.Sequence()
                 .Append(spriteRenderer.DOColor(Color.red, 1f))
                 .Append(spriteRenderer.DOColor(Color.green, 1f))
-                .Append(spriteRenderer.DOColor(Color.blue, 1f));
+                .Append(spriteRenderer.DOColor(Color.blue, 1f))
+                .SetLoops(-1);
         }
 #endif
 
@@ -31,7 +32,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         private void Nothing2() {}
 
 #if SAINTSFIELD_DOTWEEN
-        [DOTweenPlay]
+        [DOTweenPlay("Position")]
         private Sequence PlayTween2()
         {
             return DOTween.Sequence()
