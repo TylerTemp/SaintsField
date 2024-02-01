@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 // ReSharper disable once RedundantUsingDirective
@@ -37,6 +38,8 @@ namespace SaintsField.Editor
             }
         }
 #endif
+
+        private Dictionary<string, ISaintsRendererGroup> _layoutKeyToGroup;
 
         #region UI
 
@@ -342,6 +345,37 @@ namespace SaintsField.Editor
                 .ThenBy(each => each.index)
                 .Select(each => each.value)
                 .ToList();
+
+            // Dictionary<string, ELayout> notProcessedFullKeyToInfo = new Dictionary<string, ELayout>();
+
+            // short to long, so the config chain can be built
+            // IOrderedEnumerable<ISaintsGroup> sortedGroups = _fieldWithInfos
+            //     .SelectMany(each => each.groups)
+            //     .OrderBy(each => each.GroupBy);
+
+            Dictionary<string, ELayout> layoutKeyToInfo = new Dictionary<string, ELayout>();
+            foreach (ISaintsGroup sortedGroup in _fieldWithInfos.SelectMany(each => each.groups))
+            {
+                string groupBy = sortedGroup.GroupBy;
+                ELayout config = sortedGroup.Layout;
+                if (!layoutKeyToInfo.TryGetValue(groupBy, out ELayout eLayout) || (eLayout == 0 && config != 0))
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                    Debug.Log($"add key {groupBy}: {config}");
+#endif
+                    layoutKeyToInfo[groupBy] = config;
+                }
+                else
+                {
+                    Debug.Assert(eLayout == config, $"layout config conflict: {groupBy}, {eLayout} vs {config}");
+                }
+            }
+
+            _layoutKeyToGroup = layoutKeyToInfo
+                .ToDictionary(
+                    each => each.Key,
+                    each => MakeRendererGroup(each.Value)
+                );
         }
 
         private IEnumerable<string> GetSerializedProperties()
@@ -360,6 +394,34 @@ namespace SaintsField.Editor
                     } while (iterator.NextVisible(false));
                 }
             }
+        }
+
+        // private static void SetupRendererGroup(ISaintsRendererGroup saintsRendererGroup, LayoutInfo layoutInfo)
+        // {
+        //     ISaintsRendererGroup group = MakeRendererGroup(layoutInfo);
+        //     saintsRendererGroup.Add(group);
+        //     foreach (KeyValuePair<string, LayoutInfo> kv in layoutInfo.Children)
+        //     {
+        //         Debug.Log($"add sub group {kv.Key}({kv.Value.Config})");
+        //         SetupRendererGroup(group, kv.Value);
+        //     }
+        // }
+
+        // private static ISaintsRendererGroup MakeRendererGroup(LayoutInfo layoutInfo)
+        // {
+        //     if (layoutInfo.Config.HasFlag(ELayout.Vertical))
+        //     {
+        //         return new VerticalGroup(layoutInfo.Config);
+        //     }
+        //     return new HorizontalGroup(layoutInfo.Config);
+        // }
+        private static ISaintsRendererGroup MakeRendererGroup(ELayout layoutInfo)
+        {
+            if (layoutInfo.HasFlag(ELayout.Vertical))
+            {
+                return new VerticalGroup(layoutInfo);
+            }
+            return new HorizontalGroup(layoutInfo);
         }
 
         protected virtual AbsRenderer MakeRenderer(SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit)
@@ -384,11 +446,50 @@ namespace SaintsField.Editor
         // every inspector instance can only have ONE doTweenPlayGroup
         private DOTweenPlayGroup _doTweenPlayGroup = null;
 #endif
+        private struct LayoutInfo
+        {
+            public string SingleKey;
+            public ELayout Config;
+            public Dictionary<string, LayoutInfo> Children;
+        }
 
         protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
             object parent)
         {
             SaintsFieldWithInfo fieldWithInfo = fieldWithInfos[0];
+            if (fieldWithInfo.groups.Count > 0)
+            {
+                ISaintsGroup longestGroup = fieldWithInfo.groups
+                    .OrderByDescending(each => each.GroupBy.Length)
+                    .First();
+
+                string rootGroup = longestGroup.GroupBy.Split('/')[0];
+
+                AbsRenderer itemResult = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+
+                ISaintsRendererGroup targetGroup = _layoutKeyToGroup[longestGroup.GroupBy];
+
+                if(itemResult != null)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                    Debug.Log($"add {itemResult} to {longestGroup.GroupBy}({targetGroup})");
+#endif
+                    targetGroup.Add(itemResult);
+                }
+
+                fieldWithInfos.RemoveAt(0);
+
+                if(fieldWithInfos.Any(each => each.groups.Any(eachGroup => eachGroup.GroupBy.Split('/')[0] == rootGroup)))
+                {
+                    return null;
+                }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                Debug.Log($"return root {rootGroup}");
+#endif
+
+                return _layoutKeyToGroup[rootGroup];
+            }
 
             // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
 #if SAINTSFIELD_DOTWEEN

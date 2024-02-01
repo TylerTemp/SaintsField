@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;

@@ -22,6 +22,7 @@ namespace SaintsField.Samples.Editor
     public class SaintsSimpleEditor : SaintsEditor
     {
         // protected override bool TryFixUIToolkit => false;
+        public override bool RequiresConstantRepaint() => false;
     }
 #endif
 }

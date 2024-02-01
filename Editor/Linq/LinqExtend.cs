@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace SaintsField.Editor
+namespace SaintsField.Editor.Linq
 {
     public static class LinqExtend
     {
