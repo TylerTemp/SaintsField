@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SaintsField.Playa;
+using UnityEditor;
 using UnityEngine;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
@@ -18,21 +20,25 @@ namespace SaintsField.Editor.Playa.RendererGroup
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public VisualElement CreateVisualElement()
         {
-
+            throw new NotImplementedException();
         }
 #endif
 
-        public void Add(ISaintsRenderer renderer) => _renderers.Add(renderer);
+        public virtual void Add(string groupPath, ISaintsRenderer renderer) => _renderers.Add(renderer);
 
-        public void Render()
+        public virtual void Render()
         {
-            using(new GUILayout.VerticalScope())
+            Debug.Log($"Now render layout {this}");
+
+            using(new EditorGUILayout.VerticalScope())
             {
-                foreach (ISaintsRenderer renderer in _renderers)
+                foreach (ISaintsRenderer renderer in GetRenderer())
                 {
                     renderer.Render();
                 }
             }
         }
+
+        protected virtual IEnumerable<ISaintsRenderer> GetRenderer() => _renderers;
     }
 }

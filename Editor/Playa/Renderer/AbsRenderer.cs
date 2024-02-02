@@ -10,7 +10,6 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public abstract class AbsRenderer: ISaintsRenderer
     {
-
         // ReSharper disable InconsistentNaming
         protected readonly SaintsFieldWithInfo FieldWithInfo;
         protected readonly SerializedObject SerializedObject;

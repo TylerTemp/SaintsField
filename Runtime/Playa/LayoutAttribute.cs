@@ -8,7 +8,7 @@ namespace SaintsField.Playa
         public string GroupBy { get; }
         public ELayout Layout { get; }
 
-        public LayoutAttribute(string groupBy, ELayout layout=ELayout.Horizontal)
+        public LayoutAttribute(string groupBy, ELayout layout=0)
         {
             GroupBy = groupBy;
             Layout = layout;

@@ -5,6 +5,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
 {
     public interface ISaintsRendererGroup: ISaintsRenderer
     {
-        void Add(ISaintsRenderer renderer);
+        void Add(string groupPath, ISaintsRenderer renderer);
     }
 }

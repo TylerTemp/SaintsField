@@ -5,7 +5,6 @@ using System.Reflection;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
-// ReSharper disable once RedundantUsingDirective
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -25,7 +24,7 @@ namespace SaintsField.Editor
     public class SaintsEditor: UnityEditor.Editor
     {
         private MonoScript _monoScript;
-        private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
+        // private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
 
 #if SAINTSFIELD_DOTWEEN
         private static readonly HashSet<SaintsEditor> AliveInstances = new HashSet<SaintsEditor>();
@@ -39,7 +38,8 @@ namespace SaintsField.Editor
         }
 #endif
 
-        private Dictionary<string, ISaintsRendererGroup> _layoutKeyToGroup;
+        // private Dictionary<string, ISaintsRendererGroup> _layoutKeyToGroup;
+        private List<ISaintsRenderer> _renderers;
 
         #region UI
 
@@ -139,29 +139,9 @@ namespace SaintsField.Editor
 
             serializedObject.Update();
 
-            // _doTweenPlayGroup = null;
-            List<SaintsFieldWithInfo> fieldWithInfoList = _fieldWithInfos.ToList();
-#if SAINTSFIELD_DOTWEEN
-            DOTweenPlayGroup preDoTweenPlayGroup = _doTweenPlayGroup;
-            _doTweenPlayGroup = null;
-#endif
-            // if (_doTweenPlayGroup != null)
-            // {
-            //     fieldWithInfoList.RemoveAll(each => each.groups.Any(eachGroup => eachGroup.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy));
-            // }
-            while (fieldWithInfoList.Count > 0)
+            foreach (ISaintsRenderer renderer in _renderers)
             {
-                ISaintsRenderer renderer = PopRenderer(fieldWithInfoList, false, serializedObject.targetObject);
-#if SAINTSFIELD_DOTWEEN
-                if(renderer is DOTweenPlayGroup doTweenPlayGroup)
-                {
-                    _doTweenPlayGroup = preDoTweenPlayGroup ?? doTweenPlayGroup;
-                    _doTweenPlayGroup.Render();
-                    continue;
-                }
-#endif
-                renderer?.Render();
-                // renderer.AfterRender();
+                renderer.Render();
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -338,7 +318,7 @@ namespace SaintsField.Editor
                 #endregion
             }
 
-            _fieldWithInfos = fieldWithInfos
+            List<SaintsFieldWithInfo> fieldWithInfosSorted = fieldWithInfos
                 .WithIndex()
                 .OrderBy(each => each.value.InherentDepth)
                 .ThenBy(each => each.value.Order)
@@ -354,14 +334,15 @@ namespace SaintsField.Editor
             //     .OrderBy(each => each.GroupBy);
 
             Dictionary<string, ELayout> layoutKeyToInfo = new Dictionary<string, ELayout>();
-            foreach (ISaintsGroup sortedGroup in _fieldWithInfos.SelectMany(each => each.groups))
+            foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.groups))
             {
                 string groupBy = sortedGroup.GroupBy;
                 ELayout config = sortedGroup.Layout;
-                if (!layoutKeyToInfo.TryGetValue(groupBy, out ELayout eLayout) || (eLayout == 0 && config != 0))
+                bool configExists = layoutKeyToInfo.TryGetValue(groupBy, out ELayout eLayout);
+                if (!configExists || (eLayout == 0 && config != 0))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"add key {groupBy}: {config}");
+                    Debug.Log($"add key {groupBy}: {config}.{config==0} (origin: {eLayout}.{eLayout==0})");
 #endif
                     layoutKeyToInfo[groupBy] = config;
                 }
@@ -371,11 +352,67 @@ namespace SaintsField.Editor
                 }
             }
 
-            _layoutKeyToGroup = layoutKeyToInfo
+            Dictionary<string, ISaintsRendererGroup> layoutKeyToGroup = layoutKeyToInfo
                 .ToDictionary(
                     each => each.Key,
                     each => MakeRendererGroup(each.Value)
                 );
+
+            // child nesting
+            // ReSharper disable once UseDeconstruction
+            foreach (KeyValuePair<string, ISaintsRendererGroup> kv in layoutKeyToGroup)
+            {
+                string key = kv.Key;
+                string parentKey = string.Join('/', key.Split('/').SkipLast(1));
+                if (parentKey != "")
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                    Debug.Log($"add to {parentKey}: {key}({kv.Value})");
+#endif
+                    layoutKeyToGroup[parentKey].Add(key, kv.Value);
+                }
+                else
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                    Debug.Log($"exists {key}({kv.Value})");
+#endif
+                }
+            }
+            // _layoutKeyToGroup = layoutKeyToGroup;
+
+
+            // _doTweenPlayGroup = null;
+            // List<SaintsFieldWithInfo> fieldWithInfoList = fieldWithInfosSorted.ToList();
+#if SAINTSFIELD_DOTWEEN
+            DOTweenPlayGroup preDoTweenPlayGroup = _doTweenPlayGroup;
+            _doTweenPlayGroup = null;
+#endif
+            // if (_doTweenPlayGroup != null)
+            // {
+            //     fieldWithInfoList.RemoveAll(each => each.groups.Any(eachGroup => eachGroup.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy));
+            // }
+
+            List<ISaintsRenderer> renderers = new List<ISaintsRenderer>();
+            while (fieldWithInfosSorted.Count > 0)
+            {
+                ISaintsRenderer renderer = PopRenderer(fieldWithInfosSorted, false, layoutKeyToGroup, serializedObject.targetObject);
+#if SAINTSFIELD_DOTWEEN
+                if(renderer is DOTweenPlayGroup doTweenPlayGroup)
+                {
+                    _doTweenPlayGroup = preDoTweenPlayGroup ?? doTweenPlayGroup;
+                    _doTweenPlayGroup.Render();
+                    continue;
+                }
+#endif
+                if (renderer != null)
+                {
+                    renderers.Add(renderer);
+                }
+                // renderer?.Render();
+                // renderer.AfterRender();
+            }
+
+            _renderers = renderers;
         }
 
         private IEnumerable<string> GetSerializedProperties()
@@ -417,11 +454,15 @@ namespace SaintsField.Editor
         // }
         private static ISaintsRendererGroup MakeRendererGroup(ELayout layoutInfo)
         {
-            if (layoutInfo.HasFlag(ELayout.Vertical))
+            if (layoutInfo.HasFlag(ELayout.Tab))
             {
-                return new VerticalGroup(layoutInfo);
+                return new TabGroup(layoutInfo);
             }
-            return new HorizontalGroup(layoutInfo);
+            if (layoutInfo.HasFlag(ELayout.Horizontal))
+            {
+                return new HorizontalGroup(layoutInfo);
+            }
+            return new VerticalGroup(layoutInfo);
         }
 
         protected virtual AbsRenderer MakeRenderer(SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit)
@@ -446,6 +487,7 @@ namespace SaintsField.Editor
         // every inspector instance can only have ONE doTweenPlayGroup
         private DOTweenPlayGroup _doTweenPlayGroup = null;
 #endif
+
         private struct LayoutInfo
         {
             public string SingleKey;
@@ -453,10 +495,14 @@ namespace SaintsField.Editor
             public Dictionary<string, LayoutInfo> Children;
         }
 
+        private HashSet<string> _rootGroupReturned = new HashSet<string>();
+
         protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
+            IReadOnlyDictionary<string, ISaintsRendererGroup> layoutKeyToGroup,
             object parent)
         {
             SaintsFieldWithInfo fieldWithInfo = fieldWithInfos[0];
+            fieldWithInfos.RemoveAt(0);
             if (fieldWithInfo.groups.Count > 0)
             {
                 ISaintsGroup longestGroup = fieldWithInfo.groups
@@ -467,28 +513,19 @@ namespace SaintsField.Editor
 
                 AbsRenderer itemResult = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
 
-                ISaintsRendererGroup targetGroup = _layoutKeyToGroup[longestGroup.GroupBy];
+                ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
 
                 if(itemResult != null)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"add {itemResult} to {longestGroup.GroupBy}({targetGroup})");
+                    Debug.Log($"add renderer {itemResult} to {longestGroup.GroupBy}({targetGroup})");
 #endif
-                    targetGroup.Add(itemResult);
+                    targetGroup.Add(longestGroup.GroupBy, itemResult);
                 }
 
-                fieldWithInfos.RemoveAt(0);
-
-                if(fieldWithInfos.Any(each => each.groups.Any(eachGroup => eachGroup.GroupBy.Split('/')[0] == rootGroup)))
-                {
-                    return null;
-                }
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                Debug.Log($"return root {rootGroup}");
-#endif
-
-                return _layoutKeyToGroup[rootGroup];
+                return _rootGroupReturned.Add(rootGroup)
+                    ? layoutKeyToGroup[rootGroup]  // first time
+                    : null;
             }
 
             // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
@@ -512,9 +549,8 @@ namespace SaintsField.Editor
             }
 #endif
 
-            fieldWithInfos.RemoveAt(0);
             AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
-            // Debug.Log($"{result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
+            Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
             return result;
         }
     }

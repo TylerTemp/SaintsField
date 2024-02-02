@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -49,8 +50,9 @@ namespace SaintsField.Editor.Playa.Renderer
         public override void Render()
         {
             SerializedProperty property = SerializedObject.FindProperty(FieldWithInfo.FieldInfo.Name);
-            EditorGUILayout.PropertyField(property);
+            EditorGUILayout.PropertyField(property, GUILayout.ExpandWidth(true));
         }
 
+        public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo.Name}>";
     }
 }

@@ -5,15 +5,38 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class LayoutExample: MonoBehaviour
     {
-        public string above;
+        // public string above;
 
-        [Layout("H")]
-        [Layout("H/V1", ELayout.Vertical)]
-        public string hv1Item1, hv1Item2;
+        // [Layout("Root", ELayout.Tab)]
+        // [Layout("Root/V1")]
+        // public string hv1Item1;
+        //
+        // [Layout("Root/V1")]
+        // public string hv1Item2;
+        //
+        // // public string below;
+        //
+        // [Layout("Root/V2")]
+        // public string hv2Item1, hv2Item2, hv2Item3, hv2Item4;
+        //
+        // [Layout("Root/V3", ELayout.Horizontal)]
+        // [ResizableTextArea]
+        // public string hv3Item1, hv3Item2, hv3Item3;
 
-        [Layout("H/V2", ELayout.Vertical)]
-        public string hv2Item1, hv2Item2;
+        [Layout("Root", ELayout.Horizontal)]
+        // [TextArea]
+        public string hv3Item1, hv3Item2, hv3Item3;
 
-        public string below;
+        // group 2
+
+        // [Layout("H2", ELayout.Horizontal)]
+        // [Layout("H2/V1", ELayout.Vertical)]
+        // public string h2v1Item1;
+        //
+        // [Layout("H2/V1")]
+        // public string h2v1Item2;
+        //
+        // [Layout("H2/V2", ELayout.Vertical)]
+        // public string h2v2Item1, h2v2Item2;
     }
 }
