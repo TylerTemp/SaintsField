@@ -355,7 +355,7 @@ namespace SaintsField.Editor
             Dictionary<string, ISaintsRendererGroup> layoutKeyToGroup = layoutKeyToInfo
                 .ToDictionary(
                     each => each.Key,
-                    each => MakeRendererGroup(each.Value)
+                    each => (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value)
                 );
 
             // child nesting
@@ -452,18 +452,18 @@ namespace SaintsField.Editor
         //     }
         //     return new HorizontalGroup(layoutInfo.Config);
         // }
-        private static ISaintsRendererGroup MakeRendererGroup(ELayout layoutInfo)
-        {
-            if (layoutInfo.HasFlag(ELayout.Tab))
-            {
-                return new TabGroup(layoutInfo);
-            }
-            if (layoutInfo.HasFlag(ELayout.Horizontal))
-            {
-                return new HorizontalGroup(layoutInfo);
-            }
-            return new VerticalGroup(layoutInfo);
-        }
+        // private static ISaintsRendererGroup MakeRendererGroup(ELayout layoutInfo)
+        // {
+        //     if (layoutInfo.HasFlag(ELayout.Tab))
+        //     {
+        //         return new SaintsRendererGroup(layoutInfo);
+        //     }
+        //     if (layoutInfo.HasFlag(ELayout.Horizontal))
+        //     {
+        //         return new HorizontalGroup(layoutInfo);
+        //     }
+        //     return new VerticalGroup(layoutInfo);
+        // }
 
         protected virtual AbsRenderer MakeRenderer(SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit)
         {

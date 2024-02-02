@@ -10,6 +10,7 @@ namespace SaintsField.Playa
         Background = 1 << 1,  // a background for title and content. This is used to make it like a GroupBox
         ContentBackground = 1 << 2,  // a background for content only. This is used to make it like a TitleGroup
         Foldout = 1 << 3,  // expandable?
-        Tab = 1 << 4,  // expandable?
+        Tab = 1 << 4,  // tab page
+        Title = 1 << 5,  // title
     }
 }
