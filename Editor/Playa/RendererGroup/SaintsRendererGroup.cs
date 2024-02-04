@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _eLayout = eLayout;
         }
 
-        public void Add(string groupPath, ISaintsRenderer renderer)
+        public virtual void Add(string groupPath, ISaintsRenderer renderer)
         {
             string lastId = groupPath.Substring(groupPath.LastIndexOf('/') + 1);
 
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _renderers.Add((groupPath, renderer));
         }
 
-        public void Render()
+        public virtual void Render()
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_foldoutSmallStyle == null) {

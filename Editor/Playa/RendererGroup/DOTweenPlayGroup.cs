@@ -6,6 +6,7 @@ using System.Reflection;
 using DG.DOTweenEditor;
 using DG.Tweening;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -23,9 +24,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 {
 #if SAINTSFIELD_DOTWEEN
     // ReSharper disable once InconsistentNaming
-    public class DOTweenPlayGroup: ISaintsRenderer
+    public class DOTweenPlayGroup: ISaintsRendererGroup
     {
-        private readonly IReadOnlyList<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods;
+        private readonly List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods = new List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)>();
         private readonly object _target;
 
         // ReSharper disable once InconsistentNaming
@@ -33,33 +34,20 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
             public bool autoPlay;
             public Tween tween;
-            public bool isPlaying;
             public ETweenStop stop;
         }
 
         // ReSharper disable once InconsistentNaming
-        private readonly DOTweenState[] _imGuiDOTweenStates;
+        private DOTweenState[] _imGuiDOTweenStates;
 
         private readonly Texture2D _playIcon;
         private readonly Texture2D _pauseIcon;
         private readonly Texture2D _resumeIcon;
         private readonly Texture2D _stopIcon;
 
-        // One inspector instance will only have ONE DOTweenPlayGroup
-        // IMGUI will only be created once, not repeatedly
-
-        public DOTweenPlayGroup(IEnumerable<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> doTweenMethods, object target)
+        public DOTweenPlayGroup(object target)
         {
-            _doTweenMethods = doTweenMethods.ToList();
-            // TryFixUIToolkit = tryFixUIToolkit;
             _target = target;
-            _imGuiDOTweenStates = _doTweenMethods
-                .Select(each => new DOTweenState
-                {
-                    stop = each.attribute.DOTweenStop,
-                })
-                .ToArray();
-
             _playIcon = Util.LoadResource<Texture2D>("play.png");
             _pauseIcon = Util.LoadResource<Texture2D>("pause.png");
             _resumeIcon = Util.LoadResource<Texture2D>("resume.png");
@@ -83,6 +71,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private GUIStyle _iconButtonStyle;
 
+        public void Add(string groupPath, ISaintsRenderer renderer)
+        {
+            MethodRenderer methodRenderer = renderer as MethodRenderer;
+            Debug.Assert(methodRenderer != null, $"You can NOT nest {renderer} in {this}");
+            _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, methodRenderer.FieldWithInfo.MethodInfo.GetCustomAttribute<DOTweenPlayAttribute>()));
+        }
+
         public void Render()
         {
             if (_iconButtonStyle == null)
@@ -91,6 +86,16 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     padding = new RectOffset(0, 0, 0, 0),
                 };
+            }
+
+            if (_imGuiDOTweenStates == null)
+            {
+                _imGuiDOTweenStates = _doTweenMethods
+                    .Select(each => new DOTweenState
+                    {
+                        stop = each.attribute.DOTweenStop,
+                    })
+                    .ToArray();
             }
 
             Debug.Assert(_doTweenMethods.Count > 0);
@@ -518,7 +523,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private static void StopTween(DOTweenState doTweenState)
         {
-            doTweenState.isPlaying = false;
             if (doTweenState.tween == null)
             {
                 return;

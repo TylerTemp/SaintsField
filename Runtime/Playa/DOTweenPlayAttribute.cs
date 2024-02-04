@@ -23,6 +23,10 @@ namespace SaintsField.Playa
         {
         }
 
+        public DOTweenPlayAttribute(string label, string groupBy): this(label, ETweenStop.Rewind, groupBy)
+        {
+        }
+
         public const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";
         public string GroupBy { get; }
         public ELayout Layout => 0;

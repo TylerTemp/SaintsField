@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Playa.Renderer
             //
             // EditorGUI.BeginDisabledGroup(!buttonEnabled);
 
-            if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true }))
+            if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true }, GUILayout.ExpandWidth(true)))
             {
                 object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
                 methodInfo.Invoke(target, defaultParams);

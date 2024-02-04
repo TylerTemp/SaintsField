@@ -326,29 +326,31 @@ namespace SaintsField.Editor
                 .Select(each => each.value)
                 .ToList();
 
-            Dictionary<string, ELayout> layoutKeyToInfo = new Dictionary<string, ELayout>();
+            Dictionary<string, (ELayout eLayout, bool isDOTween)> layoutKeyToInfo = new Dictionary<string, (ELayout eLayout, bool isDOTween)>();
             foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.groups))
             {
                 string groupBy = sortedGroup.GroupBy;
                 ELayout config = sortedGroup.Layout;
-                bool configExists = layoutKeyToInfo.TryGetValue(groupBy, out ELayout eLayout);
-                if (!configExists || (eLayout == 0 && config != 0))
+                bool configExists = layoutKeyToInfo.TryGetValue(groupBy, out (ELayout eLayout, bool isDOTween) info);
+                if (!configExists || (info.eLayout == 0 && config != 0) || (!info.isDOTween && sortedGroup is DOTweenPlayAttribute))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"add key {groupBy}: {config}.{config==0} (origin: {eLayout}.{eLayout==0})");
+                    Debug.Log($"add key {groupBy}: {config}.{config==0} (origin: {info.eLayout}.{info.eLayout==0})");
 #endif
-                    layoutKeyToInfo[groupBy] = config;
+                    layoutKeyToInfo[groupBy] = (config, info.isDOTween || sortedGroup is DOTweenPlayAttribute);
                 }
                 else
                 {
-                    Debug.Assert(eLayout == config, $"layout config conflict: {groupBy}, {eLayout} vs {config}");
+                    Debug.Assert(info.eLayout == config, $"layout config conflict: {groupBy}, {info.eLayout} vs {config}");
                 }
             }
 
             Dictionary<string, ISaintsRendererGroup> layoutKeyToGroup = layoutKeyToInfo
                 .ToDictionary(
                     each => each.Key,
-                    each => (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value)
+                    each => (ISaintsRendererGroup)(each.Value.isDOTween
+                        ? new DOTweenPlayGroup(serializedObject.targetObject)
+                        : new SaintsRendererGroup(each.Key, each.Value.eLayout))
                 );
 
             Dictionary<string, ISaintsRendererGroup> unconnectedSubLayoutKeyToGroup = layoutKeyToGroup
@@ -438,7 +440,7 @@ namespace SaintsField.Editor
             _renderers = renderers;
         }
 
-        private IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
+        private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
         {
             // e.g "a/b/c/d"
             // first yield: "a/b/c", "a/b/c/d"
@@ -534,61 +536,61 @@ namespace SaintsField.Editor
 
         private readonly HashSet<string> _rootGroupReturned = new HashSet<string>();
 
-        protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
-            IReadOnlyDictionary<string, ISaintsRendererGroup> layoutKeyToGroup,
-            object parent)
-        {
-            SaintsFieldWithInfo fieldWithInfo = fieldWithInfos[0];
-            fieldWithInfos.RemoveAt(0);
-            if (fieldWithInfo.groups.Count > 0)
-            {
-                ISaintsGroup longestGroup = fieldWithInfo.groups
-                    .OrderByDescending(each => each.GroupBy.Length)
-                    .First();
-
-                string rootGroup = longestGroup.GroupBy.Split('/')[0];
-
-                AbsRenderer itemResult = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
-
-                ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
-
-                if(itemResult != null)
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"add renderer {itemResult} to {longestGroup.GroupBy}({targetGroup})");
-#endif
-                    targetGroup.Add(longestGroup.GroupBy, itemResult);
-                }
-
-                return _rootGroupReturned.Add(rootGroup)
-                    ? layoutKeyToGroup[rootGroup]  // first time
-                    : null;
-            }
-
-            // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
-#if SAINTSFIELD_DOTWEEN
-            if(fieldWithInfo.groups.Count > 0)
-            {
-                ISaintsGroup group = fieldWithInfo.groups[0];
-                Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
-                List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
-                    .Where(each => each.groups.Any(eachGroup => eachGroup.GroupBy == group.GroupBy))
-                    .ToList();
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_DOTWEEN
-                Debug.Assert(_doTweenPlayGroup == null, "doTweenPlayGroup should only be created once");
-#endif
-                // Debug.Log($"create doTween play: {groupFieldWithInfos.Count}, {fieldWithInfo.MethodInfo.Name}");
-                _doTweenPlayGroup = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
-                    (DOTweenPlayAttribute)each.groups[0])), parent);
-                fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
-                return _doTweenPlayGroup;
-            }
-#endif
-
-            AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
-            Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
-            return result;
-        }
+//         protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
+//             IReadOnlyDictionary<string, ISaintsRendererGroup> layoutKeyToGroup,
+//             object parent)
+//         {
+//             SaintsFieldWithInfo fieldWithInfo = fieldWithInfos[0];
+//             fieldWithInfos.RemoveAt(0);
+//             if (fieldWithInfo.groups.Count > 0)
+//             {
+//                 ISaintsGroup longestGroup = fieldWithInfo.groups
+//                     .OrderByDescending(each => each.GroupBy.Length)
+//                     .First();
+//
+//                 string rootGroup = longestGroup.GroupBy.Split('/')[0];
+//
+//                 AbsRenderer itemResult = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+//
+//                 ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
+//
+//                 if(itemResult != null)
+//                 {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+//                     Debug.Log($"add renderer {itemResult} to {longestGroup.GroupBy}({targetGroup})");
+// #endif
+//                     targetGroup.Add(longestGroup.GroupBy, itemResult);
+//                 }
+//
+//                 return _rootGroupReturned.Add(rootGroup)
+//                     ? layoutKeyToGroup[rootGroup]  // first time
+//                     : null;
+//             }
+//
+//             // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
+// #if SAINTSFIELD_DOTWEEN
+//             if(fieldWithInfo.groups.Count > 0)
+//             {
+//                 ISaintsGroup group = fieldWithInfo.groups[0];
+//                 Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
+//                 List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
+//                     .Where(each => each.groups.Any(eachGroup => eachGroup.GroupBy == group.GroupBy))
+//                     .ToList();
+//
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_DOTWEEN
+//                 Debug.Assert(_doTweenPlayGroup == null, "doTweenPlayGroup should only be created once");
+// #endif
+//                 // Debug.Log($"create doTween play: {groupFieldWithInfos.Count}, {fieldWithInfo.MethodInfo.Name}");
+//                 _doTweenPlayGroup = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
+//                     (DOTweenPlayAttribute)each.groups[0])), parent);
+//                 fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
+//                 return _doTweenPlayGroup;
+//             }
+// #endif
+//
+//             AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+//             Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
+//             return result;
+//         }
     }
 }

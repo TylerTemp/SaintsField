@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Playa.Renderer
     public abstract class AbsRenderer: ISaintsRenderer
     {
         // ReSharper disable InconsistentNaming
-        protected readonly SaintsFieldWithInfo FieldWithInfo;
+        public readonly SaintsFieldWithInfo FieldWithInfo;
         protected readonly SerializedObject SerializedObject;
         // ReSharper disable once MemberCanBePrivate.Global
         protected readonly bool TryFixUIToolkit;
