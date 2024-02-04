@@ -7,7 +7,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
     {
         // public string above;
 
-        [Layout("Root", ELayout.Tab | ELayout.Foldout)]
+        [Layout("Root", ELayout.Tab | ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
+        // [Layout("Root", ELayout.Title)]
+        // [Layout("Root", ELayout.Title | ELayout.Background)]
         [Layout("Root/V1")]
         public string hv1Item1;
 
@@ -17,11 +19,18 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         // public string below;
 
         [Layout("Root/V2")]
-        public string hv2Item1, hv2Item2, hv2Item3, hv2Item4;
+        public string hv2Item1;
+
+        [Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
+        public string hv2Item2, hv2Item3;
+        [Layout("Root/V2")]
+        public string hv2Item4;
 
         [Layout("Root/V3", ELayout.Horizontal)]
         [ResizableTextArea]
-        public string hv3Item1, hv3Item2, hv3Item3;
+        public string hv3Item1, hv3Item2;
+
+
 
         // [Layout("Root", ELayout.Horizontal)]
         // // [TextArea]

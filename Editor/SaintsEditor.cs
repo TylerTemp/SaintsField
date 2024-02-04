@@ -39,7 +39,7 @@ namespace SaintsField.Editor
 #endif
 
         // private Dictionary<string, ISaintsRendererGroup> _layoutKeyToGroup;
-        private List<ISaintsRenderer> _renderers;
+        private List<ISaintsRenderer> _renderers = new List<ISaintsRenderer>();
 
         #region UI
 
@@ -495,7 +495,7 @@ namespace SaintsField.Editor
             public Dictionary<string, LayoutInfo> Children;
         }
 
-        private HashSet<string> _rootGroupReturned = new HashSet<string>();
+        private readonly HashSet<string> _rootGroupReturned = new HashSet<string>();
 
         protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
             IReadOnlyDictionary<string, ISaintsRendererGroup> layoutKeyToGroup,

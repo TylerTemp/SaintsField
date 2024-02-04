@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 
 namespace SaintsField.Utils
 {
@@ -95,6 +98,14 @@ namespace SaintsField.Utils
                 // ReSharper disable once StringLiteralTypo
                 case "oceanicslate":
                     return new Color32(44, 93, 135, 255);
+
+#if UNITY_EDITOR
+                case "editorseparator":
+                {
+                    float c = EditorGUIUtility.isProSkin ? 0.45f : 0.4f;
+                    return new Color(c, c, c);
+                }
+#endif
 
 
                 default:
