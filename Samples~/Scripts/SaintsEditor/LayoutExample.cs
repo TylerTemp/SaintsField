@@ -12,6 +12,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [Ordered]
         [Layout("Root", ELayout.Tab | ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
+        // [Layout("Root", ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
         // [Layout("Root", ELayout.Title)]
         // [Layout("Root", ELayout.Title | ELayout.Background)]
         [Layout("Root/V1")]

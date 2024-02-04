@@ -46,9 +46,11 @@ namespace SaintsField.Editor
         #region UIToolkit
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
+        protected virtual bool TryFixUIToolkit => true;
+
         public override VisualElement CreateInspectorGUI()
         {
-            Setup();
+            Setup(TryFixUIToolkit);
             // return new Label("This is a Label in a Custom Editor");
             if (target == null)
             {
@@ -76,28 +78,13 @@ namespace SaintsField.Editor
                 root.Add(objectField);
             }
 
-            while (_fieldWithInfos.Count > 0)
+            foreach (ISaintsRenderer renderer in _renderers)
             {
-                ISaintsRenderer renderer = PopRenderer(_fieldWithInfos, TryFixUIToolkit, serializedObject.targetObject);
-                if(renderer != null)
-                {
-                    root.Add(renderer.CreateVisualElement());
-                }
+                root.Add(renderer.CreateVisualElement());
             }
-
-            // foreach (SaintsFieldWithInfo fieldWithInfo in _fieldWithInfos)
-            // {
-            //     AbsRenderer renderer = MakeRenderer(fieldWithInfo, TryFixUIToolkit);
-            //     if(renderer != null)
-            //     {
-            //         root.Add(renderer.CreateVisualElement());
-            //     }
-            // }
 
             return root;
         }
-
-        protected virtual bool TryFixUIToolkit => true;
 
 #endif
         #endregion
@@ -526,71 +513,5 @@ namespace SaintsField.Editor
         // every inspector instance can only have ONE doTweenPlayGroup
         private DOTweenPlayGroup _doTweenPlayGroup = null;
 #endif
-
-        private struct LayoutInfo
-        {
-            public string SingleKey;
-            public ELayout Config;
-            public Dictionary<string, LayoutInfo> Children;
-        }
-
-        private readonly HashSet<string> _rootGroupReturned = new HashSet<string>();
-
-//         protected virtual ISaintsRenderer PopRenderer(List<SaintsFieldWithInfo> fieldWithInfos, bool tryFixUIToolkit,
-//             IReadOnlyDictionary<string, ISaintsRendererGroup> layoutKeyToGroup,
-//             object parent)
-//         {
-//             SaintsFieldWithInfo fieldWithInfo = fieldWithInfos[0];
-//             fieldWithInfos.RemoveAt(0);
-//             if (fieldWithInfo.groups.Count > 0)
-//             {
-//                 ISaintsGroup longestGroup = fieldWithInfo.groups
-//                     .OrderByDescending(each => each.GroupBy.Length)
-//                     .First();
-//
-//                 string rootGroup = longestGroup.GroupBy.Split('/')[0];
-//
-//                 AbsRenderer itemResult = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
-//
-//                 ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
-//
-//                 if(itemResult != null)
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-//                     Debug.Log($"add renderer {itemResult} to {longestGroup.GroupBy}({targetGroup})");
-// #endif
-//                     targetGroup.Add(longestGroup.GroupBy, itemResult);
-//                 }
-//
-//                 return _rootGroupReturned.Add(rootGroup)
-//                     ? layoutKeyToGroup[rootGroup]  // first time
-//                     : null;
-//             }
-//
-//             // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
-// #if SAINTSFIELD_DOTWEEN
-//             if(fieldWithInfo.groups.Count > 0)
-//             {
-//                 ISaintsGroup group = fieldWithInfo.groups[0];
-//                 Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
-//                 List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
-//                     .Where(each => each.groups.Any(eachGroup => eachGroup.GroupBy == group.GroupBy))
-//                     .ToList();
-//
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_DOTWEEN
-//                 Debug.Assert(_doTweenPlayGroup == null, "doTweenPlayGroup should only be created once");
-// #endif
-//                 // Debug.Log($"create doTween play: {groupFieldWithInfos.Count}, {fieldWithInfo.MethodInfo.Name}");
-//                 _doTweenPlayGroup = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
-//                     (DOTweenPlayAttribute)each.groups[0])), parent);
-//                 fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
-//                 return _doTweenPlayGroup;
-//             }
-// #endif
-//
-//             AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
-//             Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
-//             return result;
-//         }
     }
 }

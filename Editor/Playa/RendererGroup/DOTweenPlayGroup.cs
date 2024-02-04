@@ -423,10 +423,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                     DOTweenEditorPreview.Start();
 
-                    if (doTweenState.isPlaying)  // pause
+                    if (doTweenState.tween?.IsPlaying() ?? false)  // pause
                     {
                         doTweenState.tween.Pause();
-                        doTweenState.isPlaying = false;
                         playPauseButton.style.backgroundImage = _resumeIcon;
                     }
                     else // create / resume
@@ -442,7 +441,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             doTweenState.tween.Play();
                         }
-                        doTweenState.isPlaying = true;
 
                         playPauseButton.style.backgroundImage = _pauseIcon;
                         stopButton.SetEnabled(true);

@@ -40,6 +40,10 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 text = buttonText,
                 enableRichText = true,
+                style =
+                {
+                    flexGrow = 1,
+                },
             };
         }
 #endif

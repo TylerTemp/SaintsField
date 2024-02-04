@@ -137,6 +137,18 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected static VisualElement UIToolkitLayout(object value, string label)
         {
+            if (value == null)
+            {
+                return new Label("[null]")
+                {
+                    style =
+                    {
+                        backgroundColor = Color.yellow,
+                    },
+                    pickingMode = PickingMode.Ignore,
+                };
+            }
+
             Type valueType = value.GetType();
             VisualElement visualElement;
 

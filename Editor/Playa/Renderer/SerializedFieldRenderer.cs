@@ -19,7 +19,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override VisualElement CreateVisualElement()
         {
-            PropertyField result = new PropertyField(SerializedObject.FindProperty(FieldWithInfo.FieldInfo.Name));
+            PropertyField result = new PropertyField(SerializedObject.FindProperty(FieldWithInfo.FieldInfo.Name))
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
 
             // ReSharper disable once InvertIf
             if(TryFixUIToolkit && FieldWithInfo.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
