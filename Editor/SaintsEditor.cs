@@ -108,7 +108,7 @@ namespace SaintsField.Editor
 
         public virtual void OnEnable()
         {
-            Setup();
+            Setup(false);
 #if SAINTSFIELD_DOTWEEN
             AliveInstances.Add(this);
 #endif
@@ -150,7 +150,7 @@ namespace SaintsField.Editor
 
         #endregion
 
-        private void Setup()
+        private void Setup(bool tryFixUIToolkit)
         {
             #region MonoScript
             if (serializedObject.targetObject)
@@ -326,13 +326,6 @@ namespace SaintsField.Editor
                 .Select(each => each.value)
                 .ToList();
 
-            // Dictionary<string, ELayout> notProcessedFullKeyToInfo = new Dictionary<string, ELayout>();
-
-            // short to long, so the config chain can be built
-            // IOrderedEnumerable<ISaintsGroup> sortedGroups = _fieldWithInfos
-            //     .SelectMany(each => each.groups)
-            //     .OrderBy(each => each.GroupBy);
-
             Dictionary<string, ELayout> layoutKeyToInfo = new Dictionary<string, ELayout>();
             foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.groups))
             {
@@ -358,61 +351,105 @@ namespace SaintsField.Editor
                     each => (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value)
                 );
 
-            // child nesting
-            // ReSharper disable once UseDeconstruction
-            foreach (KeyValuePair<string, ISaintsRendererGroup> kv in layoutKeyToGroup)
-            {
-                string key = kv.Key;
-                string parentKey = string.Join('/', key.Split('/').SkipLast(1));
-                if (parentKey != "")
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"add to {parentKey}: {key}({kv.Value})");
-#endif
-                    layoutKeyToGroup[parentKey].Add(key, kv.Value);
-                }
-                else
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"exists {key}({kv.Value})");
-#endif
-                }
-            }
-            // _layoutKeyToGroup = layoutKeyToGroup;
-
-
-            // _doTweenPlayGroup = null;
-            // List<SaintsFieldWithInfo> fieldWithInfoList = fieldWithInfosSorted.ToList();
-#if SAINTSFIELD_DOTWEEN
-            DOTweenPlayGroup preDoTweenPlayGroup = _doTweenPlayGroup;
-            _doTweenPlayGroup = null;
-#endif
-            // if (_doTweenPlayGroup != null)
-            // {
-            //     fieldWithInfoList.RemoveAll(each => each.groups.Any(eachGroup => eachGroup.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy));
-            // }
+            Dictionary<string, ISaintsRendererGroup> unconnectedSubLayoutKeyToGroup = layoutKeyToGroup
+                .Where(each => each.Key.Contains('/'))
+                .ToDictionary(each => each.Key, each => each.Value);
 
             List<ISaintsRenderer> renderers = new List<ISaintsRenderer>();
+            HashSet<string> rootGroupAdded = new HashSet<string>();
             while (fieldWithInfosSorted.Count > 0)
             {
-                ISaintsRenderer renderer = PopRenderer(fieldWithInfosSorted, false, layoutKeyToGroup, serializedObject.targetObject);
-#if SAINTSFIELD_DOTWEEN
-                if(renderer is DOTweenPlayGroup doTweenPlayGroup)
+                SaintsFieldWithInfo fieldWithInfo = fieldWithInfosSorted[0];
+                fieldWithInfosSorted.RemoveAt(0);
+                if (fieldWithInfo.groups.Count > 0)
                 {
-                    _doTweenPlayGroup = preDoTweenPlayGroup ?? doTweenPlayGroup;
-                    _doTweenPlayGroup.Render();
+                    ISaintsGroup longestGroup = fieldWithInfo.groups
+                        .OrderByDescending(each => each.GroupBy.Length)
+                        .First();
+
+                    // check if this group need to be connected
+                    if (unconnectedSubLayoutKeyToGroup.ContainsKey(longestGroup.GroupBy))
+                    {
+                        foreach((string parentGroupBy, string subGroupBy) in ChunkGroupBy(longestGroup.GroupBy)
+                                    .Where(each => unconnectedSubLayoutKeyToGroup.ContainsKey(each.subGroupBy)))
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                            Debug.Log($"Layout connect: {parentGroupBy}->{subGroupBy}");
+#endif
+                            ISaintsRendererGroup parentGroup = layoutKeyToGroup[parentGroupBy];
+                            ISaintsRendererGroup subGroup = layoutKeyToGroup[subGroupBy];
+                            parentGroup.Add(subGroupBy, subGroup);
+                            unconnectedSubLayoutKeyToGroup.Remove(subGroupBy);
+                        }
+                    }
+
+                    string rootGroup = longestGroup.GroupBy.Split('/')[0];
+                    if(rootGroupAdded.Add(rootGroup))
+                    {
+                        renderers.Add(layoutKeyToGroup[rootGroup]);
+                    }
+
+                    AbsRenderer itemResult = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+
+                    ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
+
+                    if(itemResult != null)
+                    {
+    #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                        Debug.Log($"add renderer {itemResult} to {longestGroup.GroupBy}({targetGroup})");
+    #endif
+                        targetGroup.Add(longestGroup.GroupBy, itemResult);
+                    }
                     continue;
                 }
-#endif
-                if (renderer != null)
+
+                // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
+    // #if SAINTSFIELD_DOTWEEN
+    //             if(fieldWithInfo.groups.Count > 0)
+    //             {
+    //                 ISaintsGroup group = fieldWithInfo.groups[0];
+    //                 Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
+    //                 List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
+    //                     .Where(each => each.groups.Any(eachGroup => eachGroup.GroupBy == group.GroupBy))
+    //                     .ToList();
+    //
+    // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_DOTWEEN
+    //                 Debug.Assert(_doTweenPlayGroup == null, "doTweenPlayGroup should only be created once");
+    // #endif
+    //                 // Debug.Log($"create doTween play: {groupFieldWithInfos.Count}, {fieldWithInfo.MethodInfo.Name}");
+    //                 _doTweenPlayGroup = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
+    //                     (DOTweenPlayAttribute)each.groups[0])), parent);
+    //                 fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
+    //                 return _doTweenPlayGroup;
+    //             }
+    // #endif
+
+                AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+                // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
+
+                if (result != null)
                 {
-                    renderers.Add(renderer);
+                    renderers.Add(result);
                 }
                 // renderer?.Render();
                 // renderer.AfterRender();
             }
 
             _renderers = renderers;
+        }
+
+        private IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
+        {
+            // e.g "a/b/c/d"
+            // first yield: "a/b/c", "a/b/c/d"
+            // then yield: "a/b", "a/b/c"
+            // then yield: "a", "a/b"
+            string[] groupChunk = longestGroupGroupBy.Split('/');
+
+            for (int i = groupChunk.Length - 1; i > 0; i--)
+            {
+                yield return (string.Join("/", groupChunk, 0, i), string.Join("/", groupChunk, 0, i + 1));
+            }
         }
 
         private IEnumerable<string> GetSerializedProperties()

@@ -27,10 +27,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string hv2Item4;
 
         [Layout("Root/V3", ELayout.Horizontal)]
-        [ResizableTextArea]
+        // [ResizableTextArea]
         public string hv3Item1, hv3Item2;
-
-
 
         // [Layout("Root", ELayout.Horizontal)]
         // // [TextArea]
