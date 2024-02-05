@@ -114,7 +114,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
                     {
                         EditorGUILayout.LabelField(_groupPath.Split('/').Last(), _titleLabelStyle);
-                        if(_eLayout.HasFlag(ELayout.TitleOutstanding))
+                        if(_eLayout.HasFlag(ELayout.TitleOut))
                         {
                             Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
                             EditorGUI.DrawRect(lineSep, EColor.EditorSeparator.GetColor());
@@ -135,7 +135,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         _foldout = EditorGUILayout.Foldout(_foldout, _groupPath.Split('/').Last(), true, new GUIStyle(EditorStyles.foldout){
                             fontStyle = FontStyle.Bold,
                         });
-                        if(_eLayout.HasFlag(ELayout.TitleOutstanding) && _foldout)
+                        if(_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
                         {
                             Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
                             EditorGUI.DrawRect(lineSep, EColor.EditorSeparator.GetColor());
@@ -287,7 +287,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
                 Label title = new Label(_groupPath.Split('/').Last());
-                if(_eLayout.HasFlag(ELayout.TitleOutstanding))
+                if(_eLayout.HasFlag(ELayout.TitleOut))
                 {
                     title.style.backgroundColor = EColor.Gray.GetColor();
                 }
@@ -304,7 +304,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     text = _groupPath.Split('/').Last(),
                 };
-                if(_eLayout.HasFlag(ELayout.TitleOutstanding))
+                if(_eLayout.HasFlag(ELayout.TitleOut))
                 {
                     foldout.style.backgroundColor = new Color(53f/255, 53f/255, 53f/255, 1f);
                     foldout.style.borderTopLeftRadius = foldout.style.borderTopRightRadius = 3;

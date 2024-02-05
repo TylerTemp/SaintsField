@@ -1845,8 +1845,6 @@ public class AddressableAddressExample: MonoBehaviour
 
 ## SaintsEditor ##
 
-Change: rename `UnsaintlyEditor` to `SaintsEditor`
-
 Even though `SaintsField` is designed to focus on `field` only, I still find it's necessary to use a `UnityEditor.Editor` level component, because of: showing a button, or showing a non-field property.
 
 So here is the `SaintsEditor`. It provides the minimal functions I think that is needed. Here is some comparison with `NaughtyAttributes` and `MarkupAttributes`:
@@ -1855,7 +1853,7 @@ So here is the `SaintsEditor`. It provides the minimal functions I think that is
 2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
 3.  `SaintsEditor`
 
-    *   has no layout at all.
+    *   `Layout` like markup attributes, but with less appearance functions
     *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
@@ -1871,7 +1869,6 @@ Put this in any one of your `Editor` folders:
 
 ```csharp
 using SaintsField.Editor;
-using UnityEditor;
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(UnityEngine.Object), true)]
@@ -2023,6 +2020,21 @@ private void EditorButton()
 ```
 
 ![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
+
+### `Layout` ###
+
+A layout decorator to group fields.
+
+*   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
+*   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options. Options are:
+    *   `Vertical`
+    *   `Horizontal`
+    *   `Background` draw a background color for the whole group
+    *   `TitleOut` make `title` more visible if you have `Title` enabled. On `IMGUI` it will draw an separator between title and the rest of the content. 
+        On `UI Toolkit` it will draw a background color for the title.
+    *   `Foldout` allow to fold/unfold this group
+    *   `Tab` make this group a tab page separated rather than grouping it
+    *   `Title` show the title
 
 ## About GroupBy ##
 
