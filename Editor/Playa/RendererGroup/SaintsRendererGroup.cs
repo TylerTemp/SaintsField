@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -34,7 +36,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _eLayout = eLayout;
         }
 
-        public virtual void Add(string groupPath, ISaintsRenderer renderer)
+        public void Add(string groupPath, ISaintsRenderer renderer)
         {
             string lastId = groupPath.Substring(groupPath.LastIndexOf('/') + 1);
 
@@ -58,7 +60,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         #region IMGUI
 
 
-        public virtual void Render()
+        public void Render()
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_foldoutSmallStyle == null) {
@@ -192,17 +194,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public VisualElement CreateVisualElement()
         {
+            Texture2D dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
+            Texture2D dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
+
             Dictionary<string, VisualElement> fieldToVisualElement = new Dictionary<string, VisualElement>();
             string curTab = null;
-
-            Action<string> switchTab = tab =>
-            {
-                foreach((string groupPath, VisualElement visualElement) in fieldToVisualElement)
-                {
-                    bool display = tab == null || groupPath == tab;
-                    visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
-                }
-            };
 
             VisualElement titleRow = new VisualElement
             {
@@ -216,26 +212,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
             bool hasTitle = _eLayout.HasFlag(ELayout.Title);
             bool hasTab = _eLayout.HasFlag(ELayout.Tab);
 
-            Foldout foldout = new Foldout
-            {
-                text = _groupPath.Split('/').Last(),
-            };
-
-            foldout.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.newValue)
-                {
-                    switchTab(curTab);
-                }
-                else
-                {
-                    foreach (VisualElement visualElement in fieldToVisualElement.Values)
-                    {
-                        visualElement.style.display = DisplayStyle.None;
-                    }
-                }
-            });
-
             Toolbar toolbar = new Toolbar
             {
                 style =
@@ -244,11 +220,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 },
             };
 
-            ToolbarButton[] toolbarButtons = _orderedKeys
-                .Select(each => new ToolbarButton(() =>
-                {
-                    switchTab(curTab = each);
-                })
+            ToolbarToggle[] toolbarToggles = _orderedKeys
+                .Select(each => new ToolbarToggle
                 {
                     text = each,
                     style =
@@ -258,6 +231,58 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     },
                 })
                 .ToArray();
+
+            Action<string> switchTab = tab =>
+            {
+                foreach (ToolbarToggle toolbarToggle in toolbarToggles)
+                {
+                    toolbarToggle.SetValueWithoutNotify(toolbarToggle.text == tab);
+                }
+
+                foreach((string groupPath, VisualElement visualElement) in fieldToVisualElement)
+                {
+                    bool display = tab == null || groupPath == tab;
+                    visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
+                }
+            };
+
+            foreach (ToolbarToggle toolbarToggle in toolbarToggles)
+            {
+                toolbarToggle.RegisterValueChangedCallback(evt =>
+                {
+                    if (evt.newValue)
+                    {
+                        switchTab(curTab = toolbarToggle.text);
+                    }
+                    else
+                    {
+                        toolbarToggle.SetValueWithoutNotify(true);
+                    }
+                });
+            }
+
+            Action<bool> foldoutAction = show =>
+            {
+                if (show)
+                {
+                    if(hasTitle)
+                    {
+                        toolbar.style.display = DisplayStyle.Flex;
+                    }
+                    switchTab(curTab);
+                }
+                else
+                {
+                    if(hasTitle)
+                    {
+                        toolbar.style.display = DisplayStyle.None;
+                    }
+                    foreach (VisualElement visualElement in fieldToVisualElement.Values)
+                    {
+                        visualElement.style.display = DisplayStyle.None;
+                    }
+                }
+            };
 
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
@@ -275,11 +300,16 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     || hasTitle
                     || !hasTab))
             {
+                Foldout foldout = new Foldout
+                {
+                    text = _groupPath.Split('/').Last(),
+                };
                 if(_eLayout.HasFlag(ELayout.TitleOutstanding))
                 {
                     foldout.style.backgroundColor = new Color(53f/255, 53f/255, 53f/255, 1f);
                     foldout.style.borderTopLeftRadius = foldout.style.borderTopRightRadius = 3;
                 }
+                foldout.RegisterValueChangedCallback(evt => foldoutAction(evt.newValue));
 
                 titleRow.Add(foldout);
             }
@@ -287,10 +317,33 @@ namespace SaintsField.Editor.Playa.RendererGroup
             // foldout-tabs:
             if(hasFoldout && !hasTitle && hasTab)
             {
-                foldout.text = " ";
-                toolbar.Add(foldout);
+                // toolbar.Add(foldout);
+                ToolbarToggle foldoutToggle = new ToolbarToggle
+                {
+                    value = true,
+                    style =
+                    {
+                        paddingTop = 0,
+                        paddingRight = 0,
+                        paddingBottom = 0,
+                        paddingLeft = 0,
+                    },
+                };
+                Image foldoutImage = new Image
+                {
+                    image = dropdownIcon,
+                };
+                foldoutToggle.style.width = SaintsPropertyDrawer.SingleLineHeight;
+                foldoutToggle.Add(foldoutImage);
+                foldoutToggle.RegisterValueChangedCallback(evt =>
+                {
+                    foldoutAction(evt.newValue);
+                    foldoutImage.image = evt.newValue ? dropdownIcon : dropdownRightIcon;
+                });
 
-                foreach (ToolbarButton eachTab in toolbarButtons)
+                toolbar.Add(foldoutToggle);
+
+                foreach (ToolbarToggle eachTab in toolbarToggles)
                 {
                     toolbar.Add(eachTab);
                 }
@@ -303,7 +356,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 // TODO: 2023_3+ these is a TabView can be used
 
-                foreach (ToolbarButton eachTab in toolbarButtons)
+                foreach (ToolbarToggle eachTab in toolbarToggles)
                 {
                     toolbar.Add(eachTab);
                 }
@@ -342,6 +395,24 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             root.Add(titleRow);
             root.Add(body);
+
+            if (_eLayout.HasFlag(ELayout.Tab))
+            {
+                // ReSharper disable once ConvertToLocalFunction
+                EventCallback<AttachToPanelEvent> switchOnAttack = null;
+                switchOnAttack = evt =>
+                {
+                    root.UnregisterCallback(switchOnAttack);
+                    toolbarToggles[0].value = true;
+                };
+                root.RegisterCallback(switchOnAttack);
+            }
+
+            root.RegisterCallback<DetachFromPanelEvent>(_ =>
+            {
+                UnityEngine.Object.DestroyImmediate(dropdownIcon);
+                UnityEngine.Object.DestroyImmediate(dropdownRightIcon);
+            });
 
             return root;
         }
