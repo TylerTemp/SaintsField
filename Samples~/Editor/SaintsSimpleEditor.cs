@@ -1,4 +1,4 @@
-﻿#if !SAINTSFIELD_SAMPLE_DISABLE_UNSAINTLY_EDITOR
+﻿#if !SAINTSFIELD_SAMPLE_DISABLE_SAINTS_EDITOR && !SAINTSFIELD_SAINTS_EDITOR_APPLY
 using SaintsField.Editor;
 using UnityEditor;
 
@@ -21,8 +21,8 @@ namespace SaintsField.Samples.Editor
     [CustomEditor(typeof(UnityEngine.Object), true)]
     public class SaintsSimpleEditor : SaintsEditor
     {
-        // protected override bool TryFixUIToolkit => false;
-        public override bool RequiresConstantRepaint() => false;
+        // protected override bool TryFixUIToolkit => true;
+        // public override bool RequiresConstantRepaint() => false;
     }
 #endif
 }

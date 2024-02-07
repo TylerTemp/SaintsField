@@ -59,20 +59,16 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.0**
+**2.1.1**
 
-1.  **Breaking Changes**: rename `UnsaintlyEditor` to `SaintsEditor`
-2.  `SatinsEditor` now supports `DOTweenPlay` to preview DOTween without entering play mode
-3.  Add `Windows/Saints` menu for quick function toggle
-4.  **Breaking Changes**: rename `InfoBox`'s `contentIsCallback` to `isCallback`
-5.  **Breaking Changes**: General Buttons rename parameter `buttonLabelIsCallback` to `isCallback`
-6.  General Buttons now will use function name as label when you omit the `buttonLabel` parameter
+1.  `SaintsEditor` now supports Layout (Foldout, Tab, GropBox, TitledBox etc) to group several fields together
+2.  Fix incorrect width condition check for UI Toolkit when trying to fix Unity's labelWidth issue.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
 ## Document ##
 
-UI Toolkit supports are experimental, you can disable it by adding a custom marco `SAINTSFIELD_UI_TOOLKIT_DISABLE`
+UI Toolkit supports are experimental, you can disable it by `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information)
 
 ### Label & Text ###
 
@@ -542,7 +538,7 @@ public class ColorToggleImage: MonoBehaviour
 
 Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
-Known issue: 
+Known issue:
 1.  In IMGUI, a custom drawer won't work because `PropertyDrawer` is not allowed to create an `Editor` class, thus it'll list all fields in the object. If the field itself has a custom `PropertyDrawer`, the drawer WILL be used.
 2.  In IMGUI, the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Tryng outside of the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
@@ -562,7 +558,7 @@ public class ExpandableExample : MonoBehaviour
 
 A dropdown to pick a referenced value for Unity's [`SerializeReference`](https://docs.unity3d.com/ScriptReference/SerializeReference.html).
 
-You can use this to pick non UnityObject object like `interface` or polymorphism `class`. 
+You can use this to pick non UnityObject object like `interface` or polymorphism `class`.
 
 Limitation:
 1.  The target must have a public constructor with no required arguments.
@@ -791,7 +787,7 @@ A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/
 **Known Issue**:
 
 1.  IMGUI: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
-    This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup. 
+    This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup.
 
     This issue is not fixable unless Unity fixes it.
 
@@ -800,7 +796,7 @@ A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/
 2.  UI Toolkit:
 
     The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not has the same layout even with same elements+style+boundary size.
-    
+
     This issue is not fixable unless Unity fixes it. This issue might be different on different Unity (UI Toolkit) version.
 
 **Arguments**
@@ -1781,7 +1777,7 @@ public class ButtonAddOnClickExample: MonoBehaviour
 
 Add this only to field that has not `SaintsField` attribute to make this field's label behave like UI Toolkit. This does not work for pure `IMGUI` drawer. This is a fix for Unity's bugged `PropertyField` label.
 
-This is only available if you have `UI Toolkit` enabled (Unity 2022.2+ with not custom `SAINTSFIELD_UI_TOOLKIT_DISABLE` marco)
+This is only available if you have `UI Toolkit` enabled (Unity 2022.2+ without disable UI Toolkit in `SaintsField`)
 
 ### Other Tools ###
 
@@ -1791,7 +1787,7 @@ These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.un
 
 Namespace: `SaintsField.Addressable`
 
-If you encounter issue because of version incompatible with your installation, you can add a macro `SAINTSFIELD_ADDRESSABLE_DISABLE` to disable this component
+If you encounter issue because of version incompatible with your installation, you can add a macro `SAINTSFIELD_ADDRESSABLE_DISABLE` to disable this component (See "Add a Macro" section for more information)
 
 ##### `AddressableLabel` #####
 
@@ -1863,26 +1859,12 @@ Please note, any `Editor` is not compatible with each other (unless you manually
 
 If you are interested, here is how to use it.
 
-### Setup SaintsEditor ###
+### Set Up SaintsEditor ###
 
-Put this in any one of your `Editor` folders:
+`Window` - `Saints` - `Apply SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
 
-```csharp
-using SaintsField.Editor;
+If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
-[CanEditMultipleObjects]
-[CustomEditor(typeof(UnityEngine.Object), true)]
-public class MyEditor : SaintsEditor
-{
-    // If you're using UI Toolkit and the label fix is buggy, turn it off by uncomment next line
-    // protected override bool TryFixUIToolkit => false;
-
-    // If you're using IMGUI and it takes too much resources, turn `ConstantRepaint` off by uncomment next line
-    // public override bool RequiresConstantRepaint() => false;
-}
-```
-
-Change the value of `typeof` if you only want to apply to a specific type, like a `MonoBehavior` or `ScriptableObject`.
 
 ### `DOTweenPlay` ###
 
@@ -1892,7 +1874,7 @@ The method should not have required parameters, and need to return a `Tween` or 
 
 Parameters:
 
-*   `[Optional] string label = null` the label of the button. Use method name if null. Rich label not supported. 
+*   `[Optional] string label = null` the label of the button. Use method name if null. Rich label not supported.
 *   `ETweenStop stopAction = ETweenStop.Rewind` the action after the tween is finished or killed. Options are:
     *   `None`: do nothing
     *   `Complete`: complete the tween. This only works if the tween get killed
@@ -1940,9 +1922,8 @@ The check of each row means auto play when you click the start in the global con
 
 To use `DOTweenPlay`:
 
-1.  `Tools`-`Demigaint`-`DOTween Utility Panel`, click `Create ASMDEF`
-2.  manually add a macro `SAINTSFIELD_DOTWEEN` to your project.
-    Please read "Add a Macro" section for more information.
+1.  `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+2.  `Window` - `Saints` - `Enable DOTween Support` (See "Add a Macro" section for more information)
 
 ### `Button` ###
 
@@ -2026,15 +2007,158 @@ private void EditorButton()
 A layout decorator to group fields.
 
 *   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
-*   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options. Options are:
+*   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
+
+Options are:
     *   `Vertical`
     *   `Horizontal`
     *   `Background` draw a background color for the whole group
-    *   `TitleOut` make `title` more visible if you have `Title` enabled. On `IMGUI` it will draw an separator between title and the rest of the content. 
+    *   `TitleOut` make `title` more visible if you have `Title` enabled. On `IMGUI` it will draw an separator between title and the rest of the content.
         On `UI Toolkit` it will draw a background color for the title.
-    *   `Foldout` allow to fold/unfold this group
+    *   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
     *   `Tab` make this group a tab page separated rather than grouping it
     *   `Title` show the title
+
+**Known Issue**
+
+`Horizental` style is buggy, for the following reasons:
+
+1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
+2.  On UI Toolkit we have the well-behaved layout system, but because of its buggy "Label Width" (see "Common Pitfalls & Compatibility" - "UI Toolkit" section for more information), all the field except the first one will get the super-shrank label width which makes it unreadable.
+
+![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
+
+**Appearance**
+
+![layout_compare](https://github.com/TylerTemp/SaintsField/assets/6391063/d34c317d-3c24-42f9-8efa-831195167490)
+
+**Example**
+
+```csharp
+public class LayoutExample: MonoBehaviour
+{
+    [Layout("Titled", ELayout.Title | ELayout.TitleOut)]
+    public string titledItem1, titledItem2;
+
+    // title
+    [Layout("Titled Box", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+    public string titledBoxItem1;
+    [Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
+    public string titledBoxItem2;
+
+    // foldout
+    [Layout("Foldout", ELayout.Foldout)]
+    public string foldoutItem1, foldoutItem2;
+
+    // tabs
+    [Layout("Tabs", ELayout.Tab | ELayout.Foldout)]
+    [Layout("Tabs/Tab1")]
+    public string tab1Item1, tab1Item2;
+
+    [Layout("Tabs/Tab2")]
+    public string tab2Item1, tab2Item2;
+
+    [Layout("Tabs/Tab3")]
+    public string tab3Item1, tab3Item2;
+
+    // nested groups
+    [Layout("Nested", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+    public int nestedOne;
+    [Layout("Nested/Nested Group 1", ELayout.Title | ELayout.TitleOut)]
+    public int nestedTwo, nestedThree;
+    [Layout("Nested/Nested Group 2", ELayout.Title | ELayout.TitleOut)]
+    public int nestedFour, nestedFive;
+
+    // Unlabeled Box
+    [Layout("Unlabeled Box", ELayout.Background)]
+    public int unlabeledBoxItem1, unlabeledBoxItem2;
+
+    // Foldout In A Box
+    [Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
+    public int foldoutInABoxItem1, foldoutInABoxItem2;
+
+    // Complex example. Button and ShowInInspector works too
+    [Ordered]
+    [Layout("Root", ELayout.Tab | ELayout.TitleOut | ELayout.Foldout | ELayout.Background)]
+    // [Layout("Root", ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
+    // [Layout("Root", ELayout.Title)]
+    // [Layout("Root", ELayout.Title | ELayout.Background)]
+    [Layout("Root/V1")]
+    [SepTitle("Basic", EColor.Pink)]
+    public string hv1Item1;
+
+    [Ordered]
+    [Layout("Root/V1/buttons", ELayout.Horizontal)]
+    [Button("Root/V1 Button1")]
+    public void RootV1Button()
+    {
+        Debug.Log("Root/V1 Button");
+    }
+    [Ordered]
+    [Layout("Root/V1/buttons", ELayout.Horizontal)]
+    [Button("Root/V1 Button2")]
+    public void RootV1Button2()
+    {
+        Debug.Log("Root/V1 Button");
+    }
+
+    [Ordered]
+    [Layout("Root/V1")]
+    [ShowInInspector]
+    public static Color color1 = Color.red;
+
+    [Ordered]
+    [DOTweenPlay("Tween1", "Root/V1")]
+    public Tween RootV1Tween1()
+    {
+        return DOTween.Sequence();
+    }
+
+    [Ordered]
+    [DOTweenPlay("Tween2", "Root/V1")]
+    public Tween RootV1Tween2()
+    {
+        return DOTween.Sequence();
+    }
+
+    [Ordered]
+    [Layout("Root/V1")]
+    public string hv1Item2;
+
+    // public string below;
+
+    [Ordered]
+    [Layout("Root/V2")]
+    public string hv2Item1;
+
+    [Ordered]
+    [Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
+    public string hv2Item2, hv2Item3;
+
+    [Ordered]
+    [Layout("Root/V2")]
+    public string hv2Item4;
+
+    [Ordered]
+    [Layout("Root/V3", ELayout.Horizontal)]
+    [ResizableTextArea, RichLabel(null)]
+    public string hv3Item1, hv3Item2;
+
+    [Ordered]
+    [Layout("Root/Buggy")]
+    [InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
+    public string buggy = "See below:";
+
+    [Ordered]
+    [Layout("Root/Buggy/H", ELayout.Horizontal)]
+    public string buggy1;
+    [Ordered]
+    [Layout("Root/Buggy/H", ELayout.Horizontal)]
+    public string buggy2;
+}
+```
+
+[![layout](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
 
 ## About GroupBy ##
 
@@ -2052,23 +2176,41 @@ Pick a way that is most convenient for you:
 
 Go to `Window` - `Saints` to enable/disable functions you want
 
+![Saints Menu](https://github.com/TylerTemp/SaintsField/assets/6391063/272e72c3-656c-47e4-adc6-75ba62f7f432)
+
 **Using csc.rsp**
 
 1.  Create file `Assets/csc.rsp`
 2.  Write marcos like this:
 
-    ```
+    ```r
     #"Enable DOTween"
     -define:SAINTSFIELD_DOTWEEN
-    
+
     #"Disable Addressable"
     -define:SAINTSFIELD_ADDRESSABLE_DISABLE
-    
+
     #"Disable UI Toolkit"
     -define:SAINTSFIELD_UI_TOOLKIT_DISABLE
+
+    #"Disable UI Toolkit label fix for PropertyDrawer"
+    -define:SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
+
+    #"Apply SaintsEditor project wide"
+    -define:SAINTSFIELD_SAINTS_EDITOR_APPLY
+
+    #"Disable SaintsEditor IMGUI constant repaint"
+    -define:SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
+
+    #"Disable SaintsEditor UI Toolkit label fix"
+    -define:SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
     ```
 
 Note: `csc.rsp` can override settings by Saints Menu.
+
+**Using project settings**
+
+`Edit` - `Project Settings` - `Player`, find your platform, then go `Other Settings` - `Script Compliation` - `Scripting Define Symbols` to add your marcos. Don't forget to click `Apply` before closing the window.
 
 ## Common Pitfalls & Compatibility ##
 
@@ -2130,21 +2272,14 @@ public class CompatibilityNaAndDefault : MonoBehaviour
 }
 ```
 
-### Multiple Fields Handling ###
-
-Unlike `NaghthyAttributes`/`Odin`, `SaintsField` does not have a decorator like `Tag`, or `GroupBox` that puts several fields into one place
-because it does not inject a global `CustomEditor`.
-
-For the same reason, it can not handle `NonSerializedField` and `AutoPropertyField` (unless you give a `[field: SerializedFile]` decorator to make it as a normal property). Because they are all not `PropertyAttribute`.
-
-**Other Drawers**
+### Fallback To Other Drawers ###
 
 `SaintsField` is designed to be compatible with other drawers if
 
 1.  the drawer itself respects the `GUIContent` argument in `OnGUI` for IMGUI, or add `unity-label` class to Label for UI Toolkit
 
     NOTE: `NaughtyAttributes` (IMGUI) uses `property.displayName` instead of `GUIContent`. You need to set `Label(" ")` if you want to use `RichLabel`.
-    Also, `NaughtyAttributes` tread many Attribute as first-class citizen, so the compatibility is not guaranteed.
+    Also, `NaughtyAttributes` tread some attributes as first-class citizen, so the compatibility is not guaranteed.
 
 2.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
 
@@ -2153,7 +2288,7 @@ For the same reason, it can not handle `NonSerializedField` and `AutoPropertyFie
 Special Note:
 
 NaughtyAttributes uses only IMGUI. If you're using Unity 2022.2+, `NaughtyAttributes`'s editor will try fallback default drawers and Unity will decide to use UI Toolkit rendering `SaintsField` and cause troubles.
-Please disable `SaintsField`'s UI Toolkit ability by adding marco `-define:SAINTSFIELD_UI_TOOLKIT_DISABLE` to your project.
+Please disable `SaintsField`'s UI Toolkit ability by `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information)
 
 My (not full) test about compatibility:
 
@@ -2189,4 +2324,4 @@ If you encounter any issue, please report it to the issue page. However, there a
 
 6.  When leaving an PropertyDrawer to switch to a new target, the old one's `CreatePropertyGUI` will also get called once. This... makes the nested fallback difficult. Currently I use some silly way to work around with it, and you will see the inspector flick one frame at the beginning.
 
-If you're in Unity 2022.2+ (from which Unity use UI Toolkit as default inspector), `SaintsField` will switch to UI Toolkit by default. In this case, if you want to use the IMGUI version, you can add a macro `-define:SAINTSFIELD_UI_TOOLKIT_DISABLE` to disable UI Toolkit.
+If you're in Unity 2022.2+ (from which Unity use UI Toolkit as default inspector), `SaintsField` will switch to UI Toolkit by default. In this case, if you want to use the IMGUI version, you can go `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information) to disable UI Toolkit.

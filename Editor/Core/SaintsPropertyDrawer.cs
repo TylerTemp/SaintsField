@@ -1757,11 +1757,13 @@ namespace SaintsField.Editor.Core
                     // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
                     // Debug.Log($"container={container.Count}");
                     thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ForEach(each => each.RemoveFromHierarchy());
+#if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
                     Label label = thisPropField.Q<Label>(className: "unity-label");
                     if (label != null)
                     {
                         UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
                     }
+#endif
 
                     OnAwakeReady(property, containerElement, parent, saintsPropertyDrawers);
                 });

@@ -8,14 +8,54 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class LayoutExample: MonoBehaviour
     {
-        // public string above;
+        [Layout("Titled", ELayout.Title | ELayout.TitleOut)]
+        public string titledItem1, titledItem2;
 
+        // title
+        [Layout("Titled Box", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+        public string titledBoxItem1;
+        [Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
+        public string titledBoxItem2;
+
+        // foldout
+        [Layout("Foldout", ELayout.Foldout)]
+        public string foldoutItem1, foldoutItem2;
+
+        // tabs
+        [Layout("Tabs", ELayout.Tab | ELayout.Foldout)]
+        [Layout("Tabs/Tab1")]
+        public string tab1Item1, tab1Item2;
+
+        [Layout("Tabs/Tab2")]
+        public string tab2Item1, tab2Item2;
+
+        [Layout("Tabs/Tab3")]
+        public string tab3Item1, tab3Item2;
+
+        // nested groups
+        [Layout("Nested", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+        public int nestedOne;
+        [Layout("Nested/Nested Group 1", ELayout.Title | ELayout.TitleOut)]
+        public int nestedTwo, nestedThree;
+        [Layout("Nested/Nested Group 2", ELayout.Title | ELayout.TitleOut)]
+        public int nestedFour, nestedFive;
+
+        // Unlabeled Box
+        [Layout("Unlabeled Box", ELayout.Background)]
+        public int unlabeledBoxItem1, unlabeledBoxItem2;
+
+        // Foldout In A Box
+        [Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
+        public int foldoutInABoxItem1, foldoutInABoxItem2;
+
+        // Complex example. Button and ShowInInspector works too
         [Ordered]
         [Layout("Root", ELayout.Tab | ELayout.TitleOut | ELayout.Foldout | ELayout.Background)]
         // [Layout("Root", ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
         // [Layout("Root", ELayout.Title)]
         // [Layout("Root", ELayout.Title | ELayout.Background)]
         [Layout("Root/V1")]
+        [SepTitle("Basic", EColor.Pink)]
         public string hv1Item1;
 
         [Ordered]
@@ -26,7 +66,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             Debug.Log("Root/V1 Button");
         }
         [Ordered]
-        [Layout("Root/V1/buttons", ELayout.Horizontal)]
+        [Layout("Root/V1/buttons")]
         [Button("Root/V1 Button2")]
         public void RootV1Button2()
         {
@@ -76,20 +116,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [ResizableTextArea, RichLabel(null)]
         public string hv3Item1, hv3Item2;
 
-        // [Layout("Root", ELayout.Horizontal)]
-        // // [TextArea]
-        // public string hv3Item1, hv3Item2, hv3Item3;
+        [Ordered]
+        [Layout("Root/Buggy")]
+        [InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
+        public string buggy = "See below:";
 
-        // group 2
-
-        // [Layout("H2", ELayout.Horizontal)]
-        // [Layout("H2/V1", ELayout.Vertical)]
-        // public string h2v1Item1;
-        //
-        // [Layout("H2/V1")]
-        // public string h2v1Item2;
-        //
-        // [Layout("H2/V2", ELayout.Vertical)]
-        // public string h2v2Item1, h2v2Item2;
+        [Ordered]
+        [Layout("Root/Buggy/H", ELayout.Horizontal)]
+        public string buggy1, buggy2, buggy3;
     }
 }

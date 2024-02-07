@@ -44,9 +44,16 @@ namespace SaintsField.Editor
         #region UI
 
         #region UIToolkit
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
-        protected virtual bool TryFixUIToolkit => true;
+        protected virtual bool TryFixUIToolkit =>
+#if SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
+            false
+#else
+            true
+#endif
+        ;
+
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -328,7 +335,7 @@ namespace SaintsField.Editor
                 }
                 else
                 {
-                    Debug.Assert(info.eLayout == config, $"layout config conflict: {groupBy}, {info.eLayout} vs {config}");
+                    Debug.Assert(info.eLayout == config || config == 0, $"layout config conflict: [{groupBy}] {info.eLayout} vs {config}");
                 }
             }
 

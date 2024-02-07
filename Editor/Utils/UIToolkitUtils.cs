@@ -19,9 +19,16 @@ namespace SaintsField.Editor.Utils
         // ReSharper disable once SuggestBaseTypeForParameter
         private static void FixLabelWidthUIToolkit(Label label)
         {
-            if(label.style.width != StyleKeyword.Auto)
+            StyleLength autoLength = new StyleLength(StyleKeyword.Auto);
+            StyleLength curLenght = label.style.width;
+            float resolvedWidth = label.resolvedStyle.width;
+            // if(curLenght.value != autoLength)
+            // don't ask me why we need to compare with 0, ask Unity...
+            if(!(curLenght.value.IsAuto() || curLenght.value == 0) && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
             {
-                label.style.width = StyleKeyword.Auto;
+                // Debug.Log($"try fix {label.style.width}({curLenght.value.IsAuto()}); {resolvedWidth > 0} {resolvedWidth}");
+                label.style.width = autoLength;
+                // label.schedule.Execute(() => label.style.width = autoLength);
             }
         }
     }

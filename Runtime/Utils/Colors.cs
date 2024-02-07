@@ -99,6 +99,9 @@ namespace SaintsField.Utils
                 case "oceanicslate":
                     return new Color32(44, 93, 135, 255);
 
+                case "midnightash":
+                    return new Color32(35, 35, 35, 255);
+
 #if UNITY_EDITOR
                 case "editorseparator":
                 {

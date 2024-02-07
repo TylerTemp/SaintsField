@@ -8,27 +8,43 @@ namespace SaintsField.Editor.Utils
 {
     public static class SaintsMenu
     {
-        // private readonly static BuildTargetGroup[] _buildingGroups = new BuildTargetGroup[] { BuildTargetGroup.Android, BuildTargetGroup.iOS, BuildTargetGroup.Standalone, Bu };
-#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        [MenuItem("Window/Saints/Disable UI Toolkit")]
-        public static void UIToolkit() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
-#endif
 
+        #region UI Toolkit
 #if SAINTSFIELD_UI_TOOLKIT_DISABLE
         [MenuItem("Window/Saints/Enable UI Toolkit Support")]
         public static void UIToolkit() => RemoveCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
+#else
+        [MenuItem("Window/Saints/Disable UI Toolkit Support")]
+        public static void UIToolkit() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
 #endif
 
+        #region Label Fix (UI Toolkit)
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
+        [MenuItem("Window/Saints/Disable UI Toolkit Label Fix")]
+        public static void UIToolkitLabelFix() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE");
+#else
+        [MenuItem("Window/Saints/Enable UI Toolkit Label Fix")]
+        public static void UIToolkitLabelFix() => RemoveCompileDefine("SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE");
+#endif
+#endif
+        #endregion
+
+        #endregion
+
+        #region DOTween
 #if !SAINTSFIELD_DOTWEEN
         [MenuItem("Window/Saints/Enable DOTween Support")]
         public static void DOTween() => AddCompileDefine("SAINTSFIELD_DOTWEEN");
 #endif
-
-#if SAINTSFIELD_ADDRESSABLE
 #if SAINTSFIELD_DOTWEEN
         [MenuItem("Window/Saints/Disable DOTween Support")]
         public static void DOTween() => RemoveCompileDefine("SAINTSFIELD_DOTWEEN");
 #endif
+        #endregion
+
+        #region Addressable
+#if SAINTSFIELD_ADDRESSABLE
 
 #if !SAINTSFIELD_ADDRESSABLE_DISABLE
         [MenuItem("Window/Saints/Disable Addressable Support")]
@@ -44,8 +60,53 @@ namespace SaintsField.Editor.Utils
         [MenuItem("Window/Saints/Addressable Not Installed")]
         public static void AddressableNotInstalled() { }
         [MenuItem("Window/Saints/Addressable Not Installed", true)]
-        public static bool AddressableNotInstalledDisabled() => false;
+        public static bool AddressableNotInstalledEnabled() => false;
 #endif
+        #endregion
+
+        #region SaintsEditor
+
+#if SAINTSFIELD_SAINTS_EDITOR_APPLY
+        [MenuItem("Window/Saints/SaintsEditor/Unapply")]
+        public static void SaintsEditorUnapply() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_APPLY");
+
+        #region Enable UI Toolkit Label Fix
+#if SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
+        [MenuItem("Window/Saints/SaintsEditor/Enable UI Toolkit Label Fix")]
+        public static void SaintsEditorTryFixUIToolkit() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE");
+
+#if SAINTSFIELD_UI_TOOLKIT_DISABLE
+        [MenuItem("Window/Saints/SaintsEditor/Enable UI Toolkit Label Fix", true)]
+        public static bool SaintsEditorTryFixUIToolkitEnabled() => false;
+#endif
+
+#else
+        [MenuItem("Window/Saints/SaintsEditor/Disable UI Toolkit Label Fix")]
+        public static void SaintsEditorTryFixUIToolkit() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE");
+#if SAINTSFIELD_UI_TOOLKIT_DISABLE
+        [MenuItem("Window/Saints/SaintsEditor/Disable UI Toolkit Label Fix", true)]
+        public static bool SaintsEditorTryFixUIToolkitEnabled() => false;
+#endif
+
+#endif
+        #endregion
+
+        #region IMGUI Constant Repaint
+#if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
+        [MenuItem("Window/Saints/SaintsEditor/Enable IMGUI Constant Repaint")]
+        public static void SaintsEditorIMGUIConstantRepaint() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
+#else
+        [MenuItem("Window/Saints/SaintsEditor/Disable IMGUI Constant Repaint")]
+        public static void SaintsEditorIMGUIConstantRepaint() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
+#endif
+        #endregion
+#else
+        [MenuItem("Window/Saints/Apply SaintsEditor")]
+        public static void ApplySaintsEditor() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_APPLY");
+#endif
+
+        #endregion
+
 
         // ReSharper disable once UnusedMember.Local
         private static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)

@@ -38,6 +38,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public void Add(string groupPath, ISaintsRenderer renderer)
         {
+            // ReSharper disable once ReplaceSubstringWithRangeIndexer
             string lastId = groupPath.Substring(groupPath.LastIndexOf('/') + 1);
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -49,7 +50,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
             if(!_groupIdToRenderer.TryGetValue(lastId, out List<ISaintsRenderer> renderers))
             {
                 _groupIdToRenderer[lastId] = renderers = new List<ISaintsRenderer>();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                 Debug.Log($"Add Key: {lastId} of {groupPath}");
+#endif
                 _orderedKeys.Add(lastId);
             }
 
@@ -70,6 +73,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_titleLabelStyle == null)
             {
                 _titleLabelStyle = new GUIStyle(GUI.skin.label)
@@ -194,10 +198,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public VisualElement CreateVisualElement()
         {
+            const int radius = 3;
+
             Texture2D dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
             Texture2D dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
 
-            Dictionary<string, VisualElement> fieldToVisualElement = new Dictionary<string, VisualElement>();
+            Dictionary<string, List<VisualElement>> fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
             string curTab = null;
 
             VisualElement titleRow = new VisualElement
@@ -232,6 +238,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 })
                 .ToArray();
 
+            // ReSharper disable once ConvertToLocalFunction
             Action<string> switchTab = tab =>
             {
                 foreach (ToolbarToggle toolbarToggle in toolbarToggles)
@@ -239,10 +246,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     toolbarToggle.SetValueWithoutNotify(toolbarToggle.text == tab);
                 }
 
-                foreach((string groupPath, VisualElement visualElement) in fieldToVisualElement)
+                foreach((string groupPath, List<VisualElement> visualElements) in fieldToVisualElement)
                 {
                     bool display = tab == null || groupPath == tab;
-                    visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
+                    visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);
                 }
             };
 
@@ -261,6 +268,22 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 });
             }
 
+            VisualElement body = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexDirection = _eLayout.HasFlag(ELayout.Horizontal)? FlexDirection.Row :FlexDirection.Column,
+                },
+            };
+            if (_eLayout.HasFlag(ELayout.Background))
+            {
+                body.style.paddingRight = 4;
+                body.style.paddingTop = 1;
+                body.style.paddingBottom = 3;
+            }
+
+            // ReSharper disable once ConvertToLocalFunction
             Action<bool> foldoutAction = show =>
             {
                 if (show)
@@ -277,19 +300,44 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         toolbar.style.display = DisplayStyle.None;
                     }
-                    foreach (VisualElement visualElement in fieldToVisualElement.Values)
+                    foreach (List<VisualElement> visualElements in fieldToVisualElement.Values)
                     {
-                        visualElement.style.display = DisplayStyle.None;
+                        visualElements.ForEach(visualElement => visualElement.style.display = DisplayStyle.None);
                     }
                 }
             };
 
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
-                Label title = new Label(_groupPath.Split('/').Last());
+                Label title = new Label(_groupPath.Split('/').Last())
+                {
+                    style =
+                    {
+                        unityFontStyleAndWeight = FontStyle.Bold,
+                        paddingLeft = 5,
+                        paddingTop = 2,
+                        paddingBottom = 2,
+                        borderTopLeftRadius = radius,
+                        borderTopRightRadius = radius,
+                    },
+                };
                 if(_eLayout.HasFlag(ELayout.TitleOut))
                 {
-                    title.style.backgroundColor = EColor.Gray.GetColor();
+                    if(_eLayout.HasFlag(ELayout.Background))
+                    {
+                        // boxed
+                        title.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
+                        title.style.borderBottomColor = EColor.MidnightAsh.GetColor();
+                    }
+                    else
+                    {
+                        // separator
+                        title.style.borderBottomColor = EColor.EditorSeparator.GetColor();
+                        title.style.paddingBottom = 1;
+                        title.style.marginBottom = 2;
+                    }
+
+                    title.style.borderBottomWidth = 1f;
                 }
                 titleRow.Add(title);
             }
@@ -306,8 +354,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
                 if(_eLayout.HasFlag(ELayout.TitleOut))
                 {
-                    foldout.style.backgroundColor = new Color(53f/255, 53f/255, 53f/255, 1f);
-                    foldout.style.borderTopLeftRadius = foldout.style.borderTopRightRadius = 3;
+                    if(_eLayout.HasFlag(ELayout.Background))
+                    {
+                        foldout.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
+                    }
+                    else
+                    {
+                        foldout.style.borderBottomColor = EColor.EditorSeparator.GetColor();
+                        foldout.style.borderBottomWidth = 1f;
+                    }
                 }
                 foldout.RegisterValueChangedCallback(evt => foldoutAction(evt.newValue));
 
@@ -363,20 +418,24 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 titleRow.Add(toolbar);
             }
 
-            VisualElement body = new VisualElement
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    flexDirection = _eLayout.HasFlag(ELayout.Horizontal)? FlexDirection.Row :FlexDirection.Column,
-                },
-            };
-
             foreach ((string groupPath, ISaintsRenderer renderer) in _renderers)
             {
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
                 string groupId = groupPath.Substring(groupPath.LastIndexOf('/') + 1);
-                VisualElement fieldElement = fieldToVisualElement[groupId] = renderer.CreateVisualElement();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+                Debug.Log($"add item@{groupPath}: {renderer}");
+#endif
+                VisualElement fieldElement = renderer.CreateVisualElement();
+                // if(_eLayout.HasFlag(ELayout.Background))
+                // {
+                //     fieldElement.style.marginRight = 4;
+                // }
+
+                if(!fieldToVisualElement.TryGetValue(groupId, out List<VisualElement> visualElements))
+                {
+                    fieldToVisualElement[groupId] = visualElements = new List<VisualElement>();
+                }
+                visualElements.Add(fieldElement);
                 body.Add(fieldElement);
             }
 
@@ -385,12 +444,24 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 style =
                 {
                     flexGrow = 1,
+                    borderTopLeftRadius = radius,
+                    borderTopRightRadius = radius,
+                    borderBottomLeftRadius = radius,
+                    borderBottomRightRadius = radius,
                 },
             };
 
             if(_eLayout.HasFlag(ELayout.Background))
             {
                 root.style.backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f);
+                root.style.borderTopWidth = 1;
+                root.style.borderLeftWidth = 1;
+                root.style.borderRightWidth = 1;
+                root.style.borderBottomWidth = 1;
+                root.style.borderLeftColor = EColor.MidnightAsh.GetColor();
+                root.style.borderRightColor = EColor.MidnightAsh.GetColor();
+                root.style.borderTopColor = EColor.MidnightAsh.GetColor();
+                root.style.borderBottomColor = EColor.MidnightAsh.GetColor();
             }
 
             root.Add(titleRow);
@@ -400,7 +471,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 // ReSharper disable once ConvertToLocalFunction
                 EventCallback<AttachToPanelEvent> switchOnAttack = null;
-                switchOnAttack = evt =>
+                switchOnAttack = _ =>
                 {
                     root.UnregisterCallback(switchOnAttack);
                     toolbarToggles[0].value = true;
@@ -408,11 +479,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 root.RegisterCallback(switchOnAttack);
             }
 
-            root.RegisterCallback<DetachFromPanelEvent>(_ =>
-            {
-                UnityEngine.Object.DestroyImmediate(dropdownIcon);
-                UnityEngine.Object.DestroyImmediate(dropdownRightIcon);
-            });
+            // root.RegisterCallback<DetachFromPanelEvent>(_ =>
+            // {
+            //     UnityEngine.Object.DestroyImmediate(dropdownIcon);
+            //     UnityEngine.Object.DestroyImmediate(dropdownRightIcon);
+            // });
 
             return root;
         }

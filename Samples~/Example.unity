@@ -4582,6 +4582,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0c5ab3f94ba447bb86e31ca29224a2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  titledItem1: 
+  titledItem2: 
+  titledBoxItem1: 
+  titledBoxItem2: 
+  foldoutItem1: 
+  foldoutItem2: 
+  tab1Item1: 
+  tab1Item2: 
+  tab2Item1: 
+  tab2Item2: 
+  tab3Item1: 
+  tab3Item2: 
+  nestedOne: 0
+  nestedTwo: 0
+  nestedThree: 0
+  nestedFour: 0
+  nestedFive: 0
+  unlabeledBoxItem1: 0
+  unlabeledBoxItem2: 0
+  foldoutInABoxItem1: 0
+  foldoutInABoxItem2: 0
   hv1Item1: 
   hv1Item2: 
   hv2Item1: 
@@ -4590,6 +4611,10 @@ MonoBehaviour:
   hv2Item4: 
   hv3Item1: 
   hv3Item2: 
+  buggy: UI Toolkit
+  buggy1: 
+  buggy2: 
+  buggy3: 
 --- !u!1 &1963263914
 GameObject:
   m_ObjectHideFlags: 0

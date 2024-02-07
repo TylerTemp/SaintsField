@@ -40,6 +40,7 @@ namespace SaintsField
         // this is extended from Unity UI Toolkit: ProgressBar
         CharcoalGray,  // progressBar background
         OceanicSlate,  // progressBar fill
+        MidnightAsh,  // box border
 
 #if UNITY_EDITOR
         // this is dynamic color
@@ -111,6 +112,8 @@ namespace SaintsField
                     return Colors.GetColorByName("charcoalgray");
                 case EColor.OceanicSlate:
                     return Colors.GetColorByName("oceanicslate");
+                case EColor.MidnightAsh:
+                    return Colors.GetColorByName("midnightash");
 #if UNITY_EDITOR
                 case EColor.EditorSeparator:
                     return Colors.GetColorByName("editorseparator");

@@ -1,11 +1,16 @@
+## 2.1.1 ##
+
+1.  `SaintsEditor` now supports Layout (Foldout, Tab, GropBox, TitledBox etc) to group several fields together
+2.  Fix incorrect width condition check for UI Toolkit when trying to fix Unity's labelWidth issue.
+
 ## 2.1.0 ##
 
 1.  **Breaking Changes**: rename `UnsaintlyEditor` to `SaintsEditor`
 2.  `SatinsEditor` now supports `DOTweenPlay` to preview DOTween without entering play mode
 3.  Add `Windows/Saints` menu for quick function toggle
 4.  **Breaking Changes**: rename `InfoBox`'s `contentIsCallback` to `isCallback`
-5.  **Breaking Changes**: General Buttons rename parameter `buttonLabelIsCallback` to `isCallback` 
-6.  General Buttons now will use function name as label when you omit the `buttonLabel` parameter 
+5.  **Breaking Changes**: General Buttons rename parameter `buttonLabelIsCallback` to `isCallback`
+6.  General Buttons now will use function name as label when you omit the `buttonLabel` parameter
 
 ## 2.0.12 ##
 
