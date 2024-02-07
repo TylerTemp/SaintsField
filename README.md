@@ -88,7 +88,7 @@ UI Toolkit supports are experimental, you can disable it by `Window` - `Saints` 
     *   `"Assets/Editor Default Resources/SaintsField/"`  (You can override things here)
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
-    *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (useing [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
+    *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (using [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
 
     for `color` it supports:
 
