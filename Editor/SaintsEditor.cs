@@ -344,9 +344,9 @@ namespace SaintsField.Editor
                     each => each.Key,
                     each =>
 #if SAINTSFIELD_DOTWEEN
-                        (ISaintsRendererGroup)(each.Value.isDOTween
-                            ? new DOTweenPlayGroup(serializedObject.targetObject)
-                            : new SaintsRendererGroup(each.Key, each.Value.eLayout))
+                        each.Value.isDOTween
+                            ? (ISaintsRendererGroup)new DOTweenPlayGroup(serializedObject.targetObject)
+                            : new SaintsRendererGroup(each.Key, each.Value.eLayout)
 #else
                         (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value.eLayout)
 #endif
