@@ -24,7 +24,11 @@ namespace SaintsField.Editor.Utils
             float resolvedWidth = label.resolvedStyle.width;
             // if(curLenght.value != autoLength)
             // don't ask me why we need to compare with 0, ask Unity...
-            if(!(curLenght.value.IsAuto() || curLenght.value == 0) && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
+            if(
+                // !(curLenght.value.IsAuto()  // IsAuto() is not available in 2021.3.0f1
+                !(curLenght.keyword == StyleKeyword.Auto
+                  || curLenght.value == 0)
+                && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
             {
                 // Debug.Log($"try fix {label.style.width}({curLenght.value.IsAuto()}); {resolvedWidth > 0} {resolvedWidth}");
                 label.style.width = autoLength;
