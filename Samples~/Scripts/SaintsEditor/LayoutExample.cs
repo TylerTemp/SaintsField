@@ -124,5 +124,23 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [Ordered]
         [Layout("Root/Buggy/H", ELayout.Horizontal)]
         public string buggy1, buggy2, buggy3;
+
+        [Ordered]
+        [Layout("Title+Tab", ELayout.Tab | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
+        [Layout("Title+Tab/g1")]
+        public string titleTabG11, titleTabG21;
+
+        [Ordered]
+        [Layout("Title+Tab/g2")]
+        public string titleTabG12, titleTabG22;
+
+        [Ordered]
+        [Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
+        [Layout("All Together/g1")]
+        public string allTogetherG11, allTogetherG21;
+
+        [Ordered]
+        [Layout("All Together/g2")]
+        public string allTogetherG12, allTogetherG22;
     }
 }

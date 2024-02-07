@@ -342,9 +342,14 @@ namespace SaintsField.Editor
             Dictionary<string, ISaintsRendererGroup> layoutKeyToGroup = layoutKeyToInfo
                 .ToDictionary(
                     each => each.Key,
-                    each => (ISaintsRendererGroup)(each.Value.isDOTween
-                        ? new DOTweenPlayGroup(serializedObject.targetObject)
-                        : new SaintsRendererGroup(each.Key, each.Value.eLayout))
+                    each =>
+#if SAINTSFIELD_DOTWEEN
+                        (ISaintsRendererGroup)(each.Value.isDOTween
+                            ? new DOTweenPlayGroup(serializedObject.targetObject)
+                            : new SaintsRendererGroup(each.Key, each.Value.eLayout))
+#else
+                        (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value.eLayout)
+#endif
                 );
 
             Dictionary<string, ISaintsRendererGroup> unconnectedSubLayoutKeyToGroup = layoutKeyToGroup

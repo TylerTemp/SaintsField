@@ -5,9 +5,11 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+using UnityEditor.UIElements;
+#endif
 
 namespace SaintsField.Editor.Playa.RendererGroup
 {
@@ -87,7 +89,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 ? GUI.skin.box
                 : GUIStyle.none;
             IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
-                ? new EditorGUILayout.HorizontalScope(fullBoxStyle)
+                ? (IDisposable)(new EditorGUILayout.HorizontalScope(fullBoxStyle))
                 : new EditorGUILayout.VerticalScope(fullBoxStyle);
 
             using (disposable)
@@ -107,6 +109,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     //  v      | v     | x   | [f] title   | x
                     //  v      | x     | v   | x           | [f] tab
                     //  v      | x     | x   | [f] title   | x
+                    //  x      | v     | v   | title       | tab
                     //  x      | v     | v   | title       | tab
                     //  x      | v     | x   | title       | x
                     //  x      | x     | v   | x           | tab
@@ -153,18 +156,28 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             _foldout = EditorGUILayout.Foldout(_foldout, GUIContent.none, true, _foldoutSmallStyle);
-                            _curSelected = GUILayout.Toolbar(_curSelected, _orderedKeys.ToArray());
+                            using(var changed = new EditorGUI.ChangeCheckScope())
+                            {
+                                _curSelected = GUILayout.Toolbar(_curSelected, _orderedKeys.ToArray());
+                                if (changed.changed)
+                                {
+                                    _foldout = true;
+                                }
+                            }
                         }
                     }
 
                     // tabs
+                    //  x      | v     | v   | title       | tab
                     //  v      | v     | v   | [f] title   | tab
                     //  x      | v     | v   | title       | tab
                     //  x      | x     | v   | x           | tab
-                    if((hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
+                    if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
                     {
-                        if(hasFoldout && _foldout)
+                        // Debug.Log($"Draw tabs, hasFoldout={hasFoldout}, _foldout={_foldout}");
+                        if((hasFoldout && _foldout) || !hasFoldout)
                         {
+                            // Debug.Log($"Draw tabs, all = {string.Join(",", _orderedKeys)}");
                             _curSelected = GUILayout.Toolbar(_curSelected, _orderedKeys.ToArray());
                         }
                     }
@@ -407,10 +420,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
 
             // tabs
-            if((hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
+            if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
             {
                 // TODO: 2023_3+ these is a TabView can be used
-
                 foreach (ToolbarToggle eachTab in toolbarToggles)
                 {
                     toolbar.Add(eachTab);
