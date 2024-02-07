@@ -1849,7 +1849,7 @@ So here is the `SaintsEditor`. It provides the minimal functions I think that is
 2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
 3.  `SaintsEditor`
 
-    *   `Layout` like markup attributes, but with less appearance functions
+    *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). However, it does not have a `Scope` for convience coding.
     *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
