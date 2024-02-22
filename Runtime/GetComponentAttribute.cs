@@ -8,6 +8,7 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
+        // ReSharper disable once InconsistentNaming
         public readonly Type CompType;
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")

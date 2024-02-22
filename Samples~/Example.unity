@@ -1991,12 +1991,12 @@ MonoBehaviour:
   root2: 
   firstInt: 0
   secondInt: 0
-  rootAfterGroupp: 
+  rootAfterGroup: 
   sub2ToRoot: 0
-  sub1Item1: 
+  sub2Item1: 
   sub2Group1: 0
   sub2Group2: 0
-  sub1ItemAfterGroup: 
+  sub2ItemAfterGroup: 
 --- !u!114 &827518003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2013,7 +2013,7 @@ MonoBehaviour:
   root2: 
   firstInt: 0
   secondInt: 0
-  rootAfterGroupp: 
+  rootAfterGroup: 
   sub1ToRoot: 0
   sub1Item1: 
   sub1Group1: 0
@@ -2035,7 +2035,7 @@ MonoBehaviour:
   root2: 
   firstInt: 0
   secondInt: 0
-  rootAfterGroupp: 
+  rootAfterGroup: 
 --- !u!1 &847311490
 GameObject:
   m_ObjectHideFlags: 0
@@ -4444,6 +4444,51 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1830778823
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1830778825}
+  - component: {fileID: 1830778824}
+  m_Layer: 0
+  m_Name: GetComponentByPath
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1830778824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830778823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2f998a04624f3793ca59ff408bb0c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentGameObject: {fileID: 0}
+--- !u!4 &1830778825
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830778823}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 62
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1849519773
 GameObject:
   m_ObjectHideFlags: 0
