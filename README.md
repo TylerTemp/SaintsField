@@ -1454,7 +1454,10 @@ public class RequiredExample: MonoBehaviour
 
 Validate the input of the field when the value changes.
 
-*   `string callback` is the callback function to validate the data. note: return type is **`string`** not bool! return a null or empty string for valid, otherwise, the string will be used as the error message
+*   `string callback` is the callback function to validate the data. note: 
+
+    1.  If return type is **`string`**, then `null` or empty string for valid, otherwise, the string will be used as the error message
+    2.  If return type is bool, then `true` for valid, `false` for invalid with message "\`{label}\` is invalid`"
 
 *   AllowMultiple: Yes
 
@@ -1465,6 +1468,16 @@ public class ValidateInputExample : MonoBehaviour
     public int _value;
 
     private string OnValidateInput() => _value < 0 ? $"Should be positive, but gets {_value}" : null;
+    
+    // property validate
+    [ValidateInput(nameof(boolValidate))]
+    public bool boolValidate;
+
+    // bool callback
+    [ValidateInput(nameof(BoolCallbackValidate))]
+    public string boolCallbackValidate;
+
+    private bool BoolCallbackValidate() => boolValidate;
 }
 ```
 

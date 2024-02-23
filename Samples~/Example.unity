@@ -597,7 +597,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6830dc4b87389ed4daf7678ce72b922f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: -15
+  value: -12
+  boolValidate: 1
+  boolCallbackValidate: 
 --- !u!4 &272774834
 Transform:
   m_ObjectHideFlags: 0
@@ -3191,29 +3193,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nativeRange: 2.1
   nativeRangeHandled: 1.05
-  naCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  naCurveHandled:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  inputAxis: 
-  naProgressBar: 30
-  naNativeProgressBar: 30
-  sfProgressBar: 0
-  firstInt: 0
-  sepHere: 0
-  secondInt: 0
-  nest:
-    nest2:
-      saints: {fileID: 0}
-      na: {fileID: 0}
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0

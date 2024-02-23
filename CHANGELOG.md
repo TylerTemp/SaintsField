@@ -1,3 +1,9 @@
+## 2.1.3 ##
+
+1.  `ValidateInput` now also support for `bool` result.
+2.  `ValidateInput` now will continuously validate the input rather than check on value changed.
+3.  Fix `<label/>` not work in rich text when working with NaughtyAttributes.
+
 ## 2.1.2 ##
 
 Add `GetComponentByPath`. Now you can auto sign a component with hierarchy by path, with index filter support.

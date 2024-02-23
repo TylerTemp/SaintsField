@@ -18,65 +18,29 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         // ensure first time render will check the value
-        private bool _againRender;
+        // private bool _againRender;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
         {
-            if (!valueChanged)
-            {
-                if(_againRender)
-                {
-                    return true;
-                }
-            }
+            // if (!valueChanged)
+            // {
+            //     if(_againRender)
+            //     {
+            //         return true;
+            //     }
+            // }
 
-            _againRender = true;
+            // _againRender = true;
 
-            string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
-            // object target = GetParentTarget(property);
-
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            MethodInfo methodInfo = parent.GetType().GetMethod(callback, bindAttr);
-            if (methodInfo == null)
-            {
-                _error = $"no method found `{callback}` on `{parent}`";
-                return true;
-            }
-
-            _error = "";
-
-            ParameterInfo[] methodParams = methodInfo.GetParameters();
-            Debug.Assert(methodParams.All(p => p.IsOptional));
-
-            string validateResult;
             if(valueChanged)
             {
                 property.serializedObject.ApplyModifiedProperties();
             }
             // Debug.Log($"call on {property.intValue}");
-            try
-            {
-                validateResult = (string)methodInfo.Invoke(parent, methodParams.Select(p => p.DefaultValue).ToArray());
-            }
-            catch (TargetInvocationException e)
-            {
-                Debug.Assert(e.InnerException != null);
-                _error = e.InnerException.Message;
-                Debug.LogException(e);
-                return true;
-            }
-            catch (Exception e)
-            {
-                _error = e.Message;
-                Debug.LogException(e);
-                return true;
-            }
 
-            // Debug.Log($"get: {validateResult}");
-
-            _error = string.IsNullOrEmpty(validateResult) ? "" : validateResult;
+            string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
+            _error = CallValidateMethod(callback, label.text, parent);
 
             return true;
         }
@@ -112,47 +76,99 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            object parent, object newValue)
+        // protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        //     object parent, object newValue)
+        // {
+        //     string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
+        //     string validateResult = CallValidateMethod(callback, property.displayName, parent);
+        //
+        //     HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+        //     // ReSharper disable once InvertIf
+        //     if(helpBox.text != validateResult)
+        //     {
+        //         helpBox.style.display = string.IsNullOrEmpty(validateResult) ? DisplayStyle.None : DisplayStyle.Flex;
+        //         helpBox.text = validateResult;
+        //     }
+        // }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, object parent)
         {
             string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
-
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            MethodInfo methodInfo = parent.GetType().GetMethod(callback, bindAttr);
-            if (methodInfo == null)
-            {
-                Debug.LogError($"no method found `{callback}` on `{parent}`");
-                return;
-            }
-
-            ParameterInfo[] methodParams = methodInfo.GetParameters();
-            Debug.Assert(methodParams.All(p => p.IsOptional));
-
-            string validateResult = "";
-            try
-            {
-                validateResult = (string)methodInfo.Invoke(parent, methodParams.Select(p => p.DefaultValue).ToArray());
-            }
-            catch (TargetInvocationException e)
-            {
-                Debug.Assert(e.InnerException != null);
-                Debug.LogException(e);
-                return;
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                return;
-            }
+            string validateResult = CallValidateMethod(callback, property.displayName, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-            helpBox.style.display = string.IsNullOrEmpty(validateResult) ? DisplayStyle.None : DisplayStyle.Flex;
-            helpBox.text = validateResult;
+            // ReSharper disable once InvertIf
+            if(helpBox.text != validateResult)
+            {
+                helpBox.style.display = string.IsNullOrEmpty(validateResult) ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = validateResult;
+            }
         }
 
         #endregion
 
 #endif
+
+        private static string CallValidateMethod(string callback, string label, object parent)
+        {
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(parent.GetType(), callback);
+
+            if (found.getPropType == ReflectUtils.GetPropType.NotFound)
+            {
+                return $"No field or method named `{callback}` found on `{parent}`";
+            }
+
+            object validateResult;
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
+            {
+                validateResult = propertyInfo.GetValue(parent);
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
+            {
+                validateResult = foundFieldInfo.GetValue(parent);
+            }
+            else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
+            {
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                Debug.Assert(methodParams.All(p => p.IsOptional));
+                // Debug.Assert(methodInfo.ReturnType == typeof(bool));
+                try
+                {
+                    validateResult = methodInfo.Invoke(parent, methodParams.Select(p => p.DefaultValue).ToArray());
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.Assert(e.InnerException != null);
+                    Debug.LogException(e);
+                    return e.InnerException.Message;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return e.Message;
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            }
+
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (validateResult)
+            {
+                case bool boolValue:
+                    return boolValue? "" : $"`{label}` is invalid";
+                case string stringContent:
+                    return stringContent;
+                case null:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(validateResult), validateResult, null);
+            }
+        }
     }
 }

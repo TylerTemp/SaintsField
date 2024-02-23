@@ -11,5 +11,13 @@ namespace SaintsField.Samples.Scripts
 
         private string OnValidateInput() => value < 0 ? $"Should be positive, but gets {value}" : null;
         private string OnValidateInput2() => value < -10 ? $"Way too low" : null;
+
+        [ValidateInput(nameof(boolValidate))]
+        public bool boolValidate;
+
+        [ValidateInput(nameof(BoolCallbackValidate))]
+        public string boolCallbackValidate;
+
+        private bool BoolCallbackValidate() => boolValidate;
     }
 }
