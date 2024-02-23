@@ -321,7 +321,7 @@ namespace SaintsField.Editor.Drawers
         {
             bool isGameObject = type == typeof(GameObject);
             return IteratePath(new Queue<GetComponentByPathAttribute.Token>(tokens), new[] { current })
-                .Select(each => (Object)(isGameObject ? each.gameObject : each.GetComponent(type)))
+                .Select(each => isGameObject ? (Object)each.gameObject : each.GetComponent(type))
                 .FirstOrDefault(each => each != null);
         }
 

@@ -1710,7 +1710,7 @@ public class GetComponentByPathExample: MonoBehaviour
 }
 ```
 
-![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/7bbc4dd1-8625-495b-bae5-e6f401f72cde)
+![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/a0fdca83-0c96-4d57-9c9d-989efbac0f07)
 
 #### `GetPrefabWithComponent` ####
 

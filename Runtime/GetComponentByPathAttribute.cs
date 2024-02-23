@@ -166,7 +166,7 @@ namespace SaintsField
                 processPath = $"/{path}";
             }
 
-            Match[] matches = Regex.Matches(processPath, @"(//?)([^/]+)").ToArray();
+            MatchCollection matches = Regex.Matches(processPath, @"(//?)([^/]+)");
             foreach (Match match in matches)
             {
                 string slash = match.Groups[1].Value;
