@@ -1660,7 +1660,7 @@ Automatically sign a component to a field by a given path.
     *   `EGetComp.ForceResign`: when the target changed (e.g. you delete/create one), automatically resign the new correct component.
     *   `EGetComp.NoResignButton`: do not display a resign button when the target mismatches.
 
-*   `string paths...""`
+*   `string paths...`
 
     Paths to search.
 
@@ -1686,8 +1686,9 @@ For example:
 *   `.//sth`: any descendant child under current. (descendant::sth)
 *   `..//sth`: first go to parent, then find the direct child named `sth`
 *   `/sth`: top level node in current scene named `sth`
-*   `//sth`: first go to top level, then find the direct child named `sth`.
+*   `//sth`: first go to top level, then find the direct child named `sth`
 *   `///sth`: first go to top level, then find any node named `sth`
+*   `./get/sth[1]`: the child named `get` of current node, then the second node named `sth` in the direct children list of `get`
 
 ```csharp
 public class GetComponentByPathExample: MonoBehaviour
