@@ -12,6 +12,8 @@ Developed by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github
 
 Unity: 2019.1 or higher
 
+(Yes, the project name comes from, of course, [Saints Row 2](https://saintsrow.fandom.com/wiki/Saints_Row_2))
+
 ## Highlights ##
 
 1.  Works on deep nested fields!

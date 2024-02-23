@@ -2,7 +2,6 @@
 
 Add `GetComponentByPath`. Now you can auto sign a component with hierarchy by path, with index filter support.
 
-
 ## 2.1.1 ##
 
 1.  `SaintsEditor` now supports Layout (Foldout, Tab, GropBox, TitledBox etc) to group several fields together
