@@ -5,8 +5,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
     public class Issue322 : MonoBehaviour
     {
         // work with NaughtyAttributes
-        [RichLabel("<color=lime><label/></color>")]
+        [RichLabel("<color=lime><label/>")]
+#if SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES
         [NaughtyAttributes.ResizableTextArea, NaughtyAttributes.Label(" ")]
+#endif
         public string thisIsAVariable;
 
         // work alone
