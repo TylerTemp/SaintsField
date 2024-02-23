@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace SaintsField
 {
+    [AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
     public class GetComponentByPathAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
@@ -25,6 +26,7 @@ namespace SaintsField
 
         public struct Token
         {
+            // ReSharper disable InconsistentNaming
             public Locate Locate;
             public string Node;
             // this is not index, but at this point it's OK.
@@ -32,6 +34,7 @@ namespace SaintsField
             // at this point just number, last()
             // empty string for no index (do NOT use null)
             public string Index;
+            // ReSharper enable InconsistentNaming
 
 #if UNITY_EDITOR
             public override string ToString() => $"{Locate}::{EditorNodeToString(Node)}::{Index}";
@@ -52,16 +55,19 @@ namespace SaintsField
         }
 
         // ReSharper disable InconsistentNaming
-        public readonly Type CompType;
+        // public readonly Type CompType;
         public readonly IReadOnlyList<IReadOnlyList<Token>> Paths;
+        public readonly IReadOnlyList<string> RawPaths;
         public readonly bool ForceResign;
         public readonly bool ResignButton = true;
         // ReSharper enable InconsistentNaming
 
         public GetComponentByPathAttribute(string path, params string[] paths)
         {
-            Paths = paths
+            RawPaths = paths
                 .Prepend(path)
+                .ToArray();
+            Paths = RawPaths
                 .Select(each =>
                 {
                     IReadOnlyList<Token> result = ParsePath(each).ToArray();
@@ -79,17 +85,17 @@ namespace SaintsField
             ResignButton = !config.HasFlag(EGetComp.NoResignButton);
         }
 
-        public GetComponentByPathAttribute(Type compType, EGetComp config, string path, params string[] paths): this(config, path, paths)
-        {
-            CompType = compType;
-        }
+        // public GetComponentByPathAttribute(Type compType, EGetComp config, string path, params string[] paths): this(config, path, paths)
+        // {
+        //     CompType = compType;
+        // }
+        //
+        // public GetComponentByPathAttribute(EGetComp config, Type compType, string path, params string[] paths): this(config, path, paths)
+        // {
+        //     CompType = compType;
+        // }
 
-        public GetComponentByPathAttribute(EGetComp config, Type compType, string path, params string[] paths): this(config, path, paths)
-        {
-            CompType = compType;
-        }
-
-        public static IEnumerable<Token> ParsePath(string path)
+        private static IEnumerable<Token> ParsePath(string path)
         {
             // "./sth" equals "sth", relative, so, (child::sth)
 
@@ -100,25 +106,58 @@ namespace SaintsField
 
             // ".." means parent. "a/../b (child::a, :parent, child::b)
 
-            // "/sth" means from root (:root, child::sth), equals `/./sth`
-            // "//sth" means `sth` directly under root (:root, child::sth); which is `/` + `/sth`
+            // "/sth" means from root (root::sth)
+            // "//sth" means `sth` directly under root (:root, child::sth), equals `/./sth`
             // "///sth" means `sth` anywhere under root (:root, descendant::sth), equals `/.//sth`
 
             // string processPath = (path.StartsWith("./") || path.StartsWith("/"))
             //     ? path
             //     : $"./{path}";
 
+            // const string slashContentPattern = @"(//?)([^/]+)";
+
             string processPath;
             if (path.StartsWith("/"))
             {
+                // /sth[index] => root::sth::[index]
+                // //sth[index] => root::::, /sth
+                // ///sth[index] => root::::, //sth
+                // /./sth[index] => root::::, /.
+                Match rootMatch = Regex.Match(path, $"^/([^/]+)");
+                string rootNode = "*";
+                string rootIndex = "";
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                string sub = path.Substring(1);
+                if (rootMatch.Success)
+                {
+                    string rootContent = rootMatch.Groups[1].Value;
+                    Match rootContentMatch = ContentSquareBracket.Match(rootContent);
+                    if (rootContentMatch.Success)
+                    {
+                        rootNode = rootContentMatch.Groups[1].Value;
+                        rootIndex = rootContentMatch.Groups[2].Value.Trim();
+                    }
+                    else
+                    {
+                        rootNode = rootContent;
+                    }
+
+                    if (rootNode == ".")
+                    {
+                        rootNode = "*";
+                    }
+
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                    sub = path.Substring(rootMatch.Value.Length);
+                }
+
                 yield return new Token
                 {
                     Locate = Locate.Root,
-                    Node = "/",
-                    Index = "",
+                    Node = rootNode,
+                    Index = rootIndex,
                 };
-                // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                string sub = path.Substring(1);
+
                 processPath = sub.StartsWith("/")? sub: $"/{sub}";
             }
             else

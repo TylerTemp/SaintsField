@@ -25,6 +25,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
+            int index,
             bool valueChanged, FieldInfo info, object parent)
         {
             _error = BindButtonEvent(property, saintsAttribute, parent);

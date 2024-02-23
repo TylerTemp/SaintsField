@@ -22,6 +22,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
+            int index,
             bool valueChanged, FieldInfo info, object parent)
         {
             (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
@@ -109,7 +110,10 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            property.objectReferenceValue = result;
+            if(!ReferenceEquals(property.objectReferenceValue, result))
+            {
+                property.objectReferenceValue = result;
+            }
             return ("", result);
         }
 
@@ -117,8 +121,7 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NamePlaceholder(SerializedProperty property, int index) =>
-            $"{property.propertyPath}_{index}__GetComponentInScene";
+        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetComponentInScene";
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -128,7 +131,7 @@ namespace SaintsField.Editor.Drawers
             Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
             (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
-            HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if (error != helpBox.text)
             {
                 helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
@@ -153,7 +156,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     display = DisplayStyle.None,
                 },
-                name = NamePlaceholder(property, index),
+                name = NameHelpBox(property, index),
             };
         }
         #endregion

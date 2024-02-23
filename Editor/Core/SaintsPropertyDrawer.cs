@@ -340,7 +340,6 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
             _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
 
-
             float aboveHeight = 0;
             float belowHeight = 0;
 
@@ -1230,6 +1229,7 @@ namespace SaintsField.Editor.Core
                     // Debug.Log($"DrawPostField, valueChange={_valueChange}");
                     bool isActive = drawer.DrawPostFieldImGui(eachRect, property, label,
                         attributeWithIndex.SaintsAttribute,
+                        attributeWithIndex.Index,
                         PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result) && result.Changed,
                         fieldInfo,
                         parent);
@@ -1310,6 +1310,7 @@ namespace SaintsField.Editor.Core
                 }
 
                 foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>
+                             // ReSharper disable once UseDeconstruction
                              groupedDrawerInfo in groupedDrawers)
                 {
                     string groupBy = groupedDrawerInfo.Key;
@@ -1941,7 +1942,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
         {
             return false;
         }

@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers
         private bool _againRender;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
         {
             if (!valueChanged)
             {

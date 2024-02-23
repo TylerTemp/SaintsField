@@ -59,10 +59,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.1**
+**2.1.2**
 
-1.  `SaintsEditor` now supports Layout (Foldout, Tab, GropBox, TitledBox etc) to group several fields together
-2.  Fix incorrect width condition check for UI Toolkit when trying to fix Unity's labelWidth issue.
+Add `GetComponentByPath`. Now you can auto sign a component with hierarchy by path, with index filter support.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1647,6 +1646,69 @@ public class GetComponentInSceneExample: MonoBehaviour
 ```
 
 ![get_component_in_scene](https://github.com/TylerTemp/SaintsField/assets/6391063/95a008a2-c7f8-4bc9-90f6-57c58724ebaf)
+
+#### `GetComponentByPath` ####
+
+Automatically sign a component to a field by a given path.
+
+*   (Optional)`EGetComp config`
+
+    Options are:
+
+    *   `EGetComp.ForceResign`: when the target changed (e.g. you delete/create one), automatically resign the new correct component.
+    *   `EGetComp.NoResignButton`: do not display a resign button when the target mismatches.
+
+*   `string paths...""`
+
+    Paths to search.
+
+*   AllowMultiple: Yes. But not necessary.
+
+The `path` is a bit like html's `XPath` but with less functions:
+
+Path | Meaning
+-----|---------
+`/`  | Separator. Using at start means the root of the current scene.
+`//` | Separator. Any descendant children
+`.`  | Node. Current node
+`..` | Node. Parent node
+`*`  | All nodes
+name | Node. Any nodes with this name
+`[last()]` | Index Filter. Last of results
+`[index() > 1]` | Index Filter. Node index that is greater than 1
+`[0]` | Index Filter. First node in the results
+
+For example:
+
+*   `./sth` or `sth`: direct child object of current object named `sth`
+*   `.//sth`: any descendant child under current. (descendant::sth)
+*   `..//sth`: first go to parent, then find the direct child named `sth`
+*   `/sth`: top level node in current scene named `sth`
+*   `//sth`: first go to top level, then find the direct child named `sth`.
+*   `///sth`: first go to top level, then find any node named `sth`
+
+```csharp
+public class GetComponentByPathExample: MonoBehaviour
+{
+    // starting from root, search any object with name "Dummy"
+    [GetComponentByPath("///Dummy")] public GameObject dummy;
+    // first child of current object
+    [GetComponentByPath("./*[1]")] public GameObject direct1;
+    // child of current object which has index greater than 1
+    [GetComponentByPath("./*[index() > 1]")] public GameObject directPosTg1;
+    // last child of current object
+    [GetComponentByPath("./*[last()]")] public GameObject directLast;
+    // re-sign the target if mis-match
+    [GetComponentByPath(EGetComp.NoResignButton | EGetComp.ForceResign, "./DirectSub")] public GameObject directSubWatched;
+    // without "ForceResign", it'll display a reload button if mis-match
+    // with multiple paths, it'll search from left to right
+    [GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMulti;
+    // if no match, it'll show an error message
+    [GetComponentByPath("/no", "///sth/else/../what/.//ever[last()]/goes/here")] public GameObject notExists;
+}
+```
+
+![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/7bbc4dd1-8625-495b-bae5-e6f401f72cde)
 
 #### `GetPrefabWithComponent` ####
 
