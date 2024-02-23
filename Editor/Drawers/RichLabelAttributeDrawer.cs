@@ -64,9 +64,13 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            // EditorGUI.DrawRect(position, _backgroundColor);
-            _richTextDrawer.DrawChunks(position, label, RichTextDrawer.ParseRichXml(labelXml, label.text));
-            // LabelMouseProcess(position, property);
+            string labelText = label.text;
+#if SAINTSFIELD_NAUGHYTATTRIBUTES
+            labelText = property.displayName;
+#endif
+
+            RichTextDrawer.RichTextChunk[] parsedXmlNode = RichTextDrawer.ParseRichXml(labelXml, labelText).ToArray();
+            _richTextDrawer.DrawChunks(position, label, parsedXmlNode);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,

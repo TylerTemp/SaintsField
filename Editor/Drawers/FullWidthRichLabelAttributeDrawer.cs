@@ -42,10 +42,11 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, object parent)
         {
-            return DrawImGui(position, label, saintsAttribute, parent);
+            return DrawImGui(position, property, label, saintsAttribute, parent);
         }
 
-        private Rect DrawImGui(Rect position, GUIContent label, ISaintsAttribute saintsAttribute, object parent)
+        private Rect DrawImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
 
@@ -63,7 +64,12 @@ namespace SaintsField.Editor.Drawers
 
             (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
-            _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(xml, label.text));
+            string labelText = label.text;
+#if SAINTSFIELD_NAUGHYTATTRIBUTES
+            labelText = property.displayName;
+#endif
+
+            _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(xml, labelText));
             return leftRect;
         }
 
@@ -153,7 +159,7 @@ namespace SaintsField.Editor.Drawers
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
             {
-                useRect = DrawImGui(position, label, fullWidthRichLabelAttribute, parent);
+                useRect = DrawImGui(position, property, label, fullWidthRichLabelAttribute, parent);
             }
             return _error == ""
                 ? useRect

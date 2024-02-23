@@ -167,7 +167,7 @@ namespace SaintsField.Editor.Core
 
             public override string ToString() => IsIcon
                 ? $"<ICON={Content} COLOR={IconColor}/>"
-                : Content;
+                : Content.Replace("<", "[").Replace(">", "]");
         }
 
         // e.g. prefix<icon=iconPath/>some <color=red>rich</color> <color=green><label /></color>suffix
