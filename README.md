@@ -1636,7 +1636,7 @@ public class GetComponentInChildrenExample: MonoBehaviour
 
 #### `GetComponentInParent` / `GetComponentInParents` ####
 
-Automatically sign a component to a field, if the field value is null and the component is already attached to its parent(s) GameObjects. (First one found will be used)
+Automatically sign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
 
 *   `Type compType = null`
 
