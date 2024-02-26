@@ -1,10 +1,10 @@
-﻿#if SAINTSFIELD_ADDRESSABLE
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 
 namespace SaintsField.Addressable
 {
+#if SAINTSFIELD_ADDRESSABLE
     public class AddressableAddressAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
@@ -44,5 +44,5 @@ namespace SaintsField.Addressable
                 .ToArray();
         }
     }
-}
 #endif
+}

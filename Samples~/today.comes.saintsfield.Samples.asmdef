@@ -26,6 +26,11 @@
             "name": "com.dbrizov.naughtyattributes",
             "expression": "",
             "define": "SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES"
+        },
+        {
+            "name": "com.unity.ai.navigation",
+            "expression": "",
+            "define": "SAINTSFIELD_AI_NAVIGATION"
         }
     ],
     "noEngineReferences": false

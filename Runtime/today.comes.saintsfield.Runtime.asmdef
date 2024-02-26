@@ -14,6 +14,11 @@
             "name": "com.unity.addressables",
             "expression": "",
             "define": "SAINTSFIELD_ADDRESSABLE"
+        },
+        {
+            "name": "com.unity.ai.navigation",
+            "expression": "",
+            "define": "SAINTSFIELD_AI_NAVIGATION"
         }
     ],
     "noEngineReferences": false
