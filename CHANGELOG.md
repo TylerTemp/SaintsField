@@ -1,8 +1,9 @@
 ## 2.1.3 ##
 
-1.  `ValidateInput` now also support for `bool` result.
-2.  `ValidateInput` now will continuously validate the input rather than check on value changed.
-3.  Fix `<label/>` not work in rich text when working with NaughtyAttributes.
+1.  `GetComponentInParent` / `GetComponentInParents`
+2.  `ValidateInput` now also support for `bool` result.
+3.  `ValidateInput` now will continuously validate the input rather than check on value changed.
+4.  Fix `<label/>` not work in rich text when working with NaughtyAttributes.
 
 ## 2.1.2 ##
 

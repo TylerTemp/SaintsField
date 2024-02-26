@@ -61,9 +61,12 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.2**
+**2.1.3**
 
-Add `GetComponentByPath`. Now you can auto sign a component with hierarchy by path, with index filter support.
+1.  `GetComponentInParent` / `GetComponentInParents`
+2.  `ValidateInput` now also support for `bool` result.
+3.  `ValidateInput` now will continuously validate the input rather than check on value changed.
+4.  Fix `<label/>` not work in rich text when working with NaughtyAttributes.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -541,7 +544,7 @@ Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
 Known issue:
 1.  In IMGUI, a custom drawer won't work because `PropertyDrawer` is not allowed to create an `Editor` class, thus it'll list all fields in the object. If the field itself has a custom `PropertyDrawer`, the drawer WILL be used.
-2.  In IMGUI, the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Tryng outside of the rect will make the target non-interactable.
+2.  In IMGUI, the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
 
 *   AllowMultiple: No
@@ -1206,7 +1209,7 @@ Parameters:
 *   `EColor backgroundColor=EColor.CharcoalGray`: background color
 *   `string colorCallback=null`: a callback or property name for the filler color. The function must return a `EColor`, `Color`, a name of `EColor`/`Color`, or a hex color string (starts with `#`). This will override `color` parameter.
 *   `string backgroundColorCallback=null`: a callback or property name for the background color.
-*   `string titleCallback=null`: a callback for displaying the title. The function sigunature is:
+*   `string titleCallback=null`: a callback for displaying the title. The function signature is:
 
     ```csharp
     string TitleCallback(float curValue, float min, float max, string label);
@@ -1414,7 +1417,7 @@ public class ReadOnlyGroupExample: MonoBehaviour
 
 #### `Required` ####
 
-Remide a given reference type field to be required.
+Reminding a given reference type field to be required.
 
 This will check if the field value is a `truly` value, which means:
 
@@ -1630,6 +1633,35 @@ public class GetComponentInChildrenExample: MonoBehaviour
 ```
 
 ![get_component_in_children](https://github.com/TylerTemp/SaintsField/assets/6391063/854aeefc-6456-4df2-a4a7-40a5cd5e2290)
+
+#### `GetComponentInParent` / `GetComponentInParents` ####
+
+Automatically sign a component to a field, if the field value is null and the component is already attached to its parent(s) GameObjects. (First one found will be used)
+
+*   `Type compType = null`
+
+    The component type to sign. If null, it'll use the field type.
+
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+*   AllowMultiple: No
+
+```csharp
+public class GetComponentInParentsExample: MonoBehaviour
+{
+    [GetComponentInParent] public SpriteRenderer directParent;
+    [GetComponentInParent(typeof(SpriteRenderer))] public GameObject directParentDifferentType;
+    [GetComponentInParent] public BoxCollider directNoSuch;
+
+    [GetComponentInParents] public SpriteRenderer searchParent;
+    [GetComponentInParents(typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
+    [GetComponentInParents] public BoxCollider searchNoSuch;
+}
+```
+
+![get_component_in_parents](https://github.com/TylerTemp/SaintsField/assets/6391063/02836529-1aff-4bc9-b849-203d7bdaad21)
 
 #### `GetComponentInScene` ####
 
@@ -1927,7 +1959,7 @@ So here is the `SaintsEditor`. It provides the minimal functions I think that is
 2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
 3.  `SaintsEditor`
 
-    *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). However, it does not have a `Scope` for convience coding.
+    *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). However, it does not have a `Scope` for convenience coding.
     *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
@@ -1948,7 +1980,7 @@ If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/T
 
 A method decorator to play a `DOTween` animation returned by the method.
 
-The method should not have required parameters, and need to return a `Tween` or a `Sequence` (`Sequence` is atually also a tween).
+The method should not have required parameters, and need to return a `Tween` or a `Sequence` (`Sequence` is actually also a tween).
 
 Parameters:
 
@@ -2376,7 +2408,7 @@ My (not full) test about compatibility:
 
 ### UI Toolkit ###
 
-The support for UI Toolkit is experimental. There are way too many issues with UI Toolkit that Unity does not give any guildline of how to do, and there are bugs that not fixed even in the newest Unity (Unity 2023.2.5f1 at this point)
+The support for UI Toolkit is experimental. There are way too many issues with UI Toolkit that Unity does not give any guild of how to do, and there are bugs that not fixed even in the newest Unity (Unity 2023.2.5f1 at this point)
 
 If you encounter any issue, please report it to the issue page. However, there are many issues that is just not fixable:
 
