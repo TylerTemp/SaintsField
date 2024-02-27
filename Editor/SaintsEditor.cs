@@ -23,7 +23,7 @@ namespace SaintsField.Editor
 {
     public class SaintsEditor: UnityEditor.Editor
     {
-        private MonoScript _monoScript;
+        // private MonoScript _monoScript;
         // private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
 
 #if SAINTSFIELD_DOTWEEN
@@ -117,18 +117,10 @@ namespace SaintsField.Editor
 
         public override void OnInspectorGUI()
         {
-            if (target == null)
+            using (new EditorGUI.DisabledScope(true))
             {
-                Debug.LogError("The target object is null. Check for missing scripts.");
-                return;
-            }
-
-            if(_monoScript)
-            {
-                using(new EditorGUI.DisabledScope(true))
-                {
-                    EditorGUILayout.ObjectField("Script", _monoScript, typeof(MonoScript), false);
-                }
+                EditorGUILayout.ObjectField("Script", GetMonoScript(), GetType(),
+                    false);
             }
 
             serializedObject.Update();
@@ -144,32 +136,62 @@ namespace SaintsField.Editor
 
         #endregion
 
-        private void Setup(bool tryFixUIToolkit)
+        private MonoScript GetMonoScript()
         {
-            #region MonoScript
-            if (serializedObject.targetObject)
+            try
+            {
+                return MonoScript.FromMonoBehaviour((MonoBehaviour) target);
+            }
+            catch (Exception)
             {
                 try
                 {
-                    _monoScript = MonoScript.FromMonoBehaviour((MonoBehaviour) serializedObject.targetObject);
+                    return MonoScript.FromScriptableObject((ScriptableObject)target);
                 }
                 catch (Exception)
                 {
-                    try
-                    {
-                        _monoScript = MonoScript.FromScriptableObject((ScriptableObject)serializedObject.targetObject);
-                    }
-                    catch (Exception)
-                    {
-                        _monoScript = null;
-                    }
+                    return null;
                 }
             }
-            else
-            {
-                _monoScript = null;
-            }
-            #endregion
+        }
+
+        // private void CheckMonoScript()
+        // {
+        //     if (_monoScript != null)
+        //     {
+        //         return;
+        //     }
+        //
+        //
+        //     if (target)
+        //     {
+        //         try
+        //         {
+        //             _monoScript = MonoScript.FromMonoBehaviour((MonoBehaviour) target);
+        //         }
+        //         catch (Exception)
+        //         {
+        //             try
+        //             {
+        //                 _monoScript = MonoScript.FromScriptableObject((ScriptableObject)target);
+        //             }
+        //             catch (Exception)
+        //             {
+        //                 _monoScript = null;
+        //             }
+        //         }
+        //     }
+        //     else
+        //     {
+        //         _monoScript = null;
+        //     }
+        // }
+
+        private void Setup(bool tryFixUIToolkit)
+        {
+            // #region MonoScript
+            // CheckMonoScript();
+            // #endregion
 
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
