@@ -544,9 +544,9 @@ namespace SaintsField.Editor
             }
         }
 
-#if SAINTSFIELD_DOTWEEN
-        // every inspector instance can only have ONE doTweenPlayGroup
-        private DOTweenPlayGroup _doTweenPlayGroup = null;
-#endif
+// #if SAINTSFIELD_DOTWEEN
+//         // every inspector instance can only have ONE doTweenPlayGroup
+//         private DOTweenPlayGroup _doTweenPlayGroup = null;
+// #endif
     }
 }
