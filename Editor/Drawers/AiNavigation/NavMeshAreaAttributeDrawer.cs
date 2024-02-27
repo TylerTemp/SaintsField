@@ -1,4 +1,4 @@
-﻿#if SAINTSFIELD_AI_NAVIGATION
+﻿#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.AiNavigation
 {
-#if SAINTSFIELD_AI_NAVIGATION
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
     [CustomPropertyDrawer(typeof(NavMeshAreaAttribute))]
     public class NavMeshAreaAttributeDrawer: SaintsPropertyDrawer
     {

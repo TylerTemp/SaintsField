@@ -1,3 +1,8 @@
+## 2.1.4 ##
+
+1.  Add `NavMeshAreaMask` to select NavMesh area bitmask for Unity's AI Navigation.
+2.  Add `NavMeshArea` to select NavMesh area as name, value or bitmask.
+
 ## 2.1.3 ##
 
 1.  Add `GetComponentInParent` / `GetComponentInParents`

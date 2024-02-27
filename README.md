@@ -61,12 +61,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.3**
+**2.1.4**
 
-1.  Add `GetComponentInParent` / `GetComponentInParents`
-2.  `ValidateInput` now also support for `bool` result.
-3.  `ValidateInput` now will continuously validate the input rather than check on value changed.
-4.  Fix `<label/>` not work in rich text when working with NaughtyAttributes.
+1.  Add `NavMeshAreaMask` to select NavMesh area bitmask for Unity's AI Navigation.
+2.  Add `NavMeshArea` to select NavMesh area as name, value or bitmask.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1457,7 +1455,7 @@ public class RequiredExample: MonoBehaviour
 
 Validate the input of the field when the value changes.
 
-*   `string callback` is the callback function to validate the data. note: 
+*   `string callback` is the callback function to validate the data. note:
 
     1.  If return type is **`string`**, then `null` or empty string for valid, otherwise, the string will be used as the error message
     2.  If return type is bool, then `true` for valid, `false` for invalid with message "\`{label}\` is invalid`"
@@ -1471,7 +1469,7 @@ public class ValidateInputExample : MonoBehaviour
     public int _value;
 
     private string OnValidateInput() => _value < 0 ? $"Should be positive, but gets {_value}" : null;
-    
+
     // property validate
     [ValidateInput(nameof(boolValidate))]
     public bool boolValidate;
@@ -1949,6 +1947,49 @@ public class AddressableAddressExample: MonoBehaviour
 
 ![addressable_address](https://github.com/TylerTemp/SaintsField/assets/6391063/5646af00-c167-4131-be06-7e0b8e9b102e)
 
+#### AI Navigation ####
+
+These tools are for [Unity AI Navigation](https://docs.unity3d.com/Packages/com.unity.ai.navigation@2.0/manual/) (`NavMesh`). It's there only if you have `AI Navigation` installed.
+
+Namespace: `SaintsField.AiNavigation`
+
+Adding marco `SAINTSFIELD_AI_NAVIGATION_DISABLED` to disable this component. (See "Add a Macro" section for more information)
+
+##### `NavMeshAreaMask` #####
+
+Select `NavMesh` area bit mask for an integer field. (So the integer value can be used in `SamplePathPosition`)
+
+*   Allow Multiple: No
+
+```csharp
+[NavMeshAreaMask]
+public int areaMask;
+```
+
+![nav_mesh_area_mask](https://github.com/TylerTemp/SaintsField/assets/6391063/acbd016b-6001-4440-86b6-e3278216bdde)
+
+##### `NavMeshArea` #####
+
+Select a `NavMesh` area for a string or an interger field.
+
+*   `bool isMask=true` if true, it'll use the bit mask, otherwise, it'll use the area value. Has no effect if the field is a string.
+*   `string groupBy = ""` for error message grouping
+
+*   Allow Multiple: No
+
+```csharp
+[NavMeshArea]  // then you can use `areaSingleMask1 | areaSingleMask2` to get multiple masks
+public int areaSingleMask;
+
+[NavMeshArea(false)]  // then you can use `1 << areaValue` to get areaSingleMask
+public int areaValue;
+
+[NavMeshArea]  // then you can use `NavMesh.GetAreaFromName(areaName)` to get areaValue
+public int areaName;
+```
+
+![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
+
 ## SaintsEditor ##
 
 Even though `SaintsField` is designed to focus on `field` only, I still find it's necessary to use a `UnityEditor.Editor` level component, because of: showing a button, or showing a non-field property.
@@ -2299,6 +2340,9 @@ Go to `Window` - `Saints` to enable/disable functions you want
 
     #"Disable Addressable"
     -define:SAINTSFIELD_ADDRESSABLE_DISABLE
+
+    #"Disable AI Navigation"
+    -define:SAINTSFIELD_AI_NAVIGATION_DISABLED
 
     #"Disable UI Toolkit"
     -define:SAINTSFIELD_UI_TOOLKIT_DISABLE

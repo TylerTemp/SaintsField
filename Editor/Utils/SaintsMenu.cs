@@ -32,38 +32,6 @@ namespace SaintsField.Editor.Utils
 
         #endregion
 
-        #region DOTween
-#if !SAINTSFIELD_DOTWEEN
-        [MenuItem("Window/Saints/Enable DOTween Support")]
-        public static void DOTween() => AddCompileDefine("SAINTSFIELD_DOTWEEN");
-#endif
-#if SAINTSFIELD_DOTWEEN
-        [MenuItem("Window/Saints/Disable DOTween Support")]
-        public static void DOTween() => RemoveCompileDefine("SAINTSFIELD_DOTWEEN");
-#endif
-        #endregion
-
-        #region Addressable
-#if SAINTSFIELD_ADDRESSABLE
-
-#if !SAINTSFIELD_ADDRESSABLE_DISABLE
-        [MenuItem("Window/Saints/Disable Addressable Support")]
-        public static void Addressable() => AddCompileDefine("SAINTSFIELD_ADDRESSABLE_DISABLE");
-#endif
-
-#if SAINTSFIELD_ADDRESSABLE_DISABLE
-        [MenuItem("Window/Saints/Enable Addressable Support")]
-        public static void Addressable() => RemoveCompileDefine("SAINTSFIELD_ADDRESSABLE_DISABLE");
-#endif
-
-#else
-        [MenuItem("Window/Saints/Addressable Not Installed")]
-        public static void AddressableNotInstalled() { }
-        [MenuItem("Window/Saints/Addressable Not Installed", true)]
-        public static bool AddressableNotInstalledEnabled() => false;
-#endif
-        #endregion
-
         #region SaintsEditor
 
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY
@@ -107,6 +75,61 @@ namespace SaintsField.Editor.Utils
 
         #endregion
 
+        #region DOTween
+#if !SAINTSFIELD_DOTWEEN
+        [MenuItem("Window/Saints/Enable DOTween Support")]
+        public static void DOTween() => AddCompileDefine("SAINTSFIELD_DOTWEEN");
+#endif
+#if SAINTSFIELD_DOTWEEN
+        [MenuItem("Window/Saints/Disable DOTween Support")]
+        public static void DOTween() => RemoveCompileDefine("SAINTSFIELD_DOTWEEN");
+#endif
+        #endregion
+
+        #region Addressable
+#if SAINTSFIELD_ADDRESSABLE
+
+#if !SAINTSFIELD_ADDRESSABLE_DISABLE
+        [MenuItem("Window/Saints/Disable Addressable Support")]
+        public static void Addressable() => AddCompileDefine("SAINTSFIELD_ADDRESSABLE_DISABLE");
+#endif
+
+#if SAINTSFIELD_ADDRESSABLE_DISABLE
+        [MenuItem("Window/Saints/Enable Addressable Support")]
+        public static void Addressable() => RemoveCompileDefine("SAINTSFIELD_ADDRESSABLE_DISABLE");
+#endif
+
+#else
+        [MenuItem("Window/Saints/Addressable Not Installed")]
+        public static void AddressableNotInstalled() { }
+        [MenuItem("Window/Saints/Addressable Not Installed", true)]
+        public static bool AddressableNotInstalledEnabled() => false;
+#endif
+        #endregion
+
+        #region AI Navigation
+
+        // && !SAINTSFIELD_AI_NAVIGATION_DISABLED
+#if SAINTSFIELD_AI_NAVIGATION
+
+#if !SAINTSFIELD_AI_NAVIGATION_DISABLED
+        [MenuItem("Window/Saints/Disable AI Navigation Support")]
+        public static void AiNavigation() => AddCompileDefine("SAINTSFIELD_AI_NAVIGATION_DISABLED");
+#endif  // !SAINTSFIELD_AI_NAVIGATION_DISABLED
+
+#if SAINTSFIELD_AI_NAVIGATION_DISABLED
+        [MenuItem("Window/Saints/Enable AI Navigation Support")]
+        public static void AiNavigation() => RemoveCompileDefine("SAINTSFIELD_AI_NAVIGATION_DISABLED");
+#endif  // SAINTSFIELD_AI_NAVIGATION_DISABLED
+
+#else   // SAINTSFIELD_AI_NAVIGATION
+        [MenuItem("Window/Saints/AI Navigation Not Installed")]
+        public static void AiNavigationNotInstalled() { }
+        [MenuItem("Window/Saints/AI Navigation Not Installed", true)]
+        public static bool AiNavigationNotInstalledEnabled() => false;
+#endif  // SAINTSFIELD_AI_NAVIGATION
+
+        #endregion
 
         // ReSharper disable once UnusedMember.Local
         private static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)

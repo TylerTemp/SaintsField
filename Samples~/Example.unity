@@ -407,9 +407,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff2d6969bfac654ba24aa56cd5c8e26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  areaMask: 8
-  areaValue: 2
-  navMeshAreaMask: -1
+  areaSingleMask: 1
+  areaValue: 1
+  areaName: 0
+  areaMask: 0
 --- !u!1 &90550605
 GameObject:
   m_ObjectHideFlags: 0

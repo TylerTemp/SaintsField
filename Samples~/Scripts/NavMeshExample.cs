@@ -1,7 +1,7 @@
 using UnityEngine;
+using SaintsField.AiNavigation;
 
 #if SAINTSFIELD_AI_NAVIGATION
-using SaintsField.AiNavigation;
 using UnityEngine.AI;
 #endif
 
@@ -9,30 +9,49 @@ namespace SaintsField.Samples.Scripts
 {
     public class NavMeshExample : MonoBehaviour
     {
-#if SAINTSFIELD_AI_NAVIGATION
-        [NavMeshArea, OnValueChanged(nameof(AreaMaskChanged)), AboveButton(nameof(ResetZero))]
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
+        [NavMeshArea, OnValueChanged(nameof(AreaSingleMaskChanged)), AboveButton(nameof(ResetZero))]
+#else
+        [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
 #endif
-        public int areaMask;
+        public int areaSingleMask;
 
-#if SAINTSFIELD_AI_NAVIGATION
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
         [NavMeshArea(false), OnValueChanged(nameof(AreaValueChanged))]
+#else
+        [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
 #endif
         public int areaValue;
 
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
+        [NavMeshArea, OnValueChanged(nameof(AreaNameChanged))]
+#else
+        [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
+#endif
+        public int areaName;
+
 #if SAINTSFIELD_AI_NAVIGATION
-        private void AreaMaskChanged() => Debug.Log($"areaMask: {areaMask}");
+        private void AreaSingleMaskChanged() => Debug.Log($"areaMask: {areaSingleMask}");
         private void AreaValueChanged() => Debug.Log($"areaValue: {areaValue}");
+        private void AreaNameChanged() => Debug.Log($"areaName: {areaName}");
         private void ResetZero()
         {
-            areaMask = 0;
+            areaSingleMask = 0;
             areaValue = 0;
-            navMeshAreaMask = 0;
+            areaMask = 0;
         }
 #endif
 
-        #if SAINTSFIELD_AI_NAVIGATION
-        [NavMeshAreaMask]
-        #endif
-        public int navMeshAreaMask;
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
+        [NavMeshAreaMask, OnValueChanged(nameof(AreaMaskChanged))]
+#else
+        [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
+#endif
+        [Space]
+        public int areaMask;
+
+#if SAINTSFIELD_AI_NAVIGATION
+        private void AreaMaskChanged() => Debug.Log($"areaMask: {areaMask}");
+#endif
     }
 }

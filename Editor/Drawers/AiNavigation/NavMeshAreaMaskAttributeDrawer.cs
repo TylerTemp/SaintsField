@@ -1,4 +1,4 @@
-﻿#if SAINTSFIELD_AI_NAVIGATION
+﻿#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.AiNavigation
 {
-#if SAINTSFIELD_AI_NAVIGATION
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
     [CustomPropertyDrawer(typeof(NavMeshAreaMaskAttribute))]
     public class NavMeshAreaMaskAttributeDrawer: SaintsPropertyDrawer
     {
@@ -53,21 +53,14 @@ namespace SaintsField.Editor.Drawers.AiNavigation
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, Label fakeLabel, object parent)
         {
-            // var areas = AiNavigationUtils.GetNavMeshAreas().ToList();
-            // return new MaskField(
-            //     areas.Select(each => each.Name).ToList(),
-            //     property.intValue,
-            //     listItem => listItem,
-            //     selected =>
-            //     {
-            //         int index = areas.FindIndex(each => each.Name == selected);
-            //         return $"{areas[index].Mask}: {areas[index].Name}";
-            //     }
-            // );
             MaskField maskField = new MaskField(new string(' ', property.displayName.Length))
             {
                 userData = new List<AiNavigationUtils.NavMeshArea>(),
                 name = NameMaskField(property),
+                style =
+                {
+                    flexGrow = 1,
+                },
             };
             maskField.BindProperty(property);
             return maskField;

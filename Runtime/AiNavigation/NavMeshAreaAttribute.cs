@@ -2,7 +2,7 @@
 
 namespace SaintsField.AiNavigation
 {
-#if SAINTSFIELD_AI_NAVIGATION
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
     public class NavMeshAreaAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
