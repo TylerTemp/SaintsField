@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -283,11 +284,19 @@ namespace SaintsField.Editor.Utils
             };
         }
 
-        public static int ListIndexOfAction<T>(IReadOnlyList<T> lis, Func<T, bool> callback)
+        public static int ListIndexOfAction<T>(IEnumerable<T> lis, Func<T, bool> callback)
         {
-            foreach (int index in Enumerable.Range(0, lis.Count))
+            // foreach (int index in Enumerable.Range(0, lis.Count))
+            // {
+            //     if (callback(lis[index]))
+            //     {
+            //         return index;
+            //     }
+            // }
+
+            foreach ((T value, int index) in lis.WithIndex())
             {
-                if (callback(lis[index]))
+                if(callback(value))
                 {
                     return index;
                 }

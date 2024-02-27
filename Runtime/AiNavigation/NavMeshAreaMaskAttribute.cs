@@ -3,17 +3,14 @@
 namespace SaintsField.AiNavigation
 {
 #if SAINTSFIELD_AI_NAVIGATION
-    public class NavMeshAreaAttribute: PropertyAttribute, ISaintsAttribute
+    public class NavMeshAreaMaskAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy { get; }
 
-        public readonly bool IsMask;
-
-        public NavMeshAreaAttribute(bool isMask=true, string groupBy = "")
+        public NavMeshAreaMaskAttribute(string groupBy = "")
         {
             GroupBy = groupBy;
-            IsMask = isMask;
         }
     }
 #endif

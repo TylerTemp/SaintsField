@@ -341,6 +341,7 @@ GameObject:
   m_Component:
   - component: {fileID: 69899267}
   - component: {fileID: 69899266}
+  - component: {fileID: 69899268}
   m_Layer: 0
   m_Name: NavMesh Surface
   m_TagString: Untagged
@@ -394,6 +395,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 64
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &69899268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69899265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ff2d6969bfac654ba24aa56cd5c8e26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  areaMask: 16
+  areaValue: 4
 --- !u!1 &90550605
 GameObject:
   m_ObjectHideFlags: 0
@@ -3374,29 +3389,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nativeRange: 2.1
   nativeRangeHandled: 1.05
-  naCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  naCurveHandled:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  inputAxis: 
-  naProgressBar: 30
-  naNativeProgressBar: 30
-  sfProgressBar: 0
-  firstInt: 0
-  sepHere: 0
-  secondInt: 0
-  nest:
-    nest2:
-      saints: {fileID: 0}
-      na: {fileID: 0}
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
