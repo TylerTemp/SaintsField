@@ -71,12 +71,13 @@ namespace SaintsField.Editor
             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance());
 #endif
 
-            if(_monoScript)
+            MonoScript monoScript = GetMonoScript();
+            if(monoScript)
             {
                 ObjectField objectField = new ObjectField("Script")
                 {
                     bindingPath = "m_Script",
-                    value = _monoScript,
+                    value = monoScript,
                     allowSceneObjects = false,
                     objectType = typeof(MonoScript),
                 };

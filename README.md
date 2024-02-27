@@ -65,7 +65,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 1.  Add `NavMeshAreaMask` to select NavMesh area bitmask for Unity's AI Navigation.
 2.  Add `NavMeshArea` to select NavMesh area as name, value or bitmask.
-3.  Fix a weird issue that `SaintsField` might not find the correct `MonoScript` in Unity 2021
+3.  Fix a weird issue that `SaintsEditor` might not find the correct `MonoScript` in Unity 2021
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
