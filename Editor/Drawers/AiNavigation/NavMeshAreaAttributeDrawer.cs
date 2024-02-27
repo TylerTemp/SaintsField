@@ -104,6 +104,8 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         #endregion
 
+#if UNITY_2021_3_OR_NEWER
+
         #region UI Toolkit
 
         private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__NavMeshArea_Button";
@@ -220,6 +222,40 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 ShowDropdownUIToolkit(property, buttonData, button, label, onValueChangedCallback);
         }
 
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, object parent)
+        {
+            Button button = container.Q<Button>(NameButtonField(property));
+            ButtonData buttonData = (ButtonData) button.userData;
+
+            ValueType valueType = buttonData.ValueType;
+            int areaIndex = Util.ListIndexOfAction(AiNavigationUtils.GetNavMeshAreas(), area =>
+            {
+                // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+                switch (valueType)
+                {
+                    case ValueType.Index:
+                        return area.Value == property.intValue;
+                    case ValueType.Mask:
+                        return area.Mask == property.intValue;
+                    case ValueType.String:
+                        return area.Name == property.stringValue;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(valueType), valueType, null);
+                }
+            });
+
+            // ReSharper disable once InvertIf
+            if(areaIndex != buttonData.selectedIndex)
+            {
+                buttonData.selectedIndex = areaIndex;
+                string buttonLabel = areaIndex == -1
+                    ? "-"
+                    : FormatAreaName(AiNavigationUtils.GetNavMeshAreas().ElementAt(areaIndex), valueType);
+                button.Q<Label>(NameButtonLabelField(property)).text = buttonLabel;
+            }
+        }
+
         private static void ShowDropdownUIToolkit(SerializedProperty property, ButtonData buttonData,
             // ReSharper disable once SuggestBaseTypeForParameter
             Button button,
@@ -265,6 +301,8 @@ namespace SaintsField.Editor.Drawers.AiNavigation
         }
 
         #endregion
+
+#endif
     }
 #endif  // SAINTSFIELD_AI_NAVIGATION
 }

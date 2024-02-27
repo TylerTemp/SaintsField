@@ -8,6 +8,7 @@ namespace SaintsField.AiNavigation
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy { get; }
 
+        // ReSharper disable once InconsistentNaming
         public readonly bool IsMask;
 
         public NavMeshAreaAttribute(bool isMask=true, string groupBy = "")
