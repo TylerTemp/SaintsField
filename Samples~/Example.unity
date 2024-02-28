@@ -456,7 +456,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _label: <color=red>ok here
-  floatV: 0
+  floatV: 2
+  go1: {fileID: 724537242}
+  go2: {fileID: 1036765199}
+  refs: {fileID: 724537242}
+  color: {r: 0, g: 0, b: 0, a: 1}
+  colorNoSub: {r: 1, g: 1, b: 1, a: 1}
+  uniq1: 2
+  uniq2: 3
+  uniq3: 1
+  normal: 22
+  myInt: 2
+  my:
+    normal: 0
+    myInt: 3
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -2841,6 +2854,53 @@ Transform:
   - {fileID: 367409193}
   m_Father: {fileID: 579857409}
   m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1044156547
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1044156549}
+  - component: {fileID: 1044156548}
+  m_Layer: 0
+  m_Name: SimpleAdvancedDropdown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1044156548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044156547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea25e1d5e61249249221a3fa47d4e4e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  strTyp:
+    selectIt: 3
+    searchableDropdown: 6
+--- !u!4 &1044156549
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044156547}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 65
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1060634460
 GameObject:

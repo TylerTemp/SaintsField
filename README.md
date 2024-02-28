@@ -705,6 +705,8 @@ public class FieldTypeExample: MonoBehaviour
 
 A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
 
+If you want a searchable dropdown, see `AdvancedDropdown`.
+
 *   `string funcName` callback function. Must return a `DropdownList<T>`.
 *   `bool slashAsSub=true` treat `/` as a sub item.
 
@@ -830,27 +832,31 @@ public class AdvancedDropdownExample: MonoBehaviour
 
     public AdvancedDropdownList<int> AdvDropdown()
     {
-        return new AdvancedDropdownList<int>("Select One!", new List<AdvancedDropdownList<int>>()
+        return new AdvancedDropdownList<int>("Days")
         {
             // a grouped value
-            new AdvancedDropdownList<int>("First half", new List<AdvancedDropdownList<int>>()
+            new AdvancedDropdownList<int>("First Half")
             {
                 // with icon
                 new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
                 // no icon
                 new AdvancedDropdownList<int>("Tuesday", 2),
-            }),
-            new AdvancedDropdownList<int>("Second half", new List<AdvancedDropdownList<int>>()
+            },
+            new AdvancedDropdownList<int>("Second Half")
             {
-                new AdvancedDropdownList<int>("Wednesday", 3),
-                new AdvancedDropdownList<int>("Thursday", 4, icon: "eye.png"),
-            }),
+                new AdvancedDropdownList<int>("Wednesday")
+                {
+                    new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
+                    new AdvancedDropdownList<int>("Afternoon", 8),
+                },
+                new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
+            },
             // direct value
-            new AdvancedDropdownList<int>("Friday", 5, true),  // disabled
+            new AdvancedDropdownList<int>("Friday", 5, true),
             AdvancedDropdownList<int>.Separator(),
             new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
             new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
-        });
+        };
     }
 }
 ```
@@ -862,6 +868,56 @@ public class AdvancedDropdownExample: MonoBehaviour
 **UI Toolkit**
 
 [![advanced_dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/ad2f556b-7d98-4f49-a1ad-e2a5a52bf8f0)](https://github.com/TylerTemp/SaintsField/assets/6391063/157838e7-1f63-4b44-9503-bbb0004db7e8)
+
+There is also a parser to automaticly seperate items as sub items using `/`:
+
+```csharp
+[AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
+
+public AdvancedDropdownList<int> AdvDropdown()
+{
+    return new AdvancedDropdownList<int>("Days")
+    {
+        {"First Half/Monday", 1, false, "star.png"},  // enabled, with icon
+        {"First Half/Tuesday", 2},
+
+        {"Second Half/Wednesday/Morning", 3, false, "star.png"},
+        {"Second Half/Wednesday/Afternoon", 4},
+        {"Second Half/Thursday", 5, true, "star.png"},  // disabled, with icon
+        "",  // root separator
+        {"Friday", 6, true},  // disabled
+        "",
+        {"Weekend/Saturday", 7, false, "star.png"},
+        "Weekend/",  // separator under `Weekend` group
+        {"Weekend/Sunday", 8, false, "star.png"},
+    };
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1bbad2f3-e1aa-4175-a6b1-fd350c58feb3)
+
+You can use this to make a searchable dropdown:
+
+```csharp
+[AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
+
+public AdvancedDropdownList<int> AdvDropdownNoNest()
+{
+    return new AdvancedDropdownList<int>("Days")
+    {
+        {"Monday", 1},
+        {"Tuesday", 2, true},  // disabled
+        {"Wednesday", 3, false, "star.png"},  // enabled with icon
+        {"Thursday", 4, true, "star.png"},  // disabled with icon
+        {"Friday", 5},
+        "",  // separator
+        {"Saturday", 6},
+        {"Sunday", 7},
+    };
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1e0ad6f4-e65d-4953-9f2a-fa9e22e706af)
 
 #### `PropRange` ####
 
@@ -1633,6 +1689,25 @@ public class GetComponentInChildrenExample: MonoBehaviour
 
 ![get_component_in_children](https://github.com/TylerTemp/SaintsField/assets/6391063/854aeefc-6456-4df2-a4a7-40a5cd5e2290)
 
+#### `FindComponent` ####
+
+Automatically find a component under the current target. This is very similar to Unity's [`transform.Find`](https://docs.unity3d.com/ScriptReference/Transform.Find.html), except it accepts many paths, and it's returning value is not limited to `transform`
+
+*   `string path` a path to search
+*   `params string[] paths` more paths to search
+*   AllowMultiple: Yes but not necessary
+
+```csharp
+public class FindComponentExample: MonoBehaviour
+{
+    [FindComponent("sub/dummy")] public Dummy subDummy;
+    [FindComponent("sub/dummy")] public GameObject subDummyGo;
+    [FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
+}
+```
+
+![find_component](https://github.com/TylerTemp/SaintsField/assets/6391063/6620e643-3f8a-4c33-a136-6cbfc889d2ac)
+
 #### `GetComponentInParent` / `GetComponentInParents` ####
 
 Automatically sign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
@@ -1831,24 +1906,6 @@ public class AddComponentExample: MonoBehaviour
 
 ![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
 
-#### `FindComponent` ####
-
-Automatically add a component to the current target. This is very similar to Unity's [`transform.Find`](https://docs.unity3d.com/ScriptReference/Transform.Find.html), except it accepts many paths, and it's returning value is not limited to `transform`
-
-*   `string path` a path to search
-*   `params string[] paths` more paths to search
-*   AllowMultiple: Yes but not necessary
-
-```csharp
-public class FindComponentExample: MonoBehaviour
-{
-    [FindComponent("sub/dummy")] public Dummy subDummy;
-    [FindComponent("sub/dummy")] public GameObject subDummyGo;
-    [FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
-}
-```
-
-![find_component](https://github.com/TylerTemp/SaintsField/assets/6391063/6620e643-3f8a-4c33-a136-6cbfc889d2ac)
 
 #### `ButtonAddOnClick` ####
 

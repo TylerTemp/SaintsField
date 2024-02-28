@@ -8,7 +8,7 @@ namespace SaintsField
 {
     public class AdvancedDropdownList<T> : IAdvancedDropdownList
     {
-        public string displayName { get; set; }
+        public string displayName { get; }
 
         private readonly T _typeValue;
 
@@ -19,12 +19,21 @@ namespace SaintsField
         public IReadOnlyList<IAdvancedDropdownList> children =>
             _typeChildren.Select(each => (IAdvancedDropdownList)each).ToList();
 
-        public bool disabled { get; set; }
-        public string icon { get; set; }
-        public bool isSeparator { get; set; }
+        public bool disabled { get; }
+        public string icon { get; }
+        public bool isSeparator { get; }
 
-        public AdvancedDropdownList(string displayName, T value, bool disabled = false, string icon = null,
-            bool isSeparator = false)
+        public AdvancedDropdownList(string displayName, bool disabled = false, string icon = null)
+        {
+            this.displayName = displayName;
+            _typeValue = default;
+            _typeChildren = new List<AdvancedDropdownList<T>>();
+            this.disabled = disabled;
+            this.icon = icon;
+            isSeparator = false;
+        }
+
+        public AdvancedDropdownList(string displayName, T value, bool disabled = false, string icon = null, bool isSeparator = false)
         {
             this.displayName = displayName;
             _typeValue = value;
@@ -46,6 +55,53 @@ namespace SaintsField
         }
 
         public void Add(AdvancedDropdownList<T> child) => _typeChildren.Add(child);
+
+        // this will parse "/"
+        public void Add(string displayNames, T value, bool disabled = false, string icon = null)
+        {
+            AddByNames(this, new Queue<string>(displayNames.Split('/')), value, disabled, icon);
+        }
+
+        // this add a separator
+        public void Add(string displayNames)
+        {
+            // ReSharper disable once MergeIntoLogicalPattern
+            if (displayNames == "" || displayNames == "/")
+            {
+                AddSeparator();
+                return;
+            }
+
+            string useNames = displayNames.EndsWith("/")
+                ? displayNames
+                : displayNames + "/";
+
+            Add(useNames, default);
+
+        }
+
+        private static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null)
+        {
+            string curName = nameQuery.Dequeue();
+            if (nameQuery.Count == 0)
+            {
+                container.Add(curName == ""? Separator(): new AdvancedDropdownList<T>(curName, value, disabled, icon));
+                return;
+            }
+            IAdvancedDropdownList matchedChild = container.children.FirstOrDefault(each => each.displayName == curName);
+            AdvancedDropdownList<T> targetChild;
+            if (matchedChild != null)
+            {
+                targetChild = (AdvancedDropdownList<T>)matchedChild;
+            }
+            else
+            {
+                targetChild = new AdvancedDropdownList<T>(curName);
+                container.Add(targetChild);
+            }
+            // ReSharper disable once TailRecursiveCall
+            AddByNames(targetChild, nameQuery, value, disabled, icon);
+        }
 
         public void AddSeparator() => _typeChildren.Add(Separator());
 

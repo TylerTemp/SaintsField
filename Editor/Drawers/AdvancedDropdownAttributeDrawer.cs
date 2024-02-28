@@ -1396,6 +1396,8 @@ namespace SaintsField.Editor.Drawers
                     flexDirection = FlexDirection.Row,
                     alignItems = Align.Center,
                     justifyContent = Justify.SpaceBetween,
+                    paddingLeft = 1,
+                    paddingRight = 1,
                 },
                 name = NameButton(property),
                 userData = initMetaInfo.CurValue,
@@ -1416,10 +1418,17 @@ namespace SaintsField.Editor.Drawers
             Label buttonLabel = new Label(GetMetaStackDisplay(initMetaInfo))
             {
                 name = NameButtonLabel(property),
-                // userData = metaInfo.SelectedIndex,
             };
             button.Add(buttonLabel);
-            button.Add(new Label("▼"));
+            button.Add(new Image
+            {
+                image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
+                style =
+                {
+                    width = 15,
+                    height = 12,
+                },
+            });
 
             VisualElement root = new VisualElement
             {

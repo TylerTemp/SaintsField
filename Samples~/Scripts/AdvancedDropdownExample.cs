@@ -21,28 +21,31 @@ namespace SaintsField.Samples.Scripts
 
             public AdvancedDropdownList<int> AdvDropdown()
             {
-                return new AdvancedDropdownList<int>("Days", new List<AdvancedDropdownList<int>>
+                return new AdvancedDropdownList<int>("Days")
                 {
-                    new AdvancedDropdownList<int>("First Half", new List<AdvancedDropdownList<int>>
+                    // a grouped value
+                    new AdvancedDropdownList<int>("First Half")
                     {
+                        // with icon
                         new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+                        // no icon
                         new AdvancedDropdownList<int>("Tuesday", 2),
-                    }),
-                    new AdvancedDropdownList<int>("Second Half", new List<AdvancedDropdownList<int>>
+                    },
+                    new AdvancedDropdownList<int>("Second Half")
                     {
-                        new AdvancedDropdownList<int>("Wednesday", new List<AdvancedDropdownList<int>>
+                        new AdvancedDropdownList<int>("Wednesday")
                         {
                             new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
                             new AdvancedDropdownList<int>("Afternoon", 8),
-                        }),
+                        },
                         new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
-                    }),
-                    AdvancedDropdownList<int>.Separator(),
+                    },
+                    // direct value
                     new AdvancedDropdownList<int>("Friday", 5, true),
                     AdvancedDropdownList<int>.Separator(),
                     new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
                     new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
-                });
+                };
             }
 
             public void ShowNewValue()

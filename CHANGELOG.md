@@ -1,3 +1,9 @@
+## 2.1.5 ##
+
+1.  A better parser for `AdvancedDropdown`. Now you can use `/` to define a sub item.
+2.  UI Toolkit: dropdown icon for `AdvancedDropdown` lookes better now.
+3.  Fix readme about `FindComponent`
+
 ## 2.1.4 ##
 
 1.  Add `NavMeshAreaMask` to select NavMesh area bitmask for Unity's AI Navigation.
