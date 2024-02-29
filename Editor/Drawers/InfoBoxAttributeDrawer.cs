@@ -361,7 +361,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo((InfoBoxAttribute)saintsAttribute, parent);
             HelpBox infoBox = container.Q<HelpBox>(NameInfoBox(property, index));

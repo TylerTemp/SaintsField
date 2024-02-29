@@ -1455,8 +1455,9 @@ namespace SaintsField.Editor.Drawers
                 : string.Join("/", metaInfo.SelectStacks.Skip(1).Select(each => each.Display).Append(metaInfo.CurDisplay));
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property));
             button.clicked += () =>

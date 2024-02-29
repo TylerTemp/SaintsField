@@ -1227,7 +1227,7 @@ namespace SaintsField.Editor.Core
                     postFieldAccWidth += width;
 
                     // Debug.Log($"DrawPostField, valueChange={_valueChange}");
-                    bool isActive = drawer.DrawPostFieldImGui(eachRect, property, label,
+                    bool isActive = drawer.DrawPostFieldImGui(eachRect, property, bugFixCopyLabel,
                         attributeWithIndex.SaintsAttribute,
                         attributeWithIndex.Index,
                         PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result) && result.Changed,
@@ -1812,47 +1812,48 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
+                saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, fieldInfo, parent);
             }
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnStartUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, parent);
+                saintsPropertyInfo.Drawer.OnStartUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, fieldInfo, parent);
             }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
-            OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, onValueChangedCallback);
+            OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
         }
 
         private static void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement container,
             object parent,
             // ReSharper disable once ParameterTypeCanBeEnumerable.Local
-            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, Action<object> onValueChangedCallback
+            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, Action<object> onValueChangedCallback,
+            FieldInfo info
         )
         {
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, parent);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info, parent);
             }
 
-            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers, onValueChangedCallback)).StartingIn(100);
+            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(100);
         }
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
         }
 
         protected virtual void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
         }
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChanged, object parent)
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
         }
 

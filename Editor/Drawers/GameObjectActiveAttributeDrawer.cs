@@ -165,8 +165,9 @@ namespace SaintsField.Editor.Drawers
             return button;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property, index));
             button.clicked += () =>
@@ -188,13 +189,13 @@ namespace SaintsField.Editor.Drawers
 
                 Undo.RecordObject(go, $"GameObjectActive: {property.propertyPath}");
                 go.SetActive(!go.activeSelf);
-                OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, parent);
+                OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, parent);
             };
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             GameObject go;
             if (property.objectReferenceValue is GameObject isGo)

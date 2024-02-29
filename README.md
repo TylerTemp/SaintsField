@@ -61,11 +61,12 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.4**
+**2.1.6**
 
-1.  Add `NavMeshAreaMask` to select NavMesh area bitmask for Unity's AI Navigation.
-2.  Add `NavMeshArea` to select NavMesh area as name, value or bitmask.
-3.  Fix a weird issue that `SaintsEditor` might not find the correct `MonoScript` in Unity 2021
+1.  `ValidateInput` now support validation callback with parameter of the target field value.
+2.  `SaintsEditor` fix a button rendered twice if it's override (or use `new`) in a derived class.
+3.  `SaintsEditor`, `ShowInInspector` now will change appearance when value changed for auto property.
+4.  `SaintsEditor`, `ShowInInspector` now support to show `null` value with a yellow background.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1512,7 +1513,15 @@ public class RequiredExample: MonoBehaviour
 
 Validate the input of the field when the value changes.
 
-*   `string callback` is the callback function to validate the data. note:
+*   `string callback` is the callback function to validate the data.
+
+    **Parameters**:
+
+    1.  If the function accepts no arguments, then no argument will be passed
+    2.  If the function accepts required arguments, it should only define one required argument, and the value of the field will be passed to it. All other optional argument will receive its default value.
+    3.  If the function only has optional arguments, then first optional argument that match the field's type (or super type) will be passed the value of the field. If no match, default value will be passed.
+    
+    **Return**:
 
     1.  If return type is **`string`**, then `null` or empty string for valid, otherwise, the string will be used as the error message
     2.  If return type is bool, then `true` for valid, `false` for invalid with message "\`{label}\` is invalid`"
@@ -1522,9 +1531,9 @@ Validate the input of the field when the value changes.
 ```csharp
 public class ValidateInputExample : MonoBehaviour
 {
+    // string callback
     [ValidateInput(nameof(OnValidateInput))]
     public int _value;
-
     private string OnValidateInput() => _value < 0 ? $"Should be positive, but gets {_value}" : null;
 
     // property validate
@@ -1534,8 +1543,18 @@ public class ValidateInputExample : MonoBehaviour
     // bool callback
     [ValidateInput(nameof(BoolCallbackValidate))]
     public string boolCallbackValidate;
-
     private bool BoolCallbackValidate() => boolValidate;
+    
+    // with callback params
+    [ValidateInput(nameof(ValidateWithReqParams))]
+    public int withReqParams;
+    private string ValidateWithReqParams(int v) => $"ValidateWithReqParams: {v}";
+
+    // with optional callback params
+    [ValidateInput(nameof(ValidateWithOptParams))]
+    public int withOptionalParams;
+
+    private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
 }
 ```
 
@@ -2050,12 +2069,12 @@ public int areaName;
 
 ## SaintsEditor ##
 
-Even though `SaintsField` is designed to focus on `field` only, I still find it's necessary to use a `UnityEditor.Editor` level component, because of: showing a button, or showing a non-field property.
+`SaintsField` is a `UnityEditor.Editor` level component.
 
-So here is the `SaintsEditor`. It provides the minimal functions I think that is needed. Here is some comparison with `NaughtyAttributes` and `MarkupAttributes`:
+Compared with `NaughtyAttributes` and `MarkupAttributes`:
 
-1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`.
-2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property.
+1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`. It's IMGUI only.
+2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property. It's IMGUI only.
 3.  `SaintsEditor`
 
     *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). However, it does not have a `Scope` for convenience coding.
@@ -2064,7 +2083,7 @@ So here is the `SaintsEditor`. It provides the minimal functions I think that is
     *   Supports both `UI Toolkit` and `IMGUI`.
     *   When using `UI Toolkit`, it'll try to fix the old style field, change the label behavior like UI Toolkit. (This fix does not work if the fallback drawer is a pure `IMGUI` drawer)
 
-Please note, any `Editor` is not compatible with each other (unless you manually apply it to only some classes). Which means, `OdinInspector`, `NaughtyAttributes`, `MarkupAttributes`, `SaintsEditor` can not be used together.
+Please note, any `Editor` level component can not work together with each other (it will not cause trouble, but only one will actually work). Which means, `OdinInspector`, `NaughtyAttributes`, `MarkupAttributes`, `SaintsEditor` can not work together.
 
 If you are interested, here is how to use it.
 
@@ -2073,7 +2092,6 @@ If you are interested, here is how to use it.
 `Window` - `Saints` - `Apply SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
-
 
 ### `DOTweenPlay` ###
 
@@ -2219,14 +2237,15 @@ A layout decorator to group fields.
 *   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
 
 Options are:
-    *   `Vertical`
-    *   `Horizontal`
-    *   `Background` draw a background color for the whole group
-    *   `TitleOut` make `title` more visible if you have `Title` enabled. On `IMGUI` it will draw an separator between title and the rest of the content.
-        On `UI Toolkit` it will draw a background color for the title.
-    *   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
-    *   `Tab` make this group a tab page separated rather than grouping it
-    *   `Title` show the title
+
+*   `Vertical`
+*   `Horizontal`
+*   `Background` draw a background color for the whole group
+*   `TitleOut` make `title` more visible if you have `Title` enabled. On `IMGUI` it will draw an separator between title and the rest of the content.
+    On `UI Toolkit` it will draw a background color for the title.
+*   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
+*   `Tab` make this group a tab page separated rather than grouping it
+*   `Title` show the title
 
 **Known Issue**
 
@@ -2289,9 +2308,6 @@ public class LayoutExample: MonoBehaviour
     // Complex example. Button and ShowInInspector works too
     [Ordered]
     [Layout("Root", ELayout.Tab | ELayout.TitleOut | ELayout.Foldout | ELayout.Background)]
-    // [Layout("Root", ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
-    // [Layout("Root", ELayout.Title)]
-    // [Layout("Root", ELayout.Title | ELayout.Background)]
     [Layout("Root/V1")]
     [SepTitle("Basic", EColor.Pink)]
     public string hv1Item1;
@@ -2520,7 +2536,7 @@ If you encounter any issue, please report it to the issue page. However, there a
 
 2.  Even most UI Toolkit fields are fixed label width, there is one that the label width behavior exactly like IMGUI: `PropertyField`. This bug has been reported to Unity (Sorry I can't find the link now), but is never fixed.
 
-    `SaintsField` heavily relies on `PropertyField` to fallback the appearance. This is not even fixable at this point. If you try to obtain the info by query out the `PropertyField` element, you'll notice that Unity is internally using a script (rather than a uss style) to update it's label width.
+    `SaintsField` heavily relies on `PropertyField` to fallback the appearance. This is not even fixable at this point. If you try to obtain the info by query out the `PropertyField` element, you'll notice that Unity is internally using a script (rather than a uss style) to update its label width.
 
     Even without using any custom inspector, if you use your UI Toolkit `PropertyDrawer` with default fields, your inspector label will not aligned, and makes it looks really ridiculous.
 

@@ -19,5 +19,17 @@ namespace SaintsField.Samples.Scripts
         public string boolCallbackValidate;
 
         private bool BoolCallbackValidate() => boolValidate;
+
+        // with callback params
+        [ValidateInput(nameof(ValidateWithReqParams))]
+        public int withReqParams;
+        private string ValidateWithReqParams(int v) => $"ValidateWithReqParams: {v}";
+
+        // with optional callback params
+        [ValidateInput(nameof(ValidateWithOptParams))]
+        public int withOptionalParams;
+
+        private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
+
     }
 }

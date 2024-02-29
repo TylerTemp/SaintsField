@@ -66,8 +66,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             return maskField;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             container.Q<MaskField>(NameMaskField(property)).RegisterValueChangedCallback(evt =>
             {
@@ -76,8 +77,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             });
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
             MaskField maskField = container.Q<MaskField>(NameMaskField(property));
             List<AiNavigationUtils.NavMeshArea> oldData = (List<AiNavigationUtils.NavMeshArea>)maskField.userData;

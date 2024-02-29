@@ -296,6 +296,10 @@ namespace SaintsField.Editor
                         OrderedAttribute orderProp =
                             allMethodAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
                         int order = orderProp?.Order ?? int.MinValue;
+
+                        // inspector does not care about inherited/new method. It just need to use the last one
+                        fieldWithInfos.RemoveAll(each => each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
+
                         fieldWithInfos.Add(new SaintsFieldWithInfo
                         {
                             groups = allMethodAttributes.OfType<ISaintsGroup>().ToArray(),

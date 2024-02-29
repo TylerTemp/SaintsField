@@ -337,7 +337,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             VisualElement root = container.Q<VisualElement>(NameRoot(property, index));
             Image image = root.Q<Image>(NameImage(property, index));

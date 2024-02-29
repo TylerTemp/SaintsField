@@ -296,7 +296,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             MetaInfo metaInfo = (MetaInfo)dropdownField.userData;
@@ -327,7 +327,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
 

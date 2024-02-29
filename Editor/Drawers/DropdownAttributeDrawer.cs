@@ -367,16 +367,18 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;
             container.Q<Button>(NameButtonField(property)).clicked += () =>
                 ShowDropdown(property, saintsAttribute, container, dropdownAttribute.SlashAsSub, parent, onValueChangedCallback);
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
             Type parentType = parent.GetType();
             FieldInfo field = parentType.GetField(property.name, BindAttr);

@@ -1,4 +1,5 @@
 ﻿using System;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
@@ -30,11 +31,23 @@ namespace SaintsField.Editor.Playa.Renderer
         public abstract void Render();
 
         // NA: NaughtyEditorGUI
-        protected static bool FieldLayout(object value, string label)
+        protected static void FieldLayout(object value, string label)
         {
-            using (new EditorGUI.DisabledScope(disabled: true))
+            using (new EditorGUI.DisabledScope(true))
             {
-                bool isDrawn = true;
+                if (value == null)
+                {
+                    Rect rt = GUILayoutUtility.GetRect(new GUIContent(label), EditorStyles.label);
+                    EditorGUI.DrawRect(new Rect(rt)
+                    {
+                        x = rt.x + EditorGUIUtility.labelWidth,
+                        width = rt.width - EditorGUIUtility.labelWidth,
+                    }, Color.yellow * new Color(1, 1,1, 0.2f));
+                    EditorGUI.LabelField(rt, label, "null", EditorStyles.label);
+                    return;
+                }
+
+                // bool isDrawn = true;
                 Type valueType = value.GetType();
 
                 if (valueType == typeof(bool))
@@ -127,30 +140,43 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
                 else
                 {
-                    isDrawn = false;
+                    EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
                 }
 
-                return isDrawn;
+                // return isDrawn;
             }
         }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        private static StyleSheet nullUss;
+
         protected static VisualElement UIToolkitLayout(object value, string label)
         {
+            // TODO: need a way to monitor if the value changed, for auto-property.
             if (value == null)
             {
-                return new Label("[null]")
+                TextField textField = new TextField(label)
                 {
-                    style =
-                    {
-                        backgroundColor = Color.yellow,
-                    },
+                    value = "null",
+                    // style =
+                    // {
+                    //     backgroundColor = Color.yellow * new Color(1, 1, 1, 0.2f),
+                    // },
                     pickingMode = PickingMode.Ignore,
                 };
+
+                if(nullUss == null)
+                {
+                    nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
+                }
+                textField.styleSheets.Add(nullUss);
+
+                textField.SetEnabled(false);
+                return textField;
             }
 
-            Type valueType = value.GetType();
             VisualElement visualElement;
+            Type valueType = value.GetType();
 
             if (valueType == typeof(bool))
             {

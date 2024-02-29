@@ -2,10 +2,7 @@
 
 namespace SaintsField.Editor.Playa
 {
-#if SAINTSFIELD_NAUGHYTATTRIBUTES && SAINTSFIELD_SAINTS_EDITOR_APPLY
-    [CanEditMultipleObjects]
-    [CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
-    public class ApplySaintsMonoBehaviorEditor : SaintsEditor
+    public class ApplySaintsMonoBehaviorEditorBase : SaintsEditor
     {
         // should we try to fix the UI Toolkit PropertyField label unmatched width issue?
         protected override bool TryFixUIToolkit =>
@@ -24,53 +21,25 @@ namespace SaintsField.Editor.Playa
             true
 #endif
         ;
+    }
+
+#if SAINTSFIELD_NAUGHYTATTRIBUTES && SAINTSFIELD_SAINTS_EDITOR_APPLY
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
+    public class ApplySaintsMonoBehaviorEditor : ApplySaintsMonoBehaviorEditorBase
+    {
     }
 
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.ScriptableObject), true)]
-    public class ApplySaintsScriptableObjectEditor : SaintsEditor
+    public class ApplySaintsScriptableObjectEditor : ApplySaintsMonoBehaviorEditorBase
     {
-        // should we try to fix the UI Toolkit PropertyField label unmatched width issue?
-        protected override bool TryFixUIToolkit =>
-#if SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
-            false
-#else
-            true
-#endif
-        ;
-
-        // should IMGUI constant repaint? The `ProgressBar` and `Rate` will look much better
-        public override bool RequiresConstantRepaint() =>
-#if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
-            false
-#else
-            true
-#endif
-        ;
-        ;
     }
 #elif SAINTSFIELD_SAINTS_EDITOR_APPLY
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.Object), true)]
-    public class ApplySaintsEditor : SaintsEditor
+    public class ApplySaintsEditor : ApplySaintsMonoBehaviorEditorBase
     {
-        // should we try to fix the UI Toolkit PropertyField label unmatched width issue?
-        protected override bool TryFixUIToolkit =>
-#if SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
-            false
-#else
-            true
-#endif
-        ;
-
-        // should IMGUI constant repaint? The `ProgressBar` and `Rate` will look much better
-        public override bool RequiresConstantRepaint() =>
-#if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
-            false
-#else
-            true
-#endif
-        ;
     }
 #endif
 }

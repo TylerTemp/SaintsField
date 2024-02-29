@@ -1,3 +1,10 @@
+## 2.1.6 ##
+
+1.  `ValidateInput` now support validation callback with parameter of the target field value.
+2.  `SaintsEditor` fix a button rendered twice if it's override (or use `new`) in a derived class.
+3.  `SaintsEditor`, `ShowInInspector` now will change appearance when value changed for auto property.
+4.  `SaintsEditor`, `ShowInInspector` now support to show `null` value with a yellow background.
+
 ## 2.1.5 ##
 
 1.  A better parser for `AdvancedDropdown`. Now you can use `/` to define a sub item.

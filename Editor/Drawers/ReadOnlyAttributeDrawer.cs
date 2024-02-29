@@ -26,6 +26,17 @@ namespace SaintsField.Editor.Drawers
             EditorGUI.BeginDisabledGroup(disabled);
             return -1;
         }
+        // protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        //     object parent) => true;
+        //
+        // protected override Rect DrawAboveImGui(Rect position, SerializedProperty property,
+        //     GUIContent label, ISaintsAttribute saintsAttribute, object parent)
+        // {
+        //     (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, parent);
+        //     _error = error;
+        //     EditorGUI.BeginDisabledGroup(disabled);
+        //     return position;
+        // }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
@@ -39,11 +50,14 @@ namespace SaintsField.Editor.Drawers
             object parent)
         {
             return _error != "";
+            // return true;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
+            // EditorGUI.EndDisabledGroup();
+
             if (_error == "")
             {
                 return position;
@@ -190,7 +204,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container, Action<object> onValueChangedCallback, object parent)
+            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassReadOnly(property)).ToList();
             VisualElement topElement = visibilityElements[0];

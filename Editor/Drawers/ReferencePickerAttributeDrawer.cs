@@ -255,8 +255,9 @@ namespace SaintsField.Editor.Drawers
             return button;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property));
             // VisualElement propertyContainer = container.Q<VisualElement>(NamePropertyContainer(property));
@@ -307,8 +308,9 @@ namespace SaintsField.Editor.Drawers
             UpdateLabel(property, container, newValue);
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
             UpdateLabel(property, container, property.managedReferenceValue);
         }

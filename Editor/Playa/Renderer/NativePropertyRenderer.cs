@@ -14,9 +14,32 @@ namespace SaintsField.Editor.Playa.Renderer
         public override VisualElement CreateVisualElement()
         {
             object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
-            return UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
+            VisualElement child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
-            // return FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
+
+            VisualElement container = new VisualElement
+            {
+                userData = value,
+            };
+            container.Add(child);
+
+            container.RegisterCallback<AttachToPanelEvent>(_ => WatchValueChanged(container));
+
+            return container;
+        }
+
+        private void WatchValueChanged(VisualElement container)
+        {
+            object userData = container.userData;
+            object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
+            if (userData != value)
+            {
+                container.Clear();
+                container.userData = value;
+                container.Add(UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
+                    .PropertyInfo.Name)));
+            }
+            container.schedule.Execute(() => WatchValueChanged(container)).Every(100);
         }
 #endif
         public override void Render()

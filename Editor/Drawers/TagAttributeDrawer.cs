@@ -70,8 +70,9 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             TagField tagField = container.Q<TagField>(NameTag(property));
             tagField.RegisterValueChangedCallback(evt =>

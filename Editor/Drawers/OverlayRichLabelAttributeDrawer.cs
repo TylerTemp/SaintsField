@@ -292,8 +292,9 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute) saintsAttribute;
             CalcOverlay(property, index, overlayRichLabelAttribute, container, parent);
@@ -308,7 +309,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute) saintsAttribute;
             CalcOverlay(property, index, overlayRichLabelAttribute, container, parent);

@@ -165,8 +165,9 @@ namespace SaintsField.Editor.Drawers
             return objectField;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;

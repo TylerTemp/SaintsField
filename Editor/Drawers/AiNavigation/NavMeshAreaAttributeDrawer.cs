@@ -210,8 +210,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             return root;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButtonField(property));
             ButtonData buttonData = (ButtonData) button.userData;
@@ -222,8 +223,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 ShowDropdownUIToolkit(property, buttonData, button, label, onValueChangedCallback);
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButtonField(property));
             ButtonData buttonData = (ButtonData) button.userData;

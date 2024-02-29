@@ -148,8 +148,9 @@ namespace SaintsField.Editor.Drawers.Addressable
             return helpBoxElement;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             dropdownField.RegisterValueChangedCallback(v =>
@@ -178,7 +179,7 @@ namespace SaintsField.Editor.Drawers.Addressable
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             (string error, IReadOnlyList<string> keys) = SetupAssetGroup((AddressableAddressAttribute) saintsAttribute);
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));

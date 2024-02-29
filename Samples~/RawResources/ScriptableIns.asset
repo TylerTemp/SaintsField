@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fda37f049d31d4f48a28c8bb3da27cdb, type: 3}
   m_Name: ScriptableIns
   m_EditorClassIdentifier: 
-  _intRange: 42
+  _intRange: 19
   normalRange: 36
-  publicValue: -11
+  publicValue: -18
   noLabel: 

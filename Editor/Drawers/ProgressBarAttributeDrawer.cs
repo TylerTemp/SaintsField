@@ -466,8 +466,9 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             ProgressBar progressBar = container.Q<ProgressBar>(NameProgressBar(property));
 
@@ -490,8 +491,9 @@ namespace SaintsField.Editor.Drawers
             });
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(saintsAttribute,
                 parent);
