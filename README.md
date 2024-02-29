@@ -1518,13 +1518,13 @@ Validate the input of the field when the value changes.
     **Parameters**:
 
     1.  If the function accepts no arguments, then no argument will be passed
-    2.  If the function accepts required arguments, it should only define one required argument, and the value of the field will be passed to it. All other optional argument will receive its default value.
-    3.  If the function only has optional arguments, then first optional argument that match the field's type (or super type) will be passed the value of the field. If no match, default value will be passed.
+    2.  If the function accepts required arguments, it should only define one required argument for this field, and the value of the field will be passed to it. All other optional argument will receive its default value.
+    3.  If the function only has optional arguments, then first optional argument that match the field's type (or parent type) will be passed the value of the field. If no match, default value will be passed.
     
     **Return**:
 
-    1.  If return type is **`string`**, then `null` or empty string for valid, otherwise, the string will be used as the error message
-    2.  If return type is bool, then `true` for valid, `false` for invalid with message "\`{label}\` is invalid`"
+    1.  If return type is `string`, then `null` or empty string for valid, otherwise, the string will be used as the error message
+    2.  If return type is `bool`, then `true` for valid, `false` for invalid with message "\`{label}\` is invalid`"
 
 *   AllowMultiple: Yes
 
