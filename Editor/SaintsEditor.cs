@@ -39,7 +39,7 @@ namespace SaintsField.Editor
 #endif
 
         // private Dictionary<string, ISaintsRendererGroup> _layoutKeyToGroup;
-        private List<ISaintsRenderer> _renderers = new List<ISaintsRenderer>();
+        private IReadOnlyList<ISaintsRenderer> _renderers = new List<ISaintsRenderer>();
 
         #region UI
 
@@ -55,23 +55,32 @@ namespace SaintsField.Editor
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
-        public override VisualElement CreateInspectorGUI()
+        public static VisualElement CreateVisualElement(bool TryFixUIToolkit, SerializedObject serializedObject, UnityEngine.Object target)
         {
-            Setup(TryFixUIToolkit);
+            var _renderers = Setup(TryFixUIToolkit, serializedObject, target);
             // return new Label("This is a Label in a Custom Editor");
             if (target == null)
             {
                 return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
             }
 
+            // Debug.Log($"SaintsEditor: {target}");
+
             VisualElement root = new VisualElement();
 
-#if SAINTSFIELD_DOTWEEN
-            root.RegisterCallback<AttachToPanelEvent>(_ => AliveInstances.Add(this));
-            root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance());
-#endif
+            foreach (ISaintsRenderer renderer in _renderers)
+            {
+                root.Add(renderer.CreateVisualElement());
+            }
 
-            MonoScript monoScript = GetMonoScript();
+            return root;
+        }
+
+        public override VisualElement CreateInspectorGUI()
+        {
+            VisualElement root = new VisualElement();
+
+            MonoScript monoScript = GetMonoScript(target);
             if(monoScript)
             {
                 ObjectField objectField = new ObjectField("Script")
@@ -86,11 +95,12 @@ namespace SaintsField.Editor
                 root.Add(objectField);
             }
 
-            foreach (ISaintsRenderer renderer in _renderers)
-            {
-                root.Add(renderer.CreateVisualElement());
-            }
+            root.Add(CreateVisualElement(TryFixUIToolkit, serializedObject, target));
 
+#if SAINTSFIELD_DOTWEEN
+            root.RegisterCallback<AttachToPanelEvent>(_ => AliveInstances.Add(this));
+            root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance());
+#endif
             return root;
         }
 
@@ -103,7 +113,7 @@ namespace SaintsField.Editor
 
         public virtual void OnEnable()
         {
-            Setup(false);
+            _renderers = Setup(false, serializedObject, target);
 #if SAINTSFIELD_DOTWEEN
             AliveInstances.Add(this);
 #endif
@@ -120,7 +130,7 @@ namespace SaintsField.Editor
         {
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.ObjectField("Script", GetMonoScript(), GetType(),
+                EditorGUILayout.ObjectField("Script", GetMonoScript(target), GetType(),
                     false);
             }
 
@@ -137,7 +147,7 @@ namespace SaintsField.Editor
 
         #endregion
 
-        private MonoScript GetMonoScript()
+        private static MonoScript GetMonoScript(UnityEngine.Object target)
         {
             try
             {
@@ -188,7 +198,7 @@ namespace SaintsField.Editor
         //     }
         // }
 
-        private void Setup(bool tryFixUIToolkit)
+        public static IReadOnlyList<ISaintsRenderer> Setup(bool tryFixUIToolkit, SerializedObject serializedObject, object target)
         {
             // #region MonoScript
             // CheckMonoScript();
@@ -196,7 +206,7 @@ namespace SaintsField.Editor
 
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            string[] serializableFields = GetSerializedProperties().ToArray();
+            string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
             foreach (int inherentDepth in Enumerable.Range(0, types.Count))
             {
                 Type systemType = types[inherentDepth];
@@ -417,7 +427,7 @@ namespace SaintsField.Editor
                         renderers.Add(layoutKeyToGroup[rootGroup]);
                     }
 
-                    AbsRenderer itemResult = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+                    AbsRenderer itemResult = MakeRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
 
                     ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
 
@@ -452,7 +462,7 @@ namespace SaintsField.Editor
     //             }
     // #endif
 
-                AbsRenderer result = MakeRenderer(fieldWithInfo, tryFixUIToolkit);
+                AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
                 // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
 
                 if (result != null)
@@ -463,7 +473,7 @@ namespace SaintsField.Editor
                 // renderer.AfterRender();
             }
 
-            _renderers = renderers;
+            return renderers;
         }
 
         private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
@@ -480,7 +490,7 @@ namespace SaintsField.Editor
             }
         }
 
-        private IEnumerable<string> GetSerializedProperties()
+        private static IEnumerable<string> GetSerializedProperties(SerializedObject serializedObject)
         {
             // outSerializedProperties.Clear();
             // ReSharper disable once ConvertToUsingDeclaration
@@ -530,19 +540,19 @@ namespace SaintsField.Editor
         //     return new VerticalGroup(layoutInfo);
         // }
 
-        protected virtual AbsRenderer MakeRenderer(SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit)
+        protected static AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit)
         {
             // Debug.Log($"field {fieldWithInfo.fieldInfo?.Name}/{fieldWithInfo.fieldInfo?.GetCustomAttribute<ExtShowHideConditionBase>()}");
             switch (fieldWithInfo.RenderType)
             {
                 case SaintsRenderType.SerializedField:
-                    return new SerializedFieldRenderer(this, fieldWithInfo, tryFixUIToolkit);
+                    return new SerializedFieldRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
                 case SaintsRenderType.NonSerializedField:
-                    return new NonSerializedFieldRenderer(this, fieldWithInfo, tryFixUIToolkit);
+                    return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
                 case SaintsRenderType.Method:
-                    return new MethodRenderer(this, fieldWithInfo, tryFixUIToolkit);
+                    return new MethodRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
                 case SaintsRenderType.NativeProperty:
-                    return new NativePropertyRenderer(this, fieldWithInfo, tryFixUIToolkit);
+                    return new NativePropertyRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }

@@ -18,10 +18,10 @@ namespace SaintsField.Editor.Playa.Renderer
         protected readonly bool TryFixUIToolkit;
         // ReSharper enable InconsistentNaming
 
-        protected AbsRenderer(UnityEditor.Editor editor, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
+        protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
         {
             FieldWithInfo = fieldWithInfo;
-            SerializedObject = editor.serializedObject;
+            SerializedObject = serializedObject;
             TryFixUIToolkit = tryFixUIToolkit;
         }
 
