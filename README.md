@@ -61,12 +61,15 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.6**
+**2.1.5**
 
-1.  `ValidateInput` now support validation callback with parameter of the target field value.
-2.  `SaintsEditor` fix a button rendered twice if it's override (or use `new`) in a derived class.
-3.  `SaintsEditor`, `ShowInInspector` now will change appearance when value changed for auto property.
-4.  `SaintsEditor`, `ShowInInspector` now support to show `null` value with a yellow background.
+1.  A better parser for `AdvancedDropdown`. Now you can use `/` to define a sub item.
+2.  UI Toolkit: dropdown icon for `AdvancedDropdown` looks better now.
+3.  Fix readme about `FindComponent`
+4.  `ValidateInput` now support validation callback with parameter of the target field value.
+5.  `SaintsEditor` fix a button rendered twice if it's override (or use `new`) in a derived class.
+6.  `SaintsEditor`, `ShowInInspector` now will change appearance when value changed for auto property.
+7.  `SaintsEditor`, `ShowInInspector` now support to show `null` value with a yellow background.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
