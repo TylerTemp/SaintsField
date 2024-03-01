@@ -1,3 +1,8 @@
+## 2.1.6 ##
+
+1.  UI Toolkit: Fix `MinMaxSlider` incorrect clamp.
+2.  UI Toolkit: Fix `MinMaxSlider` difficult to manually input a value because of auto-correction.
+
 ## 2.1.5 ##
 
 1.  A better parser for `AdvancedDropdown`. Now you can use `/` to define a sub item.
