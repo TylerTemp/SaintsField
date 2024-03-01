@@ -1,5 +1,7 @@
 using System;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.StoreShowOff
@@ -29,7 +31,9 @@ namespace SaintsField.Samples.Scripts.StoreShowOff
         {
             public string name;
             [Rate(1, 5), RichLabel(null)] public int stars;
+#if UNITY_2021_3_OR_NEWER
             [SerializeReference, ReferencePicker]
+#endif
             public Role role;
 
             [ProgressBar(0, 100, step: 1, color: EColor.Brown)]
@@ -77,9 +81,12 @@ namespace SaintsField.Samples.Scripts.StoreShowOff
 #endif
         }
 
+#if UNITY_EDITOR
         [RichLabel(nameof(LabelCharacterName), isCallback: true)]
+#endif
         public Character[] characters;
 
+#if UNITY_EDITOR
         public string LabelCharacterName(int index)
         {
             Character character = characters[index];
@@ -96,5 +103,6 @@ namespace SaintsField.Samples.Scripts.StoreShowOff
 
             return $"<color={color}><icon={AssetDatabase.GetAssetPath(character.role.icon)}/></color>{character.name}";
         }
+#endif
     }
 }

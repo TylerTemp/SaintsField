@@ -552,7 +552,7 @@ MonoBehaviour:
       rid: 9188093135070429191
     hp: 45
     mpSkillRange: {x: 7.2000003, y: 88}
-    mp: 95.4
+    mp: 70.200005
   - name: Shaundi
     stars: 4
     role:
@@ -666,6 +666,7 @@ Transform:
   m_Children:
   - {fileID: 20230547}
   - {fileID: 89587279}
+  - {fileID: 809626211}
   m_Father: {fileID: 0}
   m_RootOrder: 66
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -848,6 +849,7 @@ MonoBehaviour:
   _content: 0
   _modInt: 72
   _defaultInt: 32
+  canSell: 1
 --- !u!4 &246861352
 Transform:
   m_ObjectHideFlags: 0
@@ -2501,6 +2503,53 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 51
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &809626210
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 809626211}
+  - component: {fileID: 809626212}
+  m_Layer: 0
+  m_Name: ShowOff3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &809626211
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 809626210}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 118144894}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &809626212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 809626210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54090db25e3b0ea4cbdabad34a9b6a29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  equipments:
+  - {fileID: 11400000, guid: 7f55408cb57bcb04dac0fd03bb500871, type: 2}
+  - {fileID: 11400000, guid: a663c0a3e7461c341821fc722507e2cf, type: 2}
 --- !u!1 &812603483
 GameObject:
   m_ObjectHideFlags: 0

@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     flexDirection = FlexDirection.Row,
-                }
+                },
             };
 
             Toggle toggle = new Toggle("")
@@ -104,6 +104,7 @@ namespace SaintsField.Editor.Drawers
             container.Q<Toggle>(NameLeftToggle(property)).RegisterValueChangedCallback(evt =>
             {
                 property.boolValue = evt.newValue;
+                property.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(evt.newValue);
             });
         }

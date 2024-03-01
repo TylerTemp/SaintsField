@@ -2,6 +2,8 @@
 
 1.  Fix `MinMaxSlider` incorrect step.
 2.  Fix `ProgressBar` set value is not in real-time in struct type.
+3.  UI Toolkit: Fix incorrect image align for `AsssetPreview`, `AboveImage`, `BelowImage`
+4.  UI Toolkit: Fix `LeftToggle` not apply the value.
 
 ## 2.1.6 ##
 

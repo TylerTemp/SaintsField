@@ -280,8 +280,7 @@ namespace SaintsField.Editor.Drawers
                 });
                 genericDropdownMenu.AddSeparator("");
 
-                foreach (Type type in GetTypes(property)  // no public empty constructors
-                        )
+                foreach (Type type in GetTypes(property))
                 {
                     // string assemblyName =  type.Assembly.ToString().Split('(', ',')[0];
                     string displayName = $"{type.Name}: {type.Namespace}";

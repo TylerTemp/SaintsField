@@ -12,7 +12,6 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
             public GameObject base1;
         }
 
-
         [Serializable]
         public class Base2Fruit: Base1Fruit
         {

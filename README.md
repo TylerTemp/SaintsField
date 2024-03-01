@@ -61,10 +61,12 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.5**
+**2.1.7**
 
-1.  UI Toolkit: Fix `MinMaxSlider` incorrect clamp.
-2.  UI Toolkit: Fix `MinMaxSlider` difficult to manually input a value because of auto-correction.
+1.  Fix `MinMaxSlider` incorrect step.
+2.  Fix `ProgressBar` set value is not in real-time in struct type.
+3.  UI Toolkit: Fix incorrect image align for `AsssetPreview`, `AboveImage`, `BelowImage`
+4.  UI Toolkit: Fix `LeftToggle` not apply the value.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

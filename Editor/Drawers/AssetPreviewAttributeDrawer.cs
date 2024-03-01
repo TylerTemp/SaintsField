@@ -413,20 +413,19 @@ namespace SaintsField.Editor.Drawers
             switch (assetPreviewAttribute.Align)
             {
                 case EAlign.Start:
-                    // image.style.alignSelf = Align.Start;
                     fakeLabel.style.display = DisplayStyle.None;
                     break;
                 case EAlign.Center:
-                    // image.style.alignSelf = Align.Center;
                     fakeLabel.style.display = DisplayStyle.None;
+                    root.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
+                    fakeLabel.style.display = DisplayStyle.None;
                     // image.style.alignSelf = Align.FlexEnd;
+                    root.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
                     fakeLabel.style.display = DisplayStyle.Flex;
-                    // image.style.alignSelf = Align.FlexStart;
-                    // image.style.left = LabelBaseWidth;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(assetPreviewAttribute.Align), assetPreviewAttribute.Align, null);

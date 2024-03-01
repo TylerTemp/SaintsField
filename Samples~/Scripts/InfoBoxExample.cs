@@ -20,5 +20,10 @@ namespace SaintsField.Samples.Scripts
         public int _modInt;
 
         public int _defaultInt;
+
+        [InfoBox("Can not be sold", show: nameof(canSell))]
+        [LeftToggle]
+        [AboveRichLabel(nameof(canSell), isCallback:true)]
+        public bool canSell;
     }
 }
