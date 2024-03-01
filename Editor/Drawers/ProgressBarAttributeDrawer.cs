@@ -93,20 +93,6 @@ namespace SaintsField.Editor.Drawers
                 backgroundColor = value;
             }
 
-            // (string titleError, string _) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, min, max, parent);
-            // if (titleError != "")
-            // {
-            //     return new MetaInfo
-            //     {
-            //         Error = "",
-            //         Min = min,
-            //         Max = max,
-            //         Color = color,
-            //         BackgroundColor = backgroundColor,
-            //         // Title = null,
-            //     };
-            // }
-
             return new MetaInfo
             {
                 Error = "",
@@ -421,7 +407,6 @@ namespace SaintsField.Editor.Drawers
             if (backgroundFieldInfo != null)
             {
                 background = (VisualElement) backgroundFieldInfo.GetValue(progressBar);
-                // background.style.backgroundColor = EColor.Aqua.GetColor();
                 background.style.backgroundColor = metaInfo.BackgroundColor;
             }
 
@@ -475,7 +460,7 @@ namespace SaintsField.Editor.Drawers
             progressBar.RegisterCallback<PointerDownEvent>(evt =>
             {
                 progressBar.CapturePointer(0);
-                OnProgressBarInteract(property, (ProgressBarAttribute)saintsAttribute, container, progressBar, evt.localPosition, onValueChangedCallback, parent);
+                OnProgressBarInteract(property, (ProgressBarAttribute)saintsAttribute, container, progressBar, evt.localPosition, onValueChangedCallback, info, parent);
             });
             progressBar.RegisterCallback<PointerUpEvent>(_ =>
             {
@@ -486,7 +471,7 @@ namespace SaintsField.Editor.Drawers
                 if(progressBar.HasPointerCapture(0))
                 {
                     OnProgressBarInteract(property, (ProgressBarAttribute)saintsAttribute, container, progressBar,
-                        evt.localPosition, onValueChangedCallback, parent);
+                        evt.localPosition, onValueChangedCallback, info, parent);
                 }
             });
         }
@@ -522,7 +507,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     // Debug.Log($"update change: {metaInfo.Min} <= {propValue} <= {metaInfo.Max}");
                     propValue = ChangeValue(property, progressBarAttribute, container, progressBar, Mathf.Clamp(propValue, metaInfo.Min, metaInfo.Max), metaInfo.Min, metaInfo.Max,
-                        onValueChanged, parent);
+                        onValueChanged, info, parent);
                     // Debug.Log($"now prop = {propValue}");
                 }
 
@@ -537,6 +522,9 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
+            Debug.Log($"oldColor={oldMetaInfo.Color}/newColor={metaInfo.Color}, progress={uiToolkitPayload.Progress}");
+#endif
             if(metaInfo.Color != oldMetaInfo.Color && uiToolkitPayload.Progress != null)
             {
                 changed = true;
@@ -566,7 +554,7 @@ namespace SaintsField.Editor.Drawers
             label.text = labelOrNull ?? "";
         }
 
-        private static void OnProgressBarInteract(SerializedProperty property, ProgressBarAttribute progressBarAttribute, VisualElement container, ProgressBar progressBar, Vector3 mousePosition, Action<object> onValueChangedCallback, object parent)
+        private static void OnProgressBarInteract(SerializedProperty property, ProgressBarAttribute progressBarAttribute, VisualElement container, ProgressBar progressBar, Vector3 mousePosition, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             float curWidth = progressBar.resolvedStyle.width;
             if(float.IsNaN(curWidth))
@@ -578,10 +566,10 @@ namespace SaintsField.Editor.Drawers
 
             float curValue = Mathf.Lerp(uiToolkitPayload.metaInfo.Min, uiToolkitPayload.metaInfo.Max, mousePosition.x / curWidth);
             // Debug.Log(curValue);
-            ChangeValue(property, progressBarAttribute, container, progressBar, curValue, uiToolkitPayload.metaInfo.Min, uiToolkitPayload.metaInfo.Max, onValueChangedCallback, parent);
+            ChangeValue(property, progressBarAttribute, container, progressBar, curValue, uiToolkitPayload.metaInfo.Min, uiToolkitPayload.metaInfo.Max, onValueChangedCallback, info, parent);
         }
 
-        private static float ChangeValue(SerializedProperty property, ProgressBarAttribute progressBarAttribute, VisualElement container, ProgressBar progressBar, float curValue, float minValue, float maxValue, Action<object> onValueChangedCallback, object parent)
+        private static float ChangeValue(SerializedProperty property, ProgressBarAttribute progressBarAttribute, VisualElement container, ProgressBar progressBar, float curValue, float minValue, float maxValue, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             // UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;
 
@@ -606,14 +594,14 @@ namespace SaintsField.Editor.Drawers
             if (property.propertyType == SerializedPropertyType.Integer)
             {
                 int intValue = (int)newValue;
-                property.intValue = intValue;
+                Util.SetValue(property, intValue, parent, parent.GetType(), info);
                 property.serializedObject.ApplyModifiedProperties();
                 progressBar.SetValueWithoutNotify(intValue - minValue);
                 onValueChangedCallback.Invoke(intValue);
             }
             else
             {
-                property.floatValue = newValue;
+                Util.SetValue(property, newValue, parent, parent.GetType(), info);
                 property.serializedObject.ApplyModifiedProperties();
                 progressBar.SetValueWithoutNotify(newValue - minValue);
                 onValueChangedCallback.Invoke(newValue);

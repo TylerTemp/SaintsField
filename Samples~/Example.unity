@@ -171,6 +171,51 @@ Transform:
   m_Father: {fileID: 1486592967}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &20230546
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 20230547}
+  - component: {fileID: 20230548}
+  m_Layer: 0
+  m_Name: ShowOff1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &20230547
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20230546}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 118144894}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &20230548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20230546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b806521b4b68e9545b4414d683f92d5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rating: 5
 --- !u!1 &29054844
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,6 +501,82 @@ MonoBehaviour:
   areaValue: 1
   areaName: 0
   areaMask: 0
+--- !u!1 &89587278
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 89587279}
+  - component: {fileID: 89587280}
+  m_Layer: 0
+  m_Name: ShowOff2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &89587279
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89587278}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 118144894}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &89587280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89587278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10f31a08806947642ba0ace83a0c3ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characters:
+  - name: Playa
+    stars: 5
+    role:
+      rid: 9188093135070429191
+    hp: 45
+    mpSkillRange: {x: 7.2000003, y: 88}
+    mp: 95.4
+  - name: Shaundi
+    stars: 4
+    role:
+      rid: 9188093135070429192
+    hp: 78
+    mpSkillRange: {x: 28.6, y: 60.600002}
+    mp: 47.600002
+  references:
+    version: 2
+    RefIds:
+    - rid: 9188093135070429191
+      type: {class: ShowOff2/Knight, ns: SaintsField.Samples.Scripts.StoreShowOff, asm: today.comes.saintsfield.Samples}
+      data:
+        roleId: 0
+        icon: {fileID: 21300000, guid: d5a743de92646d542a7fec22472c2ade, type: 3}
+        sword: 
+        shield: 
+    - rid: 9188093135070429192
+      type: {class: ShowOff2/Thief, ns: SaintsField.Samples.Scripts.StoreShowOff, asm: today.comes.saintsfield.Samples}
+      data:
+        roleId: 0
+        icon: {fileID: 21300000, guid: 12205a1e00dac3140bde6e6c3660971c, type: 3}
+        leftSword: 
+        rightSword: 
 --- !u!1 &90550605
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,6 +636,39 @@ MonoBehaviour:
   my:
     normal: 0
     myInt: 3
+--- !u!1 &118144893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 118144894}
+  m_Layer: 0
+  m_Name: StoreShowOff
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &118144894
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118144893}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 20230547}
+  - {fileID: 89587279}
+  m_Father: {fileID: 0}
+  m_RootOrder: 66
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -592,13 +746,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_maxValue>k__BackingField: 61
-  <_minValue>k__BackingField: 17
-  <_range>k__BackingField: {x: 24.482992, y: 44.62857}
-  <intRange>k__BackingField: {x: 17, y: 61}
-  wrongMin: 55
-  wrongMax: -19
-  errorRange: {x: 1, y: 1}
+  <_maxValue>k__BackingField: 0
+  <_minValue>k__BackingField: 0
+  <_range>k__BackingField: {x: 0, y: 0}
+  <intRange>k__BackingField: {x: 0, y: 0}
+  wrongMin: 0
+  wrongMax: 0
+  errorRange: {x: 0, y: 0}
 --- !u!4 &185980176
 Transform:
   m_ObjectHideFlags: 0
@@ -5606,8 +5760,8 @@ MonoBehaviour:
   myMp: 65.85
   minValue: -5
   maxValue: 30
-  fValue: 24.550001
-  stamina: 50
+  fValue: 12.7
+  stamina: 73
   highStamina: 150
   maxStamina: 200
 --- !u!1 &1967770119

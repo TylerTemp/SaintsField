@@ -532,14 +532,16 @@ namespace SaintsField.Editor.Drawers
 
         private static void ApplyFloatValue(SerializedProperty property, float step, Vector2 sliderValue, float minValue, float maxValue, MinMaxSlider slider, FloatField minField, FloatField maxField, Action<object> onValueChangedCallback)
         {
-            // UI Toolkit might give reversed result...
-            float actualMin = Mathf.Min(sliderValue.x, sliderValue.y);
-            float actualMax = Mathf.Max(sliderValue.x, sliderValue.y);
-            // Debug.Log($"try apply float {minValue}~{maxValue}<={actualMin}~{actualMax}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
+            Debug.Log($"try apply float {minValue}~{maxValue}<={sliderValue}");
+#endif
             Vector2 vector2Value = step <= 0f
-                ? new Vector2(Mathf.Max(actualMin, minValue), Mathf.Min(actualMax, maxValue))
-                : BoundV2Step(new Vector2(actualMin, actualMax), actualMin, actualMax, step);
+                ? new Vector2(Mathf.Max(sliderValue.x, minValue), Mathf.Min(sliderValue.y, maxValue))
+                : BoundV2Step(sliderValue, minValue, maxValue, step);
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
+            Debug.Log($"apply step={step}: {sliderValue} => {vector2Value}");
+#endif
             property.vector2Value = vector2Value;
             // Debug.Log($"apply float {vector2Value}");
             property.serializedObject.ApplyModifiedProperties();

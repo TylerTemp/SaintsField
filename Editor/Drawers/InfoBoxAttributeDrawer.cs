@@ -125,10 +125,12 @@ namespace SaintsField.Editor.Drawers
 
         private struct MetaInfo
         {
+            // ReSharper disable InconsistentNaming
             public string Error;
             public EMessageType MessageType;
             public string Content;
             public bool WillDraw;
+            // ReSharper enable InconsistentNaming
         }
 
         private static MetaInfo GetMetaInfo(InfoBoxAttribute infoboxAttribute, object target)
@@ -215,6 +217,11 @@ namespace SaintsField.Editor.Drawers
             {
                 ParameterInfo[] methodParams = methodInfo.GetParameters();
                 Debug.Assert(methodParams.All(p => p.IsOptional));
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_INFO_BOX
+                Debug.Log(methodInfo.ReturnType);
+                Debug.Log(methodInfo.ReturnType == typeof(ValueTuple<EMessageType, string>));
+#endif
 
                 if (methodInfo.ReturnType != typeof(ValueTuple<EMessageType, string>))
                     return new MetaInfo

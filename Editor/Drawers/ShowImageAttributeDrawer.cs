@@ -493,9 +493,12 @@ namespace SaintsField.Editor.Drawers
                 case EAlign.Center:
                     // image.style.alignSelf = Align.Center;
                     fakeLabel.style.display = DisplayStyle.None;
+                    root.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
+                    fakeLabel.style.display = DisplayStyle.None;
                     // image.style.alignSelf = Align.FlexEnd;
+                    root.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
                     fakeLabel.style.display = DisplayStyle.Flex;

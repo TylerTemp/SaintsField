@@ -288,7 +288,7 @@ Draw an info box above/below the field.
 
     If the value (or returned value) is a string, then the content will be changed
 
-    If the value is `(string content, EMessageType messageType)` then both content and message type will be changed
+    If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
 
 *   `bool above=false`
 

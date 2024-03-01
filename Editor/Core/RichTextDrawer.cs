@@ -161,9 +161,11 @@ namespace SaintsField.Editor.Core
 
         public struct RichTextChunk
         {
+            // ReSharper disable InconsistentNaming
             public bool IsIcon;
             public string Content;
             public string IconColor;
+            // ReSharper enable InconsistentNaming
 
             public override string ToString() => IsIcon
                 ? $"<ICON={Content} COLOR={IconColor}/>"
@@ -225,6 +227,7 @@ namespace SaintsField.Editor.Core
                 {
                     if (!parsedResult.isSelfClose)
                     {
+                        // ReSharper disable once UseIndexFromEndExpression
                         Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content);
                         openTags.RemoveAt(openTags.Count - 1);
                     }
@@ -261,6 +264,7 @@ namespace SaintsField.Editor.Core
                             {
                                 IsIcon = true,
                                 Content = parsedResult.value,
+                                // ReSharper disable once UseIndexFromEndExpression
                                 IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
                             };
 
@@ -519,8 +523,8 @@ namespace SaintsField.Editor.Core
                         style =
                         {
                             flexShrink = 0,
-                            marginTop = 1,
-                            marginBottom = 1,
+                            marginTop = 2,
+                            marginBottom = 2,
                             paddingLeft = 1,
                             paddingRight = 1,
                             width = ImageWidth,

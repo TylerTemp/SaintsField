@@ -1,14 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
     public class MinMaxExample: MonoBehaviour
     {
-        // public int upLimit;
-
-        // [MinValue(0), MaxValue(nameof(upLimit))] public int min0Max;
-        // [MinValue(nameof(upLimit)), MaxValue(10)] public float fMinMax10;
-
         [field: SerializeField, MinValue(nameof(_minValue)), Space]
         public int _maxValue { get; private set; }
 
