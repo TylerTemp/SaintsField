@@ -63,13 +63,8 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 **2.1.5**
 
-1.  A better parser for `AdvancedDropdown`. Now you can use `/` to define a sub item.
-2.  UI Toolkit: dropdown icon for `AdvancedDropdown` looks better now.
-3.  Fix readme about `FindComponent`
-4.  `ValidateInput` now support validation callback with parameter of the target field value.
-5.  `SaintsEditor` fix a button rendered twice if it's override (or use `new`) in a derived class.
-6.  `SaintsEditor`, `ShowInInspector` now will change appearance when value changed for auto property.
-7.  `SaintsEditor`, `ShowInInspector` now support to show `null` value with a yellow background.
+1.  UI Toolkit: Fix `MinMaxSlider` incorrect clamp.
+2.  UI Toolkit: Fix `MinMaxSlider` difficult to manually input a value because of auto-correction.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1523,7 +1518,7 @@ Validate the input of the field when the value changes.
     1.  If the function accepts no arguments, then no argument will be passed
     2.  If the function accepts required arguments, it should only define one required argument for this field, and the value of the field will be passed to it. All other optional argument will receive its default value.
     3.  If the function only has optional arguments, then first optional argument that match the field's type (or parent type) will be passed the value of the field. If no match, default value will be passed.
-    
+
     **Return**:
 
     1.  If return type is `string`, then `null` or empty string for valid, otherwise, the string will be used as the error message
@@ -1547,7 +1542,7 @@ public class ValidateInputExample : MonoBehaviour
     [ValidateInput(nameof(BoolCallbackValidate))]
     public string boolCallbackValidate;
     private bool BoolCallbackValidate() => boolValidate;
-    
+
     // with callback params
     [ValidateInput(nameof(ValidateWithReqParams))]
     public int withReqParams;
