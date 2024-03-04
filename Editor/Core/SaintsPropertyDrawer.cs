@@ -1558,7 +1558,7 @@ namespace SaintsField.Editor.Core
                 // bool result = (bool)methodInfo.Invoke(handler, methodArgs);
                 // Debug.Log(result);
 
-                EditorGUI.PropertyField(position, property, label, false);
+                EditorGUI.PropertyField(position, property, label, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
             }
             // Debug.Log($"UnityDraw exit, isSub={isSubDrawer}");

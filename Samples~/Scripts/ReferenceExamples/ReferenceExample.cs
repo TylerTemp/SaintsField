@@ -74,8 +74,8 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
             public override string AbsValue => $"Sub2: {sub2}";
         }
 
-        // [SerializeReference, ReferencePicker]
-        // public StructImpl structImpl;
+        [SerializeReference, ReferencePicker]
+        public IRefInterface structImpl;
 
         [SerializeReference, ReferencePicker]
         public IRefInterface myInterface;

@@ -1,3 +1,7 @@
+## 2.1.8 ##
+
+1.  IMGUI: Fix PropertyField not with `includeChildren: true` and lead to broken `ReferencePicker` 
+
 ## 2.1.7 ##
 
 1.  Fix `MinMaxSlider` incorrect step.
