@@ -786,11 +786,11 @@ The look in the UI Toolkit with `slashAsSub: false`:
 
 #### `AdvancedDropdown` ####
 
-A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
+A dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
 
 **Known Issue**:
 
-1.  IMGUI: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
+1.  IMGUI: Using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
     This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup.
 
     This issue is not fixable unless Unity fixes it.
@@ -868,7 +868,7 @@ public class AdvancedDropdownExample: MonoBehaviour
 
 [![advanced_dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/ad2f556b-7d98-4f49-a1ad-e2a5a52bf8f0)](https://github.com/TylerTemp/SaintsField/assets/6391063/157838e7-1f63-4b44-9503-bbb0004db7e8)
 
-There is also a parser to automaticly seperate items as sub items using `/`:
+There is also a parser to automatically separate items as sub items using `/`:
 
 ```csharp
 [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
