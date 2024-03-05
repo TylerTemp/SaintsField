@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override bool DrawOverlay(Rect position, SerializedProperty property,
             GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabel, object parent)
+            ISaintsAttribute saintsAttribute, bool hasLabel, FieldInfo info, object parent)
         {
             string inputContent = GetContent(property);
             if (inputContent == null)  // null=error
@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers
             OverlayRichLabelAttribute targetAttribute = (OverlayRichLabelAttribute)saintsAttribute;
 
             float contentWidth = GetPlainTextWidth(inputContent) + targetAttribute.Padding;
-            (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
+            (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml, targetAttribute.IsCallback, info, parent);
 
             _error = error;
 
@@ -297,14 +297,16 @@ namespace SaintsField.Editor.Drawers
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute) saintsAttribute;
-            CalcOverlay(property, index, overlayRichLabelAttribute, container, parent);
+            CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
             object parent, object newValue)
         {
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute) saintsAttribute;
-            CalcOverlay(property, index, overlayRichLabelAttribute, container, parent);
+            CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -312,11 +314,11 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute) saintsAttribute;
-            CalcOverlay(property, index, overlayRichLabelAttribute, container, parent);
+            CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);
         }
 
         private void CalcOverlay(SerializedProperty property, int index, OverlayRichLabelAttribute overlayRichLabelAttribute,
-            VisualElement container, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             (string contentString, Rect contentRect) = GetFieldString(container.Q<VisualElement>(className: ClassFieldUIToolkit(property)));
 
@@ -347,7 +349,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             MetaInfo metaInfo = (MetaInfo)labelContainer.userData;
-            (string error, string xml) = RichTextDrawer.GetLabelXml(property, overlayRichLabelAttribute, parent);
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, overlayRichLabelAttribute.RichTextXml, overlayRichLabelAttribute.IsCallback, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property, index));
             if (helpBox.text != error)

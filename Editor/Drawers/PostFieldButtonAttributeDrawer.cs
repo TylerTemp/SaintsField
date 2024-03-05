@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute)saintsAttribute;
 

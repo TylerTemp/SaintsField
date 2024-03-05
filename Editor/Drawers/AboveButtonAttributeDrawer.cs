@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             Rect leftRect = Draw(position, property, label, saintsAttribute, parent);
 

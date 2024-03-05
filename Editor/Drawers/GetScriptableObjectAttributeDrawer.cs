@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent) => 0;
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => 0;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,

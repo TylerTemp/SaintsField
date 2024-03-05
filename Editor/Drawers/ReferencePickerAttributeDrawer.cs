@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return ImGuiButtonWidth;
         }
@@ -301,7 +301,9 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
             object parent, object newValue)
         {
             UpdateLabel(property, container, newValue);

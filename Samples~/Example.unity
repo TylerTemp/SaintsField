@@ -434,7 +434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ce5118ba42f4824cbe1daf592932b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ints: 0200000002000000
+  ints: 00000000000000004800000036000000e4ffffff
   myStructs:
   - minMax: {x: 0.14833865, y: 0.7255423}
     normalFloat: 0.21

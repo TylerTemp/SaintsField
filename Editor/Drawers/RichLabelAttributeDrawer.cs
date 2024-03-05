@@ -40,10 +40,11 @@ namespace SaintsField.Editor.Drawers
         //     EditorGUIUtility.singleLineHeight;
 
         protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
-            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml, targetAttribute.IsCallback, info, parent);
             // bool result = GetLabelXml(property, targetAttribute) != null;
             // Debug.Log($"richLabel willDraw={result}");
             // return result;
@@ -52,11 +53,11 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
 
-            (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
+            (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml, targetAttribute.IsCallback, info, parent);
             _error = error;
 
             if (labelXml is null)
@@ -145,7 +146,8 @@ namespace SaintsField.Editor.Drawers
         {
             VisualElement labelContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
             string curXml = (string)labelContainer.userData;
-            (string error, string nowXml) = RichTextDrawer.GetLabelXml(property, (RichLabelAttribute)saintsAttribute, parent);
+            RichLabelAttribute richLabelAttribute = (RichLabelAttribute)saintsAttribute;
+            (string error, string nowXml) = RichTextDrawer.GetLabelXml(property, richLabelAttribute.RichTextXml, richLabelAttribute.IsCallback, info, parent);
             if (curXml != nowXml)
             {
                 labelContainer.userData = nowXml;

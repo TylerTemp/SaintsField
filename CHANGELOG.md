@@ -1,3 +1,7 @@
+## 2.1.9
+
+1.  `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+
 ## 2.1.8 ##
 
 1.  IMGUI: Fix PropertyField not with `includeChildren: true` and lead to broken `ReferencePicker` 

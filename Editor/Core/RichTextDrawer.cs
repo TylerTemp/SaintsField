@@ -56,17 +56,15 @@ namespace SaintsField.Editor.Core
             _textureCache.Clear();
         }
 
-        public static (string error, string xml) GetLabelXml(SerializedProperty property, RichLabelAttribute targetAttribute, object target)
+        public static (string error, string xml) GetLabelXml(SerializedProperty property, string richTextXml, bool isCallback, FieldInfo fieldInfo, object target)
         {
-            if (!targetAttribute.IsCallback)
+            if (!isCallback)
             {
-                return ("", targetAttribute.RichTextXml);
+                return ("", richTextXml);
             }
-            //
-            // _error = "";
-            // object target = GetParentTarget(property);
+
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
+                ReflectUtils.GetProp(target.GetType(), richTextXml);
             switch (getPropType)
             {
                 case ReflectUtils.GetPropType.Field:
@@ -83,52 +81,20 @@ namespace SaintsField.Editor.Core
                 case ReflectUtils.GetPropType.Method:
                 {
                     MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    ParameterInfo[] requiredParams = methodParams.Where(p => !p.IsOptional).ToArray();
-                    // Debug.Assert(methodParams.All(p => p.IsOptional));
-                    Debug.Assert(requiredParams.Length <= 1);
-                    if (methodInfo.ReturnType != typeof(string))
-                    {
-                        return (
-                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}", property.displayName);
-                    }
 
                     int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                    bool dataCallback = false;
-                    if (requiredParams.Length == 1)
-                    {
-                        Debug.Assert(requiredParams[0].ParameterType == typeof(int));
-                        if(arrayIndex >= 0)
+                    object rawValue = fieldInfo.GetValue(target);
+                    object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                    object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                        ? new[]
                         {
-                            dataCallback = true;
+                            curValue,
                         }
-                    }
-
-                    object[] passParams;
-                    if(dataCallback)
-                    {
-                        List<object> injectedParams = new List<object>();
-                        bool injected = false;
-                        foreach (ParameterInfo methodParam in methodParams)
+                        : new []
                         {
-                            if (!injected && methodParam.ParameterType == typeof(int))
-                            {
-                                injectedParams.Add(arrayIndex);
-                                injected = true;
-                            }
-                            else
-                            {
-                                injectedParams.Add(methodParam.DefaultValue);
-                            }
-                        }
-                        passParams = injectedParams.ToArray();
-                    }
-                    else
-                    {
-                        passParams = methodParams
-                            .Select(p => p.DefaultValue)
-                            .ToArray();
-                    }
+                            curValue,
+                            arrayIndex,
+                        });
 
                     try
                     {
@@ -152,7 +118,7 @@ namespace SaintsField.Editor.Core
                 }
                 case ReflectUtils.GetPropType.NotFound:
                 {
-                    return ($"not found `{targetAttribute.RichTextXml}` on `{target}`", property.displayName);
+                    return ($"not found `{richTextXml}` on `{target}`", property.displayName);
                 }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);

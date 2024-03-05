@@ -61,10 +61,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.8**
+**2.1.9**
 
-1.  IMGUI: Fix PropertyField not with `includeChildren: true` and lead to broken `ReferencePicker`
-2.  `ValidateInput` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+1.  `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

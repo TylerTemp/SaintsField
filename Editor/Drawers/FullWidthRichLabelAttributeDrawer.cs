@@ -40,17 +40,18 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            return DrawImGui(position, property, label, saintsAttribute, parent);
+            return DrawImGui(position, property, label, saintsAttribute, info, parent);
         }
 
         private Rect DrawImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
 
-            (string error, string xml) = GetLabelXml(fullWidthRichLabelAttribute, parent);
+            (string error, string xml) =
+                RichTextDrawer.GetLabelXml(property, fullWidthRichLabelAttribute.RichTextXml, fullWidthRichLabelAttribute.IsCallback, info, parent);
             if(error != "")
             {
                 _error = error;
@@ -73,66 +74,66 @@ namespace SaintsField.Editor.Drawers
             return leftRect;
         }
 
-        private static (string error, string xml) GetLabelXml(FullWidthRichLabelAttribute targetAttribute, object target)
-        {
-            if (!targetAttribute.IsCallback)
-            {
-                return ("", targetAttribute.RichTextXml);
-            }
-
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
-            switch (getPropType)
-            {
-                case ReflectUtils.GetPropType.Field:
-                {
-                    object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-                    return ("", result == null ? string.Empty : result.ToString());
-                }
-
-                case ReflectUtils.GetPropType.Property:
-                {
-                    object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                    return ("", result == null ? string.Empty : result.ToString());
-                }
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    if (methodInfo.ReturnType != typeof(string))
-                    {
-                        return (
-                            $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}",
-                            "");
-                    }
-
-                    try
-                    {
-                        string xml = (string)methodInfo.Invoke(target,
-                            methodParams.Select(p => p.DefaultValue).ToArray());
-                        return ("", xml);
-                    }
-                    catch (TargetInvocationException e)
-                    {
-                        Debug.LogException(e);
-                        Debug.Assert(e.InnerException != null);
-                        return (e.InnerException.Message, null);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        return (e.Message, null);
-                    }
-                }
-                case ReflectUtils.GetPropType.NotFound:
-                {
-                    return ($"not found `{targetAttribute.RichTextXml}` on `{target}`", null);
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            }
-        }
+        // private static (string error, string xml) GetLabelXml(FullWidthRichLabelAttribute targetAttribute, object target)
+        // {
+        //     if (!targetAttribute.IsCallback)
+        //     {
+        //         return ("", targetAttribute.RichTextXml);
+        //     }
+        //
+        //     (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+        //         ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
+        //     switch (getPropType)
+        //     {
+        //         case ReflectUtils.GetPropType.Field:
+        //         {
+        //             object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+        //             return ("", result == null ? string.Empty : result.ToString());
+        //         }
+        //
+        //         case ReflectUtils.GetPropType.Property:
+        //         {
+        //             object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+        //             return ("", result == null ? string.Empty : result.ToString());
+        //         }
+        //         case ReflectUtils.GetPropType.Method:
+        //         {
+        //             MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+        //             ParameterInfo[] methodParams = methodInfo.GetParameters();
+        //             Debug.Assert(methodParams.All(p => p.IsOptional));
+        //             if (methodInfo.ReturnType != typeof(string))
+        //             {
+        //                 return (
+        //                     $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}",
+        //                     "");
+        //             }
+        //
+        //             try
+        //             {
+        //                 string xml = (string)methodInfo.Invoke(target,
+        //                     methodParams.Select(p => p.DefaultValue).ToArray());
+        //                 return ("", xml);
+        //             }
+        //             catch (TargetInvocationException e)
+        //             {
+        //                 Debug.LogException(e);
+        //                 Debug.Assert(e.InnerException != null);
+        //                 return (e.InnerException.Message, null);
+        //             }
+        //             catch (Exception e)
+        //             {
+        //                 Debug.LogException(e);
+        //                 return (e.Message, null);
+        //             }
+        //         }
+        //         case ReflectUtils.GetPropType.NotFound:
+        //         {
+        //             return ($"not found `{targetAttribute.RichTextXml}` on `{target}`", null);
+        //         }
+        //         default:
+        //             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+        //     }
+        // }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info,
@@ -159,7 +160,7 @@ namespace SaintsField.Editor.Drawers
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
             {
-                useRect = DrawImGui(position, property, label, fullWidthRichLabelAttribute, parent);
+                useRect = DrawImGui(position, property, label, fullWidthRichLabelAttribute, info, parent);
             }
             return _error == ""
                 ? useRect
@@ -175,7 +176,7 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__FullWidthRichLabel_HelpBox";
 
-        private VisualElement DrawUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, object parent)
+        private static VisualElement DrawUIToolKit(SerializedProperty property, int index)
         {
             // FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             //
@@ -210,7 +211,7 @@ namespace SaintsField.Editor.Drawers
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             return fullWidthRichLabelAttribute.Above
-                ? DrawUIToolKit(property, saintsAttribute, index, parent)
+                ? DrawUIToolKit(property, index)
                 : null;
         }
 
@@ -222,7 +223,7 @@ namespace SaintsField.Editor.Drawers
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute) saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
             {
-                root.Add(DrawUIToolKit(property, saintsAttribute, index, parent));
+                root.Add(DrawUIToolKit(property, index));
             }
 
             root.Add(new HelpBox("", HelpBoxMessageType.Error)
@@ -241,7 +242,8 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            (string error, string xml) = GetLabelXml((FullWidthRichLabelAttribute)saintsAttribute, parent);
+            FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, fullWidthRichLabelAttribute.RichTextXml, fullWidthRichLabelAttribute.IsCallback, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if ((string)helpBox.userData != error)
