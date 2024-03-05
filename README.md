@@ -64,6 +64,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 **2.1.8**
 
 1.  IMGUI: Fix PropertyField not with `includeChildren: true` and lead to broken `ReferencePicker`
+2.  `ValidateInput` now can receive the value and/or the index (if it's in a list/array) in the callback function.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1515,8 +1516,8 @@ Validate the input of the field when the value changes.
     **Parameters**:
 
     1.  If the function accepts no arguments, then no argument will be passed
-    2.  If the function accepts required arguments, it should only define one required argument for this field, and the value of the field will be passed to it. All other optional argument will receive its default value.
-    3.  If the function only has optional arguments, then first optional argument that match the field's type (or parent type) will be passed the value of the field. If no match, default value will be passed.
+    2.  If the function accepts required arguments, the first required argument will receive the field's value. If there is another required argument and the field is inside a list/array, the index will be passed. 
+    3.  If the function only has optional arguments, it will try to pass the field's value and index if possible. Otherwise the default value of the parameter will be passed.
 
     **Return**:
 
@@ -1552,6 +1553,12 @@ public class ValidateInputExample : MonoBehaviour
     public int withOptionalParams;
 
     private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
+    
+    // with array index callback
+    [ValidateInput(nameof(ValidateValArr))]
+    public int[] valArr;
+
+    private string ValidateValArr(int v, int index) => $"ValidateValArr[{index}]: {v}";
 }
 ```
 

@@ -614,11 +614,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6830dc4b87389ed4daf7678ce72b922f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: -15
-  boolValidate: 0
+  value: 0
+  boolValidate: 1
   boolCallbackValidate: 
-  withReqParams: 0
-  withOptionalParams: 0
+  withReqParams: 9
+  withOptionalParams: 16
+  valArr: 1600000055000000
+  nested:
+  - nestedValue: c3ffffffb3ffffff
+  - nestedValue: 85ffffff
 --- !u!4 &272774834
 Transform:
   m_ObjectHideFlags: 0

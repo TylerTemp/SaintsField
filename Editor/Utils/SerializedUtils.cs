@@ -185,7 +185,7 @@ namespace SaintsField.Editor.Utils
             throw new Exception($"Unable to get type from {source}");
         }
 
-        private static object GetValueAtIndex(object source, int index)
+        public static object GetValueAtIndex(object source, int index)
         {
             if (!(source is IEnumerable enumerable))
             {

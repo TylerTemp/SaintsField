@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -45,7 +43,7 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_NAUGHYTATTRIBUTES
             labelText = property.displayName;
 #endif
-            _error = CallValidateMethod(callback, labelText, info, parent);
+            _error = CallValidateMethod(callback, labelText, property, info, parent);
 
             return true;
         }
@@ -101,7 +99,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
             string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
-            string validateResult = CallValidateMethod(callback, property.displayName, info, parent);
+            string validateResult = CallValidateMethod(callback, property.displayName, property, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             // ReSharper disable once InvertIf
@@ -116,7 +114,7 @@ namespace SaintsField.Editor.Drawers
 
 #endif
 
-        private static string CallValidateMethod(string callback, string label, FieldInfo fieldInfo, object parent)
+        private static string CallValidateMethod(string callback, string label, SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(parent.GetType(), callback);
 
@@ -138,61 +136,28 @@ namespace SaintsField.Editor.Drawers
             }
             else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
             {
-                ParameterInfo[] methodParams = methodInfo.GetParameters();
-                List<object> methodWithRequiredParamValues = new List<object>();
-                List<object> methodWithOptionalParamValues = new List<object>();
-                List<object> methodWithOptionalSignedParamValues = new List<object>();
+                int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                object rawValue = fieldInfo.GetValue(parent);
+                object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
 
-                bool requiredParam = false;
-                bool optionalSignedParam = false;
-                foreach (ParameterInfo param in methodParams)
-                {
-                    if (param.IsOptional)
+                object[] filledParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                    ? new[]
                     {
-                        if (!requiredParam)
-                        {
-                            methodWithOptionalParamValues.Add(param.DefaultValue);
+                        curValue,
+                    }
+                    : new []
+                    {
+                        curValue,
+                        arrayIndex,
+                    });
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_VALIDATE_INPUT
-                            Debug.Log($"optionalSignedParam={optionalSignedParam}， fieldInfo.FieldType={fieldInfo.FieldType}, param.ParameterType={param.ParameterType}");
+                Debug.Log($"#ValidateInput# {methodInfo.Name}({string.Join(", ", filledParams)})");
 #endif
-                            if (!optionalSignedParam && (fieldInfo.FieldType == param.ParameterType || fieldInfo.FieldType.IsSubclassOf(param.ParameterType)))
-                            {
-                                optionalSignedParam = true;
-                                methodWithOptionalSignedParamValues.Add(fieldInfo.GetValue(parent));
-                            }
-                            else
-                            {
-                                methodWithOptionalSignedParamValues.Add(param.DefaultValue);
-                            }
-                        }
-                        methodWithRequiredParamValues.Add(param.DefaultValue);
-                    }
-                    else
-                    {
-                        Debug.Assert(!requiredParam,
-                            $"Can only have one required parameter in method `{methodInfo}`, got `{param.Name}`");
-                        requiredParam = true;
-                        methodWithRequiredParamValues.Add(fieldInfo.GetValue(parent));
-                    }
-                }
-
-                List<object> methodParam;
-                if (requiredParam)
-                {
-                    methodParam = methodWithRequiredParamValues;
-                }
-                else if(optionalSignedParam)
-                {
-                    methodParam = methodWithOptionalSignedParamValues;
-                }
-                else
-                {
-                    methodParam = methodWithOptionalParamValues;
-                }
 
                 try
                 {
-                    validateResult = methodInfo.Invoke(parent, methodParam.ToArray());
+                    validateResult = methodInfo.Invoke(parent, filledParams);
                 }
                 catch (TargetInvocationException e)
                 {

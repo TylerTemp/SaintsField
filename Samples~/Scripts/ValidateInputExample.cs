@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -31,5 +32,19 @@ namespace SaintsField.Samples.Scripts
 
         private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
 
+        [ValidateInput(nameof(ValidateValArr))]
+        public int[] valArr;
+
+        private string ValidateValArr(int v, int index) => $"ValidateValArr[{index}]: {v}";
+
+        [Serializable]
+        public struct Nested
+        {
+            [ValidateInput(nameof(ValidateNested))]
+            public int[] nestedValue;
+            private string ValidateNested(int newValue, int index) => newValue < 0 ? $"Nested value at {index} should be positive, get {newValue}" : null;
+        }
+
+        public Nested[] nested;
     }
 }
