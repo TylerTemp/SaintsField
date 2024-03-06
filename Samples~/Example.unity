@@ -434,10 +434,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ce5118ba42f4824cbe1daf592932b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ints: 00000000000000004800000036000000e4ffffff
+  ints: 00000000000000000000000000000000
   myStructs:
-  - minMax: {x: 0.14833865, y: 0.7255423}
-    normalFloat: 0.21
+  - minMax: {x: 0, y: 0}
+    normalFloat: 0
+  - minMax: {x: 0, y: 0}
+    normalFloat: 0
+  structNested:
+  - ints: 02000000fbffffff1d000000c1ffffffd5ffffff10000000
+  - ints: fbffffff020000001d000000abffffff2f000000d5ffffff
 --- !u!1 &185980174
 GameObject:
   m_ObjectHideFlags: 0
@@ -3822,7 +3827,7 @@ MonoBehaviour:
   _rainbow: {fileID: 0}
   _callbackToggle: 0
   arrayLabels: []
-  _propertyLabel: 
+  _propertyLabel: My <color=green>Dynamic</color> label
   colorAqua: Aqua
   colorBlack: Black
   colorBlue: Blue

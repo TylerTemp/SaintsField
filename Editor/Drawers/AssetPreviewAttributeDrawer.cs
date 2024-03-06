@@ -100,6 +100,7 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
             return ((AssetPreviewAttribute)saintsAttribute).Above;

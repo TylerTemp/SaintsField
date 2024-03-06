@@ -25,10 +25,22 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
-            // Debug.Log("ABOVE!");
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
+            (string error, string xml) =
+                RichTextDrawer.GetLabelXml(property, fullWidthRichLabelAttribute.RichTextXml, fullWidthRichLabelAttribute.IsCallback, info, parent);
+            if (error != "")
+            {
+                _error = error;
+            }
+
+            if (string.IsNullOrEmpty(xml))
+            {
+                return false;
+            }
+
             return fullWidthRichLabelAttribute.Above;
         }
 
@@ -36,7 +48,18 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
-            return fullWidthRichLabelAttribute.Above? EditorGUIUtility.singleLineHeight: 0;
+            if (!fullWidthRichLabelAttribute.Above)
+            {
+                return 0;
+            }
+
+            (string error, string xml) =
+                RichTextDrawer.GetLabelXml(property, fullWidthRichLabelAttribute.RichTextXml, fullWidthRichLabelAttribute.IsCallback, info, parent);
+            if (error != "")
+            {
+                _error = error;
+            }
+            return string.IsNullOrEmpty(xml)? 0 : EditorGUIUtility.singleLineHeight;
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
@@ -74,88 +97,57 @@ namespace SaintsField.Editor.Drawers
             return leftRect;
         }
 
-        // private static (string error, string xml) GetLabelXml(FullWidthRichLabelAttribute targetAttribute, object target)
-        // {
-        //     if (!targetAttribute.IsCallback)
-        //     {
-        //         return ("", targetAttribute.RichTextXml);
-        //     }
-        //
-        //     (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-        //         ReflectUtils.GetProp(target.GetType(), targetAttribute.RichTextXml);
-        //     switch (getPropType)
-        //     {
-        //         case ReflectUtils.GetPropType.Field:
-        //         {
-        //             object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-        //             return ("", result == null ? string.Empty : result.ToString());
-        //         }
-        //
-        //         case ReflectUtils.GetPropType.Property:
-        //         {
-        //             object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-        //             return ("", result == null ? string.Empty : result.ToString());
-        //         }
-        //         case ReflectUtils.GetPropType.Method:
-        //         {
-        //             MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-        //             ParameterInfo[] methodParams = methodInfo.GetParameters();
-        //             Debug.Assert(methodParams.All(p => p.IsOptional));
-        //             if (methodInfo.ReturnType != typeof(string))
-        //             {
-        //                 return (
-        //                     $"Expect returning string from `{targetAttribute.RichTextXml}`, get {methodInfo.ReturnType}",
-        //                     "");
-        //             }
-        //
-        //             try
-        //             {
-        //                 string xml = (string)methodInfo.Invoke(target,
-        //                     methodParams.Select(p => p.DefaultValue).ToArray());
-        //                 return ("", xml);
-        //             }
-        //             catch (TargetInvocationException e)
-        //             {
-        //                 Debug.LogException(e);
-        //                 Debug.Assert(e.InnerException != null);
-        //                 return (e.InnerException.Message, null);
-        //             }
-        //             catch (Exception e)
-        //             {
-        //                 Debug.LogException(e);
-        //                 return (e.Message, null);
-        //             }
-        //         }
-        //         case ReflectUtils.GetPropType.NotFound:
-        //         {
-        //             return ($"not found `{targetAttribute.RichTextXml}` on `{target}`", null);
-        //         }
-        //         default:
-        //             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-        //     }
-        // }
-
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info,
             object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
-            return !fullWidthRichLabelAttribute.Above || _error != "";
+            (string error, string xml) =
+                RichTextDrawer.GetLabelXml(property, fullWidthRichLabelAttribute.RichTextXml, fullWidthRichLabelAttribute.IsCallback, info, parent);
+            if (error != "")
+            {
+                _error = error;
+            }
+
+            if (_error != "")
+            {
+                return true;
+            }
+
+            if (fullWidthRichLabelAttribute.Above)
+            {
+                return false;
+            }
+
+            return !string.IsNullOrEmpty(xml);
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
+            float xmlHeight = 0;
+            if (!fullWidthRichLabelAttribute.Above)
+            {
+                (string error, string xml) =
+                    RichTextDrawer.GetLabelXml(property, fullWidthRichLabelAttribute.RichTextXml, fullWidthRichLabelAttribute.IsCallback, info, parent);
+                if (error != "")
+                {
+                    _error = error;
+                }
+
+                xmlHeight = string.IsNullOrEmpty(xml) ? 0 : EditorGUIUtility.singleLineHeight;
+            }
             float errorHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
-            return fullWidthRichLabelAttribute.Above
-                ? errorHeight
-                : errorHeight + EditorGUIUtility.singleLineHeight;
+            // Debug.Log($"#FullWidthRichLabel# below height={errorHeight}+{xmlHeight}/property={property.propertyPath}");
+
+            return errorHeight + xmlHeight;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
+            // EditorGUI.DrawRect(position, Color.green);
             Rect useRect = position;
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
