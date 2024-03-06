@@ -24,7 +24,9 @@ Unity: 2019.1 or higher
 
 ## Installation ##
 
-*   Using [OpenUPM](https://openupm.com/)
+*   Using [Unity Asset Store](https://assetstore.unity.com/packages/tools/utilities/saints-field-269741)
+
+*   Using [OpenUPM](https://openupm.com/packages/today.comes.saintsfield/)
 
     ```bash
     openupm add today.comes.saintsfield
