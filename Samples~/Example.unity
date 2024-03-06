@@ -434,15 +434,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ce5118ba42f4824cbe1daf592932b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ints: 64000000640000006400000064000000
+  ints: 6400000064000000640000006400000064000000
   myStructs:
   - minMax: {x: 0, y: 0}
     normalFloat: 0
   - minMax: {x: 0, y: 0}
     normalFloat: 0
   structNested:
-  - ints: 0000000000000000d2ffffffa7ffffff
-  - ints: 0000000000000000d2ffffff79ffffffa7ffffff
+  - ints: 00000000000000003c000000a7ffffff
+  - ints: 0000000000000000a7ffffffa7ffffff
 --- !u!1 &185980174
 GameObject:
   m_ObjectHideFlags: 0
@@ -2125,7 +2125,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54fdc29f5ce44e0a9750019eaf9cecdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _intValue: -35
+  _intValue: -18
+  _int2Value: -7
 --- !u!4 &887127789
 Transform:
   m_ObjectHideFlags: 0

@@ -7,6 +7,7 @@ namespace SaintsField.Samples.Scripts.CustomPropDrawer
         [AboveRichLabel("Above")]
         [InfoBox("Below")]
         [CustomProp]
+        [SepTitle(EColor.Gray)]
         public string sth;
     }
 }

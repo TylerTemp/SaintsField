@@ -12,9 +12,9 @@ namespace SaintsField.Samples.Scripts
         [BelowRichLabel("==================================", groupBy: "example")]
         private int _intValue;
 
-        // [SerializeField]
-        // [RichLabel("Int Value<icon=eye.png/><label />┤")]
-        // private int _int2Value;
+        [SerializeField]
+        [RichLabel("Int Value<icon=eye.png/><label />┤")]
+        private int _int2Value;
 
         private string BelowLabel() => "└<icon=eye.png/><label />┘";
     }

@@ -65,6 +65,12 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
+            FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
+            if (!fullWidthRichLabelAttribute.Above)
+            {
+                return position;
+            }
+
             return DrawImGui(position, property, label, saintsAttribute, info, parent);
         }
 

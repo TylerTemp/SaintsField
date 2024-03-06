@@ -74,12 +74,12 @@ namespace SaintsField.Editor.Drawers
             _richTextDrawer.DrawChunks(position, label, parsedXmlNode);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            FieldInfo info,
-            object parent)
-        {
-            return _error != "";
-        }
+        // protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        //     FieldInfo info,
+        //     object parent)
+        // {
+        //     return _error != "";
+        // }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
@@ -90,7 +90,7 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            return ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            return  _error == ""?  position: ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         }
         #endregion
 
