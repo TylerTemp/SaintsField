@@ -203,40 +203,59 @@ namespace SaintsField.Editor.Utils
             // 4.  Return.
 
             Queue<object> toFillQueue = new Queue<object>(toFillValues);
+            Queue<object> leftOverQueue = new Queue<object>();
             // required:
             foreach (int index in Enumerable.Range(0, methodParams.Count))
             {
                 if (!methodParams[index].IsOptional)
                 {
-                    Debug.Assert(toFillQueue.Count > 0);
-                    object value = toFillQueue.Dequeue();
-                    Type valueType = value.GetType();
-                    Type paramType = methodParams[index].ParameterType;
-                    Debug.Assert(valueType == paramType || valueType.IsSubclassOf(paramType),
-                        $"The value type `{valueType}` is not match the param type `{paramType}`");
-                    // Debug.Log($"Add {value} at {index}");
-                    filledValues[index] = value;
+                    // Debug.Log($"checking {index}={methodParams[index].Name}");
+                    Debug.Assert(toFillQueue.Count > 0, $"Nothing to fill required parameter {methodParams[index].Name}");
+                    while(toFillQueue.Count > 0)
+                    {
+                        object value = toFillQueue.Dequeue();
+                        Type valueType = value.GetType();
+                        Type paramType = methodParams[index].ParameterType;
+                        if (valueType == paramType || valueType.IsSubclassOf(paramType))
+                        {
+                            // Debug.Log($"Push value {value} for {methodParams[index].Name}");
+                            filledValues[index] = value;
+                            break;
+                        }
+
+                        // Debug.Log($"Skip value {value} for {methodParams[index].Name}");
+                        leftOverQueue.Enqueue(value);
+                        // Debug.Assert(valueType == paramType || valueType.IsSubclassOf(paramType),
+                        //     $"The value type `{valueType}` is not match the param type `{paramType}`");
+                        // Debug.Log($"Add {value} at {index}");
+
+                    }
                 }
             }
 
+            foreach (object leftOver in toFillQueue)
+            {
+                leftOverQueue.Enqueue(leftOver);
+            }
+
             // optional:
-            if(toFillQueue.Count > 0)
+            if(leftOverQueue.Count > 0)
             {
                 foreach (int index in Enumerable.Range(0, methodParams.Count))
                 {
-                    if (toFillQueue.Count == 0)
+                    if (leftOverQueue.Count == 0)
                     {
                         break;
                     }
 
                     if (methodParams[index].IsOptional)
                     {
-                        object value = toFillQueue.Peek();
+                        object value = leftOverQueue.Peek();
                         Type valueType = value.GetType();
                         Type paramType = methodParams[index].ParameterType;
                         if(valueType == paramType || valueType.IsSubclassOf(paramType))
                         {
-                            toFillQueue.Dequeue();
+                            leftOverQueue.Dequeue();
                             filledValues[index] = value;
                         }
                     }

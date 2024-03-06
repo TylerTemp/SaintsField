@@ -301,6 +301,21 @@ namespace SaintsField.Editor.Core
                 return 0f;
             }
 
+            // if (_usedAttributes.Count == 0)
+            // {
+            //     foreach ((SaintsWithIndex each, SaintsPropertyDrawer drawer) in attributes
+            //                  .Select((each, index) => new SaintsWithIndex
+            //                  {
+            //                      SaintsAttribute = each,
+            //                      Index = index,
+            //                  })
+            //                  .Where(each => !(each.SaintsAttribute is VisibilityAttribute))
+            //                  .Select(each => (each, GetOrCreateSaintsDrawer(each))))
+            //     {
+            //         _usedAttributes[each] = drawer;
+            //     }
+            // }
+
             // float defaultHeight = base.GetPropertyHeight(property, label);
             (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer)[] filedOrLabel = _usedAttributes
                 .Where(each => each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Field || each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Label)
