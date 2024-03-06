@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
-            bool valueChanged, FieldInfo info, object parent)
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             (string error, Object result) = DoCheckComponent(property, saintsAttribute);
             if (error != "")
@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers
             }
             if(result != null)
             {
-                SetValueChanged(property);
+                onGUIPayload.SetValue(result);
             }
             return true;
         }

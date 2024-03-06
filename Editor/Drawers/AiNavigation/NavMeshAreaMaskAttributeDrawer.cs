@@ -25,7 +25,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         #region IMGUI
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
             string[] options = AiNavigationUtils.GetNavMeshAreas().Select(each => $"{each.Mask}: {each.Name}").ToArray();

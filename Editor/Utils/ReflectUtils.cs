@@ -161,6 +161,11 @@ namespace SaintsField.Editor.Utils
 
         public static bool Truly(object value)
         {
+            if (value is string stringValue)
+            {
+                return stringValue != "";
+            }
+
             try
             {
                 // Debug.Log($"try convert to bool");

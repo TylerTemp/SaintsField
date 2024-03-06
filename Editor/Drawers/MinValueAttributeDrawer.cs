@@ -19,9 +19,9 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            if (!valueChanged)
+            if (!onGUIPayload.changed)
             {
                 return true;
             }
@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Drawers
                 if (valueLimit > curValue)
                 {
                     property.floatValue = valueLimit;
-                    SetValueChanged(property);
+                    onGUIPayload.SetValue(valueLimit);
                 }
             }
             else if (property.propertyType == SerializedPropertyType.Integer)
@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers
                 if (valueLimit > curValue)
                 {
                     property.intValue = (int)valueLimit;
-                    SetValueChanged(property);
+                    onGUIPayload.SetValue((int)valueLimit);
                 }
             }
             return true;

@@ -37,13 +37,13 @@ namespace SaintsField.Editor.Core
             new Dictionary<Type, IReadOnlyList<Type>>();
 #endif
 
-        private class SharedInfo
-        {
-            public bool Changed;
-            // public object ParentTarget;
-        }
+        // private class SharedInfo
+        // {
+        //     public bool Changed;
+        //     // public object ParentTarget;
+        // }
 
-        private static readonly Dictionary<string, SharedInfo> PropertyPathToShared = new Dictionary<string, SharedInfo>();
+        // private static readonly Dictionary<string, SharedInfo> PropertyPathToShared = new Dictionary<string, SharedInfo>();
 
         // private IReadOnlyList<ISaintsAttribute> _allSaintsAttributes;
         // private SaintsPropertyDrawer _labelDrawer;
@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Core
         // private static readonly FieldDrawerConfigAttribute DefaultFieldDrawerConfigAttribute =
         //     new FieldDrawerConfigAttribute(FieldDrawerConfigAttribute.FieldDrawType.Inline, 0);
 
-        private string _cachedPropPath;
+        // private string _cachedPropPath;
 
         protected static readonly Dictionary<object, object> inMemoryStorage = new Dictionary<object, object>();
 #if UNITY_2022_1_OR_NEWER
@@ -194,13 +194,13 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        ~SaintsPropertyDrawer()
-        {
-            if (!string.IsNullOrEmpty(_cachedPropPath) && PropertyPathToShared.ContainsKey(_cachedPropPath))
-            {
-                PropertyPathToShared.Remove(_cachedPropPath);
-            }
-        }
+        // ~SaintsPropertyDrawer()
+        // {
+        //     if (!string.IsNullOrEmpty(_cachedPropPath) && PropertyPathToShared.ContainsKey(_cachedPropPath))
+        //     {
+        //         PropertyPathToShared.Remove(_cachedPropPath);
+        //     }
+        // }
 
         // ~SaintsPropertyDrawer()
         // {
@@ -221,11 +221,11 @@ namespace SaintsField.Editor.Core
             // List<bool> hideAndResults = new List<bool>();
             // private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SaintsWithIndex saintsAttributeWithIndex);
 
-            string propPath = property.propertyPath;
-            if(!PropertyPathToShared.ContainsKey(propPath))
-            {
-                PropertyPathToShared[propPath] = new SharedInfo();
-            }
+            // string propPath = property.propertyPath;
+            // if(!PropertyPathToShared.ContainsKey(propPath))
+            // {
+            //     PropertyPathToShared[propPath] = new SharedInfo();
+            // }
 
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
@@ -279,18 +279,18 @@ namespace SaintsField.Editor.Core
             // {
             //     return EditorGUI.GetPropertyHeight(property, label);
             // }
-            Debug.Log($"GetPropertyHeight/{this}");
+            // Debug.Log($"GetPropertyHeight/{this}");
 
             if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideDrawCount) && insideDrawCount > 0)
             {
-                Debug.Log($"Sub Draw GetPropertyHeight/{this}");
+                // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
                 return GetPropertyHeightFallback(property, label);
             }
 
             if (SubGetHeightCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideGetHeightCount) && insideGetHeightCount > 0)
             {
-                Debug.Log($"Sub GetHeight GetPropertyHeight/{this}");
+                // Debug.Log($"Sub GetHeight GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
                 return GetPropertyHeightFallback(property, label);
             }
@@ -376,10 +376,13 @@ namespace SaintsField.Editor.Core
             float aboveHeight = 0;
             float belowHeight = 0;
 
-            float fullWidth = _filedWidthCache < 0
+            float fullWidth = _filedWidthCache <= 0
                 ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
                 : _filedWidthCache;
+            // Nah, Unity will give `EditorGUIUtility.currentViewWidth=0` on first render...
+            // Let Drawer decide what to do then...
             // float fullWidth = 100;
+            // Debug.Log($"fullWidth={fullWidth}, _filedWidthCache={_filedWidthCache}; EditorGUIUtility.currentViewWidth={EditorGUIUtility.currentViewWidth}, EditorGUI.indentLevel={EditorGUI.indentLevel}");
 
             foreach (IGrouping<string, KeyValuePair<SaintsWithIndex, SaintsPropertyDrawer>> grouped in _usedAttributes.ToLookup(each => each.Key.SaintsAttribute.GroupBy))
             {
@@ -412,7 +415,7 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"aboveHeight={aboveHeight}");
 
             // Debug.Log($"_labelFieldBasicHeight={_labelFieldBasicHeight}");
-            Debug.Log($"Done GetPropertyHeight/{this}");
+            // Debug.Log($"Done GetPropertyHeight/{this}");
 
             return _labelFieldBasicHeight + aboveHeight + belowHeight;
         }
@@ -466,15 +469,15 @@ namespace SaintsField.Editor.Core
 #endif
         }
 
-        protected static void SetValueChanged(SerializedProperty property, bool changed=true)
-        {
-            // Debug.LogWarning($"set {property.propertyPath}=true");
-            if(!PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo sharedInfo))
-            {
-                PropertyPathToShared[property.propertyPath] = sharedInfo = new SharedInfo();
-            }
-            sharedInfo.Changed = changed;
-        }
+        // protected static void SetValueChanged(SerializedProperty property, bool changed=true)
+        // {
+        //     // Debug.LogWarning($"set {property.propertyPath}=true");
+        //     if(!PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo sharedInfo))
+        //     {
+        //         PropertyPathToShared[property.propertyPath] = sharedInfo = new SharedInfo();
+        //     }
+        //     sharedInfo.Changed = changed;
+        // }
 
         public struct SaintsPropertyInfo
         {
@@ -894,6 +897,19 @@ namespace SaintsField.Editor.Core
         #endregion
 
         #region IMGUI
+
+        public class OnGUIPayload
+        {
+            public bool changed;
+            public object newValue;
+
+            public void SetValue(object newValue)
+            {
+                changed = true;
+                this.newValue = newValue;
+            }
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // Debug.Log($"OnGui Start: {SepTitleAttributeDrawer.drawCounter}");
@@ -905,12 +921,12 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"OnGUI: pos={position}");
 
             // Debug.Log($"raw pos={position.y} height={position.height}");
-            _cachedPropPath = property.propertyPath;
-
-            if (!PropertyPathToShared.ContainsKey(property.propertyPath))
-            {
-                PropertyPathToShared[property.propertyPath] = new SharedInfo();
-            }
+            // _cachedPropPath = property.propertyPath;
+            //
+            // if (!PropertyPathToShared.ContainsKey(property.propertyPath))
+            // {
+            //     PropertyPathToShared[property.propertyPath] = new SharedInfo();
+            // }
             // Debug.Log($"OnGUI: {property.displayName} path {property.propertyPath}; obj={property.serializedObject.targetObject}");
 
             if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
@@ -920,6 +936,8 @@ namespace SaintsField.Editor.Core
                 UnityDraw(position, property, label, fieldInfo);
                 return;
             }
+
+            OnGUIPayload onGUIPayload = new OnGUIPayload();
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
 
@@ -1200,15 +1218,23 @@ namespace SaintsField.Editor.Core
                         // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                         // GUI.SetNextControlName(_fieldControlName);
                         fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            fieldAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
+                            fieldAttributeWithIndex.SaintsAttribute, onGUIPayload, fieldInfo, parent);
                         // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
                         UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
                     }
 
-                    if (changed.changed)
+                    // if (changed.changed && fieldDrawer == null)
+                    if (changed.changed && !onGUIPayload.changed)
                     {
-                        PropertyPathToShared[property.propertyPath].Changed = true;
+                        // PropertyPathToShared[property.propertyPath].Changed = true;
+                        // onGUIPayload.changed = true;
+                        property.serializedObject.ApplyModifiedProperties();
+                        // onGUIPayload.newValue = fieldInfo.GetValue();
+                        object rawValue = fieldInfo.GetValue(parent);
+                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                        object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                        onGUIPayload.SetValue(curValue);
                     }
                 }
 
@@ -1245,7 +1271,7 @@ namespace SaintsField.Editor.Core
                     bool isActive = drawer.DrawPostFieldImGui(eachRect, property, bugFixCopyLabel,
                         attributeWithIndex.SaintsAttribute,
                         attributeWithIndex.Index,
-                        PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo result) && result.Changed,
+                        onGUIPayload,
                         fieldInfo,
                         parent);
                     // ReSharper disable once InvertIf
@@ -1370,11 +1396,17 @@ namespace SaintsField.Editor.Core
 
                 // Debug.Log($"reset {property.propertyPath}=false");
                 // PropertyPathToShared[property.propertyPath].changed = false;
-                SetValueChanged(property, false);
+                // SetValueChanged(property, false);
 
                 // Debug.Log($"OnGui End: {SepTitleAttributeDrawer.drawCounter}");
             }
+
+            foreach (SaintsWithIndex saintsWithIndex in allSaintsAttributes)
+            {
+                GetOrCreateSaintsDrawer(saintsWithIndex).OnPropertyEndImGui(property, label, saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, onGUIPayload, fieldInfo, parent);
+            }
         }
+
         #endregion
 
         #endregion
@@ -1945,7 +1977,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             return false;
         }
@@ -1964,7 +1996,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
         }
 
@@ -1986,6 +2018,10 @@ namespace SaintsField.Editor.Core
             GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return position;
+        }
+
+        protected virtual void OnPropertyEndImGui(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, int saintsIndex, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        {
         }
 
         private bool _mouseHold;

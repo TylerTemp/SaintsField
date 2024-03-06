@@ -174,7 +174,7 @@ namespace SaintsField.Editor.Drawers
             // // int useWidth = maxWidth == -1? Mathf.FloorToInt(width): Mathf.Min(maxWidth, Mathf.FloorToInt(width));
             // int maxHeight = assetPreviewAttribute.Height;
 
-            if (width < 0)
+            if (width - 1 < Mathf.Epsilon)
             {
                 return 0;
             }
@@ -189,8 +189,8 @@ namespace SaintsField.Editor.Drawers
                 ? Mathf.Max(width - EditorGUIUtility.labelWidth, 1)
                 : width;
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ASSET_PREVIEW
-            Debug.Log($"useWidth={useWidth}, width={width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
+            Debug.Log($"#AssetPreview# useWidth={useWidth}, width={width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
 #endif
 
             (int width, int height) size =
@@ -233,7 +233,7 @@ namespace SaintsField.Editor.Drawers
                 ? Mathf.Max(position.width - EditorGUIUtility.labelWidth, 1)
                 : position.width;
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ASSET_PREVIEW
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
             Debug.Log($"useWidth={useWidth}, width={position.width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
 #endif
 
@@ -528,7 +528,7 @@ namespace SaintsField.Editor.Drawers
                 (width, height) = Tex.GetProperScaleRect(
                     maxWidth,
                     widthConfig, heightConfig, preview.width, preview.height);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ASSET_PREVIEW
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
                 Debug.Log($"{width}x{height}<-rootWidth={rootWidth}, fakeLabel={fakeLabelWidth}, widthConfig={widthConfig}, heightConfig={heightConfig}, preview={preview.width}x{preview.height}");
 #endif
             }

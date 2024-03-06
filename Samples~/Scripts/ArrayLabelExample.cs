@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ArrayLabelExample : MonoBehaviour
     {
-        // TODO: fix list above/below incorrect height when item height is not the same
+        // FIXED: list above/below incorrect height when item height is not the same
 
         [RichLabel(nameof(IntsLabel), true)]
         [AboveRichLabel(nameof(IntsLabel), true)]

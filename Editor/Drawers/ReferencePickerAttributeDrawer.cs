@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
-            bool valueChanged, FieldInfo info, object parent)
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             object managedReferenceValue = property.managedReferenceValue;
 
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     property.managedReferenceValue = null;
                     property.serializedObject.ApplyModifiedProperties();
-                    SetValueChanged(property);
+                    onGUIPayload.SetValue(null);
                 });
                 genericDropdownMenu.AddSeparator("");
 
@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Drawers
                         property.managedReferenceValue = instance;
                         property.serializedObject.ApplyModifiedProperties();
                         // property.serializedObject.SetIsDifferentCacheDirty();
-                        SetValueChanged(property);
+                        onGUIPayload.SetValue(instance);
                     });
                 }
                 genericDropdownMenu.DropDown(new Rect(position)

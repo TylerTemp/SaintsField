@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
             _error = error;

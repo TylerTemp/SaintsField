@@ -18,18 +18,27 @@ namespace SaintsField.Editor.Drawers
 
         private string _error = "";
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+        // protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        //     ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        // {
+        //     // Debug.Log($"OnValueChangedAttributeDrawer={valueChanged}");
+        //     if (!onGUIPayload)
+        //     {
+        //         return true;
+        //     }
+        //
+        //     _error = InvokeCallback(saintsAttribute, parent);
+        //
+        //     return true;
+        // }
+        protected override void OnPropertyEndImGui(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, int saintsIndex, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            // Debug.Log($"OnValueChangedAttributeDrawer={valueChanged}");
-            if (!valueChanged)
+            if (!onGUIPayload.changed)
             {
-                return true;
+                return;
             }
 
-            _error = InvokeCallback(saintsAttribute, parent);
-
-            return true;
+            _error = InvokeCallback(saintsAttribute, onGUIPayload.newValue, parent);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -43,8 +52,9 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
-        private static string InvokeCallback(ISaintsAttribute saintsAttribute, object target)
+        private static string InvokeCallback(ISaintsAttribute saintsAttribute, object newValue, object target)
         {
+            // Debug.Log(saintsAttribute);
             string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
@@ -56,10 +66,10 @@ namespace SaintsField.Editor.Drawers
             }
 
             ParameterInfo[] methodParams = methodInfo.GetParameters();
-            Debug.Assert(methodParams.All(p => p.IsOptional));
+            object[] paramValues = ReflectUtils.MethodParamsFill(methodParams, new[] { newValue });
             try
             {
-                methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                methodInfo.Invoke(target, paramValues);
             }
             catch (TargetInvocationException e)
             {
@@ -105,7 +115,7 @@ namespace SaintsField.Editor.Drawers
             object newValue)
         {
             // Debug.Log($"OK I got a new value {newValue}; {this}");
-            string error = InvokeCallback(saintsAttribute, parent);
+            string error = InvokeCallback(saintsAttribute, newValue, parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             helpBox.text = error;
             helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;

@@ -236,6 +236,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
+            OnGUIPayload onGUIPayload,
             FieldInfo info,
             object parent)
         {
@@ -317,12 +318,13 @@ namespace SaintsField.Editor.Drawers
                     if (isInt)
                     {
                         property.intValue = (int)boundValue;
+                        onGUIPayload.SetValue((int)boundValue);
                     }
                     else
                     {
                         property.floatValue = boundValue;
+                        onGUIPayload.SetValue(boundValue);
                     }
-                    SetValueChanged(property);
 
                     (string titleError, string title) changedTitle = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, boundValue, metaInfo.Min, metaInfo.Max, parent);
                     if (_imGuiError == "")

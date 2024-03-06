@@ -151,7 +151,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     Content = infoboxAttribute.Content,
                     MessageType = infoboxAttribute.MessageType,
-                    WillDraw = willDraw,
+                    WillDraw = infoboxAttribute.Content != null && willDraw,
                     Error = "",
                 };
             }
@@ -176,7 +176,7 @@ namespace SaintsField.Editor.Drawers
                     return new MetaInfo
                     {
                         Error = "",
-                        WillDraw = willDraw,
+                        WillDraw = resultTuple.Item2 != null && willDraw,
                         MessageType = resultTuple.Item1,
                         Content = resultTuple.Item2,
                     };
@@ -184,9 +184,9 @@ namespace SaintsField.Editor.Drawers
                 return new MetaInfo
                 {
                     Error = "",
-                    WillDraw = willDraw,
+                    WillDraw = propertyValue != null && willDraw,
                     MessageType = infoboxAttribute.MessageType,
-                    Content = propertyValue.ToString(),
+                    Content = propertyValue?.ToString(),
                 };
             }
 
@@ -199,7 +199,7 @@ namespace SaintsField.Editor.Drawers
                     return new MetaInfo
                     {
                         Error = "",
-                        WillDraw = willDraw,
+                        WillDraw = resultTuple.Item2 != null && willDraw,
                         MessageType = resultTuple.Item1,
                         Content = resultTuple.Item2,
                     };
@@ -208,9 +208,9 @@ namespace SaintsField.Editor.Drawers
                 return new MetaInfo
                 {
                     Error = "",
-                    WillDraw = willDraw,
+                    WillDraw = fieldValue != null && willDraw,
                     MessageType = infoboxAttribute.MessageType,
-                    Content = fieldValue.ToString(),
+                    Content = fieldValue == null? "": fieldValue.ToString(),
                 };
             }
             // ReSharper disable once InvertIf

@@ -66,6 +66,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 **2.1.9**
 
 1.  `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+2.  IMGUI: fix incorrect height on first time rendering.
+3.  `OnChanged` now can receive the changed value in the callback.
+4.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
+5.  `InfoBox` now will disappear if the callback function returns null as content.
+6.  Fix `InfoBox` gives error instead of display nothing when the content is null.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1406,12 +1411,20 @@ Call a function every time the field value is changed
 ```csharp
 public class OnChangedExample : MonoBehaviour
 {
+    // no params
     [OnValueChanged(nameof(Changed))]
-    public int _value;
-
+    public int value;
     private void Changed()
     {
-        Debug.Log($"changed={_value}");
+        Debug.Log($"changed={value}");
+    }
+
+    // with params to get the new value
+    [OnValueChanged(nameof(Changed))]
+    public int v;
+    private void Changed(int newValue)
+    {
+        Debug.Log($"changed={newValue}");
     }
 }
 ```
