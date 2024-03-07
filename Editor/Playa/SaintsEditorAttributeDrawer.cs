@@ -99,6 +99,7 @@ namespace SaintsField.Editor.Playa
                     x = position.x + SaintsPropertyDrawer.IndentWidth,
                     y = position.y + SaintsPropertyDrawer.SingleLineHeight,
                     height = position.height - SaintsPropertyDrawer.SingleLineHeight,
+                    width = position.width - SaintsPropertyDrawer.IndentWidth,
                 };
 
                 float yAcc = leftRect.y;

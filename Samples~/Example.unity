@@ -3142,10 +3142,10 @@ MonoBehaviour:
   n1:
     n2:
       nest2Str: 
-      spriteRenderer: {fileID: 0}
+      spriteRenderer: {fileID: 1056546885}
     n2Array:
     - nest2Str: 
-      spriteRenderer: {fileID: 0}
+      spriteRenderer: {fileID: 1056546885}
     - nest2Str: 
       spriteRenderer: {fileID: 0}
     <MyProperty>k__BackingField: 0
