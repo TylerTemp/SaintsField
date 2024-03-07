@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using SaintsField.Editor.Core;
+using UnityEditor;
+using UnityEngine;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
@@ -51,5 +53,14 @@ namespace SaintsField.Editor.Playa.Renderer
             // FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
         }
 
+        public override float GetHeight()
+        {
+            return SaintsPropertyDrawer.SingleLineHeight;
+        }
+
+        public override void RenderPosition(Rect position)
+        {
+
+        }
     }
 }

@@ -12,7 +12,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [GetComponent]
         public SpriteRenderer spriteRenderer;
 
-
         [Button("Tween under me")]
         private void Nothing1() {}
 

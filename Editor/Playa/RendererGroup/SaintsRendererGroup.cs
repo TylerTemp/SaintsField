@@ -89,7 +89,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 ? GUI.skin.box
                 : GUIStyle.none;
             IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
-                ? (IDisposable)(new EditorGUILayout.HorizontalScope(fullBoxStyle))
+                // ReSharper disable once RedundantCast
+                ? (IDisposable)new EditorGUILayout.HorizontalScope(fullBoxStyle)
                 : new EditorGUILayout.VerticalScope(fullBoxStyle);
 
             using (disposable)
@@ -156,7 +157,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             _foldout = EditorGUILayout.Foldout(_foldout, GUIContent.none, true, _foldoutSmallStyle);
-                            using(var changed = new EditorGUI.ChangeCheckScope())
+                            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                             {
                                 _curSelected = GUILayout.Toolbar(_curSelected, _orderedKeys.ToArray());
                                 if (changed.changed)
@@ -201,6 +202,258 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return _eLayout.HasFlag(ELayout.Tab)
                 ? _groupIdToRenderer[_orderedKeys[_curSelected]]
                 : _renderers.Select(each => each.renderer);
+        }
+
+        public float GetHeight()
+        {
+            float titleHeight = 0f;
+
+            bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout);
+            bool hasTitle = _eLayout.HasFlag(ELayout.Title);
+            bool hasTab = _eLayout.HasFlag(ELayout.Tab);
+
+            if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
+            {
+                titleHeight += EditorGUIUtility.singleLineHeight;
+                // EditorGUILayout.LabelField(_groupPath.Split('/').Last(), _titleLabelStyle);
+                if(_eLayout.HasFlag(ELayout.TitleOut))
+                {
+                    titleHeight += 1;
+                    // Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
+                    // EditorGUI.DrawRect(lineSep, EColor.EditorSeparator.GetColor());
+                }
+            }
+
+            if (hasFoldout && (
+                    (hasTitle && hasTab)
+                    || hasTitle
+                    || !hasTab))
+            {
+                titleHeight += EditorGUIUtility.singleLineHeight;
+                // _foldout = EditorGUILayout.Foldout(_foldout, _groupPath.Split('/').Last(), true, new GUIStyle(EditorStyles.foldout){
+                //     fontStyle = FontStyle.Bold,
+                // });
+                if(_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                {
+                    titleHeight += 1f;
+                    // Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
+                    // EditorGUI.DrawRect(lineSep, EColor.EditorSeparator.GetColor());
+                }
+            }
+
+            // foldout-tabs:
+            //  v      | x     | v   | x           | [f] tab
+            if(hasFoldout && !hasTitle && hasTab)
+            {
+                titleHeight += EditorGUIUtility.singleLineHeight;
+                // using (new EditorGUILayout.HorizontalScope())
+                // {
+                //     _foldout = EditorGUILayout.Foldout(_foldout, GUIContent.none, true, _foldoutSmallStyle);
+                //     using(var changed = new EditorGUI.ChangeCheckScope())
+                //     {
+                //         _curSelected = GUILayout.Toolbar(_curSelected, _orderedKeys.ToArray());
+                //         if (changed.changed)
+                //         {
+                //             _foldout = true;
+                //         }
+                //     }
+                // }
+            }
+
+            // tabs
+            //  x      | v     | v   | title       | tab
+            //  v      | v     | v   | [f] title   | tab
+            //  x      | v     | v   | title       | tab
+            //  x      | x     | v   | x           | tab
+            if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
+            {
+                // Debug.Log($"Draw tabs, hasFoldout={hasFoldout}, _foldout={_foldout}");
+                if((hasFoldout && _foldout) || !hasFoldout)
+                {
+                    titleHeight += EditorGUIUtility.singleLineHeight;
+                    // _curSelected = GUILayout.Toolbar(_curSelected, _orderedKeys.ToArray());
+                }
+            }
+
+            float contentHeight = 0f;
+            if(_foldout)
+            {
+                foreach (ISaintsRenderer renderer in GetRenderer())
+                {
+                    contentHeight += renderer.GetHeight();
+                }
+            }
+
+            return titleHeight + contentHeight;
+        }
+
+        public void RenderPosition(Rect position)
+        {
+            Debug.Assert(!_eLayout.HasFlag(ELayout.Horizontal), $"Horizontal is not supported for IMGUI in SaintsEditorAttribute mode");
+
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if(_foldoutSmallStyle == null) {
+                _foldoutSmallStyle = new GUIStyle(EditorStyles.foldout)
+                {
+                    fixedWidth = 5,
+                };
+            }
+
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if(_titleLabelStyle == null)
+            {
+                _titleLabelStyle = new GUIStyle(GUI.skin.label)
+                {
+                    // alignment = TextAnchor.MiddleCenter,
+                    fontStyle = FontStyle.Bold,
+                };
+            }
+
+            GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
+                ? GUI.skin.box
+                : GUIStyle.none;
+            // IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
+            //     // ReSharper disable once RedundantCast
+            //     ? (IDisposable)new EditorGUILayout.HorizontalScope(fullBoxStyle)
+            //     : new EditorGUILayout.VerticalScope(fullBoxStyle);
+
+            // using (disposable)
+            // Rect bodyRect = new Rect(position);
+            float titleUsedHeight = 0f;
+
+            {
+                #region Title
+
+                // using (new EditorGUILayout.VerticalScope())
+                {
+                    bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout);
+                    bool hasTitle = _eLayout.HasFlag(ELayout.Title);
+                    bool hasTab = _eLayout.HasFlag(ELayout.Tab);
+
+                    Rect titleRect = new Rect(position)
+                    {
+                        height = 0,
+                    };
+
+                    // this looks better:
+                    // foldout | title | tab | style:title | style: tab
+                    // --------|-------|-----|-------------|------------
+                    //  v      | v     | v   | [f] title   | tab
+                    //  v      | v     | x   | [f] title   | x
+                    //  v      | x     | v   | x           | [f] tab
+                    //  v      | x     | x   | [f] title   | x
+                    //  x      | v     | v   | title       | tab
+                    //  x      | v     | v   | title       | tab
+                    //  x      | v     | x   | title       | x
+                    //  x      | x     | v   | x           | tab
+                    //  x      | x     | x   | x           | x
+
+                    // line-title:
+                    //  x      | v     | v   | title       | tab
+                    //  x      | v     | x   | title       | x
+                    if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
+                    {
+                        titleRect.height = EditorGUIUtility.singleLineHeight;
+                        EditorGUI.LabelField(titleRect, _groupPath.Split('/').Last(), _titleLabelStyle);
+                        titleRect.y += titleRect.height;
+                        titleUsedHeight += titleRect.height;
+
+                        if(_eLayout.HasFlag(ELayout.TitleOut))
+                        {
+                            titleRect.height = 1;
+                            EditorGUI.DrawRect(titleRect, EColor.EditorSeparator.GetColor());
+                            titleRect.y += titleRect.height;
+                            titleUsedHeight += titleRect.height;
+                        }
+                        // EditorGUILayout.LabelField(_groupPath.Split('/').Last(), _centerLabelStyle);
+                        // EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                    }
+
+                    // foldout-title:
+                    //  v      | v     | v   | [f] title   | tab
+                    //  v      | v     | x   | [f] title   | x
+                    //  v      | x     | x   | [f] title   | x
+                    if (hasFoldout && (
+                            (hasTitle && hasTab)
+                            || hasTitle
+                            || !hasTab))
+                    {
+                        titleRect.height = EditorGUIUtility.singleLineHeight;
+                        _foldout = EditorGUI.Foldout(titleRect, _foldout, _groupPath.Split('/').Last(), true, new GUIStyle(EditorStyles.foldout){
+                            fontStyle = FontStyle.Bold,
+                        });
+                        titleRect.y += titleRect.height;
+                        titleUsedHeight += titleRect.height;
+
+                        if(_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                        {
+                            titleRect.height = 1;
+                            EditorGUI.DrawRect(titleRect, EColor.EditorSeparator.GetColor());
+                            titleRect.y += titleRect.height;
+                            titleUsedHeight += titleRect.height;
+                        }
+                    }
+
+                    // foldout-tabs:
+                    //  v      | x     | v   | x           | [f] tab
+                    if(hasFoldout && !hasTitle && hasTab)
+                    {
+                        // using (new EditorGUILayout.HorizontalScope())
+                        {
+                            titleRect.height = EditorGUIUtility.singleLineHeight;
+                            _foldout = EditorGUI.Foldout(titleRect, _foldout, GUIContent.none, true, _foldoutSmallStyle);
+                            titleRect.y += titleRect.height;
+                            titleUsedHeight += titleRect.height;
+
+                            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                            {
+                                titleRect.height = EditorGUIUtility.singleLineHeight;
+                                _curSelected = GUI.Toolbar(titleRect, _curSelected, _orderedKeys.ToArray());
+                                titleRect.y += titleRect.height;
+                                titleUsedHeight += titleRect.height;
+                                if (changed.changed)
+                                {
+                                    _foldout = true;
+                                }
+                            }
+                        }
+                    }
+
+                    // tabs
+                    //  x      | v     | v   | title       | tab
+                    //  v      | v     | v   | [f] title   | tab
+                    //  x      | v     | v   | title       | tab
+                    //  x      | x     | v   | x           | tab
+                    if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
+                    {
+                        // Debug.Log($"Draw tabs, hasFoldout={hasFoldout}, _foldout={_foldout}");
+                        if((hasFoldout && _foldout) || !hasFoldout)
+                        {
+                            // Debug.Log($"Draw tabs, all = {string.Join(",", _orderedKeys)}");
+                            titleRect.height = EditorGUIUtility.singleLineHeight;
+                            _curSelected = GUI.Toolbar(titleRect, _curSelected, _orderedKeys.ToArray());
+                            titleRect.y += titleRect.height;
+                            titleUsedHeight += titleRect.height;
+                        }
+                    }
+                }
+
+                #endregion
+
+                if(_foldout)
+                {
+                    Rect bodyRect = new Rect(position)
+                    {
+                        y = position.y + titleUsedHeight,
+                        height = position.height - titleUsedHeight,
+                    };
+                    foreach (ISaintsRenderer renderer in GetRenderer())
+                    {
+                        renderer.RenderPosition(bodyRect);
+                    }
+
+                }
+            }
         }
 
         #endregion

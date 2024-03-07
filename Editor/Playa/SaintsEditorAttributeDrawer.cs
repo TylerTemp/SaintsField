@@ -1,120 +1,167 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
-#if SAINTSFIELD_DOTWEEN
-using DG.DOTweenEditor;
-#endif
+// #if SAINTSFIELD_DOTWEEN
+// using DG.DOTweenEditor;
+// #endif
 
 namespace SaintsField.Editor.Playa
 {
     [CustomPropertyDrawer(typeof(SaintsEditorAttribute))]
-    public class SaintsEditorAttributeDrawer: PropertyDrawer
+    public class SaintsEditorAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
     {
-
-#if SAINTSFIELD_DOTWEEN
-        private static readonly HashSet<SaintsEditorAttributeDrawer> AliveInstances = new HashSet<SaintsEditorAttributeDrawer>();
-        private void RemoveInstance()
+        public static (object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
-            AliveInstances.Remove(this);
-            if (AliveInstances.Count == 0)
+            object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            object rawValue = fieldInfo.GetValue(parentValue);
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+
+            object value = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+            return (parentValue, value);
+        }
+
+        private static IEnumerable<(string name, SerializedProperty property)> GetSerializableFieldInfo(SerializedProperty property)
+        {
+            HashSet<string> alreadySend = new HashSet<string>();
+            SerializedProperty it = property.Copy();
+            // or Next, also, the bool argument specifies whether to enter on children or not
+            while (it.NextVisible(true))
             {
-                DOTweenEditorPreview.Stop();
+                // ReSharper disable once InvertIf
+                if (alreadySend.Add(it.name))
+                {
+                    SerializedProperty relProperty = property.FindPropertyRelative(it.name);
+                    // Debug.Log($"prop={it.name}/relProp={relProperty}");
+                    if(relProperty != null)
+                    {
+                        yield return (it.name, relProperty);
+                    }
+                }
             }
         }
-#endif
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+
+        #region IMGUI
+
+        private IReadOnlyList<ISaintsRenderer> _imGuiRenderers;
+
+        private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(SerializedProperty property)
         {
-            // Debug.Log($"Drawer: {property.serializedObject}");
-            // Debug.Log($"Drawer: {property.serializedObject.targetObject}");
-            // Debug.Log($"Drawer.type: {property.type}");
-            // Debug.Log($"Drawer.propertyType: {property.propertyType}");
-            // Debug.Log($"Drawer.propertyPath: {property.propertyPath}");
-            // Debug.Log($"field.DeclaringType: {fieldInfo.DeclaringType}");
-            // Debug.Log($"field.FieldType: {fieldInfo.FieldType}");
-            // Debug.Log($"field.GetValue: {fieldInfo.GetValue(property.serializedObject.targetObject)}");
-            // var value = fieldInfo.GetValue(property.serializedObject.targetObject);
-            //
-            // MethodInfo[] methodInfos = fieldInfo.FieldType
-            //     .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-            //                 BindingFlags.Public | BindingFlags.DeclaredOnly);
-            // foreach (MethodInfo methodInfo in methodInfos)
-            // {
-            //     Debug.Log($"methodInfo: {methodInfo.Name}");
-            //     methodInfo.Invoke(value, null);
-            // }
-            var value = fieldInfo.GetValue(property.serializedObject.targetObject);
-
-            VisualElement root = new VisualElement();
-            var renderer = SaintsEditor.Setup(true, property.serializedObject, fieldInfo.GetValue(property.serializedObject.targetObject));
-
-//             VisualElement root = SaintsEditor.CreateVisualElement(false, property.serializedObject, property.serializedObject.targetObject);
-// #if SAINTSFIELD_DOTWEEN
-//             root.RegisterCallback<AttachToPanelEvent>(_ => AliveInstances.Add(this));
-//             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance());
-// #endif
-            return root;
+            if (_imGuiRenderers != null)
+            {
+                return _imGuiRenderers;
+            }
+            (object _, object current) = GetTargets(fieldInfo, property);
+            Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
+            return _imGuiRenderers = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
         }
 
-        // public static void SetValueDirect(SerializedProperty property, object value)
-        // {
-        //     object obj = property.serializedObject.targetObject;
-        //     string propertyPath = property.propertyPath;
-        //     var flag = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
-        //     var paths = propertyPath.Split('.');
-        //     FieldInfo field = null;
-        //
-        //     for (int i = 0; i < paths.Length; i++)
-        //     {
-        //         var path = paths[i];
-        //         if (obj == null)
-        //             throw new System.NullReferenceException("Can't set a value on a null instance");
-        //
-        //         var type = obj.GetType();
-        //         if (path == "Array")
-        //         {
-        //             path = paths[++i];
-        //             var iter = (obj as System.Collections.IEnumerable);
-        //             if (iter == null)
-        //                 //Property path thinks this property was an enumerable, but isn't. property path can't be parsed
-        //                 throw new System.ArgumentException("SerializedProperty.PropertyPath [" + propertyPath + "] thinks that [" + paths[i-2] + "] is Enumerable.");
-        //
-        //             var sind = path.Split('[', ']');
-        //             int index = -1;
-        //
-        //             if (sind == null || sind.Length < 2)
-        //                 // the array string index is malformed. the property path can't be parsed
-        //                 throw new System.FormatException("PropertyPath [" + propertyPath + "] is malformed");
-        //
-        //             if (!Int32.TryParse(sind[1], out index))
-        //                 //the array string index in the property path couldn't be parsed,
-        //                 throw new System.FormatException("PropertyPath [" + propertyPath + "] is malformed");
-        //
-        //             obj = iter.ElementAtOrDefault(index);
-        //             continue;
-        //         }
-        //
-        //         field = type.GetField(path, flag);
-        //         if (field == null)
-        //             //field wasn't found
-        //             throw new System.MissingFieldException("The field ["+path+"] in ["+propertyPath+"] could not be found");
-        //
-        //         if(i< paths.Length-1)
-        //             obj = field.GetValue(obj);
-        //
-        //     }
-        //
-        //     var valueType = value.GetType();
-        //
-        //     field.GetValue(obj, value);
-        // }
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            SaintsEditorAttribute saintsEditorAttribute = (SaintsEditorAttribute) attribute;
+            float baseLineHeight = saintsEditorAttribute.Inline ? 0 : SaintsPropertyDrawer.SingleLineHeight;
+            float fieldHeight = 0f;
+            if(property.isExpanded)
+            {
+                foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
+                {
+                    fieldHeight += saintsRenderer.GetHeight();
+                }
+            }
 
+            return baseLineHeight + fieldHeight;
+        }
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            // SaintsEditorAttribute saintsEditorAttribute = (SaintsEditorAttribute) attribute;
+            using (new EditorGUI.PropertyScope(position, label, property))
+            {
+                property.isExpanded = EditorGUI.Foldout(new Rect(position)
+                {
+                    height = SaintsPropertyDrawer.SingleLineHeight,
+                }, property.isExpanded, label, true);
+
+                if (!property.isExpanded)
+                {
+                    return;
+                }
+
+                Rect leftRect = new Rect(position)
+                {
+                    x = position.x + SaintsPropertyDrawer.IndentWidth,
+                    y = position.y + SaintsPropertyDrawer.SingleLineHeight,
+                    height = position.height - SaintsPropertyDrawer.SingleLineHeight,
+                };
+
+                float yAcc = leftRect.y;
+
+                foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
+                {
+                    float height = saintsRenderer.GetHeight();
+                    Rect rect = new Rect(leftRect)
+                    {
+                        y = yAcc,
+                        height = height,
+                    };
+                    saintsRenderer.RenderPosition(rect);
+                    yAcc += height;
+                }
+            }
+        }
+
+        #endregion
+
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        #region UI Toolkit
+        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        {
+            object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            object rawValue = fieldInfo.GetValue(parentValue);
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+
+            object value = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+
+            Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
+
+            SaintsEditorAttribute saintsEditorAttribute = (SaintsEditorAttribute) attribute;
+
+            IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.GetRenderers(true, serializedFieldNames, property.serializedObject, value);
+
+            VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
+
+#if SAINTSFIELD_DOTWEEN
+            bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(this));
+            bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(this));
+#endif
+
+            if (saintsEditorAttribute.Inline)
+            {
+                return bodyElement;
+            }
+
+            bodyElement.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
+
+            Foldout toggle = new Foldout
+            {
+                text = property.displayName,
+                value = true,
+            };
+            toggle.RegisterValueChangedCallback(evt => bodyElement.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+
+            VisualElement root = new VisualElement();
+            root.Add(toggle);
+            root.Add(bodyElement);
+            return root;
+        }
+        #endregion
 #endif
     }
 }

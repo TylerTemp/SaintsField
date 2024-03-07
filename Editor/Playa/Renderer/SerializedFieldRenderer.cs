@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override VisualElement CreateVisualElement()
         {
-            PropertyField result = new PropertyField(SerializedObject.FindProperty(FieldWithInfo.FieldInfo.Name))
+            PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
             {
                 style =
                 {
@@ -34,6 +34,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 _result = result;
                 _result.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
             }
+
             return result;
         }
 
@@ -55,8 +56,19 @@ namespace SaintsField.Editor.Playa.Renderer
 #endif
         public override void Render()
         {
-            SerializedProperty property = SerializedObject.FindProperty(FieldWithInfo.FieldInfo.Name);
-            EditorGUILayout.PropertyField(property, GUILayout.ExpandWidth(true));
+            EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, GUILayout.ExpandWidth(true));
+        }
+
+        public override float GetHeight()
+        {
+            return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
+        }
+
+        public override void RenderPosition(Rect position)
+        {
+            // Debug.Log($"render {this}/{position}");
+            EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, true);
+            // EditorGUI.DrawRect(position, Color.blue);
         }
 
         public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo.Name}>";

@@ -21,20 +21,24 @@ using DG.DOTweenEditor;
 
 namespace SaintsField.Editor
 {
-    public class SaintsEditor: UnityEditor.Editor
+    public class SaintsEditor: UnityEditor.Editor, IDOTweenPlayRecorder
     {
         // private MonoScript _monoScript;
         // private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
 
 #if SAINTSFIELD_DOTWEEN
-        private static readonly HashSet<SaintsEditor> AliveInstances = new HashSet<SaintsEditor>();
-        private void RemoveInstance()
+        private static readonly HashSet<IDOTweenPlayRecorder> AliveInstances = new HashSet<IDOTweenPlayRecorder>();
+        public static void RemoveInstance(IDOTweenPlayRecorder doTweenPlayRecorder)
         {
-            AliveInstances.Remove(this);
+            AliveInstances.Remove(doTweenPlayRecorder);
             if (AliveInstances.Count == 0)
             {
                 DOTweenEditorPreview.Stop();
             }
+        }
+        public static void AddInstance(IDOTweenPlayRecorder doTweenPlayRecorder)
+        {
+            AliveInstances.Add(doTweenPlayRecorder);
         }
 #endif
 
@@ -55,21 +59,15 @@ namespace SaintsField.Editor
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
-        public static VisualElement CreateVisualElement(bool TryFixUIToolkit, SerializedObject serializedObject, UnityEngine.Object target)
+        public static VisualElement CreateVisualElement(IEnumerable<ISaintsRenderer> renderers)
         {
-            var _renderers = Setup(TryFixUIToolkit, serializedObject, target);
-            // return new Label("This is a Label in a Custom Editor");
-            if (target == null)
-            {
-                return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
-            }
-
             // Debug.Log($"SaintsEditor: {target}");
 
             VisualElement root = new VisualElement();
 
-            foreach (ISaintsRenderer renderer in _renderers)
+            foreach (ISaintsRenderer renderer in renderers)
             {
+                Debug.Log(renderer);
                 root.Add(renderer.CreateVisualElement());
             }
 
@@ -78,6 +76,11 @@ namespace SaintsField.Editor
 
         public override VisualElement CreateInspectorGUI()
         {
+            if (target == null)
+            {
+                return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
+            }
+
             VisualElement root = new VisualElement();
 
             MonoScript monoScript = GetMonoScript(target);
@@ -95,11 +98,13 @@ namespace SaintsField.Editor
                 root.Add(objectField);
             }
 
-            root.Add(CreateVisualElement(TryFixUIToolkit, serializedObject, target));
+            IReadOnlyList<ISaintsRenderer> renderers = Setup(TryFixUIToolkit, serializedObject, target);
+
+            root.Add(CreateVisualElement(renderers));
 
 #if SAINTSFIELD_DOTWEEN
-            root.RegisterCallback<AttachToPanelEvent>(_ => AliveInstances.Add(this));
-            root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance());
+            root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
+            root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance(this));
 #endif
             return root;
         }
@@ -122,7 +127,7 @@ namespace SaintsField.Editor
         public virtual void OnDestroy()
         {
 #if SAINTSFIELD_DOTWEEN
-            RemoveInstance();
+            RemoveInstance(this);
 #endif
         }
 
@@ -198,15 +203,20 @@ namespace SaintsField.Editor
         //     }
         // }
 
-        public static IReadOnlyList<ISaintsRenderer> Setup(bool tryFixUIToolkit, SerializedObject serializedObject, object target)
+        private static IReadOnlyList<ISaintsRenderer> Setup(bool tryFixUIToolkit, SerializedObject serializedObject,
+            object target)
         {
-            // #region MonoScript
-            // CheckMonoScript();
-            // #endregion
+            string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
+            Dictionary<string, SerializedProperty> serializedPropertyDict = serializableFields
+                .ToDictionary(each => each, serializedObject.FindProperty);
+            return GetRenderers(tryFixUIToolkit, serializedPropertyDict, serializedObject, target);
+        }
 
+        public static IReadOnlyList<ISaintsRenderer> GetRenderers(bool tryFixUIToolkit, IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject, object target)
+        {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
+
             foreach (int inherentDepth in Enumerable.Range(0, types.Count))
             {
                 Type systemType = types[inherentDepth];
@@ -220,16 +230,16 @@ namespace SaintsField.Editor
                 IEnumerable<FieldInfo> serializableFieldInfos =
                     allFields.Where(fieldInfo =>
                         {
-                            if (serializableFields.Contains(fieldInfo.Name))
+                            if (serializedPropertyDict.ContainsKey(fieldInfo.Name))
                             {
                                 return true;
                             }
 
                             // Name            : <GetHitPoint>k__BackingField
-                            if (fieldInfo.Name.StartsWith("<") && fieldInfo.Name.EndsWith(">k__BackingField"))
-                            {
-                                return serializedObject.FindProperty(fieldInfo.Name) != null;
-                            }
+                            // if (fieldInfo.Name.StartsWith("<") && fieldInfo.Name.EndsWith(">k__BackingField"))
+                            // {
+                            //     return serializedObject.FindProperty(fieldInfo.Name) != null;
+                            // }
 
                             // return !fieldInfo.IsLiteral // const
                             //        && !fieldInfo.IsStatic // static
@@ -253,8 +263,10 @@ namespace SaintsField.Editor
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
                         groups = fieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        target = target,
 
                         RenderType = SaintsRenderType.SerializedField,
+                        SerializedProperty = serializedPropertyDict[fieldInfo.Name],
                         FieldInfo = fieldInfo,
                         InherentDepth = inherentDepth,
                         Order = order,
@@ -273,6 +285,7 @@ namespace SaintsField.Editor
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
                         groups = nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        target = target,
 
                         RenderType = SaintsRenderType.NonSerializedField,
                         // memberType = nonSerFieldInfo.MemberType,
@@ -313,6 +326,7 @@ namespace SaintsField.Editor
                         fieldWithInfos.Add(new SaintsFieldWithInfo
                         {
                             groups = allMethodAttributes.OfType<ISaintsGroup>().ToArray(),
+                            target = target,
 
                             // memberType = MemberTypes.Method,
                             RenderType = SaintsRenderType.Method,
@@ -339,6 +353,7 @@ namespace SaintsField.Editor
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
                         groups = propertyInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        target = target,
 
                         RenderType = SaintsRenderType.NativeProperty,
                         PropertyInfo = propertyInfo,
@@ -382,7 +397,7 @@ namespace SaintsField.Editor
                     each =>
 #if SAINTSFIELD_DOTWEEN
                         each.Value.isDOTween
-                            ? (ISaintsRendererGroup)new DOTweenPlayGroup(serializedObject.targetObject)
+                            ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
                             : new SaintsRendererGroup(each.Key, each.Value.eLayout)
 #else
                         (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value.eLayout)

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using DG.DOTweenEditor;
 using DG.Tweening;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Utils;
@@ -99,16 +100,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
 
             Debug.Assert(_doTweenMethods.Count > 0);
-
-            // ReSharper disable once InconsistentNaming
-            // foreach (DOTweenState imGuiDOTweenStates in _imGuiDOTweenStates)
-            // {
-            //     // Debug.Log(imGuiDOTweenStates.tween?.IsComplete());
-            //     if (imGuiDOTweenStates.tween?.IsComplete() ?? false)
-            //     {
-            //         StopTween(imGuiDOTweenStates);
-            //     }
-            // }
 
             Rect labelTitleRect = EditorGUILayout.GetControlRect(false);
             const string title = "DOTween Preview";
@@ -239,6 +230,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             }
 
+        }
+
+        public float GetHeight()
+        {
+            return SaintsPropertyDrawer.SingleLineHeight * (_doTweenMethods.Count + 1);
         }
 
         #endregion

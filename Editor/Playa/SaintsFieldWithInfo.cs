@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Playa;
+using UnityEditor;
 
 namespace SaintsField.Editor.Playa
 {
@@ -11,8 +12,11 @@ namespace SaintsField.Editor.Playa
         public int Order;
 
         public IReadOnlyList<ISaintsGroup> groups;
+        public object target;
 
         public SaintsRenderType RenderType;
+
+        public SerializedProperty SerializedProperty;
 
         public FieldInfo FieldInfo;
         public MethodInfo MethodInfo;

@@ -29,6 +29,9 @@ namespace SaintsField.Editor.Playa.Renderer
         public abstract VisualElement CreateVisualElement();
 #endif
         public abstract void Render();
+        public abstract float GetHeight();
+
+        public abstract void RenderPosition(Rect position);
 
         // NA: NaughtyEditorGUI
         protected static void FieldLayout(object value, string label)
@@ -141,6 +144,122 @@ namespace SaintsField.Editor.Playa.Renderer
                 else
                 {
                     EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
+                }
+
+                // return isDrawn;
+            }
+        }
+
+        protected static void FieldPosition(Rect position, object value, string label)
+        {
+            using (new EditorGUI.DisabledScope(true))
+            {
+                if (value == null)
+                {
+                    Rect rt = position;
+                    EditorGUI.DrawRect(new Rect(rt)
+                    {
+                        x = rt.x + EditorGUIUtility.labelWidth,
+                        width = rt.width - EditorGUIUtility.labelWidth,
+                    }, Color.yellow * new Color(1, 1,1, 0.2f));
+                    EditorGUI.LabelField(rt, label, "null", EditorStyles.label);
+                    return;
+                }
+
+                // bool isDrawn = true;
+                Type valueType = value.GetType();
+
+                if (valueType == typeof(bool))
+                {
+                    EditorGUI.Toggle(position, label, (bool)value);
+                }
+                else if (valueType == typeof(short))
+                {
+                    EditorGUI.IntField(position, label, (short)value);
+                }
+                else if (valueType == typeof(ushort))
+                {
+                    EditorGUI.IntField(position, label, (ushort)value);
+                }
+                else if (valueType == typeof(int))
+                {
+                    EditorGUI.IntField(position, label, (int)value);
+                }
+                else if (valueType == typeof(uint))
+                {
+                    EditorGUI.LongField(position, label, (uint)value);
+                }
+                else if (valueType == typeof(long))
+                {
+                    EditorGUI.LongField(position, label, (long)value);
+                }
+                else if (valueType == typeof(ulong))
+                {
+                    EditorGUI.TextField(position, label, ((ulong)value).ToString());
+                }
+                else if (valueType == typeof(float))
+                {
+                    EditorGUI.FloatField(position, label, (float)value);
+                }
+                else if (valueType == typeof(double))
+                {
+                    EditorGUI.DoubleField(position, label, (double)value);
+                }
+                else if (valueType == typeof(string))
+                {
+                    EditorGUI.TextField(position, label, (string)value);
+                }
+                else if (valueType == typeof(Vector2))
+                {
+                    EditorGUI.Vector2Field(position, label, (Vector2)value);
+                }
+                else if (valueType == typeof(Vector3))
+                {
+                    EditorGUI.Vector3Field(position, label, (Vector3)value);
+                }
+                else if (valueType == typeof(Vector4))
+                {
+                    EditorGUI.Vector4Field(position, label, (Vector4)value);
+                }
+                else if (valueType == typeof(Vector2Int))
+                {
+                    EditorGUI.Vector2IntField(position, label, (Vector2Int)value);
+                }
+                else if (valueType == typeof(Vector3Int))
+                {
+                    EditorGUI.Vector3IntField(position, label, (Vector3Int)value);
+                }
+                else if (valueType == typeof(Color))
+                {
+                    EditorGUI.ColorField(position, label, (Color)value);
+                }
+                else if (valueType == typeof(Bounds))
+                {
+                    EditorGUI.BoundsField(position, label, (Bounds)value);
+                }
+                else if (valueType == typeof(Rect))
+                {
+                    EditorGUI.RectField(position, label, (Rect)value);
+                }
+                else if (valueType == typeof(RectInt))
+                {
+                    EditorGUI.RectIntField(position, label, (RectInt)value);
+                }
+                else if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
+                {
+                    EditorGUI.ObjectField(position, label, (UnityEngine.Object)value, valueType, true);
+                }
+                else if (valueType.BaseType == typeof(Enum))
+                {
+                    EditorGUI.EnumPopup(position, label, (Enum)value);
+                }
+                else if (valueType.BaseType == typeof(System.Reflection.TypeInfo))
+                {
+                    EditorGUI.TextField(position, label, value.ToString());
+                }
+                else
+                {
+                    EditorGUI.HelpBox(position, $"Type not supported: {valueType}", MessageType.Warning);
                 }
 
                 // return isDrawn;

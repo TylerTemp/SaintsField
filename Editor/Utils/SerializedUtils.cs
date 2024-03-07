@@ -25,14 +25,14 @@ namespace SaintsField.Editor.Utils
         //     return attributes.Length > 0 ? attributes[0] : null;
         // }
 
-        private struct FieldOrProp
+        public struct FieldOrProp
         {
             public bool IsField;
             public FieldInfo FieldInfo;
             public PropertyInfo PropertyInfo;
         }
 
-        public static (T[] attributes, object parent) GetAttributesAndDirectParent<T>(SerializedProperty property) where T : class
+        public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
         {
             string originPath = property.propertyPath;
             string[] propPaths = originPath.Split('.');
@@ -125,22 +125,12 @@ namespace SaintsField.Editor.Utils
                 // Debug.Log($"[{propSegName}]={targetObj}");
             }
 
+            return (fieldOrProp, sourceObj);
+        }
 
-            // if (!fileOrProp.isFile)
-            // {
-            //     Debug.Log($"check prop {fileOrProp.PropertyInfo.Name}/{fileOrProp.PropertyInfo.GetCustomAttributes().Count()}");
-            //     foreach (CustomAttributeData customAttributeData in fileOrProp.PropertyInfo.CustomAttributes)
-            //     {
-            //         Debug.Log($"check attr {customAttributeData.AttributeType}");
-            //         // if (customAttributeData.AttributeType == typeof(T))
-            //         // {
-            //         //     Debug.Log($"return attr {customAttributeData.AttributeType}");
-            //         //     yield return (T)fileOrProp.PropertyInfo.GetValue(sourceObj);
-            //         // }
-            //     }
-            // }
-
-            // Debug.Log($"return result for {property.propertyPath}: {fileOrProp.FileInfo?.Name ?? fileOrProp.PropertyInfo.Name}");
+        public static (T[] attributes, object parent) GetAttributesAndDirectParent<T>(SerializedProperty property) where T : class
+        {
+            (FieldOrProp fieldOrProp, object sourceObj) = GetFieldInfoAndDirectParent(property);
             T[] attributes = fieldOrProp.IsField
                 ? fieldOrProp.FieldInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray()
                 : fieldOrProp.PropertyInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray();
