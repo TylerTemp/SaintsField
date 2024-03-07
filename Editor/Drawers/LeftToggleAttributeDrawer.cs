@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     flexDirection = FlexDirection.Row,
-                }
+                },
             };
 
             Toggle toggle = new Toggle("")
@@ -104,6 +104,7 @@ namespace SaintsField.Editor.Drawers
             container.Q<Toggle>(NameLeftToggle(property)).RegisterValueChangedCallback(evt =>
             {
                 property.boolValue = evt.newValue;
+                property.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(evt.newValue);
             });
         }

@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers
         private const string NonSelectedStr = "○";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             _container = GetContainer(saintsAttribute, parent);
 
@@ -205,7 +205,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             if (_container.FieldType == FieldType.NotFoundOrValid || _error != "")
             {
@@ -373,7 +373,9 @@ namespace SaintsField.Editor.Drawers
             UpdateToggleDisplay(property, saintsAttribute, index, container, parent);
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
             object parent, object newValue)
         {
             UpdateToggleDisplay(property, saintsAttribute, index, container, parent);

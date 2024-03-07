@@ -29,10 +29,10 @@ namespace SaintsField.Editor.Drawers
         private IReadOnlyList<RichTextDrawer.RichTextChunk> _payloads;
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
-            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml, targetAttribute.IsCallback, info, parent);
 
             _error = error;
 
@@ -47,7 +47,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             if (_error != "")
             {
@@ -141,7 +141,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
-            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute, parent);
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml, targetAttribute.IsCallback, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             string curError = (string)helpBox.userData;

@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
-            bool valueChanged, FieldInfo info, object parent)
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             object managedReferenceValue = property.managedReferenceValue;
 
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     property.managedReferenceValue = null;
                     property.serializedObject.ApplyModifiedProperties();
-                    SetValueChanged(property);
+                    onGUIPayload.SetValue(null);
                 });
                 genericDropdownMenu.AddSeparator("");
 
@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Drawers
                         property.managedReferenceValue = instance;
                         property.serializedObject.ApplyModifiedProperties();
                         // property.serializedObject.SetIsDifferentCacheDirty();
-                        SetValueChanged(property);
+                        onGUIPayload.SetValue(instance);
                     });
                 }
                 genericDropdownMenu.DropDown(new Rect(position)
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return ImGuiButtonWidth;
         }
@@ -280,8 +280,7 @@ namespace SaintsField.Editor.Drawers
                 });
                 genericDropdownMenu.AddSeparator("");
 
-                foreach (Type type in GetTypes(property)  // no public empty constructors
-                        )
+                foreach (Type type in GetTypes(property))
                 {
                     // string assemblyName =  type.Assembly.ToString().Split('(', ',')[0];
                     string displayName = $"{type.Name}: {type.Namespace}";
@@ -302,7 +301,9 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
             object parent, object newValue)
         {
             UpdateLabel(property, container, newValue);

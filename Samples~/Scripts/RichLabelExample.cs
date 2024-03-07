@@ -11,12 +11,12 @@ namespace SaintsField.Samples.Scripts
         // [InfoBox("3")]
         // [InfoBox("4")]
         // [InfoBox("5")]
-        [RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
+        [RichLabel("<color=indigo><icon=star.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
         public RichLabelExample _rainbow;
 
         [RichLabel(nameof(LabelCallback), true)]
         public bool _callbackToggle;
-        private string LabelCallback() => _callbackToggle ? "<color=" + EColor.Green + "><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
+        private string LabelCallback() => _callbackToggle ? "<color=" + EColor.Green + "><icon=star.png /></color> <label/>" : "<icon=star-slash.png /> <label/>";
 
         [RichLabel(nameof(ArrayLabels), true)]
         public string[] arrayLabels;

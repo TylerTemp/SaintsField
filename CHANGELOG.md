@@ -1,7 +1,33 @@
+## 2.1.9
+
+1.  `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+2.  IMGUI: fix incorrect height on first time rendering.
+3.  `OnChanged` now can receive the changed value in the callback.
+4.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
+5.  `InfoBox` now will disappear if the callback function returns null as content. 
+6.  Fix `InfoBox` gives error instead of display nothing when the content is null.
+
+## 2.1.8 ##
+
+1.  IMGUI: Fix PropertyField not with `includeChildren: true` and lead to broken `ReferencePicker` 
+2.  `ValidateInput` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+
+## 2.1.7 ##
+
+1.  Fix `MinMaxSlider` incorrect step.
+2.  Fix `ProgressBar` set value is not in real-time in struct type.
+3.  UI Toolkit: Fix incorrect image align for `AsssetPreview`, `AboveImage`, `BelowImage`
+4.  UI Toolkit: Fix `LeftToggle` not apply the value.
+
+## 2.1.6 ##
+
+1.  UI Toolkit: Fix `MinMaxSlider` incorrect clamp.
+2.  UI Toolkit: Fix `MinMaxSlider` difficult to manually input a value because of auto-correction.
+
 ## 2.1.5 ##
 
 1.  A better parser for `AdvancedDropdown`. Now you can use `/` to define a sub item.
-2.  UI Toolkit: dropdown icon for `AdvancedDropdown` lookes better now.
+2.  UI Toolkit: dropdown icon for `AdvancedDropdown` looks better now.
 3.  Fix readme about `FindComponent`
 4.  `ValidateInput` now support validation callback with parameter of the target field value.
 5.  `SaintsEditor` fix a button rendered twice if it's override (or use `new`) in a derived class.

@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers
         private Material _material;
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
             string rendererCompName = toggleAttribute.CompName;
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
             _error = error;
@@ -199,7 +199,9 @@ namespace SaintsField.Editor.Drawers
             UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
             object parent, object newValue)
         {
             UpdateToggleDisplay(property, index, saintsAttribute, container, parent);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,27 +26,29 @@ namespace SaintsField.Editor.Core
             PropertyPath = property.propertyPath,
         };
 
-        public InsideSaintsFieldScoop(PropertyKey key)
+        private readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> Counter;
+
+        public InsideSaintsFieldScoop(Dictionary<InsideSaintsFieldScoop.PropertyKey, int> counter, PropertyKey key)
         {
-            // SaintsPropertyDrawer.IsSubDrawer = true;
-            if (!SaintsPropertyDrawer.SubCounter.TryGetValue(key, out int count))
+            Counter = counter;
+            _property = key;
+
+            if (!Counter.TryGetValue(key, out int count))
             {
                 count = 0;
             }
 
             // Debug.Log($"subCount {key} {count}+1");
-            SaintsPropertyDrawer.SubCounter[key] = count + 1;
-
-            _property = key;
+            Counter[key] = count + 1;
         }
 
         public void Dispose()
         {
             // SaintsPropertyDrawer.IsSubDrawer = false;
-            if (SaintsPropertyDrawer.SubCounter.TryGetValue(_property, out int count))
+            if (Counter.TryGetValue(_property, out int count))
             {
                 // Debug.Log($"subCount {_property} {count}-1");
-                SaintsPropertyDrawer.SubCounter[_property] = count - 1;
+                Counter[_property] = count - 1;
             }
         }
     }

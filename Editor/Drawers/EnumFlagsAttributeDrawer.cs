@@ -119,7 +119,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
             if (!_initExpandState)
@@ -705,7 +705,9 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
             object parent, object newValue)
         {
             int newInt = (int)newValue;

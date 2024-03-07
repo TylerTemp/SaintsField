@@ -18,12 +18,12 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent) => 0;
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => 0;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
-            bool valueChanged, FieldInfo info, object parent)
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             (string error, UnityEngine.Object result) = DoCheckComponent(property, (GetComponentInParentsAttribute)saintsAttribute);
             if (error != "")
@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers
             }
             if(result != null)
             {
-                SetValueChanged(property);
+                onGUIPayload.SetValue(result);
             }
             return true;
         }

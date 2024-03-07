@@ -100,6 +100,7 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
             return ((AssetPreviewAttribute)saintsAttribute).Above;
@@ -118,7 +119,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             string error = MismatchError(property);
             if (error != null)
@@ -173,7 +174,7 @@ namespace SaintsField.Editor.Drawers
             // // int useWidth = maxWidth == -1? Mathf.FloorToInt(width): Mathf.Min(maxWidth, Mathf.FloorToInt(width));
             // int maxHeight = assetPreviewAttribute.Height;
 
-            if (width < 0)
+            if (width - 1 < Mathf.Epsilon)
             {
                 return 0;
             }
@@ -188,8 +189,8 @@ namespace SaintsField.Editor.Drawers
                 ? Mathf.Max(width - EditorGUIUtility.labelWidth, 1)
                 : width;
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ASSET_PREVIEW
-            Debug.Log($"useWidth={useWidth}, width={width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
+            Debug.Log($"#AssetPreview# useWidth={useWidth}, width={width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
 #endif
 
             (int width, int height) size =
@@ -232,7 +233,7 @@ namespace SaintsField.Editor.Drawers
                 ? Mathf.Max(position.width - EditorGUIUtility.labelWidth, 1)
                 : position.width;
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ASSET_PREVIEW
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
             Debug.Log($"useWidth={useWidth}, width={position.width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
 #endif
 
@@ -413,20 +414,19 @@ namespace SaintsField.Editor.Drawers
             switch (assetPreviewAttribute.Align)
             {
                 case EAlign.Start:
-                    // image.style.alignSelf = Align.Start;
                     fakeLabel.style.display = DisplayStyle.None;
                     break;
                 case EAlign.Center:
-                    // image.style.alignSelf = Align.Center;
                     fakeLabel.style.display = DisplayStyle.None;
+                    root.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
+                    fakeLabel.style.display = DisplayStyle.None;
                     // image.style.alignSelf = Align.FlexEnd;
+                    root.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
                     fakeLabel.style.display = DisplayStyle.Flex;
-                    // image.style.alignSelf = Align.FlexStart;
-                    // image.style.left = LabelBaseWidth;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(assetPreviewAttribute.Align), assetPreviewAttribute.Align, null);
@@ -528,7 +528,7 @@ namespace SaintsField.Editor.Drawers
                 (width, height) = Tex.GetProperScaleRect(
                     maxWidth,
                     widthConfig, heightConfig, preview.width, preview.height);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ASSET_PREVIEW
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
                 Debug.Log($"{width}x{height}<-rootWidth={rootWidth}, fakeLabel={fakeLabelWidth}, widthConfig={widthConfig}, heightConfig={heightConfig}, preview={preview.width}x{preview.height}");
 #endif
             }

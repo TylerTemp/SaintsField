@@ -17,13 +17,14 @@ namespace SaintsField.Editor.Drawers
 
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
             return true;
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             Rect leftRect = Draw(position, property, label, saintsAttribute, parent);
 

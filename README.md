@@ -18,13 +18,15 @@ Unity: 2019.1 or higher
 
 1.  Works on deep nested fields!
 2.  Supports UI Toolkit (Experimental)! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
-3.  Use and only use `PropertyDrawer` and `DecoratorDrawer`, thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
+3.  Use and only use `PropertyDrawer` and `DecoratorDrawer` (except `SaintsEditor`, which is disabled by default), thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
 
 ## Installation ##
 
-*   Using [OpenUPM](https://openupm.com/)
+*   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741 )
+
+*   Using [OpenUPM](https://openupm.com/packages/today.comes.saintsfield/)
 
     ```bash
     openupm add today.comes.saintsfield
@@ -61,15 +63,14 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.5**
+**2.1.9**
 
-1.  A better parser for `AdvancedDropdown`. Now you can use `/` to define a sub item.
-2.  UI Toolkit: dropdown icon for `AdvancedDropdown` lookes better now.
-3.  Fix readme about `FindComponent`
-4.  `ValidateInput` now support validation callback with parameter of the target field value.
-5.  `SaintsEditor` fix a button rendered twice if it's override (or use `new`) in a derived class.
-6.  `SaintsEditor`, `ShowInInspector` now will change appearance when value changed for auto property.
-7.  `SaintsEditor`, `ShowInInspector` now support to show `null` value with a yellow background.
+1.  `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+2.  IMGUI: fix incorrect height on first time rendering.
+3.  `OnChanged` now can receive the changed value in the callback.
+4.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
+5.  `InfoBox` now will disappear if the callback function returns null as content.
+6.  Fix `InfoBox` gives error instead of display nothing when the content is null.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -293,7 +294,7 @@ Draw an info box above/below the field.
 
     If the value (or returned value) is a string, then the content will be changed
 
-    If the value is `(string content, EMessageType messageType)` then both content and message type will be changed
+    If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
 
 *   `bool above=false`
 
@@ -791,11 +792,11 @@ The look in the UI Toolkit with `slashAsSub: false`:
 
 #### `AdvancedDropdown` ####
 
-A dropdown selector using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Supports reference type, sub-menu, separator, and disabled select item, plus icon.
+A dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
 
 **Known Issue**:
 
-1.  IMGUI: Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
+1.  IMGUI: Using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
     This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup.
 
     This issue is not fixable unless Unity fixes it.
@@ -873,7 +874,7 @@ public class AdvancedDropdownExample: MonoBehaviour
 
 [![advanced_dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/ad2f556b-7d98-4f49-a1ad-e2a5a52bf8f0)](https://github.com/TylerTemp/SaintsField/assets/6391063/157838e7-1f63-4b44-9503-bbb0004db7e8)
 
-There is also a parser to automaticly seperate items as sub items using `/`:
+There is also a parser to automatically separate items as sub items using `/`:
 
 ```csharp
 [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
@@ -1405,17 +1406,34 @@ public class ShowImageExample: MonoBehaviour
 Call a function every time the field value is changed
 
 *   `string callback` the callback function name
+    
+    It'll try to pass the new value and the index (only if it's in an array/list). You can set the corresponding parameter in your callback if you want to receive them. 
+
 *   AllowMultiple: Yes
 
 ```csharp
 public class OnChangedExample : MonoBehaviour
 {
+    // no params
     [OnValueChanged(nameof(Changed))]
-    public int _value;
-
+    public int value;
     private void Changed()
     {
-        Debug.Log($"changed={_value}");
+        Debug.Log($"changed={value}");
+    }
+
+    // with params to get the new value
+    [OnValueChanged(nameof(ChangedAnyType))]
+    public GameObject go;
+
+    // it will pass the index too if it's inside an array/list
+    [OnValueChanged(nameof(ChangedAnyType))]
+    public SpriteRenderer[] srs;
+    
+    // it's ok to set it as the super class
+    private void ChangedAnyType(object anyObj, int index=-1)
+    {
+        Debug.Log($"changed={anyObj}@{index}");
     }
 }
 ```
@@ -1521,9 +1539,9 @@ Validate the input of the field when the value changes.
     **Parameters**:
 
     1.  If the function accepts no arguments, then no argument will be passed
-    2.  If the function accepts required arguments, it should only define one required argument for this field, and the value of the field will be passed to it. All other optional argument will receive its default value.
-    3.  If the function only has optional arguments, then first optional argument that match the field's type (or parent type) will be passed the value of the field. If no match, default value will be passed.
-    
+    2.  If the function accepts required arguments, the first required argument will receive the field's value. If there is another required argument and the field is inside a list/array, the index will be passed. 
+    3.  If the function only has optional arguments, it will try to pass the field's value and index if possible. Otherwise the default value of the parameter will be passed.
+
     **Return**:
 
     1.  If return type is `string`, then `null` or empty string for valid, otherwise, the string will be used as the error message
@@ -1547,7 +1565,7 @@ public class ValidateInputExample : MonoBehaviour
     [ValidateInput(nameof(BoolCallbackValidate))]
     public string boolCallbackValidate;
     private bool BoolCallbackValidate() => boolValidate;
-    
+
     // with callback params
     [ValidateInput(nameof(ValidateWithReqParams))]
     public int withReqParams;
@@ -1558,6 +1576,12 @@ public class ValidateInputExample : MonoBehaviour
     public int withOptionalParams;
 
     private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
+    
+    // with array index callback
+    [ValidateInput(nameof(ValidateValArr))]
+    public int[] valArr;
+
+    private string ValidateValArr(int v, int index) => $"ValidateValArr[{index}]: {v}";
 }
 ```
 

@@ -1019,7 +1019,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute) saintsAttribute;
 
@@ -1197,7 +1197,8 @@ namespace SaintsField.Editor.Drawers
                     curItem =>
                     {
                         Util.SetValue(property, curItem, parent, parentType, field);
-                        SetValueChanged(property);
+                        // SetValueChanged(property);
+                        onGUIPayload.SetValue(curItem);
                     },
                     GetIcon);
                 dropdown.Show(position);

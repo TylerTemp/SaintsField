@@ -185,7 +185,7 @@ namespace SaintsField.Editor.Drawers
         // private SpriteRenderer _spriteRenderer;
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // SpriteToggleAttribute toggleAttribute = (SpriteToggleAttribute)saintsAttribute;
             // string imageCompName = toggleAttribute.CompName;
@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, bool valueChanged, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             // if (_containerProperty == null)
             // {
@@ -348,7 +348,9 @@ namespace SaintsField.Editor.Drawers
             UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
             object parent, object newValue)
         {
             UpdateToggleDisplay(property, index, saintsAttribute, container, parent);

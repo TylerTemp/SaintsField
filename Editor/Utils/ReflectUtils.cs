@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
@@ -160,6 +161,11 @@ namespace SaintsField.Editor.Utils
 
         public static bool Truly(object value)
         {
+            if (value is string stringValue)
+            {
+                return stringValue != "";
+            }
+
             try
             {
                 // Debug.Log($"try convert to bool");
@@ -189,6 +195,79 @@ namespace SaintsField.Editor.Utils
                 // Debug.Log($"Null, return false");
                 return false;
             }
+        }
+
+        public static object[] MethodParamsFill(IReadOnlyList<ParameterInfo> methodParams, IEnumerable<object> toFillValues)
+        {
+            // first we just sign default value and null value
+            object[] filledValues = methodParams.Select(param => param.IsOptional ? param.DefaultValue : null).ToArray();
+            // then we check for each params:
+            // 1.  If there are required params, fill the value
+            // 2.  Then, if there are left value to fill and can match the optional type, then fill it
+            // 3.  Ensure all required params are filled
+            // 4.  Return.
+
+            Queue<object> toFillQueue = new Queue<object>(toFillValues);
+            Queue<object> leftOverQueue = new Queue<object>();
+            // required:
+            foreach (int index in Enumerable.Range(0, methodParams.Count))
+            {
+                if (!methodParams[index].IsOptional)
+                {
+                    // Debug.Log($"checking {index}={methodParams[index].Name}");
+                    Debug.Assert(toFillQueue.Count > 0, $"Nothing to fill required parameter {methodParams[index].Name}");
+                    while(toFillQueue.Count > 0)
+                    {
+                        object value = toFillQueue.Dequeue();
+                        Type valueType = value.GetType();
+                        Type paramType = methodParams[index].ParameterType;
+                        if (valueType == paramType || valueType.IsSubclassOf(paramType))
+                        {
+                            // Debug.Log($"Push value {value} for {methodParams[index].Name}");
+                            filledValues[index] = value;
+                            break;
+                        }
+
+                        // Debug.Log($"Skip value {value} for {methodParams[index].Name}");
+                        leftOverQueue.Enqueue(value);
+                        // Debug.Assert(valueType == paramType || valueType.IsSubclassOf(paramType),
+                        //     $"The value type `{valueType}` is not match the param type `{paramType}`");
+                        // Debug.Log($"Add {value} at {index}");
+
+                    }
+                }
+            }
+
+            foreach (object leftOver in toFillQueue)
+            {
+                leftOverQueue.Enqueue(leftOver);
+            }
+
+            // optional:
+            if(leftOverQueue.Count > 0)
+            {
+                foreach (int index in Enumerable.Range(0, methodParams.Count))
+                {
+                    if (leftOverQueue.Count == 0)
+                    {
+                        break;
+                    }
+
+                    if (methodParams[index].IsOptional)
+                    {
+                        object value = leftOverQueue.Peek();
+                        Type valueType = value.GetType();
+                        Type paramType = methodParams[index].ParameterType;
+                        if(valueType == paramType || valueType.IsSubclassOf(paramType))
+                        {
+                            leftOverQueue.Dequeue();
+                            filledValues[index] = value;
+                        }
+                    }
+                }
+            }
+
+            return filledValues;
         }
     }
 }

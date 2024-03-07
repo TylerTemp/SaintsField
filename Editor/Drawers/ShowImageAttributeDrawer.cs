@@ -80,6 +80,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
             return ((ShowImageAttribute)saintsAttribute).Above;
@@ -97,7 +98,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             if (_error != "")
             {
@@ -493,9 +494,12 @@ namespace SaintsField.Editor.Drawers
                 case EAlign.Center:
                     // image.style.alignSelf = Align.Center;
                     fakeLabel.style.display = DisplayStyle.None;
+                    root.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
+                    fakeLabel.style.display = DisplayStyle.None;
                     // image.style.alignSelf = Align.FlexEnd;
+                    root.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
                     fakeLabel.style.display = DisplayStyle.Flex;

@@ -21,6 +21,7 @@ namespace SaintsField.Editor.Drawers
         // private EMessageType _messageType;
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
@@ -55,7 +56,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(infoboxAttribute, parent);
@@ -125,10 +126,12 @@ namespace SaintsField.Editor.Drawers
 
         private struct MetaInfo
         {
+            // ReSharper disable InconsistentNaming
             public string Error;
             public EMessageType MessageType;
             public string Content;
             public bool WillDraw;
+            // ReSharper enable InconsistentNaming
         }
 
         private static MetaInfo GetMetaInfo(InfoBoxAttribute infoboxAttribute, object target)
@@ -148,7 +151,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     Content = infoboxAttribute.Content,
                     MessageType = infoboxAttribute.MessageType,
-                    WillDraw = willDraw,
+                    WillDraw = infoboxAttribute.Content != null && willDraw,
                     Error = "",
                 };
             }
@@ -173,7 +176,7 @@ namespace SaintsField.Editor.Drawers
                     return new MetaInfo
                     {
                         Error = "",
-                        WillDraw = willDraw,
+                        WillDraw = resultTuple.Item2 != null && willDraw,
                         MessageType = resultTuple.Item1,
                         Content = resultTuple.Item2,
                     };
@@ -181,9 +184,9 @@ namespace SaintsField.Editor.Drawers
                 return new MetaInfo
                 {
                     Error = "",
-                    WillDraw = willDraw,
+                    WillDraw = propertyValue != null && willDraw,
                     MessageType = infoboxAttribute.MessageType,
-                    Content = propertyValue.ToString(),
+                    Content = propertyValue?.ToString(),
                 };
             }
 
@@ -196,7 +199,7 @@ namespace SaintsField.Editor.Drawers
                     return new MetaInfo
                     {
                         Error = "",
-                        WillDraw = willDraw,
+                        WillDraw = resultTuple.Item2 != null && willDraw,
                         MessageType = resultTuple.Item1,
                         Content = resultTuple.Item2,
                     };
@@ -205,9 +208,9 @@ namespace SaintsField.Editor.Drawers
                 return new MetaInfo
                 {
                     Error = "",
-                    WillDraw = willDraw,
+                    WillDraw = fieldValue != null && willDraw,
                     MessageType = infoboxAttribute.MessageType,
-                    Content = fieldValue.ToString(),
+                    Content = fieldValue == null? "": fieldValue.ToString(),
                 };
             }
             // ReSharper disable once InvertIf
@@ -215,6 +218,11 @@ namespace SaintsField.Editor.Drawers
             {
                 ParameterInfo[] methodParams = methodInfo.GetParameters();
                 Debug.Assert(methodParams.All(p => p.IsOptional));
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_INFO_BOX
+                Debug.Log(methodInfo.ReturnType);
+                Debug.Log(methodInfo.ReturnType == typeof(ValueTuple<EMessageType, string>));
+#endif
 
                 if (methodInfo.ReturnType != typeof(ValueTuple<EMessageType, string>))
                     return new MetaInfo

@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             // Object target = property.serializedObject.targetObject;
@@ -94,7 +94,8 @@ namespace SaintsField.Editor.Drawers
                 ShowGenericMenu(metaInfo, curDisplay, fieldRect, (_, item) =>
                 {
                     Util.SetValue(property, item, parent, parentType, field);
-                    SetValueChanged(property);
+                    onGUIPayload.SetValue(item);
+
                 }, !dropdownAttribute.SlashAsSub);
             }
 

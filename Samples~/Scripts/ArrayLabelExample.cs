@@ -5,8 +5,22 @@ namespace SaintsField.Samples.Scripts
 {
     public class ArrayLabelExample : MonoBehaviour
     {
-        // this wont work
-        [RichLabel("HI"), InfoBox("this will apply to all element", EMessageType.Warning)] public int[] _ints;
+        // FIXED: list above/below incorrect height when item height is not the same
+
+        [RichLabel(nameof(IntsLabel), true)]
+        [AboveRichLabel(nameof(IntsLabel), true)]
+        [BelowRichLabel(nameof(IntsLabel), true)]
+        public int[] ints;
+
+        private string IntsLabel(int value, int index)
+        {
+            if (index <= 1)
+            {
+                return null;
+            }
+
+            return (value < 0? "<color=red>": "") + $"<label/>[{index}]={value}";
+        }
 
         [Serializable]
         public struct MyStruct
@@ -17,5 +31,26 @@ namespace SaintsField.Samples.Scripts
         }
 
         public MyStruct[] myStructs;
+
+        [Serializable]
+        public struct StructNested
+        {
+            [RichLabel(nameof(IntsLabel), true)]
+            [AboveRichLabel(nameof(IntsLabel), true)]
+            [BelowRichLabel(nameof(IntsLabel), true)]
+            public int[] ints;
+
+            private string IntsLabel(int value, int index)
+            {
+                if (index <= 1)
+                {
+                    return null;
+                }
+
+                return (value < 0? "<color=red>": "") + $"[{index}]={value}|<label/>";
+            }
+        }
+
+        public StructNested[] structNested;
     }
 }

@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;
             if (!getComponentByPathAttribute.ResignButton)
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
-            bool valueChanged, FieldInfo info, object parent)
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             // Debug.Log($"init first open {_firstOpen}");
             _error = "";
