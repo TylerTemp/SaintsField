@@ -1754,7 +1754,6 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"On Awake");
 #endif
-
             Action<object> onValueChangedCallback = obj =>
             {
                 foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
@@ -1799,7 +1798,7 @@ namespace SaintsField.Editor.Core
                     }
 #endif
 
-                    OnAwakeReady(property, containerElement, parent, saintsPropertyDrawers);
+                    OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
                 });
 
                 // foreach (VisualElement child in thisPropField.Children().SkipLast(1).ToArray())
@@ -1817,27 +1816,39 @@ namespace SaintsField.Editor.Core
                 // thisPropField.Bind(property.serializedObject);
                 thisPropField.Unbind();
                 thisPropField.BindProperty(property.serializedObject);
-                thisPropField.RegisterValueChangeCallback(_ => onValueChangedCallback(null));
+                thisPropField.RegisterValueChangeCallback(evt =>
+                {
+                    SerializedProperty prop = evt.changedProperty;
+                    if(prop == property)
+                    {
+                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                        object rawValue = fieldInfo.GetValue(parent);
+                        object curValue = arrayIndex == -1
+                            ? rawValue
+                            : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                        onValueChangedCallback(curValue);
+                    }
+                });
             }
             else
             {
-                OnAwakeReady(property, containerElement, parent, saintsPropertyDrawers);
+                OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
             }
 
 
         }
 
         private void OnAwakeReady(SerializedProperty property, VisualElement containerElement,
-            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+            object parent,  Action<object> onValueChangedCallback, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
 
-            Action<object> onValueChangedCallback = obj =>
-            {
-                foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
-                {
-                    saintsPropertyInfo.Drawer.OnValueChanged(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent, obj);
-                }
-            };
+            // Action<object> onValueChangedCallback = obj =>
+            // {
+            //     foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
+            //     {
+            //         saintsPropertyInfo.Drawer.OnValueChanged(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent, obj);
+            //     }
+            // };
 
             containerElement.visible = true;
 

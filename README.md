@@ -1406,6 +1406,9 @@ public class ShowImageExample: MonoBehaviour
 Call a function every time the field value is changed
 
 *   `string callback` the callback function name
+    
+    It'll try to pass the new value and the index (only if it's in an array/list). You can set the corresponding parameter in your callback if you want to receive them. 
+
 *   AllowMultiple: Yes
 
 ```csharp
@@ -1420,11 +1423,17 @@ public class OnChangedExample : MonoBehaviour
     }
 
     // with params to get the new value
-    [OnValueChanged(nameof(Changed))]
-    public int v;
-    private void Changed(int newValue)
+    [OnValueChanged(nameof(ChangedAnyType))]
+    public GameObject go;
+
+    // it will pass the index too if it's inside an array/list
+    [OnValueChanged(nameof(ChangedAnyType))]
+    public SpriteRenderer[] srs;
+    
+    // it's ok to set it as the super class
+    private void ChangedAnyType(object anyObj, int index=-1)
     {
-        Debug.Log($"changed={newValue}");
+        Debug.Log($"changed={anyObj}@{index}");
     }
 }
 ```
