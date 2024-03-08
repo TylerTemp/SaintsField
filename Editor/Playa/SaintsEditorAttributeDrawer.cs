@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Playa
     [CustomPropertyDrawer(typeof(SaintsEditorAttribute))]
     public class SaintsEditorAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
     {
-        public static (object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
+        private static (object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             object rawValue = fieldInfo.GetValue(parentValue);
@@ -52,15 +52,30 @@ namespace SaintsField.Editor.Playa
 
         private IReadOnlyList<ISaintsRenderer> _imGuiRenderers;
 
+        // private class CacheCounter
+        // {
+        //     public int count;
+        //     public IReadOnlyList<ISaintsRenderer> renderers;
+        // }
+
+        // script change will clean this cache. At this point it just be like this.
+        // Note:
+        // 1.  IMGUI PropertyDrawer can not store status. Even a private attribute does not work
+        // 2.  DOTweenPlay requires to store status
+        // 3.  SerializedProperty is changed every time it renders (even for the same attribute)
+        private static readonly Dictionary<string, IReadOnlyList<ISaintsRenderer>> GlobalCache = new Dictionary<string, IReadOnlyList<ISaintsRenderer>>();
+
         private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(SerializedProperty property)
         {
-            if (_imGuiRenderers != null)
+            string key = $"{property.serializedObject.targetObject.GetInstanceID()}:{property.propertyPath}";
+            if (GlobalCache.TryGetValue(key, out IReadOnlyList<ISaintsRenderer> result))
             {
-                return _imGuiRenderers;
+                return result;
             }
+
             (object _, object current) = GetTargets(fieldInfo, property);
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
-            return _imGuiRenderers = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
+            return GlobalCache[key] = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -72,7 +87,7 @@ namespace SaintsField.Editor.Playa
             {
                 foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
                 {
-                    fieldHeight += saintsRenderer.GetHeight();
+                    fieldHeight += saintsRenderer.GetHeight(property);
                 }
             }
 
@@ -106,13 +121,13 @@ namespace SaintsField.Editor.Playa
 
                 foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
                 {
-                    float height = saintsRenderer.GetHeight();
+                    float height = saintsRenderer.GetHeight(property);
                     Rect rect = new Rect(leftRect)
                     {
                         y = yAcc,
                         height = height,
                     };
-                    saintsRenderer.RenderPosition(rect);
+                    saintsRenderer.RenderPosition(rect, property);
                     yAcc += height;
                 }
             }

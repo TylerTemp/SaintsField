@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
@@ -13,8 +14,8 @@ namespace SaintsField.Editor.Playa
 
         void Render();
 
-        public float GetHeight();
+        public float GetHeight(SerializedProperty property);
 
-        public void RenderPosition(Rect position);
+        public void RenderPosition(Rect position, SerializedProperty property);
     }
 }

@@ -70,7 +70,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        public override float GetHeight()
+        public override float GetHeight(SerializedProperty property)
         {
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
             if(methodInfo.GetCustomAttribute<ButtonAttribute>(true) == null)
@@ -80,7 +80,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return SaintsPropertyDrawer.SingleLineHeight;
         }
 
-        public override void RenderPosition(Rect position)
+        public override void RenderPosition(Rect position, SerializedProperty property)
         {
             object target = FieldWithInfo.target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;

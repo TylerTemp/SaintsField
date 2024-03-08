@@ -204,7 +204,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 : _renderers.Select(each => each.renderer);
         }
 
-        public float GetHeight()
+        public float GetHeight(SerializedProperty property)
         {
             float titleHeight = 0f;
 
@@ -280,14 +280,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 foreach (ISaintsRenderer renderer in GetRenderer())
                 {
-                    contentHeight += renderer.GetHeight();
+                    contentHeight += renderer.GetHeight(property);
                 }
             }
 
             return titleHeight + contentHeight;
         }
 
-        public void RenderPosition(Rect position)
+        public void RenderPosition(Rect position, SerializedProperty property)
         {
             Debug.Assert(!_eLayout.HasFlag(ELayout.Horizontal), $"Horizontal is not supported for IMGUI in SaintsEditorAttribute mode");
 
@@ -449,7 +449,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     };
                     foreach (ISaintsRenderer renderer in GetRenderer())
                     {
-                        renderer.RenderPosition(bodyRect);
+                        renderer.RenderPosition(bodyRect, property);
                     }
 
                 }

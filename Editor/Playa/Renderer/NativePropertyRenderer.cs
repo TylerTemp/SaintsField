@@ -53,12 +53,12 @@ namespace SaintsField.Editor.Playa.Renderer
             // FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
         }
 
-        public override float GetHeight()
+        public override float GetHeight(SerializedProperty property)
         {
             return SaintsPropertyDrawer.SingleLineHeight;
         }
 
-        public override void RenderPosition(Rect position)
+        public override void RenderPosition(Rect position, SerializedProperty property)
         {
 
         }
