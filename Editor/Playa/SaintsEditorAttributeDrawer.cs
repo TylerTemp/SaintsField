@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -15,9 +16,15 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa
 {
-    [CustomPropertyDrawer(typeof(SaintsEditorAttribute))]
-    public class SaintsEditorAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
+    [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
+    public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
     {
+        private int _count = 0;
+        public SaintsRowAttributeDrawer()
+        {
+            _count += 1;
+        }
+
         private static (object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
@@ -63,31 +70,41 @@ namespace SaintsField.Editor.Playa
         // 1.  IMGUI PropertyDrawer can not store status. Even a private attribute does not work
         // 2.  DOTweenPlay requires to store status
         // 3.  SerializedProperty is changed every time it renders (even for the same attribute)
-        private static readonly Dictionary<string, IReadOnlyList<ISaintsRenderer>> GlobalCache = new Dictionary<string, IReadOnlyList<ISaintsRenderer>>();
+        // private static readonly Dictionary<string, IReadOnlyList<ISaintsRenderer>> GlobalCache = new Dictionary<string, IReadOnlyList<ISaintsRenderer>>();
 
         private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(SerializedProperty property)
         {
-            string key = $"{property.serializedObject.targetObject.GetInstanceID()}:{property.propertyPath}";
-            if (GlobalCache.TryGetValue(key, out IReadOnlyList<ISaintsRenderer> result))
+            // string key = $"{property.serializedObject.targetObject.GetInstanceID()}:{property.propertyPath}";
+            // if (GlobalCache.TryGetValue(key, out IReadOnlyList<ISaintsRenderer> result))
+            // {
+            //     return result;
+            // }
+            //
+            // (object _, object current) = GetTargets(fieldInfo, property);
+            // Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
+            // return GlobalCache[key] = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
+
+            if(_imGuiRenderers != null)
             {
-                return result;
+                return _imGuiRenderers;
             }
 
+            // Debug.Log($"create new");
             (object _, object current) = GetTargets(fieldInfo, property);
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
-            return GlobalCache[key] = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
+            return _imGuiRenderers = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            SaintsEditorAttribute saintsEditorAttribute = (SaintsEditorAttribute) attribute;
-            float baseLineHeight = saintsEditorAttribute.Inline ? 0 : SaintsPropertyDrawer.SingleLineHeight;
+            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
+            float baseLineHeight = saintsRowAttribute.Inline ? 0 : SaintsPropertyDrawer.SingleLineHeight;
             float fieldHeight = 0f;
-            if(property.isExpanded)
+            if(property.isExpanded || saintsRowAttribute.Inline)
             {
                 foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
                 {
-                    fieldHeight += saintsRenderer.GetHeight(property);
+                    fieldHeight += saintsRenderer.GetHeight();
                 }
             }
 
@@ -96,41 +113,50 @@ namespace SaintsField.Editor.Playa
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            // SaintsEditorAttribute saintsEditorAttribute = (SaintsEditorAttribute) attribute;
+            // Debug.Log(_imGuiRenderers);
+            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
             using (new EditorGUI.PropertyScope(position, label, property))
             {
-                property.isExpanded = EditorGUI.Foldout(new Rect(position)
+                if(!saintsRowAttribute.Inline)
                 {
-                    height = SaintsPropertyDrawer.SingleLineHeight,
-                }, property.isExpanded, label, true);
+                    // Debug.Log($"render foldout {position.x}, {position.y}");
+                    property.isExpanded = EditorGUI.Foldout(new Rect(position)
+                    {
+                        height = SaintsPropertyDrawer.SingleLineHeight,
+                    }, property.isExpanded, label, true);
+                }
 
-                if (!property.isExpanded)
+                if (!saintsRowAttribute.Inline && !property.isExpanded)
                 {
                     return;
                 }
 
-                Rect leftRect = new Rect(position)
-                {
-                    x = position.x + SaintsPropertyDrawer.IndentWidth,
-                    y = position.y + SaintsPropertyDrawer.SingleLineHeight,
-                    height = position.height - SaintsPropertyDrawer.SingleLineHeight,
-                    width = position.width - SaintsPropertyDrawer.IndentWidth,
-                };
+                Rect leftRect = saintsRowAttribute.Inline
+                    ? new Rect(position)
+                    : new Rect(position)
+                    {
+                        x = position.x + SaintsPropertyDrawer.IndentWidth,
+                        y = position.y + SaintsPropertyDrawer.SingleLineHeight,
+                        height = position.height - SaintsPropertyDrawer.SingleLineHeight,
+                        width = position.width - SaintsPropertyDrawer.IndentWidth,
+                    };
 
                 float yAcc = leftRect.y;
 
                 foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
                 {
-                    float height = saintsRenderer.GetHeight(property);
+                    float height = saintsRenderer.GetHeight();
                     Rect rect = new Rect(leftRect)
                     {
                         y = yAcc,
                         height = height,
                     };
-                    saintsRenderer.RenderPosition(rect, property);
+                    saintsRenderer.RenderPosition(rect);
                     yAcc += height;
                 }
             }
+
+            // Debug.Log($"Done {property.propertyPath}");
         }
 
         #endregion

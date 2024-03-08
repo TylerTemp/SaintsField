@@ -232,12 +232,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         }
 
-        public float GetHeight(SerializedProperty property)
+        public float GetHeight()
         {
             return EditorGUIUtility.singleLineHeight * (_doTweenMethods.Count + 1);
         }
 
-        public void RenderPosition(Rect position, SerializedProperty property)
+        public void RenderPosition(Rect position)
         {
             if (_iconButtonStyle == null)
             {

@@ -29,9 +29,9 @@ namespace SaintsField.Editor.Playa.Renderer
         public abstract VisualElement CreateVisualElement();
 #endif
         public abstract void Render();
-        public abstract float GetHeight(SerializedProperty property);
+        public abstract float GetHeight();
 
-        public abstract void RenderPosition(Rect position, SerializedProperty property);
+        public abstract void RenderPosition(Rect position);
 
         // NA: NaughtyEditorGUI
         protected static void FieldLayout(object value, string label)

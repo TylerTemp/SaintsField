@@ -59,15 +59,15 @@ namespace SaintsField.Editor.Playa.Renderer
             EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, GUILayout.ExpandWidth(true));
         }
 
-        public override float GetHeight(SerializedProperty property)
+        public override float GetHeight()
         {
-            return EditorGUI.GetPropertyHeight(property, true);
+            return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
         }
 
-        public override void RenderPosition(Rect position, SerializedProperty property)
+        public override void RenderPosition(Rect position)
         {
             // Debug.Log($"render {this}/{position}");
-            EditorGUI.PropertyField(position, property, true);
+            EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, true);
             // EditorGUI.DrawRect(position, Color.blue);
         }
 

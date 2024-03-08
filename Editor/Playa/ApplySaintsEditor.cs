@@ -2,7 +2,7 @@
 
 namespace SaintsField.Editor.Playa
 {
-    public class ApplySaintsMonoBehaviorEditorBase : SaintsEditor
+    public class ApplySaintsEditorBase : SaintsEditor
     {
         // should we try to fix the UI Toolkit PropertyField label unmatched width issue?
         protected override bool TryFixUIToolkit =>
@@ -26,19 +26,19 @@ namespace SaintsField.Editor.Playa
 #if SAINTSFIELD_NAUGHYTATTRIBUTES && SAINTSFIELD_SAINTS_EDITOR_APPLY
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
-    public class ApplySaintsMonoBehaviorEditor : ApplySaintsMonoBehaviorEditorBase
+    public class ApplySaintsMonoBehaviorEditor : ApplySaintsEditorBase
     {
     }
 
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.ScriptableObject), true)]
-    public class ApplySaintsScriptableObjectEditor : ApplySaintsMonoBehaviorEditorBase
+    public class ApplySaintsScriptableObjectEditor : ApplySaintsEditorBase
     {
     }
 #elif SAINTSFIELD_SAINTS_EDITOR_APPLY
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.Object), true)]
-    public class ApplySaintsEditor : ApplySaintsMonoBehaviorEditorBase
+    public class ApplySaintsEditor : ApplySaintsEditorBase
     {
     }
 #endif

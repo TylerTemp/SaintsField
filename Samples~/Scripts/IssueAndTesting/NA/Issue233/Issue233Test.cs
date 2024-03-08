@@ -51,9 +51,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233
             [Button, Ordered]
             private void Nest1Btn() => Debug.Log("Call Nest1Btn");
 
-            [SaintsEditor, Ordered]
+            [SaintsRow, Ordered]
             public Nest2 n2;
-            [SaintsEditor, Ordered]
+            [SaintsRow, Ordered]
             public Nest2[] n2Array;
 
             [field: SerializeField, Ordered]
@@ -63,7 +63,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233
             public string myString;
         }
 
-        [SaintsEditor]
+        [SaintsRow]
         public Nest1 n1;
     }
 }

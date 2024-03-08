@@ -28,14 +28,15 @@ namespace SaintsField.Editor.Playa.Renderer
                 .FieldInfo.Name));
         }
 
-        public override float GetHeight(SerializedProperty property)
+        public override float GetHeight()
         {
             return SaintsPropertyDrawer.SingleLineHeight;
         }
 
-        public override void RenderPosition(Rect position, SerializedProperty property)
+        public override void RenderPosition(Rect position)
         {
-            object value = FieldWithInfo.FieldInfo.GetValue(property.serializedObject.targetObject);
+            // TODO: Fix This
+            object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.SerializedProperty.serializedObject.targetObject);
             FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .FieldInfo.Name));
         }
