@@ -11,8 +11,8 @@ namespace SaintsField.Editor.Playa
         public int InherentDepth;
         public int Order;
 
-        public IReadOnlyList<ISaintsGroup> groups;
-        public object target;
+        public IReadOnlyList<ISaintsGroup> Groups;
+        public object Target;
 
         public SaintsRenderType RenderType;
 

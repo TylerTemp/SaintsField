@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Playa.Renderer
 #endif
         public override void Render()
         {
-            object target = FieldWithInfo.target;
+            object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
             ButtonAttribute[] buttonAttributes = methodInfo.GetCustomAttributes<ButtonAttribute>(true).ToArray();
@@ -82,7 +82,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override void RenderPosition(Rect position)
         {
-            object target = FieldWithInfo.target;
+            object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
             ButtonAttribute[] buttonAttributes = methodInfo.GetCustomAttributes<ButtonAttribute>(true).ToArray();

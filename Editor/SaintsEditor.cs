@@ -262,8 +262,8 @@ namespace SaintsField.Editor
 
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
-                        groups = fieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
-                        target = target,
+                        Groups = fieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        Target = target,
 
                         RenderType = SaintsRenderType.SerializedField,
                         SerializedProperty = serializedPropertyDict[fieldInfo.Name],
@@ -284,8 +284,8 @@ namespace SaintsField.Editor
                     int order = orderProp?.Order ?? int.MinValue;
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
-                        groups = nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
-                        target = target,
+                        Groups = nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        Target = target,
 
                         RenderType = SaintsRenderType.NonSerializedField,
                         // memberType = nonSerFieldInfo.MemberType,
@@ -325,8 +325,8 @@ namespace SaintsField.Editor
 
                         fieldWithInfos.Add(new SaintsFieldWithInfo
                         {
-                            groups = allMethodAttributes.OfType<ISaintsGroup>().ToArray(),
-                            target = target,
+                            Groups = allMethodAttributes.OfType<ISaintsGroup>().ToArray(),
+                            Target = target,
 
                             // memberType = MemberTypes.Method,
                             RenderType = SaintsRenderType.Method,
@@ -352,8 +352,8 @@ namespace SaintsField.Editor
                     int order = orderProp?.Order ?? int.MinValue;
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
-                        groups = propertyInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
-                        target = target,
+                        Groups = propertyInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        Target = target,
 
                         RenderType = SaintsRenderType.NativeProperty,
                         PropertyInfo = propertyInfo,
@@ -373,7 +373,7 @@ namespace SaintsField.Editor
                 .ToList();
 
             Dictionary<string, (ELayout eLayout, bool isDOTween)> layoutKeyToInfo = new Dictionary<string, (ELayout eLayout, bool isDOTween)>();
-            foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.groups))
+            foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.Groups))
             {
                 string groupBy = sortedGroup.GroupBy;
                 ELayout config = sortedGroup.Layout;
@@ -414,9 +414,9 @@ namespace SaintsField.Editor
             {
                 SaintsFieldWithInfo fieldWithInfo = fieldWithInfosSorted[0];
                 fieldWithInfosSorted.RemoveAt(0);
-                if (fieldWithInfo.groups.Count > 0)
+                if (fieldWithInfo.Groups.Count > 0)
                 {
-                    ISaintsGroup longestGroup = fieldWithInfo.groups
+                    ISaintsGroup longestGroup = fieldWithInfo.Groups
                         .OrderByDescending(each => each.GroupBy.Length)
                         .First();
 

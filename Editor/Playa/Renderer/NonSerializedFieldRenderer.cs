@@ -35,8 +35,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override void RenderPosition(Rect position)
         {
-            // TODO: Fix This
-            object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.SerializedProperty.serializedObject.targetObject);
+            object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
             FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .FieldInfo.Name));
         }
