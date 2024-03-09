@@ -19,12 +19,6 @@ namespace SaintsField.Editor.Playa
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
     public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
     {
-        private int _count = 0;
-        public SaintsRowAttributeDrawer()
-        {
-            _count += 1;
-        }
-
         private static (object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
@@ -161,8 +155,8 @@ namespace SaintsField.Editor.Playa
 
         #endregion
 
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         #region UI Toolkit
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
@@ -203,7 +197,7 @@ namespace SaintsField.Editor.Playa
             root.Add(bodyElement);
             return root;
         }
-        #endregion
 #endif
+        #endregion
     }
 }

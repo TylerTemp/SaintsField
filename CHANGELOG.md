@@ -6,6 +6,7 @@
 4.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
 5.  `InfoBox` now will disappear if the callback function returns null as content. 
 6.  Fix `InfoBox` gives error instead of display nothing when the content is null.
+7.  Add `SaintsRow` for `Serializable` class/struct to draw Button/Layout/DOTweenPlay for the target field.
 
 ## 2.1.8 ##
 
