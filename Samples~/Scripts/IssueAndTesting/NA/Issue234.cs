@@ -30,31 +30,29 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             private Sequence PlayColor()
             {
                 return DOTween.Sequence()
-                    .Append(spriteRenderer.DOColor(Color.red, 1f))
-                    .Append(spriteRenderer.DOColor(Color.green, 1f))
-                    .Append(spriteRenderer.DOColor(Color.blue, 1f))
-                    .SetLoops(-1);
+                  .Append(spriteRenderer.DOColor(Color.red, 1f))
+                  .Append(spriteRenderer.DOColor(Color.green, 1f))
+                  .Append(spriteRenderer.DOColor(Color.blue, 1f))
+                  .SetLoops(-1);
             }
             [DOTweenPlay("Position")]
             private Sequence PlayTween2()
             {
-                Debug.Log(spriteRenderer);
-                Debug.Log(spriteRenderer.transform);
                 return DOTween.Sequence()
-                        .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
-                        .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
-                        .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
-                        .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
-                        .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
-                    ;
+                      .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
+                      .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
+                      .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
+                      .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
+                      .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
+                  ;
             }
 #endif
-        }
+      }
 
-        [SaintsRow]
-        public MyStruct myStruct;
+      [SaintsRow]
+      public MyStruct myStruct;
 
-        [SaintsRow(inline: true)]
-        public MyStruct myStructInline;
+      [SaintsRow(inline: true)]
+      public MyStruct myStructInline;
     }
 }

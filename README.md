@@ -65,12 +65,14 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 **2.1.9**
 
-1.  `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
-2.  IMGUI: fix incorrect height on first time rendering.
-3.  `OnChanged` now can receive the changed value in the callback.
-4.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
-5.  `InfoBox` now will disappear if the callback function returns null as content.
-6.  Fix `InfoBox` gives error instead of display nothing when the content is null.
+1.  Add `SaintsRow` for `Serializable` class/struct to draw Button/Layout/DOTweenPlay for the target field.
+2.  **Breaking Changes**: `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+3.  IMGUI: fix incorrect height on first time rendering.
+4.  `OnChanged` now can receive the changed value in the callback.
+5.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
+6.  `InfoBox` now will disappear if the callback function returns null as content.
+7.  Fix `InfoBox` gives error instead of display nothing when the content is null.
+8.  Fix `AboveImage`/`BelowImage` gives error instead of display nothing when the SpriteRenderer/Image/RawImage does not have a sprite.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1406,8 +1408,8 @@ public class ShowImageExample: MonoBehaviour
 Call a function every time the field value is changed
 
 *   `string callback` the callback function name
-    
-    It'll try to pass the new value and the index (only if it's in an array/list). You can set the corresponding parameter in your callback if you want to receive them. 
+
+    It'll try to pass the new value and the index (only if it's in an array/list). You can set the corresponding parameter in your callback if you want to receive them.
 
 *   AllowMultiple: Yes
 
@@ -1429,7 +1431,7 @@ public class OnChangedExample : MonoBehaviour
     // it will pass the index too if it's inside an array/list
     [OnValueChanged(nameof(ChangedAnyType))]
     public SpriteRenderer[] srs;
-    
+
     // it's ok to set it as the super class
     private void ChangedAnyType(object anyObj, int index=-1)
     {
@@ -1539,7 +1541,7 @@ Validate the input of the field when the value changes.
     **Parameters**:
 
     1.  If the function accepts no arguments, then no argument will be passed
-    2.  If the function accepts required arguments, the first required argument will receive the field's value. If there is another required argument and the field is inside a list/array, the index will be passed. 
+    2.  If the function accepts required arguments, the first required argument will receive the field's value. If there is another required argument and the field is inside a list/array, the index will be passed.
     3.  If the function only has optional arguments, it will try to pass the field's value and index if possible. Otherwise the default value of the parameter will be passed.
 
     **Return**:
@@ -1576,7 +1578,7 @@ public class ValidateInputExample : MonoBehaviour
     public int withOptionalParams;
 
     private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
-    
+
     // with array index callback
     [ValidateInput(nameof(ValidateValArr))]
     public int[] valArr;
@@ -1984,6 +1986,84 @@ public class ButtonAddOnClickExample: MonoBehaviour
 ```
 
 ![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
+
+#### `SaintsRow` ####
+
+`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc in a `Serializable` object (usually a class or a struct).
+
+This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
+
+Parameters:
+
+*   `bool inline=false`
+
+    If true, it'll draw the `Serializable` inline like it's directly in the `MonoBehavior`
+
+*   `bool tryFixUIToolkit=defaultValue`
+
+    Should it try to fix the UI Toolkit label width issue? (See the UI Toolkit section). By default it will try, unless you toggled the `Disable UI Toolkit Label Fix` marco, or you passed this parameter.
+
+*   AllowMultiple: No
+
+Special Note:
+
+1.  After applied this attribute, only pure `PropertyDrawer`, or decorators from `SaintsEditor` works on this target. Which means, Using third party's `PropertyDrawer` is fine, but decorator of Editor Level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
+2.  IMGUI: `ELayout.Horizontal` does not work here
+3.  IMGUI: `DOTweenPlay` might be a bit buggy display the playing/pause/stop status for each button.
+
+```csharp
+[Serializable]
+public struct Nest
+{
+    public string nest2Str;  // normal field
+    [Button]  // function button
+    private void Nest2Btn() => Debug.Log("Call Nest2Btn");
+    // static field (non serializable)
+    [ShowInInspector] public static Color StaticColor => Color.cyan;
+    // const field (non serializable)
+    [ShowInInspector] public const float Pi = 3.14f;
+    // normal attribute drawer works as expected
+    [BelowImage(maxWidth: 25)] public SpriteRenderer spriteRenderer;
+
+    [DOTweenPlay]  // DOTween helper
+    private Sequence PlayColor()
+    {
+        return DOTween.Sequence()
+            .Append(spriteRenderer.DOColor(Color.red, 1f))
+            .Append(spriteRenderer.DOColor(Color.green, 1f))
+            .Append(spriteRenderer.DOColor(Color.blue, 1f))
+            .SetLoops(-1);
+    }
+    [DOTweenPlay("Position")]
+    private Sequence PlayTween2()
+    {
+        return DOTween.Sequence()
+                .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
+            ;
+    }
+}
+
+[SaintsRow]
+public Nest1 n1;
+```
+
+To show a `Serializable` inline like it's directly in the `MonoBehavior`:
+
+```csharp
+[Serializable]
+public struct MyStruct
+{
+    public int structInt;
+    public bool structBool;
+}
+
+[SaintsRow(inline: true)]
+public MyStruct myStructInline;
+```
 
 #### `UIToolkit` ####
 

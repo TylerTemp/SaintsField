@@ -19,7 +19,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233
             [ShowInInspector] public static Color StaticColor => Color.cyan;
             [ShowInInspector] public const float Pi = 3.14f;
 
-            public SpriteRenderer spriteRenderer;
+            [BelowImage(maxWidth: 25)] public SpriteRenderer spriteRenderer;
 
 #if SAINTSFIELD_DOTWEEN
             [DOTweenPlay]
@@ -64,6 +64,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233
         }
 
         [SaintsRow]
+        // [TestIMGUI]
         public Nest1 n1;
     }
 }

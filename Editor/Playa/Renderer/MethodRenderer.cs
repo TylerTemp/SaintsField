@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreateVisualElement()
         {
-            object target = FieldWithInfo.target;
+            object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
             Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
             ButtonAttribute[] buttonAttributes = methodInfo.GetCustomAttributes<ButtonAttribute>(true).ToArray();

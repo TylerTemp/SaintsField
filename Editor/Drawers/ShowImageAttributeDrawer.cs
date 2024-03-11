@@ -335,9 +335,9 @@ namespace SaintsField.Editor.Drawers
                 //     _originTexture = texture as Texture2D;
                 //     break;
                 case SpriteRenderer spriteRenderer:
-                    return ("", spriteRenderer.sprite.texture);
+                    return ("", spriteRenderer.sprite == null? null: spriteRenderer.sprite.texture);
                 case Image image:
-                    return ("", image.sprite.texture);
+                    return ("", image.sprite == null? null: image.sprite.texture);
                 case RawImage image:
                     return ("", image.texture as Texture2D);
                 case Button button:

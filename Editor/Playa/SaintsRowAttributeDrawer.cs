@@ -19,6 +19,27 @@ namespace SaintsField.Editor.Playa
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
     public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
     {
+        // public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        // {
+        //     return EditorGUIUtility.singleLineHeight;
+        // }
+        //
+        // private bool _testToggle;
+        //
+        // public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        // {
+        //     _testToggle = EditorGUI.Toggle(position, label, _testToggle);
+        // }
+        // public SaintsRowAttributeDrawer()
+        // {
+        //     Debug.Log("SaintsRowAttributeDrawer created");
+        // }
+        //
+        // ~SaintsRowAttributeDrawer()
+        // {
+        //     Debug.Log("SaintsRowAttributeDrawer destroyed");
+        // }
+
         private static (object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
@@ -83,7 +104,7 @@ namespace SaintsField.Editor.Playa
                 return _imGuiRenderers;
             }
 
-            // Debug.Log($"create new");
+            // Debug.Log($"create new for {property.propertyPath}");
             (object _, object current) = GetTargets(fieldInfo, property);
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
             return _imGuiRenderers = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
@@ -91,6 +112,7 @@ namespace SaintsField.Editor.Playa
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            // return EditorGUIUtility.singleLineHeight;
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
             float baseLineHeight = saintsRowAttribute.Inline ? 0 : SaintsPropertyDrawer.SingleLineHeight;
             float fieldHeight = 0f;
@@ -105,8 +127,13 @@ namespace SaintsField.Editor.Playa
             return baseLineHeight + fieldHeight;
         }
 
+        // private bool _testToggle;
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // _testToggle = EditorGUI.Toggle(position, label, _testToggle);
+            // Debug.Log(_testToggle);
+            // return;
             // Debug.Log(_imGuiRenderers);
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
             using (new EditorGUI.PropertyScope(position, label, property))
@@ -167,7 +194,7 @@ namespace SaintsField.Editor.Playa
 
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
 
-            SaintsEditorAttribute saintsEditorAttribute = (SaintsEditorAttribute) attribute;
+            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
 
             IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.GetRenderers(true, serializedFieldNames, property.serializedObject, value);
 
@@ -178,7 +205,7 @@ namespace SaintsField.Editor.Playa
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(this));
 #endif
 
-            if (saintsEditorAttribute.Inline)
+            if (saintsRowAttribute.Inline)
             {
                 return bodyElement;
             }

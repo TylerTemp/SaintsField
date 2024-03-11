@@ -336,7 +336,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     width = labelWidth,
                 };
+                // Debug.Log($"checked: {imGuiDOTweenStates.autoPlay}/before");
                 imGuiDOTweenStates.autoPlay = EditorGUI.ToggleLeft(labelRect, previewText, imGuiDOTweenStates.autoPlay);
+                // Debug.Log($"checked: {imGuiDOTweenStates.autoPlay}/after");
 
                 Rect playPauseBtnRect = new Rect(lineRect)
                 {
@@ -400,9 +402,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         StopTween(imGuiDOTweenStates);
                     }
                 }
-
             }
+
+            // _debugCheck = EditorGUI.ToggleLeft(position, "Debug", _debugCheck);
         }
+
+        // private bool _debugCheck;
 
         #endregion
 
