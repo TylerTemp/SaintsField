@@ -1,13 +1,17 @@
-## 2.1.9
+## 2.1.10
 
 1.  Add `SaintsRow` for `Serializable` class/struct to draw Button/Layout/DOTweenPlay for the target field.
-2.  **Breaking Changes**: `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
-3.  IMGUI: fix incorrect height on first time rendering.
-4.  `OnChanged` now can receive the changed value in the callback.
-5.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
-6.  `InfoBox` now will disappear if the callback function returns null as content.
-7.  Fix `InfoBox` gives error instead of display nothing when the content is null.
-8.  Fix `AboveImage`/`BelowImage` gives error instead of display nothing when the SpriteRenderer/Image/RawImage does not have a sprite.
+2.  Fix `AboveImage`/`BelowImage` gives error instead of display nothing when the SpriteRenderer/Image/RawImage does not have a sprite.
+
+## 2.1.9
+
+1.  `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
+2.  IMGUI: fix incorrect height on first time rendering.
+3.  `OnChanged` now can receive the changed value in the callback.
+4.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
+5.  `InfoBox` now will disappear if the callback function returns null as content.
+6.  Fix `InfoBox` gives error instead of display nothing when the content is null.
+7.  Fix `AboveImage`/`BelowImage` gives error instead of display nothing when the SpriteRenderer/Image/RawImage does not have
 
 ## 2.1.8 ##
 

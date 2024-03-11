@@ -63,20 +63,14 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.9**
+**2.1.10**
 
 1.  Add `SaintsRow` for `Serializable` class/struct to draw Button/Layout/DOTweenPlay for the target field.
-2.  **Breaking Changes**: `RichLabel`, `AboveRichLabel`, `BelowRichLabel`, `OverlayRichLabel`, `PostFieldRichLabel` now can receive the value and/or the index (if it's in a list/array) in the callback function.
-3.  IMGUI: fix incorrect height on first time rendering.
-4.  `OnChanged` now can receive the changed value in the callback.
-5.  Fix string value incorrect truly check for `ValudateInput` and `InfoBox`
-6.  `InfoBox` now will disappear if the callback function returns null as content.
-7.  Fix `InfoBox` gives error instead of display nothing when the content is null.
-8.  Fix `AboveImage`/`BelowImage` gives error instead of display nothing when the SpriteRenderer/Image/RawImage does not have a sprite.
+2.  Fix `AboveImage`/`BelowImage` gives error instead of display nothing when the SpriteRenderer/Image/RawImage does not have a sprite.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
-## Document ##
+## Usage ##
 
 UI Toolkit supports are experimental, you can disable it by `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information)
 
@@ -2007,9 +2001,9 @@ Parameters:
 
 Special Note:
 
-1.  After applied this attribute, only pure `PropertyDrawer`, or decorators from `SaintsEditor` works on this target. Which means, Using third party's `PropertyDrawer` is fine, but decorator of Editor Level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
+1.  After applied this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, Using third party's `PropertyDrawer` is fine, but decorator of Editor Level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
 2.  IMGUI: `ELayout.Horizontal` does not work here
-3.  IMGUI: `DOTweenPlay` might be a bit buggy display the playing/pause/stop status for each button.
+3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
 
 ```csharp
 [Serializable]
@@ -2048,8 +2042,10 @@ public struct Nest
 }
 
 [SaintsRow]
-public Nest1 n1;
+public Nest n1;
 ```
+
+![saints_row](https://github.com/TylerTemp/SaintsField/assets/6391063/d8465de6-0741-4bfb-aa0d-3042422ca56c)
 
 To show a `Serializable` inline like it's directly in the `MonoBehavior`:
 
@@ -2063,7 +2059,11 @@ public struct MyStruct
 
 [SaintsRow(inline: true)]
 public MyStruct myStructInline;
+
+public string normalStringField;
 ```
+
+![saints_row_inline](https://github.com/TylerTemp/SaintsField/assets/6391063/571f4a05-91e0-4860-9ea2-bff6b1fe1d58)
 
 #### `UIToolkit` ####
 

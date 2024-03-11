@@ -47,12 +47,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
                   ;
             }
 #endif
-      }
+        }
 
-      [SaintsRow]
-      public MyStruct myStruct;
+        [SaintsRow(inline: true)]
+        public MyStruct myStructInline;
 
-      [SaintsRow(inline: true)]
-      public MyStruct myStructInline;
+        public string normalStringField;
+
+        [SaintsRow]
+        public MyStruct myStruct;
     }
 }

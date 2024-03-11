@@ -659,11 +659,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24d04f950d34d0a4a8c466db65ae920a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myStruct:
+  myStructInline:
     structInt: 0
     structBool: 0
     spriteRenderer: {fileID: 0}
-  myStructInline:
+  myStruct:
     structInt: 0
     structBool: 0
     spriteRenderer: {fileID: 0}
@@ -3201,6 +3201,9 @@ MonoBehaviour:
       spriteRenderer: {fileID: 1776789733}
     <MyProperty>k__BackingField: 0
     myString: 
+  n:
+    nest2Str: 
+    spriteRenderer: {fileID: 1776789733}
 --- !u!1 &1060634460
 GameObject:
   m_ObjectHideFlags: 0
@@ -3976,8 +3979,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a1ce442aa299e04a8225e9f789e2509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  naCarConfig: {fileID: 0}
-  carConfig: {fileID: 0}
+  naCarConfig: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  carConfig: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
 --- !u!1 &1350909637
 GameObject:
   m_ObjectHideFlags: 0

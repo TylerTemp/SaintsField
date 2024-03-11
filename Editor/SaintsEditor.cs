@@ -67,7 +67,7 @@ namespace SaintsField.Editor
 
             foreach (ISaintsRenderer renderer in renderers)
             {
-                Debug.Log(renderer);
+                // Debug.Log(renderer);
                 root.Add(renderer.CreateVisualElement());
             }
 

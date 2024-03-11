@@ -64,7 +64,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233
         }
 
         [SaintsRow]
-        // [TestIMGUI]
         public Nest1 n1;
+
+        [SaintsRow]
+        public Nest2 n;
     }
 }
