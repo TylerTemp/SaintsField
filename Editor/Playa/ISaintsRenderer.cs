@@ -14,8 +14,8 @@ namespace SaintsField.Editor.Playa
 
         void Render();
 
-        public float GetHeight();
+        float GetHeight();
 
-        public void RenderPosition(Rect position);
+        void RenderPosition(Rect position);
     }
 }
