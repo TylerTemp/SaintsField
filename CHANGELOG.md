@@ -1,3 +1,7 @@
+## 2.1.12
+
+1.  IMGUI: Fix `SaintsRow` incorrect renderer cache when inside a list
+
 ## 2.1.11
 
 1.  Fix [Issue 3](https://github.com/TylerTemp/SaintsField/issues/3) Texture2D can not be destroyed on a GC calling. 

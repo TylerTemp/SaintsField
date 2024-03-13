@@ -7,47 +7,24 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
-// #if SAINTSFIELD_DOTWEEN
-// using DG.DOTweenEditor;
-// #endif
 
 namespace SaintsField.Editor.Playa
 {
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
     public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
     {
-        // public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-        // {
-        //     return EditorGUIUtility.singleLineHeight;
-        // }
-        //
-        // private bool _testToggle;
-        //
-        // public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-        // {
-        //     _testToggle = EditorGUI.Toggle(position, label, _testToggle);
-        // }
-        // public SaintsRowAttributeDrawer()
-        // {
-        //     Debug.Log("SaintsRowAttributeDrawer created");
-        // }
-        //
-        // ~SaintsRowAttributeDrawer()
-        // {
-        //     Debug.Log("SaintsRowAttributeDrawer destroyed");
-        // }
-
-        private static (object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
+        private static (int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             object rawValue = fieldInfo.GetValue(parentValue);
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
             object value = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-            return (parentValue, value);
+            // Debug.Log($"get value {value} at index {arrayIndex} from {rawValue}");
+            return (arrayIndex, parentValue, value);
         }
 
         private static IEnumerable<(string name, SerializedProperty property)> GetSerializableFieldInfo(SerializedProperty property)
@@ -72,20 +49,8 @@ namespace SaintsField.Editor.Playa
 
         #region IMGUI
 
-        private IReadOnlyList<ISaintsRenderer> _imGuiRenderers;
-
-        // private class CacheCounter
-        // {
-        //     public int count;
-        //     public IReadOnlyList<ISaintsRenderer> renderers;
-        // }
-
-        // script change will clean this cache. At this point it just be like this.
-        // Note:
-        // 1.  IMGUI PropertyDrawer can not store status. Even a private attribute does not work
-        // 2.  DOTweenPlay requires to store status
-        // 3.  SerializedProperty is changed every time it renders (even for the same attribute)
-        // private static readonly Dictionary<string, IReadOnlyList<ISaintsRenderer>> GlobalCache = new Dictionary<string, IReadOnlyList<ISaintsRenderer>>();
+        // private IReadOnlyList<ISaintsRenderer> _imGuiRenderers;
+        private readonly Dictionary<int, IReadOnlyList<ISaintsRenderer>> _imGuiRenderers = new Dictionary<int, IReadOnlyList<ISaintsRenderer>>();
 
         private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(SerializedProperty property)
         {
@@ -98,16 +63,17 @@ namespace SaintsField.Editor.Playa
             // (object _, object current) = GetTargets(fieldInfo, property);
             // Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
             // return GlobalCache[key] = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-            if(_imGuiRenderers != null)
+            if(_imGuiRenderers.TryGetValue(arrayIndex, out IReadOnlyList<ISaintsRenderer> result))
             {
-                return _imGuiRenderers;
+                return result;
             }
 
             // Debug.Log($"create new for {property.propertyPath}");
-            (object _, object current) = GetTargets(fieldInfo, property);
+            (int index, object _, object current) = GetTargets(fieldInfo, property);
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
-            return _imGuiRenderers = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
+            return _imGuiRenderers[index] = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -116,8 +82,10 @@ namespace SaintsField.Editor.Playa
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
             float baseLineHeight = saintsRowAttribute.Inline ? 0 : SaintsPropertyDrawer.SingleLineHeight;
             float fieldHeight = 0f;
+            // ReSharper disable once InvertIf
             if(property.isExpanded || saintsRowAttribute.Inline)
             {
+                // ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
                 {
                     fieldHeight += saintsRenderer.GetHeight();
@@ -131,10 +99,7 @@ namespace SaintsField.Editor.Playa
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            // _testToggle = EditorGUI.Toggle(position, label, _testToggle);
-            // Debug.Log(_testToggle);
-            // return;
-            // Debug.Log(_imGuiRenderers);
+            // Debug.Log(property.propertyPath);
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
             using (new EditorGUI.PropertyScope(position, label, property))
             {

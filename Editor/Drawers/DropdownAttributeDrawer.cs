@@ -67,6 +67,10 @@ namespace SaintsField.Editor.Drawers
             FieldInfo field = parentType.GetField(property.name, BindAttr);
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
 
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DROPDOWN
+//             Debug.Log($"meta info={metaInfo}/{property.propertyPath}");
+// #endif
+
             if (metaInfo.Error != "")
             {
                 _error = metaInfo.Error;
@@ -133,6 +137,9 @@ namespace SaintsField.Editor.Drawers
             public IReadOnlyList<ValueTuple<string, object, bool, bool>> DropdownListValue;
             public int SelectedIndex;
             // ReSharper enable InconsistentNaming
+
+            public override string ToString() =>
+                $"MetaInfo(index={SelectedIndex}, items={string.Join(",", DropdownListValue.Select(each => each.Item1))}";
         }
 
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute,
