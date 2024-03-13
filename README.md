@@ -1434,26 +1434,36 @@ public class OnChangedExample : MonoBehaviour
 }
 ```
 
-#### `ReadOnly` ####
+#### `ReadOnly`/`DisableIf`/`EnableIf` ####
 
 This has two overrides:
 
-*   `ReadOnlyAttribute(bool directValue=true, string groupBy="")`
-*   `ReadOnlyAttribute(params string[] by)`
+*   `(bool directValue=true, string groupBy="")`
+*   `(params string[] by)`
+
+`ReadOnly` equals `DisableIf`, `EnableIf` is the opposite of `DisableIf`
 
 Each arguments:
 
 *   `bool directValue=true`
 
-    if true, the field will be read-only
+    use a direct value.
 
-*   `string[] by`
+*   `string by...`
 
-    a callback or property name, if **ALL** the value is truly, the field will be read-only
+    callbacks or attributes for the condition.
 
 *   AllowMultiple: Yes
 
-    When using multiple `ReadOnly` on a field, the field will be read only if **ANY** of them is read-only
+For `ReadOnly`/`DisableIf`: The field will be disabled if **ALL** condition is true (`and` operation)
+
+For `EnableIf`: The field will be enabled if **ANY** condition is true (`or` operation)
+
+This is the same logic as the `ShowIf`/`HideIf` pair, which `DisableIf` is the major attribute:
+
+*   `EnableIf(A)` == `DisableIf(!A)`
+*   `EnableIf(A, B)` == `EnableIf(A || B)` == `DisableIf(!(A || B))` == `DisableIf(!A && !B)`
+*   `[EnableIf(A), EnableIf(B)]` == `[DisableIf(!A), DisableIf(!B)]` == `DisableIf(!A || !B)` == `DisableIf(!(A && B))`
 
 ```csharp
 public class ReadOnlyGroupExample: MonoBehaviour
@@ -1599,11 +1609,20 @@ For `ShowIf`:
     
     For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
 
-`HideIf` is the opposite of `ShowIf`. You can use multiple `ShowIf`, `HideIf`, and even a mix of the two.
+`HideIf` is the opposite of `ShowIf`:
 
-For example: 
-*   `HideIf(A, B)` means `!ShowIf(A, B)`, means it will be shown if `!(A && B)`
-*   `[HideIf(A...), HideIf(B...)]` means `!ShowIf(A...) || !ShowIf(B...)`, means it will be shown if `!(A && ...) || !(B && ...)` is true.
+*   `string orCallbacks...` a list of callback or property names, if **ANY** the value is truly, the field will be shown. (`!or` operation)
+*   AllowMultiple: Yes
+
+You can use multiple `ShowIf`, `HideIf`, and even a mix of the two.
+
+Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
+
+*   `HideIf(A)` == `ShowIf(!A)`
+*   `HideIf(A, B)` == `HideIf(A || B)` == `ShowIf(!(A || B))` == `ShowIf(!A && !B)`
+*   `[Hideif(A), HideIf(B)]` == `[ShowIf(!A), ShowIf(!B)]` == `ShowIf(!A || !B)` == `ShowIf(!(A && B))`
+
+```csharp
 
 A full featured example:
 
@@ -1633,7 +1652,7 @@ public class ShowHideExample: MonoBehaviour
 
 
     [HideIf(nameof(_bool1), nameof(_bool2))]
-    [RichLabel("<color=yellow>show=!(1&&2)=!1||!2")]
+    [RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
     public string _hideIf1And2;
 
     [ShowIf(nameof(_bool1))]
@@ -1648,8 +1667,8 @@ public class ShowHideExample: MonoBehaviour
 
     [HideIf(nameof(_bool1), nameof(_bool2))]
     [HideIf(nameof(_bool3), nameof(_bool4))]
-    [RichLabel("<color=pink>show=!(1&&2)||!(3&&4)")]
-    public string _hideIf1234;;
+    [RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
+    public string _hideIf1234;
 }
 ```
 

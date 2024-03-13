@@ -4,21 +4,24 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 
-namespace SaintsField.Editor.Drawers.VisibilityDrawers
+namespace SaintsField.Editor.Drawers.DisabledDrawers
 {
-    [CustomPropertyDrawer(typeof(HideIfAttribute))]
-    public class HideIfAttributeDrawer: ShowIfAttributeDrawer
+    [CustomPropertyDrawer(typeof(EnableIfAttribute))]
+    public class EnableIfAttributeDrawer: ReadOnlyAttributeDrawer
     {
-        protected override (string error, bool shown) IsShown(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, FieldInfo info,
-            Type type, object target)
+        protected override (string error, bool disabled) IsDisabled(SerializedProperty property,
+            ReadOnlyAttribute targetAttribute, FieldInfo info, Type type, object target)
         {
-            HideIfAttribute hideIfAttribute = (HideIfAttribute)saintsAttribute;
+            string[] bys = targetAttribute.ReadOnlyBys;
+            if(bys is null)
+            {
+                return ("", targetAttribute.readOnlyDirectValue);
+            }
 
             List<bool> callbackTruly = new List<bool>();
             List<string> errors = new List<string>();
 
-            foreach (string andCallback in hideIfAttribute.orCallbacks)
+            foreach (string andCallback in bys)
             {
                 (string error, bool isTruly) = IsTruly(target, type, andCallback);
                 if (error != "")
@@ -36,13 +39,13 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             // empty means hide
             if (callbackTruly.Count == 0)
             {
-                return ("", false);
+                return ("", targetAttribute.readOnlyDirectValue);
             }
 
-            // or, get hide
+            // or, get enabled
             bool truly = callbackTruly.Any(each => each);
 
-            // reverse, get shown
+            // reverse, get disabled
             return ("", !truly);
         }
     }

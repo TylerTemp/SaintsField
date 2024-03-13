@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.ShowHideExamples
 {
     public class ShowHideExample: MonoBehaviour
     {
@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts
 
 
         [HideIf(nameof(_bool1), nameof(_bool2))]
-        [RichLabel("<color=yellow>show=!(1&&2)=!1||!2")]
+        [RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
         public string _hideIf1And2;
 
         [ShowIf(nameof(_bool1))]
@@ -41,7 +41,7 @@ namespace SaintsField.Samples.Scripts
 
         [HideIf(nameof(_bool1), nameof(_bool2))]
         [HideIf(nameof(_bool3), nameof(_bool4))]
-        [RichLabel("<color=pink>show=!(1&&2)||!(3&&4)")]
+        [RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
         public string _hideIf1234;
     }
 }

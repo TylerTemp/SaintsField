@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             List<bool> callbackTruly = new List<bool>();
             List<string> errors = new List<string>();
 
-            foreach (string andCallback in showIfAttribute.andCallbacks)
+            foreach (string andCallback in showIfAttribute.orCallbacks)
             {
                 (string error, bool isTruly) = IsTruly(target, type, andCallback);
                 if (error != "")
@@ -30,6 +30,12 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             if (errors.Count > 0)
             {
                 return (string.Join("\n\n", errors), true);
+            }
+
+            // empty means show
+            if(callbackTruly.Count == 0)
+            {
+                return ("", true);
             }
 
             bool truly = callbackTruly.All(each => each);

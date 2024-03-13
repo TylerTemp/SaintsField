@@ -1,18 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
-using System.Collections.Generic;
 using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.DisabledDrawers
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
+    [CustomPropertyDrawer(typeof(DisableIfAttribute))]
     public class ReadOnlyAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI
@@ -76,52 +75,89 @@ namespace SaintsField.Editor.Drawers
             string[] bys = targetAttribute.ReadOnlyBys;
             if(bys is null)
             {
-                return ("", targetAttribute.ReadOnlyDirectValue);
+                return ("", targetAttribute.readOnlyDirectValue);
             }
 
-            foreach (string by in bys)
+            List<bool> callbackTruly = new List<bool>();
+            List<string> errors = new List<string>();
+
+            foreach (string andCallback in bys)
             {
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(type, by);
-                (string error, bool disabled) result;
-
-                if (found.getPropType == ReflectUtils.GetPropType.NotFound)
+                (string error, bool isTruly) = IsTruly(target, type, andCallback);
+                if (error != "")
                 {
-                    string error = $"No field or method named `{by}` found on `{target}`";
-                    // Debug.LogError(_error);
-                    result = (error, false);
+                    errors.Add(error);
                 }
-                else if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
-                {
-                    result = ("", ReflectUtils.Truly(propertyInfo.GetValue(target)));
-                }
-                else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
-                {
-                    result = ("", ReflectUtils.Truly(foundFieldInfo.GetValue(target)));
-                }
-                else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
-                {
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    // Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                    result = ("", ReflectUtils.Truly(methodInfo.Invoke(target,
-                        methodParams.Select(p => p.DefaultValue).ToArray())));
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
-                }
-
-                if (result.error != "")
-                {
-                    return (result.error, false);
-                }
-
-                if (!result.disabled)
-                {
-                    return ("", false);
-                }
+                callbackTruly.Add(isTruly);
             }
-            return ("", true);
+
+            if (errors.Count > 0)
+            {
+                return (string.Join("\n\n", errors), true);
+            }
+
+            // empty means hide
+            if (callbackTruly.Count == 0)
+            {
+                return ("", targetAttribute.readOnlyDirectValue);
+            }
+
+            // and, get disabled
+            bool truly = callbackTruly.All(each => each);
+
+            return ("", truly);
+        }
+
+        protected static (string error, bool isTruly) IsTruly(object target, Type type, string by)
+        {
+            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
+
+            if (getPropType == ReflectUtils.GetPropType.NotFound)
+            {
+                string error = $"No field or method named `{by}` found on `{target}`";
+                // Debug.LogError(error);
+                // _errors.Add(error);
+                return (error, false);
+            }
+
+            if (getPropType == ReflectUtils.GetPropType.Property)
+            {
+                return ("", ReflectUtils.Truly(((PropertyInfo)fieldOrMethodInfo).GetValue(target)));
+            }
+            if (getPropType == ReflectUtils.GetPropType.Field)
+            {
+                return ("", ReflectUtils.Truly(((FieldInfo)fieldOrMethodInfo).GetValue(target)));
+            }
+            // ReSharper disable once InvertIf
+            if (getPropType == ReflectUtils.GetPropType.Method)
+            {
+                MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                Debug.Assert(methodParams.All(p => p.IsOptional));
+                object methodResult;
+                // try
+                // {
+                //     methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray())
+                // }
+                try
+                {
+                    methodResult = methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.LogException(e);
+                    Debug.Assert(e.InnerException != null);
+                    return (e.InnerException.Message, false);
+
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return (e.Message, false);
+                }
+                return ("", ReflectUtils.Truly(methodResult));
+            }
+            throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
         }
         #endregion
 

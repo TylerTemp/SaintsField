@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.ShowHideExamples
 {
     public class ShowHideSimpleExample: MonoBehaviour
     {

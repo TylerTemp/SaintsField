@@ -9,12 +9,13 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
-        public readonly bool ReadOnlyDirectValue;
+        public bool readOnlyDirectValue;
+        // ReSharper disable once InconsistentNaming
         public readonly string[] ReadOnlyBys;
 
         public ReadOnlyAttribute(bool directValue=true, string groupBy="")
         {
-            ReadOnlyDirectValue = directValue;
+            readOnlyDirectValue = directValue;
             ReadOnlyBys = null;
 
             GroupBy = groupBy;
@@ -24,13 +25,13 @@ namespace SaintsField
         {
             if (by.Length == 0)
             {
-                ReadOnlyDirectValue = true;
+                readOnlyDirectValue = true;
                 ReadOnlyBys = null;
             }
             else
             {
                 // Debug.Assert(!string.IsNullOrEmpty(by));
-                ReadOnlyDirectValue = default;
+                readOnlyDirectValue = default;
                 ReadOnlyBys = by;
             }
 

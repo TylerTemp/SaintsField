@@ -9,12 +9,12 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Visibility;
         public string GroupBy => "";
 
-        public readonly string[] andCallbacks;
+        public readonly string[] orCallbacks;
 
         // ReSharper disable once MemberCanBeProtected.Global
-        public ShowIfAttribute(params string[] andCallbacks)
+        public ShowIfAttribute(params string[] orCallbacks)
         {
-            this.andCallbacks = andCallbacks;
+            this.orCallbacks = orCallbacks;
         }
     }
 }

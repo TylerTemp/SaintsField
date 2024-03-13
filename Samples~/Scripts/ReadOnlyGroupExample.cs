@@ -17,12 +17,10 @@ namespace SaintsField.Samples.Scripts
         [RichLabel("readonly=1||2")]
         private string _ro1and2;
 
-
         [SerializeField]
         [ReadOnly(nameof(_bool1), nameof(_bool2))]
         [RichLabel("readonly=1&&2")]
         private string _ro1or2;
-
 
         [SerializeField]
         [ReadOnly(nameof(_bool1), nameof(_bool2))]
