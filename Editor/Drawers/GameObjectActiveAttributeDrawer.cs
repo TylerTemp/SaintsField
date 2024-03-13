@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            _error = "";
+            error = "";
 
             GameObject go;
             if (property.objectReferenceValue is GameObject isGO)
@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Drawers
 
             if (goIsNull)
             {
-                _error = $"Unable to get GameObject from {property.name}";
+                error = $"Unable to get GameObject from {property.name}";
             }
             return true;
         }
@@ -75,20 +75,20 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent)
         {
-            return _error != "";
+            return error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) =>
-            _error == ""
+            error == ""
                 ? position
-                : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+                : ImGuiHelpBox.Draw(position, error, MessageType.Error);
 
         #endregion
 

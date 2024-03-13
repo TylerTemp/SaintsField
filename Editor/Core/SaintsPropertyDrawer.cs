@@ -84,6 +84,7 @@ namespace SaintsField.Editor.Core
         // ReSharper disable once PublicConstructorInAbstractClass
         public SaintsPropertyDrawer()
         {
+            // Selection.selectionChanged += OnSelectionChanged;
             // Debug.Log($"OnSaintsCreate Start: {SepTitleAttributeDrawer.drawCounter}/{fieldInfo}");
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
 //             Debug.Log($"new SaintsPropertyDrawer {this}");
@@ -183,9 +184,9 @@ namespace SaintsField.Editor.Core
                     PropertyAttributeToPropertyDrawers[kv.Key] = kv.Value
                         .Select(each => (each.IsSubclassOf(typeof(SaintsPropertyDrawer)), each))
                         .ToArray();
-#if EXT_INSPECTOR_LOG
-                    Debug.Log($"attr {kv.Key} has drawer(s) {string.Join(",", kv.Value)}");
-#endif
+// #if EXT_INSPECTOR_LOG
+//                     Debug.Log($"attr {kv.Key} has drawer(s) {string.Join(",", kv.Value)}");
+// #endif
                 }
 
 #if UNITY_2022_1_OR_NEWER
@@ -196,16 +197,52 @@ namespace SaintsField.Editor.Core
 
         // ~SaintsPropertyDrawer()
         // {
-        //     if (!string.IsNullOrEmpty(_cachedPropPath) && PropertyPathToShared.ContainsKey(_cachedPropPath))
-        //     {
-        //         PropertyPathToShared.Remove(_cachedPropPath);
-        //     }
+        //     Debug.Log($"[{this}] Stop listening changed");
+        //     Selection.selectionChanged -= OnSelectionChanged;
+        // }
+        //
+        // private void OnSelectionChanged()
+        // {
+        //     Debug.Log($"selection changed: {string.Join(", ", Selection.objects.Select(each => each.ToString()))}");
         // }
 
         // ~SaintsPropertyDrawer()
         // {
         //     PropertyAttributeToDrawers.Clear();
         // }
+
+        #region IMGUI GC Issue
+
+        private UnityEngine.Object _imGuiObject;
+
+        protected virtual void ImGuiOnDispose()
+        {
+            Selection.selectionChanged -= ImGuiCheckChanged;
+            _imGuiObject = null;
+        }
+
+        private void ImGuiCheckChanged()
+        {
+            // no longer selected
+            if(Array.IndexOf(Selection.objects, _imGuiObject) == -1)
+            {
+                ImGuiOnDispose();
+            }
+        }
+
+        protected void ImGuiEnsureDispose(UnityEngine.Object serTarget)
+        {
+            if (_imGuiObject == serTarget)
+            {
+                return;
+            }
+
+            ImGuiOnDispose();
+            _imGuiObject = serTarget;
+            Selection.selectionChanged += ImGuiCheckChanged;
+        }
+
+        #endregion
 
         private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 

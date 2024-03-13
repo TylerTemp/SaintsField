@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.IssueAndTesting
 {
     public class TestNaughtyDropdownBug : MonoBehaviour
     {

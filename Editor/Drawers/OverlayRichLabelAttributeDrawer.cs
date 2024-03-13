@@ -15,14 +15,14 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(OverlayRichLabelAttribute))]
     public class OverlayRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
-        ~OverlayRichLabelAttributeDrawer()
+        protected override void ImGuiOnDispose()
         {
+            base.ImGuiOnDispose();
             _richTextDrawer.Dispose();
         }
-
-        #region IMGUI
 
         private string _error = "";
 
@@ -67,6 +67,7 @@ namespace SaintsField.Editor.Drawers
                 width = useWidth,
             };
 
+            ImGuiEnsureDispose(property.serializedObject.targetObject);
             _richTextDrawer.DrawChunks(overlayRect, label, payloads);
 
             return true;

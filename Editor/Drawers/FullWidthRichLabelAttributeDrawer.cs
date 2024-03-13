@@ -16,11 +16,13 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(FullWidthRichLabelAttribute))]
     public class FullWidthRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
         private string _error = "";
 
-        ~FullWidthRichLabelAttributeDrawer()
+        protected override void ImGuiOnDispose()
         {
+            base.ImGuiOnDispose();
             _richTextDrawer.Dispose();
         }
 
@@ -99,6 +101,7 @@ namespace SaintsField.Editor.Drawers
             labelText = property.displayName;
 #endif
 
+            ImGuiEnsureDispose(property.serializedObject.targetObject);
             _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(xml, labelText));
             return leftRect;
         }
@@ -164,6 +167,8 @@ namespace SaintsField.Editor.Drawers
                 ? useRect
                 : ImGuiHelpBox.Draw(useRect, _error, MessageType.Error);
         }
+
+        #endregion
 
 #if UNITY_2021_3_OR_NEWER
 

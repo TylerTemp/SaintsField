@@ -14,110 +14,110 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(RateAttribute))]
     public class RateAttributeDrawer: SaintsPropertyDrawer
     {
-        private readonly Texture2D _star;
-        private readonly Texture2D _starSlash;
+        private Texture2D _star;
+        private Texture2D _starSlash;
 
-        private readonly Texture2D _starSlashActive;
-        private readonly Texture2D _starSlashInactive;
-        private readonly Texture2D _starActive;
-        private readonly Texture2D _starIncrease;
-        private readonly Texture2D _starDecrease;
-        private readonly Texture2D _starInactive;
+        private Texture2D _starSlashActive;
+        private Texture2D _starSlashInactive;
+        private Texture2D _starActive;
+        private Texture2D _starIncrease;
+        private Texture2D _starDecrease;
+        private Texture2D _starInactive;
 
-        private readonly GUIContent _guiContentSlash;
-        private readonly GUIContent _guiContentSlashInactive;
-        private readonly GUIContent _guiContentActive;
-        private readonly GUIContent _guiContentIncrease;
-        private readonly GUIContent _guiContentDecrease;
-        private readonly GUIContent _guiContentInactive;
+        private GUIContent _guiContentSlash;
+        private GUIContent _guiContentSlashInactive;
+        private GUIContent _guiContentActive;
+        private GUIContent _guiContentIncrease;
+        private GUIContent _guiContentDecrease;
+        private GUIContent _guiContentInactive;
 
-        private readonly Texture2D _clear;
-        // private readonly Texture2D _hover;
-        // private readonly Texture2D _active;
+        private Texture2D _clear;
 
-        private readonly GUIStyle _normalClear;
-        private readonly GUIStyle _normalFramed;
-        // private readonly GUIStyle _hoverActive;
-        // private readonly GUIStyle _inactive;
+        private GUIStyle _normalClear;
+        private GUIStyle _normalFramed;
 
         private static readonly Color ActiveColor = Color.yellow;
         private static readonly Color WillActiveColor = new Color(228/255f, 1, 0, 0.7f);
         private static readonly Color WillInactiveColor = new Color(100/255f, 100/255f, 0, 1f);
         private static readonly Color InactiveColor = Color.grey;
 
-        public RateAttributeDrawer()
-        {
-            _star = Util.LoadResource<Texture2D>("star.png");
-
-            _starActive = Tex.ApplyTextureColor(_star, ActiveColor);
-            _starIncrease = Tex.ApplyTextureColor(_star, WillActiveColor);
-            _starDecrease = Tex.ApplyTextureColor(_star, WillInactiveColor);
-            _starInactive = Tex.ApplyTextureColor(_star, InactiveColor);
-
-            _starSlash = Util.LoadResource<Texture2D>("star-slash.png");
-            _starSlashActive = Tex.ApplyTextureColor(_starSlash, Color.red);
-            _starSlashInactive = Tex.ApplyTextureColor(_starSlash, Color.grey);
-
-            _guiContentSlash = new GUIContent(_starSlashActive);
-            _guiContentSlashInactive = new GUIContent(_starSlashInactive);
-            _guiContentActive = new GUIContent(_starActive);
-            _guiContentIncrease = new GUIContent(_starIncrease);
-            _guiContentDecrease = new GUIContent(_starDecrease);
-            _guiContentInactive = new GUIContent(_starInactive);
-
-            // Color[] pix = new Color[]{ Color.clear };
-            // Texture2D result = new Texture2D(1, 1);
-            // result.SetPixels(pix);
-            // result.Apply();
-
-            _clear = MakePixel(Color.clear);
-            // _hover = MakePixel(Color.blue * new Color(1, 1, 1, 0.6f));
-            // _active = MakePixel(Color.blue);
-
-#if !(UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE)
-
-            _normalFramed = new GUIStyle(GUI.skin.button)
-            {
-                margin = new RectOffset(0, 0, 0, 0),
-                padding = new RectOffset(0, 0, 0, 0),
-                border = new RectOffset(0, 0, 0, 0),
-                overflow = new RectOffset(0, 0, 0, 0),
-                contentOffset = new Vector2(0, 0),
-                alignment = TextAnchor.MiddleCenter,
-            };
-
-            _normalClear = new GUIStyle(_normalFramed)
-            {
-                normal =
-                {
-                    background = _clear,
-                },
-            };
-#endif
-            Debug.Assert(_starActive.width != 1);
-        }
+        #region IMGUI
 
         private static Texture2D MakePixel(Color color)
         {
-            Color[] pix = new Color[]{ color };
+            Color[] pix = { color };
             Texture2D result = new Texture2D(1, 1);
             result.SetPixels(pix);
             result.Apply();
             return result;
         }
 
-        ~RateAttributeDrawer()
+        private void ImGuiEnsureResources(SerializedProperty property)
         {
-            Object.DestroyImmediate(_starActive);
-            Object.DestroyImmediate(_starIncrease);
-            Object.DestroyImmediate(_starDecrease);
-            Object.DestroyImmediate(_starInactive);
-            Object.DestroyImmediate(_starSlashActive);
-            Object.DestroyImmediate(_starSlashInactive);
-            Object.DestroyImmediate(_clear);
+            if (_star == null)
+            {
+                ImGuiEnsureDispose(property.serializedObject.targetObject);
+                _star = Util.LoadResource<Texture2D>("star.png");
+
+                _starActive = Tex.ApplyTextureColor(_star, ActiveColor);
+                _starIncrease = Tex.ApplyTextureColor(_star, WillActiveColor);
+                _starDecrease = Tex.ApplyTextureColor(_star, WillInactiveColor);
+                _starInactive = Tex.ApplyTextureColor(_star, InactiveColor);
+
+                _starSlash = Util.LoadResource<Texture2D>("star-slash.png");
+                _starSlashActive = Tex.ApplyTextureColor(_starSlash, Color.red);
+                _starSlashInactive = Tex.ApplyTextureColor(_starSlash, Color.grey);
+
+                _guiContentSlash = new GUIContent(_starSlashActive);
+                _guiContentSlashInactive = new GUIContent(_starSlashInactive);
+                _guiContentActive = new GUIContent(_starActive);
+                _guiContentIncrease = new GUIContent(_starIncrease);
+                _guiContentDecrease = new GUIContent(_starDecrease);
+                _guiContentInactive = new GUIContent(_starInactive);
+
+                _clear = MakePixel(Color.clear);
+                Debug.Assert(_starActive.width != 1);
+            }
+
+            // ReSharper disable once InvertIf
+            if (_normalFramed == null)
+            {
+                _normalFramed = new GUIStyle(GUI.skin.button)
+                {
+                    margin = new RectOffset(0, 0, 0, 0),
+                    padding = new RectOffset(0, 0, 0, 0),
+                    border = new RectOffset(0, 0, 0, 0),
+                    overflow = new RectOffset(0, 0, 0, 0),
+                    contentOffset = new Vector2(0, 0),
+                    alignment = TextAnchor.MiddleCenter,
+                };
+
+                _normalClear = new GUIStyle(_normalFramed)
+                {
+                    normal =
+                    {
+                        background = _clear,
+                    },
+                };
+            }
         }
 
-        #region IMGUI
+        protected override void ImGuiOnDispose()
+        {
+            foreach (Texture2D texture2D in new[]
+                     {
+                         _starActive, _starIncrease, _starDecrease, _starInactive, _starSlashActive, _starSlashInactive,
+                     })
+            {
+                if (texture2D)
+                {
+                    Object.DestroyImmediate(texture2D);
+                }
+            }
+
+            _starActive = _starInactive = _starDecrease = _starInactive = _starSlashActive = _starSlashInactive = null;
+            base.ImGuiOnDispose();
+        }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, bool hasLabelWidth)
         {
@@ -127,6 +127,8 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            ImGuiEnsureResources(property);
+
             RateAttribute rateAttribute = (RateAttribute)saintsAttribute;
             int min = rateAttribute.Min;
             int max = rateAttribute.Max;

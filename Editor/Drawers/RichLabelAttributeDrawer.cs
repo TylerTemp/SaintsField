@@ -4,9 +4,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+// using Object = UnityEngine.Object;
 #if UNITY_2021_3_OR_NEWER
 using System;
-using System.Collections.Generic;
 using UnityEngine.UIElements;
 #endif
 
@@ -30,14 +30,20 @@ namespace SaintsField.Editor.Drawers
 
         private string _error = "";
 
-        ~RichLabelAttributeDrawer()
-        {
-            _richTextDrawer.Dispose();
-        }
+        // ~RichLabelAttributeDrawer()
+        // {
+        //     _richTextDrawer.Dispose();
+        // }
 
         // protected override float GetLabelHeight(SerializedProperty property, GUIContent label,
         //     ISaintsAttribute saintsAttribute) =>
         //     EditorGUIUtility.singleLineHeight;
+
+        protected override void ImGuiOnDispose()
+        {
+            base.ImGuiOnDispose();
+            _richTextDrawer.Dispose();
+        }
 
         protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info,
@@ -57,6 +63,7 @@ namespace SaintsField.Editor.Drawers
         {
             RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
 
+            ImGuiEnsureDispose(property.serializedObject.targetObject);
             (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml, targetAttribute.IsCallback, info, parent);
             _error = error;
 

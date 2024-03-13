@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Core
         {
             foreach (Texture cacheValue in _textureCache.Values)
             {
-                UnityEngine.Object.Destroy(cacheValue);
+                UnityEngine.Object.DestroyImmediate(cacheValue);
             }
             _textureCache.Clear();
         }

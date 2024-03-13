@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers
 
             object target = property.serializedObject.targetObject;
             (string error, string labelXml) = GetButtonLabelXml(decButtonAttribute, target, target.GetType());
-            _error = error;
+            base.error = error;
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment

@@ -14,25 +14,27 @@ namespace SaintsField.Editor.Drawers
 {
     public abstract class DecButtonAttributeDrawer: SaintsPropertyDrawer
     {
-        protected string _error = "";
+        protected string error = "";
         private string _execError = "";
 
         protected string DisplayError {
             get
             {
-                if (_error != "" && _execError != "")
+                if (error != "" && _execError != "")
                 {
-                    return $"{_error}\n\n{_execError}";
+                    return $"{error}\n\n{_execError}";
                 }
-                return $"{_error}{_execError}";
+                return $"{error}{_execError}";
             }
         }
 
+        // ReSharper disable once InconsistentNaming
         protected readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
         // private IReadOnlyList<RichText.RichTextPayload> _cachedResult = null;
 
-        ~DecButtonAttributeDrawer()
+        protected override void ImGuiOnDispose()
         {
+            base.ImGuiOnDispose();
             RichTextDrawer.Dispose();
         }
 
@@ -57,8 +59,8 @@ namespace SaintsField.Editor.Drawers
 
             // object target = GetParentTarget(property);
             Type objType = target.GetType();
-            (string error, string buttonLabelXml) = GetButtonLabelXml(decButtonAttribute, target, objType);
-            _error = error;
+            (string xmlError, string buttonLabelXml) = GetButtonLabelXml(decButtonAttribute, target, objType);
+            error = xmlError;
 
             if (GUI.Button(buttonRect, string.Empty))
             {
@@ -92,6 +94,7 @@ namespace SaintsField.Editor.Drawers
                 float space = (labelRect.width - textWidth) / 2f;
                 labelRect.x += space;
             }
+            ImGuiEnsureDispose(property.serializedObject.targetObject);
             RichTextDrawer.DrawChunks(labelRect, label, richChunks);
 
             return leftRect;

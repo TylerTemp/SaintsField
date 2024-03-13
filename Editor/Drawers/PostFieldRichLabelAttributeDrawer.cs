@@ -15,14 +15,15 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(PostFieldRichLabelAttribute))]
     public class PostFieldRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
+        #region IMGUI
+
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
-        ~PostFieldRichLabelAttributeDrawer()
+        protected override void ImGuiOnDispose()
         {
+            base.ImGuiOnDispose();
             _richTextDrawer.Dispose();
         }
-
-        #region IMGUI
 
         private string _error = "";
 
@@ -67,6 +68,7 @@ namespace SaintsField.Editor.Drawers
                 width = position.width - targetAttribute.Padding,
             };
 
+            ImGuiEnsureDispose(property.serializedObject.targetObject);
             _richTextDrawer.DrawChunks(drawRect, label, _payloads);
 
             return true;
