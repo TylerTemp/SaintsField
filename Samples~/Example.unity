@@ -1224,6 +1224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2e82bf4bc014bafa44c37557261550a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  disabledIfPlay: 
   showIfPlay: 
 --- !u!1 &417627789
 GameObject:
@@ -5377,15 +5378,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bbfe1bcc242ef1488babf48be8ce34b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_byBool>k__BackingField: 0
-  <_byInt>k__BackingField: 0
-  <_byReference>k__BackingField: {fileID: 0}
-  _rTrue: 
-  _rBool: 
-  _rInt: 
-  _rRef: 
-  _rMethod: 
-  _rNoSuch: 
+  <ByBool>k__BackingField: 0
+  <ByInt>k__BackingField: 5
+  <ByReference>k__BackingField: {fileID: 0}
+  isReadOnly: 
+  rBool: 
+  rInt: 
+  rRef: 
+  rMethod: 
+  rNoSuch: 
 --- !u!1 &1742714856
 GameObject:
   m_ObjectHideFlags: 0
@@ -5808,7 +5809,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rate0To5: 3
-  rate1To5: 2
+  rate1To5: 4
   rate3To5: 4
   rate0To5Rich: 0
 --- !u!4 &1881364801

@@ -173,23 +173,36 @@ namespace SaintsField.Editor.Drawers
             bool curReadOnly = !container.enabledSelf;
 
             List<string> errors = new List<string>();
+            // List<bool> nowReadOnlyResult = new List<bool>();
             bool nowReadOnly = false;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
+            Debug.Log($"curReadOnly={curReadOnly}");
+#endif
             foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, (ReadOnlyAttribute)each.userData, info,  parent.GetType(), parent)))
             {
                 if (error != "")
                 {
                     errors.Add(error);
+                    // nowReadOnlyResult.Add(false);
                 }
-
-                if (readOnly)
+                else
                 {
-                    nowReadOnly = true;
+                    if (readOnly)
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
+                        Debug.Log($"nowReadOnly=true");
+#endif
+                        nowReadOnly = true;
+                        break;
+                    }
                 }
             }
 
+            // bool nowReadOnly = nowReadOnlyResult.Any(b => b);
+
             if (curReadOnly != nowReadOnly)
             {
-                container.SetEnabled(false);
+                container.SetEnabled(!nowReadOnly);
             }
 
             HelpBox helpBox = container.Q<HelpBox>(NameReadOnlyHelpBox(property, index));

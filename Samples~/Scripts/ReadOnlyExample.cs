@@ -5,24 +5,21 @@ namespace SaintsField.Samples.Scripts
     public class ReadOnlyExample : MonoBehaviour
     {
         [field: SerializeField]
-        public bool _byBool { get; private set; }
+        public bool ByBool { get; private set; }
 
         [field: SerializeField]
-        public int _byInt { get; private set; }
+        public int ByInt { get; private set; }
 
         [field: SerializeField]
-        public Sprite _byReference { get; private set; }
+        public Sprite ByReference { get; private set; }
 
-        private bool ByMethod()
-        {
-            return _byBool;
-        }
+        private bool ByMethod() => ByBool;
 
-        [SerializeField, ReadOnly] private string _rTrue;
-        [SerializeField, ReadOnly(nameof(_byBool))] private string _rBool;
-        [SerializeField, ReadOnly(nameof(_byInt))] private string _rInt;
-        [SerializeField, ReadOnly(nameof(_byReference))] private string _rRef;
-        [SerializeField, ReadOnly(nameof(ByMethod))] private string _rMethod;
-        [SerializeField, ReadOnly("No Such")] private string _rNoSuch;
+        [SerializeField, ReadOnly] private string isReadOnly;
+        [SerializeField, ReadOnly(nameof(ByBool))] private string rBool;
+        [SerializeField, ReadOnly(nameof(ByInt))] private string rInt;
+        [SerializeField, ReadOnly(nameof(ByReference))] private string rRef;
+        [SerializeField, ReadOnly(nameof(ByMethod))] private string rMethod;
+        [SerializeField, ReadOnly("No Such")] private string rNoSuch;
     }
 }
