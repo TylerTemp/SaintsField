@@ -247,65 +247,26 @@ namespace SaintsField.Editor.Core
 
         private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
-        protected virtual (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property,
+        protected virtual bool GetAndVisibility(SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            return (false, true);
+            return true;
         }
 
         private bool GetVisibility(SerializedProperty property, IEnumerable<SaintsWithIndex> saintsAttributeWithIndexes, object parent)
         {
             List<bool> showAndResults = new List<bool>();
-            // List<bool> hideAndResults = new List<bool>();
-            // private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SaintsWithIndex saintsAttributeWithIndex);
-
-            // string propPath = property.propertyPath;
-            // if(!PropertyPathToShared.ContainsKey(propPath))
-            // {
-            //     PropertyPathToShared[propPath] = new SharedInfo();
-            // }
-
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
-                SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
-                (bool isForHide, bool andResult) = drawer.GetAndVisibility(property, saintsAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
-                if (isForHide)
+                if(saintsAttributeWithIndex.SaintsAttribute is IImGuiVisibilityAttribute visibilityAttribute)
                 {
-                    // Debug.Log($"hide or: {orResult}");
-                    showAndResults.Add(!andResult);
-                }
-                else
-                {
-                    // Debug.Log($"show or: {orResult}");
-                    showAndResults.Add(andResult);
+                    SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
+                    showAndResults.Add(drawer.GetAndVisibility(property, saintsAttributeWithIndex.SaintsAttribute, fieldInfo, parent));
                 }
             }
+            // Debug.Log($"visibility={string.Join(", ", showAndResults)}");
 
             return showAndResults.Count == 0 || showAndResults.Any(each => each);
-
-            // bool showResult = showAndResults.Count == 0
-            //     ? true
-            //     : showAndResults.Any(each => each);
-            // bool hideResult = hideAndResults.Count == 0
-            //     ? false
-            //     : hideAndResults.Any(each => each);
-            //
-            // return showResult && !hideResult;
-
-            // // bool showResult = showAndResults.Any(each => each);
-            // // bool hideResult = hideAndResults.Any(each => each);
-            // // return showResult && !hideResult;
-            // if (hideAndResults.Count > 0 && hideAndResults.Any(each => each))
-            // {
-            //     return false;
-            // }
-            //
-            // if (showAndResults.Count == 0)
-            // {
-            //     return true;
-            // }
-            //
-            // return showAndResults.All(each => each);
         }
 
         #region GetPropertyHeight
@@ -351,8 +312,10 @@ namespace SaintsField.Editor.Core
                     parent
                 ))
             {
+                // Debug.Log($"height 0");
                 return 0f;
             }
+            // Debug.Log("height continue");
 
             // if (_usedAttributes.Count == 0)
             // {
@@ -991,7 +954,7 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"Saints: {property.displayName} found {allSaintsAttributes.Count}");
 
-            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is VisibilityAttribute), parent))
+            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is IImGuiVisibilityAttribute), parent))
             {
                 return;
             }
@@ -1776,16 +1739,6 @@ namespace SaintsField.Editor.Core
         {
             throw new NotImplementedException();
         }
-
-        // protected virtual IEnumerable<VisualElement> DrawLabelChunkUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute)
-        // {
-        //     return Array.Empty<VisualElement>();
-        // }
-
-        // protected virtual VisualElement CreateSaintsPropertyGUI(SerializedProperty property, ISaintsAttribute saintsAttribute, object parent, LabelState labelState)
-        // {
-        //     throw new NotImplementedException();
-        // }
 
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
             object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, bool usingFallbackField)

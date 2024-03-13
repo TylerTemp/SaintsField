@@ -1,9 +1,20 @@
+using System;
+using UnityEngine;
+
 namespace SaintsField
 {
-    public class ShowIfAttribute: VisibilityAttribute
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
+    public class ShowIfAttribute: PropertyAttribute, ISaintsAttribute, IImGuiVisibilityAttribute
     {
-        public ShowIfAttribute(params string[] andCallbacks) : base(false, andCallbacks)
+        public SaintsAttributeType AttributeType => SaintsAttributeType.Visibility;
+        public string GroupBy => "";
+
+        public readonly string[] andCallbacks;
+
+        // ReSharper disable once MemberCanBeProtected.Global
+        public ShowIfAttribute(params string[] andCallbacks)
         {
+            this.andCallbacks = andCallbacks;
         }
     }
 }

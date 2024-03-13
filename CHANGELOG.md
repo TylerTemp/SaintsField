@@ -2,6 +2,7 @@
 
 1.  Fix [Issue 3](https://github.com/TylerTemp/SaintsField/issues/3) Texture2D can not be destroyed on a GC calling. 
 2.  UI Toolkit: Fix [Issue 2](https://github.com/TylerTemp/SaintsField/issues/2) incorrect readonly.
+3.  Fix `HideIf` inconsistent logic of being oppisite of `ShowIf`.
 
 ## 2.1.10
 

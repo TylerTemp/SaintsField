@@ -2,10 +2,9 @@
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue4
 {
-    public class ShowIfPlayAttribute: VisibilityAttribute
+    public class ShowIfPlayAttribute: PropertyAttribute, ISaintsAttribute, IImGuiVisibilityAttribute
     {
-        public ShowIfPlayAttribute(params string[] andCallbacks) : base(false, andCallbacks)
-        {
-        }
+        public SaintsAttributeType AttributeType => SaintsAttributeType.Visibility;
+        public string GroupBy => "";
     }
 }

@@ -1589,13 +1589,21 @@ Show or hide the field based on a condition.
 
 For `ShowIf`:
 
-*   `string andCallbacks...` a list of callback or property names, if **ALL** the value is truly, the field will be shown/hidden
+*   `string andCallbacks...` a list of callback or property names, if **ALL** the value is truly, the field will be shown. (`and` operation)
+
+    For example, `ShowIf(A, B)` will be shown if `A && B` is true.
 
 *   AllowMultiple: Yes
 
-    When using multiple `ShowIf` on a field, the field will be shown if **ANY** of them is shown
+    When using multiple `ShowIf` on a field, the field will be shown if **ANY** of them is shown.(`or` operation)
+    
+    For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
 
-`HideIf` is the opposite of `ShowIf`. You can use multiple `ShowIf`, `HideIf`, and even a mix of the two
+`HideIf` is the opposite of `ShowIf`. You can use multiple `ShowIf`, `HideIf`, and even a mix of the two.
+
+For example: 
+*   `HideIf(A, B)` means `!ShowIf(A, B)`, means it will be shown if `!(A && B)`
+*   `[HideIf(A...), HideIf(B...)]` means `!ShowIf(A...) || !ShowIf(B...)`, means it will be shown if `!(A && ...) || !(B && ...)` is true.
 
 A full featured example:
 
@@ -1625,7 +1633,7 @@ public class ShowHideExample: MonoBehaviour
 
 
     [HideIf(nameof(_bool1), nameof(_bool2))]
-    [RichLabel("<color=yellow>show=!1&&!2")]
+    [RichLabel("<color=yellow>show=!(1&&2)=!1||!2")]
     public string _hideIf1And2;
 
     [ShowIf(nameof(_bool1))]
@@ -1640,8 +1648,8 @@ public class ShowHideExample: MonoBehaviour
 
     [HideIf(nameof(_bool1), nameof(_bool2))]
     [HideIf(nameof(_bool3), nameof(_bool4))]
-    [RichLabel("<color=pink>show=(!1&&!2)||(!3&&!4)")]
-    public string _hideIf1234;
+    [RichLabel("<color=pink>show=!(1&&2)||!(3&&4)")]
+    public string _hideIf1234;;
 }
 ```
 

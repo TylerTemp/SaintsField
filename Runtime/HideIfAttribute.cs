@@ -1,8 +1,11 @@
-﻿namespace SaintsField
+﻿using System;
+
+namespace SaintsField
 {
-    public class HideIfAttribute: VisibilityAttribute
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
+    public class HideIfAttribute: ShowIfAttribute
     {
-        public HideIfAttribute(params string[] andCallbacks) : base(true, andCallbacks)
+        public HideIfAttribute(params string[] andCallbacks) : base(andCallbacks)
         {
         }
     }

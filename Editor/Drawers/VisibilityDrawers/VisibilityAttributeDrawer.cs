@@ -6,72 +6,32 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.VisibilityDrawers
 {
-    [CustomPropertyDrawer(typeof(VisibilityAttribute))]
-    [CustomPropertyDrawer(typeof(ShowIfAttribute))]
-    [CustomPropertyDrawer(typeof(HideIfAttribute))]
-    public class VisibilityAttributeDrawer: SaintsPropertyDrawer
+    // [CustomPropertyDrawer(typeof(VisibilityAttribute))]
+    // [CustomPropertyDrawer(typeof(ShowIfAttribute))]
+    // [CustomPropertyDrawer(typeof(HideIfAttribute))]
+    public abstract class VisibilityAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI
-        protected override (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property,
+        protected override bool GetAndVisibility(SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
+            // VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
             Type type = parent.GetType();
 
-            (string error, bool show) = IsShown(property, visibilityAttribute, info, type, parent);
+            (string error, bool show) = IsShown(property, saintsAttribute, info, type, parent);
 
             _error = error;
-
-            bool isForHide = visibilityAttribute.IsForHide;
-
-            if (error != "")
-            {
-                return (isForHide, !isForHide);
-            }
-
-            return (isForHide, show);
-
-            // return (visibilityAttribute.IsForHide, visibilityAttribute.andCallbacks.All(callback => IsTruly(target, type, callback)));
+            return show;
         }
 
-        protected virtual (string error, bool shown) IsShown(SerializedProperty property, VisibilityAttribute visibilityAttribute, FieldInfo info, Type type, object target)
-        {
-            // VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
+        protected abstract (string error, bool shown) IsShown(SerializedProperty property,
+            ISaintsAttribute visibilityAttribute, FieldInfo info, Type type, object target);
 
-            List<bool> callbackTruly = new List<bool>();
-            List<string> errors = new List<string>();
-
-            foreach (string andCallback in visibilityAttribute.andCallbacks)
-            {
-                (string error, bool isTruly) = IsTruly(target, type, andCallback);
-                if (error != "")
-                {
-                    errors.Add(error);
-                }
-                callbackTruly.Add(isTruly);
-            }
-
-            if (errors.Count > 0)
-            {
-                return (string.Join("\n\n", errors), true);
-            }
-
-            bool truly = callbackTruly.All(each => each);
-            // if (visibilityAttribute.IsForHide)
-            // {
-            //     truly = !truly;
-            // }
-
-            return ("", truly);
-        }
-
-        private static (string error, bool isTruly) IsTruly(object target, Type type, string by)
+        protected static (string error, bool isTruly) IsTruly(object target, Type type, string by)
         {
             (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
@@ -182,7 +142,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement root = new VisualElement
             {
                 name = NameVisibility(property, index),
-                userData = (VisibilityAttribute) saintsAttribute,
+                userData = saintsAttribute,
             };
             root.AddToClassList(ClassVisibility(property));
             return root;
@@ -216,17 +176,17 @@ namespace SaintsField.Editor.Drawers
 
             List<string> errors = new List<string>();
             bool nowShow = false;
-            bool isForHidden = ((VisibilityAttribute)saintsAttribute).IsForHide;
-            foreach ((string error, bool show) in visibilityElements.Select(each => IsShown(property, (VisibilityAttribute)each.userData, info, parent.GetType(), parent)))
+            // bool isForHidden = ((VisibilityAttribute)saintsAttribute).IsForHide;
+            foreach ((string error, bool show) in visibilityElements.Select(each => IsShown(property, (ISaintsAttribute)each.userData, info, parent.GetType(), parent)))
             {
-                bool invertedShow = isForHidden? !show: show;
+                // bool invertedShow = isForHidden? !show: show;
 
                 if (error != "")
                 {
                     errors.Add(error);
                 }
 
-                if (invertedShow)
+                if (show)
                 {
                     nowShow = true;
                 }
