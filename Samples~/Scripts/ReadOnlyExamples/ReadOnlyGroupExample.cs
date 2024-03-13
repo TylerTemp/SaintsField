@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.ReadOnlyExamples
 {
     public class ReadOnlyGroupExample: MonoBehaviour
     {
