@@ -19,36 +19,56 @@ namespace SaintsField.Editor.Drawers
     {
         #region IMGUI
         protected override (bool isForHide, bool orResult) GetAndVisibility(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
-
-            // object target = GetParentTarget(property);
             Type type = parent.GetType();
 
-            _errors.Clear();
-            List<bool> callbackTruly = new List<bool>();
+            (string error, bool show) = IsShown(property, visibilityAttribute, info, type, parent);
 
-            foreach (string andCallback in visibilityAttribute.andCallbacks)
-            {
-                (string error, bool isTruly) = IsTruly(parent, type, andCallback);
-                if (error != "")
-                {
-                    _errors.Add(error);
-                }
-                callbackTruly.Add(isTruly);
-            }
+            _error = error;
 
             bool isForHide = visibilityAttribute.IsForHide;
 
-            if (_errors.Count > 0)
+            if (error != "")
             {
                 return (isForHide, !isForHide);
             }
 
-            return (isForHide, callbackTruly.All(each => each));
+            return (isForHide, show);
 
             // return (visibilityAttribute.IsForHide, visibilityAttribute.andCallbacks.All(callback => IsTruly(target, type, callback)));
+        }
+
+        protected virtual (string error, bool shown) IsShown(SerializedProperty property, VisibilityAttribute visibilityAttribute, FieldInfo info, Type type, object target)
+        {
+            // VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
+
+            List<bool> callbackTruly = new List<bool>();
+            List<string> errors = new List<string>();
+
+            foreach (string andCallback in visibilityAttribute.andCallbacks)
+            {
+                (string error, bool isTruly) = IsTruly(target, type, andCallback);
+                if (error != "")
+                {
+                    errors.Add(error);
+                }
+                callbackTruly.Add(isTruly);
+            }
+
+            if (errors.Count > 0)
+            {
+                return (string.Join("\n\n", errors), true);
+            }
+
+            bool truly = callbackTruly.All(each => each);
+            // if (visibilityAttribute.IsForHide)
+            // {
+            //     truly = !truly;
+            // }
+
+            return ("", truly);
         }
 
         private static (string error, bool isTruly) IsTruly(object target, Type type, string by)
@@ -103,27 +123,27 @@ namespace SaintsField.Editor.Drawers
             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
         }
 
-        private readonly List<string> _errors = new List<string>();
+        private string _error = "";
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info,
             object parent)
         {
-            return _errors.Count > 0;
+            return _error != "";
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            if (_errors.Count == 0)
+            if (_error == "")
             {
                 return position;
             }
 
-            string error = string.Join("\n\n", _errors);
+            // string error = string.Join("\n\n", _errors);
 
-            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, ImGuiHelpBox.GetHeight(error, position.width, MessageType.Error));
-            ImGuiHelpBox.Draw(errorRect, error, MessageType.Error);
+            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, ImGuiHelpBox.GetHeight(_error, position.width, MessageType.Error));
+            ImGuiHelpBox.Draw(errorRect, _error, MessageType.Error);
             return leftRect;
         }
 
@@ -132,13 +152,13 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // Debug.Log("check extra height!");
-            if (_errors.Count == 0)
+            if (_error == "")
             {
                 return 0;
             }
 
             // Debug.Log(HelpBox.GetHeight(_error));
-            return ImGuiHelpBox.GetHeight(string.Join("\n\n", _errors), width, MessageType.Error);
+            return ImGuiHelpBox.GetHeight(string.Join("\n\n", _error), width, MessageType.Error);
         }
         #endregion
 
@@ -196,14 +216,17 @@ namespace SaintsField.Editor.Drawers
 
             List<string> errors = new List<string>();
             bool nowShow = false;
-            foreach ((string error, bool show) in visibilityElements.Select(each => GetShow((VisibilityAttribute)each.userData, parent.GetType(), parent)))
+            bool isForHidden = ((VisibilityAttribute)saintsAttribute).IsForHide;
+            foreach ((string error, bool show) in visibilityElements.Select(each => IsShown(property, (VisibilityAttribute)each.userData, info, parent.GetType(), parent)))
             {
+                bool invertedShow = isForHidden? !show: show;
+
                 if (error != "")
                 {
                     errors.Add(error);
                 }
 
-                if (show)
+                if (invertedShow)
                 {
                     nowShow = true;
                 }
@@ -214,19 +237,6 @@ namespace SaintsField.Editor.Drawers
                 container.style.display = nowShow ? DisplayStyle.Flex : DisplayStyle.None;
             }
 
-            //
-            //
-            // bool curShow = (bool)visibilityElement.userData;
-            //
-            // (string error, bool show) = GetShow(saintsAttribute, parent.GetType(), parent);
-            // // Debug.Log(show);
-            // if (curShow != show)
-            // {
-            //     // Debug.Log($"error={error}, disabled={disabled}");
-            //     visibilityElement.userData = show;
-            //     container.style.display = show? DisplayStyle.Flex: DisplayStyle.None;
-            // }
-            //
             HelpBox helpBox = container.Q<HelpBox>(NameVisibilityHelpBox(property, index));
             string joinedError = string.Join("\n\n", errors);
             // ReSharper disable once InvertIf
@@ -235,37 +245,6 @@ namespace SaintsField.Editor.Drawers
                 helpBox.text = joinedError;
                 helpBox.style.display = joinedError == "" ? DisplayStyle.None : DisplayStyle.Flex;
             }
-        }
-
-        private static (string error, bool show) GetShow(VisibilityAttribute visibilityAttribute, Type type, object target)
-        {
-            // VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
-
-            List<bool> callbackTruly = new List<bool>();
-            List<string> errors = new List<string>();
-
-            foreach (string andCallback in visibilityAttribute.andCallbacks)
-            {
-                (string error, bool isTruly) = IsTruly(target, type, andCallback);
-                if (error != "")
-                {
-                    errors.Add(error);
-                }
-                callbackTruly.Add(isTruly);
-            }
-
-            if (errors.Count > 0)
-            {
-                return (string.Join("\n\n", errors), true);
-            }
-
-            bool truly = callbackTruly.All(each => each);
-            if (visibilityAttribute.IsForHide)
-            {
-                truly = !truly;
-            }
-
-            return ("", truly);
         }
 
         #endregion

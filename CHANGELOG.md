@@ -1,3 +1,7 @@
+## 2.1.11
+
+1.  Fix [Issue 3](https://github.com/TylerTemp/SaintsField/issues/3) Texture2D can not be destroyed on a GC calling. 
+
 ## 2.1.10
 
 1.  Add `SaintsRow` for `Serializable` class/struct to draw Button/Layout/DOTweenPlay for the target field.

@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             if(property.objectReferenceValue == null)
             {

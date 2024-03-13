@@ -19,24 +19,13 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
-            ISaintsAttribute saintsAttribute, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, parent);
+            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, info, parent.GetType(), parent);
             _error = error;
             EditorGUI.BeginDisabledGroup(disabled);
             return -1;
         }
-        // protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     object parent) => true;
-        //
-        // protected override Rect DrawAboveImGui(Rect position, SerializedProperty property,
-        //     GUIContent label, ISaintsAttribute saintsAttribute, object parent)
-        // {
-        //     (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, parent);
-        //     _error = error;
-        //     EditorGUI.BeginDisabledGroup(disabled);
-        //     return position;
-        // }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
@@ -82,7 +71,7 @@ namespace SaintsField.Editor.Drawers
             return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
-        private static (string error, bool disabled) IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute, object target)
+        protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute, FieldInfo info, Type type, object target)
         {
             string[] bys = targetAttribute.ReadOnlyBys;
             if(bys is null)
@@ -92,40 +81,7 @@ namespace SaintsField.Editor.Drawers
 
             foreach (string by in bys)
             {
-                // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
-                // bool result;
-                // switch (found)
-                // {
-                //     case (ReflectUtils.GetPropType.NotFound, _):
-                //     {
-                //         _error = $"No field or method named `{by}` found on `{target}`";
-                //         Debug.LogError(_error);
-                //         result = false;
-                //     }
-                //         break;
-                //     case (ReflectUtils.GetPropType.Property, PropertyInfo propertyInfo):
-                //     {
-                //         result = ReflectUtils.Truly(propertyInfo.GetValue(target));
-                //     }
-                //         break;
-                //     case (ReflectUtils.GetPropType.Field, FieldInfo foundFieldInfo):
-                //     {
-                //         result = ReflectUtils.Truly(foundFieldInfo.GetValue(target));
-                //     }
-                //         break;
-                //     case (ReflectUtils.GetPropType.Method, MethodInfo methodInfo):
-                //     {
-                //         ParameterInfo[] methodParams = methodInfo.GetParameters();
-                //         Debug.Assert(methodParams.All(p => p.IsOptional));
-                //         // Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                //         result =  ReflectUtils.Truly(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
-                //     }
-                //         break;
-                //     default:
-                //         throw new ArgumentOutOfRangeException(nameof(found), found, null);
-                // }
-
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(type, by);
                 (string error, bool disabled) result;
 
                 if (found.getPropType == ReflectUtils.GetPropType.NotFound)
@@ -218,7 +174,7 @@ namespace SaintsField.Editor.Drawers
 
             List<string> errors = new List<string>();
             bool nowReadOnly = false;
-            foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, ((ReadOnlyAttribute)each.userData), parent)))
+            foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, (ReadOnlyAttribute)each.userData, info,  parent.GetType(), parent)))
             {
                 if (error != "")
                 {
