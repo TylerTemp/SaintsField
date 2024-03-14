@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.ReadOnlyExamples
 {
     public class ReadOnlyGroupExample: MonoBehaviour
     {
-        [ReadOnly(true)] public string directlyReadOnly;
+        [ReadOnly()] public string directlyReadOnly;
 
         [SerializeField] private bool _bool1;
         [SerializeField] private bool _bool2;

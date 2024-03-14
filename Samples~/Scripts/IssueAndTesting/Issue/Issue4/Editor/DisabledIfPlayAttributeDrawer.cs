@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue4.Editor
     [CustomPropertyDrawer(typeof(DisabledIfPlayAttribute))]
     public class DisabledIfPlayAttributeDrawer: ReadOnlyAttributeDrawer
     {
-        protected override (string error, bool disabled) IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute, FieldInfo info, Type type, object target)
+        protected override (string error, bool disabled) IsDisabled(SerializedProperty property, ISaintsAttribute targetAttribute, FieldInfo info, Type type, object target)
         {
             return ("", EditorApplication.isPlaying);
         }

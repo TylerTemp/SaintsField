@@ -5,16 +5,12 @@ namespace SaintsField
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class EnableIfAttribute: ReadOnlyAttribute
     {
-        public EnableIfAttribute(bool directValue=true, string groupBy=""): base(!directValue, groupBy)
+        public EnableIfAttribute(EMode editorMode, params string[] by) : base(editorMode, by)
         {
         }
 
-        public EnableIfAttribute(params string[] by): base(by)
+        public EnableIfAttribute(params string[] by) : base(by)
         {
-            if (by.Length == 0)
-            {
-                readOnlyDirectValue = false;
-            }
         }
     }
 }

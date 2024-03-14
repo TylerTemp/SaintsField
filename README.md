@@ -1676,6 +1676,24 @@ public class ShowHideExample: MonoBehaviour
 
 [![showifhideif](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
 
+Example about EMode:
+
+```csharp
+public bool boolValue;
+
+[ShowIf(EMode.Edit)] public string showEdit;
+[ShowIf(EMode.Play)] public string showPlay;
+
+[ShowIf(EMode.Edit, nameof(boolValue))] public string showEditAndBool;
+[ShowIf(EMode.Edit), ShowIf(nameof(boolValue))] public string showEditOrBool;
+
+[HideIf(EMode.Edit)] public string hideEdit;
+[HideIf(EMode.Play)] public string hidePlay;
+
+[HideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
+[HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
+```
+
 #### `MinValue` / `MaxValue` ####
 
 Limit for int/float field

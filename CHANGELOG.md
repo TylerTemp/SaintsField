@@ -1,6 +1,9 @@
 ## 2.1.12
 
-1.  IMGUI: Fix `SaintsRow` incorrect renderer cache when inside a list
+1.  IMGUI: Fix `SaintsRow` incorrect renderer cache when inside a list.
+2.  Fix `ReadOnly` will disable the field when there is an error in your callbacks.
+3.  Add `EMode` for `ReadOnly`, `EnableIf`, `DisableIf`, `ShowIf`, `HideIf` to specific if editor is playing or not.
+4.  **Breaking Changes**:`ReadOnly`, `EnableIf`, `DisableIf`, `ShowIf`, `HideIf` no longer support directValue and groupBy parameters.
 
 ## 2.1.11
 

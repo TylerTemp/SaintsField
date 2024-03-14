@@ -70,18 +70,38 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
-        protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, ReadOnlyAttribute targetAttribute, FieldInfo info, Type type, object target)
+        protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, Type type, object target)
         {
+            ReadOnlyAttribute targetAttribute = (ReadOnlyAttribute) saintsAttribute;
+
+            EMode editorMode = targetAttribute.EditorMode;
+            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
+            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
+
+            bool editorModeIsTrue = (
+                !editorRequiresEdit || !EditorApplication.isPlaying
+            ) && (
+                !editorRequiresPlay || EditorApplication.isPlaying
+            );
+
             string[] bys = targetAttribute.ReadOnlyBys;
-            if(bys is null)
+            if (bys == null && editorRequiresEdit && editorRequiresPlay)
             {
-                return ("", targetAttribute.readOnlyDirectValue);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
+                Debug.Log($"return={editorModeIsTrue}");
+#endif
+                return ("", true);
             }
 
             List<bool> callbackTruly = new List<bool>();
+            if(!(editorRequiresEdit && editorRequiresPlay))
+            {
+                callbackTruly.Add(editorModeIsTrue);
+            }
+
             List<string> errors = new List<string>();
 
-            foreach (string andCallback in bys)
+            foreach (string andCallback in bys ?? Array.Empty<string>())
             {
                 (string error, bool isTruly) = IsTruly(target, type, andCallback);
                 if (error != "")
@@ -93,18 +113,15 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
             if (errors.Count > 0)
             {
-                return (string.Join("\n\n", errors), true);
-            }
-
-            // empty means hide
-            if (callbackTruly.Count == 0)
-            {
-                return ("", targetAttribute.readOnlyDirectValue);
+                return (string.Join("\n\n", errors), false);
             }
 
             // and, get disabled
             bool truly = callbackTruly.All(each => each);
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
+            Debug.Log($"final return={truly}/editor[{editorMode}]={editorModeIsTrue}/bys={string.Join(",", callbackTruly)}");
+#endif
             return ("", truly);
         }
 

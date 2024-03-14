@@ -9,12 +9,19 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Visibility;
         public string GroupBy => "";
 
-        public readonly string[] orCallbacks;
+        // ReSharper disable InconsistentNaming
+        public readonly string[] Callbacks;
+        public readonly EMode EditorMode;
+        // ReSharper enable InconsistentNaming
 
-        // ReSharper disable once MemberCanBeProtected.Global
-        public ShowIfAttribute(params string[] orCallbacks)
+        public ShowIfAttribute(EMode editorMode, params string[] andCallbacks)
         {
-            this.orCallbacks = orCallbacks;
+            EditorMode = editorMode;
+            Callbacks = andCallbacks;
+        }
+
+        public ShowIfAttribute(params string[] andCallbacks): this(EMode.Edit | EMode.Play, andCallbacks)
+        {
         }
     }
 }

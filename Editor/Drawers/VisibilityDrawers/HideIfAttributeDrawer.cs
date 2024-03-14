@@ -14,11 +14,25 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             Type type, object target)
         {
             HideIfAttribute hideIfAttribute = (HideIfAttribute)saintsAttribute;
+            EMode editorMode = hideIfAttribute.EditorMode;
+            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
+            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
+
+            bool editorModeIsTrue = (
+                !editorRequiresEdit || !EditorApplication.isPlaying
+            ) && (
+                !editorRequiresPlay || EditorApplication.isPlaying
+            );
 
             List<bool> callbackTruly = new List<bool>();
             List<string> errors = new List<string>();
 
-            foreach (string andCallback in hideIfAttribute.orCallbacks)
+            if (!(editorRequiresEdit && editorRequiresPlay))
+            {
+                callbackTruly.Add(editorModeIsTrue);
+            }
+
+            foreach (string andCallback in hideIfAttribute.Callbacks)
             {
                 (string error, bool isTruly) = IsTruly(target, type, andCallback);
                 if (error != "")
@@ -33,13 +47,14 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
                 return (string.Join("\n\n", errors), true);
             }
 
-            // empty means hide
-            if (callbackTruly.Count == 0)
+            // or, get hide
+            // any(empty) = false, reversed=show(true)
+            // we need to manually deal the empty
+            if(callbackTruly.Count == 0)
             {
-                return ("", false);
+                return ("", false);  // don't show if empty
             }
 
-            // or, get hide
             bool truly = callbackTruly.Any(each => each);
 
             // reverse, get shown
