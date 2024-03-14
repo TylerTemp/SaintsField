@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using DG.DemiEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
@@ -56,6 +55,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
 
         }
 
-        [SerializeField, SaintsRow] List<TimelineItem> Timeline = new();
+        [SerializeField, SaintsRow] List<TimelineItem> Timeline = new List<TimelineItem>();
     }
 }
