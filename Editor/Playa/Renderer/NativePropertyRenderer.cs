@@ -1,4 +1,6 @@
-﻿using SaintsField.Editor.Core;
+﻿using System.Linq;
+using SaintsField.Editor.Core;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
@@ -19,15 +21,19 @@ namespace SaintsField.Editor.Playa.Renderer
             VisualElement child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
 
-            VisualElement container = new VisualElement
+            VisualElement result = new VisualElement
             {
                 userData = value,
             };
-            container.Add(child);
+            result.Add(child);
 
-            container.RegisterCallback<AttachToPanelEvent>(_ => WatchValueChanged(container));
+            result.RegisterCallback<AttachToPanelEvent>(_ => WatchValueChanged(result));
+            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute) > 0)
+            {
+                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(result, false)).Every(100));
+            }
 
-            return container;
+            return result;
         }
 
         private void WatchValueChanged(VisualElement container)
@@ -46,6 +52,12 @@ namespace SaintsField.Editor.Playa.Renderer
 #endif
         public override void Render()
         {
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return;
+            }
+
             // NaughtyEditorGUI.NativeProperty_Layout(serializedObject.targetObject, fieldWithInfo.propertyInfo);
             object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
@@ -55,12 +67,26 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override float GetHeight()
         {
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return 0;
+            }
+
             return SaintsPropertyDrawer.SingleLineHeight;
         }
 
         public override void RenderPosition(Rect position)
         {
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return;
+            }
 
+            object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
+            FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
+                .PropertyInfo.Name));
         }
     }
 }

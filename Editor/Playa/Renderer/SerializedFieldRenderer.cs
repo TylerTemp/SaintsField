@@ -1,6 +1,8 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEngine;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using SaintsField.Playa;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
@@ -35,6 +37,13 @@ namespace SaintsField.Editor.Playa.Renderer
                 _result.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
             }
 
+            // disable/enable/show/hide
+            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute || each is PlayaEnableIfAttribute ||
+                                                            each is PlayaDisableIfAttribute) > 0)
+            {
+                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(result, true)).Every(100));
+            }
+
             return result;
         }
 
@@ -56,18 +65,40 @@ namespace SaintsField.Editor.Playa.Renderer
 #endif
         public override void Render()
         {
-            EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, GUILayout.ExpandWidth(true));
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return;
+            }
+
+            using(new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+            {
+                EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, GUILayout.ExpandWidth(true));
+            }
         }
 
         public override float GetHeight()
         {
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return 0;
+            }
             return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
         }
 
         public override void RenderPosition(Rect position)
         {
-            // Debug.Log($"render {this}/{position}");
-            EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, true);
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return;
+            }
+
+            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+            {
+                EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, true);
+            }
             // EditorGUI.DrawRect(position, Color.blue);
         }
 

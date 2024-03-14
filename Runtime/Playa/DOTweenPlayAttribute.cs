@@ -4,7 +4,7 @@ namespace SaintsField.Playa
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
     // ReSharper disable once InconsistentNaming
-    public class DOTweenPlayAttribute: Attribute, ISaintsMethodAttribute, ISaintsGroup
+    public class DOTweenPlayAttribute: Attribute, IPlayaAttribute, ISaintsMethodAttribute, ISaintsGroup
     {
         // ReSharper disable InconsistentNaming
         public readonly string Label;

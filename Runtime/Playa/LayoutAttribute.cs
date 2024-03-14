@@ -3,7 +3,7 @@
 namespace SaintsField.Playa
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class LayoutAttribute: Attribute, ISaintsGroup
+    public class LayoutAttribute: Attribute, IPlayaAttribute, ISaintsGroup
     {
         public string GroupBy { get; }
         public ELayout Layout { get; }

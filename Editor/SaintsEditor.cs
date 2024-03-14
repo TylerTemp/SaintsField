@@ -257,12 +257,17 @@ namespace SaintsField.Editor
                     // Debug.Log($"MemberType      : {fieldInfo.MemberType}");
                     // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
                     // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
-                    OrderedAttribute orderProp = fieldInfo.GetCustomAttribute<OrderedAttribute>();
+
+                    IReadOnlyList<IPlayaAttribute> playaAttributes =
+                        fieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+
+                    OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                     int order = orderProp?.Order ?? int.MinValue;
 
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
-                        Groups = fieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        PlayaAttributes = playaAttributes,
+                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
                         Target = target,
 
                         RenderType = SaintsRenderType.SerializedField,
@@ -280,11 +285,15 @@ namespace SaintsField.Editor
                     .Where(f => f.GetCustomAttributes(typeof(ShowInInspectorAttribute), true).Length > 0);
                 foreach (FieldInfo nonSerFieldInfo in nonSerFieldInfos)
                 {
-                    OrderedAttribute orderProp = nonSerFieldInfo.GetCustomAttribute<OrderedAttribute>();
+                    IReadOnlyList<IPlayaAttribute> playaAttributes =
+                        nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+
+                    OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                     int order = orderProp?.Order ?? int.MinValue;
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
-                        Groups = nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        PlayaAttributes = playaAttributes,
+                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
                         Target = target,
 
                         RenderType = SaintsRenderType.NonSerializedField,
@@ -312,12 +321,15 @@ namespace SaintsField.Editor
 
                 foreach (MethodInfo methodInfo in methodInfos)
                 {
-                    Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
+                    IReadOnlyList<IPlayaAttribute> playaAttributes =
+                        methodInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
 
-                    if(allMethodAttributes.Any(each => each is ISaintsMethodAttribute))
+                    // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
+
+                    if(playaAttributes.Any(each => each is ISaintsMethodAttribute))
                     {
                         OrderedAttribute orderProp =
-                            allMethodAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
+                            playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
                         int order = orderProp?.Order ?? int.MinValue;
 
                         // inspector does not care about inherited/new method. It just need to use the last one
@@ -325,7 +337,8 @@ namespace SaintsField.Editor
 
                         fieldWithInfos.Add(new SaintsFieldWithInfo
                         {
-                            Groups = allMethodAttributes.OfType<ISaintsGroup>().ToArray(),
+                            PlayaAttributes = playaAttributes,
+                            Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
                             Target = target,
 
                             // memberType = MemberTypes.Method,
@@ -347,12 +360,16 @@ namespace SaintsField.Editor
 
                 foreach (PropertyInfo propertyInfo in propertyInfos)
                 {
+                    IReadOnlyList<IPlayaAttribute> playaAttributes =
+                        propertyInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+
                     OrderedAttribute orderProp =
-                        propertyInfo.GetCustomAttribute<OrderedAttribute>();
+                        playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                     int order = orderProp?.Order ?? int.MinValue;
                     fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
-                        Groups = propertyInfo.GetCustomAttributes<Attribute>().OfType<ISaintsGroup>().ToArray(),
+                        PlayaAttributes = playaAttributes,
+                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
                         Target = target,
 
                         RenderType = SaintsRenderType.NativeProperty,

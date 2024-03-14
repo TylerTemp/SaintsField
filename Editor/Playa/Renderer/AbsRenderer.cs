@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
@@ -18,6 +21,12 @@ namespace SaintsField.Editor.Playa.Renderer
         protected readonly bool TryFixUIToolkit;
         // ReSharper enable InconsistentNaming
 
+        protected struct PreCheckResult
+        {
+            public bool IsShown;
+            public bool IsDisabled;
+        }
+
         protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
         {
             FieldWithInfo = fieldWithInfo;
@@ -25,8 +34,188 @@ namespace SaintsField.Editor.Playa.Renderer
             TryFixUIToolkit = tryFixUIToolkit;
         }
 
+        private enum PreCheckInternalType
+        {
+            ShowHide,  // main
+            DisableEnable,  // main
+        }
+
+        private class PreCheckInternalInfo
+        {
+            public PreCheckInternalType Type;
+            public bool Reverse;
+            public string[] Callbacks;
+            public EMode EditorMode;
+            public bool SafeResult;
+            public bool EmptyResult;
+            public object Target;
+
+            public bool result;
+        }
+
+        protected static PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo)
+        {
+            List<PreCheckInternalInfo> preCheckInternalInfos = new List<PreCheckInternalInfo>();
+            foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
+            {
+                switch (playaAttribute)
+                {
+                    case PlayaHideIfAttribute hideIfAttribute:
+                        preCheckInternalInfos.Add(new PreCheckInternalInfo
+                        {
+                            Type = PreCheckInternalType.ShowHide,
+                            Reverse = true,
+                            Callbacks = hideIfAttribute.Callbacks,
+                            EditorMode = hideIfAttribute.EditorMode,
+                            SafeResult = true,
+                            EmptyResult = false,
+                            Target = fieldWithInfo.Target,
+                        });
+                        break;
+                    case PlayaShowIfAttribute showIfAttribute:
+                        preCheckInternalInfos.Add(new PreCheckInternalInfo
+                        {
+                            Type = PreCheckInternalType.ShowHide,
+                            Reverse = false,
+                            Callbacks = showIfAttribute.Callbacks,
+                            EditorMode = showIfAttribute.EditorMode,
+                            SafeResult = true,
+                            EmptyResult = true,
+                            Target = fieldWithInfo.Target,
+                        });
+                        break;
+                    case PlayaEnableIfAttribute enableIfAttribute:
+                        preCheckInternalInfos.Add(new PreCheckInternalInfo
+                        {
+                            Type = PreCheckInternalType.DisableEnable,
+                            Reverse = true,
+                            Callbacks = enableIfAttribute.Callbacks,
+                            EditorMode = enableIfAttribute.EditorMode,
+                            SafeResult = false,
+                            EmptyResult = false,
+                            Target = fieldWithInfo.Target,
+                        });
+                        break;
+                    case PlayaDisableIfAttribute disableIfAttribute:
+                        preCheckInternalInfos.Add(new PreCheckInternalInfo
+                        {
+                            Type = PreCheckInternalType.DisableEnable,
+                            Reverse = false,
+                            Callbacks = disableIfAttribute.Callbacks,
+                            EditorMode = disableIfAttribute.EditorMode,
+                            SafeResult = false,
+                            EmptyResult = true,
+                            Target = fieldWithInfo.Target,
+                        });
+                        break;
+                }
+            }
+
+            foreach (PreCheckInternalInfo preCheckInternalInfo in preCheckInternalInfos)
+            {
+                FillResult(preCheckInternalInfo);
+            }
+
+            // showIf
+            IReadOnlyList<bool> showIfResults = preCheckInternalInfos
+                .Where(each => each.Type == PreCheckInternalType.ShowHide)
+                .Select(each => each.result)
+                .ToList();
+            bool showIfResult = showIfResults.Count == 0 || showIfResults.Any(each => each);
+
+            // disableIf
+            IReadOnlyList<bool> disableIfResults = preCheckInternalInfos
+                .Where(each => each.Type == PreCheckInternalType.DisableEnable)
+                .Select(each => each.result)
+                .ToList();
+            bool disableIfResult = disableIfResults.Count != 0 && disableIfResults.Any(each => each);
+            // Debug.Log($"disableIfResult={disableIfResult}/{disableIfResults.Count != 0}/{disableIfResults.Any(each => each)}/results={string.Join(",", disableIfResults)}");
+            return new PreCheckResult
+            {
+                IsDisabled = disableIfResult,
+                IsShown = showIfResult,
+            };
+        }
+
+        private static void FillResult(PreCheckInternalInfo preCheckInternalInfo)
+        {
+            EMode editorMode = preCheckInternalInfo.EditorMode;
+            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
+            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
+
+            bool editorModeIsTrue = (
+                !editorRequiresEdit || !EditorApplication.isPlaying
+            ) && (
+                !editorRequiresPlay || EditorApplication.isPlaying
+            );
+
+            string[] bys = preCheckInternalInfo.Callbacks;
+            if (bys.Length == 0 && editorRequiresEdit && editorRequiresPlay)
+            {
+                preCheckInternalInfo.result = preCheckInternalInfo.EmptyResult;
+                // Debug.Log($"return {preCheckInternalInfo.SafeResult}");
+                return;
+            }
+
+            List<bool> callbackTruly = new List<bool>();
+            if(!(editorRequiresEdit && editorRequiresPlay))
+            {
+                callbackTruly.Add(editorModeIsTrue);
+            }
+
+            List<string> errors = new List<string>();
+
+            Type targetType = preCheckInternalInfo.Target.GetType();
+            foreach (string callback in bys)
+            {
+                (string error, bool isTruly) = Util.GetTruly(preCheckInternalInfo.Target, targetType, callback);
+                if (error != "")
+                {
+                    errors.Add(error);
+                }
+                callbackTruly.Add(isTruly);
+            }
+
+            if (errors.Count > 0)
+            {
+                // return (string.Join("\n\n", errors), false);
+                preCheckInternalInfo.result = preCheckInternalInfo.SafeResult;
+                return;
+            }
+
+            if (callbackTruly.Count == 0)
+            {
+                preCheckInternalInfo.result = preCheckInternalInfo.EmptyResult;
+                return;
+            }
+
+            if (preCheckInternalInfo.Reverse)  // !or
+            {
+                preCheckInternalInfo.result = !callbackTruly.Any(each => each);
+            }
+            else  // and
+            {
+                preCheckInternalInfo.result = callbackTruly.All(each => each);
+            }
+        }
+
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public abstract VisualElement CreateVisualElement();
+
+        protected void UIToolkitOnUpdate(VisualElement result, bool checkDisable)
+        {
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if(checkDisable && result.enabledSelf != !preCheckResult.IsDisabled)
+            {
+                result.SetEnabled(!preCheckResult.IsDisabled);
+            }
+
+            bool isShown = result.style.display != DisplayStyle.None;
+            if(isShown != preCheckResult.IsShown)
+            {
+                result.style.display = preCheckResult.IsShown ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+        }
 #endif
         public abstract void Render();
         public abstract float GetHeight();

@@ -31,58 +31,6 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
         protected abstract (string error, bool shown) IsShown(SerializedProperty property,
             ISaintsAttribute visibilityAttribute, FieldInfo info, Type type, object target);
 
-        protected static (string error, bool isTruly) IsTruly(object target, Type type, string by)
-        {
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
-
-            if (getPropType == ReflectUtils.GetPropType.NotFound)
-            {
-                string error = $"No field or method named `{by}` found on `{target}`";
-                // Debug.LogError(error);
-                // _errors.Add(error);
-                return (error, false);
-            }
-
-            if (getPropType == ReflectUtils.GetPropType.Property)
-            {
-                return ("", ReflectUtils.Truly(((PropertyInfo)fieldOrMethodInfo).GetValue(target)));
-            }
-            if (getPropType == ReflectUtils.GetPropType.Field)
-            {
-                return ("", ReflectUtils.Truly(((FieldInfo)fieldOrMethodInfo).GetValue(target)));
-            }
-            // ReSharper disable once InvertIf
-            if (getPropType == ReflectUtils.GetPropType.Method)
-            {
-                MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                ParameterInfo[] methodParams = methodInfo.GetParameters();
-                Debug.Assert(methodParams.All(p => p.IsOptional));
-                object methodResult;
-                // try
-                // {
-                //     methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray())
-                // }
-                try
-                {
-                    methodResult = methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-                }
-                catch (TargetInvocationException e)
-                {
-                    Debug.LogException(e);
-                    Debug.Assert(e.InnerException != null);
-                    return (e.InnerException.Message, false);
-
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    return (e.Message, false);
-                }
-                return ("", ReflectUtils.Truly(methodResult));
-            }
-            throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-        }
-
         private string _error = "";
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,

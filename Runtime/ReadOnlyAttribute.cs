@@ -9,24 +9,10 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
-        // public bool readOnlyDirectValue;
         // ReSharper disable InconsistentNaming
         public readonly string[] ReadOnlyBys;
         public readonly EMode EditorMode;
         // ReSharper enable InconsistentNaming
-
-        // public ReadOnlyAttribute(string groupBy = "") : this(EMode.Edit | EMode.Play, groupBy)
-        // {
-        // }
-        //
-        // public ReadOnlyAttribute(EMode editorMode, string groupBy="")
-        // {
-        //     EditorMode = editorMode;
-        //     // readOnlyDirectValue = directValue;
-        //     ReadOnlyBys = null;
-        //
-        //     GroupBy = groupBy;
-        // }
 
         public ReadOnlyAttribute(params string[] by): this(EMode.Edit | EMode.Play, by)
         {

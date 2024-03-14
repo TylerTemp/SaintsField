@@ -12,6 +12,7 @@ namespace SaintsField.Editor.Playa
         public int Order;
 
         public IReadOnlyList<ISaintsGroup> Groups;
+        public IReadOnlyList<IPlayaAttribute> PlayaAttributes;
         public object Target;
 
         public SaintsRenderType RenderType;

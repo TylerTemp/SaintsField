@@ -3,7 +3,7 @@
 namespace SaintsField.Playa
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
-    public class ButtonAttribute: Attribute, ISaintsMethodAttribute
+    public class ButtonAttribute: Attribute, IPlayaAttribute, ISaintsMethodAttribute
     {
         // public readonly string FuncName;
         public readonly string Label;

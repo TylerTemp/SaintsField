@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.VisibilityDrawers
@@ -34,7 +35,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
 
             foreach (string andCallback in hideIfAttribute.Callbacks)
             {
-                (string error, bool isTruly) = IsTruly(target, type, andCallback);
+                (string error, bool isTruly) = Util.GetTruly(target, type, andCallback);
                 if (error != "")
                 {
                     errors.Add(error);

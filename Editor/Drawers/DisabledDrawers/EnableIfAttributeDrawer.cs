@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -44,7 +45,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
             foreach (string orCallback in bys ?? Array.Empty<string>())
             {
-                (string error, bool isTruly) = IsTruly(target, type, orCallback);
+                (string error, bool isTruly) = Util.GetTruly(target, type, orCallback);
                 if (error != "")
                 {
                     errors.Add(error);

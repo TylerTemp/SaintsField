@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Playa.Renderer
             string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
             object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
 
-            return new Button(() =>
+            Button result = new Button(() =>
             {
                 methodInfo.Invoke(target, defaultParams);
             })
@@ -46,6 +46,13 @@ namespace SaintsField.Editor.Playa.Renderer
                     flexGrow = 1,
                 },
             };
+            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute || each is PlayaEnableIfAttribute ||
+                                                            each is PlayaDisableIfAttribute) > 0)
+            {
+                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(result, true)).Every(100));
+            }
+
+            return result;
         }
 #endif
         public override void Render()
@@ -61,12 +68,24 @@ namespace SaintsField.Editor.Playa.Renderer
 
             ButtonAttribute buttonAttribute = buttonAttributes[0];
 
-            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
-
-            if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true }, GUILayout.ExpandWidth(true)))
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
             {
-                object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
-                methodInfo.Invoke(target, defaultParams);
+                return;
+            }
+
+            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+            {
+                string buttonText = string.IsNullOrEmpty(buttonAttribute.Label)
+                    ? ObjectNames.NicifyVariableName(methodInfo.Name)
+                    : buttonAttribute.Label;
+
+                if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
+                        GUILayout.ExpandWidth(true)))
+                {
+                    object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+                    methodInfo.Invoke(target, defaultParams);
+                }
             }
         }
 
@@ -77,6 +96,13 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 return 0;
             }
+
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return 0;
+            }
+
             return SaintsPropertyDrawer.SingleLineHeight;
         }
 
@@ -91,14 +117,26 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            ButtonAttribute buttonAttribute = buttonAttributes[0];
-
-            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
-
-            if (GUI.Button(position, buttonText, new GUIStyle(GUI.skin.button) { richText = true }))
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
             {
-                object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
-                methodInfo.Invoke(target, defaultParams);
+                return;
+            }
+
+            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+            {
+
+                ButtonAttribute buttonAttribute = buttonAttributes[0];
+
+                string buttonText = string.IsNullOrEmpty(buttonAttribute.Label)
+                    ? ObjectNames.NicifyVariableName(methodInfo.Name)
+                    : buttonAttribute.Label;
+
+                if (GUI.Button(position, buttonText, new GUIStyle(GUI.skin.button) { richText = true }))
+                {
+                    object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+                    methodInfo.Invoke(target, defaultParams);
+                }
             }
         }
     }
