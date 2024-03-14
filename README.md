@@ -1438,18 +1438,13 @@ public class OnChangedExample : MonoBehaviour
 
 #### `ReadOnly`/`DisableIf`/`EnableIf` ####
 
-This has two overrides:
-
-*   `(bool directValue=true, string groupBy="")`
-*   `(params string[] by)`
-
 `ReadOnly` equals `DisableIf`, `EnableIf` is the opposite of `DisableIf`
 
-Each arguments:
+Arguments:
 
-*   `bool directValue=true`
+*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    use a direct value.
+    Condition: if it should be in edit mode or play mode for Editor. By default (omiting this parameter) it does not check the mode at all.
 
 *   `string by...`
 
@@ -1499,6 +1494,25 @@ public class ReadOnlyGroupExample: MonoBehaviour
 ```
 
 [![readonly](https://github.com/TylerTemp/SaintsField/assets/6391063/e267567b-469c-4156-a82c-82f21fc43021)](https://github.com/TylerTemp/SaintsField/assets/6391063/6761a0f2-07c2-4252-9dd0-c1a60091a891)
+
+EMode example:
+
+```csharp
+public bool boolVal;
+
+[DisableIf(EMode.Edit)] public string disEditMode;
+[DisableIf(EMode.Play)] public string disPlayMode;
+
+[DisableIf(EMode.Edit, nameof(boolVal))] public string disEditAndBool;
+[DisableIf(EMode.Edit), DisableIf(nameof(boolVal))] public string disEditOrBool;
+
+[EnableIf(EMode.Edit)] public string enEditMode;
+[EnableIf(EMode.Play)] public string enPlayMode;
+
+[EnableIf(EMode.Edit, nameof(boolVal))] public string enEditOrBool;
+// dis=!editor || dis=!bool => en=editor&&bool
+[EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
+```
 
 #### `Required` ####
 
@@ -1599,32 +1613,27 @@ public class ValidateInputExample : MonoBehaviour
 
 Show or hide the field based on a condition.
 
-For `ShowIf`:
+Arguments:
 
-*   `string andCallbacks...` a list of callback or property names, if **ALL** the value is truly, the field will be shown. (`and` operation)
+*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    For example, `ShowIf(A, B)` will be shown if `A && B` is true.
+    Condition: if it should be in edit mode or play mode for Editor. By default (omiting this parameter) it does not check the mode at all.
+
+*   `string by...`
+
+    callbacks or attributes for the condition.
 
 *   AllowMultiple: Yes
 
-    When using multiple `ShowIf` on a field, the field will be shown if **ANY** of them is shown.(`or` operation)
-    
-    For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
+You can use multiple `ShowIf`, `HideIf`, and even a mix of the two: the field will be shown if **ANY** of them is shown.(`or` operation)
 
-`HideIf` is the opposite of `ShowIf`:
+For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
 
-*   `string orCallbacks...` a list of callback or property names, if **ANY** the value is truly, the field will be shown. (`!or` operation)
-*   AllowMultiple: Yes
-
-You can use multiple `ShowIf`, `HideIf`, and even a mix of the two.
-
-Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
+`HideIf` is the opposite of `ShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
 
 *   `HideIf(A)` == `ShowIf(!A)`
 *   `HideIf(A, B)` == `HideIf(A || B)` == `ShowIf(!(A || B))` == `ShowIf(!A && !B)`
 *   `[Hideif(A), HideIf(B)]` == `[ShowIf(!A), ShowIf(!B)]` == `ShowIf(!A || !B)` == `ShowIf(!(A && B))`
-
-```csharp
 
 A full featured example:
 
