@@ -63,12 +63,13 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.11**
+**2.1.12**
 
-1.  Fix [Issue 3](https://github.com/TylerTemp/SaintsField/issues/3) Texture2D can not be destroyed on a GC calling.
-2.  UI Toolkit: Fix [Issue 2](https://github.com/TylerTemp/SaintsField/issues/2) incorrect readonly.
-3.  Fix `HideIf` inconsistent logic of being opposite of `ShowIf`.
-4.  Add `EnableIf`, `DisableIf`
+1.  IMGUI: Fix `SaintsRow` incorrect renderer cache when inside a list.
+2.  Fix `ReadOnly` will disable the field when there is an error in your callbacks.
+3.  Add `EMode` for `ReadOnly`, `EnableIf`, `DisableIf`, `ShowIf`, `HideIf` to specific if editor is playing or not.
+4.  **Breaking Changes**:`ReadOnly`, `EnableIf`, `DisableIf`, `ShowIf`, `HideIf` no longer support directValue and groupBy parameters.
+5.  `SaintsEditor`: Add `PlayaDisableIf`, `PlayaEnableIf`, `PlayaShowIf`, `PlayaHideIf`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2547,6 +2548,74 @@ public class LayoutExample: MonoBehaviour
 ```
 
 [![layout](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
+
+### `PlayaShowIf`/`PlayaHideIf` ###
+
+This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
+
+```csharp
+public bool boolValue;
+
+[PlayaHideIf] public int[] justHide;
+[PlayaShowIf] public int[] justShow;
+
+[PlayaHideIf(nameof(boolValue))] public int[] hideIf;
+[PlayaShowIf(nameof(boolValue))] public int[] showIf;
+
+[PlayaHideIf(EMode.Edit)] public int[] hideEdit;
+[PlayaHideIf(EMode.Play)] public int[] hidePlay;
+[PlayaShowIf(EMode.Edit)] public int[] showEdit;
+[PlayaShowIf(EMode.Play)] public int[] showPlay;
+
+[ShowInInspector, PlayaHideIf(nameof(boolValue))] public const float HideIfConst = 3.14f;
+[ShowInInspector, PlayaShowIf(nameof(boolValue))] public const float ShowIfConst = 3.14f;
+[ShowInInspector, PlayaHideIf(EMode.Edit)] public const float HideEditConst = 3.14f;
+[ShowInInspector, PlayaHideIf(EMode.Play)] public const float HidePlayConst = 3.14f;
+[ShowInInspector, PlayaShowIf(EMode.Edit)] public const float ShowEditConst = 3.14f;
+[ShowInInspector, PlayaShowIf(EMode.Play)] public const float ShowPlayConst = 3.14f;
+
+[ShowInInspector, PlayaHideIf(nameof(boolValue))] public static readonly Color HideIfStatic = Color.green;
+[ShowInInspector, PlayaShowIf(nameof(boolValue))] public static readonly Color ShowIfStatic = Color.green;
+[ShowInInspector, PlayaHideIf(EMode.Edit)] public static readonly Color HideEditStatic = Color.green;
+[ShowInInspector, PlayaHideIf(EMode.Play)] public static readonly Color HidePlayStatic = Color.green;
+[ShowInInspector, PlayaShowIf(EMode.Edit)] public static readonly Color ShowEditStatic = Color.green;
+[ShowInInspector, PlayaShowIf(EMode.Play)] public static readonly Color ShowPlayStatic = Color.green;
+
+[Button, PlayaHideIf(nameof(boolValue))] private void HideIfBtn() => Debug.Log("HideIfBtn");
+[Button, PlayaShowIf(nameof(boolValue))] private void ShowIfBtn() => Debug.Log("ShowIfBtn");
+[Button, PlayaHideIf(EMode.Edit)] private void HideEditBtn() => Debug.Log("HideEditBtn");
+[Button, PlayaHideIf(EMode.Play)] private void HidePlayBtn() => Debug.Log("HidePlayBtn");
+[Button, PlayaShowIf(EMode.Edit)] private void ShowEditBtn() => Debug.Log("ShowEditBtn");
+[Button, PlayaShowIf(EMode.Play)] private void ShowPlayBtn() => Debug.Log("ShowPlayBtn");
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
+
+### `PlayaEnableIf`/`PlayaDisableIf` ###
+
+This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
+
+```csharp
+[PlayaDisableIf] public int[] justDisable;
+[PlayaEnableIf] public int[] justEnable;
+
+[PlayaDisableIf(nameof(boolValue))] public int[] disableIf;
+[PlayaEnableIf(nameof(boolValue))] public int[] enableIf;
+
+[PlayaDisableIf(EMode.Edit)] public int[] disableEdit;
+[PlayaDisableIf(EMode.Play)] public int[] disablePlay;
+[PlayaEnableIf(EMode.Edit)] public int[] enableEdit;
+[PlayaEnableIf(EMode.Play)] public int[] enablePlay;
+
+[Button, PlayaDisableIf(nameof(boolValue))] private void DisableIfBtn() => Debug.Log("DisableIfBtn");
+[Button, PlayaEnableIf(nameof(boolValue))] private void EnableIfBtn() => Debug.Log("EnableIfBtn");
+[Button, PlayaDisableIf(EMode.Edit)] private void DisableEditBtn() => Debug.Log("DisableEditBtn");
+[Button, PlayaDisableIf(EMode.Play)] private void DisablePlayBtn() => Debug.Log("DisablePlayBtn");
+[Button, PlayaEnableIf(EMode.Edit)] private void EnableEditBtn() => Debug.Log("EnableEditBtn");
+[Button, PlayaEnableIf(EMode.Play)] private void EnablePlayBtn() => Debug.Log("EnablePlayBtn");
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
 
 ## About GroupBy ##
 

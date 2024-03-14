@@ -2981,7 +2981,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823b4df43ae1cd345960c8f21ae5fe1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boolValue: 0
+  boolValue: 1
   justDisable: 
   justEnable: 
   disableIf: 
