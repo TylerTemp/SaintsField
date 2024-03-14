@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers
         private GUIContent _guiContentDecrease;
         private GUIContent _guiContentInactive;
 
-        private Texture2D _clear;
+        // private Texture2D _clear;
 
         private GUIStyle _normalClear;
         private GUIStyle _normalFramed;
@@ -43,14 +43,14 @@ namespace SaintsField.Editor.Drawers
 
         #region IMGUI
 
-        private static Texture2D MakePixel(Color color)
-        {
-            Color[] pix = { color };
-            Texture2D result = new Texture2D(1, 1);
-            result.SetPixels(pix);
-            result.Apply();
-            return result;
-        }
+        // private static Texture2D MakePixel(Color color)
+        // {
+        //     Color[] pix = { color };
+        //     Texture2D result = new Texture2D(1, 1);
+        //     result.SetPixels(pix);
+        //     result.Apply();
+        //     return result;
+        // }
 
         private void ImGuiEnsureResources(SerializedProperty property)
         {
@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers
                 _guiContentDecrease = new GUIContent(_starDecrease);
                 _guiContentInactive = new GUIContent(_starInactive);
 
-                _clear = MakePixel(Color.clear);
+                // _clear = MakePixel(Color.clear);
                 Debug.Assert(_starActive.width != 1);
             }
 
@@ -92,12 +92,19 @@ namespace SaintsField.Editor.Drawers
                     alignment = TextAnchor.MiddleCenter,
                 };
 
-                _normalClear = new GUIStyle(_normalFramed)
+                // _normalClear = new GUIStyle(_normalFramed)
+                // {
+                //     normal =
+                //     {
+                //         background = _clear,
+                //     },
+                // };
+                _normalClear = new GUIStyle(GUI.skin.label)
                 {
-                    normal =
-                    {
-                        background = _clear,
-                    },
+                    // normal =
+                    // {
+                    //     background = _clear,
+                    // },
                 };
             }
         }
@@ -107,6 +114,7 @@ namespace SaintsField.Editor.Drawers
             foreach (Texture2D texture2D in new[]
                      {
                          _starActive, _starIncrease, _starDecrease, _starInactive, _starSlashActive, _starSlashInactive,
+                         // _clear,
                      })
             {
                 if (texture2D)
@@ -115,7 +123,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            _starActive = _starInactive = _starDecrease = _starInactive = _starSlashActive = _starSlashInactive = null;
+            _star = _starSlash = _starActive = _starInactive = _starDecrease = _starInactive = _starSlashActive = _starSlashInactive = null;
             base.ImGuiOnDispose();
         }
 
@@ -314,6 +322,16 @@ namespace SaintsField.Editor.Drawers
             if (option > minValue || option == 0)
             {
                 button.style.backgroundColor = Color.clear;
+            }
+
+            if (_starSlash == null)
+            {
+                _starSlash = Util.LoadResource<Texture2D>("star-slash.png");
+            }
+
+            if (_star == null)
+            {
+                _star = Util.LoadResource<Texture2D>("star.png");
             }
 
             Image image = new Image

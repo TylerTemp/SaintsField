@@ -6376,9 +6376,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f447d0d25d4a4bc19aaeac0ff720e887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rate0To5: 3
-  rate1To5: 4
-  rate3To5: 4
+  rate0To5: 4
+  rate1To5: 2
+  rate3To5: 5
   rate0To5Rich: 0
 --- !u!4 &1881364801
 Transform:
