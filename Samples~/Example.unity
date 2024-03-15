@@ -3955,7 +3955,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _go: {fileID: 1457332497}
   _sr: {fileID: 1457332497}
-  _collider: {fileID: 1131818498}
+  dummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   normal: 
 --- !u!4 &1131818497
 Transform:

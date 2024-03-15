@@ -10,8 +10,8 @@ namespace SaintsField.Samples.Scripts
         [SerializeField, FieldType(typeof(SpriteRenderer))]
         private GameObject _sr;
 
-        [SerializeField, FieldType(typeof(FieldTypeExample))]
-        private BoxCollider _collider;
+        [SerializeField, FieldType(typeof(Collider))]
+        private Dummy dummy;
 
         public string normal;
     }
