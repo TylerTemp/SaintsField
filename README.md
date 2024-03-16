@@ -63,13 +63,13 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.12**
+**2.1.13**
 
-1.  IMGUI: Fix `SaintsRow` incorrect renderer cache when inside a list.
-2.  Fix `ReadOnly` will disable the field when there is an error in your callbacks.
-3.  Add `EMode` for `ReadOnly`, `EnableIf`, `DisableIf`, `ShowIf`, `HideIf` to specific if editor is playing or not.
-4.  **Breaking Changes**:`ReadOnly`, `EnableIf`, `DisableIf`, `ShowIf`, `HideIf` no longer support directValue and groupBy parameters.
-5.  `SaintsEditor`: Add `PlayaDisableIf`, `PlayaEnableIf`, `PlayaShowIf`, `PlayaHideIf`
+1.  Fix [issue 7](https://github.com/TylerTemp/SaintsField/issues/7): when Unity uses `NativeProperty` to inject property with native code
+    and serialized property, `serializedObject` will still give correct serialized fields, but reflection will not work, making `SaintsEditor`
+    failed to display some fields.
+2.  Remove default `SaintsEditor` for example scene, so people who imports it (most likely when using `unitypackage`) won't accidentally
+    get `SaintsEditor` enabled for the whole project.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

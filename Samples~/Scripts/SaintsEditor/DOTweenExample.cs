@@ -9,6 +9,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
     // ReSharper disable once InconsistentNaming
     public class DOTweenExample : MonoBehaviour
     {
+        [InfoBox("Note: Enable SaintsEditor & DOTween supports to see this example.", EMessageType.Info, above: true)]
         [GetComponent]
         public SpriteRenderer spriteRenderer;
 

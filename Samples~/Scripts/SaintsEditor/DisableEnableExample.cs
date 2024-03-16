@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class DisableEnableExample : MonoBehaviour
     {
+        [InfoBox("Note: Enable SaintsEditor to see this example.", EMessageType.Info, above: true)]
         public bool boolValue;
 
         [PlayaDisableIf] public int[] justDisable;

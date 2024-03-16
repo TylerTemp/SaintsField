@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Playa.Renderer
             };
 
             // ReSharper disable once InvertIf
-            if(TryFixUIToolkit && FieldWithInfo.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
+            if(TryFixUIToolkit && FieldWithInfo.FieldInfo?.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
             {
                 // Debug.Log($"{fieldWithInfo.fieldInfo.Name} {arr.Length}");
                 _result = result;
@@ -102,6 +102,6 @@ namespace SaintsField.Editor.Playa.Renderer
             // EditorGUI.DrawRect(position, Color.blue);
         }
 
-        public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo.Name}>";
+        public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo?.Name ?? FieldWithInfo.SerializedProperty.displayName}>";
     }
 }

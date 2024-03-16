@@ -98,7 +98,15 @@ namespace SaintsField.Editor
                 root.Add(objectField);
             }
 
+            // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
+
             IReadOnlyList<ISaintsRenderer> renderers = Setup(TryFixUIToolkit, serializedObject, target);
+
+            // Debug.Log($"renderers.Count={renderers.Count}");
+            // foreach (ISaintsRenderer saintsRenderer in renderers)
+            // {
+            //     Debug.Log($"renderer={saintsRenderer}");
+            // }
 
             root.Add(CreateVisualElement(renderers));
 
@@ -133,10 +141,14 @@ namespace SaintsField.Editor
 
         public override void OnInspectorGUI()
         {
-            using (new EditorGUI.DisabledScope(true))
+            MonoScript monoScript = GetMonoScript(target);
+            if(monoScript)
             {
-                EditorGUILayout.ObjectField("Script", GetMonoScript(target), GetType(),
-                    false);
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Script", monoScript, GetType(),
+                        false);
+                }
             }
 
             serializedObject.Update();
@@ -207,8 +219,10 @@ namespace SaintsField.Editor
             object target)
         {
             string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
+            // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
             Dictionary<string, SerializedProperty> serializedPropertyDict = serializableFields
                 .ToDictionary(each => each, serializedObject.FindProperty);
+            // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
             return GetRenderers(tryFixUIToolkit, serializedPropertyDict, serializedObject, target);
         }
 
@@ -217,6 +231,10 @@ namespace SaintsField.Editor
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
 
+            Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
+            // Debug.Log($"{string.Join(",", pendingSerializedProperties.Keys)}");
+            pendingSerializedProperties.Remove("m_Script");
+
             foreach (int inherentDepth in Enumerable.Range(0, types.Count))
             {
                 Type systemType = types[inherentDepth];
@@ -224,6 +242,12 @@ namespace SaintsField.Editor
                 FieldInfo[] allFields = systemType
                     .GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+                // foreach (FieldInfo fieldInfo in allFields)
+                // {
+                //     Debug.Log($"[{systemType}]: {fieldInfo.Name}");
+                // }
+                // Debug.Log($"[{systemType}] allFields count: {allFields.Length}");
 
                 #region SerializedField
 
@@ -271,12 +295,13 @@ namespace SaintsField.Editor
                         Target = target,
 
                         RenderType = SaintsRenderType.SerializedField,
-                        SerializedProperty = serializedPropertyDict[fieldInfo.Name],
+                        SerializedProperty = pendingSerializedProperties[fieldInfo.Name],
                         FieldInfo = fieldInfo,
                         InherentDepth = inherentDepth,
                         Order = order,
                         // serializable = true,
                     });
+                    pendingSerializedProperties.Remove(fieldInfo.Name);
                 }
                 #endregion
 
@@ -311,6 +336,12 @@ namespace SaintsField.Editor
                 MethodInfo[] methodInfos = systemType
                     .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                 BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+                // Debug.Log($"[{systemType}] methodInfos count: {methodInfos.Length}");
+                // foreach (MethodInfo methodInfo in methodInfos)
+                // {
+                //     Debug.Log($"[{systemType}] method: {methodInfo.Name}");
+                // }
 
                 // var methodAllAttribute = methodInfos
                 //     .SelectMany(each => each.GetCustomAttributes<Attribute>())
@@ -379,6 +410,30 @@ namespace SaintsField.Editor
                     });
                 }
                 #endregion
+            }
+
+            if (pendingSerializedProperties.Count > 0)
+            {
+                // we got unused serialized properties because Unity directly inject them rather than using a
+                // normal workflow
+                foreach (KeyValuePair<string, SerializedProperty> pendingSer in pendingSerializedProperties)
+                {
+                    int order = int.MinValue;
+
+                    fieldWithInfos.Add(new SaintsFieldWithInfo
+                    {
+                        PlayaAttributes = Array.Empty<IPlayaAttribute>(),
+                        Groups = Array.Empty<ISaintsGroup>(),
+                        Target = target,
+
+                        RenderType = SaintsRenderType.SerializedField,
+                        SerializedProperty = pendingSer.Value,
+                        FieldInfo = null,
+                        InherentDepth = types.Count - 1,
+                        Order = order,
+                        // serializable = true,
+                    });
+                }
             }
 
             List<SaintsFieldWithInfo> fieldWithInfosSorted = fieldWithInfos

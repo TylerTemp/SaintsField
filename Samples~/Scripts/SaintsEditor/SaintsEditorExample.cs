@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class SaintsEditorExample : MonoBehaviour
     {
+        [InfoBox("Note: Enable SaintsEditor to see this example.", EMessageType.Info, above: true)]
         [Ordered] public string myStartField;
         [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
         [ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
