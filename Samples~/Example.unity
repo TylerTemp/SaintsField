@@ -3128,6 +3128,75 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   naScriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+--- !u!1 &924766851
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 924766852}
+  - component: {fileID: 924766854}
+  - component: {fileID: 924766853}
+  m_Layer: 0
+  m_Name: Issue8
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &924766852
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924766851}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &924766853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924766851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6db7dbd661ea764481fb0b86872fb2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  haveInfo: 0
+  infoTextureName: 
+  isInt: 0
+  intA: 0
+  isString: 0
+  strA: 
+  haveInfo2: 0
+  infoTextureName2: 
+--- !u!114 &924766854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924766851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16838d2ba27d13f4fa73abfc24a76b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  haveInfo: 0
+  infoTextureName: 
+  isInt: 0
+  intA: 0
 --- !u!1 &936058398
 GameObject:
   m_ObjectHideFlags: 0
@@ -5193,6 +5262,7 @@ Transform:
   - {fileID: 698893326}
   - {fileID: 415193572}
   - {fileID: 1195869911}
+  - {fileID: 924766852}
   m_Father: {fileID: 0}
   m_RootOrder: 33
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6522,6 +6592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0c5ab3f94ba447bb86e31ca29224a2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  note: 
   titledItem1: 
   titledItem2: 
   titledBoxItem1: 
