@@ -231,7 +231,8 @@ namespace SaintsField.Editor
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
 
-            Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
+            // Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
+            Dictionary<string, SerializedProperty> pendingSerializedProperties = serializedPropertyDict.ToDictionary(each => each.Key, each => each.Value);
             // Debug.Log($"{string.Join(",", pendingSerializedProperties.Keys)}");
             pendingSerializedProperties.Remove("m_Script");
 
