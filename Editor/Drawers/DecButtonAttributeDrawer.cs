@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
@@ -48,7 +49,6 @@ namespace SaintsField.Editor.Drawers
             (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
             // object target = GetParentTarget(property);
-            Type objType = target.GetType();
             (string xmlError, string buttonLabelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, target);
             error = xmlError;
 
@@ -94,55 +94,56 @@ namespace SaintsField.Editor.Drawers
 
         private static string CallButtonFunc(SerializedProperty property, DecButtonAttribute decButtonAttribute, FieldInfo fieldInfo, object target)
         {
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            types.Reverse();
-            Debug.Assert(fieldInfo != null);
-
-            foreach (Type objType in types)
-            {
-                MethodInfo methodInfo = objType.GetMethod(decButtonAttribute.FuncName, BindAttr);
-                if (methodInfo == null)
-                {
-                    //
-                    continue;
-                }
-
-                int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                object rawValue = fieldInfo.GetValue(target);
-                object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                    ? new[]
-                    {
-                        curValue,
-                    }
-                    : new []
-                    {
-                        curValue,
-                        arrayIndex,
-                    });
-
-                try
-                {
-                    methodInfo.Invoke(target, passParams);
-                }
-                catch (TargetInvocationException e)
-                {
-                    Debug.LogException(e);
-
-                    Debug.Assert(e.InnerException != null);
-                    return e.InnerException.Message;
-
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    return e.Message;
-                }
-
-                return "";
-            }
-
-            return $"No field or method named `{decButtonAttribute.FuncName}` found on `{target}`";
+            (string error, object _) = Util.GetMethodOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target);
+            return error;
+            // List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            // types.Reverse();
+            // Debug.Assert(fieldInfo != null);
+            //
+            // foreach (Type objType in types)
+            // {
+            //     MethodInfo methodInfo = objType.GetMethod(decButtonAttribute.FuncName, BindAttr);
+            //     if (methodInfo == null)
+            //     {
+            //         continue;
+            //     }
+            //
+            //     int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            //     object rawValue = fieldInfo.GetValue(target);
+            //     object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+            //     object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+            //         ? new[]
+            //         {
+            //             curValue,
+            //         }
+            //         : new []
+            //         {
+            //             curValue,
+            //             arrayIndex,
+            //         });
+            //
+            //     try
+            //     {
+            //         methodInfo.Invoke(target, passParams);
+            //     }
+            //     catch (TargetInvocationException e)
+            //     {
+            //         Debug.LogException(e);
+            //
+            //         Debug.Assert(e.InnerException != null);
+            //         return e.InnerException.Message;
+            //
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         Debug.LogException(e);
+            //         return e.Message;
+            //     }
+            //
+            //     return "";
+            // }
+            //
+            // return $"No field or method named `{decButtonAttribute.FuncName}` found on `{target}`";
         }
 
 #if UNITY_2021_3_OR_NEWER

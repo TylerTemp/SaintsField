@@ -127,8 +127,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             }
         }
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute) saintsAttribute;
             ValueType valueType = GetValueType(property, navMeshAreaAttribute);

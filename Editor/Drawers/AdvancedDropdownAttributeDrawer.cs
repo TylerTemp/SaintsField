@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.DropdownBase;
@@ -242,11 +241,12 @@ namespace SaintsField.Editor.Drawers
             Texture2D checkGroup = Util.LoadResource<Texture2D>("arrow-right.png");
             Texture2D check = Util.LoadResource<Texture2D>("check.png");
 
-            IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack = _metaInfo.SelectStacks;
+//             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack = _metaInfo.SelectStacks;
+//
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+//             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
+// #endif
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
-            Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
-#endif
             ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
 
             GoToStackEvent.AddListener(newStack =>
@@ -1196,8 +1196,9 @@ namespace SaintsField.Editor.Drawers
                     new AdvancedDropdownState(),
                     curItem =>
                     {
-                        Util.SetValue(property, curItem, parent, parentType, field);
-                        // SetValueChanged(property);
+                        Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, field);
+                        Util.SignPropertyValue(property, curItem);
+                        property.serializedObject.ApplyModifiedProperties();
                         onGUIPayload.SetValue(curItem);
                     },
                     GetIcon);
@@ -1313,6 +1314,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute,
             VisualElement container,
             Label fakeLabel,
+            FieldInfo info,
             object parent)
         {
             // VisualElement root = new VisualElement();
@@ -1469,7 +1471,10 @@ namespace SaintsField.Editor.Drawers
                     button.worldBound.width,
                     (newDisplay, curItem) =>
                     {
-                        Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo);
+                        Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
+                        Util.SignPropertyValue(property, curItem);
+                        property.serializedObject.ApplyModifiedProperties();
+
                         button.Q<Label>(NameButtonLabel(property)).text = newDisplay;
                         button.userData = curItem;
                         onValueChangedCallback(curItem);

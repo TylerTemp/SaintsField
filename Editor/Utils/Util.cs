@@ -101,109 +101,110 @@ namespace SaintsField.Editor.Utils
             return Mathf.Clamp(newValue, useStart, useEnd);
         }
 
-        public static void SetValue(SerializedProperty property, object curItem, object parentObj, Type parentType, FieldInfo field)
+        public static void SignFieldValue(UnityEngine.Object targetObject, object curItem, object parentObj, FieldInfo field)
         {
-            // object newValue = curItem;
-            // Debug.Log($"set value {parentObj}->{field.Name} = {curItem}");
-            Undo.RecordObject(property.serializedObject.targetObject, "Dropdown");
-            // Debug.Log($"not struct");
+            Undo.RecordObject(targetObject, "SignFieldValue");
             field.SetValue(parentObj, curItem);
+//             if(parentType.IsValueType)  // hack struct :(
+//             {
+//                 // EditorUtility.SetDirty(property.serializedObject.targetObject);
+//                 // field.SetValue(parentObj, curItem);
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
+//                 Debug.Log($"SetValue {property.propertyType}, {property.propertyPath} on {property.serializedObject.targetObject}: {curItem}");
+// #endif
+//
+//
+//                 property.serializedObject.ApplyModifiedProperties();
+//             }
+        }
 
-            if(parentType.IsValueType)  // hack struct :(
+        public static void SignPropertyValue(SerializedProperty property, object newValue)
+        {
+            switch (property.propertyType)
             {
-                // EditorUtility.SetDirty(property.serializedObject.targetObject);
-                // field.SetValue(parentObj, curItem);
+                case SerializedPropertyType.Generic:
+                    property.objectReferenceValue = (UnityEngine.Object) newValue;
+                    break;
+                case SerializedPropertyType.LayerMask:
+                case SerializedPropertyType.Integer:
+                case SerializedPropertyType.Enum:
+                    property.intValue = (int) newValue;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
-                Debug.Log($"SetValue {property.propertyType}, {property.propertyPath} on {property.serializedObject.targetObject}: {curItem}");
+                    Debug.Log($"{property.propertyType}: set={property.intValue}");
 #endif
-                switch (property.propertyType)
-                {
-                    case SerializedPropertyType.Generic:
-                        property.objectReferenceValue = (UnityEngine.Object) curItem;
-                        break;
-                    case SerializedPropertyType.LayerMask:
-                    case SerializedPropertyType.Integer:
-                    case SerializedPropertyType.Enum:
-                        property.intValue = (int) curItem;
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
-                        Debug.Log($"{property.propertyType}: set={property.intValue}");
-#endif
-                        break;
-                    case SerializedPropertyType.Boolean:
-                        property.boolValue = (bool) curItem;
-                        break;
-                    case SerializedPropertyType.Float:
-                        property.floatValue = (float) curItem;
-                        break;
-                    case SerializedPropertyType.String:
-                        property.stringValue = curItem.ToString();
-                        break;
-                    case SerializedPropertyType.Color:
-                        property.colorValue = (Color) curItem;
-                        break;
-                    case SerializedPropertyType.ObjectReference:
-                        property.objectReferenceValue = (UnityEngine.Object) curItem;
-                        break;
-                    case SerializedPropertyType.Vector2:
-                        property.vector2Value = (Vector2) curItem;
-                        break;
-                    case SerializedPropertyType.Vector3:
-                        property.vector3Value = (Vector3) curItem;
-                        break;
-                    case SerializedPropertyType.Vector4:
-                        property.vector4Value = (Vector4) curItem;
-                        break;
-                    case SerializedPropertyType.Rect:
-                        property.rectValue = (Rect) curItem;
-                        break;
-                    case SerializedPropertyType.ArraySize:
-                        property.arraySize = (int) curItem;
-                        break;
-                    case SerializedPropertyType.Character:
-                        property.intValue = (char) curItem;
-                        break;
-                    case SerializedPropertyType.AnimationCurve:
-                        property.animationCurveValue = (AnimationCurve) curItem;
-                        break;
-                    case SerializedPropertyType.Bounds:
-                        property.boundsValue = (Bounds) curItem;
-                        break;
-                    // case SerializedPropertyType.Gradient:
-                    //     property.gradientValue = (Gradient) curItem;
-                    //     break;
-                    case SerializedPropertyType.Quaternion:
-                        property.quaternionValue = (Quaternion) curItem;
-                        break;
-                    case SerializedPropertyType.ExposedReference:
-                        property.exposedReferenceValue = (UnityEngine.Object) curItem;
-                        break;
-                    // case SerializedPropertyType.FixedBufferSize:
-                    //     property.fixedBufferSize = (int) curItem;
-                    //     break;
-                    case SerializedPropertyType.Vector2Int:
-                        property.vector2IntValue = (Vector2Int) curItem;
-                        break;
-                    case SerializedPropertyType.Vector3Int:
-                        property.vector3IntValue = (Vector3Int) curItem;
-                        break;
-                    case SerializedPropertyType.RectInt:
-                        property.rectIntValue = (RectInt) curItem;
-                        break;
-                    case SerializedPropertyType.BoundsInt:
-                        property.boundsIntValue = (BoundsInt) curItem;
-                        break;
+                    break;
+                case SerializedPropertyType.Boolean:
+                    property.boolValue = (bool) newValue;
+                    break;
+                case SerializedPropertyType.Float:
+                    property.floatValue = (float) newValue;
+                    break;
+                case SerializedPropertyType.String:
+                    property.stringValue = newValue.ToString();
+                    break;
+                case SerializedPropertyType.Color:
+                    property.colorValue = (Color) newValue;
+                    break;
+                case SerializedPropertyType.ObjectReference:
+                    property.objectReferenceValue = (UnityEngine.Object) newValue;
+                    break;
+                case SerializedPropertyType.Vector2:
+                    property.vector2Value = (Vector2) newValue;
+                    break;
+                case SerializedPropertyType.Vector3:
+                    property.vector3Value = (Vector3) newValue;
+                    break;
+                case SerializedPropertyType.Vector4:
+                    property.vector4Value = (Vector4) newValue;
+                    break;
+                case SerializedPropertyType.Rect:
+                    property.rectValue = (Rect) newValue;
+                    break;
+                case SerializedPropertyType.ArraySize:
+                    property.arraySize = (int) newValue;
+                    break;
+                case SerializedPropertyType.Character:
+                    property.intValue = (char) newValue;
+                    break;
+                case SerializedPropertyType.AnimationCurve:
+                    property.animationCurveValue = (AnimationCurve) newValue;
+                    break;
+                case SerializedPropertyType.Bounds:
+                    property.boundsValue = (Bounds) newValue;
+                    break;
+                // case SerializedPropertyType.Gradient:
+                //     property.gradientValue = (Gradient) curItem;
+                //     break;
+                case SerializedPropertyType.Quaternion:
+                    property.quaternionValue = (Quaternion) newValue;
+                    break;
+                case SerializedPropertyType.ExposedReference:
+                    property.exposedReferenceValue = (UnityEngine.Object) newValue;
+                    break;
+                // case SerializedPropertyType.FixedBufferSize:
+                //     property.fixedBufferSize = (int) curItem;
+                //     break;
+                case SerializedPropertyType.Vector2Int:
+                    property.vector2IntValue = (Vector2Int) newValue;
+                    break;
+                case SerializedPropertyType.Vector3Int:
+                    property.vector3IntValue = (Vector3Int) newValue;
+                    break;
+                case SerializedPropertyType.RectInt:
+                    property.rectIntValue = (RectInt) newValue;
+                    break;
+                case SerializedPropertyType.BoundsInt:
+                    property.boundsIntValue = (BoundsInt) newValue;
+                    break;
 #if UNITY_2019_3_OR_NEWER
-                    case SerializedPropertyType.ManagedReference:
-                        property.managedReferenceValue = (UnityEngine.Object) curItem;
-                        break;
+                case SerializedPropertyType.ManagedReference:
+                    property.managedReferenceValue = (UnityEngine.Object) newValue;
+                    break;
 #endif
-                    case SerializedPropertyType.Gradient:
-                    case SerializedPropertyType.FixedBufferSize:
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
-                }
-
-                property.serializedObject.ApplyModifiedProperties();
+                case SerializedPropertyType.Gradient:
+                case SerializedPropertyType.FixedBufferSize:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
             }
         }
 
@@ -425,6 +426,67 @@ namespace SaintsField.Editor.Utils
                 }
 
                 return ("", finalResult);
+            }
+
+            string error = $"No field or method named `{by}` found on `{target}`";
+            return (error, defaultValue);
+        }
+
+        public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
+        {
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            types.Reverse();
+
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            object rawValue = fieldInfo.GetValue(target);
+            object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+
+            foreach (Type type in types)
+            {
+                MethodInfo methodInfo = type.GetMethod(by, bindAttr);
+                if (methodInfo == null)
+                {
+                    continue;
+                }
+
+                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                    ? new[]
+                    {
+                        curValue,
+                    }
+                    : new []
+                    {
+                        curValue,
+                        arrayIndex,
+                    });
+
+                T result;
+                try
+                {
+                    result = (T)methodInfo.Invoke(target, passParams);
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.LogException(e);
+                    Debug.Assert(e.InnerException != null);
+                    return (e.InnerException.Message, defaultValue);
+                }
+                catch (InvalidCastException e)
+                {
+                    Debug.LogException(e);
+                    return (e.Message, defaultValue);
+                }
+                catch (Exception e)
+                {
+                    // _error = e.Message;
+                    Debug.LogException(e);
+                    return (e.Message, defaultValue);
+                }
+
+                return ("", result);
             }
 
             string error = $"No field or method named `{by}` found on `{target}`";

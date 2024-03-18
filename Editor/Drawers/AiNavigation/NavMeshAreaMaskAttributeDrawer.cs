@@ -52,8 +52,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         private static string NameMaskField(SerializedProperty property) => $"{property.propertyPath}__NavMeshAreaMask";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             MaskField maskField = new MaskField(new string(' ', property.displayName.Length))
             {

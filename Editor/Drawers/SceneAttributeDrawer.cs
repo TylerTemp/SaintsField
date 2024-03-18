@@ -137,8 +137,9 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Scene_HelpBox";
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Scene_Label";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             Button button = new Button
             {

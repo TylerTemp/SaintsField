@@ -263,8 +263,9 @@ namespace SaintsField.Editor.Drawers
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Rate_Label";
         private static string ClassButton(SerializedProperty property) => $"{property.propertyPath}__Rate_Button";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement
             {

@@ -370,8 +370,9 @@ namespace SaintsField.Editor.Drawers
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_Label";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_HelpBox";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
@@ -596,14 +597,16 @@ namespace SaintsField.Editor.Drawers
             if (property.propertyType == SerializedPropertyType.Integer)
             {
                 int intValue = (int)newValue;
-                Util.SetValue(property, intValue, parent, parent.GetType(), info);
+                Util.SignFieldValue(property.serializedObject.targetObject, intValue, parent, info);
+                property.intValue = intValue;
                 property.serializedObject.ApplyModifiedProperties();
                 progressBar.SetValueWithoutNotify(intValue - minValue);
                 onValueChangedCallback.Invoke(intValue);
             }
             else
             {
-                Util.SetValue(property, newValue, parent, parent.GetType(), info);
+                Util.SignFieldValue(property.serializedObject.targetObject, newValue, parent, info);
+                property.floatValue = newValue;
                 property.serializedObject.ApplyModifiedProperties();
                 progressBar.SetValueWithoutNotify(newValue - minValue);
                 onValueChangedCallback.Invoke(newValue);

@@ -133,8 +133,9 @@ namespace SaintsField.Editor.Drawers
         private static string NameLabelPlaceholder(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea_LabelPlaceholder";
         private static string NameTextArea(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement();
             root.Add(new Label(" ")

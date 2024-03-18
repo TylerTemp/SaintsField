@@ -60,8 +60,9 @@ namespace SaintsField.Editor.Drawers
 
         private static string NameTag(SerializedProperty property) => $"{property.propertyPath}__Tag";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             return new TagField(new string(' ', property.displayName.Length))
             {

@@ -63,13 +63,8 @@ namespace SaintsField.Editor.Drawers
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             // Object target = property.serializedObject.targetObject;
-            Type parentType = parent.GetType();
-            FieldInfo field = parentType.GetField(property.name, BindAttr);
-            MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
-
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DROPDOWN
-//             Debug.Log($"meta info={metaInfo}/{property.propertyPath}");
-// #endif
+            // Type parentType = parent.GetType();
+            MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);
 
             if (metaInfo.Error != "")
             {
@@ -97,7 +92,9 @@ namespace SaintsField.Editor.Drawers
             {
                 ShowGenericMenu(metaInfo, curDisplay, fieldRect, (_, item) =>
                 {
-                    Util.SetValue(property, item, parent, parentType, field);
+                    Util.SignFieldValue(property.serializedObject.targetObject, item, parent, info);
+                    Util.SignPropertyValue(property, item);
+                    property.serializedObject.ApplyModifiedProperties();
                     onGUIPayload.SetValue(item);
 
                 }, !dropdownAttribute.SlashAsSub);
@@ -146,102 +143,115 @@ namespace SaintsField.Editor.Drawers
             FieldInfo field,
             object parentObj)
         {
+            Debug.Assert(field != null);
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
-            IDropdownList dropdownListValue;
 
-            string funcName = dropdownAttribute.FuncName;
-            // object parentObj = GetParentTarget(property);
-            Debug.Assert(parentObj != null);
-            Type parentType = parentObj.GetType();
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(parentType, funcName);
-            switch (getPropType)
+            (string error, IDropdownList dropdownListValue) =
+                Util.GetOf<IDropdownList>(dropdownAttribute.FuncName, null, property, field, parentObj);
+            if(dropdownListValue == null || error != "")
             {
-                case ReflectUtils.GetPropType.NotFound:
-                    return new MetaInfo
-                    {
-                        Error = $"not found `{funcName}` on target `{parentObj}`",
-                        SelectedIndex = -1,
-                        DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-                    };
-                case ReflectUtils.GetPropType.Property:
+                return new MetaInfo
                 {
-                    PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundPropertyInfo.GetValue(parentObj) as IDropdownList;
-                    if (dropdownListValue == null)
-                    {
-                        return new MetaInfo
-                        {
-                            Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
-                            SelectedIndex = -1,
-                            DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-                        };
-                    }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Field:
-                {
-                    FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundFieldInfo.GetValue(parentObj) as IDropdownList;
-                    if (dropdownListValue == null)
-                    {
-                        return new MetaInfo
-                        {
-                            Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
-                            SelectedIndex = -1,
-                            DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-                        };
-                    }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-
-                    try
-                    {
-                        dropdownListValue =
-                            methodInfo.Invoke(parentObj, methodParams.Select(p => p.DefaultValue).ToArray()) as
-                                IDropdownList;
-                    }
-                    catch (TargetInvocationException e)
-                    {
-                        Debug.LogException(e);
-                        Debug.Assert(e.InnerException != null);
-                        return new MetaInfo
-                        {
-                            Error = e.InnerException.Message,
-                            SelectedIndex = -1,
-                            DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        return new MetaInfo
-                        {
-                            Error = e.Message,
-                            SelectedIndex = -1,
-                            DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-                        };
-                    }
-
-                    if (dropdownListValue == null)
-                    {
-                        return new MetaInfo
-                        {
-                            Error = $"dropdownListValue is null from `{funcName}()` on target `{parentObj}`",
-                            SelectedIndex = -1,
-                            DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-                        };
-                    }
-                }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                    Error = error == ""? $"dropdownList is null from `{dropdownAttribute.FuncName}` on target `{parentObj}`": error,
+                    SelectedIndex = -1,
+                    DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+                };
             }
+
+            // IDropdownList dropdownListValue;
+            //
+            // string funcName = dropdownAttribute.FuncName;
+            // Debug.Assert(parentObj != null);
+            // Type parentType = parentObj.GetType();
+            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+            //     ReflectUtils.GetProp(parentType, funcName);
+            // switch (getPropType)
+            // {
+            //     case ReflectUtils.GetPropType.NotFound:
+            //         return new MetaInfo
+            //         {
+            //             Error = $"not found `{funcName}` on target `{parentObj}`",
+            //             SelectedIndex = -1,
+            //             DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+            //         };
+            //     case ReflectUtils.GetPropType.Property:
+            //     {
+            //         PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
+            //         dropdownListValue = foundPropertyInfo.GetValue(parentObj) as IDropdownList;
+            //         if (dropdownListValue == null)
+            //         {
+            //             return new MetaInfo
+            //             {
+            //                 Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
+            //                 SelectedIndex = -1,
+            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+            //             };
+            //         }
+            //     }
+            //         break;
+            //     case ReflectUtils.GetPropType.Field:
+            //     {
+            //         FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
+            //         dropdownListValue = foundFieldInfo.GetValue(parentObj) as IDropdownList;
+            //         if (dropdownListValue == null)
+            //         {
+            //             return new MetaInfo
+            //             {
+            //                 Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
+            //                 SelectedIndex = -1,
+            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+            //             };
+            //         }
+            //     }
+            //         break;
+            //     case ReflectUtils.GetPropType.Method:
+            //     {
+            //         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+            //         ParameterInfo[] methodParams = methodInfo.GetParameters();
+            //         Debug.Assert(methodParams.All(p => p.IsOptional));
+            //
+            //         try
+            //         {
+            //             dropdownListValue =
+            //                 methodInfo.Invoke(parentObj, methodParams.Select(p => p.DefaultValue).ToArray()) as
+            //                     IDropdownList;
+            //         }
+            //         catch (TargetInvocationException e)
+            //         {
+            //             Debug.LogException(e);
+            //             Debug.Assert(e.InnerException != null);
+            //             return new MetaInfo
+            //             {
+            //                 Error = e.InnerException.Message,
+            //                 SelectedIndex = -1,
+            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+            //             };
+            //         }
+            //         catch (Exception e)
+            //         {
+            //             Debug.LogException(e);
+            //             return new MetaInfo
+            //             {
+            //                 Error = e.Message,
+            //                 SelectedIndex = -1,
+            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+            //             };
+            //         }
+            //
+            //         if (dropdownListValue == null)
+            //         {
+            //             return new MetaInfo
+            //             {
+            //                 Error = $"dropdownListValue is null from `{funcName}()` on target `{parentObj}`",
+            //                 SelectedIndex = -1,
+            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+            //             };
+            //         }
+            //     }
+            //         break;
+            //     default:
+            //         throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+            // }
 
             Debug.Assert(field != null, $"{property.name}/{parentObj}");
             object curValue = field.GetValue(parentObj);
@@ -303,12 +313,10 @@ namespace SaintsField.Editor.Drawers
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
-            Type parentType = parent.GetType();
-            FieldInfo field = parentType.GetField(property.name, BindAttr);
-            MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);
 
             string buttonLabel = metaInfo.SelectedIndex == -1? "-": metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
 
@@ -381,7 +389,7 @@ namespace SaintsField.Editor.Drawers
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;
             container.Q<Button>(NameButtonField(property)).clicked += () =>
-                ShowDropdown(property, saintsAttribute, container, dropdownAttribute.SlashAsSub, parent, onValueChangedCallback);
+                ShowDropdown(property, saintsAttribute, container, dropdownAttribute.SlashAsSub, info, parent, onValueChangedCallback);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -416,12 +424,10 @@ namespace SaintsField.Editor.Drawers
         }
 
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, bool slashAsSub, object parent, Action<object> onChange)
+            VisualElement container, bool slashAsSub, FieldInfo info, object parent, Action<object> onChange)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
-            Type parentType = parent.GetType();
-            FieldInfo field = parentType.GetField(property.name, BindAttr);
-            MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, field, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
             if(helpBox.text != metaInfo.Error)
@@ -444,7 +450,9 @@ namespace SaintsField.Editor.Drawers
                 string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
                 ShowGenericMenu(metaInfo, curDisplay, button.worldBound, (newName, item) =>
                 {
-                    Util.SetValue(property, item, parent, parentType, field);
+                    Util.SignFieldValue(property.serializedObject.targetObject, item, parent, info);
+                    Util.SignPropertyValue(property, item);
+                    property.serializedObject.ApplyModifiedProperties();
                     onChange(item);
                     buttonLabel.text = newName;
                     // property.serializedObject.ApplyModifiedProperties();
@@ -475,7 +483,9 @@ namespace SaintsField.Editor.Drawers
                     {
                         genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
                         {
-                            Util.SetValue(property, curItem, parent, parentType, field);
+                            Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
+                            Util.SignPropertyValue(property, curItem);
+                            property.serializedObject.ApplyModifiedProperties();
                             onChange(curItem);
                             buttonLabel.text = curName;
                             // property.serializedObject.ApplyModifiedProperties();
