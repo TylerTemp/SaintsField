@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
             foreach (string andCallback in bys ?? Array.Empty<string>())
             {
-                (string error, bool isTruly) = Util.GetTruly(target, type, andCallback);
+                (string error, bool isTruly) = Util.GetTruly(target, andCallback);
                 if (error != "")
                 {
                     errors.Add(error);

@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Utils
         public static (GetPropType getPropType, object fieldOrMethodInfo) GetProp(Type targetType, string fieldName)
         {
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
             FieldInfo fieldInfo = targetType.GetField(fieldName, bindAttr);
             if (fieldInfo == null)
@@ -155,6 +155,7 @@ namespace SaintsField.Editor.Utils
             }
 
             MethodInfo methodInfo = targetType.GetMethod(fieldName, bindAttr);
+            // Debug.Log($"methodInfo={methodInfo}, fieldName={fieldName}, targetType={targetType}/FlattenHierarchy={bindAttr.HasFlag(BindingFlags.FlattenHierarchy)}");
             return methodInfo == null ? (GetPropType.NotFound, null) : (GetPropType.Method, methodInfo);
 
         }

@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
             foreach (string orCallback in bys ?? Array.Empty<string>())
             {
-                (string error, bool isTruly) = Util.GetTruly(target, type, orCallback);
+                (string error, bool isTruly) = Util.GetTruly(target, orCallback);
                 if (error != "")
                 {
                     errors.Add(error);

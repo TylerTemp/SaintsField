@@ -3173,8 +3173,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6db7dbd661ea764481fb0b86872fb2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  haveInfo: 0
-  infoTextureName: 
   isInt: 0
   intA: 0
   isString: 0
@@ -3193,8 +3191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16838d2ba27d13f4fa73abfc24a76b60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  haveInfo: 0
-  infoTextureName: 
   isInt: 0
   intA: 0
 --- !u!1 &936058398

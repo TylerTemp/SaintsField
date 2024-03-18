@@ -165,10 +165,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
             List<string> errors = new List<string>();
 
-            Type targetType = preCheckInternalInfo.Target.GetType();
+            // Type targetType = preCheckInternalInfo.Target.GetType();
             foreach (string callback in bys)
             {
-                (string error, bool isTruly) = Util.GetTruly(preCheckInternalInfo.Target, targetType, callback);
+                (string error, bool isTruly) = Util.GetTruly(preCheckInternalInfo.Target, callback);
                 if (error != "")
                 {
                     errors.Add(error);

@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
 
             foreach (string andCallback in hideIfAttribute.Callbacks)
             {
-                (string error, bool isTruly) = Util.GetTruly(target, type, andCallback);
+                (string error, bool isTruly) = Util.GetTruly(target, andCallback);
                 if (error != "")
                 {
                     errors.Add(error);
