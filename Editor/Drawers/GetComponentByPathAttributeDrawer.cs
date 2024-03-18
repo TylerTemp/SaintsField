@@ -125,13 +125,13 @@ namespace SaintsField.Editor.Drawers
         private static string NameResignButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetComponentByPath_ResignButton";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;
 
             if (!getComponentByPathAttribute.ResignButton)
             {
-                return base.CreatePostFieldUIToolkit(property, saintsAttribute, index, container, parent);
+                return base.CreatePostFieldUIToolkit(property, saintsAttribute, index, container, info, parent);
             }
 
             Texture2D refreshIcon = Util.LoadResource<Texture2D>("refresh.png");

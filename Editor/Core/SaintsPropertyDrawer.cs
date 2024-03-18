@@ -627,7 +627,7 @@ namespace SaintsField.Editor.Core
 
                 foreach (SaintsPropertyInfo saintsPropertyInfo in drawerInfoKv.Value)
                 {
-                    groupByContainer.Add(saintsPropertyInfo.Drawer.CreateAboveUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, parent));
+                    groupByContainer.Add(saintsPropertyInfo.Drawer.CreateAboveUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent));
                 }
                 // Debug.Log($"aboveUsedHeight={aboveUsedHeight}");
             }
@@ -778,7 +778,7 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
-                VisualElement postFieldElement = eachAttributeWithIndex.Drawer.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, parent);
+                VisualElement postFieldElement = eachAttributeWithIndex.Drawer.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, fieldInfo, parent);
                 if (postFieldElement != null)
                 {
                     postFieldElement.style.flexShrink = 0;
@@ -1948,7 +1948,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreateAboveUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             return null;
         }
@@ -1959,7 +1959,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             return null;
         }

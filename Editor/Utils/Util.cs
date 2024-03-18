@@ -294,7 +294,7 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, bool isTruly) GetTruly(object target, string by)
         {
-            var types = ReflectUtils.GetSelfAndBaseTypes(target);
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             types.Reverse();
 
             foreach (Type type in types)
@@ -303,10 +303,6 @@ namespace SaintsField.Editor.Utils
 
                 if (getPropType == ReflectUtils.GetPropType.NotFound)
                 {
-                    // string error = $"No field or method named `{by}` found on `{target}`";
-                    // Debug.LogError(error);
-                    // _errors.Add(error);
-                    // return (error, false);
                     continue;
                 }
 

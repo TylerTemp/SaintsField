@@ -30,7 +30,6 @@ namespace SaintsField.Editor.Drawers
 
         // ReSharper disable once InconsistentNaming
         protected readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
-        // private IReadOnlyList<RichText.RichTextPayload> _cachedResult = null;
 
         protected override void ImGuiOnDispose()
         {
@@ -38,20 +37,11 @@ namespace SaintsField.Editor.Drawers
             RichTextDrawer.Dispose();
         }
 
-        // protected float GetExtraHeight(SerializedProperty property, GUIContent label,
-        //     float width,
-        //     ISaintsAttribute saintsAttribute)
-        // {
-        //     float result = EditorGUIUtility.singleLineHeight + (DisplayError == ""? 0: HelpBox.GetHeight(DisplayError, width));
-        //     // Debug.Log($"AboveButtonAttributeDrawer.GetAboveExtraHeight={result}/{DisplayError}");
-        //     return result;
-        // }
-
         private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+                                              BindingFlags.Public | BindingFlags.DeclaredOnly;
 
         #region IMGUI
-        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, object target)
+        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object target)
         {
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
 
@@ -59,12 +49,12 @@ namespace SaintsField.Editor.Drawers
 
             // object target = GetParentTarget(property);
             Type objType = target.GetType();
-            (string xmlError, string buttonLabelXml) = GetButtonLabelXml(decButtonAttribute, target, objType);
+            (string xmlError, string buttonLabelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, target);
             error = xmlError;
 
             if (GUI.Button(buttonRect, string.Empty))
             {
-                _execError = CallButtonFunc(decButtonAttribute, target, objType);
+                _execError = CallButtonFunc(property, decButtonAttribute, info, target);
             }
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
@@ -102,36 +92,57 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
-        private static string CallButtonFunc(DecButtonAttribute aboveButtonAttribute, object target, Type objType)
+        private static string CallButtonFunc(SerializedProperty property, DecButtonAttribute decButtonAttribute, FieldInfo fieldInfo, object target)
         {
-            MethodInfo callMethodInfo = objType.GetMethod(aboveButtonAttribute.FuncName, BindAttr);
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            types.Reverse();
+            Debug.Assert(fieldInfo != null);
 
-            if (callMethodInfo == null)
+            foreach (Type objType in types)
             {
-                return $"No field or method named `{aboveButtonAttribute.FuncName}` found on `{target}`";
+                MethodInfo methodInfo = objType.GetMethod(decButtonAttribute.FuncName, BindAttr);
+                if (methodInfo == null)
+                {
+                    //
+                    continue;
+                }
+
+                int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                object rawValue = fieldInfo.GetValue(target);
+                object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                    ? new[]
+                    {
+                        curValue,
+                    }
+                    : new []
+                    {
+                        curValue,
+                        arrayIndex,
+                    });
+
+                try
+                {
+                    methodInfo.Invoke(target, passParams);
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.LogException(e);
+
+                    Debug.Assert(e.InnerException != null);
+                    return e.InnerException.Message;
+
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return e.Message;
+                }
+
+                return "";
             }
 
-            ParameterInfo[] methodParams = callMethodInfo.GetParameters();
-            Debug.Assert(methodParams.All(p => p.IsOptional));
-            try
-            {
-                callMethodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
-            }
-            catch (TargetInvocationException e)
-            {
-                Debug.LogException(e);
-
-                Debug.Assert(e.InnerException != null);
-                return e.InnerException.Message;
-
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                return e.Message;
-            }
-
-            return "";
+            return $"No field or method named `{decButtonAttribute.FuncName}` found on `{target}`";
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -144,11 +155,11 @@ namespace SaintsField.Editor.Drawers
         private static string ClassExecError(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ExecError";
 
         protected static VisualElement DrawUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, object parent, VisualElement container)
+            int index, FieldInfo info, object parent, VisualElement container)
         {
             Button button = new Button(() =>
             {
-                string error = CallButtonFunc((DecButtonAttribute) saintsAttribute, parent, parent.GetType());
+                string error = CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent);
                 HelpBox helpBox = container.Query<HelpBox>(className: ClassExecError(property, index)).First();
                 helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
                 helpBox.text = error;
@@ -209,7 +220,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement labelContainer = container.Query<VisualElement>(className: ClassLabelContainer(property, index)).First();
             string oldXml = (string)labelContainer.userData;
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
-            (string error, string newXml) = GetButtonLabelXml(decButtonAttribute, parent, parent.GetType());
+            (string xmlError, string newXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, parent);
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (newXml == null)
@@ -218,8 +229,8 @@ namespace SaintsField.Editor.Drawers
             }
 
             HelpBox helpBox = container.Query<HelpBox>(className: ClassLabelError(property, index)).First();
-            helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-            helpBox.text = error;
+            helpBox.style.display = xmlError == ""? DisplayStyle.None: DisplayStyle.Flex;
+            helpBox.text = xmlError;
 
             if (oldXml == newXml)
             {
@@ -241,54 +252,54 @@ namespace SaintsField.Editor.Drawers
 
 #endif
 
-        protected static (string error, string label) GetButtonLabelXml(DecButtonAttribute decButtonAttribute, object target, Type objType)
-        {
-            if (!decButtonAttribute.IsCallback)
-            {
-                return ("", decButtonAttribute.ButtonLabel);
-            }
-
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(objType, decButtonAttribute.ButtonLabel);
-            switch (getPropType)
-            {
-                case ReflectUtils.GetPropType.NotFound:
-                {
-                    string error = $"No field or method named `{decButtonAttribute.ButtonLabel}` found on `{target}`";
-                    return (error, decButtonAttribute.ButtonLabel);
-                }
-                case ReflectUtils.GetPropType.Field:
-                {
-                    FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
-                    object value = findFieldInfo.GetValue(target);
-                    return ("", value == null ? string.Empty : value.ToString());
-                }
-                case ReflectUtils.GetPropType.Property:
-                {
-                    PropertyInfo propertyInfo = (PropertyInfo)fieldOrMethodInfo;
-                    object value = propertyInfo.GetValue(target);
-                    return ("", value == null ? string.Empty : value.ToString());
-                }
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    // Debug.Assert(methodInfo.ReturnType == typeof(string));
-                    // ReSharper disable once InvertIf
-                    if (methodInfo.ReturnType != typeof(string))
-                    {
-                        string error = $"Return type of callback method `{decButtonAttribute.ButtonLabel}` should be string";
-                        return (error, decButtonAttribute.ButtonLabel);
-                    }
-
-                    // _error = "";
-                    return
-                        ("", (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            }
-        }
+        // protected static (string error, string label) GetButtonLabelXml(DecButtonAttribute decButtonAttribute, object target, Type objType)
+        // {
+        //     if (!decButtonAttribute.IsCallback)
+        //     {
+        //         return ("", decButtonAttribute.ButtonLabel);
+        //     }
+        //
+        //     (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+        //         ReflectUtils.GetProp(objType, decButtonAttribute.ButtonLabel);
+        //     switch (getPropType)
+        //     {
+        //         case ReflectUtils.GetPropType.NotFound:
+        //         {
+        //             string error = $"No field or method named `{decButtonAttribute.ButtonLabel}` found on `{target}`";
+        //             return (error, decButtonAttribute.ButtonLabel);
+        //         }
+        //         case ReflectUtils.GetPropType.Field:
+        //         {
+        //             FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
+        //             object value = findFieldInfo.GetValue(target);
+        //             return ("", value == null ? string.Empty : value.ToString());
+        //         }
+        //         case ReflectUtils.GetPropType.Property:
+        //         {
+        //             PropertyInfo propertyInfo = (PropertyInfo)fieldOrMethodInfo;
+        //             object value = propertyInfo.GetValue(target);
+        //             return ("", value == null ? string.Empty : value.ToString());
+        //         }
+        //         case ReflectUtils.GetPropType.Method:
+        //         {
+        //             MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+        //             ParameterInfo[] methodParams = methodInfo.GetParameters();
+        //             Debug.Assert(methodParams.All(p => p.IsOptional));
+        //             // Debug.Assert(methodInfo.ReturnType == typeof(string));
+        //             // ReSharper disable once InvertIf
+        //             if (methodInfo.ReturnType != typeof(string))
+        //             {
+        //                 string error = $"Return type of callback method `{decButtonAttribute.ButtonLabel}` should be string";
+        //                 return (error, decButtonAttribute.ButtonLabel);
+        //             }
+        //
+        //             // _error = "";
+        //             return
+        //                 ("", (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
+        //         }
+        //         default:
+        //             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+        //     }
+        // }
     }
 }

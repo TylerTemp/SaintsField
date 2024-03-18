@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            Rect leftRect = Draw(position, property, label, saintsAttribute, parent);
+            Rect leftRect = Draw(position, property, label, saintsAttribute, info, parent);
 
             if (DisplayError != "")
             {
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             VisualElement visualElement = new VisualElement
             {
@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers
                     flexGrow = 1,
                 },
             };
-            visualElement.Add(DrawUIToolkit(property, saintsAttribute, index, parent, container));
+            visualElement.Add(DrawUIToolkit(property, saintsAttribute, index, info, parent, container));
             visualElement.Add(DrawLabelError(property, index));
             visualElement.Add(DrawExecError(property, index));
             return visualElement;

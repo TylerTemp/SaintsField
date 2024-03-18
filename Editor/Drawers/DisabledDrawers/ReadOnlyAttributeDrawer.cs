@@ -134,8 +134,9 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
         private static string ClassReadOnly(SerializedProperty property) => $"{property.propertyType}__ReadOnly";
         private static string NameReadOnlyHelpBox(SerializedProperty property, int index) => $"{property.propertyType}_{index}__ReadOnly_HelpBox";
 
-        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement
             {

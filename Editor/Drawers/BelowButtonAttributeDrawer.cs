@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            Rect leftRect = Draw(position, property, label, saintsAttribute, parent);
+            Rect leftRect = Draw(position, property, label, saintsAttribute, info, parent);
 
             if (DisplayError != "")
             {
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers
                     flexGrow = 1,
                 },
             };
-            visualElement.Add(DrawUIToolkit(property, saintsAttribute, index, parent, container));
+            visualElement.Add(DrawUIToolkit(property, saintsAttribute, index, info, parent, container));
             visualElement.Add(DrawLabelError(property, index));
             visualElement.Add(DrawExecError(property, index));
             return visualElement;

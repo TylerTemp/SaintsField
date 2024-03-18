@@ -63,66 +63,71 @@ namespace SaintsField.Editor.Core
                 return ("", richTextXml);
             }
 
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(target.GetType(), richTextXml);
-            switch (getPropType)
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            types.Reverse();
+            foreach (Type eachType in types)
             {
-                case ReflectUtils.GetPropType.Field:
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                    ReflectUtils.GetProp(eachType, richTextXml);
+                switch (getPropType)
                 {
-                    object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-                    return ("", result == null ? string.Empty : result.ToString());
-                }
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+                        return ("", result == null ? string.Empty : result.ToString());
+                    }
 
-                case ReflectUtils.GetPropType.Property:
-                {
-                    object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                    return ("", result == null ? string.Empty : result.ToString());
-                }
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+                    case ReflectUtils.GetPropType.Property:
+                    {
+                        object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        return ("", result == null ? string.Empty : result.ToString());
+                    }
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
-                    int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                    object rawValue = fieldInfo.GetValue(target);
-                    object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-                    object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                        ? new[]
+                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                        object rawValue = fieldInfo.GetValue(target);
+                        object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                            ? new[]
+                            {
+                                curValue,
+                            }
+                            : new []
+                            {
+                                curValue,
+                                arrayIndex,
+                            });
+
+                        try
                         {
-                            curValue,
+                            return ("", (string)methodInfo.Invoke(
+                                target,
+                                passParams
+                            ));
                         }
-                        : new []
+                        catch (TargetInvocationException e)
                         {
-                            curValue,
-                            arrayIndex,
-                        });
-
-                    try
-                    {
-                        return ("", (string)methodInfo.Invoke(
-                            target,
-                            passParams
-                        ));
+                            Debug.LogException(e);
+                            Debug.Assert(e.InnerException != null);
+                            return (e.InnerException.Message, property.displayName);
+                        }
+                        catch (Exception e)
+                        {
+                            // _error = e.Message;
+                            Debug.LogException(e);
+                            return (e.Message, property.displayName);
+                        }
                     }
-                    catch (TargetInvocationException e)
-                    {
-                        Debug.LogException(e);
-                        Debug.Assert(e.InnerException != null);
-                        return (e.InnerException.Message, property.displayName);
-                    }
-                    catch (Exception e)
-                    {
-                        // _error = e.Message;
-                        Debug.LogException(e);
-                        return (e.Message, property.displayName);
-                    }
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
                 }
-                case ReflectUtils.GetPropType.NotFound:
-                {
-                    return ($"not found `{richTextXml}` on `{target}`", property.displayName);
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
             }
+
+            return ($"not found `{richTextXml}` on `{target}`", property.displayName);
         }
 
         public struct RichTextChunk

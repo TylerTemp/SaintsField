@@ -315,7 +315,7 @@ namespace SaintsField.Editor.Drawers
         private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             RadioButton button = new RadioButton
             {

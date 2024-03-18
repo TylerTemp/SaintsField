@@ -303,7 +303,7 @@ namespace SaintsField.Editor.Drawers
         private static string NameFakePlaceholder(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AssetPreview_Placeholder";
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             if (!assetPreviewAttribute.Above)

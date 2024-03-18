@@ -84,8 +84,9 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
         //     public VisibilityAttribute Attribute;
         // }
 
-        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, object parent)
+        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement
             {

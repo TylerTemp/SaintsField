@@ -25,8 +25,8 @@ namespace SaintsField.Editor.Drawers
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute)saintsAttribute;
 
             object target = property.serializedObject.targetObject;
-            (string error, string labelXml) = GetButtonLabelXml(decButtonAttribute, target, target.GetType());
-            base.error = error;
+            (string xmlError, string labelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, target);
+            error = xmlError;
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers
             // return Draw(position, property, label, saintsAttribute);
             // float width = GetPostFieldWidth(position, property, label, saintsAttribute);
             // (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
-            Draw(position, property, label, saintsAttribute, parent);
+            Draw(position, property, label, saintsAttribute, info, parent);
             return true;
         }
 
@@ -86,9 +86,9 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement element = DrawUIToolkit(property, saintsAttribute, index, parent, container);
+            VisualElement element = DrawUIToolkit(property, saintsAttribute, index, info, parent, container);
             element.style.flexGrow = StyleKeyword.Null;
             return element;
         }

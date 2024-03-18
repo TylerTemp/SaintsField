@@ -279,7 +279,7 @@ namespace SaintsField.Editor.Drawers
         // private static string NameButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__SpriteToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             RadioButton button = new RadioButton
             {
