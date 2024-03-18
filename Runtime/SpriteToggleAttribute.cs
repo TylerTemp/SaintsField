@@ -6,13 +6,15 @@ namespace SaintsField
     public class SpriteToggleAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
+        public string GroupBy { get; }
 
+        // ReSharper disable once InconsistentNaming
         public readonly string CompName;
 
-        public SpriteToggleAttribute(string imageOrSpriteRenderer)
+        public SpriteToggleAttribute(string imageOrSpriteRenderer=null, string groupBy = "")
         {
             CompName = imageOrSpriteRenderer;
+            GroupBy = groupBy;
         }
     }
 }

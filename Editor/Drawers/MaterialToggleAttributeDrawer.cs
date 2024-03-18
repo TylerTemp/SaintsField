@@ -9,7 +9,6 @@ using System;
 using UnityEngine.UIElements;
 #endif
 using Component = UnityEngine.Component;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -19,33 +18,41 @@ namespace SaintsField.Editor.Drawers
         private const string SelectedStr = "●";
         private const string NonSelectedStr = "○";
 
-        private static (string error, Renderer renderer) GetRenderer(SerializedProperty property, ISaintsAttribute saintsAttribute, object target)
+        private static (string error, Renderer renderer) GetRenderer(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            if(!(target is Object targetObject))
-            {
-                return ("target is not UnityEngine.Object", null);
-            }
-
             MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
-            string rendererCompName = toggleAttribute.CompName;
+            string compName = toggleAttribute.CompName;
 
-            SerializedObject targetSer = new SerializedObject(targetObject);
-
-            Renderer renderer;
-
-            if (rendererCompName == null)
+            if(compName != null)
             {
-                renderer = ((Component)targetObject).GetComponent<Renderer>();
-            }
-            else
-            {
-                renderer =
-                    (Renderer)(targetSer.FindProperty(rendererCompName) ?? SerializedUtils.FindPropertyByAutoPropertyName(targetSer, rendererCompName))?.objectReferenceValue;
+                SerializedProperty targetProperty =
+                    property.serializedObject.FindProperty(compName) ??
+                    SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, compName);
+
+                // ReSharper disable once MergeIntoPattern
+                if (targetProperty?.objectReferenceValue is Renderer propRenderer)
+                {
+                    return ("", propRenderer);
+                }
+
+                return Util.GetOf<Renderer>(compName, null, property, info, parent);
             }
 
-            return renderer == null
-                ? ($"target {rendererCompName ?? "Renderer"} not found", null)
-                : ("", renderer);
+            Component thisComponent;
+            try
+            {
+                thisComponent = (Component)property.serializedObject.targetObject;
+            }
+            catch (InvalidCastException e)
+            {
+                Debug.LogException(e);
+                return ($"target {property.serializedObject.targetObject} is not a Component", null);
+            }
+
+            Renderer renderer = thisComponent.GetComponent<Renderer>();
+            return renderer
+                ? ("", renderer)
+                : ($"target {thisComponent} has no Renderer", null);
         }
 
         #region IMGUI
@@ -58,10 +65,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
-            string rendererCompName = toggleAttribute.CompName;
-
-            (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, parent);
+            (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, info, parent);
             _renderer = renderer;
             _error = error;
 
@@ -80,7 +84,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
+            (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, info, parent);
             _error = error;
             _renderer = renderer;
             if (error != "")
@@ -156,7 +160,7 @@ namespace SaintsField.Editor.Drawers
                     return;
                 }
 
-                (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
+                (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, info, parent);
 
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
                 if (helpBox.text != error)
@@ -196,7 +200,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
+            UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -204,13 +208,13 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent, object newValue)
         {
-            UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
+            UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
         }
 
         private static void UpdateToggleDisplay(SerializedProperty property, int index,
-            ISaintsAttribute saintsAttribute, VisualElement container, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
-            (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, (Object)parent);
+            (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if(helpBox.text != error)

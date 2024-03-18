@@ -10,7 +10,6 @@ using UnityEngine.UIElements;
 #endif
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -32,12 +31,14 @@ namespace SaintsField.Editor.Drawers
 
         private struct Container
         {
+            // ReSharper disable InconsistentNaming
             public string Error;
             public FieldType FieldType;
             public Image Image;
             public SpriteRenderer SpriteRenderer;
             public Button Button;
             public Renderer Renderer;
+            // ReSharper enable InconsistentNaming
         }
 
         private Container _container;
@@ -53,7 +54,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            _container = GetContainer(saintsAttribute, parent);
+            _container = GetContainer(property, saintsAttribute, info, parent);
 
             if (_container.Error != "")
             {
@@ -68,66 +69,47 @@ namespace SaintsField.Editor.Drawers
             return width;
         }
 
-        private static Container GetContainer(ISaintsAttribute saintsAttribute, object parent)
+        private static Container GetContainer(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             ColorToggleAttribute toggleAttribute = (ColorToggleAttribute)saintsAttribute;
-            string imageCompName = toggleAttribute.CompName;
+            string compName = toggleAttribute.CompName;
 
-            Object targetObject = (Object) parent;
-            SerializedObject targetSer = new SerializedObject(targetObject);
-
-            if(imageCompName != null)
+            if(compName != null)
             {
                 SerializedProperty targetProperty =
-                    targetSer.FindProperty(imageCompName) ??
-                    SerializedUtils.FindPropertyByAutoPropertyName(targetSer, imageCompName);
+                    property.serializedObject.FindProperty(compName) ??
+                    SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, compName);
 
                 if (targetProperty != null)
                 {
                     return SignObject(targetProperty.objectReferenceValue);
                 }
 
-                Type targetType = targetObject.GetType();
+                (string error, object foundObj) =
+                    Util.GetOf<object>(compName, null, property, info, parent);
 
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) propInfo =
-                    ReflectUtils.GetProp(targetType, imageCompName);
-
-                // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (propInfo.Item1 == ReflectUtils.GetPropType.NotFound)
+                if (error != "")
                 {
                     return new Container
                     {
-                        Error = $"target {imageCompName} not found",
+                        Error = $"target {compName} not found",
                     };
                 }
 
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Field)
-                {
-                    return SignObject(((FieldInfo)propInfo.Item2).GetValue(targetObject));
-                }
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Property)
-                {
-                    return SignObject(((PropertyInfo)propInfo.Item2).GetValue(targetObject));
-                }
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Method)
-                {
-                    return SignObject(((MethodInfo)propInfo.Item2).Invoke(targetObject, null));
-                }
-
-                throw new Exception("Should not reach here");
+                return SignObject(foundObj);
             }
 
             Component thisComponent;
             try
             {
-                thisComponent = (Component)targetObject;
+                thisComponent = (Component)property.serializedObject.targetObject;
             }
             catch (InvalidCastException e)
             {
                 Debug.LogException(e);
                 return new Container
                 {
-                    Error = $"target {targetObject} is not a Component",
+                    Error = $"target {property.serializedObject.targetObject} is not a Component",
                 };
             }
 
@@ -157,7 +139,7 @@ namespace SaintsField.Editor.Drawers
 
             return new Container
             {
-                Error = $"target {targetObject} has no Image, SpriteRenderer, Button or Renderer",
+                Error = $"target {thisComponent} has no Image, SpriteRenderer, Button or Renderer",
             };
         }
 
@@ -312,7 +294,7 @@ namespace SaintsField.Editor.Drawers
 
         private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_HelpBox";
         private static string NameButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_Button";
-        private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_ButtonLabel";
+        // private static string ClassButtonLabel(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorToggle_ButtonLabel";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
@@ -335,7 +317,7 @@ namespace SaintsField.Editor.Drawers
                     return;
                 }
 
-                Container dataContainer = GetContainer(saintsAttribute, parent);
+                Container dataContainer = GetContainer(property, saintsAttribute, info, parent);
                 string error = dataContainer.Error;
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
                 if(helpBox.text != error)
@@ -370,7 +352,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UpdateToggleDisplay(property, saintsAttribute, index, container, parent);
+            UpdateToggleDisplay(property, saintsAttribute, index, container, info, parent);
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -378,14 +360,14 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent, object newValue)
         {
-            UpdateToggleDisplay(property, saintsAttribute, index, container, parent);
+            UpdateToggleDisplay(property, saintsAttribute, index, container, info, parent);
         }
 
         private static void UpdateToggleDisplay(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
-            Container dataContainer = GetContainer(saintsAttribute, parent);
+            Container dataContainer = GetContainer(property, saintsAttribute, info, parent);
             string error = dataContainer.Error;
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if (error != helpBox.text)

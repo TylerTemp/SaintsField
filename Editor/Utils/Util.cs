@@ -350,5 +350,85 @@ namespace SaintsField.Editor.Utils
             string error = $"No field or method named `{by}` found on `{target}`";
             return (error, false);
         }
+
+        public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
+        {
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            types.Reverse();
+
+            foreach (Type type in types)
+            {
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
+
+                object genResult;
+                switch (getPropType)
+                {
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+
+                    case ReflectUtils.GetPropType.Property:
+                        genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                        genResult = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                        object rawValue = fieldInfo.GetValue(target);
+                        object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                            ? new[]
+                            {
+                                curValue,
+                            }
+                            : new []
+                            {
+                                curValue,
+                                arrayIndex,
+                            });
+
+                        try
+                        {
+                            genResult = methodInfo.Invoke(target, passParams);
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            Debug.LogException(e);
+                            Debug.Assert(e.InnerException != null);
+                            return (e.InnerException.Message, defaultValue);
+                        }
+                        catch (Exception e)
+                        {
+                            // _error = e.Message;
+                            Debug.LogException(e);
+                            return (e.Message, defaultValue);
+                        }
+
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                }
+
+                T finalResult;
+                try
+                {
+                    finalResult = (T)genResult;
+                }
+                catch (InvalidCastException e)
+                {
+                    Debug.LogException(e);
+                    return (e.Message, defaultValue);
+                }
+
+                return ("", finalResult);
+            }
+
+            string error = $"No field or method named `{by}` found on `{target}`";
+            return (error, defaultValue);
+        }
     }
 }

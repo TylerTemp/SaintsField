@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -37,40 +38,26 @@ namespace SaintsField.Editor.Drawers
             // public UnityEngine.UI.Button Button;
         }
 
-        private static Container GetContainer(ISaintsAttribute saintsAttribute, object parent)
+        private static Container GetContainer(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             SpriteToggleAttribute toggleAttribute = (SpriteToggleAttribute)saintsAttribute;
             string imageCompName = toggleAttribute.CompName;
 
-            if(!(parent is Object targetObject))
-            {
-                return new Container
-                {
-                    Error = $"target {parent} is not a UnityEngine.Object",
-                };
-            }
-
-            // Object targetObject = (Object) parent;
-            SerializedObject targetSer = new SerializedObject(targetObject);
-
             if(imageCompName != null)
             {
                 SerializedProperty targetProperty =
-                    targetSer.FindProperty(imageCompName) ??
-                    SerializedUtils.FindPropertyByAutoPropertyName(targetSer, imageCompName);
+                    property.serializedObject.FindProperty(imageCompName) ??
+                    SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, imageCompName);
 
                 if (targetProperty != null)
                 {
                     return SignObject(targetProperty.objectReferenceValue);
                 }
 
-                Type targetType = targetObject.GetType();
+                (string error, object foundObj) =
+                    Util.GetOf<object>(imageCompName, null, property, info, parent);
 
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) propInfo =
-                    ReflectUtils.GetProp(targetType, imageCompName);
-
-                // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (propInfo.Item1 == ReflectUtils.GetPropType.NotFound)
+                if (error != "")
                 {
                     return new Container
                     {
@@ -78,33 +65,20 @@ namespace SaintsField.Editor.Drawers
                     };
                 }
 
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Field)
-                {
-                    return SignObject(((FieldInfo)propInfo.Item2).GetValue(targetObject));
-                }
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Property)
-                {
-                    return SignObject(((PropertyInfo)propInfo.Item2).GetValue(targetObject));
-                }
-                if (propInfo.Item1 == ReflectUtils.GetPropType.Method)
-                {
-                    return SignObject(((MethodInfo)propInfo.Item2).Invoke(targetObject, null));
-                }
-
-                throw new Exception("Should not reach here");
+                return SignObject(foundObj);
             }
 
             Component thisComponent;
             try
             {
-                thisComponent = (Component)targetObject;
+                thisComponent = (Component)property.serializedObject.targetObject;
             }
             catch (InvalidCastException e)
             {
                 Debug.LogException(e);
                 return new Container
                 {
-                    Error = $"target {targetObject} is not a Component",
+                    Error = $"target {property.serializedObject.targetObject} is not a Component",
                 };
             }
 
@@ -134,7 +108,7 @@ namespace SaintsField.Editor.Drawers
 
             return new Container
             {
-                Error = $"target {targetObject} has no Image, SpriteRenderer, Button or Renderer",
+                Error = $"target {thisComponent} has no Image, SpriteRenderer, Button or Renderer",
             };
         }
 
@@ -193,7 +167,7 @@ namespace SaintsField.Editor.Drawers
             // Object targetObject = (Object)GetTargetObjectWithProperty(property);
             // Object targetObject = (Object)GetParentTarget(property);
 
-            _container = GetContainer(saintsAttribute, parent);
+            _container = GetContainer(property, saintsAttribute, info, parent);
             _error = _container.Error;
 
             // Debug.Log(property.objectReferenceValue);
@@ -299,7 +273,7 @@ namespace SaintsField.Editor.Drawers
                     return;
                 }
 
-                Container dataContainer = GetContainer(saintsAttribute, parent);
+                Container dataContainer = GetContainer(property, saintsAttribute, info, parent);
                 string error = dataContainer.Error;
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
                 if(helpBox.text != error)
@@ -345,7 +319,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
+            UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -353,12 +327,12 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent, object newValue)
         {
-            UpdateToggleDisplay(property, index, saintsAttribute, container, parent);
+            UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
         }
 
-        private static void UpdateToggleDisplay(SerializedProperty property, int index, ISaintsAttribute saintsAttribute, VisualElement container, object parent)
+        private static void UpdateToggleDisplay(SerializedProperty property, int index, ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
-            Container dataContainer = GetContainer(saintsAttribute, parent);
+            Container dataContainer = GetContainer(property, saintsAttribute, info, parent);
             string error = dataContainer.Error;
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if(helpBox.text != error)
