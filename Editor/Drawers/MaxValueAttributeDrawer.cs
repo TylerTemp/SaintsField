@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers
             // object parentTarget = GetParentTarget(property);
 
             MaxValueAttribute minValueAttribute = (MaxValueAttribute)saintsAttribute;
-            (string error, float valueLimit) = GetLimitFloat(minValueAttribute, parent);
+            (string error, float valueLimit) = GetLimitFloat(property, minValueAttribute, info, parent);
 
             _error = error;
 
@@ -70,11 +70,11 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
-        private static (string error, float valueLimit) GetLimitFloat(MaxValueAttribute maxValueAttribute, object parentTarget)
+        private static (string error, float valueLimit) GetLimitFloat(SerializedProperty property, MinValueAttribute maxValueAttribute, FieldInfo info, object parentTarget)
         {
             return maxValueAttribute.ValueCallback == null
                 ? ("", maxValueAttribute.Value)
-                : Util.GetCallbackFloat(parentTarget, maxValueAttribute.ValueCallback);
+                : Util.GetOf(maxValueAttribute.ValueCallback, 0f, property, info, parentTarget);
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -104,7 +104,7 @@ namespace SaintsField.Editor.Drawers
         {
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             MaxValueAttribute minValueAttribute = (MaxValueAttribute)saintsAttribute;
-            (string error, float valueLimit) = GetLimitFloat(minValueAttribute, parent);
+            (string error, float valueLimit) = GetLimitFloat(property, minValueAttribute, info, parent);
 
             if(helpBox.text != error)
             {

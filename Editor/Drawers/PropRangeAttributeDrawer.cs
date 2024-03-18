@@ -18,14 +18,16 @@ namespace SaintsField.Editor.Drawers
 
         private struct MetaInfo
         {
+            // ReSharper disable InconsistentNaming
             public bool IsFloat;
             public float MinValue;
             public float MaxValue;
             public float Step;
             public string Error;
+            // ReSharper enable InconsistentNaming
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, object parentTarget)
+        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parentTarget)
         {
             PropRangeAttribute propRangeAttribute = (PropRangeAttribute) saintsAttribute;
 
@@ -40,7 +42,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MinCallback);
+                (string getError, float getValue) = Util.GetOf(propRangeAttribute.MinCallback, 0f, property, info, parentTarget);
                 error = getError;
                 minValue = getValue;
             }
@@ -52,7 +54,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, propRangeAttribute.MaxCallback);
+                (string getError, float getValue) = Util.GetOf(propRangeAttribute.MaxCallback, 0f, property, info, parentTarget);
                 error = getError;
                 maxValue = getValue;
             }
@@ -92,7 +94,7 @@ namespace SaintsField.Editor.Drawers
             Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}");
 #endif
 
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parentTarget);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parentTarget);
             if(metaInfo.Error != "")
             {
                 _error = metaInfo.Error;
@@ -275,7 +277,7 @@ namespace SaintsField.Editor.Drawers
         {
             Slider slider = container.Q<Slider>(NameSlider(property));
 
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             bool isFloat = metaInfo.IsFloat;
             float curValue = isFloat ? property.floatValue : property.intValue;
             float minValue = metaInfo.MinValue;
@@ -294,7 +296,7 @@ namespace SaintsField.Editor.Drawers
                 floatField.value = curValue;
                 floatField.RegisterValueChangedCallback(changed =>
                 {
-                    float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, parent), changed.newValue);
+                    float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent), changed.newValue);
                     property.floatValue = parsedValue;
                     floatField.SetValueWithoutNotify(parsedValue);
                     slider.SetValueWithoutNotify(parsedValue);
@@ -308,7 +310,7 @@ namespace SaintsField.Editor.Drawers
                 integerField.value = (int)curValue;
                 integerField.RegisterValueChangedCallback(changed =>
                 {
-                    int parsedValue = (int)GetValue(GetMetaInfo(property, saintsAttribute, parent), changed.newValue);
+                    int parsedValue = (int)GetValue(GetMetaInfo(property, saintsAttribute, info, parent), changed.newValue);
                     property.intValue = parsedValue;
                     slider.SetValueWithoutNotify(parsedValue);
                     integerField.SetValueWithoutNotify(parsedValue);
@@ -319,7 +321,7 @@ namespace SaintsField.Editor.Drawers
 
             slider.RegisterValueChangedCallback(changed =>
             {
-                float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, parent), changed.newValue);
+                float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent), changed.newValue);
                 if (property.propertyType == SerializedPropertyType.Float)
                 {
                     property.floatValue = parsedValue;
@@ -352,7 +354,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             Slider slider = container.Q<Slider>(NameSlider(property));
             MetaInfo curMetaInfo = (MetaInfo) slider.userData;

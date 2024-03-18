@@ -7,12 +7,14 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
 
+        // ReSharper disable InconsistentNaming
         public readonly string MinCallback;
         public readonly string MaxCallback;
         public readonly float Min;
         public readonly float Max;
 
         public readonly float Step;
+        // ReSharper enable InconsistentNaming
 
         public PropRangeAttribute(float min, float max, float step=-1f)
         {

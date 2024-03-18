@@ -27,14 +27,14 @@ namespace SaintsField.Editor.Drawers
             // ReSharper enable InconsistentNaming
         }
 
-        private static MetaInfo GetMetaInfo(ISaintsAttribute saintsAttribute, object parent)
+        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute) saintsAttribute;
 
             float min = progressBarAttribute.Min;
             if(progressBarAttribute.MinCallback != null)
             {
-                (string error, float value) = Util.GetCallbackFloat(parent, progressBarAttribute.MinCallback);
+                (string error, float value) = Util.GetOf(progressBarAttribute.MinCallback, 0f, property, info, parent);
                 if (error != "")
                 {
                     return new MetaInfo
@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Drawers
             float max = progressBarAttribute.Max;
             if(progressBarAttribute.MaxCallback != null)
             {
-                (string error, float value) = Util.GetCallbackFloat(parent, progressBarAttribute.MaxCallback);
+                (string error, float value) = Util.GetOf(progressBarAttribute.MaxCallback, 0f, property, info, parent);
                 if (error != "")
                 {
                     return new MetaInfo
@@ -251,7 +251,7 @@ namespace SaintsField.Editor.Drawers
             };
             // EditorGUI.DrawRect(position, Color.yellow);
 
-            MetaInfo metaInfo = GetMetaInfo(saintsAttribute, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             _imGuiError = metaInfo.Error;
 
             EditorGUI.DrawRect(fieldRect, metaInfo.BackgroundColor);
@@ -376,8 +376,7 @@ namespace SaintsField.Editor.Drawers
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
-            MetaInfo metaInfo = GetMetaInfo(progressBarAttribute,
-                parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
             label.name = NameLabel(property);
@@ -483,8 +482,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(saintsAttribute,
-                parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             ProgressBar progressBar = container.Q<ProgressBar>(NameProgressBar(property));
             UIToolkitPayload uiToolkitPayload = (UIToolkitPayload)progressBar.userData;

@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             _error = metaInfo.Error;
             if (_error != "")
             {
@@ -167,7 +167,7 @@ namespace SaintsField.Editor.Drawers
             );
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, object parentTarget)
+        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parentTarget)
         {
             if (property.propertyType != SerializedPropertyType.Vector2 &&
                 property.propertyType != SerializedPropertyType.Vector2Int)
@@ -188,7 +188,8 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MinCallback);
+                (string getError, float getValue) =
+                    Util.GetOf(minMaxSliderAttribute.MinCallback, 0f, property, info, parentTarget);
                 if (!string.IsNullOrEmpty(getError))
                 {
                     return new MetaInfo
@@ -208,7 +209,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (string getError, float getValue) = Util.GetCallbackFloat(parentTarget, minMaxSliderAttribute.MaxCallback);
+                (string getError, float getValue) = Util.GetOf(minMaxSliderAttribute.MaxCallback, 0f, property, info, parentTarget);
                 if (!string.IsNullOrEmpty(getError))
                 {
                     return new MetaInfo
@@ -456,7 +457,7 @@ namespace SaintsField.Editor.Drawers
             MinMaxSlider minMaxSlider = container.Q<MinMaxSlider>(NameSlider(property));
             // MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
             MetaInfo curMetaInfo = (MetaInfo)minMaxSlider.userData;
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             bool changed = false;
 

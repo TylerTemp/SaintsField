@@ -241,11 +241,9 @@ namespace SaintsField.Editor.Drawers
             Texture2D checkGroup = Util.LoadResource<Texture2D>("arrow-right.png");
             Texture2D check = Util.LoadResource<Texture2D>("check.png");
 
-//             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack = _metaInfo.SelectStacks;
-//
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
-//             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
-// #endif
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+            Debug.Log($"selectStack={string.Join("->", _metaInfo.SelectStacks.Select(each => $"{each.Display}/{each.Index}"))}");
+#endif
 
             ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
 
@@ -781,100 +779,27 @@ namespace SaintsField.Editor.Drawers
             // ReSharper enable InconsistentNaming
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, object parentObj)
+        private static MetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj)
         {
             string funcName = advancedDropdownAttribute.FuncName;
-            Debug.Assert(parentObj != null);
-            Type parentType = parentObj.GetType();
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(parentType, funcName);
 
-            #region Get List Items
-            IAdvancedDropdownList dropdownListValue;
-
-            switch (getPropType)
+            (string error, IAdvancedDropdownList dropdownListValue) =
+                Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
+            if(dropdownListValue == null || error != "")
             {
-                case ReflectUtils.GetPropType.NotFound:
-                    return new MetaInfo
-                    {
-                        Error = $"not found `{funcName}` on target `{parentObj}`",
-                    };
-                case ReflectUtils.GetPropType.Property:
+                return new MetaInfo
                 {
-                    PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundPropertyInfo.GetValue(parentObj) as IAdvancedDropdownList;
-                    if (dropdownListValue == null)
-                    {
-                        return new MetaInfo
-                        {
-                            Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
-                        };
-                    }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Field:
-                {
-                    FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundFieldInfo.GetValue(parentObj) as IAdvancedDropdownList;
-                    if (dropdownListValue == null)
-                    {
-                        return new MetaInfo
-                        {
-                            Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
-                        };
-                    }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-
-                    try
-                    {
-                        dropdownListValue =
-                            methodInfo.Invoke(parentObj, methodParams.Select(p => p.DefaultValue).ToArray()) as IAdvancedDropdownList;
-                    }
-                    catch (TargetInvocationException e)
-                    {
-                        Debug.LogException(e);
-                        Debug.Assert(e.InnerException != null);
-                        return new MetaInfo
-                        {
-                            Error = e.InnerException.Message,
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        return new MetaInfo
-                        {
-                            Error = e.Message,
-                        };
-                    }
-
-                    if (dropdownListValue == null)
-                    {
-                        return new MetaInfo
-                        {
-                            Error = $"dropdownListValue is null from `{funcName}()` on target `{parentObj}`",
-                        };
-                    }
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
-                    Debug.Log($"method got dropdown {dropdownListValue.ChildCount()} from {funcName} on parent `{parentObj}`");
-#endif
-                }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                    Error = error == ""? $"dropdownList is null from `{funcName}` on target `{parentObj}`": error,
+                    CurDisplay = "[Error]",
+                    CurValue = null,
+                    DropdownListValue = null,
+                    SelectStacks = Array.Empty<SelectStack>(),
+                };
             }
-
-            #endregion
 
             #region Get Cur Value
 
-            (FieldInfo field, object curValue) = GetCurValue(property, parentObj, parentType);
+            object curValue = field.GetValue(parentObj);
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             // string curDisplay = "";
             (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
@@ -883,22 +808,12 @@ namespace SaintsField.Editor.Drawers
             return new MetaInfo
             {
                 Error = "",
-                FieldInfo = field,
+                // FieldInfo = field,
                 CurDisplay = display,
                 CurValue = curValue,
                 DropdownListValue = dropdownListValue,
                 SelectStacks = curSelected,
             };
-        }
-
-        private static (FieldInfo field, object value) GetCurValue(SerializedProperty property, object parentObj, Type parentType)
-        {
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            // Object target = property.serializedObject.targetObject;
-            FieldInfo field = parentType.GetField(property.name, bindAttr);
-            Debug.Assert(field != null, $"{property.name}/{parentObj}");
-            return (field, field.GetValue(parentObj));
         }
 
         private static (IReadOnlyList<SelectStack> stack, string display) GetSelected(object curValue, IReadOnlyList<SelectStack> curStacks, IAdvancedDropdownList dropdownPage)
@@ -1317,79 +1232,8 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent)
         {
-            // VisualElement root = new VisualElement();
-            //
-            // VisualElement popContainer = new VisualElement
-            // {
-            //     name = "PopContainer",
-            //     style =
-            //     {
-            //         borderLeftColor = Color.green,
-            //         borderRightColor = Color.green,
-            //         borderTopColor = Color.green,
-            //         borderBottomColor = Color.green,
-            //
-            //         borderLeftWidth = 1,
-            //         borderRightWidth = 1,
-            //         borderTopWidth = 1,
-            //         borderBottomWidth = 1,
-            //     },
-            // };
-            //
-            // MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
-            //
-            // SaintsAdvancedDropdownUiToolkit advancedDropdownUiToolkit = new SaintsAdvancedDropdownUiToolkit(metaInfo, default,
-            //     curItem => Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo));
-            //
-            // popContainer.Add(advancedDropdownUiToolkit.CloneTree());
-            //
-            // root.Add(new Button(() =>
-            // {
-            //     popContainer.Clear();
-            //
-            //     MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
-            //
-            //     SaintsAdvancedDropdownUiToolkit advancedDropdownUiToolkit = new SaintsAdvancedDropdownUiToolkit(metaInfo, default,
-            //         curItem => Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo));
-            //
-            //     popContainer.Add(advancedDropdownUiToolkit.CloneTree());
-            //
-            //     Debug.Log("Done");
-            // })
-            // {
-            //     text = "Reload",
-            // });
-            //
-            // root.Add(popContainer);
-            //
-            // return root;
-
-            // Button button = new Button
-            // {
-            //     text = "Open",
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //
-            //     },
-            // };
-            //
-            // button.clicked += () =>
-            // {
-            //     MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
-            //     UnityEditor.PopupWindow.Show(button.worldBound, new SaintsAdvancedDropdownUiToolkit(
-            //         metaInfo,
-            //         button.worldBound.width,
-            //         (newDisplay, curItem) =>
-            //         {
-            //             Util.SetValue(property, curItem, parent, parent.GetType(), metaInfo.FieldInfo);
-            //             button.text = newDisplay;
-            //         }
-            //     ));
-            // };
-            //
-            // return button;
-            MetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
+            MetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
+            // Debug.Log(initMetaInfo);
 
             Button button = new Button
             {
@@ -1405,18 +1249,6 @@ namespace SaintsField.Editor.Drawers
                 name = NameButton(property),
                 userData = initMetaInfo.CurValue,
             };
-
-            // VisualElement buttonLabelContainer = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         // width = Length.Percent(100),
-            //         flexGrow = 1,
-            //         flexDirection = FlexDirection.Row,
-            //         alignItems = Align.Center,
-            //         justifyContent = Justify.SpaceBetween,
-            //     },
-            // };
 
             Label buttonLabel = new Label(GetMetaStackDisplay(initMetaInfo))
             {
@@ -1465,7 +1297,7 @@ namespace SaintsField.Editor.Drawers
             Button button = container.Q<Button>(NameButton(property));
             button.clicked += () =>
             {
-                MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, parent);
+                MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
                 UnityEditor.PopupWindow.Show(button.worldBound, new SaintsAdvancedDropdownUiToolkit(
                     metaInfo,
                     button.worldBound.width,
