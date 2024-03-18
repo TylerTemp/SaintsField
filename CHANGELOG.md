@@ -1,10 +1,12 @@
 ## 2.1.13
 
-1.  Fix [issue 7](https://github.com/TylerTemp/SaintsField/issues/7): when Unity uses `NativeProperty` to inject property with native code 
+1.  Fix [issue 7](https://github.com/TylerTemp/SaintsField/issues/7): when Unity uses `NativeProperty` to inject property with native code
     and serialized property, `serializedObject` will still give correct serialized fields, but reflection will not work, making `SaintsEditor`
     failed to display some fields.
 2.  Remove default `SaintsEditor` for example scene, so people who imports it (most likely when using `unitypackage`) won't accidentally
     get `SaintsEditor` enabled for the whole project.
+3.  Fix a bug that possibliy break `rate` in some situation.
+4.  IMGUI: fix `SaintsEditor` display an empty `MonoScript` when the target is neither `MonoBehavior` nor `ScriptableObject`.
 
 ## 2.1.12
 
@@ -16,7 +18,7 @@
 
 ## 2.1.11
 
-1.  Fix [Issue 3](https://github.com/TylerTemp/SaintsField/issues/3) Texture2D can not be destroyed on a GC calling. 
+1.  Fix [Issue 3](https://github.com/TylerTemp/SaintsField/issues/3) Texture2D can not be destroyed on a GC calling.
 2.  UI Toolkit: Fix [Issue 2](https://github.com/TylerTemp/SaintsField/issues/2) incorrect readonly.
 3.  Fix `HideIf` inconsistent logic of being opposite of `ShowIf`.
 4.  Add `EnableIf`, `DisableIf`

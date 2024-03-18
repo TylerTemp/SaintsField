@@ -70,6 +70,8 @@ If you're using `unitypackage` or git submodule but you put this project under a
     failed to display some fields.
 2.  Remove default `SaintsEditor` for example scene, so people who imports it (most likely when using `unitypackage`) won't accidentally
     get `SaintsEditor` enabled for the whole project.
+3.  Fix a bug that possibliy break `rate` in some situation.
+4.  IMGUI: fix `SaintsEditor` display an empty `MonoScript` when the target is neither `MonoBehavior` nor `ScriptableObject`.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2040,7 +2042,7 @@ public class ButtonAddOnClickExample: MonoBehaviour
 
 #### `SaintsRow` ####
 
-`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc in a `Serializable` object (usually a class or a struct).
+`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
 
 This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
 
@@ -2058,7 +2060,7 @@ Parameters:
 
 Special Note:
 
-1.  After applied this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, Using third party's `PropertyDrawer` is fine, but decorator of Editor Level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
+1.  After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
 2.  IMGUI: `ELayout.Horizontal` does not work here
 3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
 
@@ -2553,6 +2555,8 @@ public class LayoutExample: MonoBehaviour
 
 This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
 
+Different from `ShowIf`/`HideIf`: apply on an array will directly show or hide the array itself, rather than each element.
+
 ```csharp
 public bool boolValue;
 
@@ -2594,6 +2598,8 @@ public bool boolValue;
 ### `PlayaEnableIf`/`PlayaDisableIf` ###
 
 This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
+
+Different from `EnableIf`/`DisableIf`: apply on an array will directly enable or disable the array itself, rather than each element.
 
 ```csharp
 [PlayaDisableIf] public int[] justDisable;
