@@ -989,11 +989,7 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                         onGUIPayload.SetValue(curItem);
                     },
-                    icon =>
-                    {
-                        ImGuiEnsureDispose(property.serializedObject.targetObject);
-                        return GetIcon(icon);
-                    });
+                    GetIcon);
                 dropdown.Show(position);
                 dropdown.BindWindowPosition();
             }
@@ -1001,15 +997,15 @@ namespace SaintsField.Editor.Drawers
             #endregion
         }
 
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            foreach (Texture2D icon in _iconCache.Values)
-            {
-                UnityEngine.Object.DestroyImmediate(icon);
-            }
-            _iconCache.Clear();
-        }
+        // protected override void ImGuiOnDispose()
+        // {
+        //     base.ImGuiOnDispose();
+        //     foreach (Texture2D icon in _iconCache.Values)
+        //     {
+        //         UnityEngine.Object.DestroyImmediate(icon);
+        //     }
+        //     _iconCache.Clear();
+        // }
 
         private static IEnumerable<float> GetDropdownPageHeight(IAdvancedDropdownList dropdownList, float itemHeight, float sepHeight)
         {

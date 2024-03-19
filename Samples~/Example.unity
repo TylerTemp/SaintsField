@@ -6806,7 +6806,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item:
-    rid: -2
+    rid: 9188093539963895953
   structImpl:
     rid: -2
   myInterface:
@@ -6816,6 +6816,13 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 9188093539963895953
+      type: {class: ReferenceExample/Apple, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
+        base2: 0
+        apple: 
+        applePrefab: {fileID: 0}
 --- !u!4 &1638446596
 Transform:
   m_ObjectHideFlags: 0
