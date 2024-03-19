@@ -767,7 +767,7 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable InconsistentNaming
             public string Error;
 
-            public FieldInfo FieldInfo;
+            // public FieldInfo FieldInfo;
 
             public string CurDisplay;
             public object CurValue;
@@ -811,6 +811,13 @@ namespace SaintsField.Editor.Drawers
                 DropdownListValue = dropdownListValue,
                 SelectStacks = curSelected,
             };
+        }
+
+        private static string GetMetaStackDisplay(MetaInfo metaInfo)
+        {
+            return metaInfo.SelectStacks.Count == 0
+                ? "-"
+                : string.Join("/", metaInfo.SelectStacks.Skip(1).Select(each => each.Display).Append(metaInfo.CurDisplay));
         }
 
         private static (IReadOnlyList<SelectStack> stack, string display) GetSelected(object curValue, IReadOnlyList<SelectStack> curStacks, IAdvancedDropdownList dropdownPage)
@@ -942,7 +949,7 @@ namespace SaintsField.Editor.Drawers
 
             GUI.SetNextControlName(FieldControlName);
             // ReSharper disable once InvertIf
-            if (EditorGUI.DropdownButton(leftRect, new GUIContent(metaInfo.CurDisplay), FocusType.Keyboard))
+            if (EditorGUI.DropdownButton(leftRect, new GUIContent(GetMetaStackDisplay(metaInfo)), FocusType.Keyboard))
             {
                 float minHeight = advancedDropdownAttribute.MinHeight;
                 float itemHeight = advancedDropdownAttribute.ItemHeight > 0
@@ -1161,13 +1168,6 @@ namespace SaintsField.Editor.Drawers
             root.Add(button);
 
             return root;
-        }
-
-        private static string GetMetaStackDisplay(MetaInfo metaInfo)
-        {
-            return metaInfo.SelectStacks.Count == 0
-                ? "-"
-                : string.Join("/", metaInfo.SelectStacks.Skip(1).Select(each => each.Display).Append(metaInfo.CurDisplay));
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
