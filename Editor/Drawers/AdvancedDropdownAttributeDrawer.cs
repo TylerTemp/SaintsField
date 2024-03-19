@@ -748,10 +748,7 @@ namespace SaintsField.Editor.Drawers
 
         ~AdvancedDropdownAttributeDrawer()
         {
-            foreach (Texture2D iconCacheValue in _iconCache.Values)
-            {
-                UnityEngine.Object.DestroyImmediate(iconCacheValue);
-            }
+            _iconCache.Clear();
         }
 
         #region Util
@@ -936,139 +933,8 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute) saintsAttribute;
-
-            // SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(new AdvancedDropdownState());
-            // dropdown.Show(position);
-
-            string funcName = advancedDropdownAttribute.FuncName;
-            // object parentObj = GetParentTarget(property);
-            Debug.Assert(parent != null);
-            Type parentType = parent.GetType();
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(parentType, funcName);
-
-            #region Get List Items
-            IAdvancedDropdownList dropdownListValue;
-
-            switch (getPropType)
-            {
-                case ReflectUtils.GetPropType.NotFound:
-                {
-                    _error = $"not found `{funcName}` on target `{parent}`";
-                    DefaultDrawer(position, property, label, info);
-                }
-                    return;
-                case ReflectUtils.GetPropType.Property:
-                {
-                    PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundPropertyInfo.GetValue(parent) as IAdvancedDropdownList;
-                    if (dropdownListValue == null)
-                    {
-                        _error = $"dropdownListValue is null from `{funcName}` on target `{parent}`";
-                        DefaultDrawer(position, property, label, info);
-                        return;
-                    }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Field:
-                {
-                    FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
-                    dropdownListValue = foundFieldInfo.GetValue(parent) as IAdvancedDropdownList;
-                    if (dropdownListValue == null)
-                    {
-                        _error = $"dropdownListValue is null from `{funcName}` on target `{parent}`";
-                        DefaultDrawer(position, property, label, info);
-                        return;
-                    }
-                }
-                    break;
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-
-                    _error = "";
-                    // IEnumerable<AdvancedDropdownItem<object>> result;
-                    try
-                    {
-                        dropdownListValue =
-                            methodInfo.Invoke(parent, methodParams.Select(p => p.DefaultValue).ToArray()) as IAdvancedDropdownList;
-                        // Debug.Log(rawResult);
-                        // Debug.Log(rawResult as IDropdownList);
-                        // // Debug.Log(rawResult.GetType());
-                        // // Debug.Log(rawResult.GetType().Name);
-                        // // Debug.Log(typeof(rawResult));
-                        //
-
-                        // Debug.Log($"result: {dropdownListValue}");
-                    }
-                    catch (TargetInvocationException e)
-                    {
-                        Debug.Assert(e.InnerException != null);
-                        _error = e.InnerException.Message;
-                        Debug.LogException(e);
-                        return;
-                    }
-                    catch (Exception e)
-                    {
-                        _error = e.Message;
-                        Debug.LogException(e);
-                        return;
-                    }
-
-                    if (dropdownListValue == null)
-                    {
-                        _error = $"dropdownListValue is null from `{funcName}()` on target `{parent}`";
-                        DefaultDrawer(position, property, label, info);
-                        return;
-                    }
-                }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            }
-
-            #endregion
-
-            #region Get Cur Value
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            // Object target = property.serializedObject.targetObject;
-            FieldInfo field = parentType.GetField(property.name, bindAttr);
-            Debug.Assert(field != null, $"{property.name}/{parent}");
-            object curValue = field.GetValue(parent);
-            // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
-            string curDisplay = "";
-            Debug.Assert(dropdownListValue != null);
-            foreach ((string stackDisplay, string display, string icon, bool disabled, object value) itemInfos in Flatten("", dropdownListValue))
-            {
-                string name = itemInfos.display;
-                object itemValue = itemInfos.value;
-
-                if (curValue == null && itemValue == null)
-                {
-                    curDisplay = name;
-                    break;
-                }
-                if (curValue is UnityEngine.Object curValueObj
-                    && curValueObj == itemValue as UnityEngine.Object)
-                {
-                    curDisplay = name;
-                    break;
-                }
-                if (itemValue == null)
-                {
-                    // nothing
-                }
-                else if (itemValue.Equals(curValue))
-                {
-                    curDisplay = name;
-                    break;
-                }
-            }
-            #endregion
+            AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute)saintsAttribute;
+            MetaInfo metaInfo = GetMetaInfo(property, advancedDropdownAttribute, info, parent);
 
             #region Dropdown
 
@@ -1076,7 +942,7 @@ namespace SaintsField.Editor.Drawers
 
             GUI.SetNextControlName(FieldControlName);
             // ReSharper disable once InvertIf
-            if (EditorGUI.DropdownButton(leftRect, new GUIContent(curDisplay), FocusType.Keyboard))
+            if (EditorGUI.DropdownButton(leftRect, new GUIContent(metaInfo.CurDisplay), FocusType.Keyboard))
             {
                 float minHeight = advancedDropdownAttribute.MinHeight;
                 float itemHeight = advancedDropdownAttribute.ItemHeight > 0
@@ -1088,13 +954,13 @@ namespace SaintsField.Editor.Drawers
                 {
                     if(advancedDropdownAttribute.UseTotalItemCount)
                     {
-                        float totalItemCount = GetValueItemCounts(dropdownListValue);
+                        float totalItemCount = GetValueItemCounts(metaInfo.DropdownListValue);
                         // Debug.Log(totalItemCount);
                         size = new Vector2(position.width, totalItemCount * itemHeight + titleHeight);
                     }
                     else
                     {
-                        float maxChildCount = GetDropdownPageHeight(dropdownListValue, itemHeight, advancedDropdownAttribute.SepHeight).Max();
+                        float maxChildCount = GetDropdownPageHeight(metaInfo.DropdownListValue, itemHeight, advancedDropdownAttribute.SepHeight).Max();
                         size = new Vector2(position.width, maxChildCount + titleHeight);
                     }
                 }
@@ -1105,23 +971,37 @@ namespace SaintsField.Editor.Drawers
 
                 // Vector2 size = new Vector2(position.width, maxChildCount * EditorGUIUtility.singleLineHeight + 31f);
                 SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(
-                    dropdownListValue,
+                    metaInfo.DropdownListValue,
                     size,
                     position,
                     new AdvancedDropdownState(),
                     curItem =>
                     {
-                        Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, field);
+                        Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
                         Util.SignPropertyValue(property, curItem);
                         property.serializedObject.ApplyModifiedProperties();
                         onGUIPayload.SetValue(curItem);
                     },
-                    GetIcon);
+                    icon =>
+                    {
+                        ImGuiEnsureDispose(property.serializedObject.targetObject);
+                        return GetIcon(icon);
+                    });
                 dropdown.Show(position);
                 dropdown.BindWindowPosition();
             }
 
             #endregion
+        }
+
+        protected override void ImGuiOnDispose()
+        {
+            base.ImGuiOnDispose();
+            foreach (Texture2D icon in _iconCache.Values)
+            {
+                UnityEngine.Object.DestroyImmediate(icon);
+            }
+            _iconCache.Clear();
         }
 
         private static IEnumerable<float> GetDropdownPageHeight(IAdvancedDropdownList dropdownList, float itemHeight, float sepHeight)
