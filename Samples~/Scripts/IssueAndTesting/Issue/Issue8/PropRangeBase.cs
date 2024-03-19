@@ -11,5 +11,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
         [InfoBox("Test")]
         [SepTitle("Test", EColor.Green)]
         public float rangeFloat;
+
+        [MinMaxSlider(nameof(min), nameof(max))]
+        public Vector2 rangeVector2;
+
+        [MinMaxSlider(nameof(min), nameof(max))]
+        public Vector2Int rangeVector2Int;
     }
 }

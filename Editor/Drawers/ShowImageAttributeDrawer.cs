@@ -11,7 +11,6 @@ using UnityEngine.UIElements;
 #endif
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -41,7 +40,7 @@ namespace SaintsField.Editor.Drawers
         //     }
         // }
 
-        private (Texture2D, float preferredWidth, float preferredHeight) GetPreview(SerializedProperty property, int maxWidth, int maxHeight, float viewWidth, string name, object parent)
+        private (Texture2D, float preferredWidth, float preferredHeight) GetPreview(SerializedProperty property, int maxWidth, int maxHeight, float viewWidth, string name, FieldInfo info, object parent)
         {
             // Debug.Log($"viewWidth={viewWidth}");
             if (viewWidth - 1f < Mathf.Epsilon)
@@ -49,7 +48,7 @@ namespace SaintsField.Editor.Drawers
                 return (null, maxWidth, maxWidth);
             }
 
-            (string error, Texture2D image) = GetImage(property, name, parent);
+            (string error, Texture2D image) = GetImage(property, name, info, parent);
             _error = error;
 
             if(_error != "")
@@ -94,7 +93,7 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            return ((ShowImageAttribute)saintsAttribute).Above? GetImageHeight(property, width, saintsAttribute, parent): 0;
+            return ((ShowImageAttribute)saintsAttribute).Above? GetImageHeight(property, width, saintsAttribute, info, parent): 0;
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
@@ -105,7 +104,7 @@ namespace SaintsField.Editor.Drawers
                 return position;
             }
 
-            return Draw(position, property, saintsAttribute, parent);
+            return Draw(position, property, saintsAttribute, info, parent);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -128,7 +127,7 @@ namespace SaintsField.Editor.Drawers
                 return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
             }
 
-            float height = ((ShowImageAttribute)saintsAttribute).Above? 0: GetImageHeight(property, width, saintsAttribute, parent);
+            float height = ((ShowImageAttribute)saintsAttribute).Above? 0: GetImageHeight(property, width, saintsAttribute, info, parent);
             // Debug.Log($"GetBlowExtraHeight={height}");
             return height;
         }
@@ -144,10 +143,10 @@ namespace SaintsField.Editor.Drawers
             // EditorGUI.DrawRect(position, Color.blue);
             // Debug.Log($"DrawBelow height: {position.height}");
 
-            return Draw(position, property, saintsAttribute, parent);
+            return Draw(position, property, saintsAttribute, info, parent);
         }
 
-        private float GetImageHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute, object parent)
+        private float GetImageHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
             int maxWidth = showImageAttribute.MaxWidth;
@@ -155,7 +154,7 @@ namespace SaintsField.Editor.Drawers
             // int useWidth = maxWidth == -1? viewWidth: Mathf.Min(maxWidth, viewWidth);
             int maxHeight = showImageAttribute.MaxHeight;
 
-            (Texture2D _, float _, float preferredHeight) = GetPreview(property, maxWidth, maxHeight, width, showImageAttribute.ImageCallback, parent);
+            (Texture2D _, float _, float preferredHeight) = GetPreview(property, maxWidth, maxHeight, width, showImageAttribute.ImageCallback, info, parent);
 
             // Debug.Log($"GetImageHeight viewWidth={width} -> {preferredHeight}");
             // if (previewTexture)
@@ -170,7 +169,7 @@ namespace SaintsField.Editor.Drawers
             return preferredHeight;
         }
 
-        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute, object parent)
+        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             // Debug.Log($"Draw height: {position.height}");
 
@@ -188,7 +187,7 @@ namespace SaintsField.Editor.Drawers
 
             // Debug.Log($"Draw height={position.height}");
 
-            (Texture2D previewTexture, float preferredWidth, float preferredHeight)  = GetPreview(property, maxWidth, maxHeight, position.width, showImageAttribute.ImageCallback, parent);
+            (Texture2D previewTexture, float preferredWidth, float preferredHeight)  = GetPreview(property, maxWidth, maxHeight, position.width, showImageAttribute.ImageCallback, info, parent);
 
             // Debug.Log($"preview to {preferredWidth}x{preferredHeight}");
             // if (previewTexture)
@@ -244,9 +243,8 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
-        private static (string error, Texture2D image) GetImage(SerializedProperty property, string name, object target)
+        private static (string error, Texture2D image) GetImage(SerializedProperty property, string name, FieldInfo info, object target)
         {
-
             if (string.IsNullOrEmpty(name))
             {
                 // ReSharper disable once ConvertIfStatementToReturnStatement
@@ -256,6 +254,18 @@ namespace SaintsField.Editor.Drawers
                 }
 
                 return GetImageFromTarget(property.objectReferenceValue);
+            }
+
+            // search parent first
+            (string reflectError, object fieldValue) = Util.GetOf<object>(name, null, property, info, target);
+            if(reflectError == "")
+            {
+                Texture2D reflect2D;
+                (reflectError, reflect2D) = GetImageFromTarget(fieldValue);
+                if (reflectError == "")
+                {
+                    return (reflectError, reflect2D);
+                }
             }
 
             SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
@@ -268,57 +278,9 @@ namespace SaintsField.Editor.Drawers
                 }
 
                 return GetImageFromTarget(prop.objectReferenceValue);
-
             }
 
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                ReflectUtils.GetProp(target.GetType(), name);
-            switch (getPropType)
-            {
-                case ReflectUtils.GetPropType.Field:
-                {
-                    // targetChanged = CheckSetOriginalTextureAndError(((FieldInfo)fieldOrMethodInfo).GetValue(target));
-                    return GetImageFromTarget(((FieldInfo)fieldOrMethodInfo).GetValue(target));
-                }
-
-                case ReflectUtils.GetPropType.Property:
-                {
-                    // targetChanged = CheckSetOriginalTextureAndError(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
-                    return GetImageFromTarget(((PropertyInfo)fieldOrMethodInfo).GetValue(target));
-                }
-                case ReflectUtils.GetPropType.Method:
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    Object result;
-                    try
-                    {
-                        result = (Object)methodInfo.Invoke(target,
-                            methodParams.Select(p => p.DefaultValue).ToArray());
-                    }
-                    catch (TargetInvocationException e)
-                    {
-                        Debug.LogException(e);
-                        Debug.Assert(e.InnerException != null);
-                        return (e.InnerException.Message, null);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        return (e.Message, null);
-                    }
-
-                    // targetChanged = CheckSetOriginalTextureAndError(result);
-                    return GetImageFromTarget(result);
-                }
-                case ReflectUtils.GetPropType.NotFound:
-                {
-                    return ($"not found `{name}` on `{target}`", null);
-                }
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            }
+            return ($"not found `{name}` on `{target}`", null);
         }
 
         private static (string error, Texture2D image) GetImageFromTarget(object result)
@@ -416,7 +378,7 @@ namespace SaintsField.Editor.Drawers
         {
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
 
-            (string error, Texture2D preview) = GetImage(property, showImageAttribute.ImageCallback, parent);
+            (string error, Texture2D preview) = GetImage(property, showImageAttribute.ImageCallback, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             // ReSharper disable once InvertIf

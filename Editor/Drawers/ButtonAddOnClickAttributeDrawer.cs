@@ -28,11 +28,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            _error = BindButtonEvent(property, saintsAttribute, parent);
+            _error = BindButtonEvent(property, saintsAttribute, info, parent);
             return true;
         }
 
-        private static string BindButtonEvent(SerializedProperty property, ISaintsAttribute saintsAttribute, object objTarget)
+        private static string BindButtonEvent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object objTarget)
         {
             ButtonAddOnClickAttribute buttonAddOnClickAttribute = (ButtonAddOnClickAttribute) saintsAttribute;
 
@@ -44,19 +44,15 @@ namespace SaintsField.Editor.Drawers
             Button uiButton = null;
             if (string.IsNullOrEmpty(buttonComp))
             {
+                // search current field
                 if (property.propertyType == SerializedPropertyType.ObjectReference)
                 {
                     uiButton = GetUiButton(property.objectReferenceValue);
                 }
 
-                if(uiButton is null)
+                if(uiButton is null)  // search serialized target
                 {
-                    if (objTarget == null)
-                    {
-                        return "Can not find parent target";
-                    }
-
-                    uiButton = GetUiButton(objTarget);
+                    uiButton = GetUiButton(property.serializedObject.targetObject);
 
                     if (uiButton is null)
                     {
@@ -64,61 +60,15 @@ namespace SaintsField.Editor.Drawers
                     }
                 }
             }
-            else
+            else  // has name, try find it
             {
-                if (objTarget == null)
+
+                (string error, Object button) = Util.GetOf<Object>(buttonComp, null, property, info, objTarget);
+                if(error != "")
                 {
-                    return "Can not find parent target";
+                    return error;
                 }
-
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                    ReflectUtils.GetProp(objTarget.GetType(), buttonComp);
-                switch (getPropType)
-                {
-                    case ReflectUtils.GetPropType.Field:
-                        uiButton = GetUiButton(((FieldInfo)fieldOrMethodInfo).GetValue(objTarget));
-                        break;
-
-                    case ReflectUtils.GetPropType.Property:
-                        uiButton = GetUiButton(((PropertyInfo)fieldOrMethodInfo).GetValue(objTarget));
-                        break;
-
-                    case ReflectUtils.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                        ParameterInfo[] methodParams = methodInfo.GetParameters();
-                        Debug.Assert(methodParams.All(p => p.IsOptional));
-                        if (methodInfo.ReturnType != typeof(Button))
-                        {
-                            return
-                                $"Expect returning Button from `{buttonComp}`, get {methodInfo.ReturnType}";
-                        }
-
-                        try
-                        {
-                            uiButton = (Button)methodInfo.Invoke(objTarget,
-                                methodParams.Select(p => p.DefaultValue).ToArray());
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            Debug.Assert(e.InnerException != null);
-                            Debug.LogException(e);
-                            return e.InnerException.Message;
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogException(e);
-                            return e.Message;
-                        }
-                    }
-                        break;
-                    case ReflectUtils.GetPropType.NotFound:
-                    {
-                        return $"not found `{buttonComp}` on `{objTarget}`";
-                    }
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-                }
+                uiButton = GetUiButton(button);
             }
 
             if (uiButton == null)
@@ -187,12 +137,37 @@ namespace SaintsField.Editor.Drawers
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
-        protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
+        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ButtonAddOnClick";
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            BindButtonEvent(property, saintsAttribute, parent);
-            return null;
+            VisualElement helpBox = new HelpBox
+            {
+                text = "",
+                messageType = HelpBoxMessageType.Error,
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NameHelpBox(property, index),
+            };
+            return helpBox;
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        {
+            string error = BindButtonEvent(property, saintsAttribute, info, parent);
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            // ReSharper disable once InvertIf
+            if (error != helpBox.text)
+            {
+                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
+                helpBox.text = error;
+            }
         }
 
         #endregion

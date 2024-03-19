@@ -3,6 +3,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
@@ -116,64 +117,10 @@ namespace SaintsField.Editor.Drawers
 
         private static string CallValidateMethod(string callback, string label, SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(parent.GetType(), callback);
-
-            if (found.getPropType == ReflectUtils.GetPropType.NotFound)
+            (string error, object validateResult) = Util.GetMethodOf<object>(callback, null, property, fieldInfo, parent);
+            if(error != "")
             {
-                return $"No field or method named `{callback}` found on `{parent}`";
-            }
-
-            object validateResult;
-
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
-            {
-                validateResult = propertyInfo.GetValue(parent);
-            }
-            else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
-            {
-                validateResult = foundFieldInfo.GetValue(parent);
-            }
-            else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
-            {
-                int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                object rawValue = fieldInfo.GetValue(parent);
-                object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-
-                object[] filledParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                    ? new[]
-                    {
-                        curValue,
-                    }
-                    : new []
-                    {
-                        curValue,
-                        arrayIndex,
-                    });
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_VALIDATE_INPUT
-                Debug.Log($"#ValidateInput# {methodInfo.Name}({string.Join(", ", filledParams)})");
-#endif
-
-                try
-                {
-                    validateResult = methodInfo.Invoke(parent, filledParams);
-                }
-                catch (TargetInvocationException e)
-                {
-                    Debug.Assert(e.InnerException != null);
-                    Debug.LogException(e);
-                    return e.InnerException.Message;
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    return e.Message;
-                }
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(found), found, null);
+                return error;
             }
 
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression

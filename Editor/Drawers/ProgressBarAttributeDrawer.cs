@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -65,7 +65,8 @@ namespace SaintsField.Editor.Drawers
 
             if(progressBarAttribute.ColorCallback != null)
             {
-                (string error, Color value) = GetCallbackColor(parent, progressBarAttribute.ColorCallback);
+                (string error, Color value) =
+                    GetCallbackColor(progressBarAttribute.ColorCallback, color, property, info, parent);
                 if (error != "")
                 {
                     return new MetaInfo
@@ -81,7 +82,7 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once InvertIf
             if(progressBarAttribute.BackgroundColorCallback != null)
             {
-                (string error, Color value) = GetCallbackColor(parent, progressBarAttribute.BackgroundColorCallback);
+                (string error, Color value) = GetCallbackColor(progressBarAttribute.BackgroundColorCallback, backgroundColor, property, info, parent);
                 if (error != "")
                 {
                     return new MetaInfo
@@ -104,34 +105,12 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        private static (string error, Color value) GetCallbackColor(object target, string by)
+        private static (string error, Color value) GetCallbackColor(string by, Color defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
         {
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), by);
-
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if (found.Item1 == ReflectUtils.GetPropType.NotFound)
-            {
-                return ($"No field or method named `{by}` found on `{target}`", Color.white);
-            }
-
-            if (found.Item1 == ReflectUtils.GetPropType.Property)
-            {
-                return ObjToColor(((PropertyInfo)found.Item2).GetValue(target));
-            }
-            if (found.Item1 == ReflectUtils.GetPropType.Field)
-            {
-                return ObjToColor(((FieldInfo)found.Item2).GetValue(target));
-            }
-            // ReSharper disable once InvertIf
-            if (found.Item1 == ReflectUtils.GetPropType.Method)
-            {
-                MethodInfo methodInfo = (MethodInfo)found.Item2;
-                ParameterInfo[] methodParams = methodInfo.GetParameters();
-                Debug.Assert(methodParams.All(p => p.IsOptional));
-                // Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                return ObjToColor(methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
-            }
-            throw new ArgumentOutOfRangeException(nameof(found), found, null);
+            (string error, object value) = Util.GetOf<object>(by, defaultValue, property, fieldInfo, target);
+            return error != ""
+                ? (error, defaultValue)
+                : ObjToColor(value);
         }
 
         private static (string error, Color color) ObjToColor(object obj)
@@ -180,35 +159,44 @@ namespace SaintsField.Editor.Drawers
 
                 return ("", $"{formatValue} / {maxValue}");
             }
+
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
+            types.Reverse();
+
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            MethodInfo methodInfo = parent.GetType().GetMethod(titleCallback, bindAttr);
-
-            if (methodInfo == null)
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (Type type in types)
             {
-                return ($"Can not find method `{titleCallback}` on `{parent}`", null);
+                MethodInfo methodInfo = type.GetMethod(titleCallback, bindAttr);
+                if (methodInfo == null)
+                {
+                    continue;
+                }
+
+                string title;
+                try
+                {
+                    title = (string)methodInfo.Invoke(parent,
+                        new object[] { curValue, minValue, maxValue, property.displayName });
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.Assert(e.InnerException != null);
+                    Debug.LogException(e);
+                    return (e.InnerException.Message, null);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return (e.Message, null);
+                }
+
+                return ("", title);
             }
 
-            string title;
-            try
-            {
-                title = (string)methodInfo.Invoke(parent,
-                    new object[]{curValue, minValue, maxValue, property.displayName});
-            }
-            catch (TargetInvocationException e)
-            {
-                Debug.Assert(e.InnerException != null);
-                Debug.LogException(e);
-                return (e.InnerException.Message, null);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                return (e.Message, null);
-            }
-
-            return ("", title);
+            return ($"Can not find method `{titleCallback}` on `{parent}`", null);
         }
 
         private static float BoundValue(float curValue, float minValue, float maxValue, float step, bool isInt)

@@ -417,12 +417,23 @@ namespace SaintsField.Editor.Utils
                 T finalResult;
                 try
                 {
-                    finalResult = (T)genResult;
+                    // finalResult = (T)genResult;
+                    finalResult = (T)Convert.ChangeType(genResult, typeof(T));
                 }
-                catch (InvalidCastException e)
+                catch (InvalidCastException)
                 {
-                    Debug.LogException(e);
-                    return (e.Message, defaultValue);
+                    // Debug.Log($"{genResult}/{genResult.GetType()} -> {typeof(T)}");
+                    // Debug.LogException(e);
+                    // return (e.Message, defaultValue);
+                    try
+                    {
+                        finalResult = (T)genResult;
+                    }
+                    catch (InvalidCastException e)
+                    {
+                        Debug.LogException(e);
+                        return (e.Message, defaultValue);
+                    }
                 }
 
                 return ("", finalResult);

@@ -11,7 +11,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 #endif
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -25,8 +24,10 @@ namespace SaintsField.Editor.Drawers
 
         private struct MetaInfo
         {
+            // ReSharper disable InconsistentNaming
             public IReadOnlyList<AnimatorState> AnimatorStates;
             public string Error;
+            // ReSharper enable InconsistentNaming
         }
 
         #region IMGUI
@@ -49,7 +50,7 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             if (metaInfo.Error != "")
             {
@@ -129,60 +130,17 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo fieldInfo, object parent)
         {
             AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute) saintsAttribute;
             string animFieldName = animatorStateAttribute.AnimFieldName;
 
-            Animator animator;
-            if (animFieldName == null)
+            (string error, Animator animator) = AnimatorUtils.GetAnimator(animFieldName, property, fieldInfo, parent);
+            if (error != "")
             {
-                Object targetObj = property.serializedObject.targetObject;
-                // animatorController = (Animator)animProp.objectReferenceValue;
-                switch (targetObj)
-                {
-                    case GameObject go:
-                        animator = go.GetComponent<Animator>();
-                        break;
-                    case Component component:
-                        animator = component.GetComponent<Animator>();
-                        break;
-                    default:
-                        string errorMsg = $"Animator controller not found in {targetObj}. Try specific a name instead.";
-                        return new MetaInfo
-                        {
-                            Error = errorMsg,
-                            AnimatorStates = Array.Empty<AnimatorState>(),
-                        };
-                }
-            }
-            else
-            {
-                SerializedObject targetSer = property.serializedObject;
-                SerializedProperty animProp = targetSer.FindProperty(animFieldName) ??
-                                              SerializedUtils.FindPropertyByAutoPropertyName(targetSer, animFieldName);
-
-                // Debug.Log(property.type);
-                if (animProp == null)
-                {
-                    string errorMsg = $"Can't find Animator {animFieldName}";
-                    return new MetaInfo
-                    {
-                        Error = errorMsg,
-                        AnimatorStates = Array.Empty<AnimatorState>(),
-                    };
-                }
-                animator = (Animator)animProp.objectReferenceValue;
-            }
-
-
-            if (!animator)
-            {
-                string errorMsg = $"Animator {animFieldName} is null";
-                // Debug.Log(_errorMsg);
                 return new MetaInfo
                 {
-                    Error = errorMsg,
+                    Error = error,
                     AnimatorStates = Array.Empty<AnimatorState>(),
                 };
             }
@@ -310,11 +268,11 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container1, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
-            VisualElement container = new VisualElement();
+            VisualElement root = new VisualElement();
 
             DropdownField dropdownField = new DropdownField(new string(' ', property.displayName.Length))
             {
@@ -329,7 +287,7 @@ namespace SaintsField.Editor.Drawers
             // dropdownField.choices = metaInfo.AnimatorStates.Select(each => each.ToString()).ToList();
             SetDropdownNoNotice(property, dropdownField, metaInfo);
 
-            container.Add(dropdownField);
+            root.Add(dropdownField);
 
             SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
             // ReSharper disable once InvertIf
@@ -343,17 +301,17 @@ namespace SaintsField.Editor.Drawers
                     name = NameSpeedField(property),
                 };
                 speedField.SetEnabled(false);
-                container.Add(speedField);
+                root.Add(speedField);
                 ObjectField animationClipField = new ObjectField($"┗{curAnimationClipProp.displayName}")
                 {
                     value = curAnimationClipProp.objectReferenceValue,
                     name = NameClipField(property),
                 };
                 animationClipField.SetEnabled(false);
-                container.Add(animationClipField);
+                root.Add(animationClipField);
             }
 
-            return container;
+            return root;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -399,7 +357,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
 
             MetaInfo curMetaInfo = (MetaInfo) dropdownField.userData;

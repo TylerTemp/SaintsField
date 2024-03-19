@@ -63,15 +63,15 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.1.13**
+**2.2.0**
 
-1.  Fix [issue 7](https://github.com/TylerTemp/SaintsField/issues/7): when Unity uses `NativeProperty` to inject property with native code
-    and serialized property, `serializedObject` will still give correct serialized fields, but reflection will not work, making `SaintsEditor`
-    failed to display some fields.
-2.  Remove default `SaintsEditor` for example scene, so people who imports it (most likely when using `unitypackage`) won't accidentally
-    get `SaintsEditor` enabled for the whole project.
-3.  Fix a bug that possibliy break `rate` in some situation.
-4.  IMGUI: fix `SaintsEditor` display an empty `MonoScript` when the target is neither `MonoBehavior` nor `ScriptableObject`.
+1.  Fix [Issue 8](https://github.com/TylerTemp/SaintsField/issues/8) that most attributes in `SaintsField` did NOT looking for the inherited parent target... This includes `PropRange`, `Min`, `Max, `Dropdown`, `AdvancedDropdown`, `SpriteToggle`, `MaterialToggle`, `ColorToggle`, `RichLabel`, `Above/BelowRichLabel`, `InfoBox`, Buttons etc...
+2.  Fix `Dropdown` and `AdvancedDropdown` incorrect parent finding which may lead to incorrect dropdown items.
+3.  Most callbacks now can receive the value of the target field. Allowing a suitable required/optional parameter in the callback to make it work.
+
+This update does not break existing APIs, but greatly changed internal logic of property/method finding, so it's a minor version bump.
+
+Special thanks to [ZeroUltra](https://github.com/ZeroUltra) to find this important issue.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

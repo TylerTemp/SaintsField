@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers
 
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-            _error = InvokeCallback(saintsAttribute, onGUIPayload.newValue, arrayIndex, parent);
+            _error = InvokeCallback(property, saintsAttribute, onGUIPayload.newValue, arrayIndex, info, parent);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -54,39 +54,39 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
-        private static string InvokeCallback(ISaintsAttribute saintsAttribute, object newValue, int index, object target)
+        private static string InvokeCallback(SerializedProperty property, ISaintsAttribute saintsAttribute, object newValue, int index, FieldInfo info, object target)
         {
             // Debug.Log(saintsAttribute);
             string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
 
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly;
-            MethodInfo methodInfo =  target.GetType().GetMethod(callback, bindAttr);
-            if (methodInfo == null)
-            {
-                return $"No method found `{callback}` on `{target}`";
-            }
-
-            ParameterInfo[] methodParams = methodInfo.GetParameters();
-            object[] paramValues = ReflectUtils.MethodParamsFill(methodParams,  index == -1? new[] { newValue }: new[] { newValue, index });
-            try
-            {
-                methodInfo.Invoke(target, paramValues);
-            }
-            catch (TargetInvocationException e)
-            {
-                Debug.LogException(e);
-                Debug.Assert(e.InnerException != null);
-                return e.InnerException.Message;
-
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                return e.Message;
-            }
-
-            return "";
+            (string error, object _) = Util.GetMethodOf<object>(callback, null, property, info, target);
+            return error != "" ? error : "";
+            // const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+            //                               BindingFlags.Public | BindingFlags.DeclaredOnly;
+            // MethodInfo methodInfo =  target.GetType().GetMethod(callback, bindAttr);
+            // if (methodInfo == null)
+            // {
+            //     return $"No method found `{callback}` on `{target}`";
+            // }
+            //
+            // ParameterInfo[] methodParams = methodInfo.GetParameters();
+            // object[] paramValues = ReflectUtils.MethodParamsFill(methodParams,  index == -1? new[] { newValue }: new[] { newValue, index });
+            // try
+            // {
+            //     methodInfo.Invoke(target, paramValues);
+            // }
+            // catch (TargetInvocationException e)
+            // {
+            //     Debug.LogException(e);
+            //     Debug.Assert(e.InnerException != null);
+            //     return e.InnerException.Message;
+            //
+            // }
+            // catch (Exception e)
+            // {
+            //     Debug.LogException(e);
+            //     return e.Message;
+            // }
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -117,7 +117,7 @@ namespace SaintsField.Editor.Drawers
             object newValue)
         {
             // Debug.Log($"OK I got a new value {newValue}; {this}");
-            string error = InvokeCallback(saintsAttribute, newValue, SerializedUtils.PropertyPathIndex(property.propertyPath), parent);
+            string error = InvokeCallback(property, saintsAttribute, newValue, SerializedUtils.PropertyPathIndex(property.propertyPath), info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             helpBox.text = error;
             helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;

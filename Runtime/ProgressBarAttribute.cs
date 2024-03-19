@@ -7,6 +7,7 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
 
+        // ReSharper disable InconsistentNaming
         public readonly float Min;
         public readonly string MinCallback;
         public readonly float Max;
@@ -20,6 +21,7 @@ namespace SaintsField
         public readonly string BackgroundColorCallback;
 
         public readonly string TitleCallback;
+        // ReSharper enable InconsistentNaming
 
         public ProgressBarAttribute(): this(0, 100, -1) { }
         public ProgressBarAttribute(EColor color=EColor.OceanicSlate, EColor backgroundColor=EColor.CharcoalGray, string colorCallback=null, string backgroundColorCallback=null)

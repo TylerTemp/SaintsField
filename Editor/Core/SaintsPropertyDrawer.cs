@@ -1813,7 +1813,8 @@ namespace SaintsField.Editor.Core
                 thisPropField.RegisterValueChangeCallback(evt =>
                 {
                     SerializedProperty prop = evt.changedProperty;
-                    if(prop == property)
+                    // Debug.Log($"changed: {prop.propertyPath}; {prop.propertyPath}; {prop.}");
+                    if(SerializedProperty.EqualContents(prop, property))
                     {
                         int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
                         object rawValue = fieldInfo.GetValue(parent);
