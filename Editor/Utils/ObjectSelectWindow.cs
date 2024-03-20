@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Utils
         }
 
         // public static ObjectSelectWindow Instance { get; private set; }
-        private string _search;
+        private string _search = "";
         private int _tabSelected;
 
         private Vector2 _scrollPos;
@@ -78,8 +78,8 @@ namespace SaintsField.Editor.Utils
 
         private IReadOnlyList<ItemInfo> _sceneItems;
         private IReadOnlyList<ItemInfo> _assetItems;
-        private int _sceneItemSelectedIndex = 0;
-        private int _assetItemSelectedIndex = 0;
+        private int _sceneItemSelectedIndex;
+        private int _assetItemSelectedIndex;
 
         private void OnDestroy()
         {
@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Utils
 
         private void OnGUI()
         {
-            EditorGUILayout.TextField(_search);
+            _search = EditorGUILayout.TextField(_search);
 
             Rect tabLine = EditorGUILayout.GetControlRect();
             // EditorGUI.DrawRect(tabLine, Color.black);
@@ -150,6 +150,7 @@ namespace SaintsField.Editor.Utils
                     x = tabLine.x + leftHalf.width + 10,
                     width = tabLine.width - leftHalf.width - 10,
                 };
+                // ReSharper disable once ConvertToUsingDeclaration
                 using (var changed = new EditorGUI.ChangeCheckScope())
                 {
                     float newValue = EditorGUI.Slider(sliderRect, _scale, 0f, 1f);
@@ -185,12 +186,12 @@ namespace SaintsField.Editor.Utils
             {
                 // scrollView.handleScrollWheel = !(Event.current.control || Event.current.command);
                 _scrollPos = scrollView.scrollPosition;
-                IReadOnlyList<ItemInfo> targets;
+                IEnumerable<ItemInfo> targets;
                 if (isAssets)
                 {
                     if(_assetItems == null)
                     {
-                        _assetItems = FetchAllAssets(_search).Prepend(NullItemInfo).ToArray();
+                        _assetItems = FetchAllAssets("").Prepend(NullItemInfo).ToArray();
                     }
 
                     targets = _assetItems;
@@ -202,6 +203,12 @@ namespace SaintsField.Editor.Utils
                         _sceneItems = FetchAllSceneObject().Prepend(NullItemInfo).ToArray();
                     }
                     targets = _sceneItems;
+                }
+
+                string[] searchParts = _search.Trim().Split();
+                if(searchParts.Length > 0)
+                {
+                    targets = targets.Where(each => searchParts.All(part => each.Label.IndexOf(part, StringComparison.OrdinalIgnoreCase) >= 0));
                 }
 
                 if (showPreviewImage)  // image view
@@ -450,5 +457,7 @@ namespace SaintsField.Editor.Utils
                 yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name };
             }
         }
+
+        // protected bool PreFilter()
     }
 }
