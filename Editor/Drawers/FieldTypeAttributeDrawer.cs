@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -15,6 +16,75 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(FieldTypeAttribute))]
     public class FieldTypeAttributeDrawer: SaintsPropertyDrawer
     {
+        private class FieldTypeSelectWindow : ObjectSelectWindow
+        {
+            private Type[] _expectedTypes;
+            private Action<Object> _onSelected;
+            private EPick _editorPick;
+
+            public static void Open(EPick editorPick, Type[] expectedTypes, Action<Object> onSelected)
+            {
+                FieldTypeSelectWindow thisWindow = CreateInstance<FieldTypeSelectWindow>();
+                thisWindow.titleContent = new GUIContent($"Select {expectedTypes[0].Name}");
+                thisWindow._expectedTypes = expectedTypes;
+                thisWindow._onSelected = onSelected;
+                thisWindow._editorPick = editorPick;
+                thisWindow.ShowAuxWindow();
+            }
+
+            protected override bool AllowScene => _editorPick.HasFlag(EPick.Scene);
+            protected override bool AllowAssets => _editorPick.HasFlag(EPick.Assets);
+            protected override string Error => _error;
+
+            private string _error = "";
+
+            protected override void OnSelect(ItemInfo itemInfo)
+            {
+                _error = "";
+                Object obj = itemInfo.Object;
+
+                if(!FetchFilter(itemInfo))
+                {
+                    // Debug.LogError($"Selected object {obj} has no component {expectedType}");
+                    _error = $"{itemInfo.Label} is invalid";
+                    return;
+                }
+                _onSelected(obj);
+            }
+
+            protected override bool FetchAllSceneObjectFilter(ItemInfo itemInfo) => FetchFilter(itemInfo);
+
+            protected override bool FetchAllAssetsFilter(ItemInfo itemInfo) => FetchFilter(itemInfo);
+
+            private bool FetchFilter(ItemInfo itemInfo)
+            {
+                return itemInfo.Object == null || _expectedTypes.All(each => CanSign(itemInfo.Object, each));
+            }
+        }
+
+        private static bool CanSign(Object target, Type type)
+        {
+            if(type.IsInstanceOfType(target))
+            {
+                return true;
+            }
+
+            bool expectedIsGameObject = type == typeof(GameObject);
+            switch (target)
+            {
+                case GameObject go:
+                    if (expectedIsGameObject)
+                    {
+                        return true;
+                    }
+                    return go.GetComponent(type) != null;
+                case Component comp:
+                    return comp.GetComponent(type) != null;
+                default:
+                    return false;
+            }
+        }
+
         #region IMGUI
         private string _error = "";
 
@@ -40,11 +110,21 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
+            EPick editorPick = fieldTypeAttribute.EditorPick;
+            bool customPicker = fieldTypeAttribute.CustomPicker;
+
             // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
+                Rect fieldRect = customPicker
+                    ? new Rect(position)
+                    {
+                        width = position.width - 20,
+                    }
+                    : position;
+
                 Object fieldResult =
-                    EditorGUI.ObjectField(position, label, requiredValue, requiredComp, true);
+                    EditorGUI.ObjectField(fieldRect, label, requiredValue, requiredComp, editorPick.HasFlag(EPick.Scene));
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
@@ -55,6 +135,38 @@ namespace SaintsField.Editor.Drawers
                     {
                         _error = $"{fieldResult} has no component {fieldType}";
                     }
+                }
+            }
+
+            if(customPicker)
+            {
+                Rect overrideButtonRect = new Rect(position.x + position.width - 21, position.y, 21, position.height);
+                if (GUI.Button(overrideButtonRect, "●"))
+                {
+                    Type[] types = requiredComp  == fieldType
+                        ? new []{requiredComp}
+                        : new []{requiredComp, fieldType};
+                    FieldTypeSelectWindow.Open(editorPick, types, fieldResult =>
+                    {
+                        Object result = null;
+                        switch (fieldResult)
+                        {
+                            case null:
+                                // property.objectReferenceValue = null;
+                                break;
+                            case GameObject go:
+                                result = fieldType == typeof(GameObject) ? go : go.GetComponent(fieldType);
+                                break;
+                            case Component comp:
+                                result = fieldType == typeof(GameObject)
+                                    ? comp.gameObject
+                                    : comp.GetComponent(fieldType);
+                                break;
+                        }
+
+                        property.objectReferenceValue = result;
+                        property.serializedObject.ApplyModifiedProperties();
+                    });
                 }
             }
         }

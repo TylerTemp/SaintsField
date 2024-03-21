@@ -26,5 +26,8 @@ namespace SaintsField.Editor.Utils
         {
             Debug.Log($"{itemInfo.Label}: {itemInfo.Object}");
         }
+
+        protected override bool FetchAllSceneObjectFilter(ItemInfo itemInfo) => true;
+        protected override bool FetchAllAssetsFilter(ItemInfo itemInfo) => true;
     }
 }

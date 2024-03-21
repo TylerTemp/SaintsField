@@ -222,7 +222,7 @@ namespace SaintsField.Editor.Utils
                 {
                     if(_assetItems == null)
                     {
-                        _assetItems = FetchAllAssets().Prepend(NullItemInfo).ToArray();
+                        _assetItems = FetchAllAssets().Where(FetchAllAssetsFilter).Prepend(NullItemInfo).ToArray();
                     }
 
                     targets = _assetItems;
@@ -231,7 +231,7 @@ namespace SaintsField.Editor.Utils
                 {
                     if (_sceneItems == null)
                     {
-                        _sceneItems = FetchAllSceneObject().Prepend(NullItemInfo).ToArray();
+                        _sceneItems = FetchAllSceneObject().Where(FetchAllSceneObjectFilter).Prepend(NullItemInfo).ToArray();
                     }
                     targets = _sceneItems;
                 }
@@ -543,5 +543,8 @@ namespace SaintsField.Editor.Utils
         }
 
         // protected bool PreFilter()
+
+        protected abstract bool FetchAllSceneObjectFilter(ItemInfo itemInfo);
+        protected abstract bool FetchAllAssetsFilter(ItemInfo itemInfo);
     }
 }
