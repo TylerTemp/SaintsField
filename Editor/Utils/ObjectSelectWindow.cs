@@ -8,8 +8,13 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils
 {
-    public class ObjectSelectWindow: EditorWindow
+    public abstract class ObjectSelectWindow: EditorWindow
     {
+        protected abstract bool AllowScene { get; }
+        protected abstract bool AllowAssets { get; }
+
+        protected abstract string Error { get; }
+
         private class GUIBackgroundScoop : IDisposable
         {
             private readonly bool _changed;
@@ -43,7 +48,7 @@ namespace SaintsField.Editor.Utils
 
         private static readonly Vector2 WidthScale = new Vector2(30f, 100f);
 
-        private class ItemInfo
+        public class ItemInfo
         {
             // ReSharper disable InconsistentNaming
             public Object Object;
@@ -51,8 +56,11 @@ namespace SaintsField.Editor.Utils
             // public bool HasInstanceId;
             public int InstanceID;
             public string Label;
+            public GUIContent GuiLabel;
             // ReSharper enable InconsistentNaming
             public Texture2D preview;
+            // public bool triedFirstLoad;
+            public int failedCount;
         }
 
         private static readonly ItemInfo NullItemInfo = new ItemInfo
@@ -64,22 +72,45 @@ namespace SaintsField.Editor.Utils
             preview = null,
         };
 
-        [MenuItem("Saints/Show")]
-        public static void TestShow()
-        {
-            ObjectSelectWindow thisWindow = CreateInstance<ObjectSelectWindow>();
-            // if (Instance == null)
-            // {
-            //     Instance = CreateInstance<ObjectSelectWindow>();
-            // }
-            // // Instance.ShowAuxWindow();
-            thisWindow.Show();
-        }
+        // [MenuItem("Saints/Show")]
+        // public static void TestShow()
+        // {
+        //     ObjectSelectWindow thisWindow = CreateInstance<ObjectSelectWindow>();
+        //     // if (Instance == null)
+        //     // {
+        //     //     Instance = CreateInstance<ObjectSelectWindow>();
+        //     // }
+        //     // // Instance.ShowAuxWindow();
+        //     thisWindow.Show();
+        // }
 
         private IReadOnlyList<ItemInfo> _sceneItems;
         private IReadOnlyList<ItemInfo> _assetItems;
         private int _sceneItemSelectedIndex;
         private int _assetItemSelectedIndex;
+
+        private string[] tabs;
+
+        private void OnEnable()
+        {
+            List<string> useTabs = new List<string>();
+            if (AllowAssets)
+            {
+                useTabs.Add("Assets");
+            }
+
+            if (AllowScene)
+            {
+                useTabs.Add("Scene");
+            }
+
+            tabs = useTabs.ToArray();
+
+            if(_tabSelected >= tabs.Length)
+            {
+                _tabSelected = 0;
+            }
+        }
 
         private void OnDestroy()
         {
@@ -99,7 +130,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private GUIStyle _buttonStyle = null;
+        private GUIStyle _buttonStyle;
 
         private void OnGUI()
         {
@@ -113,11 +144,10 @@ namespace SaintsField.Editor.Utils
             };
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                _tabSelected = GUI.Toolbar(leftHalf, _tabSelected, new[]
+                using(new EditorGUI.DisabledScope(tabs.Length == 1))
                 {
-                    "Assets",
-                    "Scene",
-                });
+                    _tabSelected = GUI.Toolbar(leftHalf, _tabSelected, tabs);
+                }
 
                 if (changed.changed)
                 {
@@ -141,7 +171,8 @@ namespace SaintsField.Editor.Utils
                     }
                 }
             }
-            bool isAssets = _tabSelected == 0;
+
+            bool isAssets = tabs[_tabSelected] == "Assets";
             // slider
             if (isAssets)
             {
@@ -151,7 +182,7 @@ namespace SaintsField.Editor.Utils
                     width = tabLine.width - leftHalf.width - 10,
                 };
                 // ReSharper disable once ConvertToUsingDeclaration
-                using (var changed = new EditorGUI.ChangeCheckScope())
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
                     float newValue = EditorGUI.Slider(sliderRect, _scale, 0f, 1f);
                     if (changed.changed)
@@ -191,7 +222,7 @@ namespace SaintsField.Editor.Utils
                 {
                     if(_assetItems == null)
                     {
-                        _assetItems = FetchAllAssets("").Prepend(NullItemInfo).ToArray();
+                        _assetItems = FetchAllAssets().Prepend(NullItemInfo).ToArray();
                     }
 
                     targets = _assetItems;
@@ -205,10 +236,12 @@ namespace SaintsField.Editor.Utils
                     targets = _sceneItems;
                 }
 
+                IEnumerable<(ItemInfo itemInfo, int index)> targetsWithIndex = targets.WithIndex();
+
                 string[] searchParts = _search.Trim().Split();
                 if(searchParts.Length > 0)
                 {
-                    targets = targets.Where(each => searchParts.All(part => each.Label.IndexOf(part, StringComparison.OrdinalIgnoreCase) >= 0));
+                    targetsWithIndex = targetsWithIndex.Where(each => searchParts.All(part => each.itemInfo.Label.IndexOf(part, StringComparison.OrdinalIgnoreCase) >= 0));
                 }
 
                 if (showPreviewImage)  // image view
@@ -227,15 +260,10 @@ namespace SaintsField.Editor.Utils
                         colCount = Mathf.FloorToInt(useWidth / previewSize);
                     }
 
-                    // Debug.Log($"EditorGUIUtility.currentViewWidth={EditorGUIUtility.currentViewWidth}, previewSize={previewSize}, count={colCount}");
-
-                    // Debug.Log($"previewSize={previewSize}, colCount={colCount}");
-
                     float colWidth = useWidth / colCount;
 
-                    foreach (IReadOnlyList<(ItemInfo itemInfo, int index)> itemInfos in ChunkBy(targets.WithIndex(), colCount))
+                    foreach (IReadOnlyList<(ItemInfo itemInfo, int index)> itemInfos in ChunkBy(targetsWithIndex, colCount))
                     {
-                        // EditorGUILayout.BeginHorizontal();
                         Rect rect = EditorGUILayout.GetControlRect(GUILayout.Height(colWidth));
 
                         foreach (((ItemInfo itemInfo, int itemIndex), int rowIndex) in itemInfos.WithIndex())
@@ -263,35 +291,32 @@ namespace SaintsField.Editor.Utils
 
                             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                             {
-                                bool selected = GUI.Toggle(thisRect, _assetItemSelectedIndex == itemIndex, "", "button");
-                                if (changed.changed && selected)
+                                bool active = GUI.Toggle(thisRect, _assetItemSelectedIndex == itemIndex, "", GUI.skin.button);
+                                if (changed.changed)
                                 {
-                                    _assetItemSelectedIndex = itemIndex;
+                                    OnItemClick(itemIndex, active, true);
+                                    // _assetItemSelectedIndex = itemIndex;
                                 }
                             }
 
                             EditorGUI.LabelField(labelRect, itemInfo.Label);
                             Texture2D previewTexture = GetPreview(itemInfo);
                             // let's bypass Unity's life cycle null check
-                            if(previewTexture)
+                            if(!previewTexture)
+                            {
+                                previewTexture = itemInfo.Icon;
+                            }
+
+                            if (previewTexture)
                             {
                                 GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
                             }
-                            else if (itemInfo.Icon)
-                            {
-                                GUI.DrawTexture(previewRect, itemInfo.Icon, ScaleMode.ScaleToFit);
-                                // EditorGUI.LabelField(previewRect, "I");
-                            }
-
-                            // buttonStyleToggled.active.background = activeButtonColor;
-
-                            // if (itemInfo.Icon != null)
                             // {
-                            //     EditorGUI.DrawPreviewTexture(thisRect, itemInfo.Icon);
+                            //     GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
                             // }
-                            // else
+                            // else if (itemInfo.Icon)
                             // {
-                            //     EditorGUI.DrawRect(thisRect, Color.black);
+                            //     GUI.DrawTexture(previewRect, itemInfo.Icon, ScaleMode.ScaleToFit);
                             // }
                         }
                         // EditorGUILayout.EndHorizontal();
@@ -318,10 +343,10 @@ namespace SaintsField.Editor.Utils
                         };
                     }
 
-                    foreach ((ItemInfo itemInfo, int itemIndex) in targets.WithIndex())
+                    foreach ((ItemInfo itemInfo, int itemIndex) in targetsWithIndex)
                     {
                         Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight, GUI.skin.label);
-                        rect.height += 4;
+                        rect.height += 3;
                         rect.y -= 2;
                         // EditorGUI.DrawRect(rect, Color.blue);
 
@@ -334,16 +359,9 @@ namespace SaintsField.Editor.Utils
                         {
                             bool active = GUI.Toggle(rect, selected, new GUIContent(itemInfo.Label, itemInfo.Icon), _buttonStyle);
                             // ReSharper disable once InvertIf
-                            if (changed.changed && active)
+                            if (changed.changed)
                             {
-                                if(isAssets)
-                                {
-                                    _assetItemSelectedIndex = itemIndex;
-                                }
-                                else
-                                {
-                                    _sceneItemSelectedIndex = itemIndex;
-                                }
+                                OnItemClick(itemIndex, active, isAssets);
                             }
                         }
                         // GUI.Button(rect, new GUIContent(itemInfo.Label, itemInfo.Icon), _buttonStyle);
@@ -363,21 +381,30 @@ namespace SaintsField.Editor.Utils
 
             }
 
+            if (Error != "")
+            {
+                EditorGUILayout.HelpBox(Error, MessageType.Error);
+            }
+
             if(curSelectedIndex > 0)  // selected not null
             {
                 Rect searchRect = EditorGUILayout.GetControlRect(GUILayout.Height(80));
                 Rect selectPreviewRect = new Rect(searchRect.x + 5, searchRect.y + 5, 70, 70);
-                var itemInfo = isAssets ? _assetItems[curSelectedIndex] : _sceneItems[curSelectedIndex];
-                Texture2D previewTexture = GetPreview(itemInfo);
-                // let's bypass Unity's life cycle null check
-                if(!previewTexture)
+                ItemInfo itemInfo = isAssets ? _assetItems[curSelectedIndex] : _sceneItems[curSelectedIndex];
+                if(isAssets)
                 {
-                    previewTexture = itemInfo.Icon;
-                }
+                    itemInfo.failedCount = 0;
+                    Texture2D previewTexture = GetPreview(itemInfo);
+                    // let's bypass Unity's life cycle null check
+                    if (!previewTexture)
+                    {
+                        previewTexture = itemInfo.Icon;
+                    }
 
-                if (previewTexture)
-                {
-                    GUI.DrawTexture(selectPreviewRect, previewTexture, ScaleMode.ScaleToFit);
+                    if (previewTexture)
+                    {
+                        GUI.DrawTexture(selectPreviewRect, previewTexture, ScaleMode.ScaleToFit);
+                    }
                 }
 
                 Rect selectInfoRect = new Rect(searchRect.x + 80, searchRect.y + 5, searchRect.width - 80, 70);
@@ -398,6 +425,42 @@ namespace SaintsField.Editor.Utils
             // EditorGUI.DrawRect(searchRect, Color.blue);
         }
 
+        private double lastActiveClickTime = double.MinValue;
+
+        private void OnItemClick(int itemIndex, bool active, bool isAssets)
+        {
+            bool isClickActive = !active;
+            double curTime = EditorApplication.timeSinceStartup;
+            var itemInfo = isAssets ? _assetItems[itemIndex] : _sceneItems[itemIndex];
+            OnSelect(itemInfo);
+            if (isClickActive)
+            {
+                if (curTime - lastActiveClickTime < 0.5f)
+                {
+                    // double click
+                    // Debug.Log($"Double Click {itemIndex}");
+                    Close();
+                    return;
+                }
+
+                lastActiveClickTime = curTime;
+                return;
+            }
+
+            lastActiveClickTime = curTime;
+
+            if (isAssets)
+            {
+                _assetItemSelectedIndex = itemIndex;
+            }
+            else
+            {
+                _sceneItemSelectedIndex = itemIndex;
+            }
+        }
+
+        protected abstract void OnSelect(ItemInfo itemInfo);
+
         private static Texture2D GetPreview(ItemInfo itemInfo)
         {
             if (!itemInfo.Object)
@@ -405,17 +468,37 @@ namespace SaintsField.Editor.Utils
                 return null;
             }
 
-            if (itemInfo.preview != null && itemInfo.preview.width != 1)
+            // ReSharper disable once Unity.NoNullPropagation
+            if (itemInfo.preview && itemInfo.preview.width != 1)
             {
+                // Debug.Log($"return preview {itemInfo.preview.width}");
                 return itemInfo.preview;
             }
 
             if(AssetPreview.IsLoadingAssetPreview(itemInfo.InstanceID))
             {
+                // Debug.Log($"loading preview {itemInfo.Label}");
                 return null;
             }
 
-            return itemInfo.preview = AssetPreview.GetAssetPreview(itemInfo.Object);
+            if (itemInfo.failedCount > 5)
+            {
+                return null;
+            }
+
+            // itemInfo.triedFirstLoad = true;
+
+            Texture2D result = AssetPreview.GetAssetPreview(itemInfo.Object);
+            // Debug.Log($"return preview {result?.width}");
+            if (result && result.width != 1)
+            {
+                itemInfo.preview = result;
+                return result;
+            }
+
+            itemInfo.failedCount += 1;
+
+            return null;
         }
 
         private static IEnumerable<IReadOnlyList<T>> ChunkBy<T>(IEnumerable<T> source, int chunkSize)
@@ -437,14 +520,15 @@ namespace SaintsField.Editor.Utils
                 {
                     continue;
                 }
-                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name };
+                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name, GuiLabel = new GUIContent(property.name)};
             }
         }
 
-        private static IEnumerable<ItemInfo> FetchAllAssets(string search)
+        private static IEnumerable<ItemInfo> FetchAllAssets()
         {
             HierarchyProperty property = new HierarchyProperty(HierarchyType.Assets, false);
-            property.SetSearchFilter(search, 0);
+
+            // property.SetSearchFilter(search, 0);
 
             while (property.Next(null))
             {
@@ -454,7 +538,7 @@ namespace SaintsField.Editor.Utils
                     go = null;  // Object(null) is not null in Unity because Unity overrides `==`
                 }
 
-                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name };
+                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name, GuiLabel = new GUIContent(property.name)};
             }
         }
 
