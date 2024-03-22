@@ -183,14 +183,13 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                             break;
                     }
 
-                    if (matched)
-                    {
-                        onGUIPayload.SetValue(curValue);
-                    }
-                    else
+                    if (!matched)
                     {
                         property.objectReferenceValue = previousValue;
                     }
+                    // report it anyway because SaintsPropertyDrawer will check the value to decide changes,
+                    // which is earlier than this check
+                    onGUIPayload.SetValue(property.objectReferenceValue);
                 }
             }
 
