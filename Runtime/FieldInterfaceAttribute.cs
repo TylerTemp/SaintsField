@@ -15,7 +15,7 @@ namespace SaintsField
         // ReSharper enable InconsistentNaming
 
         public FieldInterfaceAttribute(Type interfaceType, EPick editorPick = EPick.Assets | EPick.Scene,
-            bool customPicker = false)
+            bool customPicker = true)
         {
             InterfaceType = interfaceType;
             EditorPick = editorPick;
