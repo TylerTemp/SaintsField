@@ -304,36 +304,37 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             ISaintsAttribute saintsAttribute,
             VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
-            FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
-            bool customPicker = fieldTypeAttribute.CustomPicker;
-            Type requiredComp = fieldTypeAttribute.CompType;
+            FieldInterfaceAttribute fieldInterfaceAttribute = (FieldInterfaceAttribute)saintsAttribute;
+            bool customPicker = fieldInterfaceAttribute.CustomPicker;
+            Type requiredInterface = fieldInterfaceAttribute.InterfaceType;
             Type fieldType = SerializedUtils.GetType(property);
-            Object requiredValue;
+            // Object requiredValue;
 
             // Debug.Log($"property.Object={property.objectReferenceValue}");
 
-            try
-            {
-                requiredValue = GetValue(property, fieldType, requiredComp);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-
-                VisualElement root = new VisualElement();
-                root.Add(SaintsFallbackUIToolkit(property));
-                root.Add(new HelpBox(e.Message, HelpBoxMessageType.Error));
-                return root;
-            }
+            // try
+            // {
+            //     requiredValue = GetValue(property, fieldType, requiredComp);
+            // }
+            // catch (Exception e)
+            // {
+            //     Debug.LogException(e);
+            //
+            //     VisualElement root = new VisualElement();
+            //     root.Add(SaintsFallbackUIToolkit(property));
+            //     root.Add(new HelpBox(e.Message, HelpBoxMessageType.Error));
+            //     return root;
+            // }
 
             // Debug.Log($"requiredValue={requiredValue}");
 
+            // PropertyField has some issue here for decoration etc. Need some test.
             ObjectField objectField = new ObjectField(new string(' ', property.displayName.Length))
             {
                 name = NameObjectField(property),
-                objectType = requiredComp,
-                allowSceneObjects = true,
-                value = requiredValue,
+                objectType = requiredInterface,
+                allowSceneObjects = fieldInterfaceAttribute.EditorPick.HasFlag(EPick.Scene),
+                value = property.objectReferenceValue,
                 style =
                 {
                     flexShrink = 1,
@@ -370,10 +371,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
-            Type requiredComp = fieldTypeAttribute.CompType;
+            FieldInterfaceAttribute fieldInterfaceAttribute = (FieldInterfaceAttribute)saintsAttribute;
+            Type requiredComp = fieldInterfaceAttribute.InterfaceType;
             Type fieldType = SerializedUtils.GetType(property);
-            EPick editorPick = fieldTypeAttribute.EditorPick;
+            EPick editorPick = fieldInterfaceAttribute.EditorPick;
 
             ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
 
@@ -399,27 +400,15 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             Button selectorButton = container.Q<Button>(NameSelectorButton(property));
             if (selectorButton != null)
             {
-                // Type[] types = requiredComp  == fieldType
-                //     ? new []{requiredComp}
-                //     : new []{requiredComp, fieldType};
-
-                // Debug.Log(editorPick);
-
                 selectorButton.clicked += () =>
                 {
-                    // FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
-                    // {
-                    //     Object result = OnSelectWindowSelected(fieldResult, fieldType);
-                    //     // Debug.Log($"fieldType={fieldType} fieldResult={fieldResult}, result={result}");
-                    //     property.objectReferenceValue = result;
-                    //     property.serializedObject.ApplyModifiedProperties();
-                    //     objectField.SetValueWithoutNotify(result);
-                    //     // objectField.Unbind();
-                    //     // objectField.BindProperty(property);
-                    //     onValueChangedCallback.Invoke(result);
-                    //
-                    //     // Debug.Log($"property new value = {property.objectReferenceValue}, objectField={objectField.value}");
-                    // });
+                    FieldInterfaceSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
+                    {
+                        Object result = OnSelectWindowSelected(fieldResult, fieldType);
+                        property.objectReferenceValue = result;
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback.Invoke(result);
+                    });
                 };
             }
         }
