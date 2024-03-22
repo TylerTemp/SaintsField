@@ -13,6 +13,6 @@ namespace SaintsField.Samples.Scripts
         [SerializeField, FieldType(typeof(Collider))]
         private Dummy dummy;
 
-        public string normal;
+        // public string normal;
     }
 }

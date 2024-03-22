@@ -3,21 +3,21 @@ using UnityEngine;
 
 namespace SaintsField
 {
-    public class FieldTypeAttribute: PropertyAttribute, ISaintsAttribute
+    public class FieldInterfaceAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
 
         // ReSharper disable InconsistentNaming
-        public readonly Type CompType;
+        public readonly Type InterfaceType;
         public readonly EPick EditorPick;
         public readonly bool CustomPicker;
         // ReSharper enable InconsistentNaming
 
-        public FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene,
-            bool customPicker = true)
+        public FieldInterfaceAttribute(Type interfaceType, EPick editorPick = EPick.Assets | EPick.Scene,
+            bool customPicker = false)
         {
-            CompType = compType;
+            InterfaceType = interfaceType;
             EditorPick = editorPick;
             CustomPicker = customPicker;
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if SAINTSFIELD_DEBUG_IMGUI_DEBUGGER
+using System;
 using UnityEditor;
 
 namespace SaintsField.Editor.Utils
@@ -12,3 +13,4 @@ namespace SaintsField.Editor.Utils
         }
     }
 }
+#endif

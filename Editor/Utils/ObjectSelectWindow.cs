@@ -70,6 +70,8 @@ namespace SaintsField.Editor.Utils
             Label = "None",
             Object = null,
             preview = null,
+            GuiLabel = new GUIContent("None"),
+            failedCount = int.MaxValue - 1,
         };
 
         // [MenuItem("Saints/Show")]
@@ -86,18 +88,30 @@ namespace SaintsField.Editor.Utils
 
         private IReadOnlyList<ItemInfo> _sceneItems;
         private IReadOnlyList<ItemInfo> _assetItems;
-        private int _sceneItemSelectedIndex;
-        private int _assetItemSelectedIndex;
+        private int _sceneItemSelectedIndex = -1;
+        private int _assetItemSelectedIndex = -1;
 
         private string[] tabs;
 
-        private void OnEnable()
+        private bool _init;
+        // this is called before show in UI Toolkit env. Don't know why...
+        // private void OnEnable()
+        private void EnsureInit()
         {
+            if (_init)
+            {
+                return;
+            }
+
+            _init = true;
             List<string> useTabs = new List<string>();
+            // Debug.Log($"AllowAssets={AllowAssets}");
             if (AllowAssets)
             {
                 useTabs.Add("Assets");
             }
+
+            // Debug.Log($"AllowScene={AllowScene}");
 
             if (AllowScene)
             {
@@ -105,6 +119,8 @@ namespace SaintsField.Editor.Utils
             }
 
             tabs = useTabs.ToArray();
+
+            // Debug.Log($"OnEnable, _tabSelected={_tabSelected}, length={tabs.Length}");
 
             if(_tabSelected >= tabs.Length)
             {
@@ -132,8 +148,54 @@ namespace SaintsField.Editor.Utils
 
         private GUIStyle _buttonStyle;
 
+        protected void SetDefaultActive(Object target)
+        {
+            EnsureInit();
+
+            if (target == null)
+            {
+                _assetItemSelectedIndex = _sceneItemSelectedIndex = 0;
+                return;
+            }
+
+            if (AllowAssets)
+            {
+                foreach ((ItemInfo itemInfo, int index) in EnsureAssetItems().WithIndex())
+                {
+                    if (IsEqual(itemInfo, target))
+                    {
+                        _assetItemSelectedIndex = index;
+                        _tabSelected = Array.IndexOf(tabs, "Assets");
+                        _sceneItemSelectedIndex = -1;
+                        return;
+                    }
+                }
+            }
+
+            if (AllowScene)
+            {
+                foreach ((ItemInfo itemInfo, int index) in EnsureSceneItems().WithIndex())
+                {
+                    if (IsEqual(itemInfo, target))
+                    {
+                        _sceneItemSelectedIndex = index;
+                        _tabSelected = Array.IndexOf(tabs, "Scene");
+                        _assetItemSelectedIndex = -1;
+                        return;
+                    }
+                }
+            }
+        }
+
+        // target is not null
+        protected abstract bool IsEqual(ItemInfo itemInfo, Object target);
+
+        private GUIStyle _labelCenterStyle;
+
         private void OnGUI()
         {
+            EnsureInit();
+
             _search = EditorGUILayout.TextField(_search);
 
             Rect tabLine = EditorGUILayout.GetControlRect();
@@ -217,24 +279,9 @@ namespace SaintsField.Editor.Utils
             {
                 // scrollView.handleScrollWheel = !(Event.current.control || Event.current.command);
                 _scrollPos = scrollView.scrollPosition;
-                IEnumerable<ItemInfo> targets;
-                if (isAssets)
-                {
-                    if(_assetItems == null)
-                    {
-                        _assetItems = FetchAllAssets().Where(FetchAllAssetsFilter).Prepend(NullItemInfo).ToArray();
-                    }
-
-                    targets = _assetItems;
-                }
-                else
-                {
-                    if (_sceneItems == null)
-                    {
-                        _sceneItems = FetchAllSceneObject().Where(FetchAllSceneObjectFilter).Prepend(NullItemInfo).ToArray();
-                    }
-                    targets = _sceneItems;
-                }
+                IEnumerable<ItemInfo> targets = isAssets
+                    ? EnsureAssetItems()
+                    : EnsureSceneItems();
 
                 IEnumerable<(ItemInfo itemInfo, int index)> targetsWithIndex = targets.WithIndex();
 
@@ -299,7 +346,21 @@ namespace SaintsField.Editor.Utils
                                 }
                             }
 
-                            EditorGUI.LabelField(labelRect, itemInfo.Label);
+                            float labelWidth = EditorStyles.label.CalcSize(itemInfo.GuiLabel).x;
+                            GUIStyle labelStyle = EditorStyles.label;
+                            if (labelWidth < labelRect.width)
+                            {
+                                if (_labelCenterStyle == null)
+                                {
+                                    _labelCenterStyle = new GUIStyle(EditorStyles.label)
+                                    {
+                                        alignment = TextAnchor.MiddleCenter,
+                                    };
+                                }
+                                labelStyle = _labelCenterStyle;
+                            }
+
+                            EditorGUI.LabelField(labelRect, itemInfo.Label, labelStyle);
                             Texture2D previewTexture = GetPreview(itemInfo);
                             // let's bypass Unity's life cycle null check
                             if(!previewTexture)
@@ -457,6 +518,26 @@ namespace SaintsField.Editor.Utils
             {
                 _sceneItemSelectedIndex = itemIndex;
             }
+        }
+
+        private IReadOnlyList<ItemInfo> EnsureAssetItems()
+        {
+            if(_assetItems == null)
+            {
+                _assetItems = FetchAllAssets().Where(FetchAllAssetsFilter).Prepend(NullItemInfo).ToArray();
+            }
+
+            return _assetItems;
+        }
+
+        private IReadOnlyList<ItemInfo> EnsureSceneItems()
+        {
+            if (_sceneItems == null)
+            {
+                _sceneItems = FetchAllSceneObject().Where(FetchAllSceneObjectFilter).Prepend(NullItemInfo).ToArray();
+            }
+
+            return _sceneItems;
         }
 
         protected abstract void OnSelect(ItemInfo itemInfo);

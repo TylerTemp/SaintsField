@@ -1,42 +1,89 @@
-﻿using System;
+﻿#if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
+#endif
+using System;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-#if UNITY_2021_3_OR_NEWER
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
-#endif
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.CustomPicker
 {
     [CustomPropertyDrawer(typeof(FieldTypeAttribute))]
     public class FieldTypeAttributeDrawer: SaintsPropertyDrawer
     {
         private class FieldTypeSelectWindow : ObjectSelectWindow
         {
-            private Type[] _expectedTypes;
+            // private Type[] _expectedTypes;
+            private Type _originType;
+            private Type _swappedType;
             private Action<Object> _onSelected;
             private EPick _editorPick;
 
-            public static void Open(EPick editorPick, Type[] expectedTypes, Action<Object> onSelected)
+            public static void Open(Object curValue, EPick editorPick, Type originType, Type swappedType, Action<Object> onSelected)
             {
                 FieldTypeSelectWindow thisWindow = CreateInstance<FieldTypeSelectWindow>();
-                thisWindow.titleContent = new GUIContent($"Select {expectedTypes[0].Name}");
-                thisWindow._expectedTypes = expectedTypes;
+                thisWindow.titleContent = new GUIContent($"Select {swappedType.Name}");
+                // thisWindow._expectedTypes = expectedTypes;
+                thisWindow._originType = originType;
+                thisWindow._swappedType = swappedType;
                 thisWindow._onSelected = onSelected;
                 thisWindow._editorPick = editorPick;
+                thisWindow.SetDefaultActive(curValue);
+                // Debug.Log($"call show selector window");
                 thisWindow.ShowAuxWindow();
             }
 
-            protected override bool AllowScene => _editorPick.HasFlag(EPick.Scene);
-            protected override bool AllowAssets => _editorPick.HasFlag(EPick.Assets);
-            protected override string Error => _error;
+            protected override bool AllowScene =>
+                // Debug.Log(_editorPick);
+                _editorPick.HasFlag(EPick.Scene);
+
+            protected override bool AllowAssets =>
+                // Debug.Log(_editorPick);
+                _editorPick.HasFlag(EPick.Assets);
 
             private string _error = "";
+            protected override string Error => _error;
+
+            protected override bool IsEqual(ItemInfo itemInfo, Object target)
+            {
+                Object itemObject = itemInfo.Object;
+                if (!itemObject)
+                {
+                    return false;
+                }
+
+                int targetInstanceId = target.GetInstanceID();
+                if (itemInfo.InstanceID == targetInstanceId)
+                {
+                    return true;
+                }
+
+                // target=originalType(Component, GameObject) e.g. Sprite, SpriteRenderer
+                // itemObject: Scene.GameObject, Assets.?
+
+                // lets get the originalValue from the checking target
+                bool originalIsGameObject = _originType == typeof(GameObject);
+                Object itemToOriginTypeValue;
+                switch (itemObject)
+                {
+                    case GameObject go:
+                        itemToOriginTypeValue = originalIsGameObject ? go : go.GetComponent(_originType);
+                        break;
+                    case Component compo:
+                        itemToOriginTypeValue = originalIsGameObject ? compo.gameObject : compo.GetComponent(_originType);
+                        break;
+                    default:
+                        return false;
+                }
+
+                // Debug.Log($"{itemObject} ?= {target} => {itemToOriginTypeValue.GetInstanceID() == targetInstanceId}");
+                return itemToOriginTypeValue.GetInstanceID() == targetInstanceId;
+            }
 
             protected override void OnSelect(ItemInfo itemInfo)
             {
@@ -58,7 +105,15 @@ namespace SaintsField.Editor.Drawers
 
             private bool FetchFilter(ItemInfo itemInfo)
             {
-                return itemInfo.Object == null || _expectedTypes.All(each => CanSign(itemInfo.Object, each));
+                if (itemInfo.Object == null)
+                {
+                    return true;
+                }
+                Type[] expectedTypes = _originType == _swappedType
+                    ? new[] {_originType}
+                    : new[] {_originType, _swappedType};
+                // return  || _expectedTypes.All(each => CanSign(itemInfo.Object, each));
+                return expectedTypes.All(each => CanSign(itemInfo.Object, each));
             }
         }
 
@@ -143,32 +198,40 @@ namespace SaintsField.Editor.Drawers
                 Rect overrideButtonRect = new Rect(position.x + position.width - 21, position.y, 21, position.height);
                 if (GUI.Button(overrideButtonRect, "●"))
                 {
-                    Type[] types = requiredComp  == fieldType
-                        ? new []{requiredComp}
-                        : new []{requiredComp, fieldType};
-                    FieldTypeSelectWindow.Open(editorPick, types, fieldResult =>
+                    // Type[] types = requiredComp  == fieldType
+                    //     ? new []{requiredComp}
+                    //     : new []{requiredComp, fieldType};
+                    FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
                     {
-                        Object result = null;
-                        switch (fieldResult)
-                        {
-                            case null:
-                                // property.objectReferenceValue = null;
-                                break;
-                            case GameObject go:
-                                result = fieldType == typeof(GameObject) ? go : go.GetComponent(fieldType);
-                                break;
-                            case Component comp:
-                                result = fieldType == typeof(GameObject)
-                                    ? comp.gameObject
-                                    : comp.GetComponent(fieldType);
-                                break;
-                        }
-
+                        Object result = OnSelectWindowSelected(fieldResult, fieldType);
                         property.objectReferenceValue = result;
                         property.serializedObject.ApplyModifiedProperties();
+                        onGUIPayload.SetValue(result);
                     });
                 }
             }
+        }
+
+        private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType)
+        {
+            Object result = null;
+            switch (fieldResult)
+            {
+                case null:
+                    // property.objectReferenceValue = null;
+                    break;
+                case GameObject go:
+                    result = fieldType == typeof(GameObject) ? go : go.GetComponent(fieldType);
+                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
+                    break;
+                case Component comp:
+                    result = fieldType == typeof(GameObject)
+                        ? comp.gameObject
+                        : comp.GetComponent(fieldType);
+                    break;
+            }
+
+            return result;
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -235,15 +298,20 @@ namespace SaintsField.Editor.Drawers
 
         private static string NameObjectField(SerializedProperty property) => $"{property.propertyPath}__FieldType_ObjectField";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__FieldType_HelpBox";
+        private static string NameSelectorButton(SerializedProperty property) => $"{property.propertyPath}__FieldType_SelectorButton";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
+            bool customPicker = fieldTypeAttribute.CustomPicker;
             Type requiredComp = fieldTypeAttribute.CompType;
             Type fieldType = SerializedUtils.GetType(property);
             Object requiredValue;
+
+            // Debug.Log($"property.Object={property.objectReferenceValue}");
+
             try
             {
                 requiredValue = GetValue(property, fieldType, requiredComp);
@@ -274,6 +342,27 @@ namespace SaintsField.Editor.Drawers
 
             objectField.Bind(property.serializedObject);
 
+            if (customPicker)
+            {
+                StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
+                objectField.styleSheets.Add(hideStyle);
+                Button selectorButton = new Button
+                {
+                    text = "●",
+                    style =
+                    {
+                        position = Position.Absolute,
+                        right = 0,
+                        width = 18,
+                        marginLeft = 0,
+                        marginRight = 0,
+                    },
+                    name = NameSelectorButton(property),
+                };
+
+                objectField.Add(selectorButton);
+            }
+
             return objectField;
         }
 
@@ -284,6 +373,7 @@ namespace SaintsField.Editor.Drawers
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;
             Type fieldType = SerializedUtils.GetType(property);
+            EPick editorPick = fieldTypeAttribute.EditorPick;
 
             ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
 
@@ -305,6 +395,33 @@ namespace SaintsField.Editor.Drawers
                     helpBox.style.display = DisplayStyle.None;
                 }
             });
+
+            Button selectorButton = container.Q<Button>(NameSelectorButton(property));
+            if (selectorButton != null)
+            {
+                // Type[] types = requiredComp  == fieldType
+                //     ? new []{requiredComp}
+                //     : new []{requiredComp, fieldType};
+
+                // Debug.Log(editorPick);
+
+                selectorButton.clicked += () =>
+                {
+                    FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
+                    {
+                        Object result = OnSelectWindowSelected(fieldResult, fieldType);
+                        // Debug.Log($"fieldType={fieldType} fieldResult={fieldResult}, result={result}");
+                        property.objectReferenceValue = result;
+                        property.serializedObject.ApplyModifiedProperties();
+                        objectField.SetValueWithoutNotify(result);
+                        // objectField.Unbind();
+                        // objectField.BindProperty(property);
+                        onValueChangedCallback.Invoke(result);
+
+                        // Debug.Log($"property new value = {property.objectReferenceValue}, objectField={objectField.value}");
+                    });
+                };
+            }
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
