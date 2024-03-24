@@ -65,13 +65,8 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 **2.2.1**
 
-1.  Fix [Issue 8](https://github.com/TylerTemp/SaintsField/issues/8) that most attributes in `SaintsField` did NOT looking for the inherited parent target... This includes `PropRange`, `Min`, `Max`, `Dropdown`, `AdvancedDropdown`, `SpriteToggle`, `MaterialToggle`, `ColorToggle`, `RichLabel`, `Above/BelowRichLabel`, `InfoBox`, Buttons etc.
-2.  Fix `Dropdown` and `AdvancedDropdown` incorrect parent finding which may lead to incorrect dropdown items.
-3.  Most callbacks now can receive the value of the target field. Allowing a suitable required/optional parameter in the callback to make it work.
-
-This update does not break existing APIs, but greatly changed internal logic of property/method finding, so it's a minor version bump.
-
-Special thanks to [ZeroUltra](https://github.com/ZeroUltra) to find this important issue.
+1.  Add `RequireType`. This attribute allow you to specify the required component or **interface** for a field.
+2.  `FieldType` now has a custom object picker window. By default Unity disallow to see an asset with a specific type because of "performance consideration". Ironically, if you directly use a component type instead of a `GameObject`, Unity **WILL** show a correct asset picker. As this can not be "hacked" or "tricked" to let Unity show the correct picker, the custom object picker will allow you to pick a object (e.g. a prefab) with the component you want.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -704,7 +699,7 @@ For each argument:
     *   `EPick.Assets` for assets
     *   `EPick.Scene` for scene objects
     For the default Unity picker: if no `EPick.Scene` is set,  will not show the scene objects. However, omit `Assets` will still show the assets. This limitation is from Unity's API.
-    
+
     The custom picker does **NOT** have this limitation.
 *   `customPicker` show an extra button to use a custom picker. Disable this if you have serious performance issue.
 
@@ -2083,11 +2078,11 @@ For each argument:
     Otherwise, it will try to prevent the change.
 
 *   `bool customPicker=true`
-    
+
     Show a custom picker to pick an object. The showing objects are already meet the requirement(s).
 
 *   `EPick editorPick=EPick.Assets | EPick.Scene`
-    
+
     The picker type for the custom picker. `EPick.Assets` for assets, `EPick.Scene` for scene objects.
 
 *   `params Type[] requiredTypes`

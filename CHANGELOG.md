@@ -1,10 +1,7 @@
 ## 2.2.1
 
 1.  Add `RequireType`. This attribute allow you to specify the required component or **interface** for a field.
-2.  `FieldType` now has a custom object picker window. By default Unity disallow to see an asset with a specific type because of "performance consideration".
-    Ironically, if you directly use a component type instead of a `GameObject`, Unity **WILL** show a correct asset picker.
-    As this can not be "hacked" or "tricked" to let Unity show the correct picker, the custom object picker will allow you to pick a object (e.g. a prefab)
-    with the component you want. 
+2.  `FieldType` now has a custom object picker window. By default Unity disallow to see an asset with a specific type because of "performance consideration". Ironically, if you directly use a component type instead of a `GameObject`, Unity **WILL** show a correct asset picker. As this can not be "hacked" or "tricked" to let Unity show the correct picker, the custom object picker will allow you to pick a object (e.g. a prefab) with the component you want.
 
 ## 2.2.0
 
