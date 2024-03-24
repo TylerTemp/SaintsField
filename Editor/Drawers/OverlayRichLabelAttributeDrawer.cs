@@ -304,7 +304,7 @@ namespace SaintsField.Editor.Drawers
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container,
             FieldInfo info,
-            object parent, object newValue)
+            object parent, Action<object> onValueChangedCallback, object newValue)
         {
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute) saintsAttribute;
             CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);

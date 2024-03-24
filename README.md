@@ -63,7 +63,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.2.0**
+**2.2.1**
 
 1.  Fix [Issue 8](https://github.com/TylerTemp/SaintsField/issues/8) that most attributes in `SaintsField` did NOT looking for the inherited parent target... This includes `PropRange`, `Min`, `Max`, `Dropdown`, `AdvancedDropdown`, `SpriteToggle`, `MaterialToggle`, `ColorToggle`, `RichLabel`, `Above/BelowRichLabel`, `InfoBox`, Buttons etc.
 2.  Fix `Dropdown` and `AdvancedDropdown` incorrect parent finding which may lead to incorrect dropdown items.
@@ -691,6 +691,22 @@ public class RateExample: MonoBehaviour
 Ask the inspector to display another type of field rather than the field's original type.
 
 This is useful when you want to have a `GameObject` prefab, but you want this target prefab to have a specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you force the inspector to sign the required object that has your expected component but still gives you the original typed value to field.
+
+Overload:
+
+*   `FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
+*   `FieldTypeAttribute(Type compType, bool customPicker): this(compType, EPick.Assets | EPick.Scene, customPicker)`
+
+For each argument:
+
+*   `Type compType` the type of the component you want to pick
+*   `EPick editorPick` where you want to pick the component. Options are:
+    *   `EPick.Assets` for assets
+    *   `EPick.Scene` for scene objects
+    For the default Unity picker: if no `EPick.Scene` is set,  will not show the scene objects. However, omit `Assets` will still show the assets. This limitation is from Unity's API.
+    
+    The custom picker does **NOT** have this limitation.
+*   `customPicker` show an extra button to use a custom picker. Disable this if you have serious performance issue.
 
 *   AllowMultiple: No
 
@@ -2039,6 +2055,63 @@ public class ButtonAddOnClickExample: MonoBehaviour
 ```
 
 ![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
+
+#### `RequireType` ####
+
+Allow you to specify the required component(s) or **interface**(s) for a field.
+
+If the signed field does not meet the requirement, it'll:
+
+*   show an error message, if `freeSign=false`
+*   prevent the change, if `freeSign=true`
+
+`customPicker` will allow you to pick an object which are already meet the requirement(s).
+
+Overload:
+
+*   `RequireTypeAttribute(bool freeSign = false, bool customPicker = true, params Type[] requiredTypes): this(EPick.Assets | EPick.Scene, freeSign, customPicker, requiredTypes)`
+*   `RequireTypeAttribute(bool freeSign, params Type[] requiredTypes)`
+*   `RequireTypeAttribute(EPick editorPick, params Type[] requiredTypes)`
+*   `RequireTypeAttribute(params Type[] requiredTypes)`
+
+For each argument:
+
+*   `bool freeSign=false`
+
+    If true, it'll allow you to sign any object to this field, and display an error message if it does not meet the requirement(s).
+
+    Otherwise, it will try to prevent the change.
+
+*   `bool customPicker=true`
+    
+    Show a custom picker to pick an object. The showing objects are already meet the requirement(s).
+
+*   `EPick editorPick=EPick.Assets | EPick.Scene`
+    
+    The picker type for the custom picker. `EPick.Assets` for assets, `EPick.Scene` for scene objects.
+
+*   `params Type[] requiredTypes`
+
+    The required component(s) or interface(s) for this field.
+
+*   AllowMultiple: No
+
+```csharp
+public interface IMyInterface {}
+
+public class MyInter1: MonoBehaviour, IMyInterface {}
+public class MySubInter: MyInter1 {}
+
+public class MyInter2: MonoBehaviour, IMyInterface {}
+
+[RequireType(typeof(IMyInterface))] public SpriteRenderer interSr;
+[RequireType(typeof(IMyInterface), typeof(SpriteRenderer))] public GameObject interfaceGo;
+
+[RequireType(true, typeof(IMyInterface))] public SpriteRenderer srNoPickerFreeSign;
+[RequireType(true, typeof(IMyInterface))] public GameObject goNoPickerFreeSign;
+```
+
+![RequireType](https://github.com/TylerTemp/SaintsField/assets/6391063/fa296163-611b-4e4a-8218-f682e464ee50)
 
 #### `SaintsRow` ####
 

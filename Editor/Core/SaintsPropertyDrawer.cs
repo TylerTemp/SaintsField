@@ -1228,8 +1228,10 @@ namespace SaintsField.Editor.Core
                     }
 
                     // if (changed.changed && fieldDrawer == null)
+                    // Debug.Log($"changed.changed={changed.changed}");
                     if (changed.changed && !onGUIPayload.changed)
                     {
+                        // Debug.Log($"set changed to true");
                         // PropertyPathToShared[property.propertyPath].Changed = true;
                         // onGUIPayload.changed = true;
                         property.serializedObject.ApplyModifiedProperties();
@@ -1747,11 +1749,16 @@ namespace SaintsField.Editor.Core
             Debug.Log($"On Awake");
 #endif
             // ReSharper disable once ConvertToLocalFunction
-            Action<object> onValueChangedCallback = obj =>
+            Action<object> onValueChangedCallback = null;
+            onValueChangedCallback = obj =>
             {
                 foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
                 {
-                    saintsPropertyInfo.Drawer.OnValueChanged(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent, obj);
+                    saintsPropertyInfo.Drawer.OnValueChanged(
+                        property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement,
+                        fieldInfo, parent,
+                        onValueChangedCallback,
+                        obj);
                 }
             };
 
@@ -1900,6 +1907,7 @@ namespace SaintsField.Editor.Core
             VisualElement container,
             FieldInfo info,
             object parent,
+            Action<object> onValueChangedCallback,
             object newValue)
         {
         }

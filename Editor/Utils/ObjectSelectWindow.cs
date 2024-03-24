@@ -160,7 +160,7 @@ namespace SaintsField.Editor.Utils
 
             if (AllowAssets)
             {
-                foreach ((ItemInfo itemInfo, int index) in EnsureAssetItems().WithIndex())
+                foreach ((ItemInfo itemInfo, int index) in EnsureAssetItems().WithIndex().Skip(1))
                 {
                     if (IsEqual(itemInfo, target))
                     {
@@ -174,7 +174,7 @@ namespace SaintsField.Editor.Utils
 
             if (AllowScene)
             {
-                foreach ((ItemInfo itemInfo, int index) in EnsureSceneItems().WithIndex())
+                foreach ((ItemInfo itemInfo, int index) in EnsureSceneItems().WithIndex().Skip(1))
                 {
                     if (IsEqual(itemInfo, target))
                     {

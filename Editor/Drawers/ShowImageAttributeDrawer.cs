@@ -9,8 +9,6 @@ using UnityEngine.UI;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
-using Button = UnityEngine.UI.Button;
-using Image = UnityEngine.UI.Image;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -298,11 +296,11 @@ namespace SaintsField.Editor.Drawers
                 //     break;
                 case SpriteRenderer spriteRenderer:
                     return ("", spriteRenderer.sprite == null? null: spriteRenderer.sprite.texture);
-                case Image image:
+                case UnityEngine.UI.Image image:
                     return ("", image.sprite == null? null: image.sprite.texture);
                 case RawImage image:
                     return ("", image.texture as Texture2D);
-                case Button button:
+                case UnityEngine.UI.Button button:
                     // targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);
                     return button.targetGraphic?
                         ("", button.targetGraphic.mainTexture as Texture2D):

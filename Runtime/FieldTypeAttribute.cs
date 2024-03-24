@@ -18,9 +18,14 @@ namespace SaintsField
             bool customPicker = true)
         {
             CompType = compType;
-            EditorPick = editorPick;
+            EditorPick = editorPick == 0
+                ? EPick.Assets | EPick.Scene
+                : editorPick;
             CustomPicker = customPicker;
+        }
 
+        public FieldTypeAttribute(Type compType, bool customPicker): this(compType, EPick.Assets | EPick.Scene, customPicker)
+        {
         }
     }
 }
