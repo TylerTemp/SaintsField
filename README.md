@@ -690,7 +690,7 @@ This is useful when you want to have a `GameObject` prefab, but you want this ta
 Overload:
 
 *   `FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
-*   `FieldTypeAttribute(Type compType, bool customPicker): this(compType, EPick.Assets | EPick.Scene, customPicker)`
+*   `FieldTypeAttribute(Type compType, bool customPicker)`
 
 For each argument:
 
@@ -2064,7 +2064,7 @@ If the signed field does not meet the requirement, it'll:
 
 Overload:
 
-*   `RequireTypeAttribute(bool freeSign = false, bool customPicker = true, params Type[] requiredTypes): this(EPick.Assets | EPick.Scene, freeSign, customPicker, requiredTypes)`
+*   `RequireTypeAttribute(bool freeSign = false, bool customPicker = true, params Type[] requiredTypes)`
 *   `RequireTypeAttribute(bool freeSign, params Type[] requiredTypes)`
 *   `RequireTypeAttribute(EPick editorPick, params Type[] requiredTypes)`
 *   `RequireTypeAttribute(params Type[] requiredTypes)`
