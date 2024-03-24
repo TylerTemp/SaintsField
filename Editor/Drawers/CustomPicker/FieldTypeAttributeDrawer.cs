@@ -72,10 +72,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 switch (itemObject)
                 {
                     case GameObject go:
-                        itemToOriginTypeValue = originalIsGameObject ? go : go.GetComponent(_originType);
+                        itemToOriginTypeValue = originalIsGameObject ? (Object)go : go.GetComponent(_originType);
                         break;
                     case Component compo:
-                        itemToOriginTypeValue = originalIsGameObject ? compo.gameObject : compo.GetComponent(_originType);
+                        itemToOriginTypeValue = originalIsGameObject ? (Object)compo.gameObject : compo.GetComponent(_originType);
                         break;
                     default:
                         return false;
@@ -221,12 +221,12 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                     // property.objectReferenceValue = null;
                     break;
                 case GameObject go:
-                    result = fieldType == typeof(GameObject) ? go : go.GetComponent(fieldType);
+                    result = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
                     // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
                     break;
                 case Component comp:
                     result = fieldType == typeof(GameObject)
-                        ? comp.gameObject
+                        ? (Object)comp.gameObject
                         : comp.GetComponent(fieldType);
                     break;
             }
