@@ -99,13 +99,14 @@ namespace SaintsField.Editor.Drawers
                 //         background = _clear,
                 //     },
                 // };
-                _normalClear = new GUIStyle(GUI.skin.label)
-                {
-                    // normal =
-                    // {
-                    //     background = _clear,
-                    // },
-                };
+                // _normalClear = new GUIStyle(GUI.skin.label)
+                // {
+                //     // normal =
+                //     // {
+                //     //     background = _clear,
+                //     // },
+                // };
+                _normalClear = EditorStyles.label;
             }
         }
 
@@ -127,7 +128,8 @@ namespace SaintsField.Editor.Drawers
             base.ImGuiOnDispose();
         }
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, bool hasLabelWidth)
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth)
         {
             return EditorGUIUtility.singleLineHeight;
         }
@@ -179,10 +181,12 @@ namespace SaintsField.Editor.Drawers
             if (useValue > max)
             {
                 useValue = property.intValue = max;
+                info.SetValue(parent, useValue);
             }
             else if (useValue < min)
             {
                 useValue = property.intValue = min;
+                info.SetValue(parent, useValue);
             }
 
             int hoverValue = useValue;
@@ -234,23 +238,20 @@ namespace SaintsField.Editor.Drawers
                     iconContent = useValue == 0? _guiContentSlash: _guiContentSlashInactive;
                 }
 
-                // int thisValue = startRects[index];
+                bool frozenStar = curValue != 0 && curValue <= min;
+                if(frozenStar && curValue == 1 && min == 1)
+                {
+                    frozenStar = false;
+                }
 
-                // using(new EditorGUI.DisabledScope(belowMix))
-                // {
-                //     if (GUI.Button(startRects[index], new GUIContent(icon), _normalActive))
-                //     {
-                //         property.intValue = curValue;
-                //     }
-                // }
-
-                GUIStyle style = curValue != 0 && curValue <= min
+                GUIStyle style = frozenStar
                     ? _normalFramed
                     : _normalClear;
 
                 if (GUI.Button(startRects[index], iconContent, style))
                 {
                     property.intValue = Mathf.Clamp(curValue, min, max);
+                    info.SetValue(parent, property.intValue);
                 }
             }
         }
@@ -320,7 +321,8 @@ namespace SaintsField.Editor.Drawers
             };
             button.AddToClassList(ClassButton(property));
 
-            if (option > minValue || option == 0)
+            // frozen star || slash star || range starts from 1
+            if (option > minValue || option == 0 || (option == 1 && minValue == 1))
             {
                 button.style.backgroundColor = Color.clear;
             }
@@ -373,6 +375,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         property.intValue = value;
                         property.serializedObject.ApplyModifiedProperties();
+                        info.SetValue(parent, value);
                         onValueChangedCallback.Invoke(value);
                         UpdateStarUIToolkit(value, property, container);
                     }
@@ -429,7 +432,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private void UpdateStarUIToolkit(int value, SerializedProperty property, VisualElement container)
+        private static void UpdateStarUIToolkit(int value, SerializedProperty property, VisualElement container)
         {
             foreach (Button button in container.Query<Button>(className: ClassButton(property)).ToList())
             {

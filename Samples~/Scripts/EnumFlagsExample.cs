@@ -20,6 +20,16 @@ namespace SaintsField.Samples.Scripts
         [EnumFlags] public BitMask myMask;
         [EnumFlags, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
 
-        private void ValueChanged() => Debug.Log(myMask);
+        private void ValueChanged() => Debug.Log(myMask2);
+
+        [Serializable]
+        public struct MyStruct
+        {
+            [EnumFlags, BelowRichLabel(nameof(myMask), true)] public BitMask myMask;
+        }
+
+        public MyStruct myStruct;
+
+        public int below;
     }
 }

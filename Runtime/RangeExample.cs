@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SaintsField
 {
@@ -17,5 +18,19 @@ namespace SaintsField
         [PropRange(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
 
         [Range(0, 10)] public int normalRange;
+
+        [Serializable]
+        public struct MyRange
+        {
+            public int min;
+            public int max;
+
+            [PropRange(nameof(min), nameof(max))]
+            [BelowRichLabel(nameof(rangeFloat), true)]
+            [SepTitle("Test", EColor.Green)]
+            public float rangeFloat;
+        }
+
+        public MyRange myRange;
     }
 }

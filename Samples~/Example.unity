@@ -646,13 +646,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_maxValue>k__BackingField: 239
-  <_minValue>k__BackingField: 239
-  <_range>k__BackingField: {x: 239, y: 239}
-  <intRange>k__BackingField: {x: 1, y: 1}
+  <_maxValue>k__BackingField: 0
+  <_minValue>k__BackingField: 0
+  <_range>k__BackingField: {x: 0, y: 0}
+  <intRange>k__BackingField: {x: 0, y: 0}
   wrongMin: 0
   wrongMax: 0
   errorRange: {x: 0, y: 0}
+  myStruct:
+    minV: -6
+    maxV: 17
+    rV: {x: -2, y: 9}
 --- !u!4 &185980176
 Transform:
   m_ObjectHideFlags: 0
@@ -1119,7 +1123,7 @@ GameObject:
   - component: {fileID: 308851078}
   - component: {fileID: 308851077}
   m_Layer: 0
-  m_Name: Range
+  m_Name: PropRange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1144,6 +1148,10 @@ MonoBehaviour:
   rangeFloatStep: 14
   rangeIntStep: 20
   normalRange: 7
+  myRange:
+    min: 0
+    max: 37
+    rangeFloat: 17.2
 --- !u!4 &308851078
 Transform:
   m_ObjectHideFlags: 0
@@ -4151,8 +4159,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45cb9069ce004c2ab4ee78763c064fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myMask: 6
-  myMask2: 31
+  myMask: 0
+  myMask2: 6
+  myStruct:
+    myMask: 25
+  below: 0
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0
@@ -4931,6 +4942,55 @@ MonoBehaviour:
 
     long
     wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+  myStruct:
+    myString: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp
+      9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap
+      6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap
+      3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long
+      wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+      11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap
+      8 warp 9 wap 10 wrap 11'
+  arr:
+  - 
+  - 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8
+    warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap
+    6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3
+    wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap
+    1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+  structArr:
+  - myString: 
+  - myString: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp
+      9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap
+      6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap
+      3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long
+      wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+      11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap
+      8 warp 9 wap 10 wrap 11'
 --- !u!1 &1160369190
 GameObject:
   m_ObjectHideFlags: 0
@@ -6854,7 +6914,8 @@ MonoBehaviour:
   _scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   _dropdownExample: {fileID: 90550607}
   _spriteR: {fileID: 0}
-  _spriteRenderers: []
+  _spriteRenderers:
+  - {fileID: 4273993127172390034}
   _scriptables: []
 --- !u!1 &1631756499
 GameObject:
@@ -7989,10 +8050,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f447d0d25d4a4bc19aaeac0ff720e887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rate0To5: 4
-  rate1To5: 2
-  rate3To5: 5
-  rate0To5Rich: 0
+  rate0To5: 2
+  rate1To5: 1
+  rate3To5: 2
+  rate0To5Rich: 5
+  rate:
+    rate: 5
 --- !u!4 &1881364801
 Transform:
   m_ObjectHideFlags: 0
@@ -8932,6 +8995,11 @@ PrefabInstance:
 --- !u!1 &4273993127172390033 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4273993126308263894, guid: bfe71e2debe494743bb20374ae988950, type: 3}
+  m_PrefabInstance: {fileID: 4273993127172390032}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &4273993127172390034 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7009648041155977125, guid: bfe71e2debe494743bb20374ae988950, type: 3}
   m_PrefabInstance: {fileID: 4273993127172390032}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4398206394473841023

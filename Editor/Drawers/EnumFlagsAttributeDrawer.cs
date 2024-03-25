@@ -26,11 +26,13 @@ namespace SaintsField.Editor.Drawers
             public int AllCheckedInt;
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property)
+        private static MetaInfo GetMetaInfo(SerializedProperty property, FieldInfo info)
         {
 
+            // Debug.Log(SerializedUtils.GetType(property));
+
             Dictionary<int, string> allIntToName = Enum
-                .GetValues(SerializedUtils.GetType(property))
+                .GetValues(info.FieldType)
                 .Cast<object>()
                 .ToDictionary(
                     each => (int) each,
@@ -93,7 +95,9 @@ namespace SaintsField.Editor.Drawers
             Object.DestroyImmediate(_checkboxIndeterminateTexture2D);
         }
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             bool hasLabelWidth)
         {
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
@@ -112,7 +116,7 @@ namespace SaintsField.Editor.Drawers
                 return EditorGUIUtility.singleLineHeight;
             }
 
-            int[] values = Enum.GetValues(SerializedUtils.GetType(property)).Cast<int>().ToArray();
+            int[] values = Enum.GetValues(info.FieldType).Cast<int>().ToArray();
             int allOnValue = values.Aggregate(0, (acc, value) => acc | value);
             int valueCount = values.Count(each => each != 0 && each != allOnValue);
             return EditorGUIUtility.singleLineHeight * (valueCount + 1);
@@ -128,7 +132,7 @@ namespace SaintsField.Editor.Drawers
                 _unfold = enumFlagsAttribute.DefaultExpanded;
             }
 
-            MetaInfo metaInfo = GetMetaInfo(property);
+            MetaInfo metaInfo = GetMetaInfo(property, info);
 
             #region label+button
             Rect headRect = new Rect(position)
@@ -138,7 +142,7 @@ namespace SaintsField.Editor.Drawers
 
             float labelWidth = string.IsNullOrEmpty(label.text)? 0: EditorGUIUtility.labelWidth;
 
-            CheckAutoExpand(position.width - labelWidth, property, enumFlagsAttribute);
+            CheckAutoExpand(position.width - labelWidth, property, info, enumFlagsAttribute);
             if (_forceUnfold)
             {
                 EditorGUI.LabelField(headRect, label);
@@ -288,9 +292,9 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private void CheckAutoExpand(float positionWidth, SerializedProperty property, EnumFlagsAttribute enumFlagsAttribute)
+        private void CheckAutoExpand(float positionWidth, SerializedProperty property, FieldInfo info, EnumFlagsAttribute enumFlagsAttribute)
         {
-            if (positionWidth <= 0)  // layout event will give this to negative... wait for repaint to do correct calculate
+            if (positionWidth - 1 <= Mathf.Epsilon)  // layout event will give this to negative... wait for repaint to do correct calculate
             {
                 return;
             }
@@ -307,7 +311,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            (int, string)[] allValues = Enum.GetValues(SerializedUtils.GetType(property))
+            (int, string)[] allValues = Enum.GetValues(info.FieldType)
                 .Cast<object>()
                 .Select(each => ((int)each, each.ToString())).ToArray();
 
@@ -404,7 +408,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute,
             VisualElement container, Label fakeLabel, FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property);
+            MetaInfo metaInfo = GetMetaInfo(property, info);
 
             float lineHeight = EditorGUIUtility.singleLineHeight;
 
@@ -626,7 +630,7 @@ namespace SaintsField.Editor.Drawers
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UpdateButtonDisplay(property.intValue, property, container);
+            UpdateButtonDisplay(property.intValue, property, info, container);
 
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
 
@@ -648,7 +652,7 @@ namespace SaintsField.Editor.Drawers
                 SetExpandStatus(enumFlagsAttribute.DefaultExpanded, property, container);
             }
 
-            MetaInfo metaInfo = GetMetaInfo(property);
+            MetaInfo metaInfo = GetMetaInfo(property, info);
             // VisualElement root = container.Q<VisualElement>(NameContainer(property));
 
             // Image toggleButtonImage = container.Q<Image>(NameToggleButtonImage(property));
@@ -712,12 +716,12 @@ namespace SaintsField.Editor.Drawers
             object parent, Action<object> onValueChangedCallback, object newValue)
         {
             int newInt = (int)newValue;
-            UpdateButtonDisplay(newInt, property, container);
+            UpdateButtonDisplay(newInt, property, info, container);
         }
 
-        private void UpdateButtonDisplay(int newInt, SerializedProperty property, VisualElement container)
+        private void UpdateButtonDisplay(int newInt, SerializedProperty property, FieldInfo info, VisualElement container)
         {
-            MetaInfo metaInfo = GetMetaInfo(property);
+            MetaInfo metaInfo = GetMetaInfo(property, info);
 
             Image toggleButtonImage = container.Q<Image>(NameToggleButtonImage(property));
             bool noneChecked = newInt == 0;

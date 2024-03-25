@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute);
+            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info);
             _error = error;
             if (error != "")
             {
@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Drawers
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;
 
             // match?
-            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute);
+            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info);
             _error = error;
 
             if (error != "")
@@ -186,12 +186,12 @@ namespace SaintsField.Editor.Drawers
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if (property.objectReferenceValue == null)
             {
-                Check(property, getComponentByPathAttribute, button, helpBox, onValueChangedCallback, true);
+                Check(property, getComponentByPathAttribute, info, button, helpBox, onValueChangedCallback, true);
             }
 
             if(button != null)
             {
-                button.clicked += () => Check(property, (GetComponentByPathAttribute)saintsAttribute, button, helpBox,
+                button.clicked += () => Check(property, (GetComponentByPathAttribute)saintsAttribute, info, button, helpBox,
                     onValueChangedCallback, true);
             }
         }
@@ -206,15 +206,16 @@ namespace SaintsField.Editor.Drawers
             {
                 Button button = getComponentByPathAttribute.ResignButton? container.Q<Button>(NameResignButton(property, index)): null;
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-                Check(property, getComponentByPathAttribute, button, helpBox, onValueChangedCallback, false);
+                Check(property, getComponentByPathAttribute, info, button, helpBox, onValueChangedCallback, false);
             }
         }
 
         private static void Check(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute,
+            FieldInfo info,
             // ReSharper disable once SuggestBaseTypeForParameter
             Button button, HelpBox helpBox, Action<object> onValueChangedCallback, bool forceResign)
         {
-            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute);
+            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info);
             // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if (error != helpBox.text)
             {
@@ -261,9 +262,9 @@ namespace SaintsField.Editor.Drawers
         #endregion
 #endif
 
-        private static (string error, Object result) DoCheckComponent(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute)
+        private static (string error, Object result) DoCheckComponent(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info)
         {
-            Type fieldType = SerializedUtils.GetType(property);
+            Type fieldType = info.FieldType;
             // Type type = getComponentByPathAttribute.CompType ?? fieldType;
 
             // bool changed = false;

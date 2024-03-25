@@ -23,5 +23,17 @@ namespace SaintsField.Samples.Scripts
 
         [MinMaxSlider(nameof(wrongMin), nameof(wrongMax)), AboveRichLabel(nameof(errorRange), true)]
         public Vector2 errorRange;
+
+        [Serializable]
+        public class MyStruct
+        {
+            public int minV;
+            public int maxV;
+
+            [MinMaxSlider(nameof(minV), nameof(maxV)), BelowRichLabel(nameof(rV), true)]
+            public Vector2Int rV;
+        }
+
+        public MyStruct myStruct;
     }
 }

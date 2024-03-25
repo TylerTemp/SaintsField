@@ -216,7 +216,9 @@ namespace SaintsField.Editor.Drawers
 
         private bool _imgGuiMousePressed;
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             bool hasLabelWidth)
         {
             return EditorGUIUtility.singleLineHeight;

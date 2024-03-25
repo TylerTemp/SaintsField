@@ -222,38 +222,6 @@ namespace SaintsField.Editor.Drawers
             }
 
             return root;
-            // MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, parent);
-            // if(metaInfo.Error != "")
-            // {
-            //     _error = metaInfo.Error;
-            //     return new VisualElement();
-            // }
-            //
-            // bool isFloat = metaInfo.IsFloat;
-            // float curValue = isFloat ? property.floatValue : property.intValue;
-            // float minValue = metaInfo.MinValue;
-            // float maxValue = metaInfo.MaxValue;
-            //
-            // // return container;
-            // Slider element = new Slider(new string(' ', property.displayName.Length), minValue, maxValue, SliderDirection.Horizontal, curValue);
-            // element.RegisterValueChangedCallback(changed =>
-            // {
-            //     float parsedValue = GetValue(metaInfo, changed.newValue);
-            //     if (isFloat)
-            //     {
-            //         property.floatValue = parsedValue;
-            //         onChange?.Invoke(parsedValue);
-            //     }
-            //     else
-            //     {
-            //         int intValue = (int)parsedValue;
-            //         property.intValue = intValue;
-            //         onChange?.Invoke(intValue);
-            //     }
-            //
-            // });
-            //
-            // return element;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -298,11 +266,12 @@ namespace SaintsField.Editor.Drawers
                 {
                     float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent), changed.newValue);
                     property.floatValue = parsedValue;
+                    property.serializedObject.ApplyModifiedProperties();
+                    info.SetValue(parent, parsedValue);
+
                     floatField.SetValueWithoutNotify(parsedValue);
                     slider.SetValueWithoutNotify(parsedValue);
                     onValueChangedCallback.Invoke(parsedValue);
-
-                    property.serializedObject.ApplyModifiedProperties();
                 });
             }
             else
@@ -312,10 +281,12 @@ namespace SaintsField.Editor.Drawers
                 {
                     int parsedValue = (int)GetValue(GetMetaInfo(property, saintsAttribute, info, parent), changed.newValue);
                     property.intValue = parsedValue;
+                    property.serializedObject.ApplyModifiedProperties();
+                    info.SetValue(parent, parsedValue);
+
                     slider.SetValueWithoutNotify(parsedValue);
                     integerField.SetValueWithoutNotify(parsedValue);
                     onValueChangedCallback.Invoke(parsedValue);
-                    property.serializedObject.ApplyModifiedProperties();
                 });
             }
 
@@ -325,6 +296,9 @@ namespace SaintsField.Editor.Drawers
                 if (property.propertyType == SerializedPropertyType.Float)
                 {
                     property.floatValue = parsedValue;
+                    property.serializedObject.ApplyModifiedProperties();
+                    info.SetValue(parent, parsedValue);
+
                     floatField.SetValueWithoutNotify(parsedValue);
                     slider.SetValueWithoutNotify(parsedValue);
                     onValueChangedCallback.Invoke(parsedValue);
@@ -333,6 +307,9 @@ namespace SaintsField.Editor.Drawers
                 {
                     int intValue = (int)parsedValue;
                     property.intValue = intValue;
+                    property.serializedObject.ApplyModifiedProperties();
+                    info.SetValue(parent, intValue);
+
                     integerField.SetValueWithoutNotify(intValue);
                     slider.SetValueWithoutNotify(intValue);
                     onValueChangedCallback.Invoke(intValue);

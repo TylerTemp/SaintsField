@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
+            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info);
             if (error != "")
             {
                 _error = error;
@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
         #endregion
 
-        private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info)
         {
             if (property.objectReferenceValue != null)
             {
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             GetPrefabWithComponentAttribute getPrefabWithComponentAttribute = (GetPrefabWithComponentAttribute) saintsAttribute;
-            Type fieldType = SerializedUtils.GetType(property);
+            Type fieldType = info.FieldType;
 
             if (getPrefabWithComponentAttribute.CompType == typeof(GameObject))
             {
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_PREFAB_WITH_COMPONENT
             Debug.Log($"GetPrefabWithComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
-            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute);
+            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)
             {

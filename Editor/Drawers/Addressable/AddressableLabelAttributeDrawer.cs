@@ -16,7 +16,9 @@ namespace SaintsField.Editor.Drawers.Addressable
     public class AddressableLabelAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             bool hasLabelWidth) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,

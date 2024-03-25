@@ -23,7 +23,9 @@ namespace SaintsField.Editor.Drawers.Addressable
 
         private IReadOnlyList<string> _targetKeys;
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            FieldInfo info,
             bool hasLabelWidth) =>
             EditorGUIUtility.singleLineHeight;
 

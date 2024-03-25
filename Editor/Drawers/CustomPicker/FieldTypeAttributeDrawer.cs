@@ -144,14 +144,14 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         private string _error = "";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabelWidth) => EditorGUIUtility.singleLineHeight;
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;
-            Type fieldType = SerializedUtils.GetType(property);
+            Type fieldType = info.FieldType;
             Object requiredValue;
             try
             {
@@ -307,7 +307,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             bool customPicker = fieldTypeAttribute.CustomPicker;
             Type requiredComp = fieldTypeAttribute.CompType;
-            Type fieldType = SerializedUtils.GetType(property);
+            Type fieldType = info.FieldType;
             Object requiredValue;
 
             // Debug.Log($"property.Object={property.objectReferenceValue}");
@@ -372,7 +372,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;
-            Type fieldType = SerializedUtils.GetType(property);
+            Type fieldType = info.FieldType;
             EPick editorPick = fieldTypeAttribute.EditorPick;
 
             ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));

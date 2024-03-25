@@ -20,10 +20,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            return DoCheckComponent(property, saintsAttribute);
+            return DoCheckComponent(property, saintsAttribute, info);
         }
 
-        private static bool DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private static bool DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info)
         {
             if (property.objectReferenceValue != null)
             {
@@ -33,7 +34,7 @@ namespace SaintsField.Editor.Drawers
             AddComponentAttribute getComponentAttribute = (AddComponentAttribute) saintsAttribute;
             Object target = property.serializedObject.targetObject;
             // Type fieldType = SerializedUtils.GetType(property);
-            Type type = getComponentAttribute.CompType ?? SerializedUtils.GetType(property);
+            Type type = getComponentAttribute.CompType ?? info.FieldType;
 
             Component foundComponent = null;
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
@@ -63,7 +64,7 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            DoCheckComponent(property, saintsAttribute);
+            DoCheckComponent(property, saintsAttribute, info);
             return new VisualElement();
         }
 

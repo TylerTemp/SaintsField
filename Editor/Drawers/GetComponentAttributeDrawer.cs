@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info);
             if (error != "")
             {
                 _error = error;
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers
 
         #endregion
 
-        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info)
         {
             if (property.objectReferenceValue != null)
             {
@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
-            Type fieldType = SerializedUtils.GetType(property);
+            Type fieldType = info.FieldType;
             Type type = getComponentAttribute.CompType ?? fieldType;
 
             if (type == typeof(GameObject))
@@ -133,7 +133,7 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
             Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
-            (string error, Object result) = DoCheckComponent(property, saintsAttribute);
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)
             {

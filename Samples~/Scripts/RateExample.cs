@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -6,8 +7,16 @@ namespace SaintsField.Samples.Scripts
     {
         [Rate(0, 5)] public int rate0To5;
         [Rate(1, 5)] public int rate1To5;
-        [Rate(3, 5)] public int rate3To5;
+        [Rate(2, 5)] public int rate3To5;
 
-        [Rate(0, 5)][RichLabel(null), PostFieldRichLabel("<--")] public int rate0To5Rich;
+        [Rate(1, 5)][RichLabel(null), PostFieldRichLabel("<--")] public int rate0To5Rich;
+
+        [Serializable]
+        public struct MyRate
+        {
+            [Rate(1, 5), BelowRichLabel(nameof(rate), true)] public int rate;
+        }
+
+        public MyRate rate;
     }
 }

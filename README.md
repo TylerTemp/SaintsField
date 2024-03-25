@@ -698,6 +698,7 @@ For each argument:
 *   `EPick editorPick` where you want to pick the component. Options are:
     *   `EPick.Assets` for assets
     *   `EPick.Scene` for scene objects
+
     For the default Unity picker: if no `EPick.Scene` is set,  will not show the scene objects. However, omit `Assets` will still show the assets. This limitation is from Unity's API.
 
     The custom picker does **NOT** have this limitation.

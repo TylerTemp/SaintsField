@@ -173,7 +173,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         {
             RequireTypeAttribute requireTypeAttribute = (RequireTypeAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = requireTypeAttribute.RequiredTypes;
-            Type fieldType = SerializedUtils.GetType(property);
+            Type fieldType = info.FieldType;
 
             EPick editorPick = requireTypeAttribute.EditorPick;
             bool customPicker = requireTypeAttribute.CustomPicker;
@@ -345,7 +345,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             if(requireTypeAttribute.CustomPicker)
             {
                 EPick editorPick = requireTypeAttribute.EditorPick;
-                Type fieldType = SerializedUtils.GetType(property);
+                Type fieldType = info.FieldType;
                 container.Q<Button>(NameSelectorButton(property)).clicked += () =>
                 {
                     FieldInterfaceSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType,

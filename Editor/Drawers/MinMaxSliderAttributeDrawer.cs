@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers
         private string _error = "";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, bool hasLabelWidth)
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth)
         {
             return EditorGUIUtility.singleLineHeight;
         }
@@ -146,9 +146,13 @@ namespace SaintsField.Editor.Drawers
 
         private struct MetaInfo
         {
+            // ReSharper disable InconsistentNaming
             public string Error;
             public float MinValue;
             public float MaxValue;
+            // ReSharper enable InconsistentNaming
+
+            public override string ToString() => $"Meta(min={MinValue}, max={MaxValue}, error={Error ?? "null"})";
         }
 
         private static Vector2 BoundV2Step(Vector2 curValue, float min, float max, float step)
@@ -190,6 +194,7 @@ namespace SaintsField.Editor.Drawers
             {
                 (string getError, float getValue) =
                     Util.GetOf(minMaxSliderAttribute.MinCallback, 0f, property, info, parentTarget);
+                // Debug.Log($"get min {getValue} with error {getError}, name={minMaxSliderAttribute.MinCallback} target={parentTarget}/directGet={parentTarget.GetType().GetField(minMaxSliderAttribute.MinCallback).GetValue(parentTarget)}");
                 if (!string.IsNullOrEmpty(getError))
                 {
                     return new MetaInfo
@@ -456,15 +461,17 @@ namespace SaintsField.Editor.Drawers
 
             MinMaxSlider minMaxSlider = container.Q<MinMaxSlider>(NameSlider(property));
             // MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
-            MetaInfo curMetaInfo = (MetaInfo)minMaxSlider.userData;
+            MetaInfo oldMetaInfo = (MetaInfo)minMaxSlider.userData;
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             bool changed = false;
 
+            // Debug.Log($"old={oldMetaInfo}, new={metaInfo}");
+
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (metaInfo.Error == "" && metaInfo.MinValue != curMetaInfo.MinValue
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                || metaInfo.MaxValue != curMetaInfo.MaxValue)
+            if (metaInfo.Error == "" && (metaInfo.MinValue != oldMetaInfo.MinValue
+                                         // ReSharper disable once CompareOfFloatsByEqualityOperator
+                                         || metaInfo.MaxValue != oldMetaInfo.MaxValue))
             {
                 changed = true;
                 // WTF Unity? Fix your shit!
@@ -480,7 +487,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            if (metaInfo.Error != curMetaInfo.Error)
+            if (metaInfo.Error != oldMetaInfo.Error)
             {
                 changed = true;
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));

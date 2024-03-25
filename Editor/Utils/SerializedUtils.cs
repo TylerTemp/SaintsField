@@ -208,77 +208,79 @@ namespace SaintsField.Editor.Utils
             // return enumerator.Current;
         }
 
-        public static Type GetType(SerializedProperty prop)
-        {
-            //gets parent type info
-            string[] slices = prop.propertyPath.Split('.');
-            object targetObj = prop.serializedObject.targetObject;
-
-            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypes(targetObj))
-            {
-                // foreach (FieldInfo field in type!.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
-                // {
-                //     Debug.Log($"name={field.Name}");
-                // }
-                Type getType = eachType;
-
-                for(int i = 0; i < slices.Length; i++)
-                {
-                    if (slices[i] == "Array")
-                    {
-                        i++; //skips "data[x]"
-                        // type = type!.GetElementType(); //gets info on array elements
-                        Debug.Assert(getType != null);
-                        getType = getType.GetElementType();
-                    }
-                    else  //gets info on field and its type
-                    {
-                        // Debug.Log($"{slices[i]}, {type!.GetField(slices[i], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance)}");
-                        Debug.Assert(getType != null);
-                        FieldInfo field = getType.GetField(slices[i],
-                            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy |
-                            BindingFlags.Instance);
-                        if (field != null)
-                        {
-                            return field.FieldType;
-                        }
-                        // getType =
-                        //     !.FieldType;
-                    }
-                }
-
-                //type is now the type of the property
-                // return type;
-            }
-
-            throw new Exception($"Unable to get type from {targetObj}");
-
-            // Type type = prop.serializedObject.targetObject.GetType()!;
-            // Debug.Log($"{prop.propertyPath}, {type}");
-            // foreach (FieldInfo field in type!.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
-            // {
-            //     Debug.Log($"name={field.Name}");
-            // }
-            //
-            // for(int i = 0; i < slices.Length; i++)
-            // {
-            //     if (slices[i] == "Array")
-            //     {
-            //         i++; //skips "data[x]"
-            //         type = type!.GetElementType(); //gets info on array elements
-            //     }
-            //     else  //gets info on field and its type
-            //     {
-            //         Debug.Log($"{slices[i]}, {type!.GetField(slices[i], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance)}");
-            //         type = type
-            //             !.GetField(slices[i], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance)
-            //             !.FieldType;
-            //     }
-            // }
-            //
-            // //type is now the type of the property
-            // return type;
-        }
+        // public static Type GetType(SerializedProperty prop)
+        // {
+        //     //gets parent type info
+        //     string[] slices = prop.propertyPath.Split('.');
+        //     object targetObj = prop.serializedObject.targetObject;
+        //
+        //     foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypes(targetObj))
+        //     {
+        //         // foreach (FieldInfo field in type!.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+        //         // {
+        //         //     Debug.Log($"name={field.Name}");
+        //         // }
+        //         Type getType = eachType;
+        //
+        //         for(int i = 0; i < slices.Length; i++)
+        //         {
+        //             if (slices[i] == "Array")
+        //             {
+        //                 i++; //skips "data[x]"
+        //                 // type = type!.GetElementType(); //gets info on array elements
+        //                 Debug.Assert(getType != null);
+        //                 getType = getType.GetElementType();
+        //             }
+        //             else  //gets info on field and its type
+        //             {
+        //                 // Debug.Log($"{slices[i]}, {type!.GetField(slices[i], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance)}");
+        //                 Debug.Assert(getType != null);
+        //                 FieldInfo field = getType.GetField(slices[i],
+        //                     BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy |
+        //                     BindingFlags.Instance);
+        //
+        //                 // Debug.Log(field?.Name);
+        //                 if (field != null)
+        //                 {
+        //                     return field.FieldType;
+        //                 }
+        //                 // getType =
+        //                 //     !.FieldType;
+        //             }
+        //         }
+        //
+        //         //type is now the type of the property
+        //         // return type;
+        //     }
+        //
+        //     throw new Exception($"Unable to get type from {targetObj}");
+        //
+        //     // Type type = prop.serializedObject.targetObject.GetType()!;
+        //     // Debug.Log($"{prop.propertyPath}, {type}");
+        //     // foreach (FieldInfo field in type!.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+        //     // {
+        //     //     Debug.Log($"name={field.Name}");
+        //     // }
+        //     //
+        //     // for(int i = 0; i < slices.Length; i++)
+        //     // {
+        //     //     if (slices[i] == "Array")
+        //     //     {
+        //     //         i++; //skips "data[x]"
+        //     //         type = type!.GetElementType(); //gets info on array elements
+        //     //     }
+        //     //     else  //gets info on field and its type
+        //     //     {
+        //     //         Debug.Log($"{slices[i]}, {type!.GetField(slices[i], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance)}");
+        //     //         type = type
+        //     //             !.GetField(slices[i], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance)
+        //     //             !.FieldType;
+        //     //     }
+        //     // }
+        //     //
+        //     // //type is now the type of the property
+        //     // return type;
+        // }
 
         // public static object GetValue(SerializedProperty property)
         // {

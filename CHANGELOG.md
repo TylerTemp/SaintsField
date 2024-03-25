@@ -1,3 +1,11 @@
+## 2.2.2
+
+1.  `Rate`: no longer frozen the first star if the range starts from 1.
+2.  UIToolkit `MinMaxSlider`: incorrect update min/max value when there is an error. 
+3.  Fix `EnumFlags` IMGUI incorrect height result because Unity will give width=1 during rendering IMGUI for the first time...
+    Fix `EnumFlags` incorrect field type checking and did not work inside `Serializable`.
+4.  Fix `Rate`, `PropRange`(IMGUI) do not immediately update the value when you click on a star when it's inside a `Serializable`.
+
 ## 2.2.1
 
 1.  Add `RequireType`. This attribute allow you to specify the required component or **interface** for a field.

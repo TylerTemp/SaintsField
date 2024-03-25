@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -10,5 +11,15 @@ namespace SaintsField.Samples.Scripts
 
         // [ResizableTextArea(false)] public string _inlineShort;
         // [ResizableTextArea(false)] public string _inlineLong;
+
+        [Serializable]
+        public struct MyStruct
+        {
+            [ResizableTextArea] public string myString;
+        }
+
+        public MyStruct myStruct;
+        [ResizableTextArea] public string[] arr;
+        public MyStruct[] structArr;
     }
 }
