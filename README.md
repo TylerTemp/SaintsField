@@ -63,10 +63,13 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.2.1**
+**2.2.2**
 
-1.  Add `RequireType`. This attribute allow you to specify the required component or **interface** for a field.
-2.  `FieldType` now has a custom object picker window. By default Unity disallow to see an asset with a specific type because of "performance consideration". Ironically, if you directly use a component type instead of a `GameObject`, Unity **WILL** show a correct asset picker. As this can not be "hacked" or "tricked" to let Unity show the correct picker, the custom object picker will allow you to pick a object (e.g. a prefab) with the component you want.
+1.  `Rate`: no longer frozen the first star if the range starts from 1.
+2.  UIToolkit `MinMaxSlider`: incorrect update min/max value when there is an error.
+3.  Fix `EnumFlags` IMGUI incorrect height result because Unity will give width=1 during rendering IMGUI for the first time...
+    Fix `EnumFlags` incorrect field type checking and did not work inside `Serializable`.
+4.  Fix `Rate`, `PropRange`(IMGUI) do not immediately update the value when it's inside a `Serializable`.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
