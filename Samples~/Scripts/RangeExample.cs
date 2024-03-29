@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SaintsField
+namespace SaintsField.Samples.Scripts
 {
     public class RangeExample: MonoBehaviour
     {

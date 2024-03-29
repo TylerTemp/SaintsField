@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     public class AssetPreviewAttribute: PropertyAttribute, ISaintsAttribute
     {

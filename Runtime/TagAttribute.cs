@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics;
+using UnityEngine;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
     public class TagAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

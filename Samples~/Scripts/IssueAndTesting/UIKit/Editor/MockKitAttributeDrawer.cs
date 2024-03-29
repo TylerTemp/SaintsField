@@ -1,10 +1,10 @@
-﻿#if UNITY_2021_3_OR_NEWER
-using System.Drawing;
+﻿#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+using SaintsField.Samples.Scripts.UIKit;
 using UnityEditor;
 using UnityEngine.UIElements;
 using Color = UnityEngine.Color;
 
-namespace SaintsField.Samples.Scripts.UIKit.Editor
+namespace SaintsField.Samples.Scripts.IssueAndTesting.UIKit.Editor
 {
     [CustomPropertyDrawer(typeof(MockKitAttribute))]
     public class MockKitAttributeDrawer: PropertyDrawer

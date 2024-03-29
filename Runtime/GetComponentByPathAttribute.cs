@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
     [AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
     public class GetComponentByPathAttribute: PropertyAttribute, ISaintsAttribute
     {

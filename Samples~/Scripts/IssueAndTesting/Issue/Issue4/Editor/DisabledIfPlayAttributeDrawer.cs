@@ -1,6 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Reflection;
-using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Drawers.DisabledDrawers;
 using UnityEditor;
 
@@ -15,3 +15,4 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue4.Editor
         }
     }
 }
+#endif

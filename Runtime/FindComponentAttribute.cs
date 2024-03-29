@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class FindComponentAttribute: PropertyAttribute, ISaintsAttribute
     {

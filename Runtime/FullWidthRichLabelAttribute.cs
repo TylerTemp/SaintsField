@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics;
+using UnityEngine;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property, Inherited = true, AllowMultiple = true)]
     public class FullWidthRichLabelAttribute: PropertyAttribute, ISaintsAttribute
     {

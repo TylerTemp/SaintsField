@@ -1,15 +1,14 @@
-﻿using SaintsField.Editor.Core;
+﻿#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Utils;
+using SaintsField.Samples.Scripts.UIKit;
 using UnityEditor;
-using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Samples.Scripts.UIKit.Editor
+
+namespace SaintsField.Samples.Scripts.IssueAndTesting.UIKit.Editor
 {
-#if UNITY_2021_3_OR_NEWER
     [CustomPropertyDrawer(typeof(UIKitLabelAttribute))]
     public class UIKitLabelAttributeDrawer: PropertyDrawer
     {
@@ -96,5 +95,5 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
             return root;
         }
     }
-#endif
 }
+#endif

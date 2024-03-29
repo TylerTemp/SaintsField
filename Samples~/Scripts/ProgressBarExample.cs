@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SaintsField
+namespace SaintsField.Samples.Scripts
 {
     public class ProgressBarExample: MonoBehaviour
     {

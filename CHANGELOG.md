@@ -1,3 +1,8 @@
+## 2.2.3
+
+1.  Add `[Conditional("UNITY_EDITOR")]` for attributes so it won't be included in your build.
+2.  Fix example scene will break the build (if you import it in your project).
+
 ## 2.2.2
 
 1.  `Rate`: no longer frozen the first star if the range starts from 1.

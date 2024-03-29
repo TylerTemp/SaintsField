@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.CustomPropDrawer.Editor
@@ -27,3 +28,4 @@ namespace SaintsField.Samples.Scripts.CustomPropDrawer.Editor
         }
     }
 }
+#endif

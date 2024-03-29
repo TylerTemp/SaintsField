@@ -1,7 +1,9 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+using SaintsField.Samples.Scripts.UIKit;
+using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Samples.Scripts.UIKit.Editor
+namespace SaintsField.Samples.Scripts.IssueAndTesting.UIKit.Editor
 {
     [CustomPropertyDrawer(typeof(UIKitAutoResizeTextAreaAttribute))]
     public class UIKitAutoResizeTextAreaAttributeDrawer: PropertyDrawer
@@ -35,3 +37,4 @@ namespace SaintsField.Samples.Scripts.UIKit.Editor
         }
     }
 }
+#endif
