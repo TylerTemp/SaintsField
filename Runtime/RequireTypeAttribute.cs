@@ -9,8 +9,8 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class RequireTypeAttribute: PropertyAttribute, ISaintsAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
+        public virtual SaintsAttributeType AttributeType => SaintsAttributeType.Other;
+        public virtual string GroupBy => "";
 
         // ReSharper disable InconsistentNaming
         public readonly IReadOnlyList<Type> RequiredTypes;

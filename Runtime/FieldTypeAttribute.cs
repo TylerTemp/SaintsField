@@ -16,8 +16,7 @@ namespace SaintsField
         public readonly bool CustomPicker;
         // ReSharper enable InconsistentNaming
 
-        public FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene,
-            bool customPicker = true)
+        public FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)
         {
             CompType = compType;
             EditorPick = editorPick == 0

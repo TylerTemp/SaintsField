@@ -503,5 +503,27 @@ namespace SaintsField.Editor.Utils
             string error = $"No field or method named `{by}` found on `{target}`";
             return (error, defaultValue);
         }
+
+        public static UnityEngine.Object GetTypeFromObj(UnityEngine.Object fieldResult, Type fieldType)
+        {
+            UnityEngine.Object result = null;
+            switch (fieldResult)
+            {
+                case null:
+                    // property.objectReferenceValue = null;
+                    break;
+                case GameObject go:
+                    result = fieldType == typeof(GameObject) ? (UnityEngine.Object)go : go.GetComponent(fieldType);
+                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
+                    break;
+                case Component comp:
+                    result = fieldType == typeof(GameObject)
+                        ? (UnityEngine.Object)comp.gameObject
+                        : comp.GetComponent(fieldType);
+                    break;
+            }
+
+            return result;
+        }
     }
 }

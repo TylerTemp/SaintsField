@@ -214,24 +214,25 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
         private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType)
         {
-            Object result = null;
-            switch (fieldResult)
-            {
-                case null:
-                    // property.objectReferenceValue = null;
-                    break;
-                case GameObject go:
-                    result = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
-                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
-                    break;
-                case Component comp:
-                    result = fieldType == typeof(GameObject)
-                        ? (Object)comp.gameObject
-                        : comp.GetComponent(fieldType);
-                    break;
-            }
-
-            return result;
+            return Util.GetTypeFromObj(fieldResult, fieldType);
+            // Object result = null;
+            // switch (fieldResult)
+            // {
+            //     case null:
+            //         // property.objectReferenceValue = null;
+            //         break;
+            //     case GameObject go:
+            //         result = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
+            //         // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
+            //         break;
+            //     case Component comp:
+            //         result = fieldType == typeof(GameObject)
+            //             ? (Object)comp.gameObject
+            //             : comp.GetComponent(fieldType);
+            //         break;
+            // }
+            //
+            // return result;
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,

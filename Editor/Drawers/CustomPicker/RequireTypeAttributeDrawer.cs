@@ -66,19 +66,19 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 // itemObject: Scene.GameObject, Assets.?
 
                 // lets get the originalValue from the checking target
-                bool originalIsGameObject = _fieldType == typeof(GameObject);
-                Object itemToOriginTypeValue;
-                switch (itemObject)
-                {
-                    case GameObject go:
-                        itemToOriginTypeValue = originalIsGameObject ? (Object)go : go.GetComponent(_fieldType);
-                        break;
-                    case Component compo:
-                        itemToOriginTypeValue = originalIsGameObject ? (Object)compo.gameObject : compo.GetComponent(_fieldType);
-                        break;
-                    default:
-                        return false;
-                }
+                // bool originalIsGameObject = _fieldType == typeof(GameObject);
+                Object itemToOriginTypeValue = Util.GetTypeFromObj(itemObject, _fieldType);
+                // switch (itemObject)
+                // {
+                //     case GameObject go:
+                //         itemToOriginTypeValue = originalIsGameObject ? (Object)go : go.GetComponent(_fieldType);
+                //         break;
+                //     case Component compo:
+                //         itemToOriginTypeValue = originalIsGameObject ? (Object)compo.gameObject : compo.GetComponent(_fieldType);
+                //         break;
+                //     default:
+                //         return false;
+                // }
 
                 // Debug.Log($"{itemObject} ?= {target} => {itemToOriginTypeValue.GetInstanceID() == targetInstanceId}");
                 return itemToOriginTypeValue.GetInstanceID() == targetInstanceId;
@@ -148,8 +148,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         }
 
         #region IMGUI
-        private string _error = "";
-        private bool _imGuiFirstChecked;
+
+        // ReSharper disable once InconsistentNaming
+        protected string _error { private get; set; } = "";
+        protected bool ImGuiFirstChecked { get; private set; }
+
         private Object _previousValue;
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
@@ -173,9 +176,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         {
             RequireTypeAttribute requireTypeAttribute = (RequireTypeAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = requireTypeAttribute.RequiredTypes;
-            Type fieldType = info.FieldType;
 
-            EPick editorPick = requireTypeAttribute.EditorPick;
             bool customPicker = requireTypeAttribute.CustomPicker;
             if(customPicker)
             {
@@ -191,17 +192,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
                 if (GUI.Button(position, "●", _imGuiButtonStyle))
                 {
-                    FieldInterfaceSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredTypes, fieldResult =>
-                    {
-                        Object result = OnSelectWindowSelected(fieldResult, fieldType);
-                        property.objectReferenceValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
-                        onGUIPayload.SetValue(result);
-                    });
+                    OpenSelectorWindow(property, requireTypeAttribute, info, onGUIPayload.SetValue);
                 }
             }
 
-            if (!_imGuiFirstChecked || onGUIPayload.changed)
+            if (!ImGuiFirstChecked || onGUIPayload.changed)
             {
                 // Debug.Log($"onGUIPayload.changed={onGUIPayload.changed}/_imGuiFirstChecked={_imGuiFirstChecked}");
                 _error = "";
@@ -209,7 +204,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 // Debug.Log($"_imGuiFirstChecked={_imGuiFirstChecked}/freeSign={fieldInterfaceAttribute.FreeSign}");
 
 
-                Object curValue = property.objectReferenceValue;
+                Object curValue = GetCurFieldValue(property, requireTypeAttribute);
                 if (curValue is null)
                 {
                     return customPicker;
@@ -224,26 +219,45 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                     string errorMessage = $"{curValue} has no component{(missingTypeNames.Count > 1? "s": "")} {string.Join(", ", missingTypeNames)}.";
                     // freeSign will always give error information
                     // but if you never passed the first check, then sign as you want and it'll always just show error
-                    if (!_imGuiFirstChecked || requireTypeAttribute.FreeSign)
+                    if (!ImGuiFirstChecked || requireTypeAttribute.FreeSign)
                     {
                         // Debug.Log($"isFirstCheck={isFirstCheck}/freeSign={fieldInterfaceAttribute.FreeSign}");
                         _error = errorMessage;
                     }
                     else  // it's not freeSign, and you've already got a correct answer. So revert to the old value.
                     {
-                        property.objectReferenceValue = _previousValue;
-                        onGUIPayload.SetValue(_previousValue);
+                        // property.objectReferenceValue = _previousValue;
+                        RestorePreviousValue(property);
+                        onGUIPayload.SetValue(GetPreviousValue());
                         Debug.LogWarning($"{errorMessage} Change reverted to {(_previousValue==null? "null": _previousValue.ToString())}.");
                     }
                 }
                 else
                 {
-                    _imGuiFirstChecked = true;
+                    ImGuiFirstChecked = true;
                 }
             }
 
             return customPicker;
         }
+
+        protected virtual Object GetCurFieldValue(SerializedProperty property, RequireTypeAttribute _) => property.objectReferenceValue;
+
+        protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback)
+        {
+            FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick, info.FieldType, requireTypeAttribute.RequiredTypes, fieldResult =>
+            {
+                Object result = OnSelectWindowSelected(fieldResult, info.FieldType);
+                property.objectReferenceValue = result;
+                property.serializedObject.ApplyModifiedProperties();
+                // onGUIPayload.SetValue(result);
+                onChangeCallback(result);
+            });
+        }
+
+        protected virtual void RestorePreviousValue(SerializedProperty property) => property.objectReferenceValue = _previousValue;
+
+        protected virtual object GetPreviousValue() => _previousValue;
 
         private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType)
         {
@@ -254,11 +268,13 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                     // property.objectReferenceValue = null;
                     break;
                 case GameObject go:
+                    // ReSharper disable once RedundantCast
                     result = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
                     // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
                     break;
                 case Component comp:
                     result = fieldType == typeof(GameObject)
+                        // ReSharper disable once RedundantCast
                         ? (Object)comp.gameObject
                         : comp.GetComponent(fieldType);
                     break;
@@ -281,10 +297,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
-        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__RequireType_HelpBox";
-        private static string NameSelectorButton(SerializedProperty property) => $"{property.propertyPath}__RequireType_SelectorButton";
+        protected static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__RequireType_HelpBox";
+        protected static string NameSelectorButton(SerializedProperty property) => $"{property.propertyPath}__RequireType_SelectorButton";
 
-        private class Payload
+        protected class Payload
         {
             public bool hasCorrectValue;
             public Object correctValue;
@@ -344,18 +360,9 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
             if(requireTypeAttribute.CustomPicker)
             {
-                EPick editorPick = requireTypeAttribute.EditorPick;
-                Type fieldType = info.FieldType;
                 container.Q<Button>(NameSelectorButton(property)).clicked += () =>
                 {
-                    FieldInterfaceSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType,
-                        requiredTypes, fieldResult =>
-                        {
-                            Object result = OnSelectWindowSelected(fieldResult, fieldType);
-                            property.objectReferenceValue = result;
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke(result);
-                        });
+                    OpenSelectorWindow(property, requireTypeAttribute, info, onValueChangedCallback.Invoke);
                 };
             }
 
@@ -375,6 +382,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 payload.hasCorrectValue = true;
                 payload.correctValue = curValue;
             }
+
+
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -416,7 +425,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                     property.serializedObject.ApplyModifiedProperties();
                     Debug.LogWarning($"{errorMessage} Change reverted to {(payload.correctValue == null ? "null" : payload.correctValue.ToString())}.");
                     // careful for infinite loop!
-                    onValueChangedCallback.Invoke(payload.correctValue);
+                    onValueChangedCallback(payload.correctValue);
                 }
             }
 
