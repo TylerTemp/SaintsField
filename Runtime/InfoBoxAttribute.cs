@@ -26,5 +26,9 @@ namespace SaintsField
             this.isCallback = isCallback;
             ShowCallback = show;
         }
+
+        public InfoBoxAttribute(string content, bool isCallback): this(content, EMessageType.Info, null, isCallback)
+        {
+        }
     }
 }
