@@ -30,6 +30,16 @@ namespace SaintsField
         {
         }
 
+        public ResourcePathAttribute(EStr eStr, bool freeSign, Type compType, params Type[] requiredTypes)
+            : this(eStr, freeSign, true, compType, requiredTypes)
+        {
+        }
+
+        public ResourcePathAttribute(EStr eStr, Type compType, params Type[] requiredTypes)
+            : this(eStr, false, true, compType, requiredTypes)
+        {
+        }
+
         public ResourcePathAttribute(Type compType, params Type[] requiredTypes)
             : this(EStr.Resource, false, true, compType, requiredTypes)
         {
