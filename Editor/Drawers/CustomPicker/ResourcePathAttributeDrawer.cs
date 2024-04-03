@@ -180,9 +180,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                         }
                         else  // it's not freeSign, and you've already got a correct answer. So revert to the old value.
                         {
-                            // property.stringValue = _previousValue;
-                            // onGUIPayload.SetValue(_previousValue);
-                            RestorePreviousValue(property);
+                            RestorePreviousValue(property, info, parent);
                             onGUIPayload.SetValue(GetPreviousValue());
                             Debug.LogWarning($"{validateError} Change reverted to {(_previousValue==null? "null": _previousValue)}.");
                         }
@@ -190,14 +188,24 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                     else
                     {
                         string result = GetNewValue(fieldResult, eStr);
+                        // Debug.Log($"field change {fieldResult} -> {result}, null={result==null}");
                         property.stringValue = result;
+                        // has issue on null, need to use reflection
+                        // nah... not work... still get an empty string if it's null
+                        ReflectUtils.SetValue(property.propertyPath, info, parent, result);
+                        onGUIPayload.SetValue(result);
+                        property.serializedObject.ApplyModifiedProperties();
                         // Debug.Log($"set value to {result}");
                     }
                 }
             }
         }
 
-        protected override void RestorePreviousValue(SerializedProperty property) => property.stringValue = _previousValue;
+        protected override void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent)
+        {
+            property.stringValue = _previousValue;
+            ReflectUtils.SetValue(property.propertyPath, info, parent, _previousValue);
+        }
 
         protected override object GetPreviousValue() => _previousValue;
 
@@ -207,16 +215,19 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             return GetObjFromStr(property.stringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr);
         }
 
-        protected override void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback)
+        protected override void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
         {
             ResourcePathAttribute resourcePathAttribute = (ResourcePathAttribute)requireTypeAttribute;
 
             FieldResourcesSelectWindow.Open(GetObjFromStr(property.stringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr), resourcePathAttribute.EStr, resourcePathAttribute.RequiredTypes, fieldResult =>
             {
+                // Debug.Log($"get new value {fieldResult}, null={fieldResult==null}");
                 string result = GetNewValue(fieldResult, resourcePathAttribute.EStr);
+                // Debug.Log($"get new value {fieldResult}, null={fieldResult==null}, result={result}, null={result==null}");
                 property.stringValue = result;
                 property.serializedObject.ApplyModifiedProperties();
-                onChangeCallback.Invoke(result);
+                ReflectUtils.SetValue(property.propertyPath, info, parent, result);
+                onChangeCallback(result);
             });
         }
         #endregion
@@ -340,12 +351,20 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         {
             ResourcePathAttribute resourcePathAttribute = (ResourcePathAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = resourcePathAttribute.RequiredTypes;
+            ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
 
             if(resourcePathAttribute.CustomPicker)
             {
                 container.Q<Button>(NameSelectorButton(property)).clicked += () =>
                 {
-                    OpenSelectorWindow(property, resourcePathAttribute, info, onValueChangedCallback);
+                    OpenSelectorWindow(property, resourcePathAttribute, info, newValue =>
+                    {
+                        // Debug.Log(newValue.GetType());
+                        string newStringValue = (string)newValue;
+                        objectField.SetValueWithoutNotify(GetObjFromStr(newStringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr));
+                        ReflectUtils.SetValue(property.propertyPath, info, parent, newStringValue);
+                        onValueChangedCallback(newValue);
+                    }, parent);
                 };
             }
 
@@ -364,15 +383,14 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 payload.correctValue = newObjectValue;
             }
 
-            ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
             objectField.RegisterValueChangedCallback(evt =>
             {
                 // onValueChangedCallback(GetNewValue(evt.newValue, resourcePathAttribute.EStr));
-                OnValueChangeObjectField(property, evt.newValue, resourcePathAttribute, helpBox, objectField, onValueChangedCallback);
+                OnValueChangeObjectField(property, info, evt.newValue, resourcePathAttribute, helpBox, objectField, onValueChangedCallback, parent);
             });
         }
 
-        private void OnValueChangeObjectField(SerializedProperty property, Object newValue, ResourcePathAttribute resourcePathAttribute, HelpBox helpBox, ObjectField objectField, Action<object> onValueChangedCallback)
+        private static void OnValueChangeObjectField(SerializedProperty property, FieldInfo info, Object newValue, ResourcePathAttribute resourcePathAttribute, HelpBox helpBox, ObjectField objectField, Action<object> onValueChangedCallback, object parent)
         {
             IReadOnlyList<Type> requiredTypes = resourcePathAttribute.RequiredTypes;
             // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
@@ -389,6 +407,14 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 // ObjectField target = container.Q<ObjectField>(NameObjectField(property));
                 string newStringValue = property.stringValue = GetNewValue(newValue, resourcePathAttribute.EStr);
                 property.serializedObject.ApplyModifiedProperties();
+                ReflectUtils.SetValue(property.propertyPath, info, parent, newStringValue);
+                // info.SetValue(parent, newStringValue);
+                // object fieldValue = info.GetValue(parent);
+                // if (fieldValue is Array array)
+                // {
+                //     array.SetValue(newStringValue, 1);
+                // }
+
                 onValueChangedCallback(newStringValue);
             }
             else

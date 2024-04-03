@@ -13,7 +13,7 @@ namespace SaintsField
         public readonly bool Above;
         public readonly string Content;
         public readonly EMessageType MessageType;
-        public readonly bool isCallback;
+        public readonly bool IsCallback;
         public readonly string ShowCallback;
 
         public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool above=false, string groupBy="")
@@ -23,7 +23,7 @@ namespace SaintsField
             Above = above;
             Content = content;
             MessageType = messageType;
-            this.isCallback = isCallback;
+            IsCallback = isCallback;
             ShowCallback = show;
         }
 

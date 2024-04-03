@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
     public class ResourcePathAttribute: RequireTypeAttribute
     {
         public override SaintsAttributeType AttributeType => SaintsAttributeType.Field;

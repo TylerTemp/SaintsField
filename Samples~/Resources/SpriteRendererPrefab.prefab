@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7413174995494639647}
   - component: {fileID: -2017994943238096811}
   - component: {fileID: 7020452487235846179}
+  - component: {fileID: 4585556904798547629}
   m_Layer: 0
   m_Name: SpriteRendererPrefab
   m_TagString: Untagged
@@ -119,3 +120,15 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 5.12, y: 5.12, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4585556904798547629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8617927036001643582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb8584b9543f47409091074d62d6ad66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

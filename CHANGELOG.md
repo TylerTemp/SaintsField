@@ -2,6 +2,8 @@
 
 1.  Add `[Conditional("UNITY_EDITOR")]` for attributes so it won't be included in your build.
 2.  Fix example scene will break the build (if you import it in your project).
+3.  Fix `InfoBox` can not get correct callback when it's nested inside an array.
+4.  Add `ResourcePath` to get a string path of a resource which allows you to specific required types, and have a custom object picker.
 
 ## 2.2.2
 

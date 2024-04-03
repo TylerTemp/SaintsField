@@ -33,9 +33,11 @@ namespace SaintsField.Editor.Drawers
                 return false;
             }
 
-            (string error, bool willDraw) = WillDraw(infoboxAttribute, parent);
-            _error = error;
-            return willDraw;
+            MetaInfo metaInfo = GetMetaInfo(property, infoboxAttribute, info, parent);
+
+            // (string error, bool willDraw) = WillDraw(infoboxAttribute, parent);
+            _error = metaInfo.Error;
+            return metaInfo.WillDrawBox;
         }
 
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
@@ -81,9 +83,9 @@ namespace SaintsField.Editor.Drawers
                 return false;
             }
 
-            (string error, bool willDraw) = WillDraw(infoboxAttribute, parent);
-            _error = error;
-            return willDraw;
+            MetaInfo metaInfo = GetMetaInfo(property, infoboxAttribute, info, parent);
+            _error = metaInfo.Error;
+            return metaInfo.WillDrawBox;
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
@@ -136,9 +138,9 @@ namespace SaintsField.Editor.Drawers
         }
 
         private static MetaInfo GetMetaInfo(SerializedProperty property, InfoBoxAttribute infoboxAttribute,
-            FieldInfo fieldInfo, object target)
+            FieldInfo info, object target)
         {
-            (string drawError, bool willDraw) = WillDraw(infoboxAttribute, target);
+            (string drawError, bool willDraw) = WillDraw(property, infoboxAttribute, info, target);
             if (drawError != "")
             {
                 return new MetaInfo
@@ -147,7 +149,7 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            if (!infoboxAttribute.isCallback)
+            if (!infoboxAttribute.IsCallback)
             {
                 return new MetaInfo
                 {
@@ -158,169 +160,60 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            types.Reverse();
-            foreach (Type eachType in types)
+            (string error, object result) = Util.GetOf<object>(
+                infoboxAttribute.Content,
+                null,
+                property,
+                info,
+                target);
+
+            if (error != "")
             {
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                    ReflectUtils.GetProp(eachType, infoboxAttribute.Content);
-                switch (getPropType)
+                return new MetaInfo
                 {
-                    case ReflectUtils.GetPropType.Field:
-                    {
-                        object fieldValue = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-
-                        if (fieldValue is ValueTuple<EMessageType, string> resultTuple)
-                        {
-                            return new MetaInfo
-                            {
-                                Error = "",
-                                WillDrawBox = resultTuple.Item2 != null && willDraw,
-                                MessageType = resultTuple.Item1,
-                                Content = resultTuple.Item2,
-                            };
-                        }
-
-                        return new MetaInfo
-                        {
-                            Error = "",
-                            WillDrawBox = fieldValue != null && willDraw,
-                            MessageType = infoboxAttribute.MessageType,
-                            Content = fieldValue == null ? "" : fieldValue.ToString(),
-                        };
-                    }
-                    case ReflectUtils.GetPropType.Property:
-                    {
-                        object propertyValue = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-
-                        if (propertyValue is ValueTuple<EMessageType, string> resultTuple)
-                        {
-                            return new MetaInfo
-                            {
-                                Error = "",
-                                WillDrawBox = resultTuple.Item2 != null && willDraw,
-                                MessageType = resultTuple.Item1,
-                                Content = resultTuple.Item2,
-                            };
-                        }
-
-                        return new MetaInfo
-                        {
-                            Error = "",
-                            WillDrawBox = propertyValue != null && willDraw,
-                            MessageType = infoboxAttribute.MessageType,
-                            Content = propertyValue?.ToString(),
-                        };
-                    }
-                    case ReflectUtils.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                        ParameterInfo[] methodParams = methodInfo.GetParameters();
-                        Debug.Assert(methodParams.All(p => p.IsOptional));
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_INFO_BOX
-                        Debug.Log(methodInfo.ReturnType);
-                        Debug.Log(methodInfo.ReturnType == typeof(ValueTuple<EMessageType, string>));
-#endif
-                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                        object rawValue = fieldInfo.GetValue(target);
-                        object curValue = arrayIndex == -1
-                            ? rawValue
-                            : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                            ? new[]
-                            {
-                                curValue,
-                            }
-                            : new[]
-                            {
-                                curValue,
-                                arrayIndex,
-                            });
-
-
-                        if (methodInfo.ReturnType != typeof(ValueTuple<EMessageType, string>))
-                        {
-                            object methodDirectResult = methodInfo.Invoke(target, passParams);
-                            return new MetaInfo
-                            {
-                                Error = "",
-                                WillDrawBox = willDraw && methodDirectResult != null,
-                                MessageType = infoboxAttribute.MessageType,
-                                Content = methodDirectResult?.ToString(),
-                            };
-                        }
-
-                        (EMessageType messageType, string content) =
-                            ((EMessageType, string))methodInfo.Invoke(target,
-                                methodParams.Select(p => p.DefaultValue).ToArray());
-                        return new MetaInfo
-                        {
-                            Error = "",
-                            WillDrawBox = willDraw && content != null,
-                            MessageType = messageType,
-                            Content = content,
-                        };
-                    }
-                    case ReflectUtils.GetPropType.NotFound:
-                        continue;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-                }
+                    Error = error,
+                };
             }
+
+            if (result is ValueTuple<EMessageType, string> resultTuple)
+            {
+                return new MetaInfo
+                {
+                    Error = "",
+                    WillDrawBox = resultTuple.Item2 != null && willDraw,
+                    MessageType = resultTuple.Item1,
+                    Content = resultTuple.Item2,
+                };
+            }
+
+            // Debug.Log($"result={result}, null={result == null}, willDraw={willDraw}/{property.propertyPath}/{info.Name}");
 
             return new MetaInfo
             {
-                Error = $"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`",
+                Error = "",
+                WillDrawBox = result != null && willDraw,
+                MessageType = infoboxAttribute.MessageType,
+                Content = result == null ? "" : result.ToString(),
             };
         }
 
-        private static (string error, bool willDraw) WillDraw(InfoBoxAttribute infoboxAttribute, object target)
+        private static (string error, bool willDraw) WillDraw(SerializedProperty property, InfoBoxAttribute infoboxAttribute, FieldInfo info, object target)
         {
             if (infoboxAttribute.ShowCallback == null)
             {
                 return ("", true);
             }
 
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), infoboxAttribute.ShowCallback);
+            (string error, object result) = Util.GetOf<object>(
+                infoboxAttribute.ShowCallback,
+                null,
+                property,
+                info,
+                target);
 
-            if (found.getPropType == ReflectUtils.GetPropType.NotFound)
-            {
-                return ($"No field or method named `{infoboxAttribute.ShowCallback}` found on `{target}`", false);
-            }
-
-            if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
-            {
-                if (!ReflectUtils.Truly(propertyInfo.GetValue(target)))
-                {
-                    return ("", false);
-                }
-            }
-            else if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
-            {
-                if (!ReflectUtils.Truly(foundFieldInfo.GetValue(target)))
-                {
-                    return ("", false);
-                }
-            }
-            else if (found.getPropType == ReflectUtils.GetPropType.Method && found.fieldOrMethodInfo is MethodInfo methodInfo)
-            {
-                ParameterInfo[] methodParams = methodInfo.GetParameters();
-                Debug.Assert(methodParams.All(p => p.IsOptional));
-                Debug.Assert(methodInfo.ReturnType == typeof(bool));
-                if (!(bool)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()))
-                {
-                    return ("", false);
-                }
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(found), found, null);
-            }
-
-            return ("", true);
-
+            return error != ""
+                ? (error, false)
+                : ("", ReflectUtils.Truly(result));
         }
 
 #if UNITY_2021_3_OR_NEWER

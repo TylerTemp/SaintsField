@@ -270,5 +270,34 @@ namespace SaintsField.Editor.Utils
 
             return filledValues;
         }
+
+        public static void SetValue(string propertyPath, FieldInfo info, object parent, object value)
+        {
+            int index = SerializedUtils.PropertyPathIndex(propertyPath);
+            if (index == -1)
+            {
+                // Debug.Log($"direct set value {value} to {info} on {parent}");
+                info.SetValue(parent, value);
+            }
+            else
+            {
+                object fieldValue = info.GetValue(parent);
+                // Debug.Log($"try set value {value} at {index} to {info} on {parent}");
+                if (fieldValue is Array array)
+                {
+                    array.SetValue(value, index);
+                }
+                else if(fieldValue is IList<object> list)
+                {
+                    list[index] = value;
+                }
+                else
+                {
+                    // Debug.Log($"direct set value {value} to {info} on {parent}");
+                    info.SetValue(parent, value);
+                }
+            }
+
+        }
     }
 }

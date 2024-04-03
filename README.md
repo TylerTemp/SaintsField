@@ -63,13 +63,12 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.2.2**
+**2.2.3**
 
-1.  `Rate`: no longer frozen the first star if the range starts from 1.
-2.  UIToolkit `MinMaxSlider`: incorrect update min/max value when there is an error.
-3.  Fix `EnumFlags` IMGUI incorrect height result because Unity will give width=1 during rendering IMGUI for the first time...
-    Fix `EnumFlags` incorrect field type checking and did not work inside `Serializable`.
-4.  Fix `Rate`, `PropRange`(IMGUI) do not immediately update the value when it's inside a `Serializable`.
+1.  Add `[Conditional("UNITY_EDITOR")]` for attributes so it won't be included in your build.
+2.  Fix example scene will break the build (if you import it in your project).
+3.  Fix `InfoBox` can not get correct callback when it's nested inside an array.
+4.  Add `ResourcePath` to get a string path of a resource which allows you to specific required types, and have a custom object picker.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1324,6 +1323,63 @@ public class ProgressBarExample: MonoBehaviour
 ```
 
 [![progress_bar](https://github.com/TylerTemp/SaintsField/assets/6391063/74085d85-e447-4b6b-a3ff-1bd2f26c5d73)](https://github.com/TylerTemp/SaintsField/assets/6391063/11ad0700-32ba-4280-ae7b-6b6994c9de83)
+
+#### `ResourcePath` ####
+
+A tool to pick an resource path (a string) with:
+1.  required types or interfaces
+2.  display a type instead of showing a string
+3.  pick a suitable object using a custom picker
+
+Parameters:
+
+*   `EStr eStr = EStr.Resource`: which kind of string value you expected:
+    *  `Resource`: a resource path
+    *  `AssetDatabase`: an asset path. You should NOT use this unless you know what you are doing.
+    *  `Guid`: the GUID of the target object. You should NOT use this unless you know what you are doing.
+*   `bool freeSign=false`:
+  
+    `true` to allow to sign any object, and gives a message if the signed value does not match.
+
+    `false` to only allow to sign matched object, and trying to prevent the change if it's illegal.
+
+*   `bool customPicker=true`: use a custom object pick that only display objects which meet the requirements
+*   `Type compType`: the type of the component. It can be a component, or an object like `GameObject`, `Sprite`. The field will be this type. It can NOT be an interface
+*   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all of the types can be signed.
+*   AllowMultiple: No
+
+**Known Issue**: IMGUI, manually sign a null object by using Unity's default pick will sign an empty string instead of null. Use custom pick to avoid this inconsistency.
+
+```csharp
+// resource: display as a MonoScript, requires a BoxCollider
+[ResourcePath(typeof(Dummy), typeof(BoxCollider))]
+[InfoBox(nameof(myResource), true)]
+public string myResource;
+
+// AssetDatabase path
+[Space]
+[ResourcePath(EStr.AssetDatabase, typeof(Dummy), typeof(BoxCollider))]
+[InfoBox(nameof(myAssetPath), true)]
+public string myAssetPath;
+
+// GUID
+[Space]
+[ResourcePath(EStr.Guid, typeof(Dummy), typeof(BoxCollider))]
+[InfoBox(nameof(myGuid), true)]
+public string myGuid;
+
+// prefab resource
+[ResourcePath(typeof(GameObject))]
+[InfoBox(nameof(resourceNoRequire), true)]
+public string resourceNoRequire;
+
+// requires to have a Dummy script attached, and has interface IMyInterface
+[ResourcePath(typeof(Dummy), typeof(IMyInterface))]
+[InfoBox(nameof(myInterface), true)]
+public string myInterface;
+```
+
+![resource_path](https://github.com/TylerTemp/SaintsField/assets/6391063/35d683bf-7d19-4854-bdf6-ee63532fed80)
 
 ### Field Utilities ###
 

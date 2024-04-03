@@ -6067,8 +6067,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myResource: SpriteRendererPrefab
-  myAssetPath: Assets/SaintsField/Samples/Resources/Cube.prefab
+  myAssetPath: Assets/SaintsField/Samples/Resources/SpriteRendererPrefab.prefab
   myGuid: de2d4e879e7c1454c8209ae3d7091920
+  resourceNoRequire: Dummy
+  myInterface: Dummy
+  myStruct:
+    myResource: SpriteRendererPrefab
+    myResources:
+    - Cube
+    - SpriteRendererPrefab
+  myStructs:
+  - myResource: SpriteRendererPrefab
+    myResources: []
 --- !u!4 &1465660266
 Transform:
   m_ObjectHideFlags: 0

@@ -122,29 +122,32 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             }
         }
 
-        private static IReadOnlyList<string> GetMissingTypeNames(Object curValue, IReadOnlyList<Type> requiredTypes)
+        private static IReadOnlyList<string> GetMissingTypeNames(Object curValue, IEnumerable<Type> requiredTypes)
         {
-            switch (curValue)
-            {
-                case GameObject go:
-                    return requiredTypes
-                        .Where(requiredType => go.GetComponent(requiredType) == null)
-                        .Select(requiredType => requiredType.Name)
-                        .ToArray();
-                case Component comp:
-                    return requiredTypes
-                        .Where(requiredType => comp.GetComponent(requiredType) == null)
-                        .Select(requiredType => requiredType.Name)
-                        .ToArray();
-                default:
-                {
-                    Type curType = curValue.GetType();
-                    return requiredTypes
-                        .Where(requiredType => !curType.IsInstanceOfType(requiredType))
-                        .Select(requiredType => requiredType.Name)
-                        .ToArray();
-                }
-            }
+            return requiredTypes.Where(eachType => Util.GetTypeFromObj(curValue, eachType) == null)
+                .Select(eachType => eachType.Name)
+                .ToArray();
+            // switch (curValue)
+            // {
+            //     case GameObject go:
+            //         return requiredTypes
+            //             .Where(requiredType => go.GetComponent(requiredType) == null)
+            //             .Select(requiredType => requiredType.Name)
+            //             .ToArray();
+            //     case Component comp:
+            //         return requiredTypes
+            //             .Where(requiredType => comp.GetComponent(requiredType) == null)
+            //             .Select(requiredType => requiredType.Name)
+            //             .ToArray();
+            //     default:
+            //     {
+            //         Type curType = curValue.GetType();
+            //         return requiredTypes
+            //             .Where(requiredType => !curType.IsInstanceOfType(requiredType))
+            //             .Select(requiredType => requiredType.Name)
+            //             .ToArray();
+            //     }
+            // }
         }
 
         #region IMGUI
@@ -192,7 +195,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
                 if (GUI.Button(position, "●", _imGuiButtonStyle))
                 {
-                    OpenSelectorWindow(property, requireTypeAttribute, info, onGUIPayload.SetValue);
+                    OpenSelectorWindow(property, requireTypeAttribute, info, onGUIPayload.SetValue, parent);
                 }
             }
 
@@ -227,7 +230,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                     else  // it's not freeSign, and you've already got a correct answer. So revert to the old value.
                     {
                         // property.objectReferenceValue = _previousValue;
-                        RestorePreviousValue(property);
+                        RestorePreviousValue(property, info, parent);
                         onGUIPayload.SetValue(GetPreviousValue());
                         Debug.LogWarning($"{errorMessage} Change reverted to {(_previousValue==null? "null": _previousValue.ToString())}.");
                     }
@@ -243,7 +246,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
         protected virtual Object GetCurFieldValue(SerializedProperty property, RequireTypeAttribute _) => property.objectReferenceValue;
 
-        protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback)
+        protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
         {
             FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick, info.FieldType, requireTypeAttribute.RequiredTypes, fieldResult =>
             {
@@ -255,7 +258,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             });
         }
 
-        protected virtual void RestorePreviousValue(SerializedProperty property) => property.objectReferenceValue = _previousValue;
+        protected virtual void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent)
+        {
+            property.objectReferenceValue = _previousValue;
+            ReflectUtils.SetValue(property.propertyPath, info, parent, _previousValue);
+        }
 
         protected virtual object GetPreviousValue() => _previousValue;
 
@@ -362,7 +369,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             {
                 container.Q<Button>(NameSelectorButton(property)).clicked += () =>
                 {
-                    OpenSelectorWindow(property, requireTypeAttribute, info, onValueChangedCallback.Invoke);
+                    OpenSelectorWindow(property, requireTypeAttribute, info, onValueChangedCallback, parent);
                 };
             }
 

@@ -414,6 +414,8 @@ namespace SaintsField.Editor.Utils
                         throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
                 }
 
+                // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
+
                 T finalResult;
                 try
                 {
@@ -513,14 +515,19 @@ namespace SaintsField.Editor.Utils
                     // property.objectReferenceValue = null;
                     break;
                 case GameObject go:
+                    // ReSharper disable once RedundantCast
                     result = fieldType == typeof(GameObject) ? (UnityEngine.Object)go : go.GetComponent(fieldType);
                     // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
                     break;
                 case Component comp:
                     result = fieldType == typeof(GameObject)
+                        // ReSharper disable once RedundantCast
                         ? (UnityEngine.Object)comp.gameObject
                         : comp.GetComponent(fieldType);
                     break;
+                // default:
+                //     Debug.Log(fieldResult.GetType());
+                //     break;
             }
 
             return result;
