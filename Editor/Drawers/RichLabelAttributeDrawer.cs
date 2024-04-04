@@ -161,10 +161,21 @@ namespace SaintsField.Editor.Drawers
                 labelContainer.Clear();
                 if (nowXml != null)
                 {
-                    foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
+                    Label label = container.Q<Label>(className: "unity-label");
+                    if (label != null)
                     {
-                        labelContainer.Add(richChunk);
+                        label.Clear();
+                        label.text = "";
+                        label.style.flexDirection = FlexDirection.Row;
+                        foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
+                        {
+                            label.Add(richChunk);
+                        }
                     }
+                    // foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
+                    // {
+                    //     labelContainer.Add(richChunk);
+                    // }
 
                     // this does not work...
                     // float emptyWidth = RichTextDrawer.TextLengthUIToolkit(generateAnyLabel, " ");
@@ -181,7 +192,7 @@ namespace SaintsField.Editor.Drawers
                     // emptyXml = new string(' ', emptyCount);
                 }
 
-                OnLabelStateChangedUIToolkit(property, container, nowXml);
+                // OnLabelStateChangedUIToolkit(property, container, nowXml);
             }
 
             HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property));

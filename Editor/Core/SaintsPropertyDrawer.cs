@@ -514,13 +514,15 @@ namespace SaintsField.Editor.Core
 
         private static PropertyField UnityFallbackUIToolkit(SerializedProperty property)
         {
-            PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
+            // PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
+            PropertyField propertyField = new PropertyField(property)
             {
                 style =
                 {
                     flexGrow = 1,
                 },
             };
+
             propertyField.AddToClassList(SaintsFieldFallbackClass);
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
@@ -702,20 +704,6 @@ namespace SaintsField.Editor.Core
 
             #endregion
 
-            // VisualElement fakeLabelContainer = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         position = Position.Absolute,
-            //         height = EditorGUIUtility.singleLineHeight,
-            //         marginLeft = LabelLeftSpace,
-            //         width = LabelBaseWidth,
-            //     },
-            //     name = NameRichLabelContainer(property),
-            // };
-
-
-
             // Type fieldDrawer = fieldAttributeWithIndex.Attribute == null
             //     ? null
             //     : GetFirstSaintsDrawerType(fieldAttributeWithIndex.Attribute.GetType());
@@ -738,7 +726,7 @@ namespace SaintsField.Editor.Core
                         unityTextAlign = TextAnchor.LowerLeft,
                     },
                     pickingMode = PickingMode.Ignore,
-                    // name = NameRichLabelContainer(property),
+                    name = "SaintsField-FakeLabel",
                 });
             }
 
@@ -1932,18 +1920,19 @@ namespace SaintsField.Editor.Core
                 // Debug.Log($"fallbackContainer on label to {label}->{toLabel}");
                 if (label != null)
                 {
-                    label.text = toLabel == null ? null : new string(' ', property.displayName.Length);
+                    label.text = toLabel == null ? null : property.displayName;
                     label.style.display = toLabel == null ? DisplayStyle.None : DisplayStyle.Flex;
-                    // Debug.Log(label.style.display);
+                    label.style.color = new StyleColor(Color.clear);
                 }
             }
             else
             {
                 // Debug.Log(saintsLabelFieldDrawerData);
                 SaintsPropertyInfo drawerInfo = (SaintsPropertyInfo) saintsLabelFieldDrawerData;
-                string newLabel = toLabel == null ? null : new string(' ', property.displayName.Length);
+                // string newLabel = toLabel == null ? null : new string(' ', property.displayName.Length);
+                string newLabel = toLabel == null ? null : property.displayName;
                 drawerInfo.Drawer.ChangeFieldLabelToUIToolkit(property, drawerInfo.Attribute, drawerInfo.Index, element, newLabel);
-                // Debug.Log(mainDrawer._saintsFieldDrawer);
+                Debug.Log($"{drawerInfo.Drawer}/{newLabel}");
             }
             // Debug.Log(mainDrawer._saintsFieldFallback);
             // Debug.Log(mainDrawer._saintsFieldDrawer);
