@@ -15,8 +15,8 @@ namespace SaintsField.Editor.Utils
 
         public static void FixLabelWidthLoopUIToolkit(Label label)
         {
-
             FixLabelWidthUIToolkit(label);
+            label.schedule.Execute(() => FixLabelWidthUIToolkit(label)).StartingIn(250);
             label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
         }
 
