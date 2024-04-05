@@ -29,6 +29,11 @@ namespace SaintsField.Editor.Drawers
             return axisNames;
         }
 
+        private static void OpenInputManager()
+        {
+            SettingsService.OpenProjectSettings("Project/Input Manager");
+        }
+
         #region IMGUI
 
         private IReadOnlyList<string> _axisNames;
@@ -42,6 +47,7 @@ namespace SaintsField.Editor.Drawers
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_axisNames == null)
             {
                 _axisNames = GetAxisNames();
@@ -51,9 +57,19 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                int newIndex = EditorGUI.Popup(position, label, index, _axisNames.Select(each => new GUIContent(each)).ToArray());
+                GUIContent optionContent = new GUIContent("Open Input Manager...");
+                int newIndex = EditorGUI.Popup(position, label, index, _axisNames
+                    .Select(each => new GUIContent(each))
+                    .Concat(new[]{GUIContent.none, optionContent})
+                    .ToArray());
+                // ReSharper disable once InvertIf
                 if (changeCheck.changed)
                 {
+                    if(newIndex >= _axisNames.Count)
+                    {
+                        OpenInputManager();
+                        return;
+                    }
                     property.stringValue = _axisNames[newIndex];
                 }
             }
@@ -145,6 +161,13 @@ namespace SaintsField.Editor.Drawers
                     property.serializedObject.ApplyModifiedProperties();
                 });
             }
+
+            if(axisNames.Count > 0)
+            {
+                genericDropdownMenu.AddSeparator("");
+            }
+
+            genericDropdownMenu.AddItem("Open Input Manager...", false, OpenInputManager);
 
             Button button = container.Q<Button>(NameButtonField(property));
             genericDropdownMenu.DropDown(button.worldBound, button, true);

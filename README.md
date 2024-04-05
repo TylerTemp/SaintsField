@@ -17,7 +17,7 @@ Unity: 2019.1 or higher
 ## Highlights ##
 
 1.  Works on deep nested fields!
-2.  Supports UI Toolkit (Experimental)! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
+2.  Supports UI Toolkit! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
 3.  Use and only use `PropertyDrawer` and `DecoratorDrawer` (except `SaintsEditor`, which is disabled by default), thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
@@ -63,18 +63,18 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.2.3**
+**2.3.0**
 
-1.  Add `[Conditional("UNITY_EDITOR")]` for attributes so it won't be included in your build.
-2.  Fix example scene will break the build (if you import it in your project).
-3.  Fix `InfoBox` can not get correct callback when it's nested inside an array.
-4.  Add `ResourcePath` to get a string path of a resource which allows you to specific required types, and have a custom object picker.
+Fix the UI Toolkit buggy label width, finally!
+
+1.  UIToolkit: when using a long label, the label will take more space (rather than be truncated in the previous version). Now it behaves the same as UI Toolkit components.
+2.  `Scene` attribute now have a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
+3.  `InputAxis` attribute now have a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
+4.  `SortingLayer` attribute now have a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
 ## Usage ##
-
-UI Toolkit supports are experimental, you can disable it by `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information)
 
 ### Label & Text ###
 
@@ -1159,8 +1159,7 @@ public class LayerAttributeExample: MonoBehaviour
 
 #### `Scene` ####
 
-
-A dropdown selector for a scene in the build list.
+A dropdown selector for a scene in the build list, plus a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
 
 *   AllowMultiple: No
 
@@ -1172,11 +1171,11 @@ public class SceneExample: MonoBehaviour
 }
 ```
 
-![scene](https://github.com/TylerTemp/SaintsField/assets/6391063/94ae457e-44e2-4434-ab68-d8d51df1e2fa)
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/0da47bd1-0741-4707-b96b-6c08e4c5844c)
 
 #### `SortingLayer` ####
 
-A dropdown selector for sorting layer.
+A dropdown selector for sorting layer, plus a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
 
 *   AllowMultiple: No
 
@@ -1188,7 +1187,7 @@ public class SortingLayerExample: MonoBehaviour
 }
 ```
 
-![sorting_layer](https://github.com/TylerTemp/SaintsField/assets/6391063/cab99c5c-0ec2-49c5-843c-89f65f402b93)
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/f6633689-012b-4d55-af32-885aa2a2e3cf)
 
 #### `Tag` ####
 
@@ -1207,7 +1206,7 @@ public class TagExample: MonoBehaviour
 
 #### `InputAxis` ####
 
-A string dropdown selector for an input axis.
+A string dropdown selector for an input axis, plus a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
 
 *   AllowMultiple: No
 
@@ -1218,7 +1217,7 @@ public class InputAxisExample: MonoBehaviour
 }
 ```
 
-![input_axis](https://github.com/TylerTemp/SaintsField/assets/6391063/e7bb79f6-28f9-4080-93b4-f9781bf91b77)
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/68dc47d9-7211-48df-bbd1-c11faa536bd1)
 
 #### `LeftToggle` ####
 
@@ -1338,7 +1337,7 @@ Parameters:
     *  `AssetDatabase`: an asset path. You should NOT use this unless you know what you are doing.
     *  `Guid`: the GUID of the target object. You should NOT use this unless you know what you are doing.
 *   `bool freeSign=false`:
-  
+
     `true` to allow to sign any object, and gives a message if the signed value does not match.
 
     `false` to only allow to sign matched object, and trying to prevent the change if it's illegal.
@@ -2892,13 +2891,58 @@ My (not full) test about compatibility:
 
 ### UI Toolkit ###
 
-The support for UI Toolkit is experimental. There are way too many issues with UI Toolkit that Unity does not give any guild of how to do, and there are bugs that not fixed even in the newest Unity (Unity 2023.2.5f1 at this point)
-
 If you encounter any issue, please report it to the issue page. However, there are many issues that is just not fixable:
 
 1.  Label width. UI Toolkit uses a fixed label width 120px. However, this value is different when the field is nested and indented.
 
-    In IMGUI, we have `EditorGUIUtility.labelWidth`, `EditorGUI.indentLevel`, which is absolutely not available in UI Toolkit, and there is no way to get the label width. `SaintsField` just use the fixed label width.
+    In IMGUI, we have `EditorGUIUtility.labelWidth`, `EditorGUI.indentLevel`, which is absolutely not available in UI Toolkit, and there is no way to get the label width.
+
+    **Since SaintsField 2.3.0, this issue is much better handled!**
+
+    Considering the following labels with UI Toolkit enabled:
+
+    ```csharp
+    public string itsALongRideForPeopleWhoHaveNothingToThinkAbout;
+    public string aBitLongerThanDefault;
+    public string s;  // short
+    ```
+
+    By default (or with `PropertyField` from UI Toolkit), Unity display it as this (it's a IMGUI style even with UI Toolkit on):
+
+    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/059bd138-8178-4958-950a-daef7cd6ca9a)
+
+    Now, let's apply any UI Toolkit component (except `PropertyField`), it will (surprisingly!) use the modern UI Toolkit flavor label layout:
+
+    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/2cdea75f-5a39-46ae-91d2-023f861b593f)
+
+    This inconsistency can make your inspector looks sooooooo weird and very funny because of un-aligned fields. This problem is reported to Unity but never got fixed. Considering:
+
+    ```csharp
+    // default field with UI Toolkit, Unity will truncate it to IMGUI width, instead of UI Toolkit flavor
+    public string thereIsSomeGoodNewsForPeopleWhoLoveBadNews;
+    // UI Toolkit component! Unity will grow the space like UI Toolkit
+    [UIToolkit] public string weWereDeadBeforeTheShipEvenSank;
+    // another default, Unity will use the IMGUI style width (some mix of a percent, min-width and caculation result) instead of UI Toolkit
+    public string myString;
+    // another UI Toolkit component! Unity will use the UI Toolkit style width (120px) like UI Toolkit
+    [UIToolkit] public string myUiToolkit;
+    ```
+
+    The field indent is a mess, even you're sticking to the UI Toolkit inspector:
+
+    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/04303517-fe3d-4c42-992e-cf97f86524ad)
+
+    This issue is so difficult to solve, that even OdinInspector does not try to fix it. (Or maybe they just don't care...?)
+
+    SaintsField now use some trick to make `PropertyField` label behaves much more like the vanilla UI Toolkit component:
+
+    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/a8b90764-7053-4dcc-9af4-5f804f5e12fb)
+
+    That means:
+
+    1.  Label will by default get 120px width, which is UI Toolkit's default
+    2.  The space gets grow to fit the label when the label gets longer, which is also UI Toolkit's default
+    3.  If you have a very looooong label, the value field will be shrank out of view. This is also how UI Toolkit works.
 
 2.  Even most UI Toolkit fields are fixed label width, there is one that the label width behavior exactly like IMGUI: `PropertyField`. This bug has been reported to Unity (Sorry I can't find the link now), but is never fixed.
 

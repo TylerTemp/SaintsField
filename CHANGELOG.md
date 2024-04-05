@@ -1,6 +1,58 @@
 ## 2.3.0
 
-Fix the UIToolkit buggy label width, finally!
+Fix the UI Toolkit buggy label width, finally!
+
+1.  UIToolkit: when using a long label, the label will take more space (rather than be truncated in the previous version). Now it behaves the same as UI Toolkit components.
+2.  `Scene` attribute now have a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
+3.  `InputAxis` attribute now have a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
+4.  `SortingLayer` attribute now have a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
+
+As the most bothering issue fixed in UIToolkit, I'm now removing "experimental" from UIToolkit support. If you face any issue, please submit in [Github Issue Page](https://github.com/TylerTemp/SaintsField/issues).
+
+Considering the following labels with UI Toolkit enabled:
+
+```csharp
+public string itsALongRideForPeopleWhoHaveNothingToThinkAbout;
+public string aBitLongerThanDefault;
+public string s;  // short
+```
+
+By default (or with `PropertyField` from UI Toolkit), Unity display it as this (it's a IMGUI style even with UI Toolkit on):
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/059bd138-8178-4958-950a-daef7cd6ca9a)
+
+Now, let's apply any UI Toolkit component (except `PropertyField`), it will (surprisingly!) use the modern UI Toolkit flavor label layout:
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/2cdea75f-5a39-46ae-91d2-023f861b593f)
+
+This inconsistency can make your inspector looks sooooooo weird and very funny because of un-aligned fields. This problem is reported to Unity but never got fixed. Considering:
+
+```csharp
+// default field with UI Toolkit, Unity will truncate it to IMGUI width, instead of UI Toolkit flavor
+public string thereIsSomeGoodNewsForPeopleWhoLoveBadNews;
+// UI Toolkit component! Unity will grow the space like UI Toolkit
+[UIToolkit] public string weWereDeadBeforeTheShipEvenSank;
+// another default, Unity will use the IMGUI style width (some mix of a percent, min-width and caculation result) instead of UI Toolkit
+public string myString;
+// another UI Toolkit component! Unity will use the UI Toolkit style width (120px) like UI Toolkit
+[UIToolkit] public string myUiToolkit;
+```
+
+The field indent is a mess, even you're sticking to the UI Toolkit inspector:
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/04303517-fe3d-4c42-992e-cf97f86524ad)
+
+This issue is so difficult to solve, that even OdinInspector does not try to fit it. (Or maybe they just don't care...?)
+
+SaintsField now use some trick to make `PropertyField` label behaves much more like the vanilla UI Toolkit component:
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/a8b90764-7053-4dcc-9af4-5f804f5e12fb)
+
+That means:
+
+1.  Label will by default get 120px width, which is UI Toolkit's default
+2.  The space gets grow to fix the label when the label gets longer, which is also UI Toolkit's default
+3.  If you have a very looooong label, the value field will be shrank out of view. This is also how UI Toolkit works.
 
 ## 2.2.3
 

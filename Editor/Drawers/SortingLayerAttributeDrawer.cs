@@ -24,6 +24,18 @@ namespace SaintsField.Editor.Drawers
             return SortingLayer.layers.Select(each => each.name).ToArray();
         }
 
+        private static void OpenSortingLayerInspector()
+        {
+            // TagManagerInspector.ShowWithInitialExpansion(TagManagerInspector.InitialExpansionState.Layers)
+            Type tagManagerInspectorType = Type.GetType("UnityEditor.TagManagerInspector, UnityEditor");
+            // Get the method Info for the ShowWithInitialExpansion method
+            MethodInfo showWithInitialExpansionMethod = tagManagerInspectorType.GetMethod("ShowWithInitialExpansion", BindingFlags.Static | BindingFlags.NonPublic);
+            Type initialExpansionStateType = tagManagerInspectorType.GetNestedType("InitialExpansionState", BindingFlags.NonPublic);
+            object layersEnumValue = Enum.Parse(initialExpansionStateType, "SortingLayers");
+            // Invoke the ShowWithInitialExpansion method with the Layers enum value
+            showWithInitialExpansionMethod.Invoke(null, new object[] { layersEnumValue });
+        }
+
         #region IMGUI
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
@@ -39,14 +51,23 @@ namespace SaintsField.Editor.Drawers
 
             int selectedIndex = property.propertyType == SerializedPropertyType.Integer ? property.intValue : Array.IndexOf(layers, property.stringValue);
 
+            // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-
                 int newIndex = EditorGUI.Popup(position, label, selectedIndex,
-                    layers.Select(each => new GUIContent(each)).ToArray());
+                    layers
+                        .Select(each => each == ""? new GUIContent("<empty string>") : new GUIContent(each))
+                        .Concat(new[]{GUIContent.none, new GUIContent("Edit Sorting Layers...")})
+                        .ToArray());
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
+                    if (newIndex >= layers.Length)
+                    {
+                        OpenSortingLayerInspector();
+                        return;
+                    }
+
                     if (property.propertyType == SerializedPropertyType.Integer)
                     {
                         property.intValue = newIndex;
@@ -139,12 +160,12 @@ namespace SaintsField.Editor.Drawers
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
             Button button = container.Q<Button>(NameButtonField(property));
 
-            if (layers.Length == 0)
-            {
-                genericDropdownMenu.AddDisabledItem("No layers", false);
-                genericDropdownMenu.DropDown(button.worldBound, button, true);
-                return;
-            }
+            // if (layers.Length == 0)
+            // {
+            //     genericDropdownMenu.AddDisabledItem("No layers", false);
+            //     genericDropdownMenu.DropDown(button.worldBound, button, true);
+            //     return;
+            // }
 
             Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
 
@@ -152,12 +173,8 @@ namespace SaintsField.Editor.Drawers
             {
                 int curIndex = index;
                 string curItem = layers[index];
-                if (curItem == "")
-                {
-                    continue;
-                }
 
-                string curName = $"{curItem} [{index}]";
+                string curName = $"{index}: {curItem}";
 
                 genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
                 {
@@ -178,6 +195,12 @@ namespace SaintsField.Editor.Drawers
                 });
             }
 
+            if (layers.Length > 0)
+            {
+                genericDropdownMenu.AddSeparator("");
+            }
+            genericDropdownMenu.AddItem("Edit Sorting Layers...", false, OpenSortingLayerInspector);
+
             genericDropdownMenu.DropDown(button.worldBound, button, true);
         }
 
@@ -188,16 +211,16 @@ namespace SaintsField.Editor.Drawers
             {
                 string value = property.stringValue;
                 int index = Array.IndexOf(layers, value);
-                return (layers, index, index == -1? $"{value} [?]": $"{value} [{index}]");
+                return (layers, index, index == -1? $"?: {value}": $"{index}: {value}");
             }
             else
             {
                 int index = property.intValue;
                 if(index < 0 || index >= layers.Length)
                 {
-                    return (layers, -1, $"{index} [?]");
+                    return (layers, -1, $"{index}: ?");
                 }
-                return (layers, index, $"{layers[index]} [{index}]");
+                return (layers, index, $"{index}: {layers[index]}");
             }
         }
 

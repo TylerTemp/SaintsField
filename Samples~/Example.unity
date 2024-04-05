@@ -1050,7 +1050,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0134a10044b2475886a64552e7a8f4ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sortingLayerString: New Layer 1
+  _sortingLayerString: New Layer 3
   _sortingLayerInt: 0
 --- !u!4 &301131439
 Transform:
@@ -2482,8 +2482,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71aaeaf3bdd04306ba6b52810d6f241c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneInt: 0
-  sceneStr: SampleScene
+  sceneI: 0
+  sceneS: Example
 --- !u!4 &633783411
 Transform:
   m_ObjectHideFlags: 0
@@ -4871,10 +4871,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6159b766ec67643b45e522ef2dcc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
-  aBitLongerThanDefault: 
-  s: 
-  richLabel: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0

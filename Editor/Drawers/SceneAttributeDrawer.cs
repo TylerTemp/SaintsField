@@ -30,17 +30,11 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             string[] scenes = GetScenes();
-            bool anySceneInBuildSettings = scenes.Length > 0;
-            if (!anySceneInBuildSettings)
-            {
-                // DrawDefaultPropertyAndHelpBox(rect, property, label, "No scenes in the build settings", MessageType.Warning);
-                _error = "No scenes in the build settings";
-                DefaultDrawer(position, property, label, info);
-                return;
-            }
 
+            // const string optionName = "Edit Scenes In Build...";
             string[] sceneOptions = scenes
-                .Select((name, index) => $"{name} [{index}]")
+                .Select((name, index) => $"{index}: {name}")
+                // .Concat(scenes.Length > 0? new[]{"", optionName}: new[]{optionName})
                 .ToArray();
 
             _error = "";
@@ -72,23 +66,39 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions);
+                int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions
+                    .Concat(new[]{"", "Edit Scenes In Build..."})
+                    .ToArray());
+                // ReSharper disable once InvertIf
                 if (changeCheck.changed)
                 {
+                    if(newIndex >= sceneOptions.Length)
+                    {
+                        OpenBuildSettings();
+                        return;
+                    }
                     property.stringValue = scenes[newIndex];
                 }
             }
         }
 
-        private static void DrawPropertyForInt(Rect rect, SerializedProperty property, GUIContent label, string[] sceneOptions)
+        private static void DrawPropertyForInt(Rect rect, SerializedProperty property, GUIContent label, string[] scenes)
         {
             int index = property.intValue;
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions);
+                int newIndex = EditorGUI.Popup(rect, label.text, index, scenes
+                    .Concat(new[]{"", "Edit Scenes In Build..."})
+                    .ToArray());
+                // ReSharper disable once InvertIf
                 if (changeCheck.changed)
                 {
+                    if(newIndex >= scenes.Length)
+                    {
+                        OpenBuildSettings();
+                        return;
+                    }
                     property.intValue = newIndex;
                 }
             }
@@ -128,6 +138,11 @@ namespace SaintsField.Editor.Drawers
                 .Where(scene => scene.enabled)
                 .Select(scene => Path.GetFileNameWithoutExtension(scene.path))
                 .ToArray();
+
+        private static void OpenBuildSettings()
+        {
+            EditorWindow.GetWindow(Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
+        }
 
 #if UNITY_2021_3_OR_NEWER
 
@@ -198,13 +213,6 @@ namespace SaintsField.Editor.Drawers
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
             Button button = container.Q<Button>(NameButtonField(property));
 
-            if (scenes.Length == 0)
-            {
-                genericDropdownMenu.AddDisabledItem("No scenes in the build settings", false);
-                genericDropdownMenu.DropDown(button.worldBound, button, true);
-                return;
-            }
-
             Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
             (int selectedIndex, string _) = GetSelected(property);
 
@@ -212,7 +220,7 @@ namespace SaintsField.Editor.Drawers
             {
                 int curIndex = index;
                 string curItem = scenes[index];
-                string curName = $"{curItem} [{index}]";
+                string curName = $"{index}: {curItem}";
 
                 genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
                 {
@@ -233,6 +241,11 @@ namespace SaintsField.Editor.Drawers
                 });
             }
 
+            if(scenes.Length > 0)
+            {
+                genericDropdownMenu.AddSeparator("");
+            }
+            genericDropdownMenu.AddItem("Edit Scenes In Build...", false, OpenBuildSettings);
 
             genericDropdownMenu.DropDown(button.worldBound, button, true);
         }
@@ -244,17 +257,17 @@ namespace SaintsField.Editor.Drawers
             {
                 string scene = property.stringValue;
                 int index = Array.IndexOf(scenes, scene);
-                return (index, index == -1? scene: $"{scene} [{index}]");
+                return (index, index == -1? scene: $"{index}: {scene}");
             }
             else
             {
                 int index = property.intValue;
                 if(index >= scenes.Length)
                 {
-                    return (-1, $"? [{index}]");
+                    return (-1, $"{index}: ?");
                 }
                 string scene = scenes[index];
-                return (index, $"{scene} [{index}]");
+                return (index, $"{index}: {scene}");
             }
         }
 
