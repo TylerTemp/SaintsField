@@ -855,7 +855,7 @@ namespace SaintsField.Editor.Core
             // _rootElement.RegisterCallback<GeometryChangedEvent>(evt => Debug.Log($"GeometryChangedEvent"));
             // _rootElement.schedule.Execute(() => Debug.Log("Execute"));
             rootElement.schedule.Execute(() =>
-                OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, fieldIsFallback));
+                OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
 
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
@@ -1711,7 +1711,7 @@ namespace SaintsField.Editor.Core
         }
 
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
-            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, bool usingFallbackField)
+            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"On Awake");
@@ -1730,7 +1730,9 @@ namespace SaintsField.Editor.Core
                 }
             };
 
-            if(usingFallbackField)
+            PropertyField fallbackField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
+
+            if(fallbackField != null)
             {
                 // containerElement.visible = true;
 
@@ -1746,7 +1748,7 @@ namespace SaintsField.Editor.Core
                 // ReSharper disable once UseIndexFromEndExpression
                 VisualElement topRoot = parentRoots[parentRoots.Count - 1];
 
-                PropertyField thisPropField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
+                // PropertyField thisPropField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
 
                 // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
                 // Debug.Log($"container={container.Count}");
@@ -1758,9 +1760,9 @@ namespace SaintsField.Editor.Core
                 {
                     // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
                     // Debug.Log($"container={container.Count}");
-                    thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ForEach(each => each.RemoveFromHierarchy());
+                    fallbackField.Query<VisualElement>(className: "unity-decorator-drawers-container").ForEach(each => each.RemoveFromHierarchy());
 #if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
-                    Label label = thisPropField.Q<Label>(className: "unity-label");
+                    Label label = fallbackField.Q<Label>(className: "unity-label");
                     if (label != null)
                     {
                         UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
@@ -1774,9 +1776,9 @@ namespace SaintsField.Editor.Core
                 topRoot.Add(containerElement);
 
                 // thisPropField.Bind(property.serializedObject);
-                thisPropField.Unbind();
-                thisPropField.BindProperty(property.serializedObject);
-                thisPropField.RegisterValueChangeCallback(evt =>
+                fallbackField.Unbind();
+                fallbackField.BindProperty(property.serializedObject);
+                fallbackField.RegisterValueChangeCallback(evt =>
                 {
                     SerializedProperty prop = evt.changedProperty;
                     // Debug.Log($"changed: {prop.propertyPath}; {prop.propertyPath}; {prop.}");
@@ -1814,6 +1816,15 @@ namespace SaintsField.Editor.Core
             containerElement.visible = true;
 
             containerElement.userData = this;
+
+#if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
+            Label label = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass)?.Q<Label>(className: "unity-label");
+            if (label != null)
+            {
+                // UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
+                label.schedule.Execute(() => UIToolkitUtils.FixLabelWidthUIToolkit(label));
+            }
+#endif
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
@@ -1878,25 +1889,6 @@ namespace SaintsField.Editor.Core
             VisualElement saintsLabelField = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
             object saintsLabelFieldDrawerData = saintsLabelField.userData;
 
-            // SaintsPropertyDrawer mainDrawer = (SaintsPropertyDrawer)GetFirstAncestorName(element, NameSaintsPropertyDrawerRoot(property)).userData;
-            // Debug.Log(mainDrawer);
-            // if (saintsLabelFieldDrawerData == null)
-            // {
-            //     Label label = element.Query(className: SaintsFieldFallbackClass).First().Query<Label>(className: "unity-label");
-            //
-            //     // var fallbackContainer = element.Query(className: SaintsFieldFallbackClass).First()
-            //     //     .Q<PropertyField>();
-            //     // Debug.Log($"fallbackContainer count={fallbackContainer.Children().Count()}");
-            //     // Debug.Log($"fallbackContainer={fallbackContainer.Children().First().GetType()}");
-            //     // Debug.Log($"fallbackContainer={fallbackContainer.Query<Label>(className: "unity-label").First()}");
-            //     // Debug.Log($"fallbackContainer={fallbackContainer.Query<Label>(className: "unity-label").First()?.text}");
-            //     // Debug.Log($"fallbackContainer on label to {label}->{toLabel}");
-            //     if (label != null)
-            //     {
-            //         label.text = toLabel == null ? null : property.displayName;
-            //         label.style.display = toLabel == null ? DisplayStyle.None : DisplayStyle.Flex;
-            //     }
-            // }
             if (saintsLabelFieldDrawerData != null)
             {
                 // Debug.Log(saintsLabelFieldDrawerData);

@@ -15,13 +15,13 @@ namespace SaintsField.Editor.Utils
 
         public static void FixLabelWidthLoopUIToolkit(Label label)
         {
-            FixLabelWidthUIToolkit(label);
-            label.schedule.Execute(() => FixLabelWidthUIToolkit(label)).StartingIn(250);
+            // FixLabelWidthUIToolkit(label);
+            // label.schedule.Execute(() => FixLabelWidthUIToolkit(label)).StartingIn(250);
             label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
-        private static void FixLabelWidthUIToolkit(Label label)
+        public static void FixLabelWidthUIToolkit(Label label)
         {
             StyleLength autoLength = new StyleLength(StyleKeyword.Auto);
             StyleLength curLenght = label.style.width;
