@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -315,14 +316,14 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             ResourcePathAttribute fieldTypeAttribute = (ResourcePathAttribute)saintsAttribute;
             bool customPicker = fieldTypeAttribute.CustomPicker;
             Type requiredComp = fieldTypeAttribute.CompType;
             Object requiredValue = GetObjFromStr(property.stringValue, requiredComp, fieldTypeAttribute.EStr);
 
-            ObjectField objectField = new ObjectField(new string(' ', property.displayName.Length))
+            ObjectField objectField = new ObjectField(property.displayName)
             {
                 name = NameObjectField(property),
                 objectType = requiredComp,
@@ -443,54 +444,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            // // Debug.Log($"changed: {newValue}");
-            // ResourcePathAttribute resourcePathAttribute = (ResourcePathAttribute)saintsAttribute;
-            //
-            // string newStringValue = (string)newValue;
-            // Object newObjectValue = GetObjFromStr(newStringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr);
-            // IReadOnlyList<Type> requiredTypes = resourcePathAttribute.RequiredTypes;
-            //
-            // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-            // Payload payload = (Payload)helpBox.userData;
-            //
-            // string errorMessage = FieldResourcesSelectWindow.ValidateObject(newObjectValue, resourcePathAttribute.EStr, requiredTypes);
-            //
-            // if (errorMessage == "")
-            // {
-            //     helpBox.style.display = DisplayStyle.None;
-            //     payload.hasCorrectValue = true;
-            //     payload.correctValue = newObjectValue;
-            //
-            //     ObjectField target = container.Q<ObjectField>(NameObjectField(property));
-            //     target.SetValueWithoutNotify(newObjectValue);
-            //     property.stringValue = newStringValue;
-            //     property.serializedObject.ApplyModifiedProperties();
-            // }
-            // else
-            // {
-            //     if(resourcePathAttribute.FreeSign || !payload.hasCorrectValue)
-            //     {
-            //         helpBox.text = errorMessage;
-            //         helpBox.style.display = DisplayStyle.Flex;
-            //     }
-            //     else
-            //     {
-            //         Debug.Assert(!resourcePathAttribute.FreeSign && payload.hasCorrectValue,
-            //               "Code should not be here. This is a BUG.");
-            //         string correctValue = property.stringValue = GetNewValue(payload.correctValue, resourcePathAttribute.EStr);
-            //         property.serializedObject.ApplyModifiedProperties();
-            //         Debug.LogWarning($"{errorMessage} Change reverted to {(payload.correctValue == null ? "null" : payload.correctValue.ToString())}.");
-            //         // careful for infinite loop!
-            //         onValueChangedCallback(correctValue);
-            //     }
-            // }
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            ObjectField target = container.Q<ObjectField>(NameObjectField(property));
-            target.label = labelOrNull;
         }
 
         #endregion

@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ResizableTextAreaExample : MonoBehaviour
     {
-        [ResizableTextArea] public string _short;
+        [ResizableTextArea, RichLabel("<icon=star.png /><label />")] public string _short;
         [ResizableTextArea] public string _long;
         [RichLabel(null), ResizableTextArea] public string _noLabel;
 

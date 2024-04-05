@@ -1,0 +1,9 @@
+﻿Toggle {
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+}
+
+.unity-toggle__input {
+    flex-grow: 0;
+    margin-right: 2px;
+}

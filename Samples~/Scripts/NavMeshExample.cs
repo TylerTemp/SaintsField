@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts
     public class NavMeshExample : MonoBehaviour
     {
 #if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
-        [NavMeshArea, OnValueChanged(nameof(AreaSingleMaskChanged)), AboveButton(nameof(ResetZero))]
+        [NavMeshArea, OnValueChanged(nameof(AreaSingleMaskChanged)), AboveButton(nameof(ResetZero)), RichLabel("<icon=star.png /><label />")]
 #else
         [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
 #endif
@@ -43,7 +43,7 @@ namespace SaintsField.Samples.Scripts
 #endif
 
 #if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
-        [NavMeshAreaMask, OnValueChanged(nameof(AreaMaskChanged))]
+        [NavMeshAreaMask, OnValueChanged(nameof(AreaMaskChanged)), RichLabel("<icon=star.png /><label />")]
 #else
         [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
 #endif

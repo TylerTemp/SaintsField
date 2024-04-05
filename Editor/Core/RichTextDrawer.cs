@@ -494,10 +494,12 @@ namespace SaintsField.Editor.Core
                         style =
                         {
                             flexShrink = 0,
-                            marginTop = 2,
-                            marginBottom = 2,
-                            paddingLeft = 1,
-                            paddingRight = 1,
+                            // marginTop = 2,
+                            // marginBottom = 2,
+                            // paddingLeft = 1,
+                            // paddingRight = 1,
+                            maxHeight = 15,
+                            alignSelf = Align.Center,
                             width = ImageWidth,
                             height = SaintsPropertyDrawer.SingleLineHeight - 2,
                         },

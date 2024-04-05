@@ -4,6 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class InputAxisExample: MonoBehaviour
     {
-        [InputAxis] public string inputAxis;
+        [InputAxis][RichLabel("<icon=star.png /><label/>")]
+        public string inputAxis;
     }
 }

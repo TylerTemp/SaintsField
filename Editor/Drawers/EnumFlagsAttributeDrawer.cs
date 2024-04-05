@@ -358,7 +358,6 @@ namespace SaintsField.Editor.Drawers
             // }
             // else
             // {
-            // 顺排
             float eachX = position.x;
             foreach (BtnInfo btnInfo in btnInfos)
             {
@@ -406,7 +405,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, info);
 
@@ -577,8 +576,15 @@ namespace SaintsField.Editor.Drawers
                 },
                 userData = -1f,
             };
-            Label prefixLabel = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            Label prefixLabel = Util.PrefixLabelUIToolKit(property.displayName, 0);
             prefixLabel.name = NameLabel(property);
+            prefixLabel.style.maxHeight = SingleLineHeight;
+            EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
+            if(enumFlagsAttribute.AutoExpand)
+            {
+                prefixLabel.style.color = Color.clear;
+            }
+            prefixLabel.AddToClassList("unity-label");
             root.Add(prefixLabel);
             root.Add(fieldContainer);
 
@@ -597,7 +603,7 @@ namespace SaintsField.Editor.Drawers
 
             Foldout foldOut = new Foldout
             {
-                text = new string(' ', property.displayName.Length),
+                text = property.displayName,
                 // text = property.displayName,
                 value = enumFlagsAttribute.DefaultExpanded,
                 style =
@@ -615,14 +621,6 @@ namespace SaintsField.Editor.Drawers
                 userData = false,  // processing
             };
 
-            // foldOut.RegisterValueChangedCallback(v =>
-            // {
-            //     // container.Q<VisualElement>(NameInlineContainer(property)).style.display = v.newValue ? DisplayStyle.None : DisplayStyle.Flex;
-            //     // container.Q<VisualElement>(NameExpandContainer(property)).style.display = v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
-            //     // container.Q<VisualElement>(NameFoldout(property)).userData = false;
-            //     SetExpandStatus(v.newValue, property, container);
-            // });
-
             return foldOut;
         }
 
@@ -639,6 +637,7 @@ namespace SaintsField.Editor.Drawers
                 bool firstExpand = enumFlagsAttribute.DefaultExpanded || GetShouldExpand(property, container);
                 SetExpandStatus(firstExpand, property, container);
 
+                // ReSharper disable once ConvertToLocalFunction
                 EventCallback<GeometryChangedEvent> onGeometryChanged = (evt) => OnGeometryChanged(property, container);
                 container.RegisterCallback(onGeometryChanged);
                 container.Q<Foldout>(NameFoldout(property)).RegisterValueChangedCallback(changed =>
@@ -699,7 +698,7 @@ namespace SaintsField.Editor.Drawers
                 Button thisButton = bitButton;
                 bitButton.clicked += () =>
                 {
-                    int curValue = property.intValue;
+                    // int curValue = property.intValue;
                     int bitValue = (int)thisButton.userData;
 
                     int newValue = (property.intValue ^= bitValue);
@@ -775,7 +774,6 @@ namespace SaintsField.Editor.Drawers
         {
             container.Q<Foldout>(NameFoldout(property)).SetValueWithoutNotify(expand);
 
-            // container.Q<VisualElement>(NameInlineContainer(property)).style.display = expand ? DisplayStyle.None : DisplayStyle.Flex;
             container.Q<VisualElement>(NameInlineContainer(property)).style.height = expand ? 0 : StyleKeyword.Null;
             container.Q<VisualElement>(NameExpandContainer(property)).style.display = expand ? DisplayStyle.Flex : DisplayStyle.None;
         }
@@ -805,14 +803,19 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
         {
             Label target = container.Q<Label>(NameLabel(property));
-            target.text = labelOrNull;
-            target.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
+            UIToolkitUtils.SetLabel(target, richTextChunks, richTextDrawer);
 
             Foldout foldout = container.Q<Foldout>(NameFoldout(property));
-            foldout.text = labelOrNull ?? "";
+            // foldout.text = labelOrNull ?? "";
+            Label foldoutLabel = foldout.Q<Label>();
+            if (foldoutLabel != null)
+            {
+                UIToolkitUtils.SetLabel(foldoutLabel, richTextChunks, richTextDrawer);
+            }
         }
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -169,7 +170,7 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__PropRange_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement
             {
@@ -179,7 +180,7 @@ namespace SaintsField.Editor.Drawers
                 }
             };
 
-            Slider slider = new Slider(new string(' ', property.displayName.Length), 0, 1, SliderDirection.Horizontal, 0.5f)
+            Slider slider = new Slider(property.displayName, 0, 1, SliderDirection.Horizontal, 0.5f)
             {
                 name = NameSlider(property),
                 style =
@@ -362,14 +363,6 @@ namespace SaintsField.Editor.Drawers
                 slider.userData = metaInfo;
             }
         }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            Slider target = container.Q<Slider>(NameSlider(property));
-            target.label = labelOrNull;
-        }
-
         #endregion
 
 #endif

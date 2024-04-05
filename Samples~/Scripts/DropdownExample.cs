@@ -25,7 +25,8 @@ namespace SaintsField.Samples.Scripts
 
         public GameObject go1;
         public GameObject go2;
-        [Dropdown(nameof(GetDropdownRefs))] public GameObject refs;
+        [Dropdown(nameof(GetDropdownRefs))][RichLabel("<icon=star.png /><label />")]
+        public GameObject refs;
 
         private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
         {

@@ -9,6 +9,7 @@ namespace SaintsField.Samples.Scripts
         // resource: display as a MonoScript, requires a BoxCollider
         [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
         [InfoBox(nameof(myResource), true)]
+        [RichLabel("<icon=star.png /><label />")]
         public string myResource;
 
         // AssetDatabase path

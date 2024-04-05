@@ -313,43 +313,20 @@ namespace SaintsField.Editor.Drawers
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);
 
             string buttonLabel = metaInfo.SelectedIndex == -1? "-": metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
 
-            Button button = new Button
-            {
-                style =
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                    flexGrow = 1,
-                },
-                name = NameButtonField(property),
-                userData = metaInfo.SelectedIndex == -1
-                    ? null
-                    : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2,
-            };
-
-            VisualElement buttonLabelContainer = new VisualElement
-            {
-                style =
-                {
-                    width = Length.Percent(100),
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.SpaceBetween,
-                },
-            };
-
-            buttonLabelContainer.Add(new Label(buttonLabel)
-            {
-                name = NameButtonLabelField(property),
-                userData = metaInfo.SelectedIndex,
-            });
-            buttonLabelContainer.Add(new Label("▼"));
+            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
+            dropdownButton.Button.style.flexGrow = 1;
+            dropdownButton.Button.name = NameButtonField(property);
+            dropdownButton.Button.userData = metaInfo.SelectedIndex == -1
+                ? null
+                : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2;
+            dropdownButton.Label.text = buttonLabel;
 
             VisualElement root = new VisualElement
             {
@@ -359,12 +336,11 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            button.Add(buttonLabelContainer);
-
-            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
             label.name = NameLabel(property);
+            label.AddToClassList("unity-label");
             root.Add(label);
-            root.Add(button);
+            root.Add(dropdownButton.Button);
 
             return root;
         }
@@ -413,14 +389,6 @@ namespace SaintsField.Editor.Drawers
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, field, parent);
             string display = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
             container.Q<Label>(NameButtonLabelField(property)).text = display;
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            Label label = container.Q<Label>(NameLabel(property));
-            label.text = labelOrNull ?? "";
-            label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,

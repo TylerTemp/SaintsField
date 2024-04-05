@@ -85,39 +85,16 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             IReadOnlyList<string> axisNames = GetAxisNames();
             int selectedIndex = IndexOf(axisNames, property.stringValue);
             string buttonLabel = selectedIndex == -1 ? "-" : axisNames[selectedIndex];
 
-            Button button = new Button
-            {
-                style =
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                    flexGrow = 1,
-                },
-                name = NameButtonField(property),
-            };
-
-            VisualElement buttonLabelContainer = new VisualElement
-            {
-                style =
-                {
-                    width = Length.Percent(100),
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.SpaceBetween,
-                },
-            };
-
-            buttonLabelContainer.Add(new Label(buttonLabel)
-            {
-                name = NameButtonLabelField(property),
-                userData = selectedIndex,
-            });
-            buttonLabelContainer.Add(new Label("▼"));
+            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
+            dropdownButton.Button.style.flexGrow = 1;
+            dropdownButton.Button.name = NameButtonField(property);
+            dropdownButton.Label.text = buttonLabel;
 
             VisualElement root = new VisualElement
             {
@@ -127,14 +104,11 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            button.Add(buttonLabelContainer);
-
-            // Debug.Log(EditorGUI.indentLevel);
-
-            Label prefixLabel = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 1);
-            prefixLabel.name = NameLabel(property);
-            root.Add(prefixLabel);
-            root.Add(button);
+            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
+            label.name = NameLabel(property);
+            label.AddToClassList("unity-label");
+            root.Add(label);
+            root.Add(dropdownButton.Button);
 
             return root;
         }
@@ -176,13 +150,15 @@ namespace SaintsField.Editor.Drawers
             genericDropdownMenu.DropDown(button.worldBound, button, true);
         }
 
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            Label buttonLabel = container.Q<Label>(NameLabel(property));
-            buttonLabel.text = labelOrNull ?? "";
-            buttonLabel.style.display = labelOrNull == null? DisplayStyle.None: DisplayStyle.Flex;
-        }
+        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index,
+        //     VisualElement container, string labelOrNull, IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks,
+        //     bool tried, RichTextDrawer richTextDrawer)
+        // {
+        //     Label buttonLabel = container.Q<Label>(NameLabel(property));
+        //     buttonLabel.text = labelOrNull ?? "";
+        //     buttonLabel.style.display = labelOrNull == null? DisplayStyle.None: DisplayStyle.Flex;
+        // }
 
         #endregion
 

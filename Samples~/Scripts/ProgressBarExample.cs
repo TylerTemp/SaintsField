@@ -4,8 +4,10 @@ namespace SaintsField.Samples.Scripts
 {
     public class ProgressBarExample: MonoBehaviour
     {
-        [ProgressBar(10)] public int myHp;
-        [ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)] public float myMp;
+        [ProgressBar(10)][RichLabel("<icon=star.png /><label/>")]
+        public int myHp;
+        [ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)]
+        public float myMp;
 
         [Space]
         public int minValue;

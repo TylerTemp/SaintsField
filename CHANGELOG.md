@@ -1,3 +1,7 @@
+## 2.3.0
+
+Fix the UIToolkit buggy label width, finally!
+
 ## 2.2.3
 
 1.  Add `[Conditional("UNITY_EDITOR")]` for attributes so it won't be included in your build.

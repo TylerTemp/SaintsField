@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -78,38 +79,15 @@ namespace SaintsField.Editor.Drawers
         private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__SortingLayer_Button";
         private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__SortingLayer_ButtonLabel";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SortingLayer_HelpBox";
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__SortingLayer_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
-            Button button = new Button
-            {
-                style =
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                    flexGrow = 1,
-                },
-                name = NameButtonField(property),
-            };
-
-            VisualElement buttonLabelContainer = new VisualElement
-            {
-                style =
-                {
-                    width = Length.Percent(100),
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.SpaceBetween,
-                },
-            };
-
-            buttonLabelContainer.Add(new Label
-            {
-                name = NameButtonLabelField(property),
-            });
-            buttonLabelContainer.Add(new Label("▼"));
+            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
+            dropdownButton.Button.style.flexGrow = 1;
+            dropdownButton.Button.name = NameButtonField(property);
+            dropdownButton.Label.name = NameButtonLabelField(property);
 
             VisualElement root = new VisualElement
             {
@@ -119,12 +97,10 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            button.Add(buttonLabelContainer);
-
-            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 1);
-            label.name = NameLabel(property);
+            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
+            label.AddToClassList("unity-label");
             root.Add(label);
-            root.Add(button);
+            root.Add(dropdownButton.Button);
 
             return root;
         }
@@ -153,14 +129,6 @@ namespace SaintsField.Editor.Drawers
 
             container.Q<Button>(NameButtonField(property)).clicked += () =>
                 ShowDropdown(property, container, parent, onValueChangedCallback);
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            Label label = container.Q<Label>(NameLabel(property));
-            label.text = labelOrNull ?? "";
-            label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
         private static void ShowDropdown(SerializedProperty property,

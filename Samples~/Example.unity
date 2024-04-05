@@ -1316,6 +1316,8 @@ MonoBehaviour:
     stateSpeed: 8
     animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
   animStateName: Idle
+  animParamName: Trigger
+  animParamHash: 0
   animParamHashes: c136d6d572017303c136d6d572017303
 --- !u!95 &380193380
 Animator:
@@ -4114,8 +4116,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myToggle: 0
-  richToggle: 0
+  richToggleImGui: 1
+  richToggleUIToolkit: 1
   richToggle2: 0
+  normalToggle: 0
+  myStruct:
+    myToggle: 1
+    myToggles: 0001
+  myStructs:
+  - myToggle: 0
+    myToggles: 0001
 --- !u!4 &1030583577
 Transform:
   m_ObjectHideFlags: 0
@@ -4864,6 +4874,7 @@ MonoBehaviour:
   itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
   aBitLongerThanDefault: 
   s: 
+  richLabel: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5007,9 +5018,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ff1162fe387fd3408ee8c17c002ea6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _short: 'short
-
-    content'
+  _short: 
   _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
     10 wrap 11 wrap 12
 
@@ -5348,7 +5357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234ffe6968d5bb2418d803732892acbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  addressableLabel: default
+  addressableLabel: 
 --- !u!1 &1227266396
 GameObject:
   m_ObjectHideFlags: 0
@@ -8206,7 +8215,7 @@ MonoBehaviour:
   rate0To5: 2
   rate1To5: 1
   rate3To5: 2
-  rate0To5Rich: 5
+  rate0To5Rich: 2
   rate:
     rate: 5
 --- !u!4 &1881364801
@@ -8828,8 +8837,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: GameController
-  _tag2: 
+  _tag: Respawn
+  _tag2: MainCamera
 --- !u!1 &2118824042
 GameObject:
   m_ObjectHideFlags: 0

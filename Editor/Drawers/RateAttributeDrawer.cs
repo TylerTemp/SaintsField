@@ -266,7 +266,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement
             {
@@ -277,7 +277,7 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
             label.name = NameLabel(property);
             root.Add(label);
 
@@ -444,15 +444,6 @@ namespace SaintsField.Editor.Drawers
                     image.tintColor = Color.red;
                 }
             }
-        }
-
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            Label label = container.Q<Label>(NameLabel(property));
-            label.text = labelOrNull;
-            label.style.display = labelOrNull == null? DisplayStyle.None: DisplayStyle.Flex;
         }
 
         #endregion

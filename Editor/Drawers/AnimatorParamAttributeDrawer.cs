@@ -198,11 +198,11 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AnimatorParam_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
             MetaInfo curMetaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
-            DropdownField dropdownField = new DropdownField(new string(' ', property.displayName.Length))
+            DropdownField dropdownField = new DropdownField(property.displayName)
             {
                 style =
                 {
@@ -326,13 +326,14 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-            dropdownField.label = labelOrNull;
-            // label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
-        }
+        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        // {
+        //     DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
+        //     dropdownField.label = labelOrNull;
+        //     // label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
+        // }
 
         private static string GetParameterLabel(AnimatorControllerParameter each) => $"{each.name} [{each.type}]";
 

@@ -1113,7 +1113,6 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             VisualElement container,
-            Label fakeLabel,
             FieldInfo info,
             object parent)
         {

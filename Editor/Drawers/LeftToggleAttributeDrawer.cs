@@ -1,9 +1,12 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using System;
+using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
 #endif
 
@@ -45,56 +48,50 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-            };
-
-            Toggle toggle = new Toggle("")
+            // VisualElement root = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         flexDirection = FlexDirection.Row,
+            //     },
+            // };
+            //
+            // Toggle toggle = new Toggle(property.displayName)
+            // {
+            //     name = NameLeftToggle(property),
+            // };
+            //
+            // // label.RegisterCallback();
+            // // label.AddManipulator(new Clickable(evt =>
+            // // {
+            // //     toggle.value = !toggle.value;
+            // //     // bool newValue = !toggle.value;
+            // //     // property.boolValue = !toggle.value;
+            // //     // onChange?.Invoke(property.boolValue);
+            // //     // toggle.SetValueWithoutNotify(property.boolValue);
+            // // }));
+            //
+            // root.Add(toggle);
+            // // root.Add(label);
+            //
+            // return root;
+            Toggle toggle = new Toggle(property.displayName)
             {
                 name = NameLeftToggle(property),
-            };
-
-            string labelText;
-            if (fakeLabel == null)
-            {
-                labelText = new string(' ', property.displayName.Length);
-            }
-            else
-            {
-                labelText = fakeLabel.text;
-                fakeLabel.style.display = DisplayStyle.None;
-                fakeLabel.AddToClassList($"{property.propertyPath}__LeftToggle_Disabled");
-            }
-
-            Label label = new Label(labelText)
-            {
                 style =
                 {
-                    marginLeft = 5,
-                    flexGrow = 1,
+                    flexDirection = FlexDirection.RowReverse,
+                    justifyContent = Justify.FlexEnd,
                 },
-                name = NameLabel(property),
             };
-            // label.RegisterCallback();
-            label.AddManipulator(new Clickable(evt =>
-            {
-                toggle.value = !toggle.value;
-                // bool newValue = !toggle.value;
-                // property.boolValue = !toggle.value;
-                // onChange?.Invoke(property.boolValue);
-                // toggle.SetValueWithoutNotify(property.boolValue);
-            }));
 
-            root.Add(toggle);
-            root.Add(label);
+            toggle.BindProperty(property);
 
-            return root;
+            toggle.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/LeftToggle.uss"));
+
+            return toggle;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -103,18 +100,9 @@ namespace SaintsField.Editor.Drawers
         {
             container.Q<Toggle>(NameLeftToggle(property)).RegisterValueChangedCallback(evt =>
             {
-                property.boolValue = evt.newValue;
-                property.serializedObject.ApplyModifiedProperties();
+                ReflectUtils.SetValue(property.propertyPath, info, parent, evt.newValue);
                 onValueChangedCallback.Invoke(evt.newValue);
             });
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            Label label = container.Q<Label>(NameLabel(property));
-            label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
-            label.text = labelOrNull ?? "";
         }
 
         #endregion

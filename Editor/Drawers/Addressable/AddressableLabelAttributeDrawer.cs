@@ -46,9 +46,9 @@ namespace SaintsField.Editor.Drawers.Addressable
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AddressableLabel_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container1, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
         {
-            return new DropdownField(new string(' ', property.displayName.Length))
+            return new DropdownField(property.displayName)
             {
                 userData = Array.Empty<string>(),
                 name = NameDropdownField(property),
@@ -120,12 +120,13 @@ namespace SaintsField.Editor.Drawers.Addressable
             }
         }
 
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-            dropdownField.label = labelOrNull;
-        }
+        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        // {
+        //     DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
+        //     dropdownField.label = labelOrNull;
+        // }
         #endregion
     }
 }

@@ -362,13 +362,13 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
-            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
             label.name = NameLabel(property);
 
             #region ProgrssBar
@@ -535,14 +535,6 @@ namespace SaintsField.Editor.Drawers
             }
 
             UpdateHelpBox(property, container, error);
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            Label label = container.Q<Label>(NameLabel(property));
-            label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
-            label.text = labelOrNull ?? "";
         }
 
         private static void OnProgressBarInteract(SerializedProperty property, ProgressBarAttribute progressBarAttribute, VisualElement container, ProgressBar progressBar, Vector3 mousePosition, Action<object> onValueChangedCallback, FieldInfo info, object parent)

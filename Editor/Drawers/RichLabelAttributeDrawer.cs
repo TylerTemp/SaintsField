@@ -4,9 +4,10 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-// using Object = UnityEngine.Object;
-#if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
+#if UNITY_2021_3_OR_NEWER
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 
@@ -107,28 +108,29 @@ namespace SaintsField.Editor.Drawers
         private static string NameRichLabelContainer(SerializedProperty property) => $"{property.propertyPath}__RichLabelContainer";
         private static string NameRichLabelHelpBox(SerializedProperty property) => $"{property.propertyPath}__RichLabelHelpBox";
 
+        private class PayloadUIToolkit
+        {
+            // ReSharper disable once InconsistentNaming
+            public readonly PropertyField TargetField;
+            public string xml;
+            public string error = "";
+
+            public PayloadUIToolkit(PropertyField targetField)
+            {
+                TargetField = targetField;
+            }
+        }
+
         protected override VisualElement CreatePreOverlayUIKit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
             return new VisualElement
             {
+                name = NameRichLabelContainer(property),
                 style =
                 {
-                    position = Position.Absolute,
-                    flexDirection = FlexDirection.Row,
-                    height = SingleLineHeight,
-                    marginLeft = LabelLeftSpace,
-                    // width = LabelBaseWidth,
-                    textOverflow = TextOverflow.Clip,
-                    overflow = Overflow.Hidden,
-                    unityTextAlign = TextAnchor.MiddleLeft,
-
-                    flexShrink = 0,
-                    flexGrow = 0,
+                    display = DisplayStyle.None,
                 },
-                name = NameRichLabelContainer(property),
-                userData = new string(' ', property.displayName.Length),
-                pickingMode = PickingMode.Ignore,
             };
         }
 
@@ -147,59 +149,49 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            VisualElement richContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
+            richContainer.userData = new PayloadUIToolkit(container.Q<PropertyField>(className: SaintsFieldFallbackClass))
+            {
+                xml = property.displayName,
+            };
+        }
+
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            VisualElement labelContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
-            string curXml = (string)labelContainer.userData;
+            VisualElement richContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
+            PayloadUIToolkit payload = (PayloadUIToolkit)richContainer.userData;
             RichLabelAttribute richLabelAttribute = (RichLabelAttribute)saintsAttribute;
             (string error, string nowXml) = RichTextDrawer.GetLabelXml(property, richLabelAttribute.RichTextXml, richLabelAttribute.IsCallback, info, parent);
-            if (curXml != nowXml)
+            if (error == "" && payload.xml != nowXml)
             {
-                labelContainer.userData = nowXml;
-                labelContainer.Clear();
-                if (nowXml != null)
+                payload.xml = nowXml;
+
+                IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = nowXml == null
+                    ? null
+                    : RichTextDrawer.ParseRichXml(nowXml, property.displayName).ToArray();
+
+                bool tryProcess = payload.TargetField != null;
+
+                if(tryProcess)
                 {
-                    Label label = container.Q<Label>(className: "unity-label");
-                    if (label != null)
-                    {
-                        label.Clear();
-                        label.text = "";
-                        label.style.flexDirection = FlexDirection.Row;
-                        foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
-                        {
-                            label.Add(richChunk);
-                        }
-                    }
-                    // foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(nowXml, property.displayName)))
-                    // {
-                    //     labelContainer.Add(richChunk);
-                    // }
-
-                    // this does not work...
-                    // float emptyWidth = RichTextDrawer.TextLengthUIToolkit(generateAnyLabel, " ");
-
-                    // this also not work...
-                    // float workAroundBugFullWidth = RichTextDrawer.TextLengthUIToolkit(generateAnyLabel, "F F");
-                    // float workAroundBugFWidth = RichTextDrawer.TextLengthUIToolkit(generateAnyLabel, "F");
-                    // float emptyWidth = workAroundBugFullWidth - workAroundBugFWidth * 2f;
-
-                    // const float emptyWidth = 3.52f;
-
-                    // int emptyCount = Mathf.CeilToInt(nowLength / emptyWidth);
-                    // Debug.Log($"nowLength={nowLength}, emptyWidth={emptyWidth}, emptyCount={emptyCount}");
-                    // emptyXml = new string(' ', emptyCount);
+                    UIToolkitUtils.ChangeLabelLoop(payload.TargetField,
+                        richTextChunks,
+                        _richTextDrawer);
                 }
 
-                // OnLabelStateChangedUIToolkit(property, container, nowXml);
+                OnLabelStateChangedUIToolkit(property, container, nowXml, richTextChunks, tryProcess, _richTextDrawer);
             }
 
-            HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property));
-            string curError = (string)helpBox.userData;
             // ReSharper disable once InvertIf
-            if (curError != error)
+            if (payload.error != error)
             {
+                payload.error = error;
+                HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property));
                 helpBox.userData = error;
                 helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
                 helpBox.text = error;

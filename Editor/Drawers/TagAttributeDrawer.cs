@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -62,9 +63,9 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
-            return new TagField(new string(' ', property.displayName.Length))
+            return new TagField(property.displayName)
             {
                 value = property.stringValue,
                 name = NameTag(property),
@@ -83,13 +84,6 @@ namespace SaintsField.Editor.Drawers
 
                 onValueChangedCallback.Invoke(evt.newValue);
             });
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            TagField tagField = container.Q<TagField>(NameTag(property));
-            tagField.label = labelOrNull;
         }
 
         #endregion

@@ -268,13 +268,13 @@ namespace SaintsField.Editor.Drawers
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             VisualElement root = new VisualElement();
 
-            DropdownField dropdownField = new DropdownField(new string(' ', property.displayName.Length))
+            DropdownField dropdownField = new DropdownField(property.displayName)
             {
                 style =
                 {
@@ -413,12 +413,13 @@ namespace SaintsField.Editor.Drawers
             // return curSelect;
         }
 
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-            dropdownField.label = labelOrNull;
-        }
+        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        // {
+        //     DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
+        //     dropdownField.label = labelOrNull;
+        // }
 
         #endregion
 

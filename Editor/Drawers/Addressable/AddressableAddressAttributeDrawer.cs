@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.Addressable
 
         private string _error = "";
 
-        private IReadOnlyList<string> _targetKeys;
+        // private IReadOnlyList<string> _targetKeys;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.Addressable
             (string error, IReadOnlyList<string> keys) = SetupAssetGroup(addressableAddressAttribute);
 
             _error = error;
-            _targetKeys = keys;
+            // _targetKeys = keys;
             if (_error != "")
             {
                 DefaultDrawer(position, property, label, info);
@@ -122,9 +122,9 @@ namespace SaintsField.Editor.Drawers.Addressable
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AddressableAddress_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container1, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
         {
-            return new DropdownField(new string(' ', property.displayName.Length))
+            return new DropdownField(property.displayName)
             {
                 style =
                 {
@@ -207,12 +207,13 @@ namespace SaintsField.Editor.Drawers.Addressable
             }
         }
 
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-            dropdownField.label = labelOrNull;
-        }
+        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        // {
+        //     DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
+        //     dropdownField.label = labelOrNull;
+        // }
 
         private static string UnityFuckedUpDropdownStringEscape(string value) =>
             value.Replace('/', '\u2215').Replace('&', '＆');

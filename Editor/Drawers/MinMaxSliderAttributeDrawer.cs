@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -259,7 +260,7 @@ namespace SaintsField.Editor.Drawers
         private const int InputWidth = 50;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.Vector2 &&
                 property.propertyType != SerializedPropertyType.Vector2Int)
@@ -301,7 +302,7 @@ namespace SaintsField.Editor.Drawers
             {
                 Vector2Int curValue = property.vector2IntValue;
 
-                root.Add(new IntegerField(new string(' ', property.displayName.Length))
+                root.Add(new IntegerField(property.displayName)
                 {
                     isDelayed = true,
                     value = curValue.x,
@@ -330,7 +331,7 @@ namespace SaintsField.Editor.Drawers
                 Vector2 curValue = property.vector2Value;
                 // slider.SetValueWithoutNotify(curValue);
 
-                root.Add(new FloatField(new string(' ', property.displayName.Length))
+                root.Add(new FloatField(property.displayName)
                 {
                     isDelayed = true,
                     value = curValue.x,
@@ -500,23 +501,6 @@ namespace SaintsField.Editor.Drawers
             if (changed)
             {
                 minMaxSlider.userData = metaInfo;
-            }
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            if (property.propertyType == SerializedPropertyType.Vector2)
-            {
-                FloatField target = container.Q<FloatField>(NameMinFloat(property));
-                target.label = labelOrNull;
-                target.style.width = labelOrNull == null ? InputWidth : InputWidth + LabelBaseWidth;target.label = labelOrNull;
-            }
-            else
-            {
-                IntegerField target = container.Q<IntegerField>(NameMinInteger(property));
-                target.label = labelOrNull;
-                target.style.width = labelOrNull == null ? InputWidth : InputWidth + LabelBaseWidth;target.label = labelOrNull;
             }
         }
 

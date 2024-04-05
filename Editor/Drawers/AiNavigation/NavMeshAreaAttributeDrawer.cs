@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute) saintsAttribute;
             ValueType valueType = GetValueType(property, navMeshAreaAttribute);
@@ -155,45 +155,15 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 ? "-"
                 : FormatAreaName(areas[areaIndex], valueType);
 
-            Button button = new Button
+            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
+            dropdownButton.Button.style.flexGrow = 1;
+            dropdownButton.Button.name = NameButtonField(property);
+            dropdownButton.Button.userData = new ButtonData(valueType)
             {
-                style =
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                    flexGrow = 1,
-                    paddingLeft = 1,
-                    paddingRight = 1,
-                },
-                name = NameButtonField(property),
-                userData = new ButtonData(valueType)
-                {
-                    selectedIndex = areaIndex,
-                },
+                selectedIndex = areaIndex,
             };
-
-            VisualElement buttonLabelContainer = new VisualElement
-            {
-                style =
-                {
-                    width = Length.Percent(100),
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.SpaceBetween,
-                },
-            };
-
-            buttonLabelContainer.Add(new Label(buttonLabel)
-            {
-                name = NameButtonLabelField(property),
-            });
-            buttonLabelContainer.Add(new Image
-            {
-                image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
-                style =
-                {
-                    width = 15,
-                },
-            });
+            dropdownButton.Label.text = buttonLabel;
+            dropdownButton.Label.name = NameButtonLabelField(property);
 
             VisualElement root = new VisualElement
             {
@@ -203,12 +173,11 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 },
             };
 
-            button.Add(buttonLabelContainer);
-
-            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
             label.name = NameLabel(property);
+            label.AddToClassList("unity-label");
             root.Add(label);
-            root.Add(button);
+            root.Add(dropdownButton.Button);
 
             return root;
         }

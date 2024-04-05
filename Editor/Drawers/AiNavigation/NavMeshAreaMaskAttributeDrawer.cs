@@ -54,9 +54,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
-            MaskField maskField = new MaskField(new string(' ', property.displayName.Length))
+            MaskField maskField = new MaskField(property.displayName)
             {
                 userData = new List<AiNavigationUtils.NavMeshArea>(),
                 name = NameMaskField(property),
@@ -105,13 +105,6 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             };
             // maskField.value = property.intValue;
             maskField.SetValueWithoutNotify(property.intValue);
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            MaskField maskField = container.Q<MaskField>(NameMaskField(property));
-            maskField.label = labelOrNull ?? "";
         }
 
         #endregion

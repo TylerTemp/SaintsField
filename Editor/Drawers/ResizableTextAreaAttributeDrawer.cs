@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -135,10 +136,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement();
-            root.Add(new Label(" ")
+            root.Add(new Label(property.displayName)
             {
                 name = NameLabelPlaceholder(property),
                 style =
@@ -160,6 +161,17 @@ namespace SaintsField.Editor.Drawers
             });
 
             return root;
+            // return new TextField(property.displayName)
+            // {
+            //     value = property.stringValue,
+            //     name = NameTextArea(property),
+            //     multiline = true,
+            //     style =
+            //     {
+            //         whiteSpace = WhiteSpace.Normal,
+            //         minHeight = 47,
+            //     },
+            // };
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -173,12 +185,6 @@ namespace SaintsField.Editor.Drawers
 
                 onValueChangedCallback?.Invoke(changed.newValue);
             });
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            container.Q<Label>(NameLabelPlaceholder(property)).style.display = labelOrNull == null? DisplayStyle.None: DisplayStyle.Flex;
         }
 
         #endregion

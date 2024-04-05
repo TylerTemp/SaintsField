@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -88,10 +89,10 @@ namespace SaintsField.Editor.Drawers
         private static string NameCurveField(SerializedProperty property) => $"{property.propertyPath}__CurveRange";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
             CurveRangeAttribute curveRangeAttribute = (CurveRangeAttribute)saintsAttribute;
-            CurveField element = new CurveField(new string(' ', property.displayName.Length))
+            CurveField element = new CurveField(property.displayName)
             {
                 value = property.animationCurveValue,
                 ranges = GetRanges(curveRangeAttribute),
@@ -124,12 +125,13 @@ namespace SaintsField.Editor.Drawers
             });
         }
 
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull)
-        {
-            CurveField target = container.Q<CurveField>(NameCurveField(property));
-            target.label = labelOrNull;
-        }
+        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        // {
+        //     CurveField target = container.Q<CurveField>(NameCurveField(property));
+        //     target.label = labelOrNull;
+        // }
 
         #endregion
 

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -77,13 +78,13 @@ namespace SaintsField.Editor.Drawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            VisualElement container, Label fakeLabel, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object parent)
         {
             int curSelected = property.propertyType == SerializedPropertyType.Integer
                 ? property.intValue
                 : LayerMask.NameToLayer(property.stringValue);
 
-            LayerField layerField = new LayerField(new string(' ', property.displayName.Length), curSelected)
+            LayerField layerField = new LayerField(property.displayName, curSelected)
             {
                 name = NameLayer(property),
             };
@@ -109,12 +110,6 @@ namespace SaintsField.Editor.Drawers
                     onValueChangedCallback.Invoke(newValue);
                 }
             });
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull)
-        {
-            container.Q<LayerField>(NameLayer(property)).label = labelOrNull;
         }
 
         #endregion
