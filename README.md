@@ -1223,11 +1223,12 @@ public class InputAxisExample: MonoBehaviour
 
 A toggle button on the left of the bool field. Only works on boolean field.
 
+IMGUI: To use with `RichLabel`, you need to add 6 spaces ahead as a hack
+
 ```csharp
 public class LeftToggleExample: MonoBehaviour
 {
     [LeftToggle] public bool myToggle;
-    // To use with `RichLabel`, you need to add 6 spaces ahead as a hack
     [LeftToggle, RichLabel("      <color=green><label />")] public bool richToggle;
 }
 ```
