@@ -2945,22 +2945,14 @@ If you encounter any issue, please report it to the issue page. However, there a
     2.  The space gets grow to fit the label when the label gets longer, which is also UI Toolkit's default
     3.  If you have a very looooong label, the value field will be shrank out of view. This is also how UI Toolkit works.
 
-2.  Even most UI Toolkit fields are fixed label width, there is one that the label width behavior exactly like IMGUI: `PropertyField`. This bug has been reported to Unity (Sorry I can't find the link now), but is never fixed.
-
-    `SaintsField` heavily relies on `PropertyField` to fallback the appearance. This is not even fixable at this point. If you try to obtain the info by query out the `PropertyField` element, you'll notice that Unity is internally using a script (rather than a uss style) to update its label width.
-
-    Even without using any custom inspector, if you use your UI Toolkit `PropertyDrawer` with default fields, your inspector label will not aligned, and makes it looks really ridiculous.
-
-    `SaintsField` now will try to patch it but not guaranteed. You can also add a `[UIToolkit]` to apply this fix to non-saints fields.
-
-3.  `PropertyField` of an `Object` will give an error when click: `NullReferenceException: ... UnityEditor.ProjectBrower.FrameObject...`. Clicking will still lead you to active the target object, but I have no idea where this came from. Even official's example will have this error if you just add a `PropertyField` to it. Clicking on the error message will lead to the `Console` tab's layout got completely messed up.
+2.  `PropertyField` of an `Object` will give an error when click: `NullReferenceException: ... UnityEditor.ProjectBrower.FrameObject...`. Clicking will still lead you to active the target object, but I have no idea where this came from. Even official's example will have this error if you just add a `PropertyField` to it. Clicking on the error message will lead to the `Console` tab's layout got completely messed up.
 
     This is not fixable.
 
-4.  `DropdownField` will tread a label's change as a value change... I have no idea why this happens and why only `DropdownField`. Luckily this change event will give a `newValue=null` so I can work around with it.
+3.  `DropdownField` will tread a label's change as a value change... I have no idea why this happens and why only `DropdownField`. Luckily this change event will give a `newValue=null` so I can work around with it.
 
-5.  Again because the label width issue. `SaintsField`'s label won't take more place if the label gets super long. This is different from UI Toolkit.
+4.  Again because the label width issue. `SaintsField`'s label won't take more place if the label gets super long. This is different from UI Toolkit.
 
-6.  When leaving an PropertyDrawer to switch to a new target, the old one's `CreatePropertyGUI` will also get called once. This... makes the nested fallback difficult. Currently I use some silly way to work around with it, and you will see the inspector flick one frame at the beginning.
+5.  When leaving an PropertyDrawer to switch to a new target, the old one's `CreatePropertyGUI` will also get called once. This... makes the nested fallback difficult. Currently I use some silly way to work around with it, and you will see the inspector flick one frame at the beginning.
 
 If you're in Unity 2022.2+ (from which Unity use UI Toolkit as default inspector), `SaintsField` will switch to UI Toolkit by default. In this case, if you want to use the IMGUI version, you can go `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information) to disable UI Toolkit.
