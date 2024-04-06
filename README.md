@@ -2951,8 +2951,6 @@ If you encounter any issue, please report it to the issue page. However, there a
 
 3.  `DropdownField` will tread a label's change as a value change... I have no idea why this happens and why only `DropdownField`. Luckily this change event will give a `newValue=null` so I can work around with it.
 
-4.  Again because the label width issue. `SaintsField`'s label won't take more place if the label gets super long. This is different from UI Toolkit.
-
-5.  When leaving an PropertyDrawer to switch to a new target, the old one's `CreatePropertyGUI` will also get called once. This... makes the nested fallback difficult. Currently I use some silly way to work around with it, and you will see the inspector flick one frame at the beginning.
+4.  When leaving an PropertyDrawer to switch to a new target, the old one's `CreatePropertyGUI` will also get called once. This... makes the nested fallback difficult. Currently I use some silly way to work around with it, and you will see the inspector flick one frame at the beginning.
 
 If you're in Unity 2022.2+ (from which Unity use UI Toolkit as default inspector), `SaintsField` will switch to UI Toolkit by default. In this case, if you want to use the IMGUI version, you can go `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information) to disable UI Toolkit.
