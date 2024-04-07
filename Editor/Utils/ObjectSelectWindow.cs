@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Utils
         private int _tabSelected;
 
         private Vector2 _scrollPos;
-        private float _scale;
+        private static float _scale;
 
         private static readonly Vector2 WidthScale = new Vector2(30f, 100f);
 
@@ -94,6 +94,7 @@ namespace SaintsField.Editor.Utils
         private string[] tabs;
 
         private bool _init;
+        private Texture2D _closeIcon;
         // this is called before show in UI Toolkit env. Don't know why...
         // private void OnEnable()
         private void EnsureInit()
@@ -104,6 +105,7 @@ namespace SaintsField.Editor.Utils
             }
 
             _init = true;
+            _closeIcon = Util.LoadResource<Texture2D>("classic-close.png");
             List<string> useTabs = new List<string>();
             // Debug.Log($"AllowAssets={AllowAssets}");
             if (AllowAssets)
@@ -196,7 +198,32 @@ namespace SaintsField.Editor.Utils
         {
             EnsureInit();
 
-            _search = EditorGUILayout.TextField(_search);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                const string controlName = "object-select-window-search";
+                GUI.SetNextControlName(controlName);
+                _search = EditorGUILayout.TextField(_search);
+
+                if (!string.IsNullOrEmpty(_search) && GUILayout.Button(new GUIContent(_closeIcon), EditorStyles.label, GUILayout.Width(18), GUILayout.Height(18)))
+                {
+                    // Debug.Log($"clicked");
+                    _search = "";
+                    GUI.FocusControl(controlName);  // this won't work with keyboardControl=0. The focus does NOT work here...
+                    GUIUtility.keyboardControl = 0;
+                    return;
+                }
+            }
+
+            // Rect lastRect = GUILayoutUtility.GetLastRect();
+            // Rect closeRect = new Rect(lastRect)
+            // {
+            //     x = lastRect.x + lastRect.width - 20,
+            //     width = 20,
+            // };
+            // if (GUI.Button(closeRect, new GUIContent(_closeIcon), GUIStyle.none))
+            // {
+            //     Debug.Log($"clicked");
+            // }
 
             Rect tabLine = EditorGUILayout.GetControlRect();
             // EditorGUI.DrawRect(tabLine, Color.black);
@@ -449,8 +476,11 @@ namespace SaintsField.Editor.Utils
 
             if(curSelectedIndex > 0)  // selected not null
             {
-                Rect searchRect = EditorGUILayout.GetControlRect(GUILayout.Height(80));
-                Rect selectPreviewRect = new Rect(searchRect.x + 5, searchRect.y + 5, 70, 70);
+                Rect selectRect = EditorGUILayout.GetControlRect(GUILayout.Height(80));
+
+                EditorGUI.DrawRect(selectRect, new Color(53f / 255, 53f / 255, 53f / 255, 1f));
+
+                Rect selectPreviewRect = new Rect(selectRect.x + 5, selectRect.y + 5, 70, 70);
                 ItemInfo itemInfo = isAssets ? _assetItems[curSelectedIndex] : _sceneItems[curSelectedIndex];
                 if(isAssets)
                 {
@@ -468,7 +498,7 @@ namespace SaintsField.Editor.Utils
                     }
                 }
 
-                Rect selectInfoRect = new Rect(searchRect.x + 80, searchRect.y + 5, searchRect.width - 80, 70);
+                Rect selectInfoRect = new Rect(selectRect.x + 80, selectRect.y + 5, selectRect.width - 80, 70);
                 Rect selectNameRect = new Rect(selectInfoRect)
                 {
                     height = EditorGUIUtility.singleLineHeight,

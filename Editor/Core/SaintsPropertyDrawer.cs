@@ -490,7 +490,7 @@ namespace SaintsField.Editor.Core
         }
 
         #region UI
-        private static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
+        protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
 #if UNITY_2021_3_OR_NEWER

@@ -172,11 +172,15 @@ namespace SaintsField.Editor.Drawers
         private readonly UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> GoToStackEvent =
             new UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>>();
 
+        private bool _isFlat;
+
         public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width, Action<string, object> setValue)
         {
             _width = width;
             _metaInfo = metaInfo;
             _setValue = setValue;
+
+            _isFlat = metaInfo.DropdownListValue.All(each => each.ChildCount() == 0);
         }
 
         public override void OnGUI(Rect rect)
@@ -206,24 +210,9 @@ namespace SaintsField.Editor.Drawers
             VisualTreeAsset popUpAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
             VisualElement root = popUpAsset.CloneTree();
 
-            // root.contentContainer.style.borderBottomWidth = 1;
-            // root.contentContainer.style.borderBottomColor = Color.red;
-
-            // var saintsRoot = root.Q<VisualElement>("saintsfield-advanced-dropdown-root");
-            // saintsRoot.contentContainer.style.borderBottomWidth = 1;
-            // saintsRoot.contentContainer.style.borderBottomColor = Color.red;
-
             root.styleSheets.Add(ussStyle);
-            // root.styleSheets.Remove()
 
-            // root.style.borderBottomWidth = 1;
-            // root.style.borderBottomColor = Color.red;
-            // root.userData = new DelayUpdateSize
-            // {
-            //     IsDelay = false,
-            //     Height = 0,
-            // };
-            // root.RegisterCallback<GeometryChangedEvent>(GeoUpdateWindowSize);
+            // root.Q<Image>(name: "saintsfield-advanced-dropdown-search-clean-image").image = Util.LoadResource<Texture2D>("classic-close.png");
 
             VisualTreeAsset separatorAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
 
@@ -246,6 +235,10 @@ namespace SaintsField.Editor.Drawers
 #endif
 
             ToolbarBreadcrumbs toolbarBreadcrumbs = root.Q<ToolbarBreadcrumbs>();
+            if (_isFlat)
+            {
+                toolbarBreadcrumbs.style.display = DisplayStyle.None;
+            }
 
             GoToStackEvent.AddListener(newStack =>
             {
@@ -304,7 +297,11 @@ namespace SaintsField.Editor.Drawers
                 // }
                 if (searchFragments.Length == 0)
                 {
-                    toolbarBreadcrumbs.style.display = DisplayStyle.Flex;
+                    if(!_isFlat)
+                    {
+                        toolbarBreadcrumbs.style.display = DisplayStyle.Flex;
+                    }
+
                     AdvancedDropdownAttributeDrawer.SelectStack[] curPageStack = _curPageStack.ToArray();
                     _curPageStack = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>();
                     GoToStackEvent.Invoke(curPageStack);
@@ -1105,6 +1102,7 @@ namespace SaintsField.Editor.Drawers
 
 #if UNITY_2021_3_OR_NEWER
 
+        // private static string NameContainer(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown";
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Button";
         private static string NameButtonLabel(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_ButtonLabel";
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Label";
@@ -1117,37 +1115,13 @@ namespace SaintsField.Editor.Drawers
             object parent)
         {
             MetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
-            // Debug.Log(initMetaInfo);
 
-            Button button = new Button
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.SpaceBetween,
-                    paddingLeft = 1,
-                    paddingRight = 1,
-                },
-                name = NameButton(property),
-                userData = initMetaInfo.CurValue,
-            };
-
-            Label buttonLabel = new Label(GetMetaStackDisplay(initMetaInfo))
-            {
-                name = NameButtonLabel(property),
-            };
-            button.Add(buttonLabel);
-            button.Add(new Image
-            {
-                image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
-                style =
-                {
-                    width = 15,
-                    height = 12,
-                },
-            });
+            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
+            dropdownButton.Button.style.flexGrow = 1;
+            dropdownButton.Button.name = NameButton(property);
+            dropdownButton.Button.userData = initMetaInfo.CurValue;
+            dropdownButton.Label.text = GetMetaStackDisplay(initMetaInfo);
+            dropdownButton.Label.name = NameButtonLabel(property);
 
             VisualElement root = new VisualElement
             {
@@ -1155,16 +1129,64 @@ namespace SaintsField.Editor.Drawers
                 {
                     flexDirection = FlexDirection.Row,
                 },
+                // name = NameContainer(property),
             };
 
-            // button.Add(buttonLabelContainer);
-
-            Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
             label.name = NameLabel(property);
+            label.AddToClassList("unity-label");
             root.Add(label);
-            root.Add(button);
+            root.Add(dropdownButton.Button);
 
             return root;
+
+            // Button button = new Button
+            // {
+            //     style =
+            //     {
+            //         flexGrow = 1,
+            //         flexDirection = FlexDirection.Row,
+            //         alignItems = Align.Center,
+            //         justifyContent = Justify.SpaceBetween,
+            //         paddingLeft = 1,
+            //         paddingRight = 1,
+            //     },
+            //     name = NameButton(property),
+            //     userData = initMetaInfo.CurValue,
+            // };
+            //
+            // Label buttonLabel = new Label(GetMetaStackDisplay(initMetaInfo))
+            // {
+            //     name = NameButtonLabel(property),
+            // };
+            // button.Add(buttonLabel);
+            // button.Add(new Image
+            // {
+            //     image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
+            //     style =
+            //     {
+            //         width = 15,
+            //         height = 12,
+            //     },
+            // });
+            //
+            // VisualElement root = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         flexDirection = FlexDirection.Row,
+            //     },
+            //     name = NameContainer(property),
+            // };
+            //
+            // // button.Add(buttonLabelContainer);
+            //
+            // Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
+            // label.name = NameLabel(property);
+            // root.Add(label);
+            // root.Add(button);
+            //
+            // return root;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -1172,12 +1194,13 @@ namespace SaintsField.Editor.Drawers
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property));
+            VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
             button.clicked += () =>
             {
                 MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
-                UnityEditor.PopupWindow.Show(button.worldBound, new SaintsAdvancedDropdownUiToolkit(
+                UnityEditor.PopupWindow.Show(root.worldBound, new SaintsAdvancedDropdownUiToolkit(
                     metaInfo,
-                    button.worldBound.width,
+                    root.worldBound.width,
                     (newDisplay, curItem) =>
                     {
                         Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
@@ -1214,9 +1237,6 @@ namespace SaintsField.Editor.Drawers
                 name = NameHelpBox(property),
             };
         }
-
-
-
         // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
         //     ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);
 #endif

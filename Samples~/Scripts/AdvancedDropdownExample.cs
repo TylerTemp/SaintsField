@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -17,6 +16,7 @@ namespace SaintsField.Samples.Scripts
             [PostFieldButton(nameof(ShowNewValue), "Click")]
             [OnValueChanged(nameof(ShowNewValue))]
             [AboveRichLabel(nameof(selectIt), true)]
+            [RichLabel("<icon=star.png /><label />")]
             [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
 
             public AdvancedDropdownList<int> AdvDropdown()

@@ -4871,6 +4871,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6159b766ec67643b45e522ef2dcc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
+  aBitLongerThanDefault: 
+  s: 
+  richLabel: 
+  thereIsSomeGoodNewsForPeopleWhoLoveBadNews: 
+  weWereDeadBeforeTheShipEvenSank: 
+  myString: 
+  myUiToolkit: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4931,9 +4939,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85b764bd76d94c66b2c0c2fe45d276aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _go: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  _go: {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
   _sr: {fileID: 1776789730}
-  dummy: {fileID: 1516486913}
+  dummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
 --- !u!4 &1131818497
 Transform:
   m_ObjectHideFlags: 0

@@ -14,7 +14,6 @@ using UnityEditor;
 using UnityEngine;
 using FontStyle = UnityEngine.FontStyle;
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using SaintsField.Editor.Core;
 using UnityEngine.UIElements;
 #endif
 

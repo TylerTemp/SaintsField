@@ -63,14 +63,15 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.3.0**
+**2.3.1**
 
-Fix the UI Toolkit buggy label width, finally!
-
-1.  UIToolkit: when using a long label, the label will take more space (rather than be truncated in the previous version). Now it behaves the same as UI Toolkit components.
-2.  `Scene` attribute now have a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
-3.  `InputAxis` attribute now have a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
-4.  `SortingLayer` attribute now have a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
+1.  UI Toolkit: fix labelWidth didn't get fixed unless you change the layout (e.g. resize the inspector)
+2.  UI Toolkit: fix `AdvancedDropdown` didn't display a label because of last version's fix.
+3.  UI Toolkit: `AdvancedDropdown` now use the width of the full field.
+4.  UI Toolkit: `AdvancedDropdown` now hide breadcrumbs if it's not a nested list, thus it looks more like a normal dropdown when you use it as a searchable dropdown.
+5.  Custom object picker now share the same preview scales between all instances, making it feels more like the Unity's default picker.
+6.  Custom object picker preview panel now have a background color to distinct it from the select area.
+7.  Custom object picker search field now have a "clean" button. Due to some IMGUI limitation, clicking it will make the input field LOSE focus.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -1,3 +1,13 @@
+## 2.3.1
+
+1.  UI Toolkit: fix labelWidth didn't get fixed unless you change the layout (e.g. resize the inspector)
+2.  UI Toolkit: fix `AdvancedDropdown` didn't display a label because of last version's fix.
+3.  UI Toolkit: `AdvancedDropdown` now use the width of the full field.
+4.  UI Toolkit: `AdvancedDropdown` now hide breadcrumbs if it's not a nested list, thus it looks more like a normal dropdown when you use it as a searchable dropdown.
+5.  Custom object picker now share the same preview scales between all instances, making it feels more like the Unity's default picker.
+6.  Custom object picker preview panel now have a background color to distinct it from the select area.
+7.  Custom object picker search field now have a "clean" button. Due to some IMGUI limitation, clicking it will make the input field LOSE focus.
+
 ## 2.3.0
 
 Fix the UI Toolkit buggy label width, finally!
