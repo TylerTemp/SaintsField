@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
             CurveRangeAttribute curveRangeAttribute = (CurveRangeAttribute)saintsAttribute;
-            CurveField element = new CurveField(property.displayName)
+            CurveField createFieldElement = new CurveField(property.displayName)
             {
                 value = property.animationCurveValue,
                 ranges = GetRanges(curveRangeAttribute),
@@ -107,10 +107,12 @@ namespace SaintsField.Editor.Drawers
             FieldInfo colorFieldInfo = type.GetField("m_CurveColor", BindingFlags.NonPublic | BindingFlags.Instance);
             if (colorFieldInfo != null)
             {
-                colorFieldInfo.SetValue(element, curveRangeAttribute.Color.GetColor());
+                colorFieldInfo.SetValue(createFieldElement, curveRangeAttribute.Color.GetColor());
             }
 
-            return element;
+            createFieldElement.AddToClassList(ClassAllowDisable);
+
+            return createFieldElement;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

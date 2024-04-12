@@ -150,7 +150,7 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
                 {
@@ -158,6 +158,10 @@ namespace SaintsField.Editor.Drawers
                 },
                 name = NameHelpBox(property, index),
             };
+
+            helpBox.AddToClassList(ClassAllowDisable);
+
+            return helpBox;
         }
         #endregion
 

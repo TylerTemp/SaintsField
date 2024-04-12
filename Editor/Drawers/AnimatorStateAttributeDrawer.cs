@@ -311,6 +311,8 @@ namespace SaintsField.Editor.Drawers
                 root.Add(animationClipField);
             }
 
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
         }
 
@@ -325,6 +327,9 @@ namespace SaintsField.Editor.Drawers
                 },
                 name = NameHelpBox(property),
             };
+
+            helpBoxElement.AddToClassList(ClassAllowDisable);
+
             return helpBoxElement;
         }
 

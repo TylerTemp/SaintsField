@@ -7,6 +7,9 @@ namespace SaintsField.Samples.Scripts
         [Layer][RichLabel("<icon=star.png /><label />")] public string layerString;
         [Layer] public int layerInt;
 
+        [ReadOnly]
+        [Layer] public int layerIntDisabled;
+
         public LayerMask myLayerMask;
     }
 }

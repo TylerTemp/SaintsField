@@ -32,5 +32,9 @@ namespace SaintsField.Samples.Scripts
         }
 
         public MyRange myRange;
+
+        [ReadOnly]
+        [PropRange(nameof(min), nameof(max))]
+        public float rangeFloatDisabled;
     }
 }

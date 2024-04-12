@@ -176,6 +176,8 @@ namespace SaintsField.Editor.Drawers
             root.Add(label);
             root.Add(dropdownButton.Button);
 
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
         }
 

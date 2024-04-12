@@ -88,6 +88,7 @@ namespace SaintsField.Editor.Drawers
             {
                 name = NameLayer(property),
             };
+            layerField.AddToClassList(ClassAllowDisable);
 
             return layerField;
         }

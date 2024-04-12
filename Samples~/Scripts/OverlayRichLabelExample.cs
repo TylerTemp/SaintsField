@@ -13,6 +13,9 @@ namespace SaintsField.Samples.Scripts
         [Space]
         [OverlayRichLabel("not ok", end: true)] public GameObject notSupported;
 
+        [ReadOnly]
+        [OverlayRichLabel("<icon=eye.png/>", padding: 1)] public string textDisabled;
+
         public string TakeAGuess()
         {
             if(guess > 20)

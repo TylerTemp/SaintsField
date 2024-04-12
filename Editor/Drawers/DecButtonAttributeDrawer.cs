@@ -38,9 +38,6 @@ namespace SaintsField.Editor.Drawers
             RichTextDrawer.Dispose();
         }
 
-        private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                              BindingFlags.Public | BindingFlags.DeclaredOnly;
-
         #region IMGUI
         protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object target)
         {
@@ -189,6 +186,7 @@ namespace SaintsField.Editor.Drawers
 
             button.Add(labelContainer);
             // button.AddToClassList();
+            button.AddToClassList(ClassAllowDisable);
             return button;
         }
 
@@ -206,6 +204,7 @@ namespace SaintsField.Editor.Drawers
                 },
             };
             helpBox.AddToClassList(className);
+            helpBox.AddToClassList(ClassAllowDisable);
             return helpBox;
         }
 

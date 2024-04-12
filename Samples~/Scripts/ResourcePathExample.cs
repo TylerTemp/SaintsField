@@ -49,6 +49,10 @@ namespace SaintsField.Samples.Scripts
             [BelowRichLabel(nameof(OnLabel), true)]
             public string[] myResources;
 
+            [ReadOnly]
+            [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
+            public string myResourceDisabled;
+
             public string OnLabel(int index)
             {
                 return myResources[index];

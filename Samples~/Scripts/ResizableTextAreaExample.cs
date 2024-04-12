@@ -21,5 +21,8 @@ namespace SaintsField.Samples.Scripts
         public MyStruct myStruct;
         [ResizableTextArea] public string[] arr;
         public MyStruct[] structArr;
+
+        [ReadOnly]
+        [ResizableTextArea, RichLabel("<icon=star.png /><label />")] public string shortDisabled;
     }
 }

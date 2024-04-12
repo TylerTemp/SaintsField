@@ -79,6 +79,10 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
 
         [SerializeReference, ReferencePicker]
         public IRefInterface myInterface;
+
+        [ReadOnly]
+        [SerializeReference, ReferencePicker]
+        public IRefInterface myInterfaceDisabled;
 #else
         [InfoBox("This feature is only available in Unity 2021.3 or newer.")]
         public string info;

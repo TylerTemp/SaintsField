@@ -38,7 +38,11 @@ namespace SaintsField.Samples.Scripts
         public float DynamicMax { get; private set; }
 
         [SerializeField, MinMaxSlider(nameof(DynamicMin), nameof(DynamicMax))] private Vector2 _propRange;
-        // [SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] private Vector2 _propLeftRange;
-        // [SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] private Vector2 _propRightRange;
+        [SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] private Vector2 _propLeftRange;
+        [SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] private Vector2 _propRightRange;
+
+        [ReadOnly]
+        [MinMaxSlider(-1f, 3f, 0.3f)]
+        public Vector2 vector2Step03Disabled;
     }
 }

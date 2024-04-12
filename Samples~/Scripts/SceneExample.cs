@@ -10,5 +10,8 @@ namespace SaintsField.Samples.Scripts
         [Scene,
             // BelowRichLabel(nameof(sceneStr), true)
         ] public string sceneS;
+
+        [ReadOnly]
+        [Scene] public string sceneDisabled;
     }
 }

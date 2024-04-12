@@ -1,3 +1,12 @@
+## 2.3.2
+
+*   Fix `AssetPreview` incorrect time to destroy the preview texture.
+*   UI Toolkit: Fix `Dropdown` giving error when working with `RichLabel`.
+*   Allow `EnumFlags` to be expanded with `Disabled` state.
+*   IMGUI: Fix `EnumFlags` sometimes need click more than once to expand
+*   IMGUI: `ReadOnly` (`DisabledIf` etc) now disable the whole field rather than the value field only.
+*   IMGUI: `Expandable` now works properly with `ReadOnly` (`DisabledIf` etc): the toggle will never be disabled, and the field will be disabled accordingly.
+
 ## 2.3.1
 
 1.  UI Toolkit: fix labelWidth didn't get fixed unless you change the layout (e.g. resize the inspector)

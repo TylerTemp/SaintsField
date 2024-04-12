@@ -186,7 +186,7 @@ namespace SaintsField.Editor.Drawers
             string typeError = ValidateType(property, info.FieldType);
 
             // Debug.Log(typeError);
-            return new HelpBox(typeError, HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox(typeError, HelpBoxMessageType.Error)
             {
                 style =
                 {
@@ -199,6 +199,9 @@ namespace SaintsField.Editor.Drawers
                     IsTruly = true,
                 },
             };
+
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

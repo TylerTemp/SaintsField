@@ -160,6 +160,8 @@ namespace SaintsField.Editor.Drawers
                 },
             });
 
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
             // return new TextField(property.displayName)
             // {

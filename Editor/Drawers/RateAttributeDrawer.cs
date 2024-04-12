@@ -299,6 +299,8 @@ namespace SaintsField.Editor.Drawers
                 root.Add(MakeStarUIToolkit(property, option, min));
             }
 
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
         }
 

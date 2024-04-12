@@ -46,5 +46,9 @@ namespace SaintsField.Samples.Scripts
         }
 
         private string StaminaTitle(float curValue, float min, float max, string label) => $"[{label}] {curValue / max:P}";
+
+        [ReadOnly]
+        [ProgressBar(10)][RichLabel("<icon=star.png /><label/>")]
+        public int myHpDisabled;
     }
 }

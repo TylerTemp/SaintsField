@@ -287,6 +287,8 @@ namespace SaintsField.Editor.Drawers
             });
             root.Add(errorBox);
 
+            root.AddToClassList(ClassAllowDisable);
+
             // OnUpdateUiToolKit(property, saintsAttribute, index, root, parent);
             return root;
         }

@@ -125,6 +125,7 @@ namespace SaintsField.Editor.Drawers
             label.AddToClassList("unity-label");
             root.Add(label);
             root.Add(dropdownButton.Button);
+            root.AddToClassList(ClassAllowDisable);
 
             return root;
         }

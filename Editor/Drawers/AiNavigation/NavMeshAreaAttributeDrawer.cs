@@ -179,6 +179,8 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             root.Add(label);
             root.Add(dropdownButton.Button);
 
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
         }
 

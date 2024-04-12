@@ -276,6 +276,8 @@ namespace SaintsField.Editor.Drawers
 
             root.Add(textField);
 
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
         }
 
@@ -283,7 +285,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 name = NameRichLabelHelpBox(property, index),
                 style =
@@ -291,6 +293,9 @@ namespace SaintsField.Editor.Drawers
                     display = DisplayStyle.None,
                 },
             };
+
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
 
         protected override void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

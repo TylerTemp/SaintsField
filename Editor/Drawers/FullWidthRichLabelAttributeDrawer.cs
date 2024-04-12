@@ -190,7 +190,7 @@ namespace SaintsField.Editor.Drawers
             //     return new VisualElement();
             // }
 
-            return new VisualElement
+            VisualElement visualElement = new VisualElement
             {
                 style =
                 {
@@ -207,6 +207,8 @@ namespace SaintsField.Editor.Drawers
                 name = NameFullWidthLabelContainer(property, index),
                 userData = null,
             };
+            visualElement.AddToClassList(ClassAllowDisable);
+            return visualElement;
         }
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
@@ -238,6 +240,9 @@ namespace SaintsField.Editor.Drawers
                 name = NameHelpBox(property, index),
                 userData = "",
             });
+
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
         }
 

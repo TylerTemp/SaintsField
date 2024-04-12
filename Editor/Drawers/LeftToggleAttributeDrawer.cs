@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         private static string NameLeftToggle(SerializedProperty property) => $"{property.propertyPath}__LeftToggle";
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__LeftToggle_Label";
+        // private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__LeftToggle_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
@@ -90,6 +90,7 @@ namespace SaintsField.Editor.Drawers
             toggle.BindProperty(property);
 
             toggle.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/LeftToggle.uss"));
+            toggle.AddToClassList(ClassAllowDisable);
 
             return toggle;
         }

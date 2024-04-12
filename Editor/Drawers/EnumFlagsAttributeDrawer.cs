@@ -16,9 +16,9 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(EnumFlagsAttribute))]
     public class EnumFlagsAttributeDrawer: SaintsPropertyDrawer
     {
-        private readonly Texture2D _checkboxCheckedTexture2D;
-        private readonly Texture2D _checkboxEmptyTexture2D;
-        private readonly Texture2D _checkboxIndeterminateTexture2D;
+        private Texture2D _checkboxCheckedTexture2D;
+        private Texture2D _checkboxEmptyTexture2D;
+        private Texture2D _checkboxIndeterminateTexture2D;
 
         private struct MetaInfo
         {
@@ -49,14 +49,14 @@ namespace SaintsField.Editor.Drawers
         }
 
         #region IMGUI
-        private bool _unfold;
+        // private bool _unfold;
         private bool _forceUnfold;
 
-        private readonly GUIContent _checkBoxCheckedContent;
-        private readonly GUIContent _checkBoxEmptyContent;
-        private readonly GUIContent _checkBoxIndeterminateContent;
+        private GUIContent _checkBoxCheckedContent;
+        private GUIContent _checkBoxEmptyContent;
+        private GUIContent _checkBoxIndeterminateContent;
 
-        private readonly GUIStyle _iconButtonStyle;
+        private GUIStyle _iconButtonStyle;
 
         private struct BtnInfo
         {
@@ -70,11 +70,28 @@ namespace SaintsField.Editor.Drawers
 
         private bool _initExpandState;
 
-        public EnumFlagsAttributeDrawer()
+        private bool EnsureImageResourcesLoaded()
         {
+            if (_checkboxCheckedTexture2D != null)
+            {
+                return true;
+            }
+
             _checkboxCheckedTexture2D = Util.LoadResource<Texture2D>("checkbox-checked.png");
             _checkboxEmptyTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
             _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
+
+            return false;
+        }
+
+        private void ImGuiLoadResources()
+        {
+            if (EnsureImageResourcesLoaded())
+            {
+                return;
+            }
+
+            // ImGuiEnsureDispose(property.serializedObject.targetObject);
 
             _checkBoxCheckedContent = new GUIContent(_checkboxCheckedTexture2D);
             _checkBoxEmptyContent = new GUIContent(_checkboxEmptyTexture2D);
@@ -90,24 +107,32 @@ namespace SaintsField.Editor.Drawers
 
         ~EnumFlagsAttributeDrawer()
         {
-            Object.DestroyImmediate(_checkboxCheckedTexture2D);
-            Object.DestroyImmediate(_checkboxEmptyTexture2D);
-            Object.DestroyImmediate(_checkboxIndeterminateTexture2D);
+            _checkboxCheckedTexture2D = _checkboxEmptyTexture2D = _checkboxIndeterminateTexture2D = null;
         }
+
+        // protected override void ImGuiOnDispose()
+        // {
+        //     base.ImGuiOnDispose();
+        //     Object.DestroyImmediate(_checkboxCheckedTexture2D);
+        //     Object.DestroyImmediate(_checkboxEmptyTexture2D);
+        //     Object.DestroyImmediate(_checkboxIndeterminateTexture2D);
+        // }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
             bool hasLabelWidth)
         {
+            ImGuiLoadResources();
+
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
             if (!_initExpandState)
             {
                 _initExpandState = true;
-                _unfold = enumFlagsAttribute.DefaultExpanded;
+                property.isExpanded = enumFlagsAttribute.DefaultExpanded;
             }
 
-            bool unfold = _unfold || _forceUnfold;
+            bool unfold = property.isExpanded || _forceUnfold;
 
             // Debug.Log($"_unfold={_unfold}, _forceUnfold={_forceUnfold}, Event.current.type={Event.current.type}");
 
@@ -129,7 +154,7 @@ namespace SaintsField.Editor.Drawers
             if (!_initExpandState)
             {
                 _initExpandState = true;
-                _unfold = enumFlagsAttribute.DefaultExpanded;
+                property.isExpanded = enumFlagsAttribute.DefaultExpanded;
             }
 
             MetaInfo metaInfo = GetMetaInfo(property, info);
@@ -149,7 +174,10 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                _unfold = EditorGUI.Foldout(headRect, _unfold, label);
+                using(new GUIEnabledScoop(true))
+                {
+                    property.isExpanded = EditorGUI.Foldout(headRect, property.isExpanded, label);
+                }
             }
 
             Rect fieldRect = RectUtils.SplitWidthRect(position, labelWidth).leftRect;
@@ -165,7 +193,7 @@ namespace SaintsField.Editor.Drawers
 
             // Debug.Log($"property.intValue = {property.intValue}; noneChecked={noneChecked}, allChecked={allChecked}");
 
-            bool useUnfold = _unfold || _forceUnfold;
+            bool useUnfold = property.isExpanded || _forceUnfold;
 
             if(useUnfold)
             {
@@ -301,7 +329,7 @@ namespace SaintsField.Editor.Drawers
 
             _forceUnfold = false;
 
-            if (_unfold)
+            if (property.isExpanded)
             {
                 return;
             }
@@ -587,6 +615,8 @@ namespace SaintsField.Editor.Drawers
             prefixLabel.AddToClassList("unity-label");
             root.Add(prefixLabel);
             root.Add(fieldContainer);
+
+            root.AddToClassList(ClassAllowDisable);
 
             return root;
         }

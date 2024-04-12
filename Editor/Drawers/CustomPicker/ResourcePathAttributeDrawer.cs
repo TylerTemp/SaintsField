@@ -343,6 +343,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 objectField.styleSheets.Add(hideStyle);
             }
 
+            objectField.AddToClassList(ClassAllowDisable);
+
             return objectField;
         }
 

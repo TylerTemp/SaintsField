@@ -22,15 +22,27 @@ namespace SaintsField.Editor.Drawers
 
         ~AssetPreviewAttributeDrawer()
         {
-            if (_previewTexture)
-            {
-                Object.DestroyImmediate(_previewTexture);
-            }
+            // if (_previewTexture)
+            // {
+            //     Object.DestroyImmediate(_previewTexture);
+            // }
+            _previewTexture = null;
 
             // if (_cachedWidthTexture)
             // {
             //     Object.DestroyImmediate(_cachedWidthTexture);
             // }
+        }
+
+        protected override void ImGuiOnDispose()
+        {
+            base.ImGuiOnDispose();
+            if (!_previewTexture)
+            {
+                return;
+            }
+            Object.DestroyImmediate(_previewTexture);
+            _previewTexture = null;
         }
 
         private Texture2D GetPreview(Object target)
@@ -52,6 +64,8 @@ namespace SaintsField.Editor.Drawers
                 {
                     return null;
                 }
+
+                ImGuiEnsureDispose(target);
                 _previewTexture = AssetPreview.GetAssetPreview(target);
             }
 

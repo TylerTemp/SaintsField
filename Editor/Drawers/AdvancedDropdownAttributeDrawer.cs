@@ -1137,6 +1137,7 @@ namespace SaintsField.Editor.Drawers
             label.AddToClassList("unity-label");
             root.Add(label);
             root.Add(dropdownButton.Button);
+            root.AddToClassList(ClassAllowDisable);
 
             return root;
 
@@ -1228,7 +1229,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
                 {
@@ -1236,6 +1237,8 @@ namespace SaintsField.Editor.Drawers
                 },
                 name = NameHelpBox(property),
             };
+
+            return helpBox;
         }
         // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
         //     ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);

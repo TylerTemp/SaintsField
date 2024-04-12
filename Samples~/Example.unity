@@ -455,7 +455,9 @@ MonoBehaviour:
   areaSingleMask: 1
   areaValue: 1
   areaName: 0
+  areaNameReadonly: 0
   areaMask: 0
+  areaMaskReadonly: 0
 --- !u!1 &90550605
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,6 +517,7 @@ MonoBehaviour:
   my:
     normal: 0
     myInt: 3
+  floatVDisabled: 0
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -1052,6 +1055,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sortingLayerString: New Layer 3
   _sortingLayerInt: 0
+  _sortingLayerDisabled: 0
 --- !u!4 &301131439
 Transform:
   m_ObjectHideFlags: 0
@@ -1152,6 +1156,7 @@ MonoBehaviour:
     min: 0
     max: 37
     rangeFloat: 17.2
+  rangeFloatDisabled: 17.62
 --- !u!4 &308851078
 Transform:
   m_ObjectHideFlags: 0
@@ -1316,9 +1321,11 @@ MonoBehaviour:
     stateSpeed: 8
     animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
   animStateName: Idle
+  animStateDisabled: 
   animParamName: Trigger
   animParamHash: 0
   animParamHashes: c136d6d572017303c136d6d572017303
+  animParamNameDisable: 
 --- !u!95 &380193380
 Animator:
   serializedVersion: 5
@@ -1511,6 +1518,7 @@ MonoBehaviour:
   _sprite: {fileID: 417627792}
   _sprite1: {fileID: 21300000, guid: f6dd782be9f6242428748582d3c70a63, type: 3}
   _sprite2: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
+  _spriteDisabled: {fileID: 0}
 --- !u!4 &417627791
 Transform:
   m_ObjectHideFlags: 0
@@ -1779,6 +1787,7 @@ MonoBehaviour:
   _labelByField: dynamic <color=green>label
   _someInt: 0
   testNoLabel: 0
+  testDisable: 0
 --- !u!1 &520027140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1862,6 +1871,7 @@ MonoBehaviour:
   srNoPickerFreeSign: {fileID: 417627792}
   goNoPickerFreeSign: {fileID: 539722464}
   fieldGo: {fileID: 4273993126308263894, guid: bfe71e2debe494743bb20374ae988950, type: 3}
+  fieldGoDisable: {fileID: 0}
 --- !u!4 &539722466
 Transform:
   m_ObjectHideFlags: 0
@@ -2438,6 +2448,7 @@ MonoBehaviour:
   speed: 0
   eye: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   guess: 14
+  starDisabled: {fileID: 0}
 --- !u!4 &622173743
 Transform:
   m_ObjectHideFlags: 0
@@ -2484,6 +2495,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneI: 0
   sceneS: Example
+  sceneDisabled: Example
 --- !u!4 &633783411
 Transform:
   m_ObjectHideFlags: 0
@@ -2720,6 +2732,7 @@ MonoBehaviour:
   atEnd: 
   guess: 12
   notSupported: {fileID: 0}
+  textDisabled: Readonly
 --- !u!4 &679680719
 Transform:
   m_ObjectHideFlags: 0
@@ -2948,6 +2961,7 @@ MonoBehaviour:
   addressInGroup: Assets/SaintsField/Samples/RawResources/White.mat
   addressLabel1Or2: Assets/SaintsField/Samples/RawResources/ScriptableIns.asset
   addressLabelAnd: Assets/SaintsField/Samples/RawResources/ScriptableIns.asset
+  addressReadonly: 
 --- !u!4 &724414865
 Transform:
   m_ObjectHideFlags: 0
@@ -3689,6 +3703,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _go: {fileID: 896673125}
   _component: {fileID: 896673127}
+  _componentDisabled: {fileID: 896673127}
 --- !u!1 &906683732
 GameObject:
   m_ObjectHideFlags: 0
@@ -4126,6 +4141,7 @@ MonoBehaviour:
   myStructs:
   - myToggle: 0
     myToggles: 0001
+  richToggleDisabled: 0
 --- !u!4 &1030583577
 Transform:
   m_ObjectHideFlags: 0
@@ -4170,11 +4186,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45cb9069ce004c2ab4ee78763c064fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myMask: 0
-  myMask2: 6
-  myStruct:
-    myMask: 25
-  below: 0
+  myMaskDisabled: 0
+  myMaskDisabledLabel: 0
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0
@@ -4254,6 +4267,7 @@ MonoBehaviour:
   strTyp:
     selectIt: 3
     searchableDropdown: 6
+    searchableDropdownDisable: 0
 --- !u!4 &1044156549
 Transform:
   m_ObjectHideFlags: 0
@@ -4496,6 +4510,7 @@ MonoBehaviour:
   _colors: []
   _onColor2: {r: 0, g: 0.92941177, b: 1, a: 1}
   _offColor2: {r: 0.11764706, g: 0, b: 1, a: 1}
+  _offColorDisable: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &1060634463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4661,6 +4676,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerString: Ignore Raycast
   layerInt: 1
+  layerIntDisabled: 0
   myLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -4730,6 +4746,7 @@ MonoBehaviour:
   targetRenderer: {fileID: 1202177274077023611}
   _mat1: {fileID: 2100000, guid: 832112d0d8069044fa7b775831f6ef0f, type: 2}
   _mat2: {fileID: 2100000, guid: 09fa8ef13abd33f42a267980f8846ff5, type: 2}
+  _matDisabled: {fileID: 0}
 --- !u!1 &1111329121
 GameObject:
   m_ObjectHideFlags: 0
@@ -4942,6 +4959,7 @@ MonoBehaviour:
   _go: {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
   _sr: {fileID: 1776789730}
   dummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  dummyDisabled: {fileID: 0}
 --- !u!4 &1131818497
 Transform:
   m_ObjectHideFlags: 0
@@ -5100,6 +5118,7 @@ MonoBehaviour:
 
       long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap
       8 warp 9 wap 10 wrap 11'
+  shortDisabled: Disabled
 --- !u!1 &1160369190
 GameObject:
   m_ObjectHideFlags: 0
@@ -5362,6 +5381,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   addressableLabel: 
+  addressableLabelDisable: 
 --- !u!1 &1227266396
 GameObject:
   m_ObjectHideFlags: 0
@@ -5509,6 +5529,9 @@ MonoBehaviour:
   <DynamicMin>k__BackingField: -5.28
   <DynamicMax>k__BackingField: 12.26
   _propRange: {x: -2.8992672, y: 2.3176289}
+  _propLeftRange: {x: 0, y: 0}
+  _propRightRange: {x: 0, y: 0}
+  vector2Step03Disabled: {x: 0, y: 0}
 --- !u!1 &1271404088
 GameObject:
   m_ObjectHideFlags: 0
@@ -5763,6 +5786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputAxis: Mouse ScrollWheel
+  inputAxisDisabled: 
 --- !u!4 &1350909639
 Transform:
   m_ObjectHideFlags: 0
@@ -6185,9 +6209,11 @@ MonoBehaviour:
     myResources:
     - Cube
     - SpriteRendererPrefab
+    myResourceDisabled: 
   myStructs:
   - myResource: SpriteRendererPrefab
     myResources: []
+    myResourceDisabled: 
 --- !u!4 &1465660266
 Transform:
   m_ObjectHideFlags: 0
@@ -6889,6 +6915,7 @@ MonoBehaviour:
     DefaultFloat: 0
   richLabel: 0
   richLabel2: 0
+  richLabelDisabled: 0
 --- !u!1 &1573613039
 GameObject:
   m_ObjectHideFlags: 0
@@ -7159,14 +7186,28 @@ MonoBehaviour:
   item:
     rid: 9188093539963895953
   structImpl:
-    rid: -2
+    rid: 8812009837114949754
   myInterface:
-    rid: -2
+    rid: 8812009837114949755
+  myInterfaceDisabled:
+    rid: 8812009837114949759
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 8812009837114949754
+      type: {class: ReferenceExample/ClassDirect, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+    - rid: 8812009837114949755
+      type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub2: 
+    - rid: 8812009837114949759
+      type: {class: ReferenceExample/ClassSub1, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub1: 
     - rid: 9188093539963895953
       type: {class: ReferenceExample/Apple, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:
@@ -7980,6 +8021,7 @@ MonoBehaviour:
   slashSth: {fileID: 575593403}
   slash2Sth: {fileID: 1540778734}
   slash3Sth: {fileID: 1540778734}
+  directSubMultiDisabled: {fileID: 1830778823}
 --- !u!4 &1830778825
 Transform:
   m_ObjectHideFlags: 0
@@ -8172,6 +8214,30 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+  curveDisable:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!4 &1849519775
 Transform:
   m_ObjectHideFlags: 0
@@ -8222,6 +8288,7 @@ MonoBehaviour:
   rate0To5Rich: 2
   rate:
     rate: 5
+  rate1To5Disabled: 4
 --- !u!4 &1881364801
 Transform:
   m_ObjectHideFlags: 0
@@ -8406,6 +8473,7 @@ MonoBehaviour:
   stamina: 50
   highStamina: 150
   maxStamina: 200
+  myHpDisabled: 6
 --- !u!1 &1967770119
 GameObject:
   m_ObjectHideFlags: 0
@@ -8841,8 +8909,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: Respawn
+  _tag: 
   _tag2: MainCamera
+  _tagDisabled: 
 --- !u!1 &2118824042
 GameObject:
   m_ObjectHideFlags: 0

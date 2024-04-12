@@ -325,6 +325,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 VisualElement root = new VisualElement();
                 root.Add(UnityFallbackUIToolkit(property));
                 root.Add(new HelpBox(e.Message, HelpBoxMessageType.Error));
+                root.AddToClassList(ClassAllowDisable);
                 return root;
             }
 
@@ -364,6 +365,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
                 objectField.Add(selectorButton);
             }
+
+            objectField.AddToClassList(ClassAllowDisable);
 
             return objectField;
         }
@@ -430,7 +433,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
                 {
@@ -438,6 +441,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 },
                 name = NameHelpBox(property),
             };
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
 
         // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,

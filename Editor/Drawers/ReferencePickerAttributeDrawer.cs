@@ -252,6 +252,9 @@ namespace SaintsField.Editor.Drawers
             // });
 
             // root.Add(button);
+
+            button.AddToClassList(ClassAllowDisable);
+
             return button;
         }
 

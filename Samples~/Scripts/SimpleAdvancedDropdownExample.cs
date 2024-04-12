@@ -14,6 +14,7 @@ namespace SaintsField.Samples.Scripts
             [AboveRichLabel(nameof(selectIt), true)]
             [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
             [AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
+            [ReadOnly][AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdownDisable;
 
             public AdvancedDropdownList<int> AdvDropdown()
             {

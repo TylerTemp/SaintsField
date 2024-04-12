@@ -17,20 +17,42 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
         #region IMGUI
         private string _error = "";
 
-        protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        // protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        // {
+        //     (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, info, parent.GetType(), parent);
+        //     _error = error;
+        //     EditorGUI.BeginDisabledGroup(disabled);
+        //     return -1;
+        // }
+
+        protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo info,
+            object parent)
+        {
+            return true;
+        }
+
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property,
+            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, info, parent.GetType(), parent);
             _error = error;
             EditorGUI.BeginDisabledGroup(disabled);
-            return -1;
+            return position;
         }
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        // protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        //     ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        // {
+        //     EditorGUI.EndDisabledGroup();
+        //     return true;
+        // }
+
+        protected override void OnPropertyEndImGui(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            int saintsIndex, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             EditorGUI.EndDisabledGroup();
-            return true;
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -151,7 +173,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 name = NameReadOnlyHelpBox(property, index),
                 style =
@@ -159,6 +181,8 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
                     display = DisplayStyle.None,
                 },
             };
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -204,7 +228,8 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
             if (curReadOnly != nowReadOnly)
             {
-                container.SetEnabled(!nowReadOnly);
+                // container.SetEnabled(!nowReadOnly);
+                container.Query<VisualElement>(className: ClassAllowDisable).ForEach(each => each.SetEnabled(!nowReadOnly));
             }
 
             HelpBox helpBox = container.Q<HelpBox>(NameReadOnlyHelpBox(property, index));

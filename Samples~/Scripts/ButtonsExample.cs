@@ -55,5 +55,11 @@ namespace SaintsField.Samples.Scripts
         [BelowButton(nameof(ClickButton))]
         [PostFieldButton(nameof(ClickButton))]
         public int testNoLabel;
+
+        [ReadOnly]
+        [AboveButton(nameof(ClickButton))]
+        [BelowButton(nameof(ClickButton))]
+        [PostFieldButton(nameof(ClickButton))]
+        public int testDisable;
     }
 }

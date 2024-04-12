@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement helpBox = new HelpBox
+            HelpBox helpBox = new HelpBox
             {
                 text = "",
                 messageType = HelpBoxMessageType.Error,
@@ -153,6 +153,7 @@ namespace SaintsField.Editor.Drawers
                 },
                 name = NameHelpBox(property, index),
             };
+            helpBox.AddToClassList(ClassAllowDisable);
             return helpBox;
         }
 

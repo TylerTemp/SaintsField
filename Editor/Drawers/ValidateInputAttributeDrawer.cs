@@ -70,7 +70,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 name = NameHelpBox(property, index),
                 style =
@@ -78,6 +78,8 @@ namespace SaintsField.Editor.Drawers
                     display = DisplayStyle.None,
                 },
             };
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
 
         // protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,

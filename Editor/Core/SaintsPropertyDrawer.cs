@@ -493,6 +493,8 @@ namespace SaintsField.Editor.Core
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
+        protected const string ClassAllowDisable = "saints-field-allow-disable";
+
 #if UNITY_2021_3_OR_NEWER
 //         protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
 //         {
@@ -524,6 +526,7 @@ namespace SaintsField.Editor.Core
             };
 
             propertyField.AddToClassList(SaintsFieldFallbackClass);
+            propertyField.AddToClassList(ClassAllowDisable);
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
         }

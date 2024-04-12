@@ -9,6 +9,9 @@ namespace SaintsField.Samples.Scripts
         [PostFieldRichLabel(nameof(TakeAGuess), isCallback: true)] public int guess;
         // [PostFieldRichLabel(nameof(Error), isCallback: true)] public GameObject errorCallback;
 
+        [ReadOnly]
+        [PostFieldRichLabel("<icon=star.png/>", padding: 0)] public Sprite starDisabled;
+
         public string TakeAGuess()
         {
             if(guess > 20)

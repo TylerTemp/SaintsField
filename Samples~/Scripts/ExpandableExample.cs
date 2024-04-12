@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts
     public class ExpandableExample : MonoBehaviour
     {
         [SerializeField]
+        [ReadOnly]
         [InfoBox("Hi")]
         [Expandable, GetScriptableObject]
         private Scriptable _scriptable;

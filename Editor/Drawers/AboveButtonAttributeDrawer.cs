@@ -53,6 +53,8 @@ namespace SaintsField.Editor.Drawers
             visualElement.Add(DrawUIToolkit(property, saintsAttribute, index, info, parent, container));
             visualElement.Add(DrawLabelError(property, index));
             visualElement.Add(DrawExecError(property, index));
+
+            visualElement.AddToClassList(ClassAllowDisable);
             return visualElement;
         }
 

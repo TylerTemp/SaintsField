@@ -34,5 +34,13 @@ namespace SaintsField.Samples.Scripts.Addressable
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]
 #endif
         public string addressLabelAnd;
+
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
+        [ReadOnly]
+        [AddressableAddress][RichLabel("<icon=star.png /><label />")]
+#else
+        [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]
+#endif
+        public string addressReadonly;
     }
 }

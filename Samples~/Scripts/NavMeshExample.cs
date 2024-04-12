@@ -42,6 +42,14 @@ namespace SaintsField.Samples.Scripts
         }
 #endif
 
+        [ReadOnly]
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
+        [NavMeshArea]
+#else
+        [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
+#endif
+        public int areaNameReadonly;
+
 #if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
         [NavMeshAreaMask, OnValueChanged(nameof(AreaMaskChanged)), RichLabel("<icon=star.png /><label />")]
 #else
@@ -53,5 +61,13 @@ namespace SaintsField.Samples.Scripts
 #if SAINTSFIELD_AI_NAVIGATION
         private void AreaMaskChanged() => Debug.Log($"areaMask: {areaMask}");
 #endif
+
+        [ReadOnly]
+#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
+        [NavMeshAreaMask]
+#else
+        [InfoBox("Ai Navigation is not installed or enabled", EMessageType.Error)]
+#endif
+        public int areaMaskReadonly;
     }
 }

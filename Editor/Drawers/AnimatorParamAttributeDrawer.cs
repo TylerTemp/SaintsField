@@ -238,6 +238,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
+            dropdownField.AddToClassList(ClassAllowDisable);
 
             return dropdownField;
         }
@@ -254,7 +255,7 @@ namespace SaintsField.Editor.Drawers
                 name = NameHelpBox(property),
             };
 
-            // helpBoxElement.AddToClassList(ClassHelpBox(property));
+            helpBoxElement.AddToClassList(ClassAllowDisable);
             return helpBoxElement;
         }
 

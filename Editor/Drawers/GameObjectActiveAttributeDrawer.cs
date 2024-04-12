@@ -161,8 +161,13 @@ namespace SaintsField.Editor.Drawers
                 },
             });
 
+            // button itself can toggle enable/disable. We need a wrapper for ReadOnly
+            VisualElement root = new VisualElement();
+            root.AddToClassList(ClassAllowDisable);
 
-            return button;
+            root.Add(button);
+
+            return root;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

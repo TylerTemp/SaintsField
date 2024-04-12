@@ -359,6 +359,8 @@ namespace SaintsField.Editor.Drawers
             root.Add(CreateUIToolkitElement(property, index, null, showImageAttribute));
             root.Add(helpBox);
 
+            root.AddToClassList(ClassAllowDisable);
+
             return root;
         }
 

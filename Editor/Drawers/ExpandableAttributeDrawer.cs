@@ -76,10 +76,14 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                bool newExpanded = EditorGUI.Foldout(position, curExpanded, new GUIContent(new string(' ', property.displayName.Length)), true);
-                if (changed.changed)
+                using(new GUIEnabledScoop(true))
                 {
-                    SetExpand(property, newExpanded);
+                    bool newExpanded = EditorGUI.Foldout(position, curExpanded,
+                        new GUIContent(new string(' ', property.displayName.Length)), true);
+                    if (changed.changed)
+                    {
+                        SetExpand(property, newExpanded);
+                    }
                 }
             }
 
@@ -278,6 +282,8 @@ namespace SaintsField.Editor.Drawers
                 userData = null,
             };
 
+            visualElement.AddToClassList(ClassAllowDisable);
+
             return visualElement;
         }
 
@@ -308,13 +314,15 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            propsElement.Add(new InspectorElement(property.objectReferenceValue)
+            InspectorElement inspectorElement = new InspectorElement(property.objectReferenceValue)
             {
                 // style =
                 // {
                 //     width = Length.Percent(100),
                 // },
-            });
+            };
+
+            propsElement.Add(inspectorElement);
 
             // foreach (PropertyField propertyField in GetPropertyFields(property, property.objectReferenceValue))
             // {

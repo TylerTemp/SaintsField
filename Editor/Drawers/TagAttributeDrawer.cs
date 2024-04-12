@@ -65,11 +65,15 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new TagField(property.displayName)
+            TagField tagField = new TagField(property.displayName)
             {
                 value = property.stringValue,
                 name = NameTag(property),
             };
+
+            tagField.AddToClassList(ClassAllowDisable);
+
+            return tagField;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

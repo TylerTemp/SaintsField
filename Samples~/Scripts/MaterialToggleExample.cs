@@ -7,5 +7,7 @@ namespace SaintsField.Samples.Scripts
         public Renderer targetRenderer;
         [MaterialToggle(nameof(targetRenderer))] public Material _mat1;
         [MaterialToggle(nameof(targetRenderer))] public Material _mat2;
+        [ReadOnly]
+        [MaterialToggle(nameof(targetRenderer))] public Material _matDisabled;
     }
 }

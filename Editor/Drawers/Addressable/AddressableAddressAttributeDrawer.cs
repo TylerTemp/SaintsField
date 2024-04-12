@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
         {
-            return new DropdownField(property.displayName)
+            DropdownField dropdownField = new DropdownField(property.displayName)
             {
                 style =
                 {
@@ -134,6 +134,8 @@ namespace SaintsField.Editor.Drawers.Addressable
                 userData = Array.Empty<string>(),
                 name = NameDropdownField(property),
             };
+            dropdownField.AddToClassList(ClassAllowDisable);
+            return dropdownField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -147,6 +149,7 @@ namespace SaintsField.Editor.Drawers.Addressable
                 },
                 name = NameHelpBox(property),
             };
+            helpBoxElement.AddToClassList(ClassAllowDisable);
             return helpBoxElement;
         }
 

@@ -13,6 +13,10 @@ namespace SaintsField.Samples.Scripts
         [AnimatorState(nameof(Animator))]
         public string animStateName;
 
+        [ReadOnly]
+        [AnimatorState]
+        public string animStateDisabled;
+
         [AnimatorParam][RichLabel("<icon=star.png /><label />")]
         public string animParamName;
 
@@ -21,5 +25,9 @@ namespace SaintsField.Samples.Scripts
 
         [AnimatorParam(nameof(Animator))]
         public int[] animParamHashes;
+
+        [ReadOnly]
+        [AnimatorParam]
+        public string animParamNameDisable;
     }
 }

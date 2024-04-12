@@ -18,5 +18,8 @@ namespace SaintsField.Samples.Scripts
         }
 
         public MyRate rate;
+
+        [ReadOnly]
+        [Rate(1, 5)] public int rate1To5Disabled;
     }
 }

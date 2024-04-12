@@ -324,7 +324,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 return null;
             }
 
-            return new Button
+            Button button = new Button
             {
                 text = "●",
                 style =
@@ -337,13 +337,16 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 },
                 name = NameSelectorButton(property),
             };
+
+            button.AddToClassList(ClassAllowDisable);
+            return button;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
                 {
@@ -356,6 +359,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 },
                 name = NameHelpBox(property),
             };
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
