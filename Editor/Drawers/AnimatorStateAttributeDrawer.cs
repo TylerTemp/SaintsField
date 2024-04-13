@@ -508,6 +508,8 @@ namespace SaintsField.Editor.Drawers
         private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_DropdownField_Label";
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_Foldout";
 
+        private static string NameSubStateMachineNameChain(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_SubStateMachineNameChain";
+
         protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
@@ -602,6 +604,24 @@ namespace SaintsField.Editor.Drawers
                 properties.Add(subField);
             }
 
+            SerializedProperty subStateMachineNameChainProp = FindPropertyRelative(property, "subStateMachineNameChain");
+            if (subStateMachineNameChainProp != null)
+            {
+                TextField textField = new TextField(ObjectNames.NicifyVariableName("subStateMachineNameChain"))
+                {
+                    value = subStateMachineNameChainProp.arraySize == 0
+                        ? ""
+                        : string.Join(" > ", Enumerable
+                            .Range(0, subStateMachineNameChainProp.arraySize)
+                            .Select(each => subStateMachineNameChainProp.GetArrayElementAtIndex(each).stringValue)
+                        ),
+                    name = NameSubStateMachineNameChain(property),
+                    isReadOnly = true,
+                };
+                textField.SetEnabled(false);
+                properties.Add(textField);
+            }
+
             rootContainer.Add(properties);
 
             rootContainer.AddToClassList(ClassAllowDisable);
@@ -688,7 +708,7 @@ namespace SaintsField.Editor.Drawers
                     // Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
                     // Util.SignPropertyValue(property, curItem);
                     property.serializedObject.ApplyModifiedProperties();
-                    Debug.Log($"onChange {curItem}");
+                    // Debug.Log($"onChange {curItem}");
                     onChange(property.propertyType == SerializedPropertyType.String? curItem.state.name : curItem);
                     buttonLabel.text = curName;
                     // property.serializedObject.ApplyModifiedProperties();
@@ -725,7 +745,21 @@ namespace SaintsField.Editor.Drawers
                 helpBox.style.display = metaInfo.Error == ""? DisplayStyle.None: DisplayStyle.Flex;
             }
         }
-//
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
+        {
+            var subStateMachineNameChainTextField =
+                container.Q<TextField>(name: NameSubStateMachineNameChain(property));
+            if (subStateMachineNameChainTextField != null)
+            {
+                var subs = (AnimatorStateChanged)newValue;
+                subStateMachineNameChainTextField.value = subs.subStateMachineNameChain.Count == 0
+                    ? ""
+                    : string.Join(" > ", subs.subStateMachineNameChain);
+            }
+        }
+        //
 //         private static void SetDropdownNoNotice(SerializedProperty property, DropdownField dropdownField, MetaInfo metaInfo)
 //         {
 //             dropdownField.choices = metaInfo.AnimatorStates.Select(each => each.ToString()).ToList();
