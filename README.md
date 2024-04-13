@@ -63,17 +63,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.3.2**
+**2.3.3**
 
-*   Fix `AssetPreview` incorrect time to destroy the preview texture.
-*   UI Toolkit: Fix `Dropdown` giving error when working with `RichLabel`.
-*   Allow `EnumFlags` to be expanded with `Disabled` state.
-*   IMGUI: Fix `EnumFlags` sometimes need click more than once to expand
-*   IMGUI: `ReadOnly` (`DisabledIf` etc) now disable the whole field rather than the value field only.
-*   `Expandable` now works properly with `ReadOnly` (`DisabledIf` etc):
-
-    *   The toggle will never be disabled
-    *   IMGUI: The field will be disabled accordingly. (In UI Toolkit they will not be disabled because of the limitation from Unity)
+*   Fixes [#9](https://github.com/TylerTemp/SaintsField/issues/9) `AnimatorState` won't work for sub-state machines.
+*   `AnimatorState` now allow class/struct with satisfied fields
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -93,7 +86,6 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
     for `icon` it will search the following path:
 
-    *   ~~`"Assets/Editor Default Resources/"`  (You can override things here, or put your own icons)~~
     *   `"Assets/Editor Default Resources/SaintsField/"`  (You can override things here)
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)

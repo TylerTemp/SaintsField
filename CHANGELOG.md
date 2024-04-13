@@ -1,5 +1,8 @@
 ## 2.3.3
 
+*   Fixes [#9](https://github.com/TylerTemp/SaintsField/issues/9) `AnimatorState` won't work for sub-state machines.
+*   `AnimatorState` now allow class/struct with satisfied fields.
+
 ## 2.3.2
 
 *   Fix `AssetPreview` incorrect time to destroy the preview texture.
