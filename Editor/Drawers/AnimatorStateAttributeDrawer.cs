@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers
                     // var curSelected = metaInfo.AnimatorStates[curIndex];
                     if (SetPropValue(property, metaInfo.AnimatorStates[curIndex]))
                     {
-                        onGUIPayload.SetValue(metaInfo.AnimatorStates[curIndex]);
+                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
                     }
                 }
             }
@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Drawers
                     else
                     {
                         SetPropValue(property, metaInfo.AnimatorStates[newIndex]);
-                        onGUIPayload.SetValue(metaInfo.AnimatorStates[newIndex]);
+                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
                     }
                 }
             }
@@ -624,7 +624,7 @@ namespace SaintsField.Editor.Drawers
             {
                 if (SetPropValue(property, metaInfo.AnimatorStates[curIndex]))
                 {
-                    onValueChangedCallback.Invoke(metaInfo.AnimatorStates[curIndex]);
+                    onValueChangedCallback.Invoke(property.propertyType == SerializedPropertyType.String? metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
                 }
             }
             // dropdownField.RegisterValueChangedCallback(v =>
@@ -670,7 +670,7 @@ namespace SaintsField.Editor.Drawers
                     // Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
                     // Util.SignPropertyValue(property, curItem);
                     property.serializedObject.ApplyModifiedProperties();
-                    onChange(curItem);
+                    onChange(property.propertyType == SerializedPropertyType.String? curItem.state.name : curItem);
                     buttonLabel.text = curName;
                     // property.serializedObject.ApplyModifiedProperties();
                 });

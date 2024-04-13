@@ -1937,7 +1937,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animator: {fileID: 380193380}
   animParam: -707381567
-  anim: {fileID: 0}
+  anim: FromTest
 --- !u!1 &551199325
 GameObject:
   m_ObjectHideFlags: 0
@@ -3991,20 +3991,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state:
     <layerIndex>k__BackingField: 1
-    <stateNameHash>k__BackingField: 1370463806
-    <stateName>k__BackingField: TestSubState
-    <stateSpeed>k__BackingField: 1
+    <stateNameHash>k__BackingField: 2081823275
+    <stateName>k__BackingField: Idle
+    <stateSpeed>k__BackingField: 3
     <stateTag>k__BackingField: 
     <animationClip>k__BackingField: {fileID: 0}
-    <subStateMachineNameChain>k__BackingField:
-    - TestStateMachine
+    <subStateMachineNameChain>k__BackingField: []
   stateBase:
-    <layerIndex>k__BackingField: 1
-    <stateNameHash>k__BackingField: 808375644
-    <stateName>k__BackingField: FromTest
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1588485629
+    <stateName>k__BackingField: Example
     <stateSpeed>k__BackingField: 8
     <stateTag>k__BackingField: 
     <subStateMachineNameChain>k__BackingField: []
+  stateName: Sub2State
 --- !u!95 &972998066
 Animator:
   serializedVersion: 5
