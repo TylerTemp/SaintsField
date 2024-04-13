@@ -5,7 +5,10 @@
 *   Allow `EnumFlags` to be expanded with `Disabled` state.
 *   IMGUI: Fix `EnumFlags` sometimes need click more than once to expand
 *   IMGUI: `ReadOnly` (`DisabledIf` etc) now disable the whole field rather than the value field only.
-*   IMGUI: `Expandable` now works properly with `ReadOnly` (`DisabledIf` etc): the toggle will never be disabled, and the field will be disabled accordingly.
+*   `Expandable` now works properly with `ReadOnly` (`DisabledIf` etc):
+
+    *   The toggle will never be disabled
+    *   IMGUI: The field will be disabled accordingly. (In UI Toolkit they will not be disabled because of the limitation from Unity)
 
 ## 2.3.1
 
