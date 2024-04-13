@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public struct AnimatorState: IAnimationClip, ILayerIndex, IStateNameHash, IStateName, IStateSpeed, IStateTag, ISubStateMachineNameChain
+    public class AnimatorStateBase: ILayerIndex, IStateNameHash, IStateName, IStateSpeed, IStateTag, ISubStateMachineNameChain
     {
         [field: SerializeField]
         public int layerIndex { get; private set; }
@@ -21,12 +21,9 @@ namespace SaintsField
         public string stateTag { get; private set; }
 
         [field: SerializeField]
-        public AnimationClip animationClip { get; private set; }
-
-        [field: SerializeField]
         public string[] subStateMachineNameChain { get; private set; }
 
-        public override string ToString() => $"[{layerIndex}] {stateName}{(animationClip? $" ({animationClip.name})": "")}";
+        public override string ToString() => $"[{layerIndex}] {stateName}";
 
         public override bool Equals(object obj)
         {

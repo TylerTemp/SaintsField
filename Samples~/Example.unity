@@ -1315,14 +1315,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Animator>k__BackingField: {fileID: 380193380}
-  animatorState:
-    layerIndex: 1
-    stateNameHash: 808375644
-    stateName: FromTest
-    stateSpeed: 8
-    tag: 
-    animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
-    subStateMachineNameChain: []
+  animator: {fileID: 0}
   animStateName: Idle
   animStateDisabled: Idle
   animParamName: Trigger
@@ -1944,14 +1937,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animator: {fileID: 380193380}
   animParam: -707381567
-  animState:
-    layerIndex: 0
-    stateNameHash: -1588485629
-    stateName: Example
-    stateSpeed: 8
-    tag: 
-    animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
-    subStateMachineNameChain: []
+  anim: {fileID: 0}
 --- !u!1 &551199325
 GameObject:
   m_ObjectHideFlags: 0
@@ -4004,14 +3990,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state:
-    layerIndex: 0
-    stateNameHash: -1075812047
-    stateName: SubNewState
-    stateSpeed: 2.42
-    tag: 
-    animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
-    subStateMachineNameChain:
-    - SubStateMachine1
+    <layerIndex>k__BackingField: 1
+    <stateNameHash>k__BackingField: 1370463806
+    <stateName>k__BackingField: TestSubState
+    <stateSpeed>k__BackingField: 1
+    <stateTag>k__BackingField: 
+    <animationClip>k__BackingField: {fileID: 0}
+    <subStateMachineNameChain>k__BackingField:
+    - TestStateMachine
+  stateBase:
+    <layerIndex>k__BackingField: 1
+    <stateNameHash>k__BackingField: 808375644
+    <stateName>k__BackingField: FromTest
+    <stateSpeed>k__BackingField: 8
+    <stateTag>k__BackingField: 
+    <subStateMachineNameChain>k__BackingField: []
 --- !u!95 &972998066
 Animator:
   serializedVersion: 5
@@ -4211,6 +4204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -4966,6 +4960,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6159b766ec67643b45e522ef2dcc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
+  aBitLongerThanDefault: 
+  s: 
+  richLabel: 
+  thereIsSomeGoodNewsForPeopleWhoLoveBadNews: 
+  weWereDeadBeforeTheShipEvenSank: 
+  myString: 
+  myUiToolkit: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0

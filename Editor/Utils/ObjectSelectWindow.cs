@@ -478,7 +478,7 @@ namespace SaintsField.Editor.Utils
             {
                 Rect selectRect = EditorGUILayout.GetControlRect(GUILayout.Height(80));
 
-                EditorGUI.DrawRect(selectRect, new Color(53f / 255, 53f / 255, 53f / 255, 1f));
+                EditorGUI.DrawRect(selectRect, EColor.CharcoalGray.GetColor());
 
                 Rect selectPreviewRect = new Rect(selectRect.x + 5, selectRect.y + 5, 70, 70);
                 ItemInfo itemInfo = isAssets ? _assetItems[curSelectedIndex] : _sceneItems[curSelectedIndex];
