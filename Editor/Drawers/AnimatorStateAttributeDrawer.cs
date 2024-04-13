@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers
                     // var curSelected = metaInfo.AnimatorStates[curIndex];
                     if (SetPropValue(property, metaInfo.AnimatorStates[curIndex]))
                     {
-                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
+                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? (object)metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
                     }
                 }
             }
@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Drawers
                     else
                     {
                         SetPropValue(property, metaInfo.AnimatorStates[newIndex]);
-                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
+                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? (object)metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
                     }
                 }
             }
@@ -250,7 +250,7 @@ namespace SaintsField.Editor.Drawers
                 height = EditorGUIUtility.singleLineHeight * willRenderCount,
             };
 
-            EditorGUI.DrawRect(willRenderRect, EColor.CharcoalGray.GetColor());
+            EditorGUI.DrawRect(willRenderRect, EColor.EditorEmphasized.GetColor());
 
             using (new EditorGUI.DisabledScope(true))
             {

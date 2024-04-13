@@ -108,6 +108,17 @@ namespace SaintsField.Utils
                     float c = EditorGUIUtility.isProSkin ? 0.45f : 0.4f;
                     return new Color(c, c, c);
                 }
+
+                case "editoremphasized":
+                {
+                    if (EditorGUIUtility.isProSkin)
+                    {
+                        return EColor.CharcoalGray.GetColor();
+                    }
+
+                    const float c = 155f / 255f;
+                    return new Color(c, c, c);
+                }
 #endif
 
 

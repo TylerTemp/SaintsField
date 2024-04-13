@@ -45,6 +45,7 @@ namespace SaintsField
 #if UNITY_EDITOR
         // this is dynamic color
         EditorSeparator,
+        EditorEmphasized,
 #endif
     }
 
@@ -117,6 +118,8 @@ namespace SaintsField
 #if UNITY_EDITOR
                 case EColor.EditorSeparator:
                     return Colors.GetColorByName("editorseparator");
+                case EColor.EditorEmphasized:
+                    return Colors.GetColorByName("editoremphasized");
 #endif
                 default:
                     return Color.white;
