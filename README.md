@@ -1120,7 +1120,7 @@ to get more useful info from the state, you can use `AnimatorStateBase`/`Animato
 
 *   `AnimationClip animationClip` is the actual animation clip of the state (can be null). It has a `length` value for the length of the clip. For more detail see [Unity Doc of AnimationClip](https://docs.unity3d.com/ScriptReference/AnimationClip.html)
 
-Special Note: using `AniamtorState`/`AnimatorState` with `OnValueChanged`, you can get a `AnimatorStateChanged` on the callback (rather than the value of the field).
+Special Note: using `AniamtorState`/`AnimatorStateBase` with `OnValueChanged`, you can get a `AnimatorStateChanged` on the callback (rather than the value of the field).
 This is because `AnimatorState` expected any class/struct with satisfied fields.
 
 ```csharp
