@@ -6,10 +6,10 @@ namespace SaintsField.Samples.Scripts
     public class Anim : MonoBehaviour
     {
         [field: SerializeField]
-        public UnityEngine.Animator Animator { get; private set; }
+        public Animator Animator { get; private set; }
 
         [FormerlySerializedAs("animatorState")] [AnimatorState][RichLabel("<icon=star.png /><label />")]
-        public UnityEngine.Animator animator;
+        public Animator animator;
 
         [AnimatorState(nameof(Animator))]
         public string animStateName;
