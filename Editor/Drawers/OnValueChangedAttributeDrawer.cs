@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -58,35 +59,62 @@ namespace SaintsField.Editor.Drawers
         {
             // Debug.Log(saintsAttribute);
             string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
+            // no, don't use this. We already have the value
+            // (string error, object _) = Util.GetMethodOf<object>(callback, null, property, info, target);
+            // return error != "" ? error : "";
 
-            (string error, object _) = Util.GetMethodOf<object>(callback, null, property, info, target);
-            return error != "" ? error : "";
-            // const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-            //                               BindingFlags.Public | BindingFlags.DeclaredOnly;
-            // MethodInfo methodInfo =  target.GetType().GetMethod(callback, bindAttr);
-            // if (methodInfo == null)
-            // {
-            //     return $"No method found `{callback}` on `{target}`";
-            // }
-            //
-            // ParameterInfo[] methodParams = methodInfo.GetParameters();
-            // object[] paramValues = ReflectUtils.MethodParamsFill(methodParams,  index == -1? new[] { newValue }: new[] { newValue, index });
-            // try
-            // {
-            //     methodInfo.Invoke(target, paramValues);
-            // }
-            // catch (TargetInvocationException e)
-            // {
-            //     Debug.LogException(e);
-            //     Debug.Assert(e.InnerException != null);
-            //     return e.InnerException.Message;
-            //
-            // }
-            // catch (Exception e)
-            // {
-            //     Debug.LogException(e);
-            //     return e.Message;
-            // }
+
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            types.Reverse();
+
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+            foreach (Type type in types)
+            {
+                MethodInfo methodInfo = type.GetMethod(callback, bindAttr);
+                if (methodInfo == null)
+                {
+                    continue;
+                }
+
+                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), index == -1
+                    ? new[]
+                    {
+                        newValue,
+                    }
+                    : new []
+                    {
+                        newValue,
+                        index,
+                    });
+
+                try
+                {
+                    methodInfo.Invoke(target, passParams);
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.LogException(e);
+                    Debug.Assert(e.InnerException != null);
+                    return e.InnerException.Message;
+                }
+                catch (InvalidCastException e)
+                {
+                    Debug.LogException(e);
+                    return e.Message;
+                }
+                catch (Exception e)
+                {
+                    // _error = e.Message;
+                    Debug.LogException(e);
+                    return e.Message;
+                }
+
+                return "";
+            }
+
+            return $"No field or method named `{callback}` found on `{target}`";
         }
 
 #if UNITY_2021_3_OR_NEWER

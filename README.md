@@ -1113,32 +1113,43 @@ A dropdown selector for animator state.
 
     name of the animator. When omitted, it will try to get the animator from the current component
 
-to get more useful info from the state, you can use `AnimatorState` type instead of `string` type.
+to get more useful info from the state, you can use `AnimatorStateBase`/`AnimatorState` type instead of `string` type.
 
-`AnimatorState` has the following properties:
+`AnimatorStateBase` has the following properties:
 
 *   `int layerIndex` index of layer
 *   `int stateNameHash` hash value of state
 *   `string stateName` actual state name
 *   `float stateSpeed` the `Speed` parameter of the state
+*   `string stateTag` the `Tag` of the state
+*   `string[] subStateMachineNameChain` the sub-state machine hierarchy name list of the state
+
+`AnimatorState` added the following attribute(s):
+
 *   `AnimationClip animationClip` is the actual animation clip of the state (can be null). It has a `length` value for the length of the clip. For more detail see [Unity Doc of AnimationClip](https://docs.unity3d.com/ScriptReference/AnimationClip.html)
 
+Special Note: using `AniamtorState`/`AnimatorState` with `OnValueChanged`, you can get a `AnimatorStateChanged` on the callback (rather than the value of the field).
+This is because `AnimatorState` expected any class/struct with satisfied fields.
 
 ```csharp
 public class Anim : MonoBehaviour
 {
-    [field: SerializeField]
-    public Animator Animator { get; private set; }
+    [AnimatorState, OnValueChanged(nameof(OnChanged))]
+    public string stateName;
 
-    [AnimatorState(nameof(Animator))]
-    public AnimatorState animatorState;
+    [AnimatorState, OnValueChanged(nameof(OnChangedState))]
+    public AnimatorState state;
 
-    [AnimatorState(nameof(Animator))]
-    public string animStateName;
+    // This does not have a `animationClip`, thus it won't include a resource when serialized: only pure data.
+    [AnimatorState, OnValueChanged(nameof(OnChangedState))]
+    public AnimatorStateBase stateBase;
+
+    private void OnChanged(string changedValue) => Debug.Log(changedValue);
+    private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"layerIndex={changedValue.layerIndex}, state={changedValue.state}, animationClip={changedValue.animationClip}, subStateMachineNameChain={string.Join("/", changedValue.subStateMachineNameChain)}");
 }
 ```
 
-![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/f3e63d15-57b6-4e48-a769-f3743df22dbb)
+![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/8ee35de5-c7d5-4f0d-b8b7-8feeac41c31d)
 
 #### `Layer` ####
 
@@ -1486,6 +1497,8 @@ Call a function every time the field value is changed
     It'll try to pass the new value and the index (only if it's in an array/list). You can set the corresponding parameter in your callback if you want to receive them.
 
 *   AllowMultiple: Yes
+
+Special Note: `AnimatorState` will have a different `OnValueChanged` parameter passed in. See `AnimatorState` for more detail. 
 
 ```csharp
 public class OnChangedExample : MonoBehaviour

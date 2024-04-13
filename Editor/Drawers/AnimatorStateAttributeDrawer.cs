@@ -243,21 +243,31 @@ namespace SaintsField.Editor.Drawers
 
             SerializedProperty subStateMachineNameChainProp = FindPropertyRelative(property, "subStateMachineNameChain");
 
-            Rect leftRectForError = position;
+            // Rect leftRectForError = position;
+            int willRenderCount = renders.Count + (subStateMachineNameChainProp == null ? 0 : 1);
+            Rect willRenderRect = new Rect(position)
+            {
+                height = EditorGUIUtility.singleLineHeight * willRenderCount,
+            };
+
+            EditorGUI.DrawRect(willRenderRect, EColor.CharcoalGray.GetColor());
 
             using (new EditorGUI.DisabledScope(true))
             {
-                (Rect useRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight * renders.Count);
-                leftRectForError = leftRect;
+                Rect indentedRect = new Rect(position)
+                {
+                    x = position.x + IndentWidth,
+                    width = position.width - IndentWidth,
+                };
 
                 foreach ((SerializedProperty prop, int index) in renders.WithIndex())
                 {
-                    bool isLast = subStateMachineNameChainProp == null && index == renders.Count - 1;
-                    EditorGUI.PropertyField(new Rect(useRect)
+                    // bool isLast = subStateMachineNameChainProp == null && index == renders.Count - 1;
+                    EditorGUI.PropertyField(new Rect(indentedRect)
                     {
-                        y = useRect.y + EditorGUIUtility.singleLineHeight * index,
+                        y = indentedRect.y + EditorGUIUtility.singleLineHeight * index,
                         height = EditorGUIUtility.singleLineHeight,
-                    }, prop, new GUIContent(isLast? $"┗ {ObjectNames.NicifyVariableName(prop.displayName)}": $"┣ {ObjectNames.NicifyVariableName(prop.displayName)}"));
+                    }, prop, new GUIContent(ObjectNames.NicifyVariableName(prop.displayName)));
                     // useRect.y += EditorGUIUtility.singleLineHeight;
                 }
 
@@ -270,13 +280,21 @@ namespace SaintsField.Editor.Drawers
                             .Select(each => subStateMachineNameChainProp.GetArrayElementAtIndex(each).stringValue)
                         );
 
-                    (Rect subStateRect, Rect subStateLeft) = RectUtils.SplitHeightRect(leftRectForError, EditorGUIUtility.singleLineHeight);
-                    leftRectForError = subStateLeft;
-                    EditorGUI.TextField(subStateRect, "┗ " + ObjectNames.NicifyVariableName("subStateMachineNameChain"),
+                    Rect subStateRect = new Rect(indentedRect)
+                    {
+                        y = indentedRect.y + EditorGUIUtility.singleLineHeight * renders.Count,
+                        height = EditorGUIUtility.singleLineHeight,
+                    };
+                    EditorGUI.TextField(subStateRect, ObjectNames.NicifyVariableName("subStateMachineNameChain"),
                         subStateStr);
                 }
-                return _errorMsg == ""? position: ImGuiHelpBox.Draw(leftRectForError, _errorMsg, MessageType.Error);;
             }
+
+            Rect leftRectForError = new Rect(position)
+            {
+                y = position.y + EditorGUIUtility.singleLineHeight * (renders.Count + (subStateMachineNameChainProp == null? 0: 1)),
+            };
+            return _errorMsg == ""? leftRectForError: ImGuiHelpBox.Draw(leftRectForError, _errorMsg, MessageType.Error);;
         }
 
         #endregion
@@ -670,6 +688,7 @@ namespace SaintsField.Editor.Drawers
                     // Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
                     // Util.SignPropertyValue(property, curItem);
                     property.serializedObject.ApplyModifiedProperties();
+                    Debug.Log($"onChange {curItem}");
                     onChange(property.propertyType == SerializedPropertyType.String? curItem.state.name : curItem);
                     buttonLabel.text = curName;
                     // property.serializedObject.ApplyModifiedProperties();

@@ -3989,6 +3989,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b27e5bf5a78bf440aecf873429a7d1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stateName: Sub2State
   state:
     <layerIndex>k__BackingField: 1
     <stateNameHash>k__BackingField: 2081823275
@@ -3998,13 +3999,12 @@ MonoBehaviour:
     <animationClip>k__BackingField: {fileID: 0}
     <subStateMachineNameChain>k__BackingField: []
   stateBase:
-    <layerIndex>k__BackingField: 0
-    <stateNameHash>k__BackingField: -1588485629
-    <stateName>k__BackingField: Example
+    <layerIndex>k__BackingField: 1
+    <stateNameHash>k__BackingField: 808375644
+    <stateName>k__BackingField: FromTest
     <stateSpeed>k__BackingField: 8
     <stateTag>k__BackingField: 
     <subStateMachineNameChain>k__BackingField: []
-  stateName: Sub2State
 --- !u!95 &972998066
 Animator:
   serializedVersion: 5
@@ -4204,7 +4204,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -4960,14 +4959,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6159b766ec67643b45e522ef2dcc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
-  aBitLongerThanDefault: 
-  s: 
-  richLabel: 
-  thereIsSomeGoodNewsForPeopleWhoLoveBadNews: 
-  weWereDeadBeforeTheShipEvenSank: 
-  myString: 
-  myUiToolkit: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0
