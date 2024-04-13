@@ -2,6 +2,8 @@
 
 *   Fixes [#9](https://github.com/TylerTemp/SaintsField/issues/9) `AnimatorState` won't work for sub-state machines.
 *   `AnimatorState` now allow class/struct with satisfied fields.
+*   Fix `AnimatorState` can not property display an error when the target is not found, or the target has no controller.
+*   `AnimatorState` now has a `Edit {yourAnimatorController}...` option to directly open the animator controller.
 
 ## 2.3.2
 
