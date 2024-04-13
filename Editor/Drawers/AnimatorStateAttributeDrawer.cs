@@ -83,6 +83,8 @@ namespace SaintsField.Editor.Drawers
                 ? Util.ListIndexOfAction(metaInfo.AnimatorStates, eachInfo => eachInfo.state.name == property.stringValue)
                 : Util.ListIndexOfAction(metaInfo.AnimatorStates, eachStateInfo => EqualAnimatorState(eachStateInfo, property));
 
+            // Debug.Log($"curIndex={curIndex}");
+
             if (!_onEnableChecked)  // check whether external source changed, to avoid caching an old value
             {
                 _onEnableChecked = true;
@@ -92,6 +94,8 @@ namespace SaintsField.Editor.Drawers
                     // var curSelected = metaInfo.AnimatorStates[curIndex];
                     if (SetPropValue(property, metaInfo.AnimatorStates[curIndex]))
                     {
+                        // Debug.Log($"IMGUI init changed");
+                        // ReSharper disable once RedundantCast
                         onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? (object)metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
                     }
                 }
@@ -124,7 +128,8 @@ namespace SaintsField.Editor.Drawers
                     else
                     {
                         SetPropValue(property, metaInfo.AnimatorStates[newIndex]);
-                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? (object)metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
+                        // ReSharper disable once RedundantCast
+                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? (object)metaInfo.AnimatorStates[newIndex].state.name : metaInfo.AnimatorStates[newIndex]);
                     }
                 }
             }
@@ -133,33 +138,20 @@ namespace SaintsField.Editor.Drawers
 
         private static bool EqualAnimatorState(AnimatorStateChanged eachStateInfo, SerializedProperty property)
         {
-            // name/nameHash equal + layerIndex equal means surely equal, because it can be used by `Play` method.
-            // If it's changed, we assume it is a different state.\
-
             bool layerIndexEqual = FindPropertyRelative(property, "layerIndex")?.intValue == eachStateInfo.layerIndex;
             bool stateNameEqual = FindPropertyRelative(property, "stateName")?.stringValue == eachStateInfo.state.name;
             bool stateNameHashEqual =
                 FindPropertyRelative(property, "stateNameHash")?.intValue == eachStateInfo.state.nameHash;
 
-            if (!layerIndexEqual)
+            if (!layerIndexEqual || !stateNameEqual || !stateNameHashEqual)
             {
                 return false;
             }
 
-            if (stateNameHashEqual)
-            {
-                return true;
-            }
-
-            // If we only have name+index, we need to check the subStateMachineNameChain to ensure.
-            // Otherwise, we use `layerIndex` + `stateName` + `subStateMachineNameChain` to identify.
             SerializedProperty subStateMachineNameChainProp = FindPropertyRelative(property, "subStateMachineNameChain");
             if (subStateMachineNameChainProp == null)
             {
-                // Otherwise, we use `layerIndex` + `stateName` to identify.
-                // Note: this COULD be wrong when a sub-state machine has the same name
-
-                return stateNameEqual;
+                return true;
             }
 
             int arraySize = subStateMachineNameChainProp.arraySize;
@@ -177,7 +169,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            return stateNameEqual;
+            return true;
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -224,7 +216,7 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log(_targetIsString);
             if(property.propertyType == SerializedPropertyType.String || !property.isExpanded)
             {
-                return _errorMsg == ""? position: ImGuiHelpBox.Draw(position, _errorMsg, MessageType.Error);;
+                return _errorMsg == ""? position: ImGuiHelpBox.Draw(position, _errorMsg, MessageType.Error);
             }
 
             IReadOnlyList<SerializedProperty> renders = new[]
@@ -294,7 +286,7 @@ namespace SaintsField.Editor.Drawers
             {
                 y = position.y + EditorGUIUtility.singleLineHeight * (renders.Count + (subStateMachineNameChainProp == null? 0: 1)),
             };
-            return _errorMsg == ""? leftRectForError: ImGuiHelpBox.Draw(leftRectForError, _errorMsg, MessageType.Error);;
+            return _errorMsg == ""? leftRectForError: ImGuiHelpBox.Draw(leftRectForError, _errorMsg, MessageType.Error);
         }
 
         #endregion
@@ -327,6 +319,7 @@ namespace SaintsField.Editor.Drawers
             // must have
             if(curLayerIndexProp.intValue != animatorState.layerIndex)
             {
+                // Debug.Log($"layerIndex changed");
                 curLayerIndexProp.intValue = animatorState.layerIndex;
                 changed = true;
             }
@@ -334,11 +327,13 @@ namespace SaintsField.Editor.Drawers
             // either have
             if(curStateNameHashProp != null && curStateNameHashProp.intValue != animatorState.state.nameHash)
             {
+                // Debug.Log($"nameHash changed");
                 curStateNameHashProp.intValue = animatorState.state.nameHash;
                 changed = true;
             }
             if(curStateNameProp != null && curStateNameProp.stringValue != animatorState.state.name)
             {
+                // Debug.Log($"name changed");
                 curStateNameProp.stringValue = animatorState.state.name;
                 changed = true;
             }
@@ -348,16 +343,19 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (curStateSpeedProp != null && curStateSpeedProp.floatValue != animatorState.state.speed)
             {
+                // Debug.Log($"speed changed");
                 curStateSpeedProp.floatValue = animatorState.state.speed;
                 changed = true;
             }
             if (curAnimationClipProp != null && !ReferenceEquals(curAnimationClipProp.objectReferenceValue, animatorState.animationClip))
             {
+                // Debug.Log($"animationClip changed");
                 curAnimationClipProp.objectReferenceValue = animatorState.animationClip;
                 changed = true;
             }
             if(curTagProp != null && curTagProp.stringValue != animatorState.state.tag)
             {
+                // Debug.Log($"tag changed");
                 curTagProp.stringValue = animatorState.state.tag;
                 changed = true;
             }
@@ -367,6 +365,7 @@ namespace SaintsField.Editor.Drawers
                 int newSize = animatorState.subStateMachineNameChain.Count;
                 if(curSubStateMachineNameChainProp.arraySize != newSize)
                 {
+                    // Debug.Log($"arraySize changed");
                     curSubStateMachineNameChainProp.arraySize = newSize;
                     changed = true;
                 }
@@ -375,8 +374,10 @@ namespace SaintsField.Editor.Drawers
                 {
                     SerializedProperty arrayProp = curSubStateMachineNameChainProp.GetArrayElementAtIndex(index);
                     string newValue = animatorState.subStateMachineNameChain[index];
+                    // ReSharper disable once InvertIf
                     if(arrayProp.stringValue != newValue)
                     {
+                        // Debug.Log($"array[{index}]({arrayProp.stringValue} -> {newValue}) changed");
                         arrayProp.stringValue = newValue;
                         changed = true;
                     }
@@ -384,8 +385,6 @@ namespace SaintsField.Editor.Drawers
             }
 
             return changed;
-
-            return false;
         }
 
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo fieldInfo, object parent)
@@ -739,6 +738,7 @@ namespace SaintsField.Editor.Drawers
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
 
+            // ReSharper disable once InvertIf
             if (metaInfo.Error != helpBox.text)
             {
                 helpBox.text = metaInfo.Error;
@@ -749,47 +749,17 @@ namespace SaintsField.Editor.Drawers
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            var subStateMachineNameChainTextField =
+            TextField subStateMachineNameChainTextField =
                 container.Q<TextField>(name: NameSubStateMachineNameChain(property));
+            // ReSharper disable once InvertIf
             if (subStateMachineNameChainTextField != null)
             {
-                var subs = (AnimatorStateChanged)newValue;
+                AnimatorStateChanged subs = (AnimatorStateChanged)newValue;
                 subStateMachineNameChainTextField.value = subs.subStateMachineNameChain.Count == 0
                     ? ""
                     : string.Join(" > ", subs.subStateMachineNameChain);
             }
         }
-        //
-//         private static void SetDropdownNoNotice(SerializedProperty property, DropdownField dropdownField, MetaInfo metaInfo)
-//         {
-//             dropdownField.choices = metaInfo.AnimatorStates.Select(each => each.ToString()).ToList();
-//             int curIndex = property.propertyType == SerializedPropertyType.String
-//                 ? Util.ListIndexOfAction(metaInfo.AnimatorStates, eachInfo => eachInfo.state.name == property.stringValue)
-//                 : Util.ListIndexOfAction(metaInfo.AnimatorStates, eachStateInfo => EqualAnimatorState(eachStateInfo, property));
-//
-//             // _dropdownField.index = curSelect;
-//             if(curIndex >= 0)
-//             {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_STATE_DRAW_PROCESS
-//                     Debug.Log($"AnimatorStateAttributeDrawer: set to = {_dropdownField.choices[curSelect]}");
-// #endif
-//                 dropdownField.SetValueWithoutNotify(metaInfo.AnimatorStates[curIndex].ToString());
-//                 // _dropdownField.text = _dropdownField.choices[curSelect];
-//             }
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_STATE_DRAW_PROCESS
-//                 Debug.Log($"AnimatorStateAttributeDrawer: options={string.Join(",", _dropdownField.choices)}");
-// #endif
-//             // return curSelect;
-//         }
-//
-//         // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-//         //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
-//         //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
-//         // {
-//         //     DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-//         //     dropdownField.label = labelOrNull;
-//         // }
-
         #endregion
 
 #endif

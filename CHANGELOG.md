@@ -1,3 +1,7 @@
+## 2.3.4
+
+*   IMGUI: Fixes [#9](https://github.com/TylerTemp/SaintsField/issues/9) a typo that breaks the `AnimatorState`.
+
 ## 2.3.3
 
 *   Fixes [#9](https://github.com/TylerTemp/SaintsField/issues/9) `AnimatorState` won't work for sub-state machines.
