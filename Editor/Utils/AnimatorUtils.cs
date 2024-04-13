@@ -7,12 +7,12 @@ namespace SaintsField.Editor.Utils
 {
     public static class AnimatorUtils
     {
-        public static (string error, Animator animator) GetAnimator(string animatorName, SerializedProperty property, FieldInfo fieldInfo, object parent)
+        public static (string error, UnityEngine.Animator animator) GetAnimator(string animatorName, SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
             if (animatorName != null)
             {
                 // search parent first
-                (string error, Animator result) = Util.GetOf<Animator>(animatorName, null, property, fieldInfo, parent);
+                (string error, UnityEngine.Animator result) = Util.GetOf<UnityEngine.Animator>(animatorName, null, property, fieldInfo, parent);
                 if (error == "")
                 {
                     return ("", result);
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Utils
                                               SerializedUtils.FindPropertyByAutoPropertyName(targetSer,
                                                   animatorName);
                 // ReSharper disable once MergeIntoPattern
-                if(animProp?.objectReferenceValue is Animator anim)
+                if(animProp?.objectReferenceValue is UnityEngine.Animator anim)
                 {
                     return ("", anim);
                 }
@@ -32,14 +32,14 @@ namespace SaintsField.Editor.Utils
 
             // otherwise, search on the serialized object
             Object targetObj = property.serializedObject.targetObject;
-            Animator animator;
+            UnityEngine.Animator animator;
             switch (targetObj)
             {
                 case GameObject go:
-                    animator = go.GetComponent<Animator>();
+                    animator = go.GetComponent<UnityEngine.Animator>();
                     break;
                 case Component component:
-                    animator = component.GetComponent<Animator>();
+                    animator = component.GetComponent<UnityEngine.Animator>();
                     break;
                 default:
                     // string error = $"Animator controller not found in {targetObj}. Try specific a name instead.";

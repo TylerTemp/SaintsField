@@ -1,14 +1,15 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SaintsField.Samples.Scripts
 {
     public class Anim : MonoBehaviour
     {
         [field: SerializeField]
-        public Animator Animator { get; private set; }
+        public UnityEngine.Animator Animator { get; private set; }
 
-        [AnimatorState][RichLabel("<icon=star.png /><label />")]
-        public AnimatorState animatorState;
+        [FormerlySerializedAs("animatorState")] [AnimatorState][RichLabel("<icon=star.png /><label />")]
+        public UnityEngine.Animator animator;
 
         [AnimatorState(nameof(Animator))]
         public string animStateName;

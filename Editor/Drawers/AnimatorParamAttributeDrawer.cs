@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers
         {
             AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
 
-            (string error, Animator animatorController) = AnimatorUtils.GetAnimator(animatorParamAttribute.AnimatorName, property, fieldInfo, parent);
+            (string error, UnityEngine.Animator animatorController) = AnimatorUtils.GetAnimator(animatorParamAttribute.AnimatorName, property, fieldInfo, parent);
             if (error != "")
             {
                 return new MetaInfo

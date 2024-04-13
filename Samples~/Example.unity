@@ -814,6 +814,7 @@ MonoBehaviour:
   _modInt: 72
   _defaultInt: 32
   canSell: 0
+  canSellDisabled: 0
 --- !u!4 &246861352
 Transform:
   m_ObjectHideFlags: 0
@@ -1319,9 +1320,11 @@ MonoBehaviour:
     stateNameHash: 808375644
     stateName: FromTest
     stateSpeed: 8
+    tag: 
     animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
+    subStateMachineNameChain: []
   animStateName: Idle
-  animStateDisabled: 
+  animStateDisabled: Idle
   animParamName: Trigger
   animParamHash: 0
   animParamHashes: c136d6d572017303c136d6d572017303
@@ -1946,7 +1949,9 @@ MonoBehaviour:
     stateNameHash: -1588485629
     stateName: Example
     stateSpeed: 8
+    tag: 
     animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
+    subStateMachineNameChain: []
 --- !u!1 &551199325
 GameObject:
   m_ObjectHideFlags: 0
@@ -3953,6 +3958,80 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 25
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &972998063
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 972998064}
+  - component: {fileID: 972998066}
+  - component: {fileID: 972998065}
+  m_Layer: 0
+  m_Name: AnimSubStateMachine
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &972998064
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972998063}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 67
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &972998065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972998063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b27e5bf5a78bf440aecf873429a7d1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state:
+    layerIndex: 0
+    stateNameHash: -1075812047
+    stateName: SubNewState
+    stateSpeed: 2.42
+    tag: 
+    animationClip: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
+    subStateMachineNameChain:
+    - SubStateMachine1
+--- !u!95 &972998066
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972998063}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 891dfeda31f941d4cae65b39a9339bc3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &992757019
 GameObject:
   m_ObjectHideFlags: 0
@@ -4132,7 +4211,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 1
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -4888,14 +4966,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6159b766ec67643b45e522ef2dcc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
-  aBitLongerThanDefault: 
-  s: 
-  richLabel: 
-  thereIsSomeGoodNewsForPeopleWhoLoveBadNews: 
-  weWereDeadBeforeTheShipEvenSank: 
-  myString: 
-  myUiToolkit: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,16 +1,30 @@
 ﻿using System;
+using SaintsField.Animate;
 using UnityEngine;
 
 namespace SaintsField
 {
     [Serializable]
-    public struct AnimatorState
+    public struct AnimatorState: IAnimationClip, ILayerIndex, IStateNameHash, IStateName, IStateSpeed, IStateTag, ISubStateMachineNameChain
     {
-        public int layerIndex;
-        public int stateNameHash;
-        public string stateName;
-        public float stateSpeed;
-        public AnimationClip animationClip;
+        [field: SerializeField]
+        public int layerIndex { get; private set; }
+        [field: SerializeField]
+        public int stateNameHash { get; private set; }
+
+        [field: SerializeField]
+        public string stateName { get; private set; }
+        [field: SerializeField]
+        public float stateSpeed { get; private set; }
+
+        [field: SerializeField]
+        public string stateTag { get; private set; }
+
+        [field: SerializeField]
+        public AnimationClip animationClip { get; private set; }
+
+        [field: SerializeField]
+        public string[] subStateMachineNameChain { get; private set; }
 
         public override string ToString() => $"[{layerIndex}] {stateName}{(animationClip? $" ({animationClip.name})": "")}";
 
@@ -40,6 +54,7 @@ namespace SaintsField
                 hashCode = (hashCode * 397) ^ stateNameHash;
                 hashCode = (hashCode * 397) ^ (animationClip != null ? animationClip.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ stateSpeed.GetHashCode();
+                hashCode = (hashCode * 397) ^ (stateTag != null ? stateTag.GetHashCode() : 0);
                 return hashCode;
             }
         }

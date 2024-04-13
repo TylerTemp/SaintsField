@@ -27,30 +27,30 @@ namespace SaintsField.Editor.Drawers
         // Plus Unity array uses same drawer instance for every element in an array,
         // so just use EditorPrefs here.
 
-        private static string KeyExpanded(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__Expandable_Expanded";
+        // private static string KeyExpanded(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__Expandable_Expanded";
+        //
+        // private static bool GetExpand(SerializedProperty property)
+        // {
+        //     // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+        //     // return isArray
+        //     //     ? EditorPrefs.GetBool(KeyExpanded(property))
+        //     //     : _expanded;
+        //     return inMemoryStorage.TryGetValue(KeyExpanded(property), out object value) && (bool)value;
+        // }
 
-        private static bool GetExpand(SerializedProperty property)
-        {
-            // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-            // return isArray
-            //     ? EditorPrefs.GetBool(KeyExpanded(property))
-            //     : _expanded;
-            return inMemoryStorage.TryGetValue(KeyExpanded(property), out object value) && (bool)value;
-        }
-
-        private static void SetExpand(SerializedProperty property, bool value) {
-            // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-            // if(isArray)
-            // {
-            //     EditorPrefs.SetBool(KeyExpanded(property), value);
-            // }
-            // else
-            // {
-            //     _expanded = value;
-            // }
-            // EditorPrefs.SetBool(KeyExpanded(property), value);
-            inMemoryStorage[KeyExpanded(property)] = value;
-        }
+        // private static void SetExpand(SerializedProperty property, bool value) {
+        //     // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
+        //     // if(isArray)
+        //     // {
+        //     //     EditorPrefs.SetBool(KeyExpanded(property), value);
+        //     // }
+        //     // else
+        //     // {
+        //     //     _expanded = value;
+        //     // }
+        //     // EditorPrefs.SetBool(KeyExpanded(property), value);
+        //     inMemoryStorage[KeyExpanded(property)] = value;
+        // }
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers
             //     x = position.x - 13,
             // };
 
-            bool curExpanded = GetExpand(property);
+            bool curExpanded = property.isExpanded;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_EXPANDABLE
             Debug.Log($"cur expand {curExpanded}/{KeyExpanded(property)}");
 #endif
@@ -82,7 +82,8 @@ namespace SaintsField.Editor.Drawers
                         new GUIContent(new string(' ', property.displayName.Length)), true);
                     if (changed.changed)
                     {
-                        SetExpand(property, newExpanded);
+                        // SetExpand(property, newExpanded);
+                        property.isExpanded = newExpanded;
                     }
                 }
             }
@@ -102,7 +103,7 @@ namespace SaintsField.Editor.Drawers
         {
             float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-            if (!GetExpand(property) || property.objectReferenceValue == null)
+            if (!property.isExpanded || property.objectReferenceValue == null)
             {
                 return basicHeight;
             }
@@ -146,7 +147,7 @@ namespace SaintsField.Editor.Drawers
                 leftRect = ImGuiHelpBox.Draw(position, _error, MessageType.Error);
             }
 
-            bool isExpand = GetExpand(property);
+            bool isExpand = property.isExpanded;
             // Debug.Log($"below expand = {isExpand}");
             if (!isExpand || scriptableObject == null)
             {
