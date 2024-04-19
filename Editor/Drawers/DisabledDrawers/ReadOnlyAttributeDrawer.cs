@@ -34,7 +34,8 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            GUIContent label, ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info,
+            object parent)
         {
             (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, info, parent.GetType(), parent);
             _error = error;

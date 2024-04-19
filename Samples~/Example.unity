@@ -3944,6 +3944,63 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 25
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &965251183
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 965251185}
+  - component: {fileID: 965251184}
+  m_Layer: 0
+  m_Name: ArraySize
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &965251184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965251183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbc53294693a0ad4aa49ace4cd891a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arr3:
+  - 
+  - 
+  - 
+  nests:
+  - arr3:
+    - 
+    - 
+    - 
+  - arr3:
+    - 
+    - 
+    - 
+--- !u!4 &965251185
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965251183}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 68
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &972998063
 GameObject:
   m_ObjectHideFlags: 0
@@ -3989,6 +4046,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b27e5bf5a78bf440aecf873429a7d1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stateName: 
   state:
     <layerIndex>k__BackingField: 1
     <stateNameHash>k__BackingField: 1370463806
@@ -3998,6 +4056,13 @@ MonoBehaviour:
     <animationClip>k__BackingField: {fileID: 0}
     <subStateMachineNameChain>k__BackingField:
     - TestStateMachine
+  stateBase:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: 0
+    <stateName>k__BackingField: 
+    <stateSpeed>k__BackingField: 0
+    <stateTag>k__BackingField: 
+    <subStateMachineNameChain>k__BackingField: []
 --- !u!95 &972998066
 Animator:
   serializedVersion: 5
