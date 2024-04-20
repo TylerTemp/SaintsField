@@ -43,7 +43,7 @@ namespace SaintsField.Editor
 #endif
 
         // private Dictionary<string, ISaintsRendererGroup> _layoutKeyToGroup;
-        private IReadOnlyList<ISaintsRenderer> _renderers = new List<ISaintsRenderer>();
+        private IReadOnlyList<ISaintsRenderer> _renderers;
 
         #region UI
 
@@ -124,13 +124,13 @@ namespace SaintsField.Editor
 
         public override bool RequiresConstantRepaint() => true;
 
-        public virtual void OnEnable()
-        {
-            _renderers = Setup(false, serializedObject, target);
-#if SAINTSFIELD_DOTWEEN
-            AliveInstances.Add(this);
-#endif
-        }
+//         public virtual void OnEnable()
+//         {
+//             _renderers = Setup(false, serializedObject, target);
+// #if SAINTSFIELD_DOTWEEN
+//             AliveInstances.Add(this);
+// #endif
+//         }
 
         public virtual void OnDestroy()
         {
@@ -139,8 +139,28 @@ namespace SaintsField.Editor
 #endif
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        [InitializeOnEnterPlayMode]
+        private void ResetRenderersImGui()
+        {
+            _renderers = null;
+#if SAINTSFIELD_DOTWEEN
+            AliveInstances.Clear();
+            DOTweenEditorPreview.Stop();
+#endif
+        }
+
         public override void OnInspectorGUI()
         {
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if(_renderers == null)
+            {
+                _renderers = Setup(false, serializedObject, target);
+            }
+#if SAINTSFIELD_DOTWEEN
+            AliveInstances.Add(this);
+#endif
+
             MonoScript monoScript = GetMonoScript(target);
             if(monoScript)
             {
@@ -182,38 +202,6 @@ namespace SaintsField.Editor
                 }
             }
         }
-
-        // private void CheckMonoScript()
-        // {
-        //     if (_monoScript != null)
-        //     {
-        //         return;
-        //     }
-        //
-        //
-        //     if (target)
-        //     {
-        //         try
-        //         {
-        //             _monoScript = MonoScript.FromMonoBehaviour((MonoBehaviour) target);
-        //         }
-        //         catch (Exception)
-        //         {
-        //             try
-        //             {
-        //                 _monoScript = MonoScript.FromScriptableObject((ScriptableObject)target);
-        //             }
-        //             catch (Exception)
-        //             {
-        //                 _monoScript = null;
-        //             }
-        //         }
-        //     }
-        //     else
-        //     {
-        //         _monoScript = null;
-        //     }
-        // }
 
         private static IReadOnlyList<ISaintsRenderer> Setup(bool tryFixUIToolkit, SerializedObject serializedObject,
             object target)

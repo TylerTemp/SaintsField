@@ -5,14 +5,19 @@ namespace SaintsField.Samples.Scripts
 {
     public class ArraySizeExample : MonoBehaviour
     {
-        [ArraySize(3)] public string[] arr3;
+        // public int myInt;
 
-        [Serializable]
-        public struct Nest
-        {
-            [ArraySize(3)] public string[] arr3;
-        }
+        [ArraySize(2)]
+        public string[] myArr;
 
-        public Nest[] nests;
+        // public string myStr;
+        //
+        // [Serializable]
+        // public struct Nest
+        // {
+        //     [ArraySize(3)] public string[] arr3;
+        // }
+        //
+        // public Nest[] nests;
     }
 }

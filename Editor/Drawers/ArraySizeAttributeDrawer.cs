@@ -12,9 +12,10 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(ArraySizeAttribute))]
     public class ArraySizeAttributeDrawer: SaintsPropertyDrawer
     {
-        private static (string, SerializedProperty) GetArrayProperty(SerializedProperty property)
+        private static (string, SerializedProperty) GetArrayProperty(SerializedProperty property, IReadOnlyList<string> paths)
         {
-            string[] paths = property.propertyPath.Split('.');
+            // Debug.Log(property.propertyPath);
+            // string[] paths = property.propertyPath.Split('.');
 
             (bool arrayTrim, IEnumerable<string> propPathSegments) = SerializedUtils.TrimEndArray(paths);
             if (!arrayTrim)
@@ -46,7 +47,7 @@ namespace SaintsField.Editor.Drawers
             // SerializedProperty arrProp = property.serializedObject.FindProperty("nests.Array.data[0].arr3");
             // Debug.Log(arrProp);
             // Debug.Log(property.propertyPath);
-            (string error, SerializedProperty arrProp) = GetArrayProperty(property);
+            (string error, SerializedProperty arrProp) = GetArrayProperty(property, property.propertyPath.Split('.'));
             _error = error;
             if (_error != "")
             {
@@ -129,15 +130,26 @@ namespace SaintsField.Editor.Drawers
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
+            string propertyPath;
+            try
+            {
+                propertyPath = property.propertyPath;
+            }
+            catch (ObjectDisposedException)
+            {
+                // Debug.LogException(e);
+                return;
+            }
+
             string error;
             SerializedProperty arrProp;
             try
             {
-                (error, arrProp) = GetArrayProperty(property);
+                (error, arrProp) = GetArrayProperty(property, propertyPath.Split("."));
             }
-            catch (NullReferenceException)
+            catch (ObjectDisposedException)
             {
-                Debug.Log(property.arraySize);
+                // Debug.LogException(e);
                 return;
             }
 
@@ -150,9 +162,12 @@ namespace SaintsField.Editor.Drawers
             }
 
             int size = ((ArraySizeAttribute)saintsAttribute).Size;
+
+            // ReSharper disable once InvertIf
             if (arrProp.arraySize != size)
             {
                 arrProp.arraySize = size;
+                arrProp.serializedObject.ApplyModifiedProperties();
             }
         }
 

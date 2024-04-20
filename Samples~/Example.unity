@@ -3955,7 +3955,7 @@ GameObject:
   - component: {fileID: 965251185}
   - component: {fileID: 965251184}
   m_Layer: 0
-  m_Name: ArraySize
+  m_Name: ArraySizeObj
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3973,19 +3973,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc53294693a0ad4aa49ace4cd891a7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arr3:
-  - 
-  - 
-  - 
-  nests:
-  - arr3:
-    - 
-    - 
-    - 
-  - arr3:
-    - 
-    - 
-    - 
+  myInt: 0
+  myArr: []
+  myStr: 
 --- !u!4 &965251185
 Transform:
   m_ObjectHideFlags: 0
@@ -4262,6 +4252,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -5017,6 +5008,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6159b766ec67643b45e522ef2dcc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
+  aBitLongerThanDefault: 
+  s: 
+  richLabel: 
+  thereIsSomeGoodNewsForPeopleWhoLoveBadNews: 
+  weWereDeadBeforeTheShipEvenSank: 
+  myString: 
+  myUiToolkit: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0
