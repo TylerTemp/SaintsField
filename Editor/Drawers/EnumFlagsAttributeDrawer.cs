@@ -77,9 +77,7 @@ namespace SaintsField.Editor.Drawers
                 return true;
             }
 
-            _checkboxCheckedTexture2D = Util.LoadResource<Texture2D>("checkbox-checked.png");
-            _checkboxEmptyTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
-            _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
+            LoadIcons();
 
             return false;
         }
@@ -103,6 +101,13 @@ namespace SaintsField.Editor.Drawers
             {
                 padding = new RectOffset(padding, padding, padding, padding),
             };
+        }
+
+        private void LoadIcons()
+        {
+            _checkboxCheckedTexture2D = Util.LoadResource<Texture2D>("checkbox-checked.png");
+            _checkboxEmptyTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
+            _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
         }
 
         ~EnumFlagsAttributeDrawer()
@@ -435,6 +440,8 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute,
             VisualElement container, FieldInfo info, object parent)
         {
+            LoadIcons();
+
             MetaInfo metaInfo = GetMetaInfo(property, info);
 
             float lineHeight = EditorGUIUtility.singleLineHeight;
