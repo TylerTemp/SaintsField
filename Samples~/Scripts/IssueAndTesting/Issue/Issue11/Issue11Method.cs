@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
 {
-    public class Issue11 : MonoBehaviour
+    public class Issue11Method : MonoBehaviour
     {
         [DisableIf(nameof(IsDisabledByMethod))] public string methodChecker;
 
