@@ -1490,7 +1490,7 @@ Call a function every time the field value is changed
 
 *   AllowMultiple: Yes
 
-Special Note: `AnimatorState` will have a different `OnValueChanged` parameter passed in. See `AnimatorState` for more detail. 
+Special Note: `AnimatorState` will have a different `OnValueChanged` parameter passed in. See `AnimatorState` for more detail.
 
 ```csharp
 public class OnChangedExample : MonoBehaviour
@@ -2188,6 +2188,11 @@ Note: Because of the limitation of `PropertyDrawer`:
 3.  Delete an element will first be deleted, then the array will duplicated the last element.
 4.  UI Toolkit: you might see the UI flicked when you remove an element.
 
+Parameters:
+
+*   `int size` the size of the array or list
+*   AllowMultiple: No
+
 ```csharp
 [ArraySize(3)]
 public string[] myArr;
@@ -2754,7 +2759,7 @@ public bool boolValue;
 
 This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
 
-Different from `EnableIf`/`DisableIf` in the following: 
+Different from `EnableIf`/`DisableIf` in the following:
 1.  apply on an array will directly enable or disable the array itself, rather than each element.
 2.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
 
