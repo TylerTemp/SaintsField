@@ -2,7 +2,7 @@
 
 *   Add `ArraySize`
 *   UI Toolkit: Fix `ShowInInspector` for property that the equal operation is incorrect and repeatedly destroy and create elements. Fix a UI Toolkit weird bug that can not update values.  
-*   UI Toolkit: Fix icons not display.
+*   UI Toolkit: Fix `EnumFlags` icons not display.
 
 ## 2.3.4
 
