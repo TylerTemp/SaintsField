@@ -1546,10 +1546,23 @@ This is the same logic as the `ShowIf`/`HideIf` pair, which `DisableIf` is the m
 *   `EnableIf(A, B)` == `EnableIf(A || B)` == `DisableIf(!(A || B))` == `DisableIf(!A && !B)`
 *   `[EnableIf(A), EnableIf(B)]` == `[DisableIf(!A), DisableIf(!B)]` == `DisableIf(!A || !B)` == `DisableIf(!(A && B))`
 
+A simple example:
+
+```csharp
+[ReadOnly(nameof(ShouldBeDisabled))] public string disableMe;
+
+private bool ShouldBeDisabled  // change the logic here
+{
+    return true;
+}
+```
+
+A more complex example:
+
 ```csharp
 public class ReadOnlyGroupExample: MonoBehaviour
 {
-    [ReadOnly(true)] public string directlyReadOnly;
+    [ReadOnly] public string directlyReadOnly;
 
     [SerializeField] private bool _bool1;
     [SerializeField] private bool _bool2;
@@ -1718,6 +1731,18 @@ For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || Sh
 *   `HideIf(A)` == `ShowIf(!A)`
 *   `HideIf(A, B)` == `HideIf(A || B)` == `ShowIf(!(A || B))` == `ShowIf(!A && !B)`
 *   `[Hideif(A), HideIf(B)]` == `[ShowIf(!A), ShowIf(!B)]` == `ShowIf(!A || !B)` == `ShowIf(!(A && B))`
+
+A simple example:
+
+```csharp
+[ShowIf(nameof(ShouldShow))]
+public int showMe;
+
+public bool ShouldShow()  // change the logic here
+{
+    return true;
+}
+```
 
 A full featured example:
 
