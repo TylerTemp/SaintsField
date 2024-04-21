@@ -1,3 +1,8 @@
+## 2.3.5
+
+*   Add `ArraySize`
+*   UI Toolkit: Fix `ShowInInspector` for property that the equal operation is incorrect and repeatedly destroy and create elements. Fix a UI Toolkit weird bug that can not update values.  
+
 ## 2.3.4
 
 *   IMGUI: Fixes [#9](https://github.com/TylerTemp/SaintsField/issues/9) a typo that breaks the `AnimatorState`.

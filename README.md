@@ -63,9 +63,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.3.4**
+**2.3.5**
 
-*   IMGUI: Fixes [#9](https://github.com/TylerTemp/SaintsField/issues/9) a typo that breaks the `AnimatorState`.
+*   Add `ArraySize`
+*   UI Toolkit: Fix `ShowInInspector` for property that the equal operation is incorrect and repeatedly destroy and create elements. Fix a UI Toolkit weird bug that can not update values.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2176,6 +2177,24 @@ public class MyInter2: MonoBehaviour, IMyInterface {}
 
 ![RequireType](https://github.com/TylerTemp/SaintsField/assets/6391063/fa296163-611b-4e4a-8218-f682e464ee50)
 
+#### `ArraySize` ####
+
+A decorator that limit the size of the array or list.
+
+Note: Because of the limitation of `PropertyDrawer`:
+
+1.  When the field is 0 length, it'll not be filled to target size.
+2.  You can always change it to 0 size.
+3.  Delete an element will first be deleted, then the array will duplicated the last element.
+4.  UI Toolkit: you might see the UI flicked when you remove an element.
+
+```csharp
+[ArraySize(3)]
+public string[] myArr;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/4a2f3d42-d574-4212-a57a-76328fbf218f)
+
 #### `SaintsRow` ####
 
 `SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
@@ -2735,7 +2754,9 @@ public bool boolValue;
 
 This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
 
-Different from `EnableIf`/`DisableIf`: apply on an array will directly enable or disable the array itself, rather than each element.
+Different from `EnableIf`/`DisableIf` in the following: 
+1.  apply on an array will directly enable or disable the array itself, rather than each element.
+2.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
 
 ```csharp
 [PlayaDisableIf] public int[] justDisable;

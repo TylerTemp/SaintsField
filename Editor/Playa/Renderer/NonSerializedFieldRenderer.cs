@@ -18,16 +18,26 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreateVisualElement()
         {
+            // Debug.Log(FieldWithInfo.FieldInfo.Name);
+            // Debug.Log($"Non Serialized Field {FieldWithInfo.FieldInfo.Name}");
             object value = FieldWithInfo.FieldInfo.GetValue(SerializedObject.targetObject);
-            VisualElement result = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
-                .FieldInfo.Name));
-
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute) > 0)
+            // need this to update when the field is disabled/hide
+            VisualElement container = new VisualElement()
             {
-                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(result, false)).Every(100));
+                name = $"saints-field--non-serialized-field--{FieldWithInfo.FieldInfo.Name}",
+            };
+            VisualElement result = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
+            result.name = $"saints-field--non-serialized-field--value-{FieldWithInfo.FieldInfo.Name}";
+            container.Add(result);
+
+            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0)
+            {
+                // Debug.Log($"Non Serialized Field {FieldWithInfo.FieldInfo.Name}: reg change");
+                container.RegisterCallback<AttachToPanelEvent>(_ => container.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, false)).Every(100));
             }
 
-            return result;
+
+            return container;
         }
 #endif
         public override void Render()

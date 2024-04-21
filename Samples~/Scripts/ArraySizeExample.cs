@@ -7,17 +7,16 @@ namespace SaintsField.Samples.Scripts
     {
         // public int myInt;
 
-        [ArraySize(2)]
+        [ArraySize(3)]
         public string[] myArr;
 
-        // public string myStr;
-        //
-        // [Serializable]
-        // public struct Nest
-        // {
-        //     [ArraySize(3)] public string[] arr3;
-        // }
-        //
-        // public Nest[] nests;
+        [Serializable]
+        public struct Nest
+        {
+            [ArraySize(3)] public string[] arr3;
+        }
+
+        public Nest nest;
+        public Nest[] nests;
     }
 }

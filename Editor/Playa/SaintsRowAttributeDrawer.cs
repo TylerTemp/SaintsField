@@ -163,7 +163,12 @@ namespace SaintsField.Editor.Playa
 
             IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.GetRenderers(true, serializedFieldNames, property.serializedObject, value);
 
-            VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
+            // VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
+            VisualElement bodyElement = new VisualElement();
+            foreach (ISaintsRenderer saintsRenderer in renderer)
+            {
+                bodyElement.Add(saintsRenderer.CreateVisualElement());
+            }
 
 #if SAINTSFIELD_DOTWEEN
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(this));

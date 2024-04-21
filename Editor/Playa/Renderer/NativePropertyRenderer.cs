@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Playa;
 using UnityEditor;
@@ -17,6 +18,7 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreateVisualElement()
         {
+            // Debug.Log($"Native Prop {FieldWithInfo.PropertyInfo.Name}");
             object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
             VisualElement child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
@@ -24,31 +26,20 @@ namespace SaintsField.Editor.Playa.Renderer
             VisualElement result = new VisualElement
             {
                 userData = value,
+                name = $"saints-field--native-property--{FieldWithInfo.PropertyInfo.Name}",
             };
             result.Add(child);
 
-            result.RegisterCallback<AttachToPanelEvent>(_ => WatchValueChanged(result));
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute) > 0)
-            {
-                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(result, false)).Every(100));
-            }
+            bool callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
+            // call Every in function is broken I dont know why...
+            // result.RegisterCallback<AttachToPanelEvent>(_ => WatchValueChanged(FieldWithInfo, SerializedObject, result, callUpdate));
+            result.RegisterCallback<AttachToPanelEvent>(_ =>
+                result.schedule.Execute(() => WatchValueChanged(FieldWithInfo, SerializedObject, result, callUpdate)).Every(100)
+            );
 
             return result;
         }
 
-        private void WatchValueChanged(VisualElement container)
-        {
-            object userData = container.userData;
-            object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
-            if (userData != value)
-            {
-                container.Clear();
-                container.userData = value;
-                container.Add(UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
-                    .PropertyInfo.Name)));
-            }
-            container.schedule.Execute(() => WatchValueChanged(container)).Every(100);
-        }
 #endif
         public override void Render()
         {
@@ -63,6 +54,40 @@ namespace SaintsField.Editor.Playa.Renderer
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
             // FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
+        }
+
+        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject,  VisualElement container, bool callUpdate)
+        {
+            object userData = container.userData;
+            object value = fieldWithInfo.PropertyInfo.GetValue(serializedObject.targetObject);
+
+            bool isEqual = false;
+            if(userData == null && value == null)
+            {
+                isEqual = true;
+            }
+            else if(userData != null)
+            {
+                isEqual = userData.Equals(value);
+            }
+
+            VisualElement child = container.Children().First();
+            // if (userData != value)
+            if (!isEqual)
+            {
+                Debug.Log($"update {container.name} {userData} -> {value}");
+                StyleEnum<DisplayStyle> displayStyle = child.style.display;
+                container.Clear();
+                container.userData = value;
+                container.Add(child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name)));
+                child.style.display = displayStyle;
+            }
+
+            if (callUpdate)
+            {
+                UIToolkitOnUpdate(fieldWithInfo, child, false);
+            }
+            // container.schedule.Execute(() => WatchValueChanged(fieldWithInfo, serializedObject, container, callUpdate)).Every(100);
         }
 
         public override float GetHeight()

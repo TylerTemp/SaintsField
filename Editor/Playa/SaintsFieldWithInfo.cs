@@ -23,5 +23,10 @@ namespace SaintsField.Editor.Playa
         public MethodInfo MethodInfo;
         public PropertyInfo PropertyInfo;
         // ReSharper enable InconsistentNaming
+
+        public override string ToString()
+        {
+            return $"{RenderType} {FieldInfo?.Name} {PropertyInfo?.Name} {MethodInfo?.Name}";
+        }
     }
 }

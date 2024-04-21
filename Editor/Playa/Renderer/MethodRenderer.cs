@@ -34,10 +34,7 @@ namespace SaintsField.Editor.Playa.Renderer
             string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
             object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
 
-            Button result = new Button(() =>
-            {
-                methodInfo.Invoke(target, defaultParams);
-            })
+            Button result = new Button(() => methodInfo.Invoke(target, defaultParams))
             {
                 text = buttonText,
                 enableRichText = true,
@@ -49,7 +46,7 @@ namespace SaintsField.Editor.Playa.Renderer
             if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute || each is PlayaEnableIfAttribute ||
                                                             each is PlayaDisableIfAttribute) > 0)
             {
-                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(result, true)).Every(100));
+                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, true)).Every(100));
             }
 
             return result;

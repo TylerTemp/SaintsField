@@ -202,15 +202,20 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public abstract VisualElement CreateVisualElement();
 
-        protected void UIToolkitOnUpdate(VisualElement result, bool checkDisable)
+        protected static void UIToolkitOnUpdate(SaintsFieldWithInfo fieldWithInfo, VisualElement result, bool checkDisable)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo);
             if(checkDisable && result.enabledSelf != !preCheckResult.IsDisabled)
             {
                 result.SetEnabled(!preCheckResult.IsDisabled);
             }
 
             bool isShown = result.style.display != DisplayStyle.None;
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PLAYA_IS_SHOWN
+            Debug.Log($"{fieldWithInfo} {result.name} isShown={isShown}, preCheckIsShown={preCheckResult.IsShown}");
+#endif
+
             if(isShown != preCheckResult.IsShown)
             {
                 result.style.display = preCheckResult.IsShown ? DisplayStyle.Flex : DisplayStyle.None;

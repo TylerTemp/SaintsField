@@ -197,7 +197,9 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
                 return;
             }
 
-            bool curReadOnly = !container.enabledSelf;
+            List<VisualElement> allPossibleDisable = container.Query<VisualElement>(className: ClassAllowDisable).ToList();
+
+            bool curReadOnly = allPossibleDisable.All(each => !each.enabledSelf);
 
             List<string> errors = new List<string>();
             // List<bool> nowReadOnlyResult = new List<bool>();
@@ -229,8 +231,11 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
             if (curReadOnly != nowReadOnly)
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
+                Debug.Log($"setReadOnly={nowReadOnly}, count={container.Query<VisualElement>(className: ClassAllowDisable).ToList().Count()}");
+#endif
                 // container.SetEnabled(!nowReadOnly);
-                container.Query<VisualElement>(className: ClassAllowDisable).ForEach(each => each.SetEnabled(!nowReadOnly));
+                allPossibleDisable.ForEach(each => each.SetEnabled(!nowReadOnly));
             }
 
             HelpBox helpBox = container.Q<HelpBox>(NameReadOnlyHelpBox(property, index));

@@ -38,10 +38,10 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             // disable/enable/show/hide
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute || each is PlayaEnableIfAttribute ||
+            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
                                                             each is PlayaDisableIfAttribute) > 0)
             {
-                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(result, true)).Every(100));
+                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, true)).Every(100));
             }
 
             return result;

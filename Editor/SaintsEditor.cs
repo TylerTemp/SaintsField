@@ -59,20 +59,20 @@ namespace SaintsField.Editor
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
-        public static VisualElement CreateVisualElement(IEnumerable<ISaintsRenderer> renderers)
-        {
-            // Debug.Log($"SaintsEditor: {target}");
-
-            VisualElement root = new VisualElement();
-
-            foreach (ISaintsRenderer renderer in renderers)
-            {
-                // Debug.Log(renderer);
-                root.Add(renderer.CreateVisualElement());
-            }
-
-            return root;
-        }
+        // public static VisualElement CreateVisualElement(IEnumerable<ISaintsRenderer> renderers)
+        // {
+        //     // Debug.Log($"SaintsEditor: {target}");
+        //
+        //     VisualElement root = new VisualElement();
+        //
+        //     foreach (ISaintsRenderer renderer in renderers)
+        //     {
+        //         // Debug.Log(renderer);
+        //         root.Add(renderer.CreateVisualElement());
+        //     }
+        //
+        //     return root;
+        // }
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -103,12 +103,13 @@ namespace SaintsField.Editor
             IReadOnlyList<ISaintsRenderer> renderers = Setup(TryFixUIToolkit, serializedObject, target);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
-            // foreach (ISaintsRenderer saintsRenderer in renderers)
-            // {
-            //     Debug.Log($"renderer={saintsRenderer}");
-            // }
+            foreach (ISaintsRenderer saintsRenderer in renderers)
+            {
+                // Debug.Log($"renderer={saintsRenderer}");
+                root.Add(saintsRenderer.CreateVisualElement());
+            }
 
-            root.Add(CreateVisualElement(renderers));
+            // root.Add(CreateVisualElement(renderers));
 
 #if SAINTSFIELD_DOTWEEN
             root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
