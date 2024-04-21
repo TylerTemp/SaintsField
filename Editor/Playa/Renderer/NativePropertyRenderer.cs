@@ -56,6 +56,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
         }
 
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject,  VisualElement container, bool callUpdate)
         {
             object userData = container.userData;
@@ -89,6 +90,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             // container.schedule.Execute(() => WatchValueChanged(fieldWithInfo, serializedObject, container, callUpdate)).Every(100);
         }
+#endif
 
         public override float GetHeight()
         {

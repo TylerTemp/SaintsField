@@ -121,9 +121,16 @@ namespace SaintsField.Editor.Utils
             string lastPart = propPathSegments[usePathLength - 1];
             string secLastPart = propPathSegments[usePathLength - 2];
             bool isArray = secLastPart == "Array" && lastPart.StartsWith("data[") && lastPart.EndsWith("]");
-            return isArray ?
-                // Debug.Log($"use sub length {originPath}");
-                (true, propPathSegments.SkipLast(2)) : (false, propPathSegments);
+            if (!isArray)
+            {
+                return (false, propPathSegments);
+            }
+
+            // old Unity does not have SkipLast
+            List<string> propPaths = new List<string>(propPathSegments);
+            propPaths.RemoveAt(propPaths.Count - 1);
+            propPaths.RemoveAt(propPaths.Count - 1);
+            return (true, propPaths);
         }
 
         public static (T[] attributes, object parent) GetAttributesAndDirectParent<T>(SerializedProperty property) where T : class

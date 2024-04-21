@@ -140,8 +140,12 @@ namespace SaintsField.Editor
 #endif
         }
 
+#if UNITY_2019_2_OR_NEWER
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+#endif
+#if UNITY_2019_3_OR_NEWER
         [InitializeOnEnterPlayMode]
+#endif
         private void ResetRenderersImGui()
         {
             _renderers = null;
