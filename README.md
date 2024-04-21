@@ -67,6 +67,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 *   Add `ArraySize`
 *   UI Toolkit: Fix `ShowInInspector` for property that the equal operation is incorrect and repeatedly destroy and create elements. Fix a UI Toolkit weird bug that can not update values.
+*   UI Toolkit: Fix icons not display.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

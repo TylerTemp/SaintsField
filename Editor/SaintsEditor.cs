@@ -76,6 +76,8 @@ namespace SaintsField.Editor
 
         public override VisualElement CreateInspectorGUI()
         {
+            Debug.Log("CreateInspectorGUI");
+
             if (target == null)
             {
                 return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
@@ -125,13 +127,21 @@ namespace SaintsField.Editor
 
         public override bool RequiresConstantRepaint() => true;
 
-//         public virtual void OnEnable()
-//         {
-//             _renderers = Setup(false, serializedObject, target);
-// #if SAINTSFIELD_DOTWEEN
-//             AliveInstances.Add(this);
-// #endif
-//         }
+        public virtual void OnEnable()
+        {
+            // Debug.Log($"OnEnable");
+            try
+            {
+                _renderers = Setup(false, serializedObject, target);
+            }
+            catch (Exception)
+            {
+                _renderers = null;  // just... let IMGUI renderer to deal with it...
+            }
+#if SAINTSFIELD_DOTWEEN
+            AliveInstances.Add(this);
+#endif
+        }
 
         public virtual void OnDestroy()
         {
