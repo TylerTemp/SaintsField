@@ -25,6 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             public bool IsShown;
             public bool IsDisabled;
+            public int ArraySize;
         }
 
         protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
@@ -56,6 +57,7 @@ namespace SaintsField.Editor.Playa.Renderer
         protected static PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo)
         {
             List<PreCheckInternalInfo> preCheckInternalInfos = new List<PreCheckInternalInfo>();
+            int arraySize = -1;
             foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
             {
                 switch (playaAttribute)
@@ -108,6 +110,9 @@ namespace SaintsField.Editor.Playa.Renderer
                             Target = fieldWithInfo.Target,
                         });
                         break;
+                    case PlayaArraySizeAttribute arraySizeAttribute:
+                        arraySize = arraySizeAttribute.Size;
+                        break;
                 }
             }
 
@@ -134,6 +139,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 IsDisabled = disableIfResult,
                 IsShown = showIfResult,
+                ArraySize = arraySize,
             };
         }
 
@@ -202,7 +208,7 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public abstract VisualElement CreateVisualElement();
 
-        protected static void UIToolkitOnUpdate(SaintsFieldWithInfo fieldWithInfo, VisualElement result, bool checkDisable)
+        protected static PreCheckResult UIToolkitOnUpdate(SaintsFieldWithInfo fieldWithInfo, VisualElement result, bool checkDisable)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo);
             if(checkDisable && result.enabledSelf != !preCheckResult.IsDisabled)
@@ -220,6 +226,8 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 result.style.display = preCheckResult.IsShown ? DisplayStyle.Flex : DisplayStyle.None;
             }
+
+            return preCheckResult;
         }
 #endif
         public abstract void Render();

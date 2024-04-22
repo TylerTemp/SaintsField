@@ -63,11 +63,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.3.5**
+**2.3.6**
 
-*   Add `ArraySize`
-*   UI Toolkit: Fix `ShowInInspector` for property that the equal operation is incorrect and repeatedly destroy and create elements. Fix a UI Toolkit weird bug that can not update values.
-*   UI Toolkit: Fix `EnumFlags` icons not display.
+*   Remove a forgotten log in `SaintsEditor` UI Toolkit.
+*   Add `PlayaArraySize` which can deal with 0 length array/list.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2214,9 +2213,12 @@ Note: Because of the limitation of `PropertyDrawer`:
 3.  Delete an element will first be deleted, then the array will duplicated the last element.
 4.  UI Toolkit: you might see the UI flicked when you remove an element.
 
+(If you enable `SaintsEditor`, there is a `PlayaArraySize` that does NOT have issue 1 & 2)
+
 Parameters:
 
 *   `int size` the size of the array or list
+*   `string groupBy = ""` for error message grouping
 *   AllowMultiple: No
 
 ```csharp
@@ -2810,6 +2812,24 @@ Different from `EnableIf`/`DisableIf` in the following:
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
+
+### `PlayaArraySize` ###
+
+Like `ArraySize`, but:
+
+1.  it will set array size to expected size when the array is empty
+2.  it does not have a `groupBy`, and will not give any error if the target is not an array/list
+
+Parameters:
+
+*   `int size` the size of the array or list
+*   AllowMultiple: No
+
+```csharp
+[PlayaArraySize(3)] public int[] myArr3;
+```
+
+![PlayaArraySize](https://github.com/TylerTemp/SaintsField/assets/6391063/1cf7a58c-9e43-4261-bea8-68b349d60c35)
 
 ## About GroupBy ##
 

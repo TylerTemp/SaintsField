@@ -1,3 +1,8 @@
+## 2.3.6
+
+*   Remove a forgotten log in `SaintsEditor` UI Toolkit.
+*   Add `PlayaArraySize` which can deal with 0 length array/list.
+
 ## 2.3.5
 
 *   Add `ArraySize`

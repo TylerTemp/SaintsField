@@ -131,6 +131,9 @@ namespace SaintsField.Editor.Playa
 
                 foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTSROW
+                    Debug.Log($"saintsRow: {saintsRenderer}");
+#endif
                     float height = saintsRenderer.GetHeight();
                     Rect rect = new Rect(leftRect)
                     {

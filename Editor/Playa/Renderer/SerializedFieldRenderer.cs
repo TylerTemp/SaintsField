@@ -38,13 +38,60 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             // disable/enable/show/hide
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
-                                                            each is PlayaDisableIfAttribute) > 0)
+            bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute
+                                                                           // ReSharper disable once MergeIntoLogicalPattern
+                                                                           || each is PlayaEnableIfAttribute
+                                                                           // ReSharper disable once MergeIntoLogicalPattern
+                                                                           || each is PlayaDisableIfAttribute) > 0;
+            bool arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaArraySizeAttribute);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+            Debug.Log(
+                $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; if={ifCondition}; arraySize={arraySizeCondition}");
+#endif
+            if (ifCondition || arraySizeCondition)
             {
-                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, true)).Every(100));
+                result.RegisterCallback<AttachToPanelEvent>(_ =>
+                    result.schedule
+                        .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition))
+                        .Every(100)
+                );
             }
 
             return result;
+        }
+
+        private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition)
+        {
+            PreCheckResult preCheckResult = default;
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (ifCondition)
+            {
+                preCheckResult = UIToolkitOnUpdate(FieldWithInfo, result, true);
+            }
+
+            if(!ifCondition && arraySizeCondition)
+            {
+                preCheckResult = GetPreCheckResult(FieldWithInfo);
+            }
+
+            if (!arraySizeCondition)
+            {
+                return;
+            }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+            Debug.Log(
+                $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; preCheckResult.ArraySize={preCheckResult.ArraySize}, curSize={FieldWithInfo.SerializedProperty.arraySize}");
+#endif
+            if (preCheckResult.ArraySize == -1 ||
+                FieldWithInfo.SerializedProperty.arraySize == preCheckResult.ArraySize)
+            {
+                return;
+            }
+
+            FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
+            FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+
         }
 
         private void OnGeometryChangedEvent(GeometryChangedEvent evt)
@@ -73,7 +120,17 @@ namespace SaintsField.Editor.Playa.Renderer
 
             using(new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+                Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
+#endif
+
                 EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, GUILayout.ExpandWidth(true));
+
+                if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
+                {
+                    FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
+                }
             }
         }
 
@@ -97,7 +154,16 @@ namespace SaintsField.Editor.Playa.Renderer
 
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+                Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
+#endif
+
                 EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, true);
+
+                if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
+                {
+                    FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
+                }
             }
             // EditorGUI.DrawRect(position, Color.blue);
         }
