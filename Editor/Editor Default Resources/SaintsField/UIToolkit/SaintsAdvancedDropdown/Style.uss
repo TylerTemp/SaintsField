@@ -55,7 +55,7 @@ Button.saintsfield-advanced-dropdown-item {
 .saintsfield-advanced-dropdown-anim {
     transition-duration: 0.2s;
     /*transition-duration: 30s;*/
-    transition-delay: 0;
+    transition-delay: 0s;
     transition-timing-function: ease;
     transition-property: translate;
 }
