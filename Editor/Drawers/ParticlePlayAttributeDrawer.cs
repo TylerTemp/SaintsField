@@ -15,6 +15,10 @@ namespace SaintsField.Editor.Drawers
         private float _runTime;
         private bool _playing;
 
+        private Texture2D _playIcon;
+        private Texture2D _stopIcon;
+        private GUIStyle _iconButtonStyle;
+
         private string _error = "";
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
@@ -27,7 +31,8 @@ namespace SaintsField.Editor.Drawers
             int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             ImGuiEnsureDispose(property.serializedObject.targetObject);
-            ParticleSystem particleSystem = default;
+            ParticleSystem particleSystem = null;
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (property.objectReferenceValue)
             {
                 case GameObject go:
@@ -38,34 +43,64 @@ namespace SaintsField.Editor.Drawers
                     break;
             }
 
-            using (var changed = new EditorGUI.ChangeCheckScope())
+            if (particleSystem == null)
             {
-                _playing = GUI.Toggle(position, _playing, _playing? "■": "▶", GUI.skin.button);
-                if(changed.changed)
+                _error = "No ParticleSystem found";
+                using(new EditorGUI.DisabledScope(true))
                 {
-                    if (_playing)
-                    {
-                        // ReSharper disable once Unity.NoNullPropagation
-                        if(particleSystem?.useAutoRandomSeed ?? false)
-                        {
-                            particleSystem.randomSeed = (uint)Random.Range(0, int.MaxValue);
-                        }
+                    GUI.Button(position, "?");
+                }
+                return false;
+            }
 
-                        _previousTime = EditorApplication.timeSinceStartup;
-                        EditorApplication.update += Update;
-                        _playing = true;
-                    }
-                    else
+            if(_iconButtonStyle == null)
+            {
+                _playIcon = Util.LoadResource<Texture2D>("play.png");
+                _stopIcon = Util.LoadResource<Texture2D>("stop.png");
+                _iconButtonStyle = new GUIStyle(EditorStyles.miniButton)
+                {
+                    padding = new RectOffset(0, 0, 0, 0),
+                };
+            }
+
+            if (onGUIPayload.changed)
+            {
+                _previousTime = 0;
+                EditorApplication.update -= Update;
+                _playing = false;
+                // ReSharper disable once Unity.NoNullPropagation
+                particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                SceneView.RepaintAll();
+            }
+
+            if (GUI.Button(position, _playing ? _stopIcon : _playIcon, _iconButtonStyle))
+            {
+                _playing = !_playing;
+                if (_playing)
+                {
+                    SceneView.RepaintAll();
+
+                    // ReSharper disable once Unity.NoNullPropagation
+                    if(particleSystem.useAutoRandomSeed)
                     {
-                        _previousTime = 0;
-                        EditorApplication.update -= Update;
-                        _playing = false;
-                        // ReSharper disable once Unity.NoNullPropagation
-                        particleSystem?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                        SceneView.RepaintAll();
+                        particleSystem.randomSeed = (uint)Random.Range(0, int.MaxValue);
                     }
+
+                    _previousTime = EditorApplication.timeSinceStartup;
+                    EditorApplication.update += Update;
+                    _playing = true;
+                }
+                else
+                {
+                    _previousTime = 0;
+                    EditorApplication.update -= Update;
+                    _playing = false;
+                    // ReSharper disable once Unity.NoNullPropagation
+                    particleSystem?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    SceneView.RepaintAll();
                 }
             }
+
             if(_playing)
             {
                 // ReSharper disable once Unity.NoNullPropagation
