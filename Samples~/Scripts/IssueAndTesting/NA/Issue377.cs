@@ -31,7 +31,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
         public class TimelineItem
         {
 
+#pragma warning disable 0169
             string name = "";
+#pragma warning restore 0169
             public TimelineItem()
             {
 

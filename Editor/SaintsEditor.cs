@@ -76,7 +76,7 @@ namespace SaintsField.Editor
 
         public override VisualElement CreateInspectorGUI()
         {
-            Debug.Log("CreateInspectorGUI");
+            // Debug.Log("CreateInspectorGUI");
 
             if (target == null)
             {

@@ -8,6 +8,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             SerializeField,
             AssetPreview,
             ValidateInput(nameof(RequiredIfReloadable)),
+            // ReSharper disable once NotAccessedField.Local
         ] private Sprite ammoIcon = null;
 
         [
@@ -22,8 +23,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             InfoBox("NaughtyAttributes not installed", above: true),
 #endif
         ]
+        // ReSharper disable once NotAccessedField.Local
+#pragma warning disable 0296
         private Sprite naLabel = null;
+#pragma warning restore 0296
 
-        bool RequiredIfReloadable(Object o) => o != null;
+        private bool RequiredIfReloadable(Object o) => o != null;
     }
 }

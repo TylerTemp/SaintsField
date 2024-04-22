@@ -12,13 +12,19 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
 #else
             InfoBox("NaughtyAttributes not installed", above: true),
 #endif
-        ] Canvas naCenterMessageCanvas = default;
+        ]
+        // ReSharper disable once NotAccessedField.Local
+#pragma warning disable 0262
+        private Canvas naCenterMessageCanvas = default;
+#pragma warning restore 0262
 
         // nah, SaintsField always render the error message below the field so...
         [
             SerializeField,
             Header("Center message"),
             Required,
-        ] Canvas centerMessageCanvas = default;
+        ]
+        // ReSharper disable once NotAccessedField.Local
+        private Canvas centerMessageCanvas = default;
     }
 }
