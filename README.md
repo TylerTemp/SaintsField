@@ -3005,9 +3005,9 @@ If you encounter any issue, please report it to the issue page. However, there a
     2.  The space gets grow to fit the label when the label gets longer, which is also UI Toolkit's default
     3.  If you have a very looooong label, the value field will be shrank out of view. This is also how UI Toolkit works.
 
-2.  `PropertyField` of an `Object` will give an error when click: `NullReferenceException: ... UnityEditor.ProjectBrower.FrameObject...`. Clicking will still lead you to active the target object, but I have no idea where this came from. Even official's example will have this error if you just add a `PropertyField` to it. Clicking on the error message will lead to the `Console` tab's layout got completely messed up.
+2.  ~~`PropertyField` of an `Object` will give an error when click: `NullReferenceException: ... UnityEditor.ProjectBrower.FrameObject...`. Clicking will still lead you to active the target object, but I have no idea where this came from. Even official's example will have this error if you just add a `PropertyField` to it. Clicking on the error message will lead to the `Console` tab's layout got completely messed up.~~
 
-    This is not fixable.
+    This is now fixed after dealing with the `PropertyField` binding.
 
 3.  `DropdownField` will tread a label's change as a value change... I have no idea why this happens and why only `DropdownField`. Luckily this change event will give a `newValue=null` so I can work around with it.
 
