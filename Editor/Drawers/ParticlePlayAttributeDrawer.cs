@@ -1,21 +1,33 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(ParticlePlayAttribute))]
     public class ParticlePlayAttributeDrawer: SaintsPropertyDrawer
     {
+        private enum PlayState
+        {
+            None,  // not playing at all
+            Playing,
+            Paused,
+        }
+
         #region IMGUI
 
-        private double _previousTime;
+        private double _startTime;
+        private double _pausedTime;
         private float _runTime;
-        private bool _playing;
+        private PlayState _playing;
 
         private Texture2D _playIcon;
+        private Texture2D _pauseIcon;
+        private Texture2D _resumeIcon;
         private Texture2D _stopIcon;
         private GUIStyle _iconButtonStyle;
 
@@ -24,7 +36,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             FieldInfo info, object parent)
         {
-            return SingleLineHeight;
+            return SingleLineHeight * (_playing == PlayState.None ? 1 : 2);
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
@@ -56,6 +68,8 @@ namespace SaintsField.Editor.Drawers
             if(_iconButtonStyle == null)
             {
                 _playIcon = Util.LoadResource<Texture2D>("play.png");
+                _pauseIcon = Util.LoadResource<Texture2D>("pause.png");
+                _resumeIcon = Util.LoadResource<Texture2D>("resume.png");
                 _stopIcon = Util.LoadResource<Texture2D>("stop.png");
                 _iconButtonStyle = new GUIStyle(EditorStyles.miniButton)
                 {
@@ -65,46 +79,100 @@ namespace SaintsField.Editor.Drawers
 
             if (onGUIPayload.changed)
             {
-                _previousTime = 0;
+                _startTime = _pausedTime = 0;
                 EditorApplication.update -= Update;
-                _playing = false;
+                _playing = PlayState.None;
                 // ReSharper disable once Unity.NoNullPropagation
                 particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 SceneView.RepaintAll();
             }
 
-            if (GUI.Button(position, _playing ? _stopIcon : _playIcon, _iconButtonStyle))
+            Rect playPauseRect = position;
+            if (_playing != PlayState.None)
             {
-                _playing = !_playing;
-                if (_playing)
-                {
-                    SceneView.RepaintAll();
+                Rect stopRect;
+                (stopRect, playPauseRect) = RectUtils.SplitWidthRect(playPauseRect, SingleLineHeight);
 
-                    // ReSharper disable once Unity.NoNullPropagation
-                    if(particleSystem.useAutoRandomSeed)
-                    {
-                        particleSystem.randomSeed = (uint)Random.Range(0, int.MaxValue);
-                    }
-
-                    _previousTime = EditorApplication.timeSinceStartup;
-                    EditorApplication.update += Update;
-                    _playing = true;
-                }
-                else
+                if (GUI.Button(stopRect, _stopIcon))
                 {
-                    _previousTime = 0;
+                    _startTime = 0;
                     EditorApplication.update -= Update;
-                    _playing = false;
+                    _playing = PlayState.None;
                     // ReSharper disable once Unity.NoNullPropagation
-                    particleSystem?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                     SceneView.RepaintAll();
                 }
             }
 
-            if(_playing)
+            Texture2D buttonLabel;
+            switch (_playing)
+            {
+                case PlayState.None:
+                    buttonLabel = _playIcon;
+                    break;
+                case PlayState.Playing:
+                    buttonLabel = _pauseIcon;
+                    break;
+                case PlayState.Paused:
+                    buttonLabel = _resumeIcon;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(_playing), _playing, null);
+            }
+
+            if (GUI.Button(playPauseRect, buttonLabel))
+            {
+                switch (_playing)
+                {
+                    case PlayState.None:  // start to play
+                        _startTime = _pausedTime = EditorApplication.timeSinceStartup;
+                        EditorApplication.update += Update;
+                        _playing = PlayState.Playing;
+                        break;
+                    case PlayState.Playing:  // pause
+                        _pausedTime = EditorApplication.timeSinceStartup;
+                        EditorApplication.update -= Update;
+                        _playing = PlayState.Paused;
+                        break;
+                    case PlayState.Paused:  // resume
+                        _startTime += EditorApplication.timeSinceStartup - _pausedTime;
+                        EditorApplication.update += Update;
+                        _playing = PlayState.Playing;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(_playing), _playing, null);
+                }
+                // _playing = !_playing;
+                // if (_playing)
+                // {
+                //     SceneView.RepaintAll();
+                //
+                //     // ReSharper disable once Unity.NoNullPropagation
+                //     if(particleSystem.useAutoRandomSeed)
+                //     {
+                //         particleSystem.randomSeed = (uint)Random.Range(0, int.MaxValue);
+                //     }
+                //
+                //     _previousTime = EditorApplication.timeSinceStartup;
+                //     EditorApplication.update += Update;
+                //     _playing = true;
+                // }
+                // else
+                // {
+                //     _previousTime = 0;
+                //     EditorApplication.update -= Update;
+                //     _playing = false;
+                //     // ReSharper disable once Unity.NoNullPropagation
+                //     particleSystem?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                //     SceneView.RepaintAll();
+                // }
+            }
+
+            if(_playing == PlayState.Playing)
             {
                 // ReSharper disable once Unity.NoNullPropagation
-                particleSystem?.Simulate(_runTime, true);
+                particleSystem.Simulate(_runTime, true);
+                // Debug.Log($"isPlaying={particleSystem.isPlaying}, isPaused={particleSystem.isPaused}");
                 SceneView.RepaintAll();
             }
 
@@ -119,7 +187,7 @@ namespace SaintsField.Editor.Drawers
 
         private void Update()
         {
-            _runTime = (float)(EditorApplication.timeSinceStartup - _previousTime);
+            _runTime = (float)(EditorApplication.timeSinceStartup - _startTime);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
