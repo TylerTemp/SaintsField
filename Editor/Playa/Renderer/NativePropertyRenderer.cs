@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
 #endif
 
@@ -62,15 +62,7 @@ namespace SaintsField.Editor.Playa.Renderer
             object userData = container.userData;
             object value = fieldWithInfo.PropertyInfo.GetValue(serializedObject.targetObject);
 
-            bool isEqual = false;
-            if(userData == null && value == null)
-            {
-                isEqual = true;
-            }
-            else if(userData != null)
-            {
-                isEqual = userData.Equals(value);
-            }
+            bool isEqual = Util.GetIsEqual(userData, value);
 
             VisualElement child = container.Children().First();
             // if (userData != value)
