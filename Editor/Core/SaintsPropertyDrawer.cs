@@ -365,8 +365,7 @@ namespace SaintsField.Editor.Core
 
             float labelBasicHeight = saintsDrawNoLabel? 0f: EditorGUIUtility.singleLineHeight;
             float fieldBasicHeight = hasSaintsField
-                ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, fieldInfo,
-                    !disabledLabelField)
+                ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, fieldInfo, !disabledLabelField, parent)
                 // : EditorGUIUtility.singleLineHeight;
                 // : EditorGUI.GetPropertyHeight(property, label, true);
                 : GetPropertyHeightFallback(property, label);
@@ -431,7 +430,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth)
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             return 0;
         }

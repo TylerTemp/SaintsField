@@ -145,7 +145,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         private string _error = "";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth) => EditorGUIUtility.singleLineHeight;
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)

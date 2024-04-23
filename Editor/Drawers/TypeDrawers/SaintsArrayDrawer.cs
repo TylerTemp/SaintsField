@@ -34,9 +34,7 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
                 _imGuiPropRawName = GetSerName(property, fieldInfo).propName;
             }
             SerializedProperty arrProperty = property.FindPropertyRelative(_imGuiPropRawName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropRawName);
-            // Debug.Log($"prop={property.propertyPath};{property.propertyType}/relativeProp={_imGuiPropRawName}/prop={arrProperty}");
             return EditorGUI.GetPropertyHeight(arrProperty, label, true);
-            // return 10f;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

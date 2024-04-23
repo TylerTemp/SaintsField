@@ -1269,6 +1269,67 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   errorOut: 0
   someInt: 0
+--- !u!1 &344717669
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 344717670}
+  - component: {fileID: 344717671}
+  m_Layer: 0
+  m_Name: SaintsList
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &344717670
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344717669}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2137894681}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &344717671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344717669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c16e94af9ec5ce54db1533c0924fdd08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameObjectsDirect:
+    value:
+    - {fileID: 0}
+    - {fileID: 0}
+  gameObjects1:
+  - value:
+    - {fileID: 0}
+  - value:
+    - {fileID: 0}
+    - {fileID: 0}
+  gameObjects2:
+    value:
+    - value:
+      - {fileID: 0}
+      - {fileID: 0}
+    - value:
+      - {fileID: 0}
 --- !u!1 &367409192
 GameObject:
   m_ObjectHideFlags: 0
@@ -8857,6 +8918,71 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 25
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &964163564
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 964163565}
+  - component: {fileID: 964163566}
+  m_Layer: 0
+  m_Name: SaintsArray
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &964163565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964163564}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2137894681}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &964163566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964163564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f6eca262f6d46ea98ac2d75f1c96122, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameObjectsDirect:
+    value:
+    - {fileID: 0}
+    - {fileID: 0}
+  gameObjects1:
+  - value:
+    - {fileID: 0}
+    - {fileID: 0}
+  - value:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  gameObjects2:
+    value:
+    - value:
+      - {fileID: 0}
+      - {fileID: 0}
+    - value:
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
@@ -9145,6 +9271,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 992757019}
   m_CullTransparentMesh: 1
+--- !u!1 &1025258025
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1025258026}
+  - component: {fileID: 1025258027}
+  m_Layer: 0
+  m_Name: SaintsArrayCustom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1025258026
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025258025}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2137894681}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1025258027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025258025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdcb53deb0646044bb612926ff1969a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myArr: []
 --- !u!1 &1030583575
 GameObject:
   m_ObjectHideFlags: 0
@@ -19162,45 +19333,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2137894681}
-  - component: {fileID: 2137894680}
   m_Layer: 0
-  m_Name: SaintsArray
+  m_Name: SaintsArrayList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2137894680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2137894679}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f6eca262f6d46ea98ac2d75f1c96122, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameObjects1:
-  - value:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-  - value:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-  gameObjects2:
-    value:
-    - value:
-      - {fileID: 0}
-      - {fileID: 0}
-    - value:
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
 --- !u!4 &2137894681
 Transform:
   m_ObjectHideFlags: 0
@@ -19212,7 +19351,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 964163565}
+  - {fileID: 344717670}
+  - {fileID: 1025258026}
   m_Father: {fileID: 0}
   m_RootOrder: 70
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

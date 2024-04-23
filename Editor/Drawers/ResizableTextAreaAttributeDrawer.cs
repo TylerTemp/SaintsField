@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers
         // private bool _hasLabel = true;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth)
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             // _hasLabel = hasLabel;
             // bool fullWidth = ((ResizableTextAreaAttribute)saintsAttribute).FullWidth;

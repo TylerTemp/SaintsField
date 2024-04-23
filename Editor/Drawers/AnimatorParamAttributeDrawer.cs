@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth)
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             return EditorGUIUtility.singleLineHeight;
         }
