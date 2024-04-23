@@ -460,7 +460,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         #region UIToolkit
 
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         public VisualElement CreateVisualElement()
         {

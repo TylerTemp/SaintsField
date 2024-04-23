@@ -13,7 +13,7 @@ using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 using FontStyle = UnityEngine.FontStyle;
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
 
@@ -411,7 +411,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         #endregion
 
         #region UI Toolkit
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         // ReSharper disable InconsistentNaming
         private struct DOTweenToolkit
@@ -449,10 +449,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     width = SaintsPropertyDrawer.SingleLineHeight + 5,
                     height = SaintsPropertyDrawer.SingleLineHeight,
                     backgroundImage = DOTweenEditorPreview.isPreviewing ? _stopIcon : _playIcon,
+#if UNITY_2022_2_OR_NEWER
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                     backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#endif
                 },
             };
 
@@ -531,10 +533,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         backgroundImage = _playIcon,
                         width = SaintsPropertyDrawer.SingleLineHeight + 5,
                         height = SaintsPropertyDrawer.SingleLineHeight,
+#if UNITY_2022_2_OR_NEWER
                         backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                         backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                         backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                         backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#endif
                     },
                 };
 
@@ -545,10 +549,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         backgroundImage = _stopIcon,
                         width = SaintsPropertyDrawer.SingleLineHeight + 5,
                         height = SaintsPropertyDrawer.SingleLineHeight,
+#if UNITY_2022_2_OR_NEWER
                         backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                         backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                         backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                         backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#endif
                     },
                 };
                 stopButton.SetEnabled(false);
