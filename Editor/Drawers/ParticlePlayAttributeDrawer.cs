@@ -315,11 +315,30 @@ namespace SaintsField.Editor.Drawers
             {
                 switch (userPayload.playState)
                 {
-                    case PlayState.None:
+                    case PlayState.None:  // start to play
                     {
                         userPayload.startTime = userPayload.pausedTime = EditorApplication.timeSinceStartup;
+                        userPayload.playState = PlayState.Playing;
+                        playPauseButton.style.backgroundImage = userPayload.pauseIcon;
+                        stopButton.style.display = DisplayStyle.Flex;
                         break;
                     }
+                    case PlayState.Paused: // resume
+                    {
+                        userPayload.startTime += EditorApplication.timeSinceStartup - userPayload.pausedTime;
+                        userPayload.playState = PlayState.Playing;
+                        playPauseButton.style.backgroundImage = userPayload.pauseIcon;
+                        break;
+                    }
+                    case PlayState.Playing:  // pause
+                    {
+                        userPayload.pausedTime = EditorApplication.timeSinceStartup;
+                        userPayload.playState = PlayState.Paused;
+                        playPauseButton.style.backgroundImage = userPayload.resumeIcon;
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(userPayload.playState), userPayload.playState, null);
                 }
             };
         }
@@ -328,11 +347,36 @@ namespace SaintsField.Editor.Drawers
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             VisualElement root = container.Q<VisualElement>(NameContainer(property));
+            UserPayload userPayload = (UserPayload)root.userData;
+            Button stopButton = root.Q<Button>(NameStopButton(property));
+            Button playPauseButton = root.Q<Button>(NamePlayPauseButton(property));
 
-            root.schedule.Execute(() =>
+            root.schedule.Execute(() => UpdateParticleSystem(stopButton, playPauseButton, userPayload)).Every(1);
+        }
+
+        private static void UpdateParticleSystem(VisualElement stopButton, VisualElement playPauseButton, UserPayload userPayload)
+        {
+            if(userPayload.playState != PlayState.Playing)
             {
+                return;
+            }
 
-            }).Every(1);
+            if(userPayload.particle == null)
+            {
+                if (userPayload.playState == PlayState.None)
+                {
+                    return;
+                }
+
+                userPayload.playState = PlayState.None;
+                userPayload.startTime = userPayload.pausedTime = EditorApplication.timeSinceStartup;
+                playPauseButton.style.backgroundImage = userPayload.pauseIcon;
+                stopButton.style.display = DisplayStyle.Flex;
+                return;
+            }
+
+            userPayload.particle.Simulate((float)(EditorApplication.timeSinceStartup - userPayload.startTime), true);
+            SceneView.RepaintAll();
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -363,7 +407,7 @@ namespace SaintsField.Editor.Drawers
 
                 if (stopButton.style.display != DisplayStyle.None)
                 {
-                    stopButton.style.display = DisplayStyle.None
+                    stopButton.style.display = DisplayStyle.None;
                 }
                 if(playPauseButton.enabledSelf)
                 {
