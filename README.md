@@ -648,6 +648,30 @@ Limitation:
 
 ![reference_picker](https://github.com/TylerTemp/SaintsField/assets/6391063/06b1a8f6-806e-49c3-b491-a810bc885595)
 
+#### `ParticlePlay` ####
+
+A button to play a particle system of the field value, or the one on the field value.
+
+Unity allows play ParticleSystem in the editor, but only if you selected the target GameObject. It can only play one at a time.
+
+This decorator allows you to play multiple ParticleSystem as long as you have the expected fields.
+
+Parameters:
+
+*   `string groupBy = ""` for error grouping.
+
+*   Allow Multiple: No
+
+Note: because of the limitation from Unity, it can NOT detect if a `ParticleSystem` is finished playing
+
+```csharp
+[ParticlePlay] public ParticleSystem particle;
+// It also works if the field target has a particleSystem component
+[ParticlePlay, FieldType(typeof(ParticleSystem), false)] public GameObject particle2;
+```
+
+[![ParticlePlay](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
+
 ### Field Re-Draw ###
 
 This will change the look & behavior of a field.

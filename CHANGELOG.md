@@ -1,3 +1,7 @@
+## 2.3.7
+
+*   Add `ParticlePlay`
+
 ## 2.3.6
 
 *   Remove a forgotten log in `SaintsEditor` UI Toolkit.

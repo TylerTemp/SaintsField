@@ -10464,7 +10464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particle: {fileID: 1944822172}
-  particle2: {fileID: 676684126}
+  particle2: {fileID: 676684123}
 --- !u!4 &1209951772
 Transform:
   m_ObjectHideFlags: 0
