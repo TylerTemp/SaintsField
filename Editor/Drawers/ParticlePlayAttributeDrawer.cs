@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers
 
             if (particleSystem == null)
             {
-                _error = "No ParticleSystem found";
+                _error = "No ParticleSystem found.";
                 using(new EditorGUI.DisabledScope(true))
                 {
                     GUI.Button(position, "?");
@@ -303,12 +303,8 @@ namespace SaintsField.Editor.Drawers
 
             stopButton.clickable.clicked += () =>
             {
-                userPayload.playState = PlayState.None;
-                // ReSharper disable once Unity.NoNullPropagation
-                userPayload.particle?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                userPayload.particle = null;
+                ResetToNone(stopButton, playPauseButton, userPayload, true);
                 SceneView.RepaintAll();
-                stopButton.style.display = DisplayStyle.None;
             };
 
             playPauseButton.clickable.clicked += () =>
@@ -363,20 +359,46 @@ namespace SaintsField.Editor.Drawers
 
             if(userPayload.particle == null)
             {
-                if (userPayload.playState == PlayState.None)
+                if (userPayload.playState != PlayState.None)
                 {
-                    return;
+                    ResetToNone(stopButton, playPauseButton, userPayload, false);
+                    if(playPauseButton.enabledSelf)
+                    {
+                        playPauseButton.SetEnabled(false);
+                    }
                 }
 
-                userPayload.playState = PlayState.None;
-                userPayload.startTime = userPayload.pausedTime = EditorApplication.timeSinceStartup;
-                playPauseButton.style.backgroundImage = userPayload.pauseIcon;
-                stopButton.style.display = DisplayStyle.Flex;
                 return;
             }
 
             userPayload.particle.Simulate((float)(EditorApplication.timeSinceStartup - userPayload.startTime), true);
             SceneView.RepaintAll();
+        }
+
+        private static void ResetToNone(VisualElement stopButton, VisualElement playPauseButton, UserPayload userPayload, bool checkPlayPauseEnable)
+        {
+            userPayload.playState = PlayState.None;
+            userPayload.startTime = userPayload.pausedTime = EditorApplication.timeSinceStartup;
+            if (playPauseButton.style.backgroundImage != userPayload.playIcon)
+            {
+                playPauseButton.style.backgroundImage = userPayload.playIcon;
+            }
+
+            if (stopButton.style.display != DisplayStyle.None)
+            {
+                stopButton.style.display = DisplayStyle.None;
+            }
+            if(checkPlayPauseEnable && !playPauseButton.enabledSelf)
+            {
+                playPauseButton.SetEnabled(true);
+            }
+
+            if (userPayload.particle)
+            {
+                userPayload.particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+
+            // SceneView.RepaintAll();
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -399,29 +421,32 @@ namespace SaintsField.Editor.Drawers
 
             Button stopButton = root.Q<Button>(NameStopButton(property));
             Button playPauseButton = root.Q<Button>(NamePlayPauseButton(property));
-            HelpBox helpBox = root.Q<HelpBox>(NameHelpBox(property));
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
 
             if(particleSystem == null)
             {
-                userPayload.playState = PlayState.None;
-
-                if (stopButton.style.display != DisplayStyle.None)
-                {
-                    stopButton.style.display = DisplayStyle.None;
-                }
+                ResetToNone(stopButton, playPauseButton, userPayload, false);
                 if(playPauseButton.enabledSelf)
                 {
                     playPauseButton.SetEnabled(false);
                 }
 
-                const string error = "No ParticleSystem found";
+                const string error = "No ParticleSystem found.";
+                // Debug.Log($"helpBox={helpBox}");
 
+                // ReSharper disable once InvertIf
                 if (helpBox.text != error)
                 {
                     helpBox.text = error;
                     helpBox.style.display = DisplayStyle.Flex;
                 }
                 return;
+            }
+
+            if (helpBox.text != "")
+            {
+                helpBox.text = "";
+                helpBox.style.display = DisplayStyle.None;
             }
 
             if (!ReferenceEquals(particleSystem, userPayload.particle))

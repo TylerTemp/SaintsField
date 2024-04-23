@@ -9176,6 +9176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -9985,6 +9986,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6159b766ec67643b45e522ef2dcc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itsALongRideForPeopleWhoHaveNothingToThinkAbout: 
+  aBitLongerThanDefault: 
+  s: 
+  richLabel: 
+  thereIsSomeGoodNewsForPeopleWhoLoveBadNews: 
+  weWereDeadBeforeTheShipEvenSank: 
+  myString: 
+  myUiToolkit: 
 --- !u!114 &1118975206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10464,7 +10473,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1209951770}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 14.37, y: 14.36, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
