@@ -4,7 +4,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
 
@@ -238,10 +238,12 @@ namespace SaintsField.Editor.Drawers
                     width = SingleLineHeight,
                     height = SingleLineHeight,
                     backgroundImage = stopIcon,
+#if UNITY_2022_2_OR_NEWER
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                     backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#endif
                     marginTop = 0,
                     marginBottom = 0,
                     marginLeft = 0,
@@ -260,10 +262,12 @@ namespace SaintsField.Editor.Drawers
                     width = SingleLineHeight,
                     height = SingleLineHeight,
                     backgroundImage = playIcon,
+#if UNITY_2022_2_OR_NEWER
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                     backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#endif
                     marginTop = 0,
                     marginBottom = 0,
                     marginLeft = 0,
