@@ -63,10 +63,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.3.6**
+**2.3.7**
 
-*   Remove a forgotten log in `SaintsEditor` UI Toolkit.
-*   Add `PlayaArraySize` which can deal with 0 length array/list.
+*   Add `ParticlePlay`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
