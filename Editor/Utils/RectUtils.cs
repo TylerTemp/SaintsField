@@ -25,15 +25,27 @@ namespace SaintsField.Editor.Utils
 
         public static (Rect curRect, Rect leftRect) SplitWidthRect(Rect targetRect, float width)
         {
+            float totalWidth = targetRect.width;
+            if (totalWidth <= 0)
+            {
+                Rect zeroRect = new Rect(targetRect)
+                {
+                    width = 0,
+                };
+                return (zeroRect, zeroRect);
+            }
+
+            float canUseWidth = Mathf.Min(totalWidth, width);
+
             Rect curRect = new Rect(targetRect)
             {
-                width = width,
+                width = canUseWidth,
             };
 
             Rect leftRect = new Rect(targetRect)
             {
                 x = curRect.x + curRect.width,
-                width = targetRect.width - width,
+                width = targetRect.width - canUseWidth,
             };
 
             return (

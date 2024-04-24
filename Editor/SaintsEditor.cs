@@ -130,6 +130,7 @@ namespace SaintsField.Editor
 
         public virtual void OnDestroy()
         {
+            _renderers = null;
 #if SAINTSFIELD_DOTWEEN
             RemoveInstance(this);
 #endif

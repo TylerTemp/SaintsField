@@ -8,17 +8,12 @@ namespace SaintsField
     [Serializable]
     public struct SaintsList<T>: ISaintsArray, IList<T>
     {
-        [SerializeField]
+        [SerializeField, UIToolkit]
         public List<T> value;
 
 #if UNITY_EDITOR
         public string EditorArrayPropertyName => nameof(value);
 #endif
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return value.GetEnumerator();
-        }
 
         public override string ToString()
         {
@@ -39,52 +34,27 @@ namespace SaintsField
 
         #region IList
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        public IEnumerator<T> GetEnumerator() => value.GetEnumerator();
 
-        public void Add(T item)
-        {
-            value.Add(item);
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public void Clear()
-        {
-            value.Clear();
-        }
+        public void Add(T item) => value.Add(item);
 
-        public bool Contains(T item)
-        {
-            return value.Contains(item);
-        }
+        public void Clear() => value.Clear();
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            value.CopyTo(array, arrayIndex);
-        }
+        public bool Contains(T item) => value.Contains(item);
 
-        public bool Remove(T item)
-        {
-            return value.Remove(item);
-        }
+        public void CopyTo(T[] array, int arrayIndex) => value.CopyTo(array, arrayIndex);
+
+        public bool Remove(T item) => value.Remove(item);
 
         public int Count => value.Count;
         public bool IsReadOnly => false;
-        public int IndexOf(T item)
-        {
-            return value.IndexOf(item);
-        }
+        public int IndexOf(T item) => value.IndexOf(item);
 
-        public void Insert(int index, T item)
-        {
-            value.Insert(index, item);
-        }
+        public void Insert(int index, T item) => value.Insert(index, item);
 
-        public void RemoveAt(int index)
-        {
-            value.RemoveAt(index);
-        }
+        public void RemoveAt(int index) => value.RemoveAt(index);
 
         public T this[int index]
         {
@@ -93,5 +63,7 @@ namespace SaintsField
         }
 
         #endregion
+
+        public void AddRange(IEnumerable<T> collection) => value.AddRange(collection);
     }
 }

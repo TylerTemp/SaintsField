@@ -1313,10 +1313,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c16e94af9ec5ce54db1533c0924fdd08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameObjectsDirect:
-    value:
-    - {fileID: 0}
-    - {fileID: 0}
+  saintsListGo:
+    value: []
   gameObjects1:
   - value:
     - {fileID: 0}
@@ -1891,7 +1889,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _errorOut: 0
-  _labelByField: dynamic <color=green>label
+  _labelByField: 'dynamic <color=green>label which is very long  long  long  long 
+    long  long  long  long  long  long  long  long  long  long '
   _someInt: 0
   testNoLabel: 0
   testDisable: 0
@@ -8962,27 +8961,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f6eca262f6d46ea98ac2d75f1c96122, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameObjectsDirect:
-    value:
-    - {fileID: 0}
-    - {fileID: 0}
-  gameObjects1:
-  - value:
-    - {fileID: 0}
-    - {fileID: 0}
-  - value:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+  saintsArrayGo:
+    value: []
   gameObjects2:
+  - value:
+    - {fileID: 0}
+    - {fileID: 0}
+  - value:
+    - {fileID: 0}
+  gameObjects2Nest:
     value:
     - value:
       - {fileID: 0}
       - {fileID: 0}
     - value:
       - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
+  gameObjects4:
+  - value:
+    - value:
+      - value:
+        - {fileID: 0}
+        - {fileID: 0}
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
@@ -9315,11 +9314,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdcb53deb0646044bb612926ff1969a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myLis:
+  - myStrings:
+    - 
+    - 
+  - myStrings:
+    - 
   myArr:
-  - myArray: 00000000000000000000000000000000
-  myNormalArr:
-    myArray: 0000000000000000
-  myNormalArrList: []
+  - myArray: 00000000
+  - myArray: 0000000000000000
 --- !u!1 &1030583575
 GameObject:
   m_ObjectHideFlags: 0

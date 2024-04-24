@@ -76,10 +76,13 @@ namespace SaintsField.Editor.Drawers
             // GetWidth
             float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
             Rect labelRect = buttonRect;
+            // EditorGUI.DrawRect(labelRect, Color.blue);
             if (textWidth < labelRect.width)
             {
                 float space = (labelRect.width - textWidth) / 2f;
                 labelRect.x += space;
+                labelRect.width -= space;
+                // EditorGUI.DrawRect(labelRect, Color.yellow);
             }
             ImGuiEnsureDispose(property.serializedObject.targetObject);
             RichTextDrawer.DrawChunks(labelRect, label, richChunks);

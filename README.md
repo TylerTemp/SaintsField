@@ -2444,6 +2444,84 @@ public int areaName;
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
 
+#### `SaintsArray`/`SaintsList` ####
+
+Unity does not allow to serialize two dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
+
+```csharp
+// two dimensional array
+public SaintsArray<GameObject>[] gameObjects2;
+public SaintsArray<SaintsArray<GameObject>> gameObjects2Nest;
+// four dimensional array, if you like.
+// it can be used with array, but ensure the `[]` is always at the end.
+public SaintsArray<SaintsArray<SaintsArray<GameObject>>>[] gameObjects4;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/5c6a5d8d-ec56-45d2-9860-1ecdd6badd3f)
+
+`SaintsArray` implements `IReadOnlyList`, `SaintsList` implements `IList`:
+
+```csharp
+// SaintsArray
+GameObject firstGameObject = saintsArrayGo[0];
+Debug.Log(saintsArrayGo.value); // the actual array value
+
+// SaintsList
+saintsListGo.Add(new GameObject());
+saintsListGo.RemoveAt(0);
+Debug.Log(saintsListGo.value);  // the actual list value
+```
+
+These two can be easily converted to array/list:
+
+```csharp
+// SaintsArray to Array
+GameObject[] arrayGo = saintsArrayGo;
+// Array to SaintsArray
+SaintsArray<GameObject> expSaintsArrayGo = (SaintsArray<GameObject>)arrayGo;
+
+// SaintsList to List
+List<GameObject> ListGo = saintsListGo;
+// List to SaintsList
+SaintsList<GameObject> expSaintsListGo = (SaintsList<GameObject>)ListGo;
+```
+
+Because it's actually a struct, you can also implement your own Array/List, using `[SaintsArray]`. Here is an example of customize your own struct:
+
+```csharp
+// example: using ISaintsArray so you don't need to specify the type name everytime
+[Serializable]
+public class MyList : ISaintsArray
+{
+    [SerializeField] public List<string> myStrings;
+
+#if UNITY_EDITOR
+    public string EditorArrayPropertyName => nameof(myStrings);
+#endif
+}
+
+[SaintsArray]
+public MyList[] myLis;
+
+
+// example: any Serializable which hold a serialized array/list is fine
+[Serializable]
+public struct MyArr
+{
+    [RichLabel(nameof(MyInnerRichLabel), true)]
+    public int[] myArray;
+
+    private string MyInnerRichLabel(object _, int index) => $"<color=pink> Inner [{(char)('A' + index)}]";
+}
+
+[RichLabel(nameof(MyOuterLabel), true), SaintsArray("myArray")]
+public MyArr[] myArr;
+
+private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}";
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ff4bcdef-f3e6-4ece-8204-d4ba8798e164)
+
 ## SaintsEditor ##
 
 `SaintsField` is a `UnityEditor.Editor` level component.
@@ -2877,7 +2955,7 @@ Go to `Window` - `Saints` to enable/disable functions you want
 1.  Create file `Assets/csc.rsp`
 2.  Write marcos like this:
 
-    ```r
+    ```bash
     #"Enable DOTween"
     -define:SAINTSFIELD_DOTWEEN
 

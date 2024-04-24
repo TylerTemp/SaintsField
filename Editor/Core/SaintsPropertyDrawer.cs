@@ -883,6 +883,12 @@ namespace SaintsField.Editor.Core
             }
         }
 
+        private class LabelDrawerInfo
+        {
+            public SaintsPropertyDrawer labelDrawerInstance;
+            public Rect rect;
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // Debug.Log($"OnGui Start: {SepTitleAttributeDrawer.drawCounter}");
@@ -1079,6 +1085,7 @@ namespace SaintsField.Editor.Core
                 GUIContent useGuiContent;
 
                 // Action saintsPropertyDrawerDrawLabelCallback = () => { };
+                LabelDrawerInfo labelDrawerInfo = null;
                 if (string.IsNullOrEmpty(label.text))
                 {
                     // needFallbackLabel = true;
@@ -1098,7 +1105,6 @@ namespace SaintsField.Editor.Core
                 }
                 else
                 {
-                    // needFallbackLabel = false;
                     SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
                     // UsedAttributesTryAdd(labelAttributeWithIndex, labelDrawerInstance);
                     // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
@@ -1106,14 +1112,22 @@ namespace SaintsField.Editor.Core
                         labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
                     if (hasLabelSpace)
                     {
-                        // (Rect saintsLabelRect, Rect _) = RectUtils.SplitWidthRect(fieldUseRectWithPost, EditorGUIUtility.labelWidth - preLabelWidth);
-                        labelDrawerInstance.DrawLabel(new Rect(fieldUseRectWithPost)
+                        labelDrawerInfo = new LabelDrawerInfo
+                        {
+                            labelDrawerInstance = labelDrawerInstance,
+                            rect = new Rect(fieldUseRectWithPost)
                             {
                                 width = EditorGUIUtility.labelWidth - preLabelWidth,
                                 height = EditorGUIUtility.singleLineHeight,
-                            }, property, label,
-                            labelAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
-                        // fieldUseRectWithPost = fieldLeftRect;
+                            },
+                        };
+                        // saintsPropertyDrawerDrawLabelCallback = () =>
+                        //     labelDrawerInstance.DrawLabel(new Rect(fieldUseRectWithPost)
+                        //         {
+                        //             width = EditorGUIUtility.labelWidth - preLabelWidth,
+                        //             height = EditorGUIUtility.singleLineHeight,
+                        //         }, property, label,
+                        //         labelAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
                     }
 
                     useGuiContent = hasLabelSpace
@@ -1153,14 +1167,6 @@ namespace SaintsField.Editor.Core
 
                 (Rect fieldUseRectNoPost, Rect fieldPostRect) =
                     RectUtils.SplitWidthRect(fieldUseRectWithPost, fieldUseRectWithPost.width - postFieldWidth);
-
-                // Debug.Log($"field: {label.text}");
-
-                // if(!property.displayName)
-                // Debug.Log(property.name);
-                // if(property.name == "LabelFloat") {
-                //     EditorGUI.DrawRect(fieldUseRect, Color.black);
-                // }
 
                 #region field
 
@@ -1218,17 +1224,6 @@ namespace SaintsField.Editor.Core
 
                 #endregion
 
-                // #region label click
-
-                // if (anyLabelDrew)
-                // {
-                //     LabelMouseProcess(labelRect, property, _fieldControlName);
-                // }
-
-                // #endregion
-
-                // Debug.Log($"post field: {label.text}");
-
                 #region post field
 
                 float postFieldAccWidth = 0f;
@@ -1268,6 +1263,18 @@ namespace SaintsField.Editor.Core
                 //         _usedAttributes.TryAdd(eachAttributeWithIndex, drawerInstance);
                 //     }
                 // }
+
+                #endregion
+
+                // saintsPropertyDrawerDrawLabelCallback.Invoke();
+
+                #region Actual draw label for rich text
+
+                if (labelDrawerInfo != null)
+                {
+                    labelDrawerInfo.labelDrawerInstance.DrawLabel(labelDrawerInfo.rect, property, bugFixCopyLabel,
+                        labelAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
+                }
 
                 #endregion
 

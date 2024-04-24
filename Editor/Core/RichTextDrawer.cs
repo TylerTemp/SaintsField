@@ -441,7 +441,12 @@ namespace SaintsField.Editor.Core
                 }
 
                 (Rect textRect, Rect leftRect) = RectUtils.SplitWidthRect(labelRect, curWidth);
-                GUI.Label(textRect, curGUIContent, textStyle);
+                // GUI.Label(textRect, curGUIContent, textStyle);
+                EditorGUI.LabelField(textRect, curGUIContent, textStyle);
+                if (leftRect.width <= 0)
+                {
+                    return;
+                }
 
                 labelRect = leftRect;
             }
