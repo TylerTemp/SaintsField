@@ -11,11 +11,11 @@ namespace SaintsField
     {
 #if UNITY_EDITOR
         public AnimatorControllerLayer layer;
-#endif
-        public int layerIndex;
         public UnityEditor.Animations.AnimatorState state;
-        public AnimationClip animationClip;
+#endif
 
+        public int layerIndex;
+        public AnimationClip animationClip;
         public IReadOnlyList<string> subStateMachineNameChain;
     }
 }

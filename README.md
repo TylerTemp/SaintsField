@@ -67,6 +67,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 *   Add `SaintsArray`, `SaintsList` for nested array/list serialization.
 *   IMGUI: Change the logic of how rich text is rendered when the text is long.
+*   Fix `AnimatorStateChanged` not excluded Editor fields.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
