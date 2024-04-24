@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -36,7 +37,6 @@ namespace SaintsField.Editor.Drawers
                 return false;
             }
 
-            // Debug.Log(inputContent);
             OverlayRichLabelAttribute targetAttribute = (OverlayRichLabelAttribute)saintsAttribute;
 
             float contentWidth = GetPlainTextWidth(inputContent) + targetAttribute.Padding;
@@ -81,7 +81,8 @@ namespace SaintsField.Editor.Drawers
                 case SerializedPropertyType.Integer:
                     return property.longValue.ToString();
                 case SerializedPropertyType.Float:
-                    return $"{property.doubleValue}";
+                    // return $"{property.doubleValue}";
+                    return property.doubleValue.ToString(CultureInfo.InvariantCulture);
                 case SerializedPropertyType.String:
                     return property.stringValue ?? "";
                 default:
@@ -92,7 +93,7 @@ namespace SaintsField.Editor.Drawers
 
         private static float GetPlainTextWidth(string plainContent)
         {
-            return EditorStyles.label.CalcSize(new GUIContent(plainContent)).x;
+            return EditorStyles.textField.CalcSize(new GUIContent(plainContent)).x;
         }
 
         // private string GetLabelXml(SerializedProperty property, OverlayRichLabelAttribute targetAttribute)
@@ -360,7 +361,7 @@ namespace SaintsField.Editor.Drawers
             HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property, index));
             if (helpBox.text != error)
             {
-                Debug.Log("error changed");
+                // Debug.Log("error changed");
                 helpBox.text = error;
                 helpBox.style.display = DisplayStyle.None;
             }

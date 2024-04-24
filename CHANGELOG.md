@@ -1,3 +1,8 @@
+## 2.3.8
+
+*   Add `SaintsArray`, `SaintsList` for nested array/list serialization.
+*   IMGUI: Change the logic of how rich text is rendered when the text is long. 
+
 ## 2.3.7
 
 *   Add `ParticlePlay`
