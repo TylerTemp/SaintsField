@@ -173,6 +173,7 @@ namespace SaintsField.Editor.Drawers
             }
             catch (ObjectDisposedException)
             {
+                // Debug.Log($"property disposed {property}");
                 return;
             }
 
@@ -180,6 +181,7 @@ namespace SaintsField.Editor.Drawers
             PayloadUIToolkit payload = (PayloadUIToolkit)richContainer.userData;
             RichLabelAttribute richLabelAttribute = (RichLabelAttribute)saintsAttribute;
             (string error, string nowXml) = RichTextDrawer.GetLabelXml(property, richLabelAttribute.RichTextXml, richLabelAttribute.IsCallback, info, parent);
+            // Debug.Log($"update {nowXml}/{error}");
             if (error == "" && payload.xml != nowXml)
             {
                 payload.xml = nowXml;

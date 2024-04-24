@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using UnityEditor;
 #if UNITY_2021_3_OR_NEWER
+using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 #endif
@@ -38,6 +40,35 @@ namespace SaintsField.Editor.Utils
                 label.style.width = autoLength;
                 // label.schedule.Execute(() => label.style.width = autoLength);
             }
+        }
+
+        public static void WaitUntilThenDo<T>(VisualElement container, Func<(bool ok, T result)> until, Action<T> thenDo, long delay=0)
+        {
+            (bool ok, T result) = until.Invoke();
+            if (ok)
+            {
+                thenDo.Invoke(result);
+                return;
+            }
+
+            if(delay > 1000)
+            {
+                return;
+            }
+
+            // if (delay <= 0)
+            // {
+            //     container.schedule.Execute(() =>
+            //     {
+            //         (bool ok, T result) = until.Invoke();
+            //         if (ok)
+            //         {
+            //             thenDo.Invoke(result);
+            //         }
+            //     });
+            // }
+
+            container.schedule.Execute(() => WaitUntilThenDo(container, until, thenDo, delay+200)).StartingIn(delay);
         }
 
         public static void ChangeLabelLoop(VisualElement container, IEnumerable<RichTextDrawer.RichTextChunk> chunksOrNull, RichTextDrawer richTextDrawer)
