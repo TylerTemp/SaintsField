@@ -166,7 +166,17 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            VisualElement richContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
+            string richLabelContainerName;
+            try
+            {
+                richLabelContainerName = NameRichLabelContainer(property);
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+
+            VisualElement richContainer = container.Q<VisualElement>(richLabelContainerName);
             PayloadUIToolkit payload = (PayloadUIToolkit)richContainer.userData;
             RichLabelAttribute richLabelAttribute = (RichLabelAttribute)saintsAttribute;
             (string error, string nowXml) = RichTextDrawer.GetLabelXml(property, richLabelAttribute.RichTextXml, richLabelAttribute.IsCallback, info, parent);

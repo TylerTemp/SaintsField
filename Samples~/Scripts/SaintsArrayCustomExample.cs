@@ -8,13 +8,15 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public struct MyArr
         {
-            [RichLabel(nameof(MyArrayRichLabel))]
+            [RichLabel(nameof(MyInnerRichLabel), true)]
             public int[] myArray;
 
-            private string MyArrayRichLabel(int index) => $"<color=pink>[{(char)('A' + index)}]";
+            private string MyInnerRichLabel(object _, int index) => $"<color=pink>[{(char)('A' + index)}]";
         }
 
-        [SaintsArray("myArray")]
+        [RichLabel(nameof(MyOuterLabel), true), SaintsArray("myArray")]
         public MyArr[] myArr;
+
+        private string MyOuterLabel(object _, int index) => $"<color=Olive> {index}";
     }
 }

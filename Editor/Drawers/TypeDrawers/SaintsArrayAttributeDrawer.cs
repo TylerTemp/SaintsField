@@ -1,8 +1,11 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.TypeDrawers
 {
@@ -51,5 +54,50 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
         }
 
         #endregion
+
+#if UNITY_2021_3_OR_NEWER
+        #region UI Toolkit
+
+        private static string NamePropertyField(SerializedProperty property) => $"{property.propertyPath}_SaintsArray";
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
+        {
+            (string propName, int index) = GetSerName(property, (SaintsArrayAttribute) saintsAttribute, info, parent);
+            SerializedProperty arrProperty = property.FindPropertyRelative(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propName);
+            PropertyField propertyField = new PropertyField(arrProperty, index == -1? null: $"Element {index}")
+            {
+                name = NamePropertyField(property),
+            };
+            propertyField.AddToClassList(ClassAllowDisable);
+            return propertyField;
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        {
+            PropertyField propertyField = container.Q<PropertyField>(NamePropertyField(property));
+            Label target = propertyField.Q<Label>(className: "unity-label");
+            if(target != null)
+            {
+                UIToolkitUtils.SetLabel(target, richTextChunks, richTextDrawer);
+            }
+            else
+            {
+                Debug.Log($"label not found in {NamePropertyField(property)}");
+            }
+            //
+            // Foldout foldout = container.Q<Foldout>(NameFoldout(property));
+            // // foldout.text = labelOrNull ?? "";
+            // Label foldoutLabel = foldout.Q<Label>();
+            // if (foldoutLabel != null)
+            // {
+            //     UIToolkitUtils.SetLabel(foldoutLabel, richTextChunks, richTextDrawer);
+            // }
+        }
+
+        #endregion
+#endif
     }
 }
