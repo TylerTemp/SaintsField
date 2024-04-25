@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -26,6 +27,8 @@ namespace SaintsField.Editor.Playa.Renderer
             public bool IsShown;
             public bool IsDisabled;
             public int ArraySize;
+            public bool HasRichLabel;
+            public string RichLabelXml;
         }
 
         protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
@@ -135,11 +138,25 @@ namespace SaintsField.Editor.Playa.Renderer
                 .ToList();
             bool disableIfResult = disableIfResults.Count != 0 && disableIfResults.Any(each => each);
             // Debug.Log($"disableIfResult={disableIfResult}/{disableIfResults.Count != 0}/{disableIfResults.Any(each => each)}/results={string.Join(",", disableIfResults)}");
+
+            PlayaRichLabelAttribute richLabelAttribute = fieldWithInfo.PlayaAttributes.OfType<PlayaRichLabelAttribute>().FirstOrDefault();
+            Debug.Log($"richLabelAttribute={richLabelAttribute}");
+            bool hasRichLabel = richLabelAttribute != null;
+
+            string richLabelXml = "";
+            if (hasRichLabel)
+            {
+                richLabelXml = richLabelAttribute.IsCallback ? ParseRichLabelXml(fieldWithInfo, richLabelAttribute.RichTextXml) : richLabelAttribute.RichTextXml;
+            }
+
             return new PreCheckResult
             {
                 IsDisabled = disableIfResult,
                 IsShown = showIfResult,
                 ArraySize = arraySize,
+
+                HasRichLabel = hasRichLabel,
+                RichLabelXml = richLabelXml,
             };
         }
 
@@ -202,6 +219,102 @@ namespace SaintsField.Editor.Playa.Renderer
             else  // and
             {
                 preCheckInternalInfo.result = callbackTruly.All(each => each);
+            }
+        }
+
+        private static string ParseRichLabelXml(SaintsFieldWithInfo fieldWithInfo, string richTextXml)
+        {
+            object target = fieldWithInfo.Target;
+
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            types.Reverse();
+            foreach (Type eachType in types)
+            {
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
+                    ReflectUtils.GetProp(eachType, richTextXml);
+                switch (getPropType)
+                {
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+                        return result == null ? string.Empty : result.ToString();
+                    }
+
+                    case ReflectUtils.GetPropType.Property:
+                    {
+                        object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        return result == null ? string.Empty : result.ToString();
+                    }
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        object curValue;
+                        string fallbackName;
+
+                        switch (fieldWithInfo.RenderType)
+                        {
+                            case SaintsRenderType.SerializedField:
+                                // this can not be an list element because Editor component do not obtain it
+                                curValue = fieldWithInfo.FieldInfo.GetValue(target);
+                                Debug.Log($"ser curValue={curValue}/{fieldWithInfo.FieldInfo.FieldType}");
+                                fallbackName = ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
+                                break;
+                            case SaintsRenderType.NonSerializedField:
+                                curValue = fieldWithInfo.FieldInfo.GetValue(target);
+                                fallbackName = ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
+                                break;
+                            case SaintsRenderType.NativeProperty:
+                                curValue = fieldWithInfo.PropertyInfo.GetValue(target);
+                                fallbackName = ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name);
+                                break;
+                            case SaintsRenderType.Method:  // not work for method atm
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
+                        }
+
+                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]{curValue});
+
+                        Debug.Log($"target={target}, method={methodInfo}, passParams={passParams[0]}");
+
+                        try
+                        {
+                            return (string)methodInfo.Invoke(
+                                target,
+                                passParams
+                            );
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            Debug.LogException(e);
+                            Debug.Assert(e.InnerException != null);
+                            return fallbackName;
+                        }
+                        catch (Exception e)
+                        {
+                            // _error = e.Message;
+                            Debug.LogException(e);
+                            return fallbackName;
+                        }
+                    }
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                }
+            }
+
+            switch (fieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                    return ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
+                case SaintsRenderType.NonSerializedField:
+                    return ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
+                case SaintsRenderType.NativeProperty:
+                    return ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name);
+                case SaintsRenderType.Method:  // not work for method atm
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }
         }
 
@@ -339,7 +452,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     EditorGUILayout.EnumPopup(label, (Enum)value);
                 }
-                else if (valueType.BaseType == typeof(System.Reflection.TypeInfo))
+                else if (valueType.BaseType == typeof(TypeInfo))
                 {
                     EditorGUILayout.TextField(label, value.ToString());
                 }

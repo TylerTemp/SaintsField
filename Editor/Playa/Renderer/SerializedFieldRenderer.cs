@@ -44,15 +44,16 @@ namespace SaintsField.Editor.Playa.Renderer
                                                                            // ReSharper disable once MergeIntoLogicalPattern
                                                                            || each is PlayaDisableIfAttribute) > 0;
             bool arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaArraySizeAttribute);
+            bool richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaRichLabelAttribute);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
             Debug.Log(
                 $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; if={ifCondition}; arraySize={arraySizeCondition}");
 #endif
-            if (ifCondition || arraySizeCondition)
+            if (ifCondition || arraySizeCondition || richLabelCondition)
             {
                 result.RegisterCallback<AttachToPanelEvent>(_ =>
                     result.schedule
-                        .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition))
+                        .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition, richLabelCondition))
                         .Every(100)
                 );
             }
@@ -60,16 +61,17 @@ namespace SaintsField.Editor.Playa.Renderer
             return result;
         }
 
-        private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition)
+        private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition)
         {
             PreCheckResult preCheckResult = default;
+            // Debug.Log(preCheckResult.RichLabelXml);
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (ifCondition)
             {
                 preCheckResult = UIToolkitOnUpdate(FieldWithInfo, result, true);
             }
 
-            if(!ifCondition && arraySizeCondition)
+            if(!ifCondition && (arraySizeCondition || richLabelCondition))
             {
                 preCheckResult = GetPreCheckResult(FieldWithInfo);
             }
