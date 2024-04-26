@@ -98,10 +98,32 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        private class MethodParamFiller
+        {
+            public string name;
+            public bool isOptional;
+            public object defaultValue;
+
+            public bool signed;
+            public object value;
+        }
+
         public static object[] MethodParamsFill(IReadOnlyList<ParameterInfo> methodParams, IEnumerable<object> toFillValues)
         {
             // first we just sign default value and null value
-            object[] filledValues = methodParams.Select(param => param.IsOptional ? param.DefaultValue : null).ToArray();
+            MethodParamFiller[] filledValues = methodParams
+                .Select(param => param.IsOptional
+                    ? new MethodParamFiller
+                    {
+                        name = param.Name,
+                        isOptional = true,
+                        defaultValue = param.DefaultValue,
+                    }
+                    : new MethodParamFiller
+                    {
+                        name = param.Name,
+                    })
+                .ToArray();
             // then we check for each params:
             // 1.  If there are required params, fill the value
             // 2.  Then, if there are left value to fill and can match the optional type, then fill it
@@ -110,6 +132,9 @@ namespace SaintsField.Editor.Utils
 
             Queue<object> toFillQueue = new Queue<object>(toFillValues);
             Queue<object> leftOverQueue = new Queue<object>();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+            Debug.Log($"toFillQueue.Count={toFillQueue.Count}");
+#endif
             // required:
             foreach (int index in Enumerable.Range(0, methodParams.Count))
             {
@@ -120,14 +145,19 @@ namespace SaintsField.Editor.Utils
                     while(toFillQueue.Count > 0)
                     {
                         object value = toFillQueue.Dequeue();
-                        Type valueType = value.GetType();
                         Type paramType = methodParams[index].ParameterType;
-                        if (valueType == paramType || valueType.IsSubclassOf(paramType))
+                        if (paramType.IsInstanceOfType(value))
                         {
-                            // Debug.Log($"Push value {value} for {methodParams[index].Name}");
-                            filledValues[index] = value;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+                            Debug.Log($"Push value {value} for {methodParams[index].Name}");
+#endif
+                            filledValues[index].value = value;
+                            filledValues[index].signed = true;
                             break;
                         }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+                        Debug.Log($"No push value {value}({value.GetType()}) for {methodParams[index].Name}({paramType})");
+#endif
 
                         // Debug.Log($"Skip value {value} for {methodParams[index].Name}");
                         leftOverQueue.Enqueue(value);
@@ -162,13 +192,22 @@ namespace SaintsField.Editor.Utils
                         if(valueType == paramType || valueType.IsSubclassOf(paramType))
                         {
                             leftOverQueue.Dequeue();
-                            filledValues[index] = value;
+                            filledValues[index].value = value;
+                            filledValues[index].signed = false;
                         }
                     }
                 }
             }
 
-            return filledValues;
+            return filledValues.Select(each =>
+            {
+                if (each.signed)
+                {
+                    return each.value;
+                }
+                Debug.Assert(each.isOptional, $"No value for required parameter `{each.name}` in method.");
+                return each.defaultValue;
+            }).ToArray();
         }
 
         public static void SetValue(string propertyPath, FieldInfo info, object parent, object value)

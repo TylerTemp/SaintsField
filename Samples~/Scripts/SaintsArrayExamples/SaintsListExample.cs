@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
 {
     public class SaintsListExample: MonoBehaviour
     {
+        [RichLabel("<color=green><label />"), SaintsArray]
         public SaintsList<GameObject> saintsListGo;
         public SaintsList<GameObject>[] gameObjects1;
         public SaintsList<SaintsList<GameObject>> gameObjects2;

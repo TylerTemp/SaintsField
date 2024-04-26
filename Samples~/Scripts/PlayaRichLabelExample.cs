@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -9,10 +9,10 @@ namespace SaintsField.Samples.Scripts
         [PlayaRichLabel(nameof(MethodLabel), true)]
         public string[] myArray;
 
-        private string MethodLabel(IReadOnlyList<string> values)
+        // ReSharper disable once ParameterTypeCanBeEnumerable.Local
+        private string MethodLabel(string[] values)
         {
-            Debug.Log($"callback get: {values}, {values==null}");
-            return $"<color=green><label />";
+            return $"<color=green><label /> {string.Join("", values.Select(_ => "<icon=star.png />"))}";
         }
     }
 }

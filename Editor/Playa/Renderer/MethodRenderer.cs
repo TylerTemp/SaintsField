@@ -52,6 +52,10 @@ namespace SaintsField.Editor.Playa.Renderer
             return result;
         }
 #endif
+        public override void OnDestroy()
+        {
+        }
+
         public override void Render()
         {
             object target = FieldWithInfo.Target;

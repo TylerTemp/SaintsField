@@ -140,7 +140,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // Debug.Log($"disableIfResult={disableIfResult}/{disableIfResults.Count != 0}/{disableIfResults.Any(each => each)}/results={string.Join(",", disableIfResults)}");
 
             PlayaRichLabelAttribute richLabelAttribute = fieldWithInfo.PlayaAttributes.OfType<PlayaRichLabelAttribute>().FirstOrDefault();
-            Debug.Log($"richLabelAttribute={richLabelAttribute}");
+            // Debug.Log($"richLabelAttribute={richLabelAttribute}");
             bool hasRichLabel = richLabelAttribute != null;
 
             string richLabelXml = "";
@@ -257,7 +257,7 @@ namespace SaintsField.Editor.Playa.Renderer
                             case SaintsRenderType.SerializedField:
                                 // this can not be an list element because Editor component do not obtain it
                                 curValue = fieldWithInfo.FieldInfo.GetValue(target);
-                                Debug.Log($"ser curValue={curValue}/{fieldWithInfo.FieldInfo.FieldType}");
+                                // Debug.Log($"ser curValue={curValue}/{fieldWithInfo.FieldInfo.Name}/type={curValue.GetType()}");
                                 fallbackName = ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
                                 break;
                             case SaintsRenderType.NonSerializedField:
@@ -275,7 +275,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                         object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]{curValue});
 
-                        Debug.Log($"target={target}, method={methodInfo}, passParams={passParams[0]}");
+                        // Debug.Log($"passParams={passParams[0]==null}, length={passParams.Length}, curValue==null={curValue==null}");
 
                         try
                         {
@@ -317,6 +317,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }
         }
+
+        public abstract void OnDestroy();
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public abstract VisualElement CreateVisualElement();

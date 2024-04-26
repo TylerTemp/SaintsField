@@ -62,6 +62,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _renderers.Add((groupPath, renderer));
         }
 
+        public void OnDestroy()
+        {
+            foreach ((string _, ISaintsRenderer renderer) in _renderers)
+            {
+                renderer.OnDestroy();
+            }
+        }
+
         #region IMGUI
 
 

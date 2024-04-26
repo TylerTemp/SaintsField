@@ -41,6 +41,10 @@ namespace SaintsField.Editor.Playa.Renderer
         }
 
 #endif
+        public override void OnDestroy()
+        {
+        }
+
         public override void Render()
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);

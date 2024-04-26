@@ -1,8 +1,13 @@
 ﻿using System.Linq;
+using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEngine;
-using SaintsField.Playa;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using SaintsField.Playa;
+using System.Linq;
+using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
@@ -19,14 +24,28 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private PropertyField _result;
 
+        private class UserDataPayload
+        {
+            public string xml;
+            public Label label;
+            public string friendlyName;
+            public RichTextDrawer richTextDrawer;
+        }
+
         public override VisualElement CreateVisualElement()
         {
+            UserDataPayload userDataPayload = new UserDataPayload
+            {
+                friendlyName = FieldWithInfo.SerializedProperty.displayName,
+            };
+
             PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
             {
                 style =
                 {
                     flexGrow = 1,
                 },
+                userData = userDataPayload,
             };
 
             // ReSharper disable once InvertIf
@@ -47,7 +66,7 @@ namespace SaintsField.Editor.Playa.Renderer
             bool richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaRichLabelAttribute);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
             Debug.Log(
-                $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; if={ifCondition}; arraySize={arraySizeCondition}");
+                $"SerField: {FieldWithInfo.SerializedProperty.displayName}({FieldWithInfo.SerializedProperty.propertyPath}); if={ifCondition}; arraySize={arraySizeCondition}, richLabel={richLabelCondition}");
 #endif
             if (ifCondition || arraySizeCondition || richLabelCondition)
             {
@@ -57,6 +76,16 @@ namespace SaintsField.Editor.Playa.Renderer
                         .Every(100)
                 );
             }
+            //
+            // result.RegisterCallback<DetachFromPanelEvent>(_ =>
+            // {
+            //     // ReSharper disable once InvertIf
+            //     if(userDataPayload.richTextDrawer != null)
+            //     {
+            //         userDataPayload.richTextDrawer.Dispose();
+            //         userDataPayload.richTextDrawer = null;
+            //     }
+            // });
 
             return result;
         }
@@ -76,24 +105,58 @@ namespace SaintsField.Editor.Playa.Renderer
                 preCheckResult = GetPreCheckResult(FieldWithInfo);
             }
 
-            if (!arraySizeCondition)
+            if(arraySizeCondition)
             {
-                return;
-            }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
-            Debug.Log(
-                $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; preCheckResult.ArraySize={preCheckResult.ArraySize}, curSize={FieldWithInfo.SerializedProperty.arraySize}");
+                Debug.Log(
+                    $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; preCheckResult.ArraySize={preCheckResult.ArraySize}, curSize={FieldWithInfo.SerializedProperty.arraySize}");
 #endif
-            if (preCheckResult.ArraySize == -1 ||
-                FieldWithInfo.SerializedProperty.arraySize == preCheckResult.ArraySize)
-            {
-                return;
+                if (preCheckResult.ArraySize != -1 &&
+                    FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
+                {
+                    FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
+                    FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                }
             }
 
-            FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
-            FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
-
+            if (richLabelCondition)
+            {
+                string xml = preCheckResult.RichLabelXml;
+                // Debug.Log(xml);
+                UserDataPayload userDataPayload = (UserDataPayload) result.userData;
+                if (xml != userDataPayload.xml)
+                {
+                    if (userDataPayload.richTextDrawer == null)
+                    {
+                        userDataPayload.richTextDrawer = new RichTextDrawer();
+                    }
+                    if(userDataPayload.label == null)
+                    {
+                        UIToolkitUtils.WaitUntilThenDo(
+                            result,
+                            () =>
+                            {
+                                Label label = result.Q<Label>(className: "unity-label");
+                                if (label == null)
+                                {
+                                    return (false, null);
+                                }
+                                return (true, label);
+                            },
+                            label =>
+                            {
+                                userDataPayload.label = label;
+                            }
+                        );
+                    }
+                    else
+                    {
+                        userDataPayload.xml = xml;
+                        UIToolkitUtils.SetLabel(userDataPayload.label, RichTextDrawer.ParseRichXml(xml, userDataPayload.friendlyName), userDataPayload.richTextDrawer);
+                    }
+                }
+            }
         }
 
         private void OnGeometryChangedEvent(GeometryChangedEvent evt)
@@ -112,6 +175,12 @@ namespace SaintsField.Editor.Playa.Renderer
         }
 
 #endif
+
+        private RichTextDrawer _richTextDrawer;
+
+        private string _curXml = null;
+        private RichTextDrawer.RichTextChunk[] _curXmlChunks;
+
         public override void Render()
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
@@ -122,18 +191,62 @@ namespace SaintsField.Editor.Playa.Renderer
 
             using(new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
-
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
                 Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
 #endif
 
-                EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, GUILayout.ExpandWidth(true));
+                GUIContent useGUIContent = preCheckResult.HasRichLabel
+                    ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length))
+                    : new GUIContent(FieldWithInfo.SerializedProperty.displayName);
+
+                EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent, GUILayout.ExpandWidth(true));
+
+                if (preCheckResult.HasRichLabel
+                    // && Event.current.type == EventType.Repaint
+                   )
+                {
+                    Rect lastRect = GUILayoutUtility.GetLastRect();
+                    // GUILayout.Label("Mouse over!");
+                    Rect richRect = new Rect(lastRect)
+                    {
+                        height = SaintsPropertyDrawer.SingleLineHeight,
+                    };
+                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+                    if(_richTextDrawer == null)
+                    {
+                        _richTextDrawer = new RichTextDrawer();
+                    }
+
+                    // Debug.Log(preCheckResult.RichLabelXml);
+                    if (_curXml != preCheckResult.RichLabelXml)
+                    {
+                        _curXmlChunks =
+                            RichTextDrawer
+                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName)
+                                .ToArray();
+                    }
+
+                    _curXml = preCheckResult.RichLabelXml;
+
+                    _richTextDrawer.DrawChunks(richRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
+                }
 
                 if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
                 {
                     FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
                 }
             }
+        }
+
+        ~SerializedFieldRenderer()
+        {
+            _richTextDrawer = null;
+        }
+
+        public override void OnDestroy()
+        {
+            _richTextDrawer?.Dispose();
+            _richTextDrawer = null;
         }
 
         public override float GetHeight()

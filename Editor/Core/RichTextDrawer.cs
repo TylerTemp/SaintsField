@@ -545,17 +545,17 @@ namespace SaintsField.Editor.Core
             return texture;
         }
 
-#if UNITY_2021_3_OR_NEWER
-        public static float TextLengthUIToolkit(TextElement calculator, string origin)
-        {
-            // float spaceWidth = calculator.MeasureTextSize(" ", 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
-            // float textWidth = calculator.MeasureTextSize(original, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
-            // int spaceCount = Mathf.CeilToInt(textWidth / spaceWidth);
-            // return new string(' ', spaceCount);
-
-            return calculator.MeasureTextSize(origin, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
-
-        }
-#endif
+// #if UNITY_2021_3_OR_NEWER
+//         public static float TextLengthUIToolkit(TextElement calculator, string origin)
+//         {
+//             // float spaceWidth = calculator.MeasureTextSize(" ", 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
+//             // float textWidth = calculator.MeasureTextSize(original, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
+//             // int spaceCount = Mathf.CeilToInt(textWidth / spaceWidth);
+//             // return new string(' ', spaceCount);
+//
+//             return calculator.MeasureTextSize(origin, 0, VisualElement.MeasureMode.Undefined, 100, VisualElement.MeasureMode.Undefined).x;
+//
+//         }
+// #endif
     }
 }

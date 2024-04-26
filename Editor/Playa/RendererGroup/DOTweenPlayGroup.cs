@@ -406,6 +406,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
             // _debugCheck = EditorGUI.ToggleLeft(position, "Debug", _debugCheck);
         }
 
+        public void OnDestroy()
+        {
+        }
+
         // private bool _debugCheck;
 
         #endregion
