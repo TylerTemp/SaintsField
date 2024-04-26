@@ -8,7 +8,7 @@ namespace SaintsField
     [Serializable]
     public struct SaintsArray<T>: ISaintsArray, IReadOnlyList<T>
     {
-        [SerializeField, UIToolkit]
+        [SerializeField]
         public T[] value;
 
 #if UNITY_EDITOR
