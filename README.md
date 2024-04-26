@@ -63,7 +63,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.4.0**
+**2.4.1**
 
 1.  Since this version, UI Toolkit now can property fallback to `CustomPropertyDrawer` of a custom type (previously it only supports to fallback to custom `PropertyAttribute` drawer).
 
