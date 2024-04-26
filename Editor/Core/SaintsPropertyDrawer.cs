@@ -859,7 +859,6 @@ namespace SaintsField.Editor.Core
             rootElement.schedule.Execute(() =>
                 OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
 
-
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
 #endif
@@ -1724,7 +1723,7 @@ namespace SaintsField.Editor.Core
             object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-            Debug.Log($"On Awake");
+            Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute.GetType().Name))}");
 #endif
             // ReSharper disable once ConvertToLocalFunction
             Action<object> onValueChangedCallback = null;
@@ -1766,7 +1765,7 @@ namespace SaintsField.Editor.Core
                 // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
 
                 // really... this delay is not predictable
-                containerElement.schedule.Execute(() =>
+                topRoot.schedule.Execute(() =>
                 {
                     // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
                     // Debug.Log($"container={container.Count}");

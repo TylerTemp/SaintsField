@@ -558,10 +558,10 @@ MonoBehaviour:
   go2: {fileID: 1036765199}
   refs: {fileID: 724537242}
   color: {r: 0, g: 0, b: 0, a: 1}
-  colorNoSub: {r: 1, g: 1, b: 1, a: 1}
+  colorNoSub: {r: 0, g: 1, b: 0, a: 1}
   uniq1: 2
   uniq2: 3
-  uniq3: 1
+  uniq3: 4
   normal: 22
   myInt: 2
   my:
@@ -1318,19 +1318,9 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
-  gameObjects1:
-  - value:
-    - {fileID: 0}
-  - value:
     - {fileID: 0}
     - {fileID: 0}
-  gameObjects2:
-    value:
-    - value:
-      - {fileID: 0}
-      - {fileID: 0}
-    - value:
-      - {fileID: 0}
+    - {fileID: 0}
 --- !u!1 &367409192
 GameObject:
   m_ObjectHideFlags: 0
@@ -8207,6 +8197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myStruct:
+    normalField: 
     myStrings:
     - 
     - 
@@ -9543,7 +9534,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   strTyp:
     selectIt: 3
-    searchableDropdown: 6
+    searchableDropdown: 1
     searchableDropdownDisable: 0
 --- !u!4 &1044156549
 Transform:
@@ -10895,7 +10886,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vector2Step03: {x: -0.099999964, y: 1.4000001}
   vector2IntStep3: {x: 6, y: 12}
-  vector2Free: {x: -0.37931037, y: 0.8965516}
+  vector2Free: {x: -0.1323967, y: 1.1434653}
   vector2IntFree: {x: 5, y: 11}
   _autoWidth: {x: 11, y: 79}
   _autoWidthFloat: {x: -56.03448, y: -11.206894}
@@ -19329,8 +19320,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: 
-  _tag2: MainCamera
+  _tag: MainCamera
+  _tag2: Finish
   _tagDisabled: 
 --- !u!1 &2118824042
 GameObject:
