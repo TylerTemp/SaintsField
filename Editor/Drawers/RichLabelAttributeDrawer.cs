@@ -156,7 +156,7 @@ namespace SaintsField.Editor.Drawers
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             VisualElement richContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
-            richContainer.userData = new PayloadUIToolkit(container.Q<PropertyField>(className: SaintsFieldFallbackClass))
+            richContainer.userData = new PayloadUIToolkit(container.Q<PropertyField>(name: UIToolkitFallbackName(property)))
             {
                 xml = property.displayName,
             };
@@ -173,7 +173,9 @@ namespace SaintsField.Editor.Drawers
             }
             catch (ObjectDisposedException)
             {
-                // Debug.Log($"property disposed {property}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
+                Debug.LogError($"property disposed");
+#endif
                 return;
             }
 
@@ -199,6 +201,9 @@ namespace SaintsField.Editor.Drawers
                         _richTextDrawer);
                 }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
+                Debug.Log($"call label change to {nowXml}");
+#endif
                 OnLabelStateChangedUIToolkit(property, container, nowXml, richTextChunks, tryProcess, _richTextDrawer);
             }
 

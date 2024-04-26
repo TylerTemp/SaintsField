@@ -187,9 +187,8 @@ namespace SaintsField.Editor.Utils
                     if (methodParams[index].IsOptional)
                     {
                         object value = leftOverQueue.Peek();
-                        Type valueType = value.GetType();
                         Type paramType = methodParams[index].ParameterType;
-                        if(valueType == paramType || valueType.IsSubclassOf(paramType))
+                        if(paramType.IsInstanceOfType(value))
                         {
                             leftOverQueue.Dequeue();
                             filledValues[index].value = value;

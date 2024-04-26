@@ -31,9 +31,12 @@ namespace SaintsField.Editor.Core
         private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
 #if UNITY_2022_1_OR_NEWER
-        private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> PropertyAttributeToDecoratorDrawers =
+        private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
             new Dictionary<Type, IReadOnlyList<Type>>();
 #endif
+
+        [MenuItem("Saints/Debug")]
+        private static void SaintsDebug() => PropertyAttributeToPropertyDrawers.Clear();
 
         // private class SharedInfo
         // {
@@ -76,8 +79,6 @@ namespace SaintsField.Editor.Core
         //     new FieldDrawerConfigAttribute(FieldDrawerConfigAttribute.FieldDrawType.Inline, 0);
 
         // private string _cachedPropPath;
-
-        protected static readonly Dictionary<object, object> inMemoryStorage = new Dictionary<object, object>();
 #if UNITY_2022_1_OR_NEWER
         private static Assembly UnityEditorAssemble;
 #endif
@@ -140,7 +141,7 @@ namespace SaintsField.Editor.Core
                             }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_INIT
-                            Debug.Log($"Found drawer: {attr} -> {saintsSubDrawer}");
+                            Debug.Log($"Found drawer: {attr} -> {eachPropertyDrawer}");
 #endif
 
                             attrList.Add(eachPropertyDrawer);
@@ -166,7 +167,7 @@ namespace SaintsField.Editor.Core
                             }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_INIT
-                            Debug.Log($"Found dec drawer: {attr} -> {saintsSubDrawer}");
+                            Debug.Log($"Found dec drawer: {attr} -> {eachDecoratorDrawer}");
 #endif
 
                             if(!attrList.Contains(eachDecoratorDrawer))
@@ -191,7 +192,7 @@ namespace SaintsField.Editor.Core
                 }
 
 #if UNITY_2022_1_OR_NEWER
-                PropertyAttributeToDecoratorDrawers = attrToDecoratorDrawers.ToDictionary(each => each.Key, each => (IReadOnlyList<Type>)each.Value);
+                _propertyAttributeToDecoratorDrawers = attrToDecoratorDrawers.ToDictionary(each => each.Key, each => (IReadOnlyList<Type>)each.Value);
 #endif
             }
         }
@@ -258,7 +259,7 @@ namespace SaintsField.Editor.Core
             List<bool> showAndResults = new List<bool>();
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
-                if(saintsAttributeWithIndex.SaintsAttribute is IImGuiVisibilityAttribute visibilityAttribute)
+                if(saintsAttributeWithIndex.SaintsAttribute is IImGuiVisibilityAttribute)
                 {
                     SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
                     showAndResults.Add(drawer.GetAndVisibility(property, saintsAttributeWithIndex.SaintsAttribute, fieldInfo, parent));
@@ -513,7 +514,100 @@ namespace SaintsField.Editor.Core
 //             return UnityFallbackUIToolkit(property);
 //         }
 
-        protected static PropertyField UnityFallbackUIToolkit(SerializedProperty property)
+        private static VisualElement UnityFallbackUIToolkit(FieldInfo fieldInfo, SerializedProperty property)
+        {
+            // check if any property has drawer. If so, just use PropertyField
+            // if not, check if it has custom drawer. if it exists, then try use that custom drawer
+
+            bool hasAttributeDrawer = false;
+            // attributes can not be generic, so just check with the dictionary
+            foreach (Attribute fieldAttribute in fieldInfo.GetCustomAttributes().Where(each => each is not ISaintsAttribute))
+            {
+                hasAttributeDrawer = PropertyAttributeToPropertyDrawers.Keys.Any(checkType =>
+                    checkType.IsInstanceOfType(fieldAttribute));
+                if (hasAttributeDrawer)
+                {
+                    break;
+                }
+            }
+
+            if (hasAttributeDrawer)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+
+            Type foundDrawer = null;
+            foreach (KeyValuePair<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
+            {
+                bool matched = fieldInfo.FieldType.IsGenericType
+                    ? fieldInfo.FieldType.GetGenericTypeDefinition() == propertyAttributeToPropertyDrawer.Key
+                    : propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldInfo.FieldType);
+
+                // Debug.Log($"fieldInfo.FieldType={fieldInfo.FieldType}, key={propertyAttributeToPropertyDrawer.Key}, {matched}");
+                if (matched)
+                {
+                    foundDrawer = propertyAttributeToPropertyDrawer.Value.FirstOrDefault(each => !each.isSaints).drawerType;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                    Debug.Log($"foundDrawer={foundDrawer}");
+#endif
+                    if(foundDrawer != null)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (foundDrawer == null)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+
+            MethodInfo uiToolkitMethod = foundDrawer.GetMethod("CreatePropertyGUI");
+            if (uiToolkitMethod == null)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+
+            // Debug.Log("Yes");
+            PropertyDrawer propertyDrawer;
+            try
+            {
+                propertyDrawer = (PropertyDrawer)Activator.CreateInstance(foundDrawer);
+            }
+            catch (Exception)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+
+            FieldInfo field = foundDrawer.GetField("m_FieldInfo", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+
+            field.SetValue(propertyDrawer, fieldInfo);
+
+            VisualElement result;
+            try
+            {
+                result = propertyDrawer.CreatePropertyGUI(property);
+            }
+            catch (Exception)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+            if (result == null)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+
+            result.style.flexGrow = 1;
+            result.AddToClassList(ClassAllowDisable);
+            return result;
+
+        }
+
+        protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property)
         {
             // PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
             PropertyField propertyField = new PropertyField(property)
@@ -522,9 +616,10 @@ namespace SaintsField.Editor.Core
                 {
                     flexGrow = 1,
                 },
+                name = UIToolkitFallbackName(property),
             };
 
-            propertyField.AddToClassList(SaintsFieldFallbackClass);
+            // propertyField.AddToClassList(SaintsFieldFallbackClass);
             propertyField.AddToClassList(ClassAllowDisable);
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
@@ -532,7 +627,8 @@ namespace SaintsField.Editor.Core
 #endif
 
         #region UI Toolkit
-        protected const string SaintsFieldFallbackClass = "saints-field-fallback-property-field";
+        // protected const string SaintsFieldFallbackClass = "saints-field-fallback-property-field";
+        protected static string UIToolkitFallbackName(SerializedProperty property) => $"saints-field--fallback-{property.propertyPath}";
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
@@ -540,27 +636,6 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"Create property gui {property.propertyPath}/{property.displayName}/{this}");
 #endif
-            // InsideSaintsFieldScoop.PropertyKey insideKey = InsideSaintsFieldScoop.MakeKey(property);
-            // object serTarget = property.serializedObject.targetObject;
-            // string propPath = property.propertyPath;
-            // NestInfo nestInfo = PropertyNestInfo.FirstOrDefault(each => each.targetObject == serTarget && each.propertyPath == propPath);
-//             if (nestInfo != null && nestInfo.count > 0)
-//             {
-//                 nestInfo.count -= 1;
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-//                 Debug.Log($"PropertyNestInfo capture sub drawer `{property.displayName}`:{property.propertyPath}@{nestInfo.count}");
-// #endif
-//
-//                 if (nestInfo.count <= 0)
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-//                     Debug.Log($"PropertyNestInfo removed `{property.displayName}`:{property.propertyPath}@{nestInfo.count}");
-// #endif
-//                     PropertyNestInfo.Remove(nestInfo);
-//                 }
-//
-//                 return UnityFallbackUIToolkit(property);
-//             }
 
             VisualElement containerElement = new VisualElement
             {
@@ -721,7 +796,7 @@ namespace SaintsField.Editor.Core
                 // {
                 //     Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
                 // });
-                PropertyField fallback = UnityFallbackUIToolkit(property);
+                VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property);
                 fallback.AddToClassList(ClassFieldUIToolkit(property));
                 fieldContainer.Add(fallback);
                 containerElement.visible = false;
@@ -851,11 +926,6 @@ namespace SaintsField.Editor.Core
             rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
             rootElement.Add(containerElement);
 
-            // Debug.Log($"ContainerElement={containerElement}");
-            // _rootElement.RegisterCallback<AttachToPanelEvent>(evt => OnAwakeUiToolKitInternal(property, containerElement, parent, _saintsFieldDrawer==null));
-            // _rootElement.RegisterCallback<AttachToPanelEvent>(evt => Debug.Log($"AttachToPanelEvent"));
-            // _rootElement.RegisterCallback<GeometryChangedEvent>(evt => Debug.Log($"GeometryChangedEvent"));
-            // _rootElement.schedule.Execute(() => Debug.Log("Execute"));
             rootElement.schedule.Execute(() =>
                 OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
 
@@ -1524,7 +1594,7 @@ namespace SaintsField.Editor.Core
                     .Select(propertyAttribute =>
                     {
                         // Debug.Log(propertyAttribute.GetType());
-                        Type results = PropertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
+                        Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
                             out IReadOnlyList<Type> eachDrawers)
                             ? eachDrawers[0]
                             : null;
@@ -1739,7 +1809,8 @@ namespace SaintsField.Editor.Core
                 }
             };
 
-            PropertyField fallbackField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
+            PropertyField fallbackField = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property));
+            // Debug.Log($"check has fallback {property.propertyPath}: {fallbackField}");
 
             if(fallbackField != null)
             {
@@ -1747,12 +1818,16 @@ namespace SaintsField.Editor.Core
 
                 List<VisualElement> parentRoots = FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"usingFallbackField, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count}");
+                Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
 #endif
                 if (parentRoots.Count != saintsPropertyDrawers.Count)
                 {
                     return;
                 }
+                // Debug.Log(PropertyAttributeToPropertyDrawers[]);
+
+                // Debug.Log(fieldInfo.FieldType);
+                // Debug.Log(string.Join(",", PropertyAttributeToPropertyDrawers.Keys));
 
                 // ReSharper disable once UseIndexFromEndExpression
                 VisualElement topRoot = parentRoots[parentRoots.Count - 1];
@@ -1765,7 +1840,7 @@ namespace SaintsField.Editor.Core
                 // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
 
                 // really... this delay is not predictable
-                topRoot.schedule.Execute(() =>
+                containerElement.schedule.Execute(() =>
                 {
                     // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
                     // Debug.Log($"container={container.Count}");
@@ -1806,8 +1881,6 @@ namespace SaintsField.Editor.Core
             {
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
             }
-
-
         }
 
         private void OnAwakeReady(SerializedProperty property, VisualElement containerElement,
@@ -1827,7 +1900,7 @@ namespace SaintsField.Editor.Core
             containerElement.userData = this;
 
 #if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
-            Label label = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass)?.Q<Label>(className: "unity-label");
+            Label label = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property))?.Q<Label>(className: "unity-label");
             if (label != null)
             {
                 // UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
@@ -1898,15 +1971,33 @@ namespace SaintsField.Editor.Core
             VisualElement saintsLabelField = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
             object saintsLabelFieldDrawerData = saintsLabelField.userData;
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
+            Debug.Log($"OnLabelStateChangedUIToolkit: {saintsLabelFieldDrawerData}");
+#endif
+
             if (saintsLabelFieldDrawerData != null)
             {
                 // Debug.Log(saintsLabelFieldDrawerData);
                 SaintsPropertyInfo drawerInfo = (SaintsPropertyInfo) saintsLabelFieldDrawerData;
                 // string newLabel = toLabel == null ? null : new string(' ', property.displayName.Length);
                 // string newLabel = toLabel == null ? null : property.displayName;
+
                 drawerInfo.Drawer.ChangeFieldLabelToUIToolkit(property, drawerInfo.Attribute, drawerInfo.Index,
                     container, toLabel, richTextChunks, tried, richTextDrawer);
                 // Debug.Log($"{drawerInfo.Drawer}/{toLabel}");
+            }
+            else
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
+                Debug.Log($"3rd party drawer, label need fallback");
+#endif
+                // TODO: allow disabling this function, as it might break some custom drawer
+                VisualElement actualFieldCanHasLabel = saintsLabelField.Q<VisualElement>(className: ClassFieldUIToolkit(property));
+
+                if (actualFieldCanHasLabel != null)
+                {
+                    UIToolkitUtils.ChangeLabelLoop(actualFieldCanHasLabel, richTextChunks, richTextDrawer);
+                }
             }
             // Debug.Log(mainDrawer._saintsFieldFallback);
             // Debug.Log(mainDrawer._saintsFieldDrawer);

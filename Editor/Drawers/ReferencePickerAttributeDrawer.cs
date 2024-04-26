@@ -328,7 +328,7 @@ namespace SaintsField.Editor.Drawers
             property.serializedObject.ApplyModifiedProperties();
             // property.serializedObject.SetIsDifferentCacheDirty();
 
-            container.Query<PropertyField>(className: SaintsFieldFallbackClass).ForEach(each => each.BindProperty(property));
+            container.Query<PropertyField>(name: UIToolkitFallbackName(property)).ForEach(each => each.BindProperty(property));
         }
 
         private static void UpdateLabel(SerializedProperty property, VisualElement container, object newValue)

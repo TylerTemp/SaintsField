@@ -323,7 +323,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 Debug.LogException(e);
 
                 VisualElement root = new VisualElement();
-                root.Add(UnityFallbackUIToolkit(property));
+                root.Add(PropertyFieldFallbackUIToolkit(property));
                 root.Add(new HelpBox(e.Message, HelpBoxMessageType.Error));
                 root.AddToClassList(ClassAllowDisable);
                 return root;
