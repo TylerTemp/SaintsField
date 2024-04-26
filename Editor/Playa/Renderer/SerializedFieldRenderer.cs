@@ -273,7 +273,41 @@ namespace SaintsField.Editor.Playa.Renderer
                 Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
 #endif
 
-                EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, true);
+                GUIContent useGUIContent = preCheckResult.HasRichLabel
+                    ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length))
+                    : new GUIContent(FieldWithInfo.SerializedProperty.displayName);
+
+                EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, useGUIContent, true);
+
+                if (preCheckResult.HasRichLabel
+                    // && Event.current.type == EventType.Repaint
+                   )
+                {
+                    Rect richRect = new Rect(position)
+                    {
+                        height = SaintsPropertyDrawer.SingleLineHeight,
+                    };
+
+                    // EditorGUI.DrawRect(richRect, Color.blue);
+                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+                    if(_richTextDrawer == null)
+                    {
+                        _richTextDrawer = new RichTextDrawer();
+                    }
+
+                    // Debug.Log(preCheckResult.RichLabelXml);
+                    if (_curXml != preCheckResult.RichLabelXml)
+                    {
+                        _curXmlChunks =
+                            RichTextDrawer
+                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName)
+                                .ToArray();
+                    }
+
+                    _curXml = preCheckResult.RichLabelXml;
+
+                    _richTextDrawer.DrawChunks(richRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
+                }
 
                 if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
                 {

@@ -9,12 +9,13 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public struct MyStruct
         {
-            public string normalField;
+            // public string normalField;
 
-            [PlayaRichLabel("<color=green><label/>")]
+            [PlayaRichLabel("<color=green><icon=star.png/><label/>")]
             public string[] myStrings;
         }
 
         [SaintsRow] public MyStruct myStruct;
+        [SaintsRow(inline: true)] public MyStruct myStructInline;
     }
 }

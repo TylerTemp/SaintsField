@@ -1,3 +1,7 @@
+## 2.4.3
+
+1.  IMGUI: fix `PlayaRichLabel` for `SaintsRow`
+
 ## 2.4.2
 
 1.  Since this version, UI Toolkit now can property fallback to `CustomPropertyDrawer` of a custom type (previously it only supports to fallback to custom `PropertyAttribute` drawer).
