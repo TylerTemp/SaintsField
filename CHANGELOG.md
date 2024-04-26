@@ -1,3 +1,13 @@
+## 2.4.0
+
+1.  Since this version, UI Toolkit now can property fallback to `CustomPropertyDrawer` of a custom type (previously it only supports to fallback to custom `PropertyAttribute` drawer).
+    
+    Note: this feature is only for UI Toolkit. IMGUI does not support this feature.
+    
+    Note: combining with `RichLabel`, UI Toolkit will find the first `unity-label` class label which in some case might not be correct. This feature can not be turned off yet. Please report issue if you face any problem.
+    
+2.  `SaintsList`/`SaintsArray` fix working with `RichLabel`, fix deep nesting rendering issue.
+
 ## 2.3.9
 
 1.  Add `PlayaRichLabel` for array label modification.
