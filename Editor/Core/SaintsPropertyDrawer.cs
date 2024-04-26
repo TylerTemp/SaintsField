@@ -469,7 +469,7 @@ namespace SaintsField.Editor.Core
         {
             // attributes can not be generic, so just check with the dictionary
             return fieldInfo.GetCustomAttributes()
-                .Where(each => each is not ISaintsAttribute)
+                .Where(each => !(each is ISaintsAttribute))
                 .Any(fieldAttribute => PropertyAttributeToPropertyDrawers.Keys.Any(checkType => checkType.IsInstanceOfType(fieldAttribute)));
         }
 
