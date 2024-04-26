@@ -35,8 +35,8 @@ namespace SaintsField.Editor.Core
             new Dictionary<Type, IReadOnlyList<Type>>();
 #endif
 
-        [MenuItem("Saints/Debug")]
-        private static void SaintsDebug() => PropertyAttributeToPropertyDrawers.Clear();
+        // [MenuItem("Saints/Debug")]
+        // private static void SaintsDebug() => PropertyAttributeToPropertyDrawers.Clear();
 
         // private class SharedInfo
         // {
