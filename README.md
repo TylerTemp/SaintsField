@@ -63,11 +63,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.3.8**
+**2.3.9**
 
-*   Add `SaintsArray`, `SaintsList` for nested array/list serialization.
-*   IMGUI: Change the logic of how rich text is rendered when the text is long.
-*   Fix `AnimatorStateChanged` not excluded Editor fields.
+Add `PlayaRichLabel` for array label modification.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2933,6 +2931,33 @@ Parameters:
 ```
 
 ![PlayaArraySize](https://github.com/TylerTemp/SaintsField/assets/6391063/1cf7a58c-9e43-4261-bea8-68b349d60c35)
+
+### `PlayaRichLabel` ###
+
+This is like `RichLabel`, but it can change label of an array/list
+
+Please note: at the moment it only works for serialized property, and is only tested on array/list. It's suggested to use `RichLabel` for non-array/list
+serialized fields.
+
+Parameters:
+
+*   `string richTextXml` the rich text xml for the label
+*   `bool isCallback=false` if it's a callback (a method/property/field)
+
+```csharp
+[PlayaRichLabel("<color=lame>It's Labeled!")]
+public List<string> myList;
+
+[PlayaRichLabel(nameof(MethodLabel), true)]
+public string[] myArray;
+
+private string MethodLabel(string[] values)
+{
+    return $"<color=green><label /> {string.Join("", values.Select(_ => "<icon=star.png />"))}";
+}
+```
+
+![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
 
 ## About GroupBy ##
 

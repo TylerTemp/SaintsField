@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Playa;
 using UnityEngine;
@@ -6,6 +7,9 @@ namespace SaintsField.Samples.Scripts
 {
     public class PlayaRichLabelExample : MonoBehaviour
     {
+        [PlayaRichLabel("<color=lame>It's Labeled!")]
+        public List<string> myList;
+
         [PlayaRichLabel(nameof(MethodLabel), true)]
         public string[] myArray;
 

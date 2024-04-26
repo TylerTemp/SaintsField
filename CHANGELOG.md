@@ -1,3 +1,7 @@
+## 2.3.9
+
+Add `PlayaRichLabel` for array label modification.
+
 ## 2.3.8
 
 *   Add `SaintsArray`, `SaintsList` for nested array/list serialization.
