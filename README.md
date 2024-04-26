@@ -65,7 +65,8 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 **2.3.9**
 
-Add `PlayaRichLabel` for array label modification.
+1.  Add `PlayaRichLabel` for array label modification.
+2.  Fix callback for `OnChanged`, `RichLabel` etc. sometimes can not get a correct callback parameter filled.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

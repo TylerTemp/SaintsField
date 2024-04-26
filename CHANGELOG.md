@@ -1,6 +1,7 @@
 ## 2.3.9
 
-Add `PlayaRichLabel` for array label modification.
+1.  Add `PlayaRichLabel` for array label modification.
+2.  Fix callback for `OnChanged`, `RichLabel` etc. sometimes can not get a correct callback parameter filled.
 
 ## 2.3.8
 
