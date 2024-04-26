@@ -456,30 +456,6 @@ namespace SaintsField.Editor.Core
         }
         #endregion
 
-        // private float _aboveUsedHeight;
-
-//         private void UsedAttributesTryAdd(SaintsWithIndex key, SaintsPropertyDrawer value)
-//         {
-// #if UNITY_2021_3_OR_NEWER
-//             // _usedAttributes.TryAdd(key, value);
-// #else
-//             // if (!_usedAttributes.TryGetValue(key, out SaintsPropertyDrawer _))
-//             // {
-//             //     _usedAttributes[key] = value;
-//             // }
-// #endif
-//         }
-
-        // protected static void SetValueChanged(SerializedProperty property, bool changed=true)
-        // {
-        //     // Debug.LogWarning($"set {property.propertyPath}=true");
-        //     if(!PropertyPathToShared.TryGetValue(property.propertyPath, out SharedInfo sharedInfo))
-        //     {
-        //         PropertyPathToShared[property.propertyPath] = sharedInfo = new SharedInfo();
-        //     }
-        //     sharedInfo.Changed = changed;
-        // }
-
         private struct SaintsPropertyInfo
         {
             // ReSharper disable InconsistentNaming
@@ -489,6 +465,62 @@ namespace SaintsField.Editor.Core
             // ReSharper enable InconsistentNaming
         }
 
+        private static bool hasOtherAttributeDrawer(MemberInfo fieldInfo)
+        {
+            // attributes can not be generic, so just check with the dictionary
+            return fieldInfo.GetCustomAttributes()
+                .Where(each => each is not ISaintsAttribute)
+                .Any(fieldAttribute => PropertyAttributeToPropertyDrawers.Keys.Any(checkType => checkType.IsInstanceOfType(fieldAttribute)));
+        }
+
+        private static Type FindOtherPropertyDrawer(FieldInfo fieldInfo)
+        {
+            bool isGenericType = fieldInfo.FieldType.IsGenericType;
+            foreach (KeyValuePair<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
+            {
+                bool matched = isGenericType
+                    ? fieldInfo.FieldType.GetGenericTypeDefinition() == propertyAttributeToPropertyDrawer.Key
+                    : propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldInfo.FieldType);
+
+                // Debug.Log($"fieldInfo.FieldType={fieldInfo.FieldType}, key={propertyAttributeToPropertyDrawer.Key}, {matched}");
+                if (matched)
+                {
+                    Type foundDrawer = propertyAttributeToPropertyDrawer.Value.FirstOrDefault(each => !each.isSaints).drawerType;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                    Debug.Log($"foundDrawer={foundDrawer}");
+#endif
+                    if(foundDrawer != null)
+                    {
+                        return foundDrawer;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo)
+        {
+            PropertyDrawer propertyDrawer;
+            try
+            {
+                propertyDrawer = (PropertyDrawer)Activator.CreateInstance(foundDrawer);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            FieldInfo field = foundDrawer.GetField("m_FieldInfo", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null)
+            {
+                return null;
+            }
+
+            field.SetValue(propertyDrawer, fieldInfo);
+            return propertyDrawer;
+        }
+
         #region UI
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
@@ -496,66 +528,16 @@ namespace SaintsField.Editor.Core
         protected const string ClassAllowDisable = "saints-field-allow-disable";
 
 #if UNITY_2021_3_OR_NEWER
-//         protected PropertyField SaintsFallbackUIToolkit(SerializedProperty property)
-//         {
-// //             var nestInfo = new NestInfo
-// //             {
-// //                 targetObject = property.serializedObject.targetObject,
-// //                 propertyPath = property.propertyPath,
-// //                 // count = _saintsPropertyDrawers.Count - 1,
-// //                 count = _saintsPropertyDrawers.Count * 3 - 1,
-// //             };
-// //             PropertyNestInfo.Add(nestInfo);
-// //
-// // #if UNITY_EDITOR
-// //             Debug.Log($"PropertyNestInfo Fallback {nestInfo.targetObject}.{nestInfo.propertyPath}.{nestInfo.count}");
-// // #endif
-//
-//             return UnityFallbackUIToolkit(property);
-//         }
-
         private static VisualElement UnityFallbackUIToolkit(FieldInfo fieldInfo, SerializedProperty property)
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-
-            bool hasAttributeDrawer = false;
-            // attributes can not be generic, so just check with the dictionary
-            foreach (Attribute fieldAttribute in fieldInfo.GetCustomAttributes().Where(each => each is not ISaintsAttribute))
-            {
-                hasAttributeDrawer = PropertyAttributeToPropertyDrawers.Keys.Any(checkType =>
-                    checkType.IsInstanceOfType(fieldAttribute));
-                if (hasAttributeDrawer)
-                {
-                    break;
-                }
-            }
-
-            if (hasAttributeDrawer)
+            if (hasOtherAttributeDrawer(fieldInfo))
             {
                 return PropertyFieldFallbackUIToolkit(property);
             }
 
-            Type foundDrawer = null;
-            foreach (KeyValuePair<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
-            {
-                bool matched = fieldInfo.FieldType.IsGenericType
-                    ? fieldInfo.FieldType.GetGenericTypeDefinition() == propertyAttributeToPropertyDrawer.Key
-                    : propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldInfo.FieldType);
-
-                // Debug.Log($"fieldInfo.FieldType={fieldInfo.FieldType}, key={propertyAttributeToPropertyDrawer.Key}, {matched}");
-                if (matched)
-                {
-                    foundDrawer = propertyAttributeToPropertyDrawer.Value.FirstOrDefault(each => !each.isSaints).drawerType;
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                    Debug.Log($"foundDrawer={foundDrawer}");
-#endif
-                    if(foundDrawer != null)
-                    {
-                        break;
-                    }
-                }
-            }
+            Type foundDrawer = FindOtherPropertyDrawer(fieldInfo);
 
             if (foundDrawer == null)
             {
@@ -569,23 +551,11 @@ namespace SaintsField.Editor.Core
             }
 
             // Debug.Log("Yes");
-            PropertyDrawer propertyDrawer;
-            try
-            {
-                propertyDrawer = (PropertyDrawer)Activator.CreateInstance(foundDrawer);
-            }
-            catch (Exception)
+            PropertyDrawer propertyDrawer = MakePropertyDrawer(foundDrawer, fieldInfo);
+            if (propertyDrawer == null)
             {
                 return PropertyFieldFallbackUIToolkit(property);
             }
-
-            FieldInfo field = foundDrawer.GetField("m_FieldInfo", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field == null)
-            {
-                return PropertyFieldFallbackUIToolkit(property);
-            }
-
-            field.SetValue(propertyDrawer, fieldInfo);
 
             VisualElement result;
             try
@@ -967,15 +937,6 @@ namespace SaintsField.Editor.Core
                 _filedWidthCache = position.width;
             }
             // Debug.Log($"OnGUI: pos={position}");
-
-            // Debug.Log($"raw pos={position.y} height={position.height}");
-            // _cachedPropPath = property.propertyPath;
-            //
-            // if (!PropertyPathToShared.ContainsKey(property.propertyPath))
-            // {
-            //     PropertyPathToShared[property.propertyPath] = new SharedInfo();
-            // }
-            // Debug.Log($"OnGUI: {property.displayName} path {property.propertyPath}; obj={property.serializedObject.targetObject}");
 
             if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) && insideCount > 0)
             {
@@ -1587,6 +1548,23 @@ namespace SaintsField.Editor.Core
 
         private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo)
         {
+            // No, this does not work
+            // if (!hasOtherAttributeDrawer(fieldInfo))
+            // {
+            //     Type drawerType = FindOtherPropertyDrawer(fieldInfo);
+            //     if (drawerType != null)
+            //     {
+            //         PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo);
+            //         if(drawerInstance != null)
+            //         {
+            //             drawerInstance.GetPropertyHeight(property, label);
+            //             // Debug.Log($"Draw OnGUI with other drawer {drawerInstance}");
+            //             drawerInstance.OnGUI(position, property, label);
+            //             return;
+            //         }
+            //     }
+            // }
+
             using (new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
             {
 #if UNITY_2022_1_OR_NEWER
@@ -1605,40 +1583,11 @@ namespace SaintsField.Editor.Core
                     })
                     .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
 
-                // Debug.Log(dec);
-
                 if (dec != null && ImGuiRemoveDecDraw(position, property, label))
                 {
                     return;
                 }
 #endif
-
-                // // Debug.Log($"UnityDraw: `{property.displayName}`");
-                //
-                // var assembly = AppDomain.CurrentDomain.GetAssemblies()
-                //     .First(each => each.GetName().Name == "UnityEditor");
-                //
-                // Type scriptAttributeUtilityType = assembly.GetType("UnityEditor.ScriptAttributeUtility");
-                // MethodInfo getHandlerMethod = scriptAttributeUtilityType.GetMethod("GetHandler", BindingFlags.Static | BindingFlags.NonPublic);
-                // // Debug.Log(getHandlerMethod);
-                // object[] parameters = new object[] { property };
-                // object handler = getHandlerMethod.Invoke(null, parameters);
-                //
-                // Debug.Log(handler);
-                // Type handlerType  = assembly.GetType("UnityEditor.PropertyHandler");
-                // FieldInfo decoratorDrawersField = handlerType.GetField("m_DecoratorDrawers", BindingFlags.NonPublic | BindingFlags.Instance);
-                // decoratorDrawersField.SetValue(handler, null);
-                //
-                // object[] methodArgs = new object[]
-                // {
-                //     position,  // position
-                //     property, // property
-                //     label, // label
-                //     true, // includeChildren
-                // };
-                // MethodInfo methodInfo = handlerType.GetMethod("OnGUI");
-                // bool result = (bool)methodInfo.Invoke(handler, methodArgs);
-                // Debug.Log(result);
 
                 EditorGUI.PropertyField(position, property, label, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
