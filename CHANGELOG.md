@@ -2,7 +2,7 @@
 
 1.  Completely rewrite UI Toolkit components with `"unity-base-field__aligned"` class. Since this version, UI Toolkit will no longer have the weird label width issue.
 
-    the `UI Toolkit Label Width Fix` function is now disabled and removed.
+    The `UI Toolkit Label Width Fix` function is now disabled and removed.
 
 2.  `TryFixUIToolkit` in `SaintsEditor` is now deprecated.
 

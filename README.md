@@ -63,15 +63,23 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**2.4.2**
+**3.0.0**
 
-1.  Since this version, UI Toolkit now can property fallback to `CustomPropertyDrawer` of a custom type (previously it only supports to fallback to custom `PropertyAttribute` drawer).
+1.  Completely rewrite UI Toolkit components with `"unity-base-field__aligned"` class. Since this version, UI Toolkit will no longer have the weird label width issue.
 
-    Note: this feature is only for UI Toolkit. IMGUI does not support this feature.
+    The `UI Toolkit Label Width Fix` function is now disabled and removed.
 
-    Note: combining with `RichLabel`, UI Toolkit will find the first `unity-label` class label which in some case might not be correct. This feature can not be turned off yet. Please report issue if you face any problem.
+2.  `TryFixUIToolkit` in `SaintsEditor` is now deprecated.
 
-2.  `SaintsList`/`SaintsArray` fix working with `RichLabel`, fix deep nesting rendering issue.
+3.  `[UIToolkit]` (used for label width fixing) attribute is now deprecated
+
+4.  `ShowAboveImage`/`ShowBelowImage` now use `FieldStart` as default align.
+
+5.  IMGUI: fix `PlayaRichLabel` for `SaintsRow`
+
+6.  UI Toolkit: fix `ShowInInspector` won't update values for non-serialized fields
+
+7.  `UnsaintlyEditor` is removed
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
