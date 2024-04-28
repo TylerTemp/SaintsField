@@ -312,9 +312,19 @@ namespace SaintsField.Editor.Drawers
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
+        public class AssetPreviewField : BaseField<string>
+        {
+            public readonly VisualElement imageContainerElement;
+            public readonly Image imageElement;
+
+            public AssetPreviewField(string label, VisualElement imageContainer, Image image) : base(label, imageContainer)
+            {
+                imageContainerElement = imageContainer;
+                imageElement = image;
+            }
+        }
+
         private static string NameRoot(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AssetPreview";
-        private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AssetPreview_Image";
-        private static string NameFakePlaceholder(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AssetPreview_Placeholder";
 
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
@@ -354,8 +364,8 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            VisualElement root = container.Q<VisualElement>(NameRoot(property, index));
-            Image image = root.Q<Image>(NameImage(property, index));
+            AssetPreviewField root = container.Q<AssetPreviewField>(NameRoot(property, index));
+            Image image = root.imageElement;
             Payload payload = (Payload)image.userData;
             // ReSharper disable once Unity.NoNullPropagation
             // int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
@@ -388,8 +398,6 @@ namespace SaintsField.Editor.Drawers
                 SetImage(root, image, preview);
                 OnRootGeoChanged(
                     root,
-                    root.Q<Label>(NameFakePlaceholder(property, index)),
-                    root.Q<Image>(NameImage(property, index)),
                     assetPreviewAttribute.Width, assetPreviewAttribute.Height);
             }
         }
@@ -398,22 +406,9 @@ namespace SaintsField.Editor.Drawers
         private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index, Texture2D preview,
             AssetPreviewAttribute assetPreviewAttribute)
         {
-            VisualElement root = new VisualElement
-            {
-                name = NameRoot(property, index),
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-            };
-            Label fakeLabel = Util.PrefixLabelUIToolKit(" ", 0);
-            fakeLabel.name = NameFakePlaceholder(property, index);
-
-            root.Add(fakeLabel);
 
             Image image = new Image
             {
-                name = NameImage(property, index),
                 scaleMode = ScaleMode.ScaleToFit,
                 // ReSharper disable once Unity.NoNullPropagation
                 // userData = property.objectReferenceValue?.GetInstanceID() ?? int.MinValue ,
@@ -424,23 +419,36 @@ namespace SaintsField.Editor.Drawers
                 //     // flexShrink = 1,
                 // },
             };
+            VisualElement imageContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
+            };
+            imageContainer.Add(image);
+
+            AssetPreviewField assetPreviewField = new AssetPreviewField(" ", imageContainer, image)
+            {
+                name = NameRoot(property, index),
+            };
+
+            assetPreviewField.AddToClassList("unity-base-field__aligned");
 
             switch (assetPreviewAttribute.Align)
             {
                 case EAlign.Start:
-                    fakeLabel.style.display = DisplayStyle.None;
+                    assetPreviewField.labelElement.style.display = DisplayStyle.None;
                     break;
                 case EAlign.Center:
-                    fakeLabel.style.display = DisplayStyle.None;
-                    root.style.justifyContent = Justify.Center;
+                    assetPreviewField.labelElement.style.display = DisplayStyle.None;
+                    assetPreviewField.imageContainerElement.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
-                    fakeLabel.style.display = DisplayStyle.None;
-                    // image.style.alignSelf = Align.FlexEnd;
-                    root.style.justifyContent = Justify.FlexEnd;
+                    assetPreviewField.labelElement.style.display = DisplayStyle.None;
+                    assetPreviewField.imageContainerElement.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
-                    fakeLabel.style.display = DisplayStyle.Flex;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(assetPreviewAttribute.Align), assetPreviewAttribute.Align, null);
@@ -450,7 +458,7 @@ namespace SaintsField.Editor.Drawers
 
             // image.AddToClassList(NameImage(property, index));
 
-            SetImage(root, image, preview);
+            SetImage(assetPreviewField, image, preview);
             if (preview == null)
             {
                 image.userData = new Payload
@@ -470,11 +478,11 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            root.Add(image);
+            assetPreviewField.AddToClassList(ClassAllowDisable);
 
-            root.RegisterCallback<GeometryChangedEvent>(_ => OnRootGeoChanged(root, fakeLabel, image, assetPreviewAttribute.Width, assetPreviewAttribute.Height));
+            assetPreviewField.RegisterCallback<GeometryChangedEvent>(_ => OnRootGeoChanged(assetPreviewField, assetPreviewAttribute.Width, assetPreviewAttribute.Height));
 
-            return root;
+            return assetPreviewField;
         }
 
         private static void SetImage(VisualElement root, Image image, Texture2D preview)
@@ -489,8 +497,9 @@ namespace SaintsField.Editor.Drawers
             image.image = preview;
         }
 
-        private static void OnRootGeoChanged(VisualElement root, Label fakeLabel, Image image, int widthConfig, int heightConfig)
+        private static void OnRootGeoChanged(AssetPreviewField root, int widthConfig, int heightConfig)
         {
+            Image image = root.imageElement;
             if(root.style.display == DisplayStyle.None)
             {
                 return;
@@ -503,9 +512,9 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            float fakeLabelWidth = fakeLabel.style.display == DisplayStyle.None
+            float fakeLabelWidth = root.labelElement.style.display == DisplayStyle.None
                 ? 0
-                : fakeLabel.resolvedStyle.width;
+                : root.labelElement.resolvedStyle.width;
 
             float imageWidth = image.resolvedStyle.width;
 

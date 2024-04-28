@@ -164,6 +164,13 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
+        public class PropRangeField: BaseField<float>
+        {
+            public PropRangeField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+            }
+        }
+
         private static string NameSlider(SerializedProperty property) => $"{property.propertyPath}__PropRange_Slider";
         private static string NameInteger(SerializedProperty property) => $"{property.propertyPath}__PropRange_IntegerField";
         private static string NameFloat(SerializedProperty property) => $"{property.propertyPath}__PropRange_FloatField";
@@ -180,7 +187,7 @@ namespace SaintsField.Editor.Drawers
                 },
             };
 
-            Slider slider = new Slider(property.displayName, 0, 1, SliderDirection.Horizontal, 0.5f)
+            Slider slider = new Slider("", 0, 1, SliderDirection.Horizontal, 0.5f)
             {
                 name = NameSlider(property),
                 style =
@@ -221,10 +228,13 @@ namespace SaintsField.Editor.Drawers
                     },
                 });
             }
+            PropRangeField propRangeField = new PropRangeField(property.displayName, root);
 
-            root.AddToClassList(ClassAllowDisable);
+            propRangeField.AddToClassList(ClassAllowDisable);
+            propRangeField.labelElement.style.overflow = Overflow.Hidden;
+            propRangeField.AddToClassList("unity-base-field__aligned");
 
-            return root;
+            return propRangeField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,

@@ -111,6 +111,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             createFieldElement.AddToClassList(ClassAllowDisable);
+            createFieldElement.AddToClassList("unity-base-field__aligned");
 
             return createFieldElement;
         }

@@ -4,9 +4,6 @@ using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.Playa;
-using System.Linq;
-using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -16,7 +13,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class SerializedFieldRenderer: AbsRenderer
     {
-        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(serializedObject, fieldWithInfo, tryFixUIToolkit)
+        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(serializedObject, fieldWithInfo)
         {
         }
 
@@ -49,12 +46,12 @@ namespace SaintsField.Editor.Playa.Renderer
             };
 
             // ReSharper disable once InvertIf
-            if(TryFixUIToolkit && FieldWithInfo.FieldInfo?.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
-            {
-                // Debug.Log($"{fieldWithInfo.fieldInfo.Name} {arr.Length}");
-                _result = result;
-                _result.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
-            }
+            // if(TryFixUIToolkit && FieldWithInfo.FieldInfo?.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
+            // {
+            //     // Debug.Log($"{fieldWithInfo.fieldInfo.Name} {arr.Length}");
+            //     _result = result;
+            //     _result.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+            // }
 
             // disable/enable/show/hide
             bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute
@@ -159,20 +156,20 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        private void OnGeometryChangedEvent(GeometryChangedEvent evt)
-        {
-            // Debug.Log("OnGeometryChangedEvent");
-            Label label = _result.Q<Label>(className: "unity-label");
-            if (label == null)
-            {
-                return;
-            }
-
-            // Utils.Util.FixLabelWidthLoopUIToolkit(label);
-            _result.UnregisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
-            Utils.UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
-            _result = null;
-        }
+        // private void OnGeometryChangedEvent(GeometryChangedEvent evt)
+        // {
+        //     // Debug.Log("OnGeometryChangedEvent");
+        //     Label label = _result.Q<Label>(className: "unity-label");
+        //     if (label == null)
+        //     {
+        //         return;
+        //     }
+        //
+        //     // Utils.Util.FixLabelWidthLoopUIToolkit(label);
+        //     _result.UnregisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+        //     Utils.UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
+        //     _result = null;
+        // }
 
 #endif
 

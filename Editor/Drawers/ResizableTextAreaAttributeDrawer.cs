@@ -145,6 +145,7 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     height = SingleLineHeight,
+                    paddingLeft = 4,
                 },
                 pickingMode = PickingMode.Ignore,
             });

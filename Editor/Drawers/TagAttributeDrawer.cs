@@ -71,6 +71,7 @@ namespace SaintsField.Editor.Drawers
                 name = NameTag(property),
             };
 
+            tagField.AddToClassList("unity-base-field__aligned");
             tagField.AddToClassList(ClassAllowDisable);
 
             return tagField;

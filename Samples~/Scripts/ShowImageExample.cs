@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
     {
         [AboveImage]
         // size and group
-        [BelowImage(maxWidth: 25, groupBy: "Below1")]
+        [BelowImage(maxWidth: 20, groupBy: "Below1")]
         [BelowImage(maxHeight: 20, align: EAlign.End, groupBy: "Below1")]
         public Sprite spriteField;
 

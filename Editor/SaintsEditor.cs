@@ -49,13 +49,16 @@ namespace SaintsField.Editor
 
         #region UIToolkit
 
-        protected virtual bool TryFixUIToolkit =>
-#if SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
-            false
-#else
-            true
-#endif
-        ;
+//         protected virtual bool TryFixUIToolkit =>
+// #if SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
+//             false
+// #else
+//             true
+// #endif
+//         ;
+
+        [Obsolete("No longer needed")]
+        protected virtual bool TryFixUIToolkit => false;
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
@@ -87,7 +90,7 @@ namespace SaintsField.Editor
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            IReadOnlyList<ISaintsRenderer> renderers = Setup(TryFixUIToolkit, serializedObject, target);
+            IReadOnlyList<ISaintsRenderer> renderers = Setup(serializedObject, target);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
             foreach (ISaintsRenderer saintsRenderer in renderers)
@@ -117,7 +120,7 @@ namespace SaintsField.Editor
             // Debug.Log($"OnEnable");
             try
             {
-                _renderers = Setup(false, serializedObject, target);
+                _renderers = Setup(serializedObject, target);
             }
             catch (Exception)
             {
@@ -163,7 +166,7 @@ namespace SaintsField.Editor
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_renderers == null)
             {
-                _renderers = Setup(false, serializedObject, target);
+                _renderers = Setup(serializedObject, target);
             }
 #if SAINTSFIELD_DOTWEEN
             AliveInstances.Add(this);
@@ -211,7 +214,7 @@ namespace SaintsField.Editor
             }
         }
 
-        private static IReadOnlyList<ISaintsRenderer> Setup(bool tryFixUIToolkit, SerializedObject serializedObject,
+        private static IReadOnlyList<ISaintsRenderer> Setup(SerializedObject serializedObject,
             object target)
         {
             string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
@@ -219,10 +222,12 @@ namespace SaintsField.Editor
             Dictionary<string, SerializedProperty> serializedPropertyDict = serializableFields
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
-            return GetRenderers(tryFixUIToolkit, serializedPropertyDict, serializedObject, target);
+            return GetRenderers(serializedPropertyDict, serializedObject, target);
         }
 
-        public static IReadOnlyList<ISaintsRenderer> GetRenderers(bool tryFixUIToolkit, IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject, object target)
+        public static IReadOnlyList<ISaintsRenderer> GetRenderers(
+            IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject,
+            object target)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
@@ -511,7 +516,7 @@ namespace SaintsField.Editor
                         renderers.Add(layoutKeyToGroup[rootGroup]);
                     }
 
-                    AbsRenderer itemResult = MakeRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
+                    AbsRenderer itemResult = MakeRenderer(serializedObject, fieldWithInfo);
 
                     ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
 
@@ -546,7 +551,7 @@ namespace SaintsField.Editor
     //             }
     // #endif
 
-                AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
+                AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo);
                 // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
 
                 if (result != null)
@@ -624,19 +629,19 @@ namespace SaintsField.Editor
         //     return new VerticalGroup(layoutInfo);
         // }
 
-        protected static AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit)
+        protected static AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             // Debug.Log($"field {fieldWithInfo.fieldInfo?.Name}/{fieldWithInfo.fieldInfo?.GetCustomAttribute<ExtShowHideConditionBase>()}");
             switch (fieldWithInfo.RenderType)
             {
                 case SaintsRenderType.SerializedField:
-                    return new SerializedFieldRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
+                    return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.NonSerializedField:
-                    return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
+                    return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.Method:
-                    return new MethodRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
+                    return new MethodRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.NativeProperty:
-                    return new NativePropertyRenderer(serializedObject, fieldWithInfo, tryFixUIToolkit);
+                    return new NativePropertyRenderer(serializedObject, fieldWithInfo);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }

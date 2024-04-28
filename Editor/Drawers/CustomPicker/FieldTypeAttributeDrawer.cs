@@ -344,6 +344,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             };
 
             objectField.Bind(property.serializedObject);
+            objectField.AddToClassList("unity-base-field__aligned");
 
             if (customPicker)
             {

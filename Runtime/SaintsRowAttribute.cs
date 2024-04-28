@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace SaintsField
@@ -8,19 +9,21 @@ namespace SaintsField
     {
         // ReSharper disable InconsistentNaming
         public readonly bool Inline;
-        public readonly bool TryFixUIToolkit;
         // ReSharper enable InconsistentNaming
 
-        public SaintsRowAttribute(bool inline=false, bool tryFixUIToolkit=
-#if SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
-                false
-#else
-                true
-#endif
-            )
+        public SaintsRowAttribute() : this(false)
+        {
+        }
+
+        public SaintsRowAttribute(bool inline)
         {
             Inline = inline;
-            TryFixUIToolkit = tryFixUIToolkit;
+        }
+
+
+        [Obsolete]
+        public SaintsRowAttribute(bool inline, bool tryFixUIToolkit): this(inline)
+        {
         }
     }
 }

@@ -356,6 +356,13 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
+        public class ProgressBarField : BaseField<float>
+        {
+            public ProgressBarField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+            }
+        }
+
         private static string NameProgressBar(SerializedProperty property) => $"{property.propertyPath}__ProgressBar";
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_Label";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_HelpBox";
@@ -367,9 +374,6 @@ namespace SaintsField.Editor.Drawers
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
-
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            label.name = NameLabel(property);
 
             #region ProgrssBar
 
@@ -413,21 +417,16 @@ namespace SaintsField.Editor.Drawers
             progressBar.userData = new UIToolkitPayload(background, progress, metaInfo);
             #endregion
 
-            VisualElement root = new VisualElement
+
+            ProgressBarField progressBarField = new ProgressBarField(property.displayName, progressBar)
             {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    flexGrow = 1,
-                },
+                name = NameProgressBar(property),
             };
+            progressBarField.AddToClassList("unity-base-field__aligned");
 
-            root.Add(label);
-            root.Add(progressBar);
+            progressBarField.AddToClassList(ClassAllowDisable);
 
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
+            return progressBarField;
 
         }
 

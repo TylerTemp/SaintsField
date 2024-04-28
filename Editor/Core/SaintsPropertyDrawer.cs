@@ -591,6 +591,7 @@ namespace SaintsField.Editor.Core
 
             // propertyField.AddToClassList(SaintsFieldFallbackClass);
             propertyField.AddToClassList(ClassAllowDisable);
+            // propertyField.AddToClassList("unity-base-field__aligned");
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
         }
@@ -1788,22 +1789,22 @@ namespace SaintsField.Editor.Core
 
                 // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
 
-                // really... this delay is not predictable
-                containerElement.schedule.Execute(() =>
-                {
-                    // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
-                    // Debug.Log($"container={container.Count}");
-                    fallbackField.Query<VisualElement>(className: "unity-decorator-drawers-container").ForEach(each => each.RemoveFromHierarchy());
-#if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
-                    Label label = fallbackField.Q<Label>(className: "unity-label");
-                    if (label != null)
-                    {
-                        UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
-                    }
-#endif
-
-                    OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
-                });
+//                 // really... this delay is not predictable
+//                 containerElement.schedule.Execute(() =>
+//                 {
+//                     // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
+//                     // Debug.Log($"container={container.Count}");
+//                     // fallbackField.Query<VisualElement>(className: "unity-decorator-drawers-container").ForEach(each => each.RemoveFromHierarchy());
+// // #if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
+// //                     Label label = fallbackField.Q<Label>(className: "unity-label");
+// //                     if (label != null)
+// //                     {
+// //                         UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
+// //                     }
+// // #endif
+//
+//
+//                 });
 
                 topRoot.Clear();
                 topRoot.Add(containerElement);
@@ -1825,6 +1826,7 @@ namespace SaintsField.Editor.Core
                         onValueChangedCallback(curValue);
                     }
                 });
+                OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
             }
             else
             {
@@ -1848,14 +1850,14 @@ namespace SaintsField.Editor.Core
 
             containerElement.userData = this;
 
-#if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
-            Label label = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property))?.Q<Label>(className: "unity-label");
-            if (label != null)
-            {
-                // UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
-                label.schedule.Execute(() => UIToolkitUtils.FixLabelWidthUIToolkit(label));
-            }
-#endif
+// #if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
+//             Label label = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property))?.Q<Label>(className: "unity-label");
+//             if (label != null)
+//             {
+//                 // UIToolkitUtils.FixLabelWidthLoopUIToolkit(label);
+//                 label.schedule.Execute(() => UIToolkitUtils.FixLabelWidthUIToolkit(label));
+//             }
+// #endif
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {

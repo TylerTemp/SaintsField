@@ -18,8 +18,6 @@ namespace SaintsField.Editor.Playa.Renderer
         // ReSharper disable InconsistentNaming
         public readonly SaintsFieldWithInfo FieldWithInfo;
         protected readonly SerializedObject SerializedObject;
-        // ReSharper disable once MemberCanBePrivate.Global
-        protected readonly bool TryFixUIToolkit;
         // ReSharper enable InconsistentNaming
 
         protected struct PreCheckResult
@@ -31,11 +29,10 @@ namespace SaintsField.Editor.Playa.Renderer
             public string RichLabelXml;
         }
 
-        protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false)
+        protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             FieldWithInfo = fieldWithInfo;
             SerializedObject = serializedObject;
-            TryFixUIToolkit = tryFixUIToolkit;
         }
 
         private enum PreCheckInternalType

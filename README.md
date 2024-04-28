@@ -2271,7 +2271,7 @@ Parameters:
 
 *   `bool tryFixUIToolkit=defaultValue`
 
-    Should it try to fix the UI Toolkit label width issue? (See the UI Toolkit section). By default it will try, unless you toggled the `Disable UI Toolkit Label Fix` marco, or you passed this parameter.
+    Deprecated and has no effect now.
 
 *   AllowMultiple: No
 
@@ -2340,12 +2340,6 @@ public string normalStringField;
 ```
 
 ![saints_row_inline](https://github.com/TylerTemp/SaintsField/assets/6391063/571f4a05-91e0-4860-9ea2-bff6b1fe1d58)
-
-#### `UIToolkit` ####
-
-Add this only to field that has not `SaintsField` attribute to make this field's label behave like UI Toolkit. This does not work for pure `IMGUI` drawer. This is a fix for Unity's bugged `PropertyField` label.
-
-This is only available if you have `UI Toolkit` enabled (Unity 2022.2+ without disable UI Toolkit in `SaintsField`)
 
 ### Other Tools ###
 
@@ -3103,68 +3097,3 @@ My (not full) test about compatibility:
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
 *   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
 *   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good for Odin's `EditorWindow`.
-
-### UI Toolkit ###
-
-If you encounter any issue, please report it to the issue page. However, there are many issues that is just not fixable:
-
-1.  Label width. UI Toolkit uses a fixed label width 120px. However, this value is different when the field is nested and indented.
-
-    In IMGUI, we have `EditorGUIUtility.labelWidth`, `EditorGUI.indentLevel`, which is absolutely not available in UI Toolkit, and there is no way to get the label width.
-
-    **Since SaintsField 2.3.0, this issue is much better handled!**
-
-    Considering the following labels with UI Toolkit enabled:
-
-    ```csharp
-    public string itsALongRideForPeopleWhoHaveNothingToThinkAbout;
-    public string aBitLongerThanDefault;
-    public string s;  // short
-    ```
-
-    By default (or with `PropertyField` from UI Toolkit), Unity display it as this (it's a IMGUI style even with UI Toolkit on):
-
-    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/059bd138-8178-4958-950a-daef7cd6ca9a)
-
-    Now, let's apply any UI Toolkit component (except `PropertyField`), it will (surprisingly!) use the modern UI Toolkit flavor label layout:
-
-    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/2cdea75f-5a39-46ae-91d2-023f861b593f)
-
-    This inconsistency can make your inspector looks sooooooo weird and very funny because of un-aligned fields. This problem is reported to Unity but never got fixed. Considering:
-
-    ```csharp
-    // default field with UI Toolkit, Unity will truncate it to IMGUI width, instead of UI Toolkit flavor
-    public string thereIsSomeGoodNewsForPeopleWhoLoveBadNews;
-    // UI Toolkit component! Unity will grow the space like UI Toolkit
-    [UIToolkit] public string weWereDeadBeforeTheShipEvenSank;
-    // another default, Unity will use the IMGUI style width (some mix of a percent, min-width and caculation result) instead of UI Toolkit
-    public string myString;
-    // another UI Toolkit component! Unity will use the UI Toolkit style width (120px) like UI Toolkit
-    [UIToolkit] public string myUiToolkit;
-    ```
-
-    The field indent is a mess, even you're sticking to the UI Toolkit inspector:
-
-    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/04303517-fe3d-4c42-992e-cf97f86524ad)
-
-    This issue is so difficult to solve, that even OdinInspector does not try to fix it. (Or maybe they just don't care...?)
-
-    SaintsField now use some trick to make `PropertyField` label behaves much more like the vanilla UI Toolkit component:
-
-    ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/a8b90764-7053-4dcc-9af4-5f804f5e12fb)
-
-    That means:
-
-    1.  Label will by default get 120px width, which is UI Toolkit's default
-    2.  The space gets grow to fit the label when the label gets longer, which is also UI Toolkit's default
-    3.  If you have a very looooong label, the value field will be shrank out of view. This is also how UI Toolkit works.
-
-2.  ~~`PropertyField` of an `Object` will give an error when click: `NullReferenceException: ... UnityEditor.ProjectBrower.FrameObject...`. Clicking will still lead you to active the target object, but I have no idea where this came from. Even official's example will have this error if you just add a `PropertyField` to it. Clicking on the error message will lead to the `Console` tab's layout got completely messed up.~~
-
-    This is now fixed after dealing with the `PropertyField` binding.
-
-3.  `DropdownField` will tread a label's change as a value change... I have no idea why this happens and why only `DropdownField`. Luckily this change event will give a `newValue=null` so I can work around with it.
-
-4.  When leaving an PropertyDrawer to switch to a new target, the old one's `CreatePropertyGUI` will also get called once. This... makes the nested fallback difficult. Currently I use some silly way to work around with it, and you will see the inspector flick one frame at the beginning.
-
-If you're in Unity 2022.2+ (from which Unity use UI Toolkit as default inspector), `SaintsField` will switch to UI Toolkit by default. In this case, if you want to use the IMGUI version, you can go `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information) to disable UI Toolkit.

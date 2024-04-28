@@ -261,6 +261,13 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
+        public class RateField : BaseField<int>
+        {
+            public RateField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+            }
+        }
+
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Rate_Label";
         private static string ClassButton(SerializedProperty property) => $"{property.propertyPath}__Rate_Button";
 
@@ -268,6 +275,43 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute,
             VisualElement container, FieldInfo info, object parent)
         {
+            // VisualElement root = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         flexDirection = FlexDirection.Row,
+            //         height = SingleLineHeight,
+            //     },
+            // };
+            //
+            // Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
+            // label.name = NameLabel(property);
+            // // label.AddToClassList("unity-base-field__aligned");
+            // root.Add(label);
+            //
+            // RateAttribute rateAttribute = (RateAttribute)saintsAttribute;
+            // int min = rateAttribute.Min;
+            // int max = rateAttribute.Max;
+            //
+            // bool fromZero = min == 0;
+            //
+            // List<int> options = Enumerable.Range(fromZero? 0: 1, fromZero? max + 1: max).ToList();
+            // if (fromZero)
+            // {
+            //     options.Remove(0);
+            //     options.Add(0);
+            // }
+            //
+            // foreach (int option in options)
+            // {
+            //     root.Add(MakeStarUIToolkit(property, option, min));
+            // }
+            //
+            // root.AddToClassList(ClassAllowDisable);
+            // root.AddToClassList("unity-base-field__aligned");
+
+            // return root;
+
             VisualElement root = new VisualElement
             {
                 style =
@@ -276,11 +320,6 @@ namespace SaintsField.Editor.Drawers
                     height = SingleLineHeight,
                 },
             };
-
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            label.name = NameLabel(property);
-            root.Add(label);
-
             RateAttribute rateAttribute = (RateAttribute)saintsAttribute;
             int min = rateAttribute.Min;
             int max = rateAttribute.Max;
@@ -299,10 +338,14 @@ namespace SaintsField.Editor.Drawers
                 root.Add(MakeStarUIToolkit(property, option, min));
             }
 
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
+            RateField rateField = new RateField(property.displayName, root);
+            rateField.labelElement.style.overflow = Overflow.Hidden;
+            rateField.AddToClassList(ClassAllowDisable);
+            rateField.AddToClassList("unity-base-field__aligned");
+            return rateField;
         }
+
+
 
         private Button MakeStarUIToolkit(SerializedProperty property, int option, int minValue)
         {

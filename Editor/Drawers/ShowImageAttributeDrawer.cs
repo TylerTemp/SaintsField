@@ -6,6 +6,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Image = UnityEngine.UIElements.Image;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
@@ -315,9 +316,19 @@ namespace SaintsField.Editor.Drawers
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
+        public class ShowImageField : BaseField<string>
+        {
+            public readonly VisualElement imageContainerElement;
+            public readonly Image imageElement;
+
+            public ShowImageField(string label, VisualElement imageContainer, Image image) : base(label, imageContainer)
+            {
+                imageContainerElement = imageContainer;
+                imageElement = image;
+            }
+        }
+
         private static string NameRoot(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage";
-        private static string NameImage(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage_Image";
-        private static string NameFakePlaceholder(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ShowImage_Placeholder";
 
         private static string NameHelpBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__ShowImage_HelpBox";
@@ -354,7 +365,10 @@ namespace SaintsField.Editor.Drawers
 
             VisualElement root = new VisualElement
             {
-                name = NameImage(property, index) + "_root",
+                style =
+                {
+                    flexGrow = 1,
+                },
             };
             root.Add(CreateUIToolkitElement(property, index, null, showImageAttribute));
             root.Add(helpBox);
@@ -388,8 +402,8 @@ namespace SaintsField.Editor.Drawers
                 helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
             }
 
-            VisualElement root = container.Q<VisualElement>(NameRoot(property, index));
-            UnityEngine.UIElements.Image image = root.Q<UnityEngine.UIElements.Image>(NameImage(property, index));
+            ShowImageField root = container.Q<ShowImageField>(NameRoot(property, index));
+            Image image = root.imageElement;
             Payload payload = (Payload)image.userData;
             // ReSharper disable once Unity.NoNullPropagation
             // int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
@@ -415,11 +429,9 @@ namespace SaintsField.Editor.Drawers
             // UpdateImage(image, preview, (AssetPreviewAttribute)saintsAttribute);
             if (preview != null)
             {
-                SetImage(root, image, preview);
+                SetImage(root, preview);
                 OnRootGeoChanged(
                     root,
-                    root.Q<Label>(NameFakePlaceholder(property, index)),
-                    root.Q<UnityEngine.UIElements.Image>(NameImage(property, index)),
                     showImageAttribute.MaxWidth, showImageAttribute.MaxHeight);
             }
         }
@@ -428,45 +440,46 @@ namespace SaintsField.Editor.Drawers
         private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index, Texture2D preview,
             ShowImageAttribute showImageAttribute)
         {
-            VisualElement root = new VisualElement
+
+            Image image = new Image
             {
-                name = NameRoot(property, index),
+                scaleMode = ScaleMode.ScaleToFit,
+            };
+
+            VisualElement imageContainer = new VisualElement
+            {
                 style =
                 {
                     flexDirection = FlexDirection.Row,
                 },
             };
-            Label fakeLabel = Util.PrefixLabelUIToolKit(" ", 0);
-            fakeLabel.name = NameFakePlaceholder(property, index);
+            imageContainer.Add(image);
 
-            root.Add(fakeLabel);
-
-            UnityEngine.UIElements.Image image = new UnityEngine.UIElements.Image
+            ShowImageField showImageField = new ShowImageField(" ", imageContainer, image)
             {
-                name = NameImage(property, index),
-                scaleMode = ScaleMode.ScaleToFit,
+                name = NameRoot(property, index),
+                style =
+                {
+                    flexGrow = 1,
+                },
             };
+            showImageField.AddToClassList("unity-base-field__aligned");
+
 
             switch (showImageAttribute.Align)
             {
                 case EAlign.Start:
-                    // image.style.alignSelf = Align.Start;
-                    fakeLabel.style.display = DisplayStyle.None;
+                    showImageField.labelElement.style.display = DisplayStyle.None;
                     break;
                 case EAlign.Center:
-                    // image.style.alignSelf = Align.Center;
-                    fakeLabel.style.display = DisplayStyle.None;
-                    root.style.justifyContent = Justify.Center;
+                    showImageField.labelElement.style.display = DisplayStyle.None;
+                    showImageField.imageContainerElement.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
-                    fakeLabel.style.display = DisplayStyle.None;
-                    // image.style.alignSelf = Align.FlexEnd;
-                    root.style.justifyContent = Justify.FlexEnd;
+                    showImageField.labelElement.style.display = DisplayStyle.None;
+                    showImageField.imageContainerElement.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
-                    fakeLabel.style.display = DisplayStyle.Flex;
-                    // image.style.alignSelf = Align.FlexStart;
-                    // image.style.left = LabelBaseWidth;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(showImageAttribute.Align), showImageAttribute.Align, null);
@@ -476,7 +489,7 @@ namespace SaintsField.Editor.Drawers
 
             // image.AddToClassList(NameImage(property, index));
 
-            SetImage(root, image, preview);
+            SetImage(showImageField, preview);
             if (preview == null)
             {
                 image.userData = new Payload
@@ -496,14 +509,14 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            root.Add(image);
+            showImageField.AddToClassList(ClassAllowDisable);
 
-            root.RegisterCallback<GeometryChangedEvent>(_ => OnRootGeoChanged(root, fakeLabel, image, showImageAttribute.MaxWidth, showImageAttribute.MaxHeight));
+            showImageField.RegisterCallback<GeometryChangedEvent>(_ => OnRootGeoChanged(showImageField, showImageAttribute.MaxWidth, showImageAttribute.MaxHeight));
 
-            return root;
+            return showImageField;
         }
 
-        private static void SetImage(VisualElement root, UnityEngine.UIElements.Image image, Texture2D preview)
+        private static void SetImage(ShowImageField root, Texture2D preview)
         {
             if (preview == null)
             {
@@ -512,11 +525,14 @@ namespace SaintsField.Editor.Drawers
             }
 
             root.style.display = DisplayStyle.Flex;
-            image.image = preview;
+            root.imageElement.image = preview;
         }
 
-        private static void OnRootGeoChanged(VisualElement root, Label fakeLabel, UnityEngine.UIElements.Image image, int widthConfig, int heightConfig)
+        private static void OnRootGeoChanged(ShowImageField root, int widthConfig, int heightConfig)
         {
+            Label fakeLabel = root.labelElement;
+            Image image = root.imageElement;
+
             if(root.style.display == DisplayStyle.None)
             {
                 return;

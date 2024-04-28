@@ -5,13 +5,13 @@ namespace SaintsField.Editor.Playa
     public class ApplySaintsEditorBase : SaintsEditor
     {
         // should we try to fix the UI Toolkit PropertyField label unmatched width issue?
-        protected override bool TryFixUIToolkit =>
-#if SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
-            false
-#else
-            true
-#endif
-        ;
+//         protected override bool TryFixUIToolkit =>
+// #if SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
+//             false
+// #else
+//             true
+// #endif
+//         ;
 
         // should IMGUI constant repaint? The `ProgressBar` and `Rate` will look much better
         public override bool RequiresConstantRepaint() =>

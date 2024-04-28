@@ -250,6 +250,13 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
+        public class MinMaxSliderField : BaseField<Vector2>
+        {
+            public MinMaxSliderField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+            }
+        }
+
         private static string NameSlider(SerializedProperty property) => $"{property.propertyPath}__MinMaxSlider_Slider";
         private static string NameMinInteger(SerializedProperty property) => $"{property.propertyPath}__MinMaxSlider_MinIntegerField";
         private static string NameMaxInteger(SerializedProperty property) => $"{property.propertyPath}__MinMaxSlider_MaxIntegerField";
@@ -302,7 +309,7 @@ namespace SaintsField.Editor.Drawers
             {
                 Vector2Int curValue = property.vector2IntValue;
 
-                root.Add(new IntegerField(property.displayName)
+                root.Add(new IntegerField
                 {
                     isDelayed = true,
                     value = curValue.x,
@@ -310,7 +317,7 @@ namespace SaintsField.Editor.Drawers
                     style =
                     {
                         flexGrow = 0,
-                        width = InputWidth + LabelBaseWidth,
+                        width = InputWidth,
                     },
                 });
                 root.Add(minMaxSlider);
@@ -331,7 +338,7 @@ namespace SaintsField.Editor.Drawers
                 Vector2 curValue = property.vector2Value;
                 // slider.SetValueWithoutNotify(curValue);
 
-                root.Add(new FloatField(property.displayName)
+                root.Add(new FloatField
                 {
                     isDelayed = true,
                     value = curValue.x,
@@ -339,7 +346,7 @@ namespace SaintsField.Editor.Drawers
                     style =
                     {
                         flexGrow = 0,
-                        width = InputWidth + LabelBaseWidth,
+                        width = InputWidth,
                     },
                 });
                 root.Add(minMaxSlider);
@@ -356,9 +363,13 @@ namespace SaintsField.Editor.Drawers
                 });
             }
 
-            root.AddToClassList(ClassAllowDisable);
+            MinMaxSliderField minMaxSliderField = new MinMaxSliderField(property.displayName, root);
+            minMaxSliderField.labelElement.style.overflow = Overflow.Hidden;
+            minMaxSliderField.AddToClassList("unity-base-field__aligned");
 
-            return root;
+            minMaxSliderField.AddToClassList(ClassAllowDisable);
+
+            return minMaxSliderField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,

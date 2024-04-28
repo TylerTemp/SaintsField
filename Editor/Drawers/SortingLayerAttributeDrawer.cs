@@ -29,7 +29,17 @@ namespace SaintsField.Editor.Drawers
             // TagManagerInspector.ShowWithInitialExpansion(TagManagerInspector.InitialExpansionState.Layers)
             Type tagManagerInspectorType = Type.GetType("UnityEditor.TagManagerInspector, UnityEditor");
             // Get the method Info for the ShowWithInitialExpansion method
+            if (tagManagerInspectorType == null)
+            {
+                return;
+            }
+
             MethodInfo showWithInitialExpansionMethod = tagManagerInspectorType.GetMethod("ShowWithInitialExpansion", BindingFlags.Static | BindingFlags.NonPublic);
+            if (showWithInitialExpansionMethod == null)
+            {
+                return;
+            }
+
             Type initialExpansionStateType = tagManagerInspectorType.GetNestedType("InitialExpansionState", BindingFlags.NonPublic);
             object layersEnumValue = Enum.Parse(initialExpansionStateType, "SortingLayers");
             // Invoke the ShowWithInitialExpansion method with the Layers enum value
@@ -98,34 +108,19 @@ namespace SaintsField.Editor.Drawers
         #region UIToolkit
 
         private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__SortingLayer_Button";
-        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__SortingLayer_ButtonLabel";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SortingLayer_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
-            dropdownButton.Button.style.flexGrow = 1;
-            dropdownButton.Button.name = NameButtonField(property);
-            dropdownButton.Label.name = NameButtonLabelField(property);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.name = NameButtonField(property);
 
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-            };
+            dropdownButton.AddToClassList(ClassAllowDisable);
 
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            label.AddToClassList("unity-label");
-            root.Add(label);
-            root.Add(dropdownButton.Button);
-
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
+            return dropdownButton;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -148,22 +143,20 @@ namespace SaintsField.Editor.Drawers
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
+            UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
             (string[] _, int _, string displayName) = GetSelected(property);
-            buttonLabel.text = displayName;
+            buttonLabel.buttonLabelElement.text = displayName;
 
-            container.Q<Button>(NameButtonField(property)).clicked += () =>
-                ShowDropdown(property, container, parent, onValueChangedCallback);
+            container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).buttonElement.clicked += () =>
+                ShowDropdown(property, container, onValueChangedCallback);
         }
 
         private static void ShowDropdown(SerializedProperty property,
-            VisualElement container, object parent, Action<object> onChange)
+            VisualElement container, Action<object> onChange)
         {
             (string[] layers, int selectedIndex, string _) = GetSelected(property);
 
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-            Button button = container.Q<Button>(NameButtonField(property));
-
             // if (layers.Length == 0)
             // {
             //     genericDropdownMenu.AddDisabledItem("No layers", false);
@@ -171,7 +164,7 @@ namespace SaintsField.Editor.Drawers
             //     return;
             // }
 
-            Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
+            UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
 
             foreach (int index in Enumerable.Range(0, layers.Length))
             {
@@ -195,7 +188,7 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                         onChange.Invoke(curIndex);
                     }
-                    buttonLabel.text = curName;
+                    buttonLabel.buttonLabelElement.text = curName;
                 });
             }
 
@@ -205,7 +198,7 @@ namespace SaintsField.Editor.Drawers
             }
             genericDropdownMenu.AddItem("Edit Sorting Layers...", false, OpenSortingLayerInspector);
 
-            genericDropdownMenu.DropDown(button.worldBound, button, true);
+            genericDropdownMenu.DropDown(buttonLabel.buttonElement.worldBound, buttonLabel, true);
         }
 
         private static (string[] layers, int index, string display) GetSelected(SerializedProperty property)

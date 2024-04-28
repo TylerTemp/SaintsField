@@ -418,7 +418,14 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
+        public class EnumFlagsField : BaseField<Enum>
+        {
+            public EnumFlagsField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+            }
+        }
+
+        private static string NameEnumFlagsContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
         private static string NameInlineContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_InlineContainer";
         private static string NameExpandContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ExpandContainer";
@@ -604,28 +611,31 @@ namespace SaintsField.Editor.Drawers
 
             VisualElement root = new VisualElement
             {
-                name = NameContainer(property),
                 style =
                 {
                     flexDirection = FlexDirection.Row,
                 },
                 userData = -1f,
             };
-            Label prefixLabel = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            prefixLabel.name = NameLabel(property);
-            prefixLabel.style.maxHeight = SingleLineHeight;
+
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
-            if(enumFlagsAttribute.AutoExpand)
-            {
-                prefixLabel.style.color = Color.clear;
-            }
-            prefixLabel.AddToClassList("unity-label");
-            root.Add(prefixLabel);
+
             root.Add(fieldContainer);
 
-            root.AddToClassList(ClassAllowDisable);
+            EnumFlagsField enumFlagsField = new EnumFlagsField(property.displayName, root);
+            enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
+            enumFlagsField.AddToClassList("unity-base-field__aligned");
+            enumFlagsField.name = NameEnumFlagsContainer(property);
+            // if(enumFlagsAttribute.AutoExpand)
+            // {
+            //     enumFlagsField.labelElement.style.color = Color.clear;
+            // }
 
-            return root;
+            enumFlagsField.labelElement.style.maxHeight = SingleLineHeight;
+
+            enumFlagsField.AddToClassList(ClassAllowDisable);
+
+            return enumFlagsField;
         }
 
         protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
@@ -657,6 +667,8 @@ namespace SaintsField.Editor.Drawers
                 name = NameFoldout(property),
                 userData = false,  // processing
             };
+
+            foldOut.Q<Label>().style.color = Color.clear;
 
             return foldOut;
         }
@@ -822,7 +834,7 @@ namespace SaintsField.Editor.Drawers
             float totalSpaceWidth = inlineContainer.resolvedStyle.width;
             float totalBtnWidth = inlineContainer.Children().Sum(each => each.resolvedStyle.width);
 
-            return totalSpaceWidth < totalBtnWidth;
+            return totalSpaceWidth - totalBtnWidth <= 7f;
         }
         // Debug.Log(useExpand);
 
@@ -843,16 +855,9 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
             IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
         {
-            Label target = container.Q<Label>(NameLabel(property));
-            UIToolkitUtils.SetLabel(target, richTextChunks, richTextDrawer);
+            EnumFlagsField enumFlagsField = container.Q<EnumFlagsField>(NameEnumFlagsContainer(property));
 
-            Foldout foldout = container.Q<Foldout>(NameFoldout(property));
-            // foldout.text = labelOrNull ?? "";
-            Label foldoutLabel = foldout.Q<Label>();
-            if (foldoutLabel != null)
-            {
-                UIToolkitUtils.SetLabel(foldoutLabel, richTextChunks, richTextDrawer);
-            }
+            UIToolkitUtils.SetLabel(enumFlagsField.labelElement, richTextChunks, richTextDrawer);
         }
 
         #endregion

@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers
         {
             AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
 
-            (string error, UnityEngine.Animator animatorController) = AnimatorUtils.GetAnimator(animatorParamAttribute.AnimatorName, property, fieldInfo, parent);
+            (string error, Animator animatorController) = AnimatorUtils.GetAnimator(animatorParamAttribute.AnimatorName, property, fieldInfo, parent);
             if (error != "")
             {
                 return new MetaInfo
@@ -212,6 +212,7 @@ namespace SaintsField.Editor.Drawers
                 name = NameDropdownField(property),
                 choices = curMetaInfo.AnimatorParameters.Select(GetParameterLabel).ToList(),
             };
+            dropdownField.AddToClassList("unity-base-field__aligned");
 
             Func<AnimatorControllerParameter, bool> predicate = property.propertyType == SerializedPropertyType.String
                 ? p => ParamNameEquals(p, property)

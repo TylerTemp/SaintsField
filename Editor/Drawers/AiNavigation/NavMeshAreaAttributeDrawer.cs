@@ -155,33 +155,19 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 ? "-"
                 : FormatAreaName(areas[areaIndex], valueType);
 
-            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
-            dropdownButton.Button.style.flexGrow = 1;
-            dropdownButton.Button.name = NameButtonField(property);
-            dropdownButton.Button.userData = new ButtonData(valueType)
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(buttonLabel);
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.name = NameButtonField(property);
+            dropdownButton.userData = new ButtonData(valueType)
             {
                 selectedIndex = areaIndex,
             };
-            dropdownButton.Label.text = buttonLabel;
-            dropdownButton.Label.name = NameButtonLabelField(property);
 
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-            };
+            dropdownButton.labelElement.name = NameButtonLabelField(property);
 
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            label.name = NameLabel(property);
-            label.AddToClassList("unity-label");
-            root.Add(label);
-            root.Add(dropdownButton.Button);
+            dropdownButton.AddToClassList(ClassAllowDisable);
 
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
+            return dropdownButton;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

@@ -500,11 +500,9 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameFieldBaseline(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_FieldBaseline";
         private static string NameDropdownButton(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_DropdownButton";
         private static string NameProperties(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_Properties";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_HelpBox";
-        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_DropdownField_Label";
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_Foldout";
 
         private static string NameSubStateMachineNameChain(SerializedProperty property) => $"{property.propertyPath}__AnimatorState_SubStateMachineNameChain";
@@ -542,7 +540,13 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement rootContainer = new VisualElement();
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             int curIndex = property.propertyType == SerializedPropertyType.String
@@ -550,29 +554,13 @@ namespace SaintsField.Editor.Drawers
                 : Util.ListIndexOfAction(metaInfo.AnimatorStates, eachStateInfo => EqualAnimatorState(eachStateInfo, property));
             string buttonLabel = curIndex == -1? "-": FormatStateLabel(metaInfo.AnimatorStates[curIndex], "/");
 
-            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
-            dropdownButton.Button.style.flexGrow = 1;
-            dropdownButton.Button.name = NameDropdownButton(property);
-            dropdownButton.Button.userData = metaInfo;
-            dropdownButton.Label.text = buttonLabel;
-            dropdownButton.Label.name = NameButtonLabelField(property);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.name = NameDropdownButton(property);
+            dropdownButton.userData = metaInfo;
+            dropdownButton.buttonLabelElement.text = buttonLabel;
 
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-                name = NameFieldBaseline(property),
-            };
-
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            // label.name = NameLabel(property);
-            label.AddToClassList("unity-label");
-            root.Add(label);
-            root.Add(dropdownButton.Button);
-
-            rootContainer.Add(root);
+            root.Add(dropdownButton);
 
             VisualElement properties = new VisualElement
             {
@@ -618,14 +606,15 @@ namespace SaintsField.Editor.Drawers
                     isReadOnly = true,
                 };
                 textField.SetEnabled(false);
+                textField.AddToClassList("unity-base-field__aligned");
                 properties.Add(textField);
             }
 
-            rootContainer.Add(properties);
+            root.Add(properties);
 
-            rootContainer.AddToClassList(ClassAllowDisable);
+            root.AddToClassList(ClassAllowDisable);
 
-            return rootContainer;
+            return root;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -649,8 +638,8 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            Button dropdownButton = container.Q<Button>(NameDropdownButton(property));
-            dropdownButton.clicked += () => ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
+            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
+            dropdownButton.buttonElement.clicked += () => ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             int curIndex = property.propertyType == SerializedPropertyType.String
@@ -694,7 +683,7 @@ namespace SaintsField.Editor.Drawers
                 ? Util.ListIndexOfAction(metaInfo.AnimatorStates, eachInfo => eachInfo.state.name == property.stringValue)
                 : Util.ListIndexOfAction(metaInfo.AnimatorStates, eachStateInfo => EqualAnimatorState(eachStateInfo, property));
             // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
-            Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
+            UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
             foreach (int index in Enumerable.Range(0, metaInfo.AnimatorStates.Count))
             {
                 // int curIndex = index;
@@ -709,7 +698,7 @@ namespace SaintsField.Editor.Drawers
                     property.serializedObject.ApplyModifiedProperties();
                     // Debug.Log($"onChange {curItem}");
                     onChange(property.propertyType == SerializedPropertyType.String? curItem.state.name : curItem);
-                    buttonLabel.text = curName;
+                    buttonLabel.buttonLabelElement.text = curName;
                     // property.serializedObject.ApplyModifiedProperties();
                 });
             }
@@ -725,9 +714,9 @@ namespace SaintsField.Editor.Drawers
                     () => OpenAnimator(metaInfo.Animator.runtimeAnimatorController));
             }
 
-            VisualElement root = container.Q<VisualElement>(NameFieldBaseline(property));
+            UIToolkitUtils.DropdownButtonField root = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
 
-            genericDropdownMenu.DropDown(root.worldBound, root, true);
+            genericDropdownMenu.DropDown(root.buttonElement.worldBound, root, true);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

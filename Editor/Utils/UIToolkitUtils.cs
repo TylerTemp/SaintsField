@@ -14,32 +14,32 @@ namespace SaintsField.Editor.Utils
     public static class UIToolkitUtils
     {
 
-        public static void FixLabelWidthLoopUIToolkit(Label label)
-        {
-            // FixLabelWidthUIToolkit(label);
-            // label.schedule.Execute(() => FixLabelWidthUIToolkit(label)).StartingIn(250);
-            label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
-        }
-
-        // ReSharper disable once SuggestBaseTypeForParameter
-        public static void FixLabelWidthUIToolkit(Label label)
-        {
-            StyleLength autoLength = new StyleLength(StyleKeyword.Auto);
-            StyleLength curLenght = label.style.width;
-            float resolvedWidth = label.resolvedStyle.width;
-            // if(curLenght.value != autoLength)
-            // don't ask me why we need to compare with 0, ask Unity...
-            if(
-                // !(curLenght.value.IsAuto()  // IsAuto() is not available in 2021.3.0f1
-                !(curLenght.keyword == StyleKeyword.Auto
-                  || curLenght.value == 0)
-                && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
-            {
-                // Debug.Log($"try fix {label.style.width}({curLenght.value.IsAuto()}); {resolvedWidth > 0} {resolvedWidth}");
-                label.style.width = autoLength;
-                // label.schedule.Execute(() => label.style.width = autoLength);
-            }
-        }
+        // public static void FixLabelWidthLoopUIToolkit(Label label)
+        // {
+        //     // FixLabelWidthUIToolkit(label);
+        //     // label.schedule.Execute(() => FixLabelWidthUIToolkit(label)).StartingIn(250);
+        //     label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
+        // }
+        //
+        // // ReSharper disable once SuggestBaseTypeForParameter
+        // public static void FixLabelWidthUIToolkit(Label label)
+        // {
+        //     StyleLength autoLength = new StyleLength(StyleKeyword.Auto);
+        //     StyleLength curLenght = label.style.width;
+        //     float resolvedWidth = label.resolvedStyle.width;
+        //     // if(curLenght.value != autoLength)
+        //     // don't ask me why we need to compare with 0, ask Unity...
+        //     if(
+        //         // !(curLenght.value.IsAuto()  // IsAuto() is not available in 2021.3.0f1
+        //         !(curLenght.keyword == StyleKeyword.Auto
+        //           || curLenght.value == 0)
+        //         && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
+        //     {
+        //         // Debug.Log($"try fix {label.style.width}({curLenght.value.IsAuto()}); {resolvedWidth > 0} {resolvedWidth}");
+        //         label.style.width = autoLength;
+        //         // label.schedule.Execute(() => label.style.width = autoLength);
+        //     }
+        // }
 
         public static void WaitUntilThenDo<T>(VisualElement container, Func<(bool ok, T result)> until, Action<T> thenDo, long delay=0)
         {
@@ -122,14 +122,26 @@ namespace SaintsField.Editor.Utils
             // ReSharper enable InconsistentNaming
         }
 
-        public static DropdownButtonUIToolkit MakeDropdownButtonUIToolkit()
+        public class DropdownButtonField : BaseField<string>
+        {
+            public readonly Button buttonElement;
+            public readonly Label buttonLabelElement;
+
+            public DropdownButtonField(string label, Button visualInput, Label buttonLabel) : base(label, visualInput)
+            {
+                buttonElement = visualInput;
+                buttonLabelElement = buttonLabel;
+            }
+        }
+
+        public static DropdownButtonField MakeDropdownButtonUIToolkit(string label)
         {
             Button button = new Button
             {
                 style =
                 {
                     height = EditorGUIUtility.singleLineHeight,
-                    // flexGrow = 1,
+                    flexGrow = 1,
                     paddingRight = 2,
                     marginRight = 0,
                     marginLeft = 0,
@@ -151,9 +163,9 @@ namespace SaintsField.Editor.Utils
                 },
             };
 
-            Label label = new Label();
+            Label buttonLabel = new Label();
 
-            buttonLabelContainer.Add(label);
+            buttonLabelContainer.Add(buttonLabel);
             buttonLabelContainer.Add(new Image
             {
                 image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
@@ -166,12 +178,17 @@ namespace SaintsField.Editor.Utils
 
             button.Add(buttonLabelContainer);
 
+            DropdownButtonField dropdownButtonField = new DropdownButtonField(label, button, buttonLabel);
+
+            dropdownButtonField.AddToClassList("unity-base-field__aligned");
+
+            return dropdownButtonField;
             // return Button;
-            return new DropdownButtonUIToolkit
-            {
-                Button = button,
-                Label = label,
-            };
+            // return new DropdownButtonUIToolkit
+            // {
+            //     Button = button,
+            //     Label = label,
+            // };
         }
     }
 #endif

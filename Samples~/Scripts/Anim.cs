@@ -8,8 +8,8 @@ namespace SaintsField.Samples.Scripts
         [field: SerializeField]
         public Animator Animator { get; private set; }
 
-        [FormerlySerializedAs("animatorState")] [AnimatorState][RichLabel("<icon=star.png /><label />")]
-        public Animator animator;
+        [AnimatorState][RichLabel("<icon=star.png /><label />")]
+        public AnimatorState animator;
 
         [AnimatorState(nameof(Animator))]
         public string animStateName;

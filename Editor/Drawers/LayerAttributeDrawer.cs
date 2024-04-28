@@ -88,6 +88,7 @@ namespace SaintsField.Editor.Drawers
             {
                 name = NameLayer(property),
             };
+            layerField.AddToClassList("unity-base-field__aligned");
             layerField.AddToClassList(ClassAllowDisable);
 
             return layerField;

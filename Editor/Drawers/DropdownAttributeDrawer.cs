@@ -307,10 +307,8 @@ namespace SaintsField.Editor.Drawers
 
         #region UIToolkit
 
-        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Button";
-        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_ButtonLabel";
+        private static string NameDropdownButtonField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Button";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Dropdown_HelpBox";
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Label";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
@@ -320,32 +318,17 @@ namespace SaintsField.Editor.Drawers
 
             string buttonLabel = metaInfo.SelectedIndex == -1? "-": metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
 
-            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
-            dropdownButton.Button.style.flexGrow = 1;
-            dropdownButton.Button.name = NameButtonField(property);
-            dropdownButton.Button.userData = metaInfo.SelectedIndex == -1
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.buttonLabelElement.text = buttonLabel;
+            dropdownButton.name = NameDropdownButtonField(property);
+            dropdownButton.userData = metaInfo.SelectedIndex == -1
                 ? null
                 : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2;
-            dropdownButton.Label.text = buttonLabel;
-            dropdownButton.Label.name = NameButtonLabelField(property);
 
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-            };
+            dropdownButton.AddToClassList(ClassAllowDisable);
 
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            label.name = NameLabel(property);
-            label.AddToClassList("unity-label");
-            root.Add(label);
-            root.Add(dropdownButton.Button);
-
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
+            return dropdownButton;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -370,7 +353,7 @@ namespace SaintsField.Editor.Drawers
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;
-            container.Q<Button>(NameButtonField(property)).clicked += () =>
+            container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).buttonElement.clicked += () =>
                 ShowDropdown(property, saintsAttribute, container, dropdownAttribute.SlashAsSub, info, parent, onValueChangedCallback);
         }
 
@@ -386,7 +369,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             object newValue = field.GetValue(parent);
-            object curValue = container.Q<Button>(NameButtonField(property)).userData;
+            object curValue = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).userData;
             if (Util.GetIsEqual(curValue, newValue))
             {
                 return;
@@ -394,7 +377,12 @@ namespace SaintsField.Editor.Drawers
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, field, parent);
             string display = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
-            container.Q<Label>(NameButtonLabelField(property)).text = display;
+            // Debug.Log($"change label to {display}");
+            Label buttonLabelElement = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).buttonLabelElement;
+            if(buttonLabelElement.text != display)
+            {
+                buttonLabelElement.text = display;
+            }
         }
 
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -416,19 +404,18 @@ namespace SaintsField.Editor.Drawers
             }
 
             // Button button = container.Q<Button>(NameButtonField(property));
-            Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
-            Button button = container.Q<Button>(NameButtonField(property));
+            UIToolkitUtils.DropdownButtonField dropdownButtonField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property));
 
             if (slashAsSub)
             {
                 string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
-                ShowGenericMenu(metaInfo, curDisplay, button.worldBound, (newName, item) =>
+                ShowGenericMenu(metaInfo, curDisplay, dropdownButtonField.buttonElement.worldBound, (newName, item) =>
                 {
                     Util.SignFieldValue(property.serializedObject.targetObject, item, parent, info);
                     Util.SignPropertyValue(property, item);
                     property.serializedObject.ApplyModifiedProperties();
                     onChange(item);
-                    buttonLabel.text = newName;
+                    dropdownButtonField.buttonLabelElement.text = newName;
                     // property.serializedObject.ApplyModifiedProperties();
                 }, false);
             }
@@ -461,13 +448,13 @@ namespace SaintsField.Editor.Drawers
                             Util.SignPropertyValue(property, curItem);
                             property.serializedObject.ApplyModifiedProperties();
                             onChange(curItem);
-                            buttonLabel.text = curName;
+                            dropdownButtonField.buttonLabelElement.text = curName;
                             // property.serializedObject.ApplyModifiedProperties();
                         });
                     }
                 }
 
-                genericDropdownMenu.DropDown(button.worldBound, button, true);
+                genericDropdownMenu.DropDown(dropdownButtonField.buttonElement.worldBound, dropdownButtonField, true);
             }
         }
 

@@ -95,9 +95,7 @@ namespace SaintsField.Editor.Drawers
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
-        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__InputAxis_Button";
-        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__InputAxis_ButtonLabel";
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__InputAxis_Label";
+        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__InputAxis";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
@@ -107,34 +105,21 @@ namespace SaintsField.Editor.Drawers
             int selectedIndex = IndexOf(axisNames, property.stringValue);
             string buttonLabel = selectedIndex == -1 ? "-" : axisNames[selectedIndex];
 
-            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
-            dropdownButton.Button.style.flexGrow = 1;
-            dropdownButton.Button.name = NameButtonField(property);
-            dropdownButton.Label.text = buttonLabel;
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.name = NameButtonField(property);
+            dropdownButton.buttonLabelElement.text = buttonLabel;
 
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-            };
+            dropdownButton.AddToClassList(ClassAllowDisable);
 
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            label.name = NameLabel(property);
-            label.AddToClassList("unity-label");
-            root.Add(label);
-            root.Add(dropdownButton.Button);
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
+            return dropdownButton;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            container.Q<Button>(NameButtonField(property)).clicked += () =>
+            container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).buttonElement.clicked += () =>
                 ShowDropdown(property, saintsAttribute, container, parent, onValueChangedCallback);
         }
 
@@ -144,7 +129,7 @@ namespace SaintsField.Editor.Drawers
             IReadOnlyList<string> axisNames = GetAxisNames();
 
             // Button button = container.Q<Button>(NameButtonField(property));
-            Label buttonLabel = container.Q<Label>(NameButtonLabelField(property));
+            UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
 
             int selectedIndex = IndexOf(axisNames, property.stringValue);
@@ -158,7 +143,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     property.stringValue = axisNames[curIndex];
                     onChange(axisNames[curIndex]);
-                    buttonLabel.text = axisNames[curIndex];
+                    buttonLabel.buttonLabelElement.text = axisNames[curIndex];
                     property.serializedObject.ApplyModifiedProperties();
                 });
             }
@@ -170,8 +155,7 @@ namespace SaintsField.Editor.Drawers
 
             genericDropdownMenu.AddItem("Open Input Manager...", false, OpenInputManager);
 
-            Button button = container.Q<Button>(NameButtonField(property));
-            genericDropdownMenu.DropDown(button.worldBound, button, true);
+            genericDropdownMenu.DropDown(buttonLabel.buttonElement.worldBound, buttonLabel, true);
         }
 
         // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,

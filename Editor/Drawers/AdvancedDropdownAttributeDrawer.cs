@@ -1104,8 +1104,6 @@ namespace SaintsField.Editor.Drawers
 
         // private static string NameContainer(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown";
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Button";
-        private static string NameButtonLabel(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_ButtonLabel";
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Label";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -1116,87 +1114,24 @@ namespace SaintsField.Editor.Drawers
         {
             MetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
 
-            UIToolkitUtils.DropdownButtonUIToolkit dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit();
-            dropdownButton.Button.style.flexGrow = 1;
-            dropdownButton.Button.name = NameButton(property);
-            dropdownButton.Button.userData = initMetaInfo.CurValue;
-            dropdownButton.Label.text = GetMetaStackDisplay(initMetaInfo);
-            dropdownButton.Label.name = NameButtonLabel(property);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.name = NameButton(property);
+            dropdownButton.userData = initMetaInfo.CurValue;
+            dropdownButton.buttonLabelElement.text = GetMetaStackDisplay(initMetaInfo);
 
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                },
-                // name = NameContainer(property),
-            };
+            dropdownButton.AddToClassList(ClassAllowDisable);
 
-            Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            label.name = NameLabel(property);
-            label.AddToClassList("unity-label");
-            root.Add(label);
-            root.Add(dropdownButton.Button);
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
-
-            // Button button = new Button
-            // {
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //         flexDirection = FlexDirection.Row,
-            //         alignItems = Align.Center,
-            //         justifyContent = Justify.SpaceBetween,
-            //         paddingLeft = 1,
-            //         paddingRight = 1,
-            //     },
-            //     name = NameButton(property),
-            //     userData = initMetaInfo.CurValue,
-            // };
-            //
-            // Label buttonLabel = new Label(GetMetaStackDisplay(initMetaInfo))
-            // {
-            //     name = NameButtonLabel(property),
-            // };
-            // button.Add(buttonLabel);
-            // button.Add(new Image
-            // {
-            //     image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
-            //     style =
-            //     {
-            //         width = 15,
-            //         height = 12,
-            //     },
-            // });
-            //
-            // VisualElement root = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         flexDirection = FlexDirection.Row,
-            //     },
-            //     name = NameContainer(property),
-            // };
-            //
-            // // button.Add(buttonLabelContainer);
-            //
-            // Label label = Util.PrefixLabelUIToolKit(new string(' ', property.displayName.Length), 0);
-            // label.name = NameLabel(property);
-            // root.Add(label);
-            // root.Add(button);
-            //
-            // return root;
+            return dropdownButton;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            Button button = container.Q<Button>(NameButton(property));
+            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
             VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
-            button.clicked += () =>
+            dropdownButton.buttonElement.clicked += () =>
             {
                 MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
                 UnityEditor.PopupWindow.Show(root.worldBound, new SaintsAdvancedDropdownUiToolkit(
@@ -1208,8 +1143,8 @@ namespace SaintsField.Editor.Drawers
                         Util.SignPropertyValue(property, curItem);
                         property.serializedObject.ApplyModifiedProperties();
 
-                        button.Q<Label>(NameButtonLabel(property)).text = newDisplay;
-                        button.userData = curItem;
+                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).buttonLabelElement.text = newDisplay;
+                        dropdownButton.userData = curItem;
                         onValueChangedCallback(curItem);
                     }
                 ));

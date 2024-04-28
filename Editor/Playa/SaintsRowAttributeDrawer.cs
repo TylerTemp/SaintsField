@@ -73,7 +73,7 @@ namespace SaintsField.Editor.Playa
             // Debug.Log($"create new for {property.propertyPath}");
             (int index, object _, object current) = GetTargets(fieldInfo, property);
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
-            return _imGuiRenderers[index] = SaintsEditor.GetRenderers(false, serializedFieldNames, property.serializedObject, current);
+            return _imGuiRenderers[index] = SaintsEditor.GetRenderers(serializedFieldNames, property.serializedObject, current);
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Playa
 
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
 
-            IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.GetRenderers(true, serializedFieldNames, property.serializedObject, value);
+            IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.GetRenderers(serializedFieldNames, property.serializedObject, value);
 
             // VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
             VisualElement bodyElement = new VisualElement();

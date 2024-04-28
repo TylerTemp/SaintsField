@@ -1,6 +1,20 @@
-## 2.4.3
+## 3.0.0
 
-1.  IMGUI: fix `PlayaRichLabel` for `SaintsRow`
+1.  Completely rewrite UI Toolkit components with `"unity-base-field__aligned"` class. Since this version, UI Toolkit will no longer have the weird label width issue.
+
+    the `UI Toolkit Label Width Fix` function is now disabled and removed.
+
+2.  `TryFixUIToolkit` in `SaintsEditor` is now deprecated.
+
+3.  `[UIToolkit]` (used for label width fixing) attribute is now deprecated
+
+4.  `ShowAboveImage`/`ShowBelowImage` now use `FieldStart` as default align.
+
+5.  IMGUI: fix `PlayaRichLabel` for `SaintsRow`
+
+6.  UI Toolkit: fix `ShowInInspector` won't update values for non-serialized fields
+
+7.  `UnsaintlyEditor` is removed
 
 ## 2.4.2
 
