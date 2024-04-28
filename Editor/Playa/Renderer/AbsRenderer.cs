@@ -469,7 +469,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected static void FieldPosition(Rect position, object value, string label)
         {
-            using (new EditorGUI.DisabledScope(true))
+            using (new EditorGUI.DisabledScope(false))
             {
                 if (value == null)
                 {
@@ -776,9 +776,9 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             else if (valueType.BaseType == typeof(Enum))
             {
-                // EditorGUILayout.EnumPopup(label, (Enum)value);
-                visualElement = new EnumField()
+                visualElement = new EnumField
                 {
+                    label = label,
                     value = (Enum)value,
                 };
             }
