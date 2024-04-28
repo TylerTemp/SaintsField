@@ -40,6 +40,31 @@ namespace SaintsField.Editor.Playa.Renderer
             return result;
         }
 
+        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject,  VisualElement container, bool callUpdate)
+        {
+            object userData = container.userData;
+            object value = fieldWithInfo.PropertyInfo.GetValue(serializedObject.targetObject);
+
+            bool isEqual = Util.GetIsEqual(userData, value);
+
+            VisualElement child = container.Children().First();
+            // if (userData != value)
+            if (!isEqual)
+            {
+                // Debug.Log($"update {container.name} {userData} -> {value}");
+                StyleEnum<DisplayStyle> displayStyle = child.style.display;
+                container.Clear();
+                container.userData = value;
+                container.Add(child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name)));
+                child.style.display = displayStyle;
+            }
+
+            if (callUpdate)
+            {
+                UIToolkitOnUpdate(fieldWithInfo, child, false);
+            }
+            // container.schedule.Execute(() => WatchValueChanged(fieldWithInfo, serializedObject, container, callUpdate)).Every(100);
+        }
 #endif
         public override void OnDestroy()
         {
@@ -59,34 +84,6 @@ namespace SaintsField.Editor.Playa.Renderer
                 .PropertyInfo.Name));
             // FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
         }
-
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject,  VisualElement container, bool callUpdate)
-        {
-            object userData = container.userData;
-            object value = fieldWithInfo.PropertyInfo.GetValue(serializedObject.targetObject);
-
-            bool isEqual = Util.GetIsEqual(userData, value);
-
-            VisualElement child = container.Children().First();
-            // if (userData != value)
-            if (!isEqual)
-            {
-                Debug.Log($"update {container.name} {userData} -> {value}");
-                StyleEnum<DisplayStyle> displayStyle = child.style.display;
-                container.Clear();
-                container.userData = value;
-                container.Add(child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name)));
-                child.style.display = displayStyle;
-            }
-
-            if (callUpdate)
-            {
-                UIToolkitOnUpdate(fieldWithInfo, child, false);
-            }
-            // container.schedule.Execute(() => WatchValueChanged(fieldWithInfo, serializedObject, container, callUpdate)).Every(100);
-        }
-#endif
 
         public override float GetHeight()
         {

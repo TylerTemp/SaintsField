@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // Debug.Log($"Non Serialized Field {FieldWithInfo.FieldInfo.Name}");
             object value = FieldWithInfo.FieldInfo.GetValue(SerializedObject.targetObject);
             // need this to update when the field is disabled/hide
-            VisualElement container = new VisualElement()
+            VisualElement container = new VisualElement
             {
                 name = $"saints-field--non-serialized-field--{FieldWithInfo.FieldInfo.Name}",
             };
@@ -30,14 +31,40 @@ namespace SaintsField.Editor.Playa.Renderer
             result.name = $"saints-field--non-serialized-field--value-{FieldWithInfo.FieldInfo.Name}";
             container.Add(result);
 
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0)
-            {
-                // Debug.Log($"Non Serialized Field {FieldWithInfo.FieldInfo.Name}: reg change");
-                container.RegisterCallback<AttachToPanelEvent>(_ => container.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, false)).Every(100));
-            }
-
+            container.RegisterCallback<AttachToPanelEvent>(_ =>
+                container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, SerializedObject, container, FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0)).Every(100)
+            );
 
             return container;
+        }
+
+        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject, VisualElement container, bool callUpdate)
+        {
+            object userData = container.userData;
+            object value = fieldWithInfo.FieldInfo.GetValue(serializedObject.targetObject);
+
+            bool isEqual = Util.GetIsEqual(userData, value);
+
+            VisualElement child = container.Children().First();
+            // Debug.Log(container.name);
+            // Debug.Log(container.Children().Count());
+            // if (userData != value)
+            if (!isEqual)
+            {
+                // Debug.Log($"update {container.name} {userData} -> {value}");
+                StyleEnum<DisplayStyle> displayStyle = child.style.display;
+                container.Clear();
+                container.userData = value;
+                container.Add(child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name)));
+                // Debug.Log($"child={child}");
+                child.style.display = displayStyle;
+            }
+
+            if(callUpdate)
+            {
+                UIToolkitOnUpdate(fieldWithInfo, child, false);
+            }
+            // container.schedule.Execute(() => WatchValueChanged(fieldWithInfo, serializedObject, container, callUpdate)).Every(100);
         }
 #endif
         public override void OnDestroy()

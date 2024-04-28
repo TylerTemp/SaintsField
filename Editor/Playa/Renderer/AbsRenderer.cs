@@ -588,7 +588,6 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected static VisualElement UIToolkitLayout(object value, string label)
         {
-            // TODO: need a way to monitor if the value changed, for auto-property.
             if (value == null)
             {
                 TextField textField = new TextField(label)
@@ -776,13 +775,13 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             else if (valueType.BaseType == typeof(Enum))
             {
-                visualElement = new EnumField
+                visualElement = new EnumField((Enum)value)
                 {
                     label = label,
                     value = (Enum)value,
                 };
             }
-            else if (valueType.BaseType == typeof(System.Reflection.TypeInfo))
+            else if (valueType.BaseType == typeof(TypeInfo))
             {
                 // EditorGUILayout.TextField(label, value.ToString());
                 visualElement = new TextField(label)
