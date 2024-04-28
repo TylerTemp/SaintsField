@@ -469,7 +469,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected static void FieldPosition(Rect position, object value, string label)
         {
-            using (new EditorGUI.DisabledScope(false))
+            using (new EditorGUI.DisabledScope(true))
             {
                 if (value == null)
                 {
