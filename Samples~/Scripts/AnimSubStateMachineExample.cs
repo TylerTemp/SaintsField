@@ -15,6 +15,6 @@ namespace SaintsField.Samples.Scripts
         public AnimatorStateBase stateBase;
 
         private void OnChanged(string changedValue) => Debug.Log(changedValue);
-        private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"layerIndex={changedValue.layerIndex}, state={changedValue.state}, animationClip={changedValue.animationClip}, subStateMachineNameChain={string.Join("/", changedValue.subStateMachineNameChain)}");
+        private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"layerIndex={changedValue.layerIndex}, animationClip={changedValue.animationClip}, subStateMachineNameChain={string.Join("/", changedValue.subStateMachineNameChain)}");
     }
 }
