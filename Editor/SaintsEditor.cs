@@ -83,6 +83,7 @@ namespace SaintsField.Editor
                     allowSceneObjects = false,
                     objectType = typeof(MonoScript),
                 };
+                objectField.AddToClassList("unity-base-field__aligned");
                 objectField.Bind(serializedObject);
                 objectField.SetEnabled(false);
                 root.Add(objectField);
