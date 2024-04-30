@@ -63,23 +63,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.0**
+**3.0.1**
 
-1.  Completely rewrite UI Toolkit components with `"unity-base-field__aligned"` class. Since this version, UI Toolkit will no longer have the weird label width issue.
-
-    The `UI Toolkit Label Width Fix` function is now disabled and removed.
-
-2.  `TryFixUIToolkit` in `SaintsEditor` is now deprecated.
-
-3.  `[UIToolkit]` (used for label width fixing) attribute is now deprecated
-
-4.  `ShowAboveImage`/`ShowBelowImage` now use `FieldStart` as default align.
-
-5.  IMGUI: fix `PlayaRichLabel` for `SaintsRow`
-
-6.  UI Toolkit: fix `ShowInInspector` won't update values for non-serialized fields
-
-7.  `UnsaintlyEditor` is removed
+1.  UI Toolkit: Fix `SaintsEditor` "Script" field not aligned
+2.  Fix [Issue 20](https://github.com/TylerTemp/SaintsField/issues/20) that `EnumFlags` check contains for mixed bits, and flip bits when toggling a mixed bit.
+3.  UI Toolkit: fix `EnumFlags` layout issue.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
