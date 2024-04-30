@@ -828,11 +828,14 @@ namespace SaintsField.Editor.Drawers
 
             if (containerWidth - enumFlagsField.inlineWidth <= WidthDiff)
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ENUM_FLAGS
                 Debug.Log($"true: containerWidth={containerWidth}, inlineWidth={enumFlagsField.inlineWidth}");
+#endif
                 return true;
             }
-
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ENUM_FLAGS
             Debug.Log($"false: containerWidth={containerWidth}, inlineWidth={enumFlagsField.inlineWidth}");
+#endif
             return false;
         }
         // Debug.Log(useExpand);
@@ -841,7 +844,9 @@ namespace SaintsField.Editor.Drawers
         {
             bool useExpand = GetShouldExpand(enumFlagsField, foldout);
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ENUM_FLAGS
             Debug.Log($"useExpand={useExpand}, foldout={foldout.value}");
+#endif
 
             if (useExpand == foldout.value)
             {
