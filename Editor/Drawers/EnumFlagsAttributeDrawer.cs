@@ -882,7 +882,7 @@ namespace SaintsField.Editor.Drawers
                     bool useExpand;
                     if (enumFlagsAttribute.AutoExpand)
                     {
-                        useExpand = enumFlagsAttribute.DefaultExpanded || rootWidth - inlineWidth <= 10f;
+                        useExpand = enumFlagsAttribute.DefaultExpanded || rootWidth - inlineWidth <= WidthDiff;
                     }
                     else
                     {
