@@ -639,7 +639,6 @@ namespace SaintsField.Editor.Drawers
                     flexDirection = FlexDirection.Row,
                     flexGrow = 1,
                 },
-                userData = -1f,
             };
 
             root.Add(fieldContainer);
