@@ -2435,7 +2435,7 @@ public int areaName;
 Unity does not allow to serialize two dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
 
 ```csharp
-using SaintsField.AiNavigation;
+using SaintsField;
 
 // two dimensional array
 public SaintsArray<GameObject>[] gameObjects2;
@@ -2720,6 +2720,7 @@ Options are:
 **Example**
 
 ```csharp
+using SaintsField;
 using SaintsField.Playa;
 
 [Layout("Titled", ELayout.Title | ELayout.TitleOut)]
