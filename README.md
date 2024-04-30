@@ -1067,7 +1067,11 @@ For each argument:
 *   `bool defaultExpanded=false`: if true, the buttons group will be expanded as a vertical group by default.
 *   AllowMultiple: No
 
-Note: If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
+Known Issue:
+
+1.  If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
+2.  UI Toolkit: when `autoExpand=true`, `defaultExpanded` will be ignored
+3.  UI Toolkit: when `autoExpand=false` and `defaultExpand=false`, the layout WILL get messed up: the buttons will go out of view if you shrink the inspector width. This seems a bug in UI Toolkit itself.
 
 ```csharp
 public class EnumFlagsExample: MonoBehaviour

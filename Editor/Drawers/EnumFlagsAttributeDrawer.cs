@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers
             public int AllCheckedInt;
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, FieldInfo info)
+        private static MetaInfo GetMetaInfo(FieldInfo info)
         {
 
             // Debug.Log(SerializedUtils.GetType(property));
@@ -46,6 +46,22 @@ namespace SaintsField.Editor.Drawers
                 BitValueToName = bitValueToName,
                 AllCheckedInt = allCheckedInt,
             };
+        }
+
+        private static bool isOn(int curValue, int checkValue) => (curValue & checkValue) == checkValue;
+
+        private static int ToggleBit(int curValue, int bitValue)
+        {
+            if (isOn(curValue, bitValue))
+            {
+                int fullBits = curValue | bitValue;
+                return fullBits ^ bitValue;
+            }
+
+            // int bothOnBits = curValue & bitValue;
+            // Debug.Log($"curValue={curValue}, bitValue={bitValue}, bothOnBits={bothOnBits}");
+            // return bothOnBits ^ curValue;
+            return curValue | bitValue;
         }
 
         #region IMGUI
@@ -115,14 +131,6 @@ namespace SaintsField.Editor.Drawers
             _checkboxCheckedTexture2D = _checkboxEmptyTexture2D = _checkboxIndeterminateTexture2D = null;
         }
 
-        // protected override void ImGuiOnDispose()
-        // {
-        //     base.ImGuiOnDispose();
-        //     Object.DestroyImmediate(_checkboxCheckedTexture2D);
-        //     Object.DestroyImmediate(_checkboxEmptyTexture2D);
-        //     Object.DestroyImmediate(_checkboxIndeterminateTexture2D);
-        // }
-
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
@@ -162,7 +170,7 @@ namespace SaintsField.Editor.Drawers
                 property.isExpanded = enumFlagsAttribute.DefaultExpanded;
             }
 
-            MetaInfo metaInfo = GetMetaInfo(property, info);
+            MetaInfo metaInfo = GetMetaInfo(info);
 
             #region label+button
             Rect headRect = new Rect(position)
@@ -271,7 +279,7 @@ namespace SaintsField.Editor.Drawers
                     int value = kv.Key;
                     string name = kv.Value;
 
-                    bool on = (curValue & value) != 0;
+                    bool on = isOn(curValue, value);
                     GUIContent btnLabel = new GUIContent(name);
                     // GUIStyle btnStyle = on ? activeBtn : normalBtn;
                     btnInfos.Add(new BtnInfo
@@ -279,7 +287,7 @@ namespace SaintsField.Editor.Drawers
                         Label = btnLabel,
                         LabelStyle = EditorStyles.miniButton,
                         LabelWidth = EditorStyles.miniButton.CalcSize(btnLabel).x,
-                        Action = () => property.intValue ^= value,
+                        Action = () => property.intValue = ToggleBit(property.intValue, value),
                         Disabled = false,
                         Toggled = on,
                     });
@@ -298,7 +306,7 @@ namespace SaintsField.Editor.Drawers
                 foreach ((int value, string name, int index) in metaInfo.BitValueToName
                              .Select((each, index) => (each.Key, each.Value, index)))
                 {
-                    bool on = (curValue & value) != 0;
+                    bool on = isOn(curValue, value);
 
                     GUIStyle normalBtn = new GUIStyle(GUI.skin.button)
                     {
@@ -318,7 +326,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         if (GUI.Button(btnRect, $"{(on ? "☑" : "☐")} | {name}", normalBtn))
                         {
-                            property.intValue ^= value;
+                            property.intValue = ToggleBit(property.intValue, value);
                         }
                     }
                 }
@@ -420,14 +428,27 @@ namespace SaintsField.Editor.Drawers
 
         public class EnumFlagsField : BaseField<Enum>
         {
-            public EnumFlagsField(string label, VisualElement visualInput) : base(label, visualInput)
+            public readonly VisualElement rootElement;
+            public readonly VisualElement inlineContainerElement;
+            public readonly VisualElement expandControllerElement;
+
+            public bool autoExpand;
+
+            public int curValue;
+            public float inlineWidth = -1f;
+
+            public EnumFlagsField(string label, VisualElement visualInput, VisualElement inlineContainer, VisualElement expandController, bool autoExpand) : base(label, visualInput)
             {
+                rootElement = visualInput;
+                inlineContainerElement = inlineContainer;
+                expandControllerElement = expandController;
+                this.autoExpand = autoExpand;
             }
         }
 
-        private static string NameEnumFlagsContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
+        private static string NameEnumFlags(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
-        private static string NameInlineContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_InlineContainer";
+        // private static string NameInlineContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_InlineContainer";
         private static string NameExpandContainer(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ExpandContainer";
         private static string NameToggleButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButton";
         private static string NameToggleButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButtonImage";
@@ -441,7 +462,7 @@ namespace SaintsField.Editor.Drawers
         private static string ClassToggleBitButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButton";
         private static string ClassToggleBitButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButtonImage";
 
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Label";
+        private const float WidthDiff = 10f;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
@@ -449,25 +470,28 @@ namespace SaintsField.Editor.Drawers
         {
             LoadIcons();
 
-            MetaInfo metaInfo = GetMetaInfo(property, info);
+            MetaInfo metaInfo = GetMetaInfo(info);
 
-            float lineHeight = EditorGUIUtility.singleLineHeight;
+            // float lineHeight = EditorGUIUtility.singleLineHeight;
 
             VisualElement fieldContainer = new VisualElement
             {
                 style =
                 {
-                    width = Length.Percent(100),
+                    flexGrow = 1,
                 },
             };
 
             VisualElement inlineRowLayout = new VisualElement
             {
-                name = NameInlineContainer(property),
                 style =
                 {
                     flexDirection = FlexDirection.Row,
-                    overflow = Overflow.Hidden,
+                    flexWrap = Wrap.NoWrap,
+                    // overflow = Overflow.Hidden,
+
+                    // width = Length.Percent(100),
+                    flexGrow = 1,
                 },
             };
 
@@ -477,8 +501,8 @@ namespace SaintsField.Editor.Drawers
                 name = NameToggleButton(property),
                 style =
                 {
-                    width = lineHeight,
-                    height = lineHeight,
+                    width = EditorGUIUtility.singleLineHeight,
+                    height = EditorGUIUtility.singleLineHeight,
                     paddingTop = 0,
                     paddingBottom = 0,
                     paddingLeft = 0,
@@ -515,6 +539,10 @@ namespace SaintsField.Editor.Drawers
             VisualElement expandControllerLayout = new VisualElement
             {
                 name = NameExpandContainer(property),
+                style =
+                {
+                    flexGrow = 1,
+                },
             };
 
             VisualElement expandMajorToggles = new VisualElement
@@ -522,7 +550,7 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     flexDirection = FlexDirection.Row,
-                    height = lineHeight,
+                    height = EditorGUIUtility.singleLineHeight,
                 },
             };
             Button expandToggleNoneButton = new Button
@@ -530,7 +558,7 @@ namespace SaintsField.Editor.Drawers
                 name = NameSetNoneButton(property),
                 style =
                 {
-                    width = lineHeight,
+                    width = EditorGUIUtility.singleLineHeight,
                     paddingTop = 0,
                     paddingBottom = 0,
                     paddingLeft = 0,
@@ -546,7 +574,7 @@ namespace SaintsField.Editor.Drawers
                 name = NameSetAllButton(property),
                 style =
                 {
-                    width = lineHeight,
+                    width = EditorGUIUtility.singleLineHeight,
                     paddingTop = 0,
                     paddingBottom = 0,
                     paddingLeft = 0,
@@ -575,7 +603,7 @@ namespace SaintsField.Editor.Drawers
                         // marginRight = 0,
                         paddingLeft = 0,
                         // paddingRight = 2,
-                        height = lineHeight,
+                        height = EditorGUIUtility.singleLineHeight,
                     },
                 };
                 bitButton.AddToClassList(ClassToggleBitButton(property));
@@ -586,7 +614,7 @@ namespace SaintsField.Editor.Drawers
                     scaleMode = ScaleMode.ScaleToFit,
                     style =
                     {
-                        width = lineHeight - 2,
+                        width = EditorGUIUtility.singleLineHeight - 2,
                         // width = lineHeight,
                     },
                 };
@@ -599,11 +627,6 @@ namespace SaintsField.Editor.Drawers
                         paddingLeft = 4,
                     },
                 });
-                // bitButton.Add(new Image
-                // {
-                //     image = _checkboxCheckedTexture2D,
-                // });
-
                 expandControllerLayout.Add(bitButton);
             }
 
@@ -614,22 +637,18 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     flexDirection = FlexDirection.Row,
+                    flexGrow = 1,
                 },
                 userData = -1f,
             };
 
-            EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
-
             root.Add(fieldContainer);
 
-            EnumFlagsField enumFlagsField = new EnumFlagsField(property.displayName, root);
+            EnumFlagsField enumFlagsField = new EnumFlagsField(property.displayName, root, inlineRowLayout, expandControllerLayout,
+                ((EnumFlagsAttribute)saintsAttribute).AutoExpand);
             enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
             enumFlagsField.AddToClassList("unity-base-field__aligned");
-            enumFlagsField.name = NameEnumFlagsContainer(property);
-            // if(enumFlagsAttribute.AutoExpand)
-            // {
-            //     enumFlagsField.labelElement.style.color = Color.clear;
-            // }
+            enumFlagsField.name = NameEnumFlags(property);
 
             enumFlagsField.labelElement.style.maxHeight = SingleLineHeight;
 
@@ -677,33 +696,7 @@ namespace SaintsField.Editor.Drawers
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UpdateButtonDisplay(property.intValue, property, info, container);
-
-            EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
-
-            if (enumFlagsAttribute.AutoExpand)
-            {
-                bool firstExpand = enumFlagsAttribute.DefaultExpanded || GetShouldExpand(property, container);
-                SetExpandStatus(firstExpand, property, container);
-
-                // ReSharper disable once ConvertToLocalFunction
-                EventCallback<GeometryChangedEvent> onGeometryChanged = (evt) => OnGeometryChanged(property, container);
-                container.RegisterCallback(onGeometryChanged);
-                container.Q<Foldout>(NameFoldout(property)).RegisterValueChangedCallback(changed =>
-                {
-                    container.UnregisterCallback(onGeometryChanged);
-                    SetExpandStatus(changed.newValue, property, container);
-                });
-            }
-            else
-            {
-                SetExpandStatus(enumFlagsAttribute.DefaultExpanded, property, container);
-            }
-
-            MetaInfo metaInfo = GetMetaInfo(property, info);
-            // VisualElement root = container.Q<VisualElement>(NameContainer(property));
-
-            // Image toggleButtonImage = container.Q<Image>(NameToggleButtonImage(property));
+            MetaInfo metaInfo = GetMetaInfo(info);
             container.Q<Button>(NameToggleButton(property)).clicked += () =>
             {
                 int curValue = property.intValue;
@@ -750,7 +743,7 @@ namespace SaintsField.Editor.Drawers
                     // int curValue = property.intValue;
                     int bitValue = (int)thisButton.userData;
 
-                    int newValue = (property.intValue ^= bitValue);
+                    int newValue = property.intValue = ToggleBit(property.intValue, bitValue);
 
                     property.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(newValue);
@@ -758,18 +751,9 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container,
-            FieldInfo info,
-            object parent, Action<object> onValueChangedCallback, object newValue)
-        {
-            int newInt = (int)newValue;
-            UpdateButtonDisplay(newInt, property, info, container);
-        }
-
         private void UpdateButtonDisplay(int newInt, SerializedProperty property, FieldInfo info, VisualElement container)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, info);
+            MetaInfo metaInfo = GetMetaInfo(info);
 
             Image toggleButtonImage = container.Q<Image>(NameToggleButtonImage(property));
             bool noneChecked = newInt == 0;
@@ -796,7 +780,8 @@ namespace SaintsField.Editor.Drawers
             foreach (Button bitButton in container.Query<Button>(className: ClassToggleBitButton(property)).ToList())
             {
                 int bitValue = (int)bitButton.userData;
-                bool on = (newInt & bitValue) != 0;
+                bool on = isOn(newInt, bitValue);
+                // bool on = newInt == bitValue;
 
                 Image image = bitButton.Q<Image>(className: ClassToggleBitButtonImage(property));
                 if(image != null)
@@ -819,43 +804,121 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static void SetExpandStatus(bool expand, SerializedProperty property, VisualElement container)
+        private static void SetExpandStatus(bool expand, EnumFlagsField enumFlagsField, Foldout foldout)
         {
-            container.Q<Foldout>(NameFoldout(property)).SetValueWithoutNotify(expand);
+            foldout.SetValueWithoutNotify(expand);
 
-            container.Q<VisualElement>(NameInlineContainer(property)).style.height = expand ? 0 : StyleKeyword.Null;
-            container.Q<VisualElement>(NameExpandContainer(property)).style.display = expand ? DisplayStyle.Flex : DisplayStyle.None;
+            enumFlagsField.inlineContainerElement.style.display = expand ? DisplayStyle.None : DisplayStyle.Flex;
+            enumFlagsField.expandControllerElement.style.display = expand ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        private static bool GetShouldExpand(SerializedProperty property, VisualElement container)
+        private static bool GetShouldExpand(EnumFlagsField enumFlagsField, Foldout foldout)
         {
-            VisualElement inlineContainer = container.Q<VisualElement>(NameInlineContainer(property));
+            if (!enumFlagsField.autoExpand)
+            {
+                return foldout.value;
+            }
 
-            float totalSpaceWidth = inlineContainer.resolvedStyle.width;
-            float totalBtnWidth = inlineContainer.Children().Sum(each => each.resolvedStyle.width);
+            float containerWidth = enumFlagsField.rootElement.resolvedStyle.width;
+            if (double.IsNaN(containerWidth) || containerWidth <= 0)
+            {
+                return foldout.value;
+            }
 
-            return totalSpaceWidth - totalBtnWidth <= 7f;
+
+            if (containerWidth - enumFlagsField.inlineWidth <= WidthDiff)
+            {
+                Debug.Log($"true: containerWidth={containerWidth}, inlineWidth={enumFlagsField.inlineWidth}");
+                return true;
+            }
+
+            Debug.Log($"false: containerWidth={containerWidth}, inlineWidth={enumFlagsField.inlineWidth}");
+            return false;
         }
         // Debug.Log(useExpand);
 
-        private static void OnGeometryChanged(SerializedProperty property, VisualElement container)
+        private static void OnGeometryChanged(EnumFlagsField enumFlagsField, Foldout foldout)
         {
+            bool useExpand = GetShouldExpand(enumFlagsField, foldout);
 
-            bool useExpand = GetShouldExpand(property, container);
+            Debug.Log($"useExpand={useExpand}, foldout={foldout.value}");
 
-            Foldout foldout = container.Q<Foldout>(NameFoldout(property));
             if (useExpand == foldout.value)
             {
                 return;
             }
-            SetExpandStatus(useExpand, property, container);
+
+            SetExpandStatus(useExpand, enumFlagsField, foldout);
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        {
+            EnumFlagsField enumFlagsField = container.Q<EnumFlagsField>(NameEnumFlags(property));
+            if (enumFlagsField.inlineWidth < 0)
+            {
+                VisualElement inlineContainer = enumFlagsField.inlineContainerElement;
+                float inlineWidth = inlineContainer.Children().Select(each => each.resolvedStyle.width).Sum();
+
+                VisualElement rootContainer = enumFlagsField.rootElement;
+                float rootWidth = rootContainer.resolvedStyle.width;
+
+                // ReSharper disable once InvertIf
+                if (!double.IsNaN(inlineWidth) && inlineWidth > 0 && !double.IsNaN(rootWidth) && rootWidth > 0)
+                {
+                    enumFlagsField.inlineWidth = inlineWidth;
+
+                    // actual init...
+
+                    Foldout foldout = container.Q<Foldout>(NameFoldout(property));
+
+                    EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute) saintsAttribute;
+
+                    bool useExpand;
+                    if (enumFlagsAttribute.AutoExpand)
+                    {
+                        useExpand = enumFlagsAttribute.DefaultExpanded || rootWidth - inlineWidth <= 10f;
+                    }
+                    else
+                    {
+                        useExpand = enumFlagsAttribute.DefaultExpanded;
+                    }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ENUM_FLAGS
+                    Debug.Log($"init useExpand={useExpand}, rootWidth={rootWidth}, inlineWidth={inlineWidth}");
+#endif
+                    SetExpandStatus(useExpand, enumFlagsField, foldout);
+
+                    if(enumFlagsAttribute.AutoExpand)
+                    {
+                        container.RegisterCallback<GeometryChangedEvent>(
+                            _ => OnGeometryChanged(enumFlagsField, foldout));
+                    }
+
+                    foldout.RegisterValueChangedCallback(changed =>
+                    {
+                        enumFlagsField.autoExpand = false;
+                        SetExpandStatus(changed.newValue, enumFlagsField, foldout);
+                    });
+                }
+
+                return;
+            }
+
+            int curValue = enumFlagsField.curValue;
+            // ReSharper disable once InvertIf
+            if (curValue != property.intValue)
+            {
+                enumFlagsField.curValue = curValue = property.intValue;
+                UpdateButtonDisplay(curValue, property, info, container);
+            }
         }
 
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
             IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
         {
-            EnumFlagsField enumFlagsField = container.Q<EnumFlagsField>(NameEnumFlagsContainer(property));
+            EnumFlagsField enumFlagsField = container.Q<EnumFlagsField>(NameEnumFlags(property));
 
             UIToolkitUtils.SetLabel(enumFlagsField.labelElement, richTextChunks, richTextDrawer);
         }

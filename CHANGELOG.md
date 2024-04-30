@@ -1,3 +1,9 @@
+## 3.0.1
+
+1.  UI Toolkit: Fix `SaintsEditor` "Script" field not aligned
+2.  Fix [Issue 20](https://github.com/TylerTemp/SaintsField/issues/20) that `EnumFlags` check contains for mixed bits, and flip bits when toggling a mixed bit.
+3.  UI Toolkit: fix `EnumFlags` layout issue.
+
 ## 3.0.0
 
 1.  Completely rewrite UI Toolkit components with `"unity-base-field__aligned"` class. Since this version, UI Toolkit will no longer have the weird label width issue.

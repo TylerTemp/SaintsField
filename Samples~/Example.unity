@@ -9405,7 +9405,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -11777,6 +11776,7 @@ Transform:
   - {fileID: 599044142}
   - {fileID: 472541783}
   - {fileID: 1906566335}
+  - {fileID: 1815438674}
   m_Father: {fileID: 0}
   m_RootOrder: 33
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -13495,6 +13495,56 @@ MonoBehaviour:
   d1: 
   d1And2: 
   d1Or2: 
+--- !u!1 &1815438673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1815438674}
+  - component: {fileID: 1815438675}
+  m_Layer: 0
+  m_Name: Issue20
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1815438674
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815438673}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1815438675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815438673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25fe8755cefed4b43bd8bc04acc8cfcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wrapped: 0
+  original: 0
+  test1: 0
+  test2: 0
+  test3: 0
+  test4: 0
 --- !u!1 &1830778823
 GameObject:
   m_ObjectHideFlags: 0
