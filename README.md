@@ -83,7 +83,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
-## Usage ##
+## Out-Of-Box Attributes ##
+
+All attributes under this section can be used in your project without any extra setup.
+
+namespace: `SaintsField`;
 
 ### Label & Text ###
 
@@ -134,36 +138,34 @@ Use it on an array/list will apply it to all the direct child element instead of
 You can use this to modify elements of an array/list field, in this way:
 
 1.  Ensure you make it a callback: `isCallback=true`
-2.  Your function must receive one `int` argument
-3.  The `int` argument will receive a value from `0` to `length-1` of the array/list
-4.  Return the desired label content from the function
+2.  It'll pass the element value and index to your function
+3.  Return the desired label content from the function
 
 ```csharp
-public class RichLabel: MonoBehaviour
+using SaintsField;
+
+[RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
+public string _rainbow;
+
+[RichLabel(nameof(LabelCallback), true)]
+public bool _callbackToggle;
+private string LabelCallback() => _callbackToggle ? "<color=green><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
+
+[Space]
+[RichLabel(nameof(_propertyLabel), true)]
+public string _propertyLabel;
+private string _rainbow;
+
+[Serializable]
+private struct MyStruct
 {
-    [RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
-    public string _rainbow;
-
-    [RichLabel(nameof(LabelCallback), true)]
-    public bool _callbackToggle;
-    private string LabelCallback() => _callbackToggle ? "<color=green><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
-
-    [Space]
-    [RichLabel(nameof(_propertyLabel), true)]
-    public string _propertyLabel;
-    private string _rainbow;
-
-    [Serializable]
-    private struct MyStruct
-    {
-        [RichLabel("<color=green>HI!</color>")]
-        public float LabelFloat;
-    }
-
-    [SerializeField]
-    [RichLabel("<color=green>Fixed For Struct!</color>")]
-    private MyStruct _myStructWorkAround;
+    [RichLabel("<color=green>HI!</color>")]
+    public float LabelFloat;
 }
+
+[SerializeField]
+[RichLabel("<color=green>Fixed For Struct!</color>")]
+private MyStruct _myStructWorkAround;
 ```
 
 [![richlabel](https://github.com/TylerTemp/SaintsField/assets/6391063/5e865350-6eeb-4f2a-8305-c7d8b8720eac)](https://github.com/TylerTemp/SaintsField/assets/6391063/25f6c7cc-ee7e-444e-b078-007dd6df499e)
@@ -171,10 +173,13 @@ public class RichLabel: MonoBehaviour
 Here is an example of using on a array:
 
 ```csharp
+using SaintsField;
+
 [RichLabel(nameof(ArrayLabels), true)]
 public string[] arrayLabels;
 
-private string ArrayLabels(int index) => $"<color=pink>[{(char)('A' + index)}]";
+// if you do not care about the actual value, use `object` as the first parameter
+private string ArrayLabels(object _, int index) => $"<color=pink>[{(char)('A' + index)}]";
 ```
 
 ![label_array](https://github.com/TylerTemp/SaintsField/assets/6391063/232da62c-9e31-4415-a09a-8e1e95ae9441)
@@ -190,18 +195,17 @@ Like `RichLabel`, but it's rendered above/below the field in full width of view 
 *   AllowMultiple: Yes
 
 ```csharp
-public class FullWidthRichLabelExample: MonoBehaviour
-{
-    [SerializeField]
-    [AboveRichLabel("┌<icon=eye.png/><label />┐")]
-    [RichLabel("├<icon=eye.png/><label />┤")]
-    [BelowRichLabel(nameof(BelowLabel), true)]
-    [BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
-    [BelowRichLabel("==================================", groupBy: "example")]
-    private int _intValue;
+using SaintsField;
 
-    private string BelowLabel() => "└<icon=eye.png/><label />┘";
-}
+[SerializeField]
+[AboveRichLabel("┌<icon=eye.png/><label />┐")]
+[RichLabel("├<icon=eye.png/><label />┤")]
+[BelowRichLabel(nameof(BelowLabel), true)]
+[BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
+[BelowRichLabel("==================================", groupBy: "example")]
+private int _intValue;
+
+private string BelowLabel() => "└<icon=eye.png/><label />┘";
 ```
 
 ![full_width_label](https://github.com/TylerTemp/SaintsField/assets/6391063/9283e25a-34b3-4192-8a07-5d97a4e55406)
@@ -223,14 +227,13 @@ Parameters:
 *   AllowMultiple: No
 
 ```csharp
-public class OverlayRichLabelExample: MonoBehaviour
-{
-    [OverlayRichLabel("<color=grey>km/s")] public double speed = double.MinValue;
-    [OverlayRichLabel("<icon=eye.png/>")] public string text;
-    [OverlayRichLabel("<color=grey>/int", padding: 1)] public int count = int.MinValue;
-    [OverlayRichLabel("<color=grey>/long", padding: 1)] public long longInt = long.MinValue;
-    [OverlayRichLabel("<color=grey>suffix", end: true)] public string atEnd;
-}
+using SaintsField;
+
+[OverlayRichLabel("<color=grey>km/s")] public double speed = double.MinValue;
+[OverlayRichLabel("<icon=eye.png/>")] public string text;
+[OverlayRichLabel("<color=grey>/int", padding: 1)] public int count = int.MinValue;
+[OverlayRichLabel("<color=grey>/long", padding: 1)] public long longInt = long.MinValue;
+[OverlayRichLabel("<color=grey>suffix", end: true)] public string atEnd;
 ```
 
 ![overlay_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bd85b5c8-3ef2-4899-9bc3-b9799e3331ed)
@@ -248,26 +251,25 @@ Parameters:
 *   AllowMultiple: Yes
 
 ```csharp
-public class PostFieldRichLabelExample: MonoBehaviour
+using SaintsField;
+
+[PostFieldRichLabel("<color=grey>km/s")] public float speed;
+[PostFieldRichLabel("<icon=eye.png/>", padding: 0)] public GameObject eye;
+[PostFieldRichLabel(nameof(TakeAGuess), isCallback: true)] public int guess;
+
+public string TakeAGuess()
 {
-    [PostFieldRichLabel("<color=grey>km/s")] public float speed;
-    [PostFieldRichLabel("<icon=eye.png/>", padding: 0)] public GameObject eye;
-    [PostFieldRichLabel(nameof(TakeAGuess), isCallback: true)] public int guess;
-
-    public string TakeAGuess()
+    if(guess > 20)
     {
-        if(guess > 20)
-        {
-            return "<color=red>too high";
-        }
-
-        if (guess < 10)
-        {
-            return "<color=blue>too low";
-        }
-
-        return "<color=green>acceptable!";
+        return "<color=red>too high";
     }
+
+    if (guess < 10)
+    {
+        return "<color=blue>too low";
+    }
+
+    return "<color=green>acceptable!";
 }
 ```
 
@@ -311,20 +313,19 @@ Draw an info box above/below the field.
 *   AllowMultiple: Yes
 
 ```csharp
-public class InfoBoxExample : MonoBehaviour
-{
-    [field: SerializeField] private bool _show;
+using SaintsField;
 
-    [Space]
-    [InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None, above: true)]
-    [InfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true, above: true)]
-    [InfoBox(nameof(DynamicMessageWithIcon), isCallback: true)]
-    [InfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
-    public bool _content;
+[field: SerializeField] private bool _show;
 
-    private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");
-    private string DynamicMessage() => _content ? "False" : "True";
-}
+[Space]
+[InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None, above: true)]
+[InfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true, above: true)]
+[InfoBox(nameof(DynamicMessageWithIcon), isCallback: true)]
+[InfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
+public bool _content;
+
+private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");
+private string DynamicMessage() => _content ? "False" : "True";
 ```
 
 [![infobox](https://github.com/TylerTemp/SaintsField/assets/6391063/c96b4b14-594d-4bfd-9cc4-e53390ed99be)](https://github.com/TylerTemp/SaintsField/assets/6391063/03ac649a-9e89-407d-a59d-3e224a7f84c8)
@@ -340,14 +341,13 @@ A separator with text
 *   `float height = 2f`, height of this decorator
 
 ```csharp
-public class SepTitleExample: MonoBehaviour
-{
-    [SepTitle("Separate Here", EColor.Pink)]
-    public string content1;
+using SaintsField;
 
-    [SepTitle(EColor.Green)]
-    public string content2;
-}
+[SepTitle("Separate Here", EColor.Pink)]
+public string content1;
+
+[SepTitle(EColor.Green)]
+public string content2;
 ```
 
 ![sep_title](https://github.com/TylerTemp/SaintsField/assets/6391063/55e08b48-4463-4be3-8f87-7afd5ce9e451)
@@ -381,52 +381,51 @@ All of them have the same arguments:
 *   AllowMultiple: Yes
 
 ```csharp
-public class ButtonsExample : MonoBehaviour
+using SaintsField;
+
+[SerializeField] private bool _errorOut;
+
+[field: SerializeField] private string _labelByField;
+
+[AboveButton(nameof(ClickErrorButton), nameof(_labelByField), true)]
+[AboveButton(nameof(ClickErrorButton), "Click <color=green><icon='eye.png' /></color>!")]
+[AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+[AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+
+[PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
+
+[BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+[BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+[BelowButton(nameof(ClickErrorButton), "Below <color=green><icon='eye.png' /></color>!")]
+public int _someInt;
+
+private void ClickErrorButton() => Debug.Log("CLICKED!");
+
+private string GetButtonLabel() =>
+    _errorOut
+        ? "Error <color=red>me</color>!"
+        : "No <color=green>Error</color>!";
+
+private string GetButtonLabelIcon() => _errorOut
+    ? "<color=red><icon='eye.png' /></color>"
+    : "<color=green><icon='eye.png' /></color>";
+
+private void ClickButton()
 {
-    [SerializeField] private bool _errorOut;
-
-    [field: SerializeField] private string _labelByField;
-
-    [AboveButton(nameof(ClickErrorButton), nameof(_labelByField), true)]
-    [AboveButton(nameof(ClickErrorButton), "Click <color=green><icon='eye.png' /></color>!")]
-    [AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-    [AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-
-    [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
-
-    [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-    [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-    [BelowButton(nameof(ClickErrorButton), "Below <color=green><icon='eye.png' /></color>!")]
-    public int _someInt;
-
-    private void ClickErrorButton() => Debug.Log("CLICKED!");
-
-    private string GetButtonLabel() =>
-        _errorOut
-            ? "Error <color=red>me</color>!"
-            : "No <color=green>Error</color>!";
-
-    private string GetButtonLabelIcon() => _errorOut
-        ? "<color=red><icon='eye.png' /></color>"
-        : "<color=green><icon='eye.png' /></color>";
-
-    private void ClickButton()
+    Debug.Log("CLICKED 2!");
+    if(_errorOut)
     {
-        Debug.Log("CLICKED 2!");
-        if(_errorOut)
-        {
-            throw new Exception("Expected exception!");
-        }
+        throw new Exception("Expected exception!");
     }
-
-    private void ToggleAndError()
-    {
-        Toggle();
-        ClickButton();
-    }
-
-    private void Toggle() => _errorOut = !_errorOut;
 }
+
+private void ToggleAndError()
+{
+    Toggle();
+    ClickButton();
+}
+
+private void Toggle() => _errorOut = !_errorOut;
 ```
 
 [![button](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
@@ -442,11 +441,10 @@ This does not require the field to be `GameObject`. It can be a component which 
 *   AllowMultiple: No
 
 ```csharp
-public class GameObjectActiveExample : MonoBehaviour
-{
-    [GameObjectActive] public GameObject _go;
-    [GameObjectActive] public GameObjectActiveExample _component;
-}
+using SaintsField;
+
+[GameObjectActive] public GameObject _go;
+[GameObjectActive] public GameObjectActiveExample _component;
 ```
 
 [![gameobjectactive](https://github.com/TylerTemp/SaintsField/assets/6391063/19944339-4bfa-4b10-b1fb-b50e0b0433e0)](https://github.com/TylerTemp/SaintsField/assets/6391063/ddb0bd02-8869-47b9-aac4-880ab9bfb81a)
@@ -464,20 +462,19 @@ The field itself must be `Sprite`.
 *   AllowMultiple: Yes
 
 ```csharp
-public class SpriteToggleExample : MonoBehaviour
-{
-    [field: SerializeField] private Image _image;
-    [field: SerializeField] private SpriteRenderer _sprite;
+using SaintsField;
 
-    [SerializeField
-     , SpriteToggle(nameof(_image))
-     , SpriteToggle(nameof(_sprite))
-    ] private Sprite _sprite1;
-    [SerializeField
-     , SpriteToggle(nameof(_image))
-     , SpriteToggle(nameof(_sprite))
-    ] private Sprite _sprite2;
-}
+[field: SerializeField] private Image _image;
+[field: SerializeField] private SpriteRenderer _sprite;
+
+[SerializeField
+ , SpriteToggle(nameof(_image))
+ , SpriteToggle(nameof(_sprite))
+] private Sprite _sprite1;
+[SerializeField
+ , SpriteToggle(nameof(_image))
+ , SpriteToggle(nameof(_sprite))
+] private Sprite _sprite2;
 ```
 
 [![spritetoggle](https://github.com/TylerTemp/SaintsField/assets/6391063/70ae0697-d13b-460d-be8b-30d4f823659b)](https://github.com/TylerTemp/SaintsField/assets/6391063/705498e9-4d70-482f-9ae6-b231cd9497ca)
@@ -499,12 +496,11 @@ The field itself must be `Material`.
 *   AllowMultiple: Yes
 
 ```csharp
-public class MaterialToggleExample: MonoBehaviour
-{
-    public Renderer targetRenderer;
-    [MaterialToggle(nameof(targetRenderer))] public Material _mat1;
-    [MaterialToggle(nameof(targetRenderer))] public Material _mat2;
-}
+using SaintsField;
+
+public Renderer targetRenderer;
+[MaterialToggle(nameof(targetRenderer))] public Material _mat1;
+[MaterialToggle(nameof(targetRenderer))] public Material _mat2;
 ```
 
 [![mattoggle](https://github.com/TylerTemp/SaintsField/assets/6391063/cd949e21-e07e-4ee7-8239-280d5d7b8ce1)](https://github.com/TylerTemp/SaintsField/assets/6391063/00c5702c-a41e-42a4-abb1-97a0713c3f66)
@@ -532,18 +528,17 @@ The field itself must be `Color`.
 *   AllowMultiple: Yes
 
 ```csharp
-public class ColorToggleImage: MonoBehaviour
-{
-    // auto find on the target object
-    [SerializeField, ColorToggle] private Color _onColor;
-    [SerializeField, ColorToggle] private Color _offColor;
+using SaintsField;
 
-    [Space]
-    // by name
-    [SerializeField] private Image _image;
-    [SerializeField, ColorToggle(nameof(_image))] private Color _onColor2;
-    [SerializeField, ColorToggle(nameof(_image))] private Color _offColor2;
-}
+// auto find on the target object
+[SerializeField, ColorToggle] private Color _onColor;
+[SerializeField, ColorToggle] private Color _offColor;
+
+[Space]
+// by name
+[SerializeField] private Image _image;
+[SerializeField, ColorToggle(nameof(_image))] private Color _onColor2;
+[SerializeField, ColorToggle(nameof(_image))] private Color _offColor2;
 ```
 
 [![color_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/ce592999-0912-4c94-85dd-a8e428b1c321)](https://github.com/TylerTemp/SaintsField/assets/6391063/236eea74-a902-4f40-b0b9-ab3f2b7c1dbe)
@@ -561,10 +556,9 @@ Known issue:
 *   AllowMultiple: No
 
 ```csharp
-public class ExpandableExample : MonoBehaviour
-{
-    [Expandable] public ScriptableObject _scriptable;
-}
+using SaintsField;
+
+[Expandable] public ScriptableObject _scriptable;
 ```
 
 ![expandable](https://github.com/TylerTemp/SaintsField/assets/6391063/92fd1f45-82c5-4d5e-bbc4-c9a70fefe158)
@@ -582,81 +576,79 @@ Limitation:
 *   Allow Multiple: No
 
 ```csharp
-    public class ReferenceExample: MonoBehaviour
-    {
-        [Serializable]
-        public class Base1Fruit
-        {
-            public GameObject base1;
-        }
+using SaintsField;
 
-        [Serializable]
-        public class Base2Fruit: Base1Fruit
-        {
-            public int base2;
-        }
+[Serializable]
+public class Base1Fruit
+{
+    public GameObject base1;
+}
 
-        [Serializable]
-        public class Apple : Base2Fruit
-        {
-            public string apple;
-            public GameObject applePrefab;
-        }
+[Serializable]
+public class Base2Fruit: Base1Fruit
+{
+    public int base2;
+}
 
-        [Serializable]
-        public class Orange : Base2Fruit
-        {
-            public bool orange;
-        }
+[Serializable]
+public class Apple : Base2Fruit
+{
+    public string apple;
+    public GameObject applePrefab;
+}
 
-        [SerializeReference, ReferencePicker]
-        public Base2Fruit item;
+[Serializable]
+public class Orange : Base2Fruit
+{
+    public bool orange;
+}
 
-        public interface IRefInterface
-        {
-            public int TheInt { get; }
-        }
+[SerializeReference, ReferencePicker]
+public Base2Fruit item;
 
-        // works for struct
-        [Serializable]
-        public struct StructImpl : IRefInterface
-        {
-            [field: SerializeField]
-            public int TheInt { get; set; }
-            public string myStruct;
-        }
+public interface IRefInterface
+{
+    public int TheInt { get; }
+}
 
-        [Serializable]
-        public class ClassDirect: IRefInterface
-        {
-            [field: SerializeField, Range(0, 10)]
-            public int TheInt { get; set; }
-        }
+// works for struct
+[Serializable]
+public struct StructImpl : IRefInterface
+{
+    [field: SerializeField]
+    public int TheInt { get; set; }
+    public string myStruct;
+}
 
-        // abstruct type will be skipped
-        public abstract class ClassSubAbs : ClassDirect
-        {
-            public abstract string AbsValue { get; }
-        }
+[Serializable]
+public class ClassDirect: IRefInterface
+{
+    [field: SerializeField, Range(0, 10)]
+    public int TheInt { get; set; }
+}
 
-        [Serializable]
-        public class ClassSub1 : ClassSubAbs
-        {
-            public string sub1;
-            public override string AbsValue => $"Sub1: {sub1}";
-        }
+// abstruct type will be skipped
+public abstract class ClassSubAbs : ClassDirect
+{
+    public abstract string AbsValue { get; }
+}
 
-        [Serializable]
-        public class ClassSub2 : ClassSubAbs
-        {
-            public string sub2;
-            public override string AbsValue => $"Sub2: {sub2}";
-        }
+[Serializable]
+public class ClassSub1 : ClassSubAbs
+{
+    public string sub1;
+    public override string AbsValue => $"Sub1: {sub1}";
+}
 
-        [SerializeReference, ReferencePicker]
-        public IRefInterface myInterface;
+[Serializable]
+public class ClassSub2 : ClassSubAbs
+{
+    public string sub2;
+    public override string AbsValue => $"Sub2: {sub2}";
+}
 
-    }
+[SerializeReference, ReferencePicker]
+public IRefInterface myInterface;
 ```
 
 ![reference_picker](https://github.com/TylerTemp/SaintsField/assets/6391063/06b1a8f6-806e-49c3-b491-a810bc885595)
@@ -706,12 +698,11 @@ Parameters:
 *   AllowMultiple: No
 
 ```csharp
-public class RateExample: MonoBehaviour
-{
-    [Rate(0, 5)] public int rate0To5;
-    [Rate(1, 5)] public int rate1To5;
-    [Rate(3, 5)] public int rate3To5;
-}
+using SaintsField;
+
+[Rate(0, 5)] public int rate0To5;
+[Rate(1, 5)] public int rate1To5;
+[Rate(3, 5)] public int rate3To5;
 ```
 
 [![stars](https://github.com/TylerTemp/SaintsField/assets/6391063/c3a0509e-b211-4a62-92c8-7bc8c3866cf4)](https://github.com/TylerTemp/SaintsField/assets/6391063/a506681f-92f8-42ab-b08d-483b26b2f7c3)
@@ -742,14 +733,13 @@ For each argument:
 *   AllowMultiple: No
 
 ```csharp
-public class FieldTypeExample: MonoBehaviour
-{
-    [SerializeField, FieldType(typeof(SpriteRenderer))]
-    private GameObject _go;
+using SaintsField;
 
-    [SerializeField, FieldType(typeof(FieldTypeExample))]
-    private ParticleSystem _ps;
-}
+[SerializeField, FieldType(typeof(SpriteRenderer))]
+private GameObject _go;
+
+[SerializeField, FieldType(typeof(FieldTypeExample))]
+private ParticleSystem _ps;
 ```
 
 ![field_type](https://github.com/TylerTemp/SaintsField/assets/6391063/7bcc058f-5cb4-4a4f-9d8e-ec08bcb8da2c)
@@ -770,32 +760,31 @@ If you want a searchable dropdown, see `AdvancedDropdown`.
 **Example**
 
 ```csharp
-public class DropdownExample : MonoBehaviour
+using SaintsField;
+
+[Dropdown(nameof(GetDropdownItems))] public float _float;
+
+public GameObject _go1;
+public GameObject _go2;
+[Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
+
+private DropdownList<float> GetDropdownItems()
 {
-    [Dropdown(nameof(GetDropdownItems))] public float _float;
-
-    public GameObject _go1;
-    public GameObject _go2;
-    [Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
-
-    private DropdownList<float> GetDropdownItems()
+    return new DropdownList<float>
     {
-        return new DropdownList<float>
-        {
-            { "1", 1.0f },
-            { "2", 2.0f },
-            { "3/1", 3.1f },
-            { "3/2", 3.2f },
-        };
-    }
-
-    private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
-    {
-        {_go1.name, _go1},
-        {_go2.name, _go2},
-        {"NULL", null},
+        { "1", 1.0f },
+        { "2", 2.0f },
+        { "3/1", 3.1f },
+        { "3/2", 3.2f },
     };
 }
+
+private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
+{
+    {_go1.name, _go1},
+    {_go2.name, _go2},
+    {"NULL", null},
+};
 ```
 
 ![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
@@ -803,24 +792,26 @@ public class DropdownExample : MonoBehaviour
 To control the separator and disabled item
 
 ```csharp
-    [Dropdown(nameof(GetDropdownItems))]
-    public Color color;
+using SaintsField;
 
-    private DropdownList<Color> GetDropdownItems()
+[Dropdown(nameof(GetDropdownItems))]
+public Color color;
+
+private DropdownList<Color> GetDropdownItems()
+{
+    return new DropdownList<Color>
     {
-        return new DropdownList<Color>
-        {
-            { "Black", Color.black },
-            { "White", Color.white },
-            DropdownList<Color>.Separator(),
-            { "Basic/Red", Color.red, true },  // the third arg means it's disabled
-            { "Basic/Green", Color.green },
-            { "Basic/Blue", Color.blue },
-            DropdownList<Color>.Separator("Basic/"),
-            { "Basic/Magenta", Color.magenta },
-            { "Basic/Cyan", Color.cyan },
-        };
-    }
+        { "Black", Color.black },
+        { "White", Color.white },
+        DropdownList<Color>.Separator(),
+        { "Basic/Red", Color.red, true },  // the third arg means it's disabled
+        { "Basic/Green", Color.green },
+        { "Basic/Blue", Color.blue },
+        DropdownList<Color>.Separator("Basic/"),
+        { "Basic/Magenta", Color.magenta },
+        { "Basic/Cyan", Color.cyan },
+    };
+}
 ```
 
 And you can always manually add it:
@@ -879,38 +870,37 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 *   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
 
 ```csharp
-public class AdvancedDropdownExample: MonoBehaviour
-{
-    [AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
+using SaintsField;
 
-    public AdvancedDropdownList<int> AdvDropdown()
+[AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
+
+public AdvancedDropdownList<int> AdvDropdown()
+{
+    return new AdvancedDropdownList<int>("Days")
     {
-        return new AdvancedDropdownList<int>("Days")
+        // a grouped value
+        new AdvancedDropdownList<int>("First Half")
         {
-            // a grouped value
-            new AdvancedDropdownList<int>("First Half")
+            // with icon
+            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+            // no icon
+            new AdvancedDropdownList<int>("Tuesday", 2),
+        },
+        new AdvancedDropdownList<int>("Second Half")
+        {
+            new AdvancedDropdownList<int>("Wednesday")
             {
-                // with icon
-                new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
-                // no icon
-                new AdvancedDropdownList<int>("Tuesday", 2),
+                new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
+                new AdvancedDropdownList<int>("Afternoon", 8),
             },
-            new AdvancedDropdownList<int>("Second Half")
-            {
-                new AdvancedDropdownList<int>("Wednesday")
-                {
-                    new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
-                    new AdvancedDropdownList<int>("Afternoon", 8),
-                },
-                new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
-            },
-            // direct value
-            new AdvancedDropdownList<int>("Friday", 5, true),
-            AdvancedDropdownList<int>.Separator(),
-            new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
-            new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
-        };
-    }
+            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
+        },
+        // direct value
+        new AdvancedDropdownList<int>("Friday", 5, true),
+        AdvancedDropdownList<int>.Separator(),
+        new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
+        new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
+    };
 }
 ```
 
@@ -925,6 +915,8 @@ public class AdvancedDropdownExample: MonoBehaviour
 There is also a parser to automatically separate items as sub items using `/`:
 
 ```csharp
+using SaintsField;
+
 [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
 
 public AdvancedDropdownList<int> AdvDropdown()
@@ -952,6 +944,8 @@ public AdvancedDropdownList<int> AdvDropdown()
 You can use this to make a searchable dropdown:
 
 ```csharp
+using SaintsField;
+
 [AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
 
 public AdvancedDropdownList<int> AdvDropdownNoNest()
@@ -983,17 +977,16 @@ For each argument:
 *   `float step=-1f`: the step for the range. `<= 0` means no limit.
 
 ```csharp
-public class RangeExample: MonoBehaviour
-{
-    public int min;
-    public int max;
+using SaintsField;
 
-    [PropRange(nameof(min), nameof(max))] public float rangeFloat;
-    [PropRange(nameof(min), nameof(max))] public int rangeInt;
+public int min;
+public int max;
 
-    [PropRange(nameof(min), nameof(max), step: 0.5f)] public float rangeFloatStep;
-    [PropRange(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
-}
+[PropRange(nameof(min), nameof(max))] public float rangeFloat;
+[PropRange(nameof(min), nameof(max))] public int rangeInt;
+
+[PropRange(nameof(min), nameof(max), step: 0.5f)] public float rangeFloatStep;
+[PropRange(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
 ```
 
 ![range](https://github.com/TylerTemp/SaintsField/assets/6391063/55f3fc5a-3ee4-4bd8-9b0a-cd016a7a79e7)
@@ -1015,42 +1008,41 @@ For each argument:
 a full-featured example:
 
 ```csharp
-public class MinMaxSliderExample: MonoBehaviour
-{
-    [MinMaxSlider(-1f, 3f, 0.3f)]
-    public Vector2 vector2Step03;
+using SaintsField;
 
-    [MinMaxSlider(0, 20, 3)]
-    public Vector2Int vector2IntStep3;
+[MinMaxSlider(-1f, 3f, 0.3f)]
+public Vector2 vector2Step03;
 
-    [MinMaxSlider(-1f, 3f)]
-    public Vector2 vector2Free;
+[MinMaxSlider(0, 20, 3)]
+public Vector2Int vector2IntStep3;
 
-    [MinMaxSlider(0, 20)]
-    public Vector2Int vector2IntFree;
+[MinMaxSlider(-1f, 3f)]
+public Vector2 vector2Free;
 
-    // not recommended
-    [SerializeField]
-    [MinMaxSlider(0, 100, minWidth:-1, maxWidth:-1)]
-    private Vector2Int _autoWidth;
+[MinMaxSlider(0, 20)]
+public Vector2Int vector2IntFree;
 
-    [field: SerializeField, MinMaxSlider(-100f, 100f)]
-    public Vector2 OuterRange { get; private set; }
+// not recommended
+[SerializeField]
+[MinMaxSlider(0, 100, minWidth:-1, maxWidth:-1)]
+private Vector2Int _autoWidth;
 
-    [SerializeField, MinMaxSlider(nameof(GetOuterMin), nameof(GetOuterMax), 1)] public Vector2Int _innerRange;
+[field: SerializeField, MinMaxSlider(-100f, 100f)]
+public Vector2 OuterRange { get; private set; }
 
-    private float GetOuterMin() => OuterRange.x;
-    private float GetOuterMax() => OuterRange.y;
+[SerializeField, MinMaxSlider(nameof(GetOuterMin), nameof(GetOuterMax), 1)] public Vector2Int _innerRange;
 
-    [field: SerializeField]
-    public float DynamicMin { get; private set; }
-    [field: SerializeField]
-    public float DynamicMax { get; private set; }
+private float GetOuterMin() => OuterRange.x;
+private float GetOuterMax() => OuterRange.y;
 
-    [SerializeField, MinMaxSlider(nameof(DynamicMin), nameof(DynamicMax))] private Vector2 _propRange;
-    [SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] private Vector2 _propLeftRange;
-    [SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] private Vector2 _propRightRange;
-}
+[field: SerializeField]
+public float DynamicMin { get; private set; }
+[field: SerializeField]
+public float DynamicMax { get; private set; }
+
+[SerializeField, MinMaxSlider(nameof(DynamicMin), nameof(DynamicMax))] private Vector2 _propRange;
+[SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] private Vector2 _propLeftRange;
+[SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] private Vector2 _propRightRange;
 ```
 
 [![minmaxslider](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
@@ -1074,19 +1066,18 @@ Known Issue:
 3.  UI Toolkit: when `autoExpand=false` and `defaultExpand=false`, the layout WILL get messed up: the buttons will go out of view if you shrink the inspector width. This seems a bug in UI Toolkit itself.
 
 ```csharp
-public class EnumFlagsExample: MonoBehaviour
-{
-    [Serializable, Flags]
-    public enum BitMask
-    {
-        None = 0,  // this will be hide as we will have an all/none button
-        Mask1 = 1,
-        Mask2 = 1 << 1,
-        Mask3 = 1 << 2,
-    }
+using SaintsField;
 
-    [EnumFlags] public BitMask myMask;
+[Serializable, Flags]
+public enum BitMask
+{
+    None = 0,  // this will be hide as we will have an all/none button
+    Mask1 = 1,
+    Mask2 = 1 << 1,
+    Mask3 = 1 << 2,
 }
+
+[EnumFlags] public BitMask myMask;
 ```
 
 [![enum_flags](https://github.com/TylerTemp/SaintsField/assets/6391063/710d3efc-5cba-471b-a0f1-a4319ded86fd)](https://github.com/TylerTemp/SaintsField/assets/6391063/48f4c25b-a4cd-40c6-bb42-913a0dc18daa)
@@ -1100,12 +1091,11 @@ Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
 *   AllowMultiple: No
 
 ```csharp
-public class ResizableTextAreaExample : MonoBehaviour
-{
-    [SerializeField, ResizableTextArea] private string _short;
-    [SerializeField, ResizableTextArea] private string _long;
-    [SerializeField, RichLabel(null), ResizableTextArea] private string _noLabel;
-}
+using SaintsField;
+
+[SerializeField, ResizableTextArea] private string _short;
+[SerializeField, ResizableTextArea] private string _long;
+[SerializeField, RichLabel(null), ResizableTextArea] private string _noLabel;
 ```
 
 [![resizabletextarea](https://github.com/TylerTemp/SaintsField/assets/6391063/202a742a-965c-4e68-a829-4a8aa4c8fe9e)](https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922)
@@ -1123,17 +1113,16 @@ A dropdown selector for an animator parameter.
     type of the parameter to filter
 
 ```csharp
-public class Anim : MonoBehaviour
-{
-    [field: SerializeField]
-    public Animator Animator { get; private set;}
+using SaintsField;
 
-    [AnimatorParam(nameof(Animator))]
-    private string animParamName;
+[field: SerializeField]
+public Animator Animator { get; private set;}
 
-    [AnimatorParam(nameof(Animator))]
-    private int animParamHash;
-}
+[AnimatorParam(nameof(Animator))]
+private string animParamName;
+
+[AnimatorParam(nameof(Animator))]
+private int animParamHash;
 ```
 
 ![animator_params](https://github.com/TylerTemp/SaintsField/assets/6391063/3cd5fb6d-1a75-457c-9bbd-e1e6b377a83c)
@@ -1165,21 +1154,24 @@ Special Note: using `AniamtorState`/`AnimatorStateBase` with `OnValueChanged`, y
 This is because `AnimatorState` expected any class/struct with satisfied fields.
 
 ```csharp
-public class Anim : MonoBehaviour
-{
-    [AnimatorState, OnValueChanged(nameof(OnChanged))]
-    public string stateName;
+using SaintsField;
 
-    [AnimatorState, OnValueChanged(nameof(OnChangedState))]
-    public AnimatorState state;
+[AnimatorState, OnValueChanged(nameof(OnChanged))]
+public string stateName;
 
-    // This does not have a `animationClip`, thus it won't include a resource when serialized: only pure data.
-    [AnimatorState, OnValueChanged(nameof(OnChangedState))]
-    public AnimatorStateBase stateBase;
+#if UNITY_EDITOR
+[AnimatorState, OnValueChanged(nameof(OnChangedState))]
+#endif
+public AnimatorState state;
 
-    private void OnChanged(string changedValue) => Debug.Log(changedValue);
-    private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"layerIndex={changedValue.layerIndex}, state={changedValue.state}, animationClip={changedValue.animationClip}, subStateMachineNameChain={string.Join("/", changedValue.subStateMachineNameChain)}");
-}
+// This does not have a `animationClip`, thus it won't include a resource when serialized: only pure data.
+[AnimatorState, OnValueChanged(nameof(OnChangedState))]
+public AnimatorStateBase stateBase;
+
+private void OnChanged(string changedValue) => Debug.Log(changedValue);
+#if UNITY_EDITOR
+private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"layerIndex={changedValue.layerIndex}, AnimatorControllerLayer={changedValue.layer}, AnimatorState={changedValue.state}, animationClip={changedValue.animationClip}, subStateMachineNameChain={string.Join("/", changedValue.subStateMachineNameChain)}");
+#endif
 ```
 
 ![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/8ee35de5-c7d5-4f0d-b8b7-8feeac41c31d)
@@ -1193,14 +1185,13 @@ A dropdown selector for layer.
 Note: want a bitmask layer selector? Unity already has it. Just use `public LayerMask myLayerMask;`
 
 ```csharp
-public class LayerAttributeExample: MonoBehaviour
-{
-    [Layer] public string layerString;
-    [Layer] public int layerInt;
+using SaintsField;
 
-    // Unity supports multiple layer selector
-    public LayerMask myLayerMask;
-}
+[Layer] public string layerString;
+[Layer] public int layerInt;
+
+// Unity supports multiple layer selector
+public LayerMask myLayerMask;
 ```
 
 ![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/a7ff79a3-f7b8-48ca-8233-5facc975f5eb)
@@ -1212,11 +1203,10 @@ A dropdown selector for a scene in the build list, plus a "Edit Scenes In Build.
 *   AllowMultiple: No
 
 ```csharp
-public class SceneExample: MonoBehaviour
-{
-    [Scene] public int _sceneInt;
-    [Scene] public string _sceneString;
-}
+using SaintsField;
+
+[Scene] public int _sceneInt;
+[Scene] public string _sceneString;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/0da47bd1-0741-4707-b96b-6c08e4c5844c)
@@ -1228,11 +1218,10 @@ A dropdown selector for sorting layer, plus a "Edit Sorting Layers..." option to
 *   AllowMultiple: No
 
 ```csharp
-public class SortingLayerExample: MonoBehaviour
-{
-    [SortingLayer] public string _sortingLayerString;
-    [SortingLayer] public int _sortingLayerInt;
-}
+using SaintsField;
+
+[SortingLayer] public string _sortingLayerString;
+[SortingLayer] public int _sortingLayerInt;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/f6633689-012b-4d55-af32-885aa2a2e3cf)
@@ -1244,10 +1233,9 @@ A dropdown selector for a tag.
 *   AllowMultiple: No
 
 ```csharp
-public class TagExample: MonoBehaviour
-{
-    [Tag] public string tag;
-}
+using SaintsField;
+
+[Tag] public string tag;
 ```
 
 ![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/1a705bce-60ac-4434-826f-69c34055450c)
@@ -1259,10 +1247,9 @@ A string dropdown selector for an input axis, plus a "Open Input Manager..." opt
 *   AllowMultiple: No
 
 ```csharp
-public class InputAxisExample: MonoBehaviour
-{
-    [InputAxis] public string inputAxis;
-}
+using SaintsField;
+
+[InputAxis] public string inputAxis;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/68dc47d9-7211-48df-bbd1-c11faa536bd1)
@@ -1274,11 +1261,10 @@ A toggle button on the left of the bool field. Only works on boolean field.
 IMGUI: To use with `RichLabel`, you need to add 6 spaces ahead as a hack
 
 ```csharp
-public class LeftToggleExample: MonoBehaviour
-{
-    [LeftToggle] public bool myToggle;
-    [LeftToggle, RichLabel("      <color=green><label />")] public bool richToggle;
-}
+using SaintsField;
+
+[LeftToggle] public bool myToggle;
+[LeftToggle, RichLabel("      <color=green><label />")] public bool richToggle;
 ```
 
 ![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
@@ -1302,17 +1288,16 @@ Override 2:
 *   `EColor color = EColor.Green` curve line color
 
 ```csharp
-public class CurveRangeExample: MonoBehaviour
-{
-    [CurveRange(-1, -1, 1, 1)]
-    public AnimationCurve curve;
+using SaintsField;
 
-    [CurveRange(EColor.Orange)]
-    public AnimationCurve curve1;
+[CurveRange(-1, -1, 1, 1)]
+public AnimationCurve curve;
 
-    [CurveRange(0, 0, 5, 5, EColor.Red)]
-    public AnimationCurve curve2;
-}
+[CurveRange(EColor.Orange)]
+public AnimationCurve curve1;
+
+[CurveRange(0, 0, 5, 5, EColor.Red)]
+public AnimationCurve curve2;
 ```
 
 ![curverange](https://github.com/TylerTemp/SaintsField/assets/6391063/7c10ebb4-ab93-4192-ad05-5e2c3addcfe9)
@@ -1341,33 +1326,32 @@ Parameters:
     rich text is not supported here
 
 ```csharp
-public class ProgressBarExample: MonoBehaviour
-{
-    [ProgressBar(10)] public int myHp;
-    // control step for float rather than free value
-    [ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)] public float myMp;
+using SaintsField;
 
-    [Space]
-    public int minValue;
-    public int maxValue;
+[ProgressBar(10)] public int myHp;
+// control step for float rather than free value
+[ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)] public float myMp;
 
-    [ProgressBar(nameof(minValue)
-            , nameof(maxValue)  // dynamic min/max
-            , step: 0.05f
-            , backgroundColorCallback: nameof(BackgroundColor)  // dynamic background color
-            , colorCallback: nameof(FillColor)  // dynamic fill color
-            , titleCallback: nameof(Title)  // dynamic title, does not support rich label
-        ),
-    ]
-    [RichLabel(null)]  // make this full width
-    public float fValue;
+[Space]
+public int minValue;
+public int maxValue;
 
-    private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
+[ProgressBar(nameof(minValue)
+        , nameof(maxValue)  // dynamic min/max
+        , step: 0.05f
+        , backgroundColorCallback: nameof(BackgroundColor)  // dynamic background color
+        , colorCallback: nameof(FillColor)  // dynamic fill color
+        , titleCallback: nameof(Title)  // dynamic title, does not support rich label
+    ),
+]
+[RichLabel(null)]  // make this full width
+public float fValue;
 
-    private Color FillColor() => Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
+private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
 
-    private string Title(float curValue, float min, float max, string label) => curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
-}
+private Color FillColor() => Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
+
+private string Title(float curValue, float min, float max, string label) => curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
 ```
 
 [![progress_bar](https://github.com/TylerTemp/SaintsField/assets/6391063/74085d85-e447-4b6b-a3ff-1bd2f26c5d73)](https://github.com/TylerTemp/SaintsField/assets/6391063/11ad0700-32ba-4280-ae7b-6b6994c9de83)
@@ -1399,6 +1383,8 @@ Parameters:
 **Known Issue**: IMGUI, manually sign a null object by using Unity's default pick will sign an empty string instead of null. Use custom pick to avoid this inconsistency.
 
 ```csharp
+using SaintsField;
+
 // resource: display as a MonoScript, requires a BoxCollider
 [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
 [InfoBox(nameof(myResource), true)]
@@ -1463,12 +1449,11 @@ Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
 *   AllowMultiple: No
 
 ```csharp
-public class AssetPreviewExample: MonoBehaviour
-{
-    [AssetPreview(20, 100)] public Texture2D _texture2D;
-    [AssetPreview(50)] public GameObject _go;
-    [AssetPreview(above: true)] public Sprite _sprite;
-}
+using SaintsField;
+
+[AssetPreview(20, 100)] public Texture2D _texture2D;
+[AssetPreview(50)] public GameObject _go;
+[AssetPreview(above: true)] public Sprite _sprite;
 ```
 
 ![asset_preview](https://github.com/TylerTemp/SaintsField/assets/6391063/ffed3715-f531-43d0-b4c3-98d20d419b3e)
@@ -1502,21 +1487,20 @@ Show an image above/below the field.
 *   AllowMultiple: No
 
 ```csharp
-public class ShowImageExample: MonoBehaviour
-{
-    [AboveImage(nameof(spriteField))]
-    // size and group
-    [BelowImage(nameof(spriteField), maxWidth: 25, groupBy: "Below1")]
-    [BelowImage(nameof(spriteField), maxHeight: 20, align: EAlign.End, groupBy: "Below1")]
-    public Sprite spriteField;
+using SaintsField;
 
-    // align
-    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.FieldStart)]
-    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Start)]
-    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Center)]
-    [BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.End)]
-    public string alignField;
-}
+[AboveImage(nameof(spriteField))]
+// size and group
+[BelowImage(nameof(spriteField), maxWidth: 25, groupBy: "Below1")]
+[BelowImage(nameof(spriteField), maxHeight: 20, align: EAlign.End, groupBy: "Below1")]
+public Sprite spriteField;
+
+// align
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.FieldStart)]
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Start)]
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Center)]
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.End)]
+public string alignField;
 ```
 
 ![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
@@ -1534,29 +1518,28 @@ Call a function every time the field value is changed
 Special Note: `AnimatorState` will have a different `OnValueChanged` parameter passed in. See `AnimatorState` for more detail.
 
 ```csharp
-public class OnChangedExample : MonoBehaviour
+using SaintsField;
+
+// no params
+[OnValueChanged(nameof(Changed))]
+public int value;
+private void Changed()
 {
-    // no params
-    [OnValueChanged(nameof(Changed))]
-    public int value;
-    private void Changed()
-    {
-        Debug.Log($"changed={value}");
-    }
+    Debug.Log($"changed={value}");
+}
 
-    // with params to get the new value
-    [OnValueChanged(nameof(ChangedAnyType))]
-    public GameObject go;
+// with params to get the new value
+[OnValueChanged(nameof(ChangedAnyType))]
+public GameObject go;
 
-    // it will pass the index too if it's inside an array/list
-    [OnValueChanged(nameof(ChangedAnyType))]
-    public SpriteRenderer[] srs;
+// it will pass the index too if it's inside an array/list
+[OnValueChanged(nameof(ChangedAnyType))]
+public SpriteRenderer[] srs;
 
-    // it's ok to set it as the super class
-    private void ChangedAnyType(object anyObj, int index=-1)
-    {
-        Debug.Log($"changed={anyObj}@{index}");
-    }
+// it's ok to set it as the super class
+private void ChangedAnyType(object anyObj, int index=-1)
+{
+    Debug.Log($"changed={anyObj}@{index}");
 }
 ```
 
@@ -1589,6 +1572,8 @@ This is the same logic as the `ShowIf`/`HideIf` pair, which `DisableIf` is the m
 A simple example:
 
 ```csharp
+using SaintsField;
+
 [ReadOnly(nameof(ShouldBeDisabled))] public string disableMe;
 
 private bool ShouldBeDisabled  // change the logic here
@@ -1600,34 +1585,33 @@ private bool ShouldBeDisabled  // change the logic here
 A more complex example:
 
 ```csharp
-public class ReadOnlyGroupExample: MonoBehaviour
-{
-    [ReadOnly] public string directlyReadOnly;
+using SaintsField;
 
-    [SerializeField] private bool _bool1;
-    [SerializeField] private bool _bool2;
-    [SerializeField] private bool _bool3;
-    [SerializeField] private bool _bool4;
+[ReadOnly] public string directlyReadOnly;
 
-    [SerializeField]
-    [ReadOnly(nameof(_bool1))]
-    [ReadOnly(nameof(_bool2))]
-    [RichLabel("readonly=1||2")]
-    private string _ro1and2;
+[SerializeField] private bool _bool1;
+[SerializeField] private bool _bool2;
+[SerializeField] private bool _bool3;
+[SerializeField] private bool _bool4;
 
-
-    [SerializeField]
-    [ReadOnly(nameof(_bool1), nameof(_bool2))]
-    [RichLabel("readonly=1&&2")]
-    private string _ro1or2;
+[SerializeField]
+[ReadOnly(nameof(_bool1))]
+[ReadOnly(nameof(_bool2))]
+[RichLabel("readonly=1||2")]
+private string _ro1and2;
 
 
-    [SerializeField]
-    [ReadOnly(nameof(_bool1), nameof(_bool2))]
-    [ReadOnly(nameof(_bool3), nameof(_bool4))]
-    [RichLabel("readonly=(1&&2)||(3&&4)")]
-    private string _ro1234;
-}
+[SerializeField]
+[ReadOnly(nameof(_bool1), nameof(_bool2))]
+[RichLabel("readonly=1&&2")]
+private string _ro1or2;
+
+
+[SerializeField]
+[ReadOnly(nameof(_bool1), nameof(_bool2))]
+[ReadOnly(nameof(_bool3), nameof(_bool4))]
+[RichLabel("readonly=(1&&2)||(3&&4)")]
+private string _ro1234;
 ```
 
 [![readonly](https://github.com/TylerTemp/SaintsField/assets/6391063/e267567b-469c-4156-a82c-82f21fc43021)](https://github.com/TylerTemp/SaintsField/assets/6391063/6761a0f2-07c2-4252-9dd0-c1a60091a891)
@@ -1635,6 +1619,8 @@ public class ReadOnlyGroupExample: MonoBehaviour
 EMode example:
 
 ```csharp
+using SaintsField;
+
 public bool boolVal;
 
 [DisableIf(EMode.Edit)] public string disEditMode;
@@ -1668,23 +1654,22 @@ Parameters:
 
 
 ```csharp
-public class RequiredExample: MonoBehaviour
+using SaintsField;
+
+[Required("Add this please!")] public Sprite _spriteImage;
+// works for the property field
+[field: SerializeField, Required] public GameObject Go { get; private set; }
+[Required] public UnityEngine.Object _object;
+[SerializeField, Required] private float _wontWork;
+
+[Serializable]
+public struct MyStruct
 {
-    [Required("Add this please!")] public Sprite _spriteImage;
-    // works for the property field
-    [field: SerializeField, Required] public GameObject Go { get; private set; }
-    [Required] public UnityEngine.Object _object;
-    [SerializeField, Required] private float _wontWork;
-
-    [Serializable]
-    public struct MyStruct
-    {
-        public int theInt;
-    }
-
-    [Required]
-    public MyStruct warnsYouNow;
+    public int theInt;
 }
+
+[Required]
+public MyStruct warnsYouNow;
 ```
 
 ![required](https://github.com/TylerTemp/SaintsField/assets/6391063/1e93c51c-ada6-4848-8fc8-a963266ee2cf)
@@ -1709,39 +1694,38 @@ Validate the input of the field when the value changes.
 *   AllowMultiple: Yes
 
 ```csharp
-public class ValidateInputExample : MonoBehaviour
-{
-    // string callback
-    [ValidateInput(nameof(OnValidateInput))]
-    public int _value;
-    private string OnValidateInput() => _value < 0 ? $"Should be positive, but gets {_value}" : null;
+using SaintsField;
 
-    // property validate
-    [ValidateInput(nameof(boolValidate))]
-    public bool boolValidate;
+// string callback
+[ValidateInput(nameof(OnValidateInput))]
+public int _value;
+private string OnValidateInput() => _value < 0 ? $"Should be positive, but gets {_value}" : null;
 
-    // bool callback
-    [ValidateInput(nameof(BoolCallbackValidate))]
-    public string boolCallbackValidate;
-    private bool BoolCallbackValidate() => boolValidate;
+// property validate
+[ValidateInput(nameof(boolValidate))]
+public bool boolValidate;
 
-    // with callback params
-    [ValidateInput(nameof(ValidateWithReqParams))]
-    public int withReqParams;
-    private string ValidateWithReqParams(int v) => $"ValidateWithReqParams: {v}";
+// bool callback
+[ValidateInput(nameof(BoolCallbackValidate))]
+public string boolCallbackValidate;
+private bool BoolCallbackValidate() => boolValidate;
 
-    // with optional callback params
-    [ValidateInput(nameof(ValidateWithOptParams))]
-    public int withOptionalParams;
+// with callback params
+[ValidateInput(nameof(ValidateWithReqParams))]
+public int withReqParams;
+private string ValidateWithReqParams(int v) => $"ValidateWithReqParams: {v}";
 
-    private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
+// with optional callback params
+[ValidateInput(nameof(ValidateWithOptParams))]
+public int withOptionalParams;
 
-    // with array index callback
-    [ValidateInput(nameof(ValidateValArr))]
-    public int[] valArr;
+private string ValidateWithOptParams(string sth="a", int v=0) => $"ValidateWithOptionalParams[{sth}]: {v}";
 
-    private string ValidateValArr(int v, int index) => $"ValidateValArr[{index}]: {v}";
-}
+// with array index callback
+[ValidateInput(nameof(ValidateValArr))]
+public int[] valArr;
+
+private string ValidateValArr(int v, int index) => $"ValidateValArr[{index}]: {v}";
 ```
 
 [![validateinput](https://github.com/TylerTemp/SaintsField/assets/6391063/f554084c-78f3-43ca-a6ab-b3f59ecbf44c)](https://github.com/TylerTemp/SaintsField/assets/6391063/9d52e663-c9f8-430a-814c-011b17b67a86)
@@ -1775,6 +1759,8 @@ For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || Sh
 A simple example:
 
 ```csharp
+using SaintsField;
+
 [ShowIf(nameof(ShouldShow))]
 public int showMe;
 
@@ -1788,48 +1774,47 @@ A full featured example:
 
 
 ```csharp
-public class ShowHideExample: MonoBehaviour
-{
-    public bool _bool1;
-    public bool _bool2;
-    public bool _bool3;
-    public bool _bool4;
+using SaintsField;
 
-    [ShowIf(nameof(_bool1))]
-    [ShowIf(nameof(_bool2))]
-    [RichLabel("<color=red>show=1||2")]
-    public string _showIf1Or2;
+public bool _bool1;
+public bool _bool2;
+public bool _bool3;
+public bool _bool4;
 
-
-    [ShowIf(nameof(_bool1), nameof(_bool2))]
-    [RichLabel("<color=green>show=1&&2")]
-    public string _showIf1And2;
-
-    [HideIf(nameof(_bool1))]
-    [HideIf(nameof(_bool2))]
-    [RichLabel("<color=blue>show=!1||!2")]
-    public string _hideIf1Or2;
+[ShowIf(nameof(_bool1))]
+[ShowIf(nameof(_bool2))]
+[RichLabel("<color=red>show=1||2")]
+public string _showIf1Or2;
 
 
-    [HideIf(nameof(_bool1), nameof(_bool2))]
-    [RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
-    public string _hideIf1And2;
+[ShowIf(nameof(_bool1), nameof(_bool2))]
+[RichLabel("<color=green>show=1&&2")]
+public string _showIf1And2;
 
-    [ShowIf(nameof(_bool1))]
-    [HideIf(nameof(_bool2))]
-    [RichLabel("<color=magenta>show=1||!2")]
-    public string _showIf1OrNot2;
+[HideIf(nameof(_bool1))]
+[HideIf(nameof(_bool2))]
+[RichLabel("<color=blue>show=!1||!2")]
+public string _hideIf1Or2;
 
-    [ShowIf(nameof(_bool1), nameof(_bool2))]
-    [ShowIf(nameof(_bool3), nameof(_bool4))]
-    [RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
-    public string _showIf1234;
 
-    [HideIf(nameof(_bool1), nameof(_bool2))]
-    [HideIf(nameof(_bool3), nameof(_bool4))]
-    [RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
-    public string _hideIf1234;
-}
+[HideIf(nameof(_bool1), nameof(_bool2))]
+[RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
+public string _hideIf1And2;
+
+[ShowIf(nameof(_bool1))]
+[HideIf(nameof(_bool2))]
+[RichLabel("<color=magenta>show=1||!2")]
+public string _showIf1OrNot2;
+
+[ShowIf(nameof(_bool1), nameof(_bool2))]
+[ShowIf(nameof(_bool3), nameof(_bool4))]
+[RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
+public string _showIf1234;
+
+[HideIf(nameof(_bool1), nameof(_bool2))]
+[HideIf(nameof(_bool3), nameof(_bool4))]
+[RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
+public string _hideIf1234;
 ```
 
 [![showifhideif](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
@@ -1837,6 +1822,8 @@ public class ShowHideExample: MonoBehaviour
 Example about EMode:
 
 ```csharp
+using SaintsField;
+
 public bool boolValue;
 
 [ShowIf(EMode.Edit)] public string showEdit;
@@ -1864,13 +1851,12 @@ They have the same overrides:
 *   AllowMultiple: Yes
 
 ```csharp
-public class MinMaxExample: MonoBehaviour
-{
-    public int upLimit;
+using SaintsField;
 
-    [MinValue(0), MaxValue(nameof(upLimit))] public int min0Max;
-    [MinValue(nameof(upLimit)), MaxValue(10)] public float fMinMax10;
-}
+public int upLimit;
+
+[MinValue(0), MaxValue(nameof(upLimit))] public int min0Max;
+[MinValue(nameof(upLimit)), MaxValue(10)] public float fMinMax10;
 ```
 
 [![minmax](https://github.com/TylerTemp/SaintsField/assets/6391063/7714fa76-fc5c-4ebc-9aae-be189cef7743)](https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604)
@@ -1890,15 +1876,14 @@ Automatically sign a component to a field, if the field value is null and the co
 *   AllowMultiple: No
 
 ```csharp
-public class GetComponentExample: MonoBehaviour
-{
-    [GetComponent] public BoxCollider otherComponent;
-    [GetComponent] public GameObject selfGameObject;  // get the GameObject itself
-    [GetComponent] public RectTransform selfRectTransform;  // useful for UI
+using SaintsField;
 
-    [GetComponent] public GetComponentExample selfScript;  // yeah you can get your script itself
-    [GetComponent] public Dummy otherScript;  // other script
-}
+[GetComponent] public BoxCollider otherComponent;
+[GetComponent] public GameObject selfGameObject;  // get the GameObject itself
+[GetComponent] public RectTransform selfRectTransform;  // useful for UI
+
+[GetComponent] public GetComponentExample selfScript;  // yeah you can get your script itself
+[GetComponent] public Dummy otherScript;  // other script
 ```
 
 ![get_component](https://github.com/TylerTemp/SaintsField/assets/6391063/a5e9ca85-ab23-4b4a-b228-5d19c66c4052)
@@ -1924,14 +1909,13 @@ NOTE: Unlike `GetComponentInChildren` by Unity, this will **NOT** check the targ
 *   AllowMultiple: No
 
 ```csharp
-public class GetComponentInChildrenExample: MonoBehaviour
-{
-    [GetComponentInChildren] public BoxCollider childBoxCollider;
-    // by setting compType, you can sign it as a different type
-    [GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
-    // and GameObject field works too
-    [GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
-}
+using SaintsField;
+
+[GetComponentInChildren] public BoxCollider childBoxCollider;
+// by setting compType, you can sign it as a different type
+[GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
+// and GameObject field works too
+[GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
 ```
 
 ![get_component_in_children](https://github.com/TylerTemp/SaintsField/assets/6391063/854aeefc-6456-4df2-a4a7-40a5cd5e2290)
@@ -1945,12 +1929,11 @@ Automatically find a component under the current target. This is very similar to
 *   AllowMultiple: Yes but not necessary
 
 ```csharp
-public class FindComponentExample: MonoBehaviour
-{
-    [FindComponent("sub/dummy")] public Dummy subDummy;
-    [FindComponent("sub/dummy")] public GameObject subDummyGo;
-    [FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
-}
+using SaintsField;
+
+[FindComponent("sub/dummy")] public Dummy subDummy;
+[FindComponent("sub/dummy")] public GameObject subDummyGo;
+[FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
 ```
 
 ![find_component](https://github.com/TylerTemp/SaintsField/assets/6391063/6620e643-3f8a-4c33-a136-6cbfc889d2ac)
@@ -1970,16 +1953,15 @@ Automatically sign a component to a field, if the field value is null and the co
 *   AllowMultiple: No
 
 ```csharp
-public class GetComponentInParentsExample: MonoBehaviour
-{
-    [GetComponentInParent] public SpriteRenderer directParent;
-    [GetComponentInParent(typeof(SpriteRenderer))] public GameObject directParentDifferentType;
-    [GetComponentInParent] public BoxCollider directNoSuch;
+using SaintsField;
 
-    [GetComponentInParents] public SpriteRenderer searchParent;
-    [GetComponentInParents(typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
-    [GetComponentInParents] public BoxCollider searchNoSuch;
-}
+[GetComponentInParent] public SpriteRenderer directParent;
+[GetComponentInParent(typeof(SpriteRenderer))] public GameObject directParentDifferentType;
+[GetComponentInParent] public BoxCollider directNoSuch;
+
+[GetComponentInParents] public SpriteRenderer searchParent;
+[GetComponentInParents(typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
+[GetComponentInParents] public BoxCollider searchNoSuch;
 ```
 
 ![get_component_in_parents](https://github.com/TylerTemp/SaintsField/assets/6391063/02836529-1aff-4bc9-b849-203d7bdaad21)
@@ -2003,14 +1985,13 @@ Automatically sign a component to a field, if the field value is null and the co
 *   AllowMultiple: No
 
 ```csharp
-public class GetComponentInSceneExample: MonoBehaviour
-{
-    [GetComponentInScene] public Dummy dummy;
-    // by setting compType, you can sign it as a different type
-    [GetComponentInScene(compType: typeof(Dummy))] public RectTransform dummyTrans;
-    // and GameObject field works too
-    [GetComponentInScene(compType: typeof(Dummy))] public GameObject dummyGo;
-}
+using SaintsField;
+
+[GetComponentInScene] public Dummy dummy;
+// by setting compType, you can sign it as a different type
+[GetComponentInScene(compType: typeof(Dummy))] public RectTransform dummyTrans;
+// and GameObject field works too
+[GetComponentInScene(compType: typeof(Dummy))] public GameObject dummyGo;
 ```
 
 ![get_component_in_scene](https://github.com/TylerTemp/SaintsField/assets/6391063/95a008a2-c7f8-4bc9-90f6-57c58724ebaf)
@@ -2034,17 +2015,17 @@ Automatically sign a component to a field by a given path.
 
 The `path` is a bit like html's `XPath` but with less functions:
 
-Path | Meaning
------|---------
-`/`  | Separator. Using at start means the root of the current scene.
-`//` | Separator. Any descendant children
-`.`  | Node. Current node
-`..` | Node. Parent node
-`*`  | All nodes
-name | Node. Any nodes with this name
-`[last()]` | Index Filter. Last of results
-`[index() > 1]` | Index Filter. Node index that is greater than 1
-`[0]` | Index Filter. First node in the results
+| Path            | Meaning                                                        |
+|-----------------|----------------------------------------------------------------|
+| `/`             | Separator. Using at start means the root of the current scene. |
+| `//`            | Separator. Any descendant children                             |
+| `.`             | Node. Current node                                             |
+| `..`            | Node. Parent node                                              |
+| `*`             | All nodes                                                      |
+| name            | Node. Any nodes with this name                                 |
+| `[last()]`      | Index Filter. Last of results                                  |
+| `[index() > 1]` | Index Filter. Node index that is greater than 1                |
+|  `[0]`          | Index Filter. First node in the results                        |
 
 For example:
 
@@ -2057,24 +2038,23 @@ For example:
 *   `./get/sth[1]`: the child named `get` of current node, then the second node named `sth` in the direct children list of `get`
 
 ```csharp
-public class GetComponentByPathExample: MonoBehaviour
-{
-    // starting from root, search any object with name "Dummy"
-    [GetComponentByPath("///Dummy")] public GameObject dummy;
-    // first child of current object
-    [GetComponentByPath("./*[1]")] public GameObject direct1;
-    // child of current object which has index greater than 1
-    [GetComponentByPath("./*[index() > 1]")] public GameObject directPosTg1;
-    // last child of current object
-    [GetComponentByPath("./*[last()]")] public GameObject directLast;
-    // re-sign the target if mis-match
-    [GetComponentByPath(EGetComp.NoResignButton | EGetComp.ForceResign, "./DirectSub")] public GameObject directSubWatched;
-    // without "ForceResign", it'll display a reload button if mis-match
-    // with multiple paths, it'll search from left to right
-    [GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMulti;
-    // if no match, it'll show an error message
-    [GetComponentByPath("/no", "///sth/else/../what/.//ever[last()]/goes/here")] public GameObject notExists;
-}
+using SaintsField;
+
+// starting from root, search any object with name "Dummy"
+[GetComponentByPath("///Dummy")] public GameObject dummy;
+// first child of current object
+[GetComponentByPath("./*[1]")] public GameObject direct1;
+// child of current object which has index greater than 1
+[GetComponentByPath("./*[index() > 1]")] public GameObject directPosTg1;
+// last child of current object
+[GetComponentByPath("./*[last()]")] public GameObject directLast;
+// re-sign the target if mis-match
+[GetComponentByPath(EGetComp.NoResignButton | EGetComp.ForceResign, "./DirectSub")] public GameObject directSubWatched;
+// without "ForceResign", it'll display a reload button if mis-match
+// with multiple paths, it'll search from left to right
+[GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMulti;
+// if no match, it'll show an error message
+[GetComponentByPath("/no", "///sth/else/../what/.//ever[last()]/goes/here")] public GameObject notExists;
 ```
 
 ![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/a0fdca83-0c96-4d57-9c9d-989efbac0f07)
@@ -2096,14 +2076,13 @@ Recommended to use it with `FieldType`!
 *   AllowMultiple: No
 
 ```csharp
-public class GetPrefabWithComponentExample: MonoBehaviour
-{
-    [GetPrefabWithComponent] public Dummy dummy;
-    // get the prefab itself
-    [GetPrefabWithComponent(compType: typeof(Dummy))] public GameObject dummyPrefab;
-    // works so good with `FieldType`
-    [GetPrefabWithComponent(compType: typeof(Dummy)), FieldType(typeof(Dummy))] public GameObject dummyPrefabFieldType;
-}
+using SaintsField;
+
+[GetPrefabWithComponent] public Dummy dummy;
+// get the prefab itself
+[GetPrefabWithComponent(compType: typeof(Dummy))] public GameObject dummyPrefab;
+// works so good with `FieldType`
+[GetPrefabWithComponent(compType: typeof(Dummy)), FieldType(typeof(Dummy))] public GameObject dummyPrefabFieldType;
 ```
 
 ![get_prefab_with_component](https://github.com/TylerTemp/SaintsField/assets/6391063/07eae93c-d2fc-4641-b71f-55a98f17b360)
@@ -2118,11 +2097,10 @@ Recommended to use it with `Expandable`!
 *   AllowMultiple: No
 
 ```csharp
-public class GetScriptableObjectExample: MonoBehaviour
-{
-    [GetScriptableObject] public Scriptable mySo;
-    [GetScriptableObject("RawResources/ScriptableIns")] public Scriptable mySoSuffix;
-}
+using SaintsField;
+
+[GetScriptableObject] public Scriptable mySo;
+[GetScriptableObject("RawResources/ScriptableIns")] public Scriptable mySoSuffix;
 ```
 
 ![GetScriptableObject](https://github.com/TylerTemp/SaintsField/assets/6391063/191c3b4b-a58a-4475-80cd-3dbc809a9511)
@@ -2144,11 +2122,10 @@ Recommended to use it with `GetComponent`!
 *   AllowMultiple: Yes
 
 ```csharp
-public class AddComponentExample: MonoBehaviour
-{
-    [AddComponent, GetComponent] public Dummy dummy;
-    [AddComponent(typeof(BoxCollider)), GetComponent] public GameObject thisObj;
-}
+using SaintsField;
+
+[AddComponent, GetComponent] public Dummy dummy;
+[AddComponent(typeof(BoxCollider)), GetComponent] public GameObject thisObj;
 ```
 
 ![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
@@ -2173,14 +2150,13 @@ Add a callback to a button's `onClick` event. Note this at this point does only 
     2.  call a function of this name from current target
 
 ```csharp
-public class ButtonAddOnClickExample: MonoBehaviour
-{
-    [GetComponent, ButtonAddOnClick(nameof(OnClick))] public Button button;
+using SaintsField;
 
-    private void OnClick()
-    {
-        Debug.Log("Button clicked!");
-    }
+[GetComponent, ButtonAddOnClick(nameof(OnClick))] public Button button;
+
+private void OnClick()
+{
+    Debug.Log("Button clicked!");
 }
 ```
 
@@ -2227,6 +2203,8 @@ For each argument:
 *   AllowMultiple: No
 
 ```csharp
+using SaintsField;
+
 public interface IMyInterface {}
 
 public class MyInter1: MonoBehaviour, IMyInterface {}
@@ -2263,6 +2241,8 @@ Parameters:
 *   AllowMultiple: No
 
 ```csharp
+using SaintsField;
+
 [ArraySize(3)]
 public string[] myArr;
 ```
@@ -2294,6 +2274,8 @@ Special Note:
 3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
 
 ```csharp
+using SaintsField;
+
 [Serializable]
 public struct Nest
 {
@@ -2338,6 +2320,8 @@ public Nest n1;
 To show a `Serializable` inline like it's directly in the `MonoBehavior`:
 
 ```csharp
+using SaintsField;
+
 [Serializable]
 public struct MyStruct
 {
@@ -2370,11 +2354,10 @@ A picker to select an addressable label.
 *   Allow Multiple: No
 
 ```csharp
-public class AddressableLabelExample : MonoBehaviour
-{
-    [AddressableLabel]
-    public string addressableLabel;
-}
+using SaintsField.Addressable;
+
+[AddressableLabel]
+public string addressableLabel;
 ```
 
 ![addressable_label](https://github.com/TylerTemp/SaintsField/assets/6391063/c0485d73-0f5f-4748-9684-d16f712e00e9)
@@ -2393,22 +2376,21 @@ A picker to select an addressable address (key).
 *   Allow Multiple: No
 
 ```csharp
-public class AddressableAddressExample: MonoBehaviour
-{
-    [AddressableAddress]  // from all group
-    public string address;
+using SaintsField.Addressable;
 
-    [AddressableAddress("Packed Assets")]  // from this group
-    public string addressInGroup;
+[AddressableAddress]  // from all group
+public string address;
 
-    [AddressableAddress(null, "Label1", "Label2")]  // either has label `Label1` or `Label2`
-    public string addressLabel1Or2;
+[AddressableAddress("Packed Assets")]  // from this group
+public string addressInGroup;
 
-    // must have both label `default` and `Label1`
-    // or have both label `default` and `Label2`
-    [AddressableAddress(null, "default && Label1", "default && Label2")]
-    public string addressLabelAnd;
-}
+[AddressableAddress(null, "Label1", "Label2")]  // either has label `Label1` or `Label2`
+public string addressLabel1Or2;
+
+// must have both label `default` and `Label1`
+// or have both label `default` and `Label2`
+[AddressableAddress(null, "default && Label1", "default && Label2")]
+public string addressLabelAnd;
 ```
 
 ![addressable_address](https://github.com/TylerTemp/SaintsField/assets/6391063/5646af00-c167-4131-be06-7e0b8e9b102e)
@@ -2428,6 +2410,8 @@ Select `NavMesh` area bit mask for an integer field. (So the integer value can b
 *   Allow Multiple: No
 
 ```csharp
+using SaintsField.AiNavigation;
+
 [NavMeshAreaMask]
 public int areaMask;
 ```
@@ -2444,6 +2428,8 @@ Select a `NavMesh` area for a string or an interger field.
 *   Allow Multiple: No
 
 ```csharp
+using SaintsField.AiNavigation;
+
 [NavMeshArea]  // then you can use `areaSingleMask1 | areaSingleMask2` to get multiple masks
 public int areaSingleMask;
 
@@ -2461,6 +2447,8 @@ public int areaName;
 Unity does not allow to serialize two dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
 
 ```csharp
+using SaintsField.AiNavigation;
+
 // two dimensional array
 public SaintsArray<GameObject>[] gameObjects2;
 public SaintsArray<SaintsArray<GameObject>> gameObjects2Nest;
@@ -2474,6 +2462,8 @@ public SaintsArray<SaintsArray<SaintsArray<GameObject>>>[] gameObjects4;
 `SaintsArray` implements `IReadOnlyList`, `SaintsList` implements `IList`:
 
 ```csharp
+using SaintsField;
+
 // SaintsArray
 GameObject firstGameObject = saintsArrayGo[0];
 Debug.Log(saintsArrayGo.value); // the actual array value
@@ -2487,6 +2477,8 @@ Debug.Log(saintsListGo.value);  // the actual list value
 These two can be easily converted to array/list:
 
 ```csharp
+using SaintsField;
+
 // SaintsArray to Array
 GameObject[] arrayGo = saintsArrayGo;
 // Array to SaintsArray
@@ -2501,6 +2493,8 @@ SaintsList<GameObject> expSaintsListGo = (SaintsList<GameObject>)ListGo;
 Because it's actually a struct, you can also implement your own Array/List, using `[SaintsArray]`. Here is an example of customize your own struct:
 
 ```csharp
+using SaintsField;
+
 // example: using ISaintsArray so you don't need to specify the type name everytime
 [Serializable]
 public class MyList : ISaintsArray
@@ -2537,6 +2531,8 @@ private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}
 ## SaintsEditor ##
 
 `SaintsField` is a `UnityEditor.Editor` level component.
+
+Namespace: `SaintsField.Playa`
 
 Compared with `NaughtyAttributes` and `MarkupAttributes`:
 
@@ -2575,32 +2571,32 @@ Parameters:
     *   `Rewind`: rewind to the start state
 
 ```csharp
-public class DOTweenExample : MonoBehaviour
+using SaintsField.Playa;
+using SaintsField;
+
+[GetComponent]
+public SpriteRenderer spriteRenderer;
+
+[DOTweenPlay]
+private Sequence PlayColor()
 {
-    [GetComponent]
-    public SpriteRenderer spriteRenderer;
+    return DOTween.Sequence()
+        .Append(spriteRenderer.DOColor(Color.red, 1f))
+        .Append(spriteRenderer.DOColor(Color.green, 1f))
+        .Append(spriteRenderer.DOColor(Color.blue, 1f))
+        .SetLoops(-1);  // Yes you can make it a loop
+}
 
-    [DOTweenPlay]
-    private Sequence PlayColor()
-    {
-        return DOTween.Sequence()
-            .Append(spriteRenderer.DOColor(Color.red, 1f))
-            .Append(spriteRenderer.DOColor(Color.green, 1f))
-            .Append(spriteRenderer.DOColor(Color.blue, 1f))
-            .SetLoops(-1);  // Yes you can make it a loop
-    }
-
-    [DOTweenPlay("Position")]
-    private Sequence PlayTween2()
-    {
-        return DOTween.Sequence()
-            .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
-            .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
-            .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
-            .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
-            .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
-        ;
-    }
+[DOTweenPlay("Position")]
+private Sequence PlayTween2()
+{
+    return DOTween.Sequence()
+        .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
+        .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
+        .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
+        .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
+        .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
+    ;
 }
 ```
 
@@ -2628,6 +2624,8 @@ Compared to `NaughtyAttributes`, this does not allow to specific for editing and
 *   `string buttonLabel = null` the button label. If null, it'll use the function name.
 
 ```csharp
+using SaintsField.Playa;
+
 [Button]
 private void EditorButton()
 {
@@ -2648,6 +2646,8 @@ private void EditorLabeledButton()
 Show a non-field property.
 
 ```csharp
+using SaintsField.Playa;
+
 // const
 [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
 // static
@@ -2673,6 +2673,8 @@ Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. B
 *   `[CallerLineNumber] int order = 0` the order of this field. By default it uses line number of the file. You may not want to override this.
 
 ```csharp
+using SaintsField.Playa;
+
 [Ordered] public string myStartField;
 
 [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
@@ -2730,124 +2732,123 @@ Options are:
 **Example**
 
 ```csharp
-public class LayoutExample: MonoBehaviour
+using SaintsField.Playa;
+
+[Layout("Titled", ELayout.Title | ELayout.TitleOut)]
+public string titledItem1, titledItem2;
+
+// title
+[Layout("Titled Box", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+public string titledBoxItem1;
+[Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
+public string titledBoxItem2;
+
+// foldout
+[Layout("Foldout", ELayout.Foldout)]
+public string foldoutItem1, foldoutItem2;
+
+// tabs
+[Layout("Tabs", ELayout.Tab | ELayout.Foldout)]
+[Layout("Tabs/Tab1")]
+public string tab1Item1, tab1Item2;
+
+[Layout("Tabs/Tab2")]
+public string tab2Item1, tab2Item2;
+
+[Layout("Tabs/Tab3")]
+public string tab3Item1, tab3Item2;
+
+// nested groups
+[Layout("Nested", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+public int nestedOne;
+[Layout("Nested/Nested Group 1", ELayout.Title | ELayout.TitleOut)]
+public int nestedTwo, nestedThree;
+[Layout("Nested/Nested Group 2", ELayout.Title | ELayout.TitleOut)]
+public int nestedFour, nestedFive;
+
+// Unlabeled Box
+[Layout("Unlabeled Box", ELayout.Background)]
+public int unlabeledBoxItem1, unlabeledBoxItem2;
+
+// Foldout In A Box
+[Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
+public int foldoutInABoxItem1, foldoutInABoxItem2;
+
+// Complex example. Button and ShowInInspector works too
+[Ordered]
+[Layout("Root", ELayout.Tab | ELayout.TitleOut | ELayout.Foldout | ELayout.Background)]
+[Layout("Root/V1")]
+[SepTitle("Basic", EColor.Pink)]
+public string hv1Item1;
+
+[Ordered]
+[Layout("Root/V1/buttons", ELayout.Horizontal)]
+[Button("Root/V1 Button1")]
+public void RootV1Button()
 {
-    [Layout("Titled", ELayout.Title | ELayout.TitleOut)]
-    public string titledItem1, titledItem2;
-
-    // title
-    [Layout("Titled Box", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
-    public string titledBoxItem1;
-    [Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
-    public string titledBoxItem2;
-
-    // foldout
-    [Layout("Foldout", ELayout.Foldout)]
-    public string foldoutItem1, foldoutItem2;
-
-    // tabs
-    [Layout("Tabs", ELayout.Tab | ELayout.Foldout)]
-    [Layout("Tabs/Tab1")]
-    public string tab1Item1, tab1Item2;
-
-    [Layout("Tabs/Tab2")]
-    public string tab2Item1, tab2Item2;
-
-    [Layout("Tabs/Tab3")]
-    public string tab3Item1, tab3Item2;
-
-    // nested groups
-    [Layout("Nested", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
-    public int nestedOne;
-    [Layout("Nested/Nested Group 1", ELayout.Title | ELayout.TitleOut)]
-    public int nestedTwo, nestedThree;
-    [Layout("Nested/Nested Group 2", ELayout.Title | ELayout.TitleOut)]
-    public int nestedFour, nestedFive;
-
-    // Unlabeled Box
-    [Layout("Unlabeled Box", ELayout.Background)]
-    public int unlabeledBoxItem1, unlabeledBoxItem2;
-
-    // Foldout In A Box
-    [Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
-    public int foldoutInABoxItem1, foldoutInABoxItem2;
-
-    // Complex example. Button and ShowInInspector works too
-    [Ordered]
-    [Layout("Root", ELayout.Tab | ELayout.TitleOut | ELayout.Foldout | ELayout.Background)]
-    [Layout("Root/V1")]
-    [SepTitle("Basic", EColor.Pink)]
-    public string hv1Item1;
-
-    [Ordered]
-    [Layout("Root/V1/buttons", ELayout.Horizontal)]
-    [Button("Root/V1 Button1")]
-    public void RootV1Button()
-    {
-        Debug.Log("Root/V1 Button");
-    }
-    [Ordered]
-    [Layout("Root/V1/buttons", ELayout.Horizontal)]
-    [Button("Root/V1 Button2")]
-    public void RootV1Button2()
-    {
-        Debug.Log("Root/V1 Button");
-    }
-
-    [Ordered]
-    [Layout("Root/V1")]
-    [ShowInInspector]
-    public static Color color1 = Color.red;
-
-    [Ordered]
-    [DOTweenPlay("Tween1", "Root/V1")]
-    public Tween RootV1Tween1()
-    {
-        return DOTween.Sequence();
-    }
-
-    [Ordered]
-    [DOTweenPlay("Tween2", "Root/V1")]
-    public Tween RootV1Tween2()
-    {
-        return DOTween.Sequence();
-    }
-
-    [Ordered]
-    [Layout("Root/V1")]
-    public string hv1Item2;
-
-    // public string below;
-
-    [Ordered]
-    [Layout("Root/V2")]
-    public string hv2Item1;
-
-    [Ordered]
-    [Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
-    public string hv2Item2, hv2Item3;
-
-    [Ordered]
-    [Layout("Root/V2")]
-    public string hv2Item4;
-
-    [Ordered]
-    [Layout("Root/V3", ELayout.Horizontal)]
-    [ResizableTextArea, RichLabel(null)]
-    public string hv3Item1, hv3Item2;
-
-    [Ordered]
-    [Layout("Root/Buggy")]
-    [InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
-    public string buggy = "See below:";
-
-    [Ordered]
-    [Layout("Root/Buggy/H", ELayout.Horizontal)]
-    public string buggy1;
-    [Ordered]
-    [Layout("Root/Buggy/H", ELayout.Horizontal)]
-    public string buggy2;
+    Debug.Log("Root/V1 Button");
 }
+[Ordered]
+[Layout("Root/V1/buttons", ELayout.Horizontal)]
+[Button("Root/V1 Button2")]
+public void RootV1Button2()
+{
+    Debug.Log("Root/V1 Button");
+}
+
+[Ordered]
+[Layout("Root/V1")]
+[ShowInInspector]
+public static Color color1 = Color.red;
+
+[Ordered]
+[DOTweenPlay("Tween1", "Root/V1")]
+public Tween RootV1Tween1()
+{
+    return DOTween.Sequence();
+}
+
+[Ordered]
+[DOTweenPlay("Tween2", "Root/V1")]
+public Tween RootV1Tween2()
+{
+    return DOTween.Sequence();
+}
+
+[Ordered]
+[Layout("Root/V1")]
+public string hv1Item2;
+
+// public string below;
+
+[Ordered]
+[Layout("Root/V2")]
+public string hv2Item1;
+
+[Ordered]
+[Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
+public string hv2Item2, hv2Item3;
+
+[Ordered]
+[Layout("Root/V2")]
+public string hv2Item4;
+
+[Ordered]
+[Layout("Root/V3", ELayout.Horizontal)]
+[ResizableTextArea, RichLabel(null)]
+public string hv3Item1, hv3Item2;
+
+[Ordered]
+[Layout("Root/Buggy")]
+[InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
+public string buggy = "See below:";
+
+[Ordered]
+[Layout("Root/Buggy/H", ELayout.Horizontal)]
+public string buggy1;
+[Ordered]
+[Layout("Root/Buggy/H", ELayout.Horizontal)]
+public string buggy2;
 ```
 
 [![layout](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
@@ -2859,6 +2860,8 @@ This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array
 Different from `ShowIf`/`HideIf`: apply on an array will directly show or hide the array itself, rather than each element.
 
 ```csharp
+using SaintsField.Playa;
+
 public bool boolValue;
 
 [PlayaHideIf] public int[] justHide;
@@ -2905,6 +2908,8 @@ Different from `EnableIf`/`DisableIf` in the following:
 2.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
 
 ```csharp
+using SaintsField.Playa;
+
 [PlayaDisableIf] public int[] justDisable;
 [PlayaEnableIf] public int[] justEnable;
 
@@ -2939,6 +2944,8 @@ Parameters:
 *   AllowMultiple: No
 
 ```csharp
+using SaintsField.Playa;
+
 [PlayaArraySize(3)] public int[] myArr3;
 ```
 
@@ -2957,6 +2964,8 @@ Parameters:
 *   `bool isCallback=false` if it's a callback (a method/property/field)
 
 ```csharp
+using SaintsField.Playa;
+
 [PlayaRichLabel("<color=lame>It's Labeled!")]
 public List<string> myList;
 
