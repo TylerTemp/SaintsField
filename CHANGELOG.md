@@ -1,6 +1,12 @@
 ## 3.0.2
 
-1.  UI Toolkit: fix `NavMeshArea` broken since 3.0.0
+1.  UI Toolkit: fix `AddressableAdress` broken since 3.0.0
+2.  UI Toolkit: fix dropdown button incorrect layout (`Dropdown`, `AdvancedDropdown`, `AddressableAdress` etc)
+3.  UI Toolkit: allow buttons to wrap if `EnumFlags` has both the `AutoExpand` and `DefaultExpand` as `false`
+4.  UI Toolkit: fix `NavMeshAreaMask` incorrect label align.
+5.  Addressable tools now can open addressable groups edit window.
+6.  AnimatorParams now can open the animator edit window.
+7.  Fix `AnimatorParams` for integer type.
 
 ## 3.0.1
 

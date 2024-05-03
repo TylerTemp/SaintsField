@@ -190,10 +190,10 @@ namespace SaintsField.Editor.Utils
                 scaleMode = ScaleMode.ScaleToFit,
                 style =
                 {
-                    maxWidth = 15,
+                    maxWidth = 12,
                     maxHeight = EditorGUIUtility.singleLineHeight,
                     position = Position.Absolute,
-                    right = 2,
+                    right = 4,
                 },
             });
 

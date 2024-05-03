@@ -5,16 +5,21 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers.Addressable
 {
     [CustomPropertyDrawer(typeof(AddressableLabelAttribute))]
     public class AddressableLabelAttributeDrawer: SaintsPropertyDrawer
     {
+        private static string ErrorNoSettings => "Addressable has no settings created yet.";
+
         #region IMGUI
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
@@ -27,18 +32,37 @@ namespace SaintsField.Editor.Drawers.Addressable
             // ReSharper disable once Unity.NoNullPropagation
             List<string> labels = AddressableAssetSettingsDefaultObject.Settings?.GetLabels() ?? new List<string>();
 
+            GUIContent[] contents = labels
+                .Select(each => new GUIContent(each.Replace('/', '\u2215').Replace('&', '＆')))
+                .Concat(new []
+                {
+                    GUIContent.none,
+                    new GUIContent("Edit Addressable Group..."),
+                })
+                .ToArray();
+
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 int index = labels.IndexOf(property.stringValue);
-                int newIndex = EditorGUI.Popup(position, label, index, labels.Select(each => new GUIContent(each)).ToArray());
-                if (changed.changed)
+                int newIndex = EditorGUI.Popup(position, label, index, contents);
+                // ReSharper disable once InvertIf
+                if(changed.changed)
                 {
-                    property.stringValue = labels[newIndex];
+                    if (newIndex < labels.Count)
+                    {
+                        property.stringValue = labels[newIndex];
+                    }
+                    else
+                    {
+                        EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
+                    }
                 }
             }
         }
         #endregion
+
+#if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
 
@@ -48,13 +72,14 @@ namespace SaintsField.Editor.Drawers.Addressable
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
         {
-            DropdownField dropdownField = new DropdownField(property.displayName)
-            {
-                userData = Array.Empty<string>(),
-                name = NameDropdownField(property),
-            };
-            dropdownField.AddToClassList(ClassAllowDisable);
-            return dropdownField;
+            UIToolkitUtils.DropdownButtonField dropdownButtonField = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButtonField.name = NameDropdownField(property);
+            dropdownButtonField.userData = Array.Empty<string>();
+            // ReSharper disable once MergeConditionalExpression
+            dropdownButtonField.buttonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
+
+            dropdownButtonField.AddToClassList(ClassAllowDisable);
+            return dropdownButtonField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -65,6 +90,8 @@ namespace SaintsField.Editor.Drawers.Addressable
                 style =
                 {
                     display = DisplayStyle.None,
+                    flexGrow = 1,
+                    flexShrink = 1,
                 },
                 name = NameHelpBox(property),
             };
@@ -76,61 +103,83 @@ namespace SaintsField.Editor.Drawers.Addressable
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-            dropdownField.RegisterValueChangedCallback(v =>
+            HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            AddressableLabelAttribute addressableLabelAttribute = (AddressableLabelAttribute) saintsAttribute;
+            dropdownField.buttonElement.clicked += () => ShowDropdown(property, addressableLabelAttribute, dropdownField, helpBoxElement, info, parent, onValueChangedCallback);
+        }
+
+        private static void ShowDropdown(SerializedProperty property, AddressableLabelAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField, HelpBox helpBox, FieldInfo info, object parent, Action<object> onValueChangedCallback)
+        {
+
+            // ReSharper disable once Unity.NoNullPropagation
+            List<string> labels = AddressableAssetSettingsDefaultObject.Settings?.GetLabels() ?? new List<string>();
+
+            GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+            foreach (string addressableLabel in labels)
             {
-                // IReadOnlyList<string> curMetaInfo = (IReadOnlyList<string>) ((DropdownField) v.target).userData;
-                // string selectedKey = curMetaInfo[dropdownField.index];
-                property.stringValue = v.newValue;
-                property.serializedObject.ApplyModifiedProperties();
-                onValueChangedCallback.Invoke(v.newValue);
+                string thisAddressableLabel = addressableLabel;
+                genericDropdownMenu.AddItem(addressableLabel, property.stringValue == thisAddressableLabel, () =>
+                {
+                    dropdownField.buttonLabelElement.text = thisAddressableLabel;
+                    property.stringValue = thisAddressableLabel;
+                    property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback.Invoke(thisAddressableLabel);
+                });
+            }
+
+            if (labels.Count > 0)
+            {
+                genericDropdownMenu.AddSeparator("");
+            }
+
+            genericDropdownMenu.AddItem("Edit Addressable Group...", false, () =>
+            {
+                EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
             });
+
+            genericDropdownMenu.DropDown(dropdownField.buttonElement.worldBound, dropdownField, true);
+        }
+
+        private static void UpdateHelpBox(HelpBox helpBox, string error)
+        {
+            if (helpBox.text == error)
+            {
+                return;
+            }
+
+            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            helpBox.text = error;
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            List<string> keys = new List<string>();
-            string error = "";
-            if (AddressableAssetSettingsDefaultObject.Settings == null)
+            if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
             {
-                error = "Addressable not set up";
-            }
-            else
-            {
-                keys = AddressableAssetSettingsDefaultObject.Settings.GetLabels();
+                UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), ErrorNoSettings);
+                return;
             }
 
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-
-            IReadOnlyList<string> curKeys = (IReadOnlyList<string>) dropdownField.userData;
-
-            if(!curKeys.SequenceEqual(keys))
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            if (dropdownField.buttonLabelElement.text != property.stringValue)
             {
-                dropdownField.userData = keys;
-                dropdownField.choices = keys;
-                dropdownField.SetValueWithoutNotify(property.stringValue);
-            }
-
-            // Debug.Log($"AnimatorStateAttributeDrawer: {newAnimatorStates}");
-            HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
-            // ReSharper disable once InvertIf
-            if (error != helpBoxElement.text)
-            {
-                helpBoxElement.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-                helpBoxElement.text = error;
+                // ReSharper disable once MergeConditionalExpression
+                dropdownField.buttonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
             }
         }
 
-        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
-        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
-        // {
-        //     DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-        //     dropdownField.label = labelOrNull;
-        // }
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
+        }
         #endregion
+
+#endif
     }
 }
 #endif

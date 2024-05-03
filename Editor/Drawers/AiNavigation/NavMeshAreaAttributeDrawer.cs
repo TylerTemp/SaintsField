@@ -252,7 +252,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             genericDropdownMenu.AddSeparator("");
             genericDropdownMenu.AddItem("Open Area Settings...", false, NavMeshEditorHelpers.OpenAreaSettings);
 
-            genericDropdownMenu.DropDown(button.worldBound, button, true);
+            genericDropdownMenu.DropDown(button.buttonElement.worldBound, button.buttonElement, true);
         }
 
         #endregion

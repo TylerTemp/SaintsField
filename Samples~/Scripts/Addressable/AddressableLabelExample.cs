@@ -16,7 +16,8 @@ namespace SaintsField.Samples.Scripts.Addressable
 
         [ReadOnly]
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
-        [AddressableLabel][RichLabel("<icon=star.png /><label />")]
+        [AddressableLabel]
+        [RichLabel("<icon=star.png /><label />")]
 #else
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]
 #endif

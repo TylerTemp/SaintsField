@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -23,6 +24,7 @@ namespace SaintsField.Editor.Drawers
         {
             // ReSharper disable InconsistentNaming
             public string Error;
+            public Animator Animator;
             public IReadOnlyList<AnimatorControllerParameter> AnimatorParameters;
             // ReSharper enable InconsistentNaming
         }
@@ -56,8 +58,15 @@ namespace SaintsField.Editor.Drawers
             return new MetaInfo
             {
                 Error = "",
+                Animator = animatorController,
                 AnimatorParameters = animatorParameters,
             };
+        }
+
+        private static void OpenAnimator(Object animatorController)
+        {
+            Selection.activeObject = animatorController;
+            EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
         }
 
         #region IMGUI
@@ -85,10 +94,10 @@ namespace SaintsField.Editor.Drawers
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    DrawPropertyForInt(position, property, label, metaInfo.AnimatorParameters);
+                    DrawPropertyForInt(position, property, label, metaInfo, onGUIPayload);
                     break;
                 case SerializedPropertyType.String:
-                    DrawPropertyForString(position, property, label, metaInfo.AnimatorParameters);
+                    DrawPropertyForString(position, property, label, metaInfo, onGUIPayload);
                     break;
                 default:
                     _error = $"Invalid property type: expect integer or string, get {property.propertyType}";
@@ -97,73 +106,86 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static void DrawPropertyForInt(Rect position, SerializedProperty property, GUIContent label, IReadOnlyList<AnimatorControllerParameter> animatorParameters)
+        private static void DrawPropertyForInt(Rect position, SerializedProperty property, GUIContent label, MetaInfo metaInfo, OnGUIPayload onGUIPayload)
         {
             int paramNameHash = property.intValue;
-            int index = 0;
+            int index = -1;
 
-            for (int i = 0; i < animatorParameters.Count; i++)
+            foreach ((AnimatorControllerParameter value, int eachIndex)  in metaInfo.AnimatorParameters.WithIndex())
             {
-                // ReSharper disable once InvertIf
-                if (paramNameHash == animatorParameters[i].nameHash)
+                if (value.nameHash == paramNameHash)
                 {
-                    index = i + 1; // +1 because the first option is reserved for (None)
+                    index = eachIndex;
                     break;
                 }
             }
 
-            IEnumerable<string> displayOptions = GetDisplayOptions(animatorParameters);
+            IEnumerable<string> displayOptions = GetDisplayOptions(metaInfo.AnimatorParameters);
+
+            GUIContent[] contents = displayOptions
+                .Select(each => new GUIContent(each))
+                .Concat(new[]
+                {
+                    GUIContent.none,
+                    new GUIContent($"Edit {metaInfo.Animator.runtimeAnimatorController.name}...")
+                })
+                .ToArray();
 
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                int newIndex = EditorGUI.Popup(position, label, index, displayOptions.Select(each => new GUIContent(each)).ToArray());
+                int newIndex = EditorGUI.Popup(position, label, index, contents);
                 // ReSharper disable once InvertIf
                 if(changed.changed)
                 {
-                    int newValue = animatorParameters[newIndex].nameHash;
-
-                    if (property.intValue != newValue)
+                    if(newIndex < metaInfo.AnimatorParameters.Count)
                     {
+                        int newValue = metaInfo.AnimatorParameters[newIndex].nameHash;
                         property.intValue = newValue;
+                        onGUIPayload.SetValue(newValue);
+                    }
+                    else
+                    {
+                        OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
                     }
                 }
             }
         }
 
-        private static void DrawPropertyForString(Rect position, SerializedProperty property, GUIContent label, IReadOnlyList<AnimatorControllerParameter> animatorParameters)
+        private static void DrawPropertyForString(Rect position, SerializedProperty property, GUIContent label, MetaInfo metaInfo, OnGUIPayload onGUIPayload)
         {
             string paramName = property.stringValue;
-            int index = animatorParameters
+            int index = metaInfo.AnimatorParameters
                 .Select((value, valueIndex) => new {value, index=valueIndex})
                 .FirstOrDefault(each => each.value.name == paramName)?.index ?? -1;
-            // int index = 0;
-            //
-            // for (int i = 0; i < animatorParameters.Count; i++)
-            // {
-            //     // ReSharper disable once InvertIf
-            //     if (paramName.Equals(animatorParameters[i].name, System.StringComparison.Ordinal))
-            //     {
-            //         index = i + 1; // +1 because the first option is reserved for (None)
-            //         break;
-            //     }
-            // }
 
-            IEnumerable<string> displayOptions = GetDisplayOptions(animatorParameters);
+            IEnumerable<string> displayOptions = GetDisplayOptions(metaInfo.AnimatorParameters);
 
             // ReSharper disable once ConvertToUsingDeclaration
             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                int newIndex = EditorGUI.Popup(position, label, index, displayOptions.Select(each => new GUIContent(each)).ToArray());
+                GUIContent[] contents = displayOptions
+                    .Select(each => new GUIContent(each))
+                    .Concat(new[]
+                    {
+                        GUIContent.none,
+                        new GUIContent($"Edit {metaInfo.Animator.runtimeAnimatorController.name}..."),
+                    })
+                    .ToArray();
+
+                int newIndex = EditorGUI.Popup(position, label, index, contents);
                 // ReSharper disable once InvertIf
                 if(changed.changed)
                 {
-                    // string newValue = newIndex == 0 ? null : animatorParameters[newIndex - 1].name;
-                    string newValue = animatorParameters[newIndex].name;
-
-                    if (!property.stringValue.Equals(newValue, StringComparison.Ordinal))
+                    if(newIndex < metaInfo.AnimatorParameters.Count)
                     {
+                        string newValue = metaInfo.AnimatorParameters[newIndex].name;
                         property.stringValue = newValue;
+                        onGUIPayload.SetValue(newValue);
+                    }
+                    else
+                    {
+                        OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
                     }
                 }
             }
@@ -200,48 +222,54 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
-            MetaInfo curMetaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
-            DropdownField dropdownField = new DropdownField(property.displayName)
-            {
-                style =
-                {
-                    flexGrow = 1,
-                },
-                userData = curMetaInfo,
-                name = NameDropdownField(property),
-                choices = curMetaInfo.AnimatorParameters.Select(GetParameterLabel).ToList(),
-            };
-            dropdownField.AddToClassList("unity-base-field__aligned");
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButton.name = NameDropdownField(property);
+            dropdownButton.userData = metaInfo;
 
-            Func<AnimatorControllerParameter, bool> predicate = property.propertyType == SerializedPropertyType.String
-                ? p => ParamNameEquals(p, property)
-                : p => ParamHashEquals(p, property);
-            int curSelected = Util.ListIndexOfAction(curMetaInfo.AnimatorParameters, predicate);
-            // ReSharper disable once InvertIf
-            if (curSelected >= 0)
-            {
-                AnimatorControllerParameter curTarget = curMetaInfo.AnimatorParameters[curSelected];
-                dropdownField.SetValueWithoutNotify(GetParameterLabel(curTarget));
-                // _dropdownField.value = GetParameterLabel(curTarget);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_PARAM_DRAW_PROCESS
-                Debug.Log($"AnimatorParam init {property.propertyPath} found {GetParameterLabel(curTarget)} among {string.Join(", ", dropdownField.choices)}: {dropdownField.index}/{dropdownField.value}");
-#endif
-            }
-            else
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_PARAM_DRAW_PROCESS
-                Debug.Log($"AnimatorParam init {property.propertyPath} found nothing {curSelected} among {string.Join(", ", dropdownField.choices)}: {dropdownField.index}/{dropdownField.value}");
-#endif
-                if(curMetaInfo.AnimatorParameters.Count > 0)
-                {
-                    dropdownField.index = 0;
-                }
-            }
-
-            dropdownField.AddToClassList(ClassAllowDisable);
-
-            return dropdownField;
+            dropdownButton.AddToClassList(ClassAllowDisable);
+            return dropdownButton;
+//             DropdownField dropdownField = new DropdownField(property.displayName)
+//             {
+//                 style =
+//                 {
+//                     flexGrow = 1,
+//                 },
+//                 userData = curMetaInfo,
+//                 name = NameDropdownField(property),
+//                 choices = curMetaInfo.AnimatorParameters.Select(GetParameterLabel).ToList(),
+//             };
+//             dropdownField.AddToClassList("unity-base-field__aligned");
+//
+//             Func<AnimatorControllerParameter, bool> predicate = property.propertyType == SerializedPropertyType.String
+//                 ? p => ParamNameEquals(p, property)
+//                 : p => ParamHashEquals(p, property);
+//             int curSelected = Util.ListIndexOfAction(curMetaInfo.AnimatorParameters, predicate);
+//             // ReSharper disable once InvertIf
+//             if (curSelected >= 0)
+//             {
+//                 AnimatorControllerParameter curTarget = curMetaInfo.AnimatorParameters[curSelected];
+//                 dropdownField.SetValueWithoutNotify(GetParameterLabel(curTarget));
+//                 // _dropdownField.value = GetParameterLabel(curTarget);
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_PARAM_DRAW_PROCESS
+//                 Debug.Log($"AnimatorParam init {property.propertyPath} found {GetParameterLabel(curTarget)} among {string.Join(", ", dropdownField.choices)}: {dropdownField.index}/{dropdownField.value}");
+// #endif
+//             }
+//             else
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ANIMATOR_PARAM_DRAW_PROCESS
+//                 Debug.Log($"AnimatorParam init {property.propertyPath} found nothing {curSelected} among {string.Join(", ", dropdownField.choices)}: {dropdownField.index}/{dropdownField.value}");
+// #endif
+//                 if(curMetaInfo.AnimatorParameters.Count > 0)
+//                 {
+//                     dropdownField.index = 0;
+//                 }
+//             }
+//
+//             dropdownField.AddToClassList(ClassAllowDisable);
+//
+//             return dropdownField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -267,31 +295,80 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-            MetaInfo metaInfo = (MetaInfo)dropdownField.userData;
-            // ReSharper disable once InvertIf
-            if (metaInfo.Error != "")
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            dropdownField.buttonElement.clicked += () => ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
+            // DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
+            // MetaInfo metaInfo = (MetaInfo)dropdownField.userData;
+            // // ReSharper disable once InvertIf
+            // if (metaInfo.Error != "")
+            // {
+            //     HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
+            //     helpBoxElement.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            //     helpBoxElement.text = metaInfo.Error;
+            // }
+            //
+            // dropdownField.RegisterValueChangedCallback(v =>
+            // {
+            //     MetaInfo nowMetaInfo = (MetaInfo)((VisualElement)v.target).userData;
+            //     AnimatorControllerParameter selectedState = nowMetaInfo.AnimatorParameters[dropdownField.index];
+            //     if(property.propertyType == SerializedPropertyType.String)
+            //     {
+            //         property.stringValue = selectedState.name;
+            //     }
+            //     else
+            //     {
+            //         property.intValue = selectedState.nameHash;
+            //     }
+            //     property.serializedObject.ApplyModifiedProperties();
+            //     onValueChangedCallback.Invoke(selectedState);
+            // });
+        }
+
+        private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent, Action<object> onValueChangedCallback)
+        {
+            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+
+            bool isString = property.propertyType == SerializedPropertyType.String;
+            int selectedIndex = isString
+                ? Util.ListIndexOfAction(metaInfo.AnimatorParameters, eachName => ParamNameEquals(eachName, property))
+                : Util.ListIndexOfAction(metaInfo.AnimatorParameters, eachHash => ParamHashEquals(eachHash, property));
+
+            GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+            foreach ((AnimatorControllerParameter value, int index) in metaInfo.AnimatorParameters.WithIndex())
             {
-                HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
-                helpBoxElement.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-                helpBoxElement.text = metaInfo.Error;
+                AnimatorControllerParameter curItem = value;
+                string curName = GetParameterLabel(curItem);
+
+                genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
+                {
+                    if (isString)
+                    {
+                        property.stringValue = curItem.name;
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback(curItem.name);
+                    }
+                    else
+                    {
+                        property.intValue = curItem.nameHash;
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback(curItem.nameHash);
+                    }
+                    dropdownField.buttonLabelElement.text = curName;
+                });
             }
 
-            dropdownField.RegisterValueChangedCallback(v =>
+            if (metaInfo.Animator != null)
             {
-                MetaInfo nowMetaInfo = (MetaInfo)((VisualElement)v.target).userData;
-                AnimatorControllerParameter selectedState = nowMetaInfo.AnimatorParameters[dropdownField.index];
-                if(property.propertyType == SerializedPropertyType.String)
+                if (metaInfo.AnimatorParameters.Count > 0)
                 {
-                    property.stringValue = selectedState.name;
+                    genericDropdownMenu.AddSeparator("");
                 }
-                else
-                {
-                    property.intValue = selectedState.nameHash;
-                }
-                property.serializedObject.ApplyModifiedProperties();
-                onValueChangedCallback.Invoke(selectedState);
-            });
+                genericDropdownMenu.AddItem($"Edit {metaInfo.Animator.runtimeAnimatorController.name}...", false, () => OpenAnimator(metaInfo.Animator.runtimeAnimatorController));
+            }
+
+            genericDropdownMenu.DropDown(dropdownField.buttonElement.worldBound, dropdownField.buttonElement, true);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -300,42 +377,69 @@ namespace SaintsField.Editor.Drawers
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-
-            MetaInfo curMetaInfo = (MetaInfo) dropdownField.userData;
-            dropdownField.userData = metaInfo;
-
-            bool errorEqual = metaInfo.Error == curMetaInfo.Error;
-            bool seqEqual = metaInfo.AnimatorParameters.SequenceEqual(curMetaInfo.AnimatorParameters);
-
-            if(!errorEqual)
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
+            if (helpBoxElement.text != metaInfo.Error)
             {
-                HelpBox helpBoxElement = container.Query<HelpBox>(NameHelpBox(property)).First();
-                helpBoxElement.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
                 helpBoxElement.text = metaInfo.Error;
+                helpBoxElement.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
             }
 
-            // ReSharper disable once InvertIf
-            if (!seqEqual)
+            string label;
+            if (property.propertyType == SerializedPropertyType.String)
             {
-                dropdownField.choices = metaInfo.AnimatorParameters.Select(GetParameterLabel).ToList();
-                // Debug.Log($"Update get {metaInfo.AnimatorParameters.Count} parameters: {string.Join(", ", metaInfo.AnimatorParameters.Select(GetParameterLabel))}");
-                if(metaInfo.AnimatorParameters.Count > 0 && dropdownField.index < 0)
+                if (string.IsNullOrEmpty(property.stringValue))
                 {
-                    // Debug.Log($"Set {property.propertyPath} to 0");
-                    dropdownField.index = 0;
+                    label = "-";
                 }
+                else
+                {
+                    label = $"{property.stringValue} [?]";
+                    foreach (AnimatorControllerParameter animatorControllerParameter in metaInfo.AnimatorParameters)
+                    {
+                        // ReSharper disable once InvertIf
+                        if (ParamNameEquals(animatorControllerParameter, property))
+                        {
+                            label = GetParameterLabel(animatorControllerParameter);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (property.intValue == 0)
+                {
+                    label = "-";
+                }
+                else
+                {
+                    label = $"{property.intValue} [?]";
+                    foreach (AnimatorControllerParameter animatorControllerParameter in metaInfo.AnimatorParameters)
+                    {
+                        // ReSharper disable once InvertIf
+                        if (ParamHashEquals(animatorControllerParameter, property))
+                        {
+                            label = GetParameterLabel(animatorControllerParameter);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (dropdownField.buttonLabelElement.text != label)
+            {
+                dropdownField.buttonLabelElement.text = label;
             }
         }
 
-        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
-        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
-        // {
-        //     DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-        //     dropdownField.label = labelOrNull;
-        //     // label.style.display = labelOrNull == null ? DisplayStyle.None : DisplayStyle.Flex;
-        // }
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            UIToolkitUtils.SetLabel(dropdownField.buttonLabelElement, richTextChunks, richTextDrawer);
+        }
 
         private static string GetParameterLabel(AnimatorControllerParameter each) => $"{each.name} [{each.type}]";
 

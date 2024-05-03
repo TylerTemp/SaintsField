@@ -1049,9 +1049,8 @@ For each argument:
 
 Known Issue:
 
-1.  If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
+1.  IMGUI: If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
 2.  UI Toolkit: when `autoExpand=true`, `defaultExpanded` will be ignored
-3.  UI Toolkit: when `autoExpand=false` and `defaultExpand=false`, the layout WILL get messed up: the buttons will go out of view if you shrink the inspector width. This seems a bug in UI Toolkit itself.
 
 ```csharp
 using SaintsField;

@@ -545,6 +545,7 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     flexGrow = 1,
+                    flexShrink = 1,
                 },
             };
 
@@ -555,7 +556,6 @@ namespace SaintsField.Editor.Drawers
             string buttonLabel = curIndex == -1? "-": FormatStateLabel(metaInfo.AnimatorStates[curIndex], "/");
 
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
-            dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameDropdownButton(property);
             dropdownButton.userData = metaInfo;
             dropdownButton.buttonLabelElement.text = buttonLabel;
@@ -653,24 +653,6 @@ namespace SaintsField.Editor.Drawers
                     onValueChangedCallback.Invoke(property.propertyType == SerializedPropertyType.String? metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
                 }
             }
-            // dropdownField.RegisterValueChangedCallback(v =>
-            // {
-            //     MetaInfo curMetaInfo = (MetaInfo) ((DropdownField) v.target).userData;
-            //     AnimatorStateInfo selectedState = curMetaInfo.AnimatorStates[dropdownField.index];
-            //     SetPropValue(property, selectedState);
-            //     property.serializedObject.ApplyModifiedProperties();
-            //     onValueChangedCallback.Invoke(selectedState);
-            //
-            //     // SerializedProperty curStateSpeedProp = property.FindPropertyRelative("stateSpeed");
-            //     // if (curStateSpeedProp == null)
-            //     // {
-            //     //     return;
-            //     // }
-            //     //
-            //     // SerializedProperty curAnimationClipProp = property.FindPropertyRelative("animationClip");
-            //     // container.Q<FloatField>(NameSpeedField(property)).value = curStateSpeedProp.floatValue;
-            //     // container.Q<ObjectField>(NameClipField(property)).value = curAnimationClipProp.objectReferenceValue;
-            // });
         }
 
         private static void ShowDropdown(SerializedProperty property,ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent, Action<object> onChange)
@@ -684,10 +666,10 @@ namespace SaintsField.Editor.Drawers
                 : Util.ListIndexOfAction(metaInfo.AnimatorStates, eachStateInfo => EqualAnimatorState(eachStateInfo, property));
             // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
             UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
-            foreach (int index in Enumerable.Range(0, metaInfo.AnimatorStates.Count))
+            // foreach (int index in Enumerable.Range(0, metaInfo.AnimatorStates.Count))
+            foreach ((AnimatorStateChanged value, int index) in metaInfo.AnimatorStates.WithIndex())
             {
-                // int curIndex = index;
-                AnimatorStateChanged curItem = metaInfo.AnimatorStates[index];
+                AnimatorStateChanged curItem = value;
                 string curName = FormatStateLabel(curItem, "/");
 
                 genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>

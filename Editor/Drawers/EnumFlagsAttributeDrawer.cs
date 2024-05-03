@@ -644,7 +644,14 @@ namespace SaintsField.Editor.Drawers
             root.Add(fieldContainer);
 
             EnumFlagsField enumFlagsField = new EnumFlagsField(property.displayName, root, inlineRowLayout, expandControllerLayout,
-                ((EnumFlagsAttribute)saintsAttribute).AutoExpand);
+                ((EnumFlagsAttribute)saintsAttribute).AutoExpand)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexShrink = 1,
+                },
+            };
             enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
             enumFlagsField.AddToClassList("unity-base-field__aligned");
             enumFlagsField.name = NameEnumFlags(property);
@@ -886,6 +893,11 @@ namespace SaintsField.Editor.Drawers
                     else
                     {
                         useExpand = enumFlagsAttribute.DefaultExpanded;
+
+                        if (!enumFlagsAttribute.DefaultExpanded)  // no auto expand, no default expand: let it wrap
+                        {
+                            inlineContainer.style.flexWrap = Wrap.Wrap;
+                        }
                     }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ENUM_FLAGS

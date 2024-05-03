@@ -66,6 +66,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 },
             };
             maskField.BindProperty(property);
+            maskField.AddToClassList("unity-base-field__aligned");
             maskField.AddToClassList(ClassAllowDisable);
             return maskField;
         }
