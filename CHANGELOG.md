@@ -1,3 +1,7 @@
+## 3.0.2
+
+1.  UI Toolkit: fix `NavMeshArea` broken since 3.0.0
+
 ## 3.0.1
 
 1.  UI Toolkit: Fix `SaintsEditor` "Script" field not aligned

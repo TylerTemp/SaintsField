@@ -730,6 +730,8 @@ namespace SaintsField.Editor.Core
                 style =
                 {
                     flexDirection = FlexDirection.Row,
+                    flexGrow = 1,
+                    flexShrink = 1,
                 },
                 name = NameLabelFieldUIToolkit(property),
                 userData = null,

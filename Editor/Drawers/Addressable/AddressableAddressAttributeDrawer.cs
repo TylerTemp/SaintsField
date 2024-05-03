@@ -124,18 +124,15 @@ namespace SaintsField.Editor.Drawers.Addressable
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
         {
-            DropdownField dropdownField = new DropdownField(property.displayName)
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    flexShrink = 1,
-                },
-                userData = Array.Empty<string>(),
-                name = NameDropdownField(property),
-            };
-            dropdownField.AddToClassList(ClassAllowDisable);
-            return dropdownField;
+            UIToolkitUtils.DropdownButtonField dropdownButtonField = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            dropdownButtonField.name = NameDropdownField(property);
+            dropdownButtonField.userData = Array.Empty<string>();
+            // dropdownButtonField.buttonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
+            // ReSharper disable once MergeConditionalExpression
+            dropdownButtonField.buttonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
+
+            dropdownButtonField.AddToClassList(ClassAllowDisable);
+            return dropdownButtonField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -157,58 +154,115 @@ namespace SaintsField.Editor.Drawers.Addressable
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-            dropdownField.RegisterValueChangedCallback(v =>
-            {
-                if (v.newValue == null)  // Apparently, modify the field's label is also a "ValueChanged" event. Good job unity.
-                {
-                    return;
-                }
-
-                IReadOnlyList<string> curMetaInfo = (IReadOnlyList<string>) ((DropdownField) v.target).userData;
-                // string selectedKey = curMetaInfo[dropdownField.index];
-                int selectedIndex = Util.ListIndexOfAction(curMetaInfo, each => UnityFuckedUpDropdownStringEscape(each) == v.newValue);
-                if (selectedIndex == -1)
-                {
-                    Debug.LogError($"failed to find {v.newValue} in {string.Join(",", curMetaInfo)}");
-                    return;
-                }
-
-                string newValue = curMetaInfo[selectedIndex];
-                // Debug.Log($"select {newValue}");
-                property.stringValue = newValue;
-                property.serializedObject.ApplyModifiedProperties();
-                onValueChangedCallback.Invoke(newValue);
-            });
-        }
-
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            (string error, IReadOnlyList<string> keys) = SetupAssetGroup((AddressableAddressAttribute) saintsAttribute);
-            DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
-
-            IReadOnlyList<string> curKeys = (IReadOnlyList<string>) dropdownField.userData;
-
-            if(!curKeys.SequenceEqual(keys))
-            {
-                dropdownField.userData = keys;
-                dropdownField.choices = keys.Select(UnityFuckedUpDropdownStringEscape).ToList();
-                // int curSelect = Util.ListIndexOfAction(keys, each => each == property.stringValue);
-                // dropdownField.index = curSelect;
-                dropdownField.SetValueWithoutNotify(UnityFuckedUpDropdownStringEscape(property.stringValue));
-            }
-
-            // Debug.Log($"AnimatorStateAttributeDrawer: {newAnimatorStates}");
             HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
-            // ReSharper disable once InvertIf
-            if (error != helpBoxElement.text)
-            {
-                helpBoxElement.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-                helpBoxElement.text = error;
-            }
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+
+            // container.RegisterCallback<GeometryChangedEvent>(_ => dropdownField.AlignLabelForce());
+
+            AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
+            dropdownField.buttonElement.clicked += () => ShowDropdown(property, addressableAddressAttribute, dropdownField, helpBoxElement, info, parent, onValueChangedCallback);
+            // dropdownField.RegisterValueChangedCallback(v =>
+            // {
+            //     if (v.newValue == null)  // Apparently, modify the field's label is also a "ValueChanged" event. Good job unity.
+            //     {
+            //         return;
+            //     }
+            //
+            //     IReadOnlyList<string> curMetaInfo = (IReadOnlyList<string>) ((DropdownField) v.target).userData;
+            //     // string selectedKey = curMetaInfo[dropdownField.index];
+            //     int selectedIndex = Util.ListIndexOfAction(curMetaInfo, each => UnityFuckedUpDropdownStringEscape(each) == v.newValue);
+            //     if (selectedIndex == -1)
+            //     {
+            //         Debug.LogError($"failed to find {v.newValue} in {string.Join(",", curMetaInfo)}");
+            //         if (curMetaInfo.Count > 0)
+            //         {
+            //             selectedIndex = 0;
+            //         }
+            //         else
+            //         {
+            //             return;
+            //         }
+            //     }
+            //
+            //     string newValue = curMetaInfo[selectedIndex];
+            //     // Debug.Log($"select {newValue}");
+            //     property.stringValue = newValue;
+            //     property.serializedObject.ApplyModifiedProperties();
+            //     onValueChangedCallback.Invoke(newValue);
+            // });
         }
+
+        private void ShowDropdown(SerializedProperty property, AddressableAddressAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField, HelpBox helpBox, FieldInfo info, object parent, Action<object> onValueChangedCallback)
+        {
+            (string error, IReadOnlyList<string> keys) = SetupAssetGroup(addressableAddressAttribute);
+
+            UpdateHelpBox(helpBox, error);
+
+            GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+            foreach (string key in keys)
+            {
+                string thisKey = key;
+                genericDropdownMenu.AddItem(key, property.stringValue == thisKey, () =>
+                {
+                    // dropdownField.buttonLabelElement.text = thisKey;
+                    dropdownField.buttonLabelElement.text = thisKey;
+                    property.stringValue = thisKey;
+                    property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback.Invoke(thisKey);
+                });
+            }
+
+            if (keys.Count > 0)
+            {
+                genericDropdownMenu.AddSeparator("");
+            }
+
+            genericDropdownMenu.AddItem("Edit Addressable Group...", false, () =>
+            {
+                EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
+            });
+
+            genericDropdownMenu.DropDown(dropdownField.buttonElement.worldBound, dropdownField, true);
+        }
+
+        private static void UpdateHelpBox(HelpBox helpBox, string error)
+        {
+            if (helpBox.text == error)
+            {
+                return;
+            }
+
+            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            helpBox.text = error;
+        }
+
+        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        //     int index,
+        //     VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        // {
+        //     (string error, IReadOnlyList<string> keys) = SetupAssetGroup((AddressableAddressAttribute) saintsAttribute);
+        //     UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+        //
+        //     IReadOnlyList<string> curKeys = (IReadOnlyList<string>) dropdownField.userData;
+        //
+        //     if(!curKeys.SequenceEqual(keys))
+        //     {
+        //         dropdownField.userData = keys;
+        //         dropdownField.choices = keys.Select(UnityFuckedUpDropdownStringEscape).ToList();
+        //         // int curSelect = Util.ListIndexOfAction(keys, each => each == property.stringValue);
+        //         // dropdownField.index = curSelect;
+        //         dropdownField.SetValueWithoutNotify(UnityFuckedUpDropdownStringEscape(property.stringValue));
+        //     }
+        //
+        //     // Debug.Log($"AnimatorStateAttributeDrawer: {newAnimatorStates}");
+        //     HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
+        //     // ReSharper disable once InvertIf
+        //     if (error != helpBoxElement.text)
+        //     {
+        //         helpBoxElement.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+        //         helpBoxElement.text = error;
+        //     }
+        // }
 
         // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
         //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
@@ -219,7 +273,8 @@ namespace SaintsField.Editor.Drawers.Addressable
         // }
 
         private static string UnityFuckedUpDropdownStringEscape(string value) =>
-            value.Replace('/', '\u2215').Replace('&', '＆');
+            // value.Replace('/', '\u2215').Replace('&', '＆');
+            value;
         // private static string UnityFuckedUpDropdownStringReverse(string value) =>
         //     value.Replace('/', '\u2215').Replace('&', '＆');
 

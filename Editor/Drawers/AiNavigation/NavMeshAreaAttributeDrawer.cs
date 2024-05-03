@@ -111,9 +111,6 @@ namespace SaintsField.Editor.Drawers.AiNavigation
         #region UI Toolkit
 
         private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__NavMeshArea_Button";
-        private static string NameButtonLabelField(SerializedProperty property) => $"{property.propertyPath}__NavMeshArea_ButtonLabel";
-        // private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__NavMeshArea_HelpBox";
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__NavMeshArea_Label";
 
         private class ButtonData
         {
@@ -155,15 +152,14 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 ? "-"
                 : FormatAreaName(areas[areaIndex], valueType);
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(buttonLabel);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButtonField(property);
+            dropdownButton.buttonLabelElement.text = buttonLabel;
             dropdownButton.userData = new ButtonData(valueType)
             {
                 selectedIndex = areaIndex,
             };
-
-            dropdownButton.labelElement.name = NameButtonLabelField(property);
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 
@@ -174,20 +170,19 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            Button button = container.Q<Button>(NameButtonField(property));
+            UIToolkitUtils.DropdownButtonField button = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
             ButtonData buttonData = (ButtonData) button.userData;
-            Label label = button.Q<Label>(NameButtonLabelField(property));
             // NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute) saintsAttribute;
 
-            container.Q<Button>(NameButtonField(property)).clicked += () =>
-                ShowDropdownUIToolkit(property, buttonData, button, label, onValueChangedCallback);
+            button.buttonElement.clicked += () =>
+                ShowDropdownUIToolkit(property, buttonData, button, onValueChangedCallback);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
-            Button button = container.Q<Button>(NameButtonField(property));
+            UIToolkitUtils.DropdownButtonField button = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
             ButtonData buttonData = (ButtonData) button.userData;
 
             ValueType valueType = buttonData.ValueType;
@@ -214,15 +209,13 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 string buttonLabel = areaIndex == -1
                     ? "-"
                     : FormatAreaName(AiNavigationUtils.GetNavMeshAreas().ElementAt(areaIndex), valueType);
-                button.Q<Label>(NameButtonLabelField(property)).text = buttonLabel;
+                button.buttonLabelElement.text = buttonLabel;
             }
         }
 
         private static void ShowDropdownUIToolkit(SerializedProperty property, ButtonData buttonData,
-            // ReSharper disable once SuggestBaseTypeForParameter
-            Button button,
-            // ReSharper disable once SuggestBaseTypeForParameter
-            Label label, Action<object> onValueChangedCallback)
+            UIToolkitUtils.DropdownButtonField button,
+            Action<object> onValueChangedCallback)
         {
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
 
@@ -252,7 +245,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                         onValueChangedCallback(newValue);
                     }
 
-                    label.text = curName;
+                    button.buttonLabelElement.text = curName;
                 });
             }
 

@@ -5,6 +5,7 @@ using UnityEditor;
 using System;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
+using System.Reflection;
 using UnityEngine.UIElements;
 #endif
 
@@ -114,24 +115,24 @@ namespace SaintsField.Editor.Utils
             label.style.display = DisplayStyle.Flex;
         }
 
-        public struct DropdownButtonUIToolkit
-        {
-            // ReSharper disable InconsistentNaming
-            public Button Button;
-            public Label Label;
-            // ReSharper enable InconsistentNaming
-        }
-
         public class DropdownButtonField : BaseField<string>
         {
             public readonly Button buttonElement;
             public readonly Label buttonLabelElement;
+            // private readonly MethodInfo AlignLabel;
 
             public DropdownButtonField(string label, Button visualInput, Label buttonLabel) : base(label, visualInput)
             {
                 buttonElement = visualInput;
                 buttonLabelElement = buttonLabel;
+
+                // AlignLabel = typeof(BaseField<string>).GetMethod("AlignLabel", BindingFlags.NonPublic | BindingFlags.Instance);
             }
+
+            // public void AlignLabelForce()
+            // {
+            //     AlignLabel.Invoke(this, new object[]{});
+            // }
         }
 
         public static DropdownButtonField MakeDropdownButtonUIToolkit(string label)
@@ -142,9 +143,12 @@ namespace SaintsField.Editor.Utils
                 {
                     height = EditorGUIUtility.singleLineHeight,
                     flexGrow = 1,
+                    flexShrink = 1,
+
                     paddingRight = 2,
                     marginRight = 0,
                     marginLeft = 0,
+                    alignItems = Align.FlexStart,
                 },
                 // name = NameButtonField(property),
                 // userData = metaInfo.SelectedIndex == -1
@@ -152,43 +156,48 @@ namespace SaintsField.Editor.Utils
                 //     : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2,
             };
 
-            VisualElement buttonLabelContainer = new VisualElement
+            Label buttonLabel = new Label
             {
                 style =
                 {
-                    width = Length.Percent(100),
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.SpaceBetween,
+                    flexGrow = 1,
+                    flexShrink = 1,
+                    // paddingRight = 20,
+                    // textOverflow = TextOverflow.Ellipsis,
+                    // unityOverflowClipBox = OverflowClipBox.PaddingBox,
+                    overflow = Overflow.Hidden,
+                    marginRight = 15,
+                    unityTextAlign = TextAnchor.MiddleLeft,
                 },
             };
 
-            Label buttonLabel = new Label();
+            button.Add(buttonLabel);
 
-            buttonLabelContainer.Add(buttonLabel);
-            buttonLabelContainer.Add(new Image
+            DropdownButtonField dropdownButtonField = new DropdownButtonField(label, button, buttonLabel)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexShrink = 1,
+                },
+            };
+
+            dropdownButtonField.AddToClassList("unity-base-field__aligned");
+
+            dropdownButtonField.Add(new Image
             {
                 image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
                 scaleMode = ScaleMode.ScaleToFit,
                 style =
                 {
                     maxWidth = 15,
+                    maxHeight = EditorGUIUtility.singleLineHeight,
+                    position = Position.Absolute,
+                    right = 2,
                 },
             });
 
-            button.Add(buttonLabelContainer);
-
-            DropdownButtonField dropdownButtonField = new DropdownButtonField(label, button, buttonLabel);
-
-            dropdownButtonField.AddToClassList("unity-base-field__aligned");
-
             return dropdownButtonField;
-            // return Button;
-            // return new DropdownButtonUIToolkit
-            // {
-            //     Button = button,
-            //     Label = label,
-            // };
         }
     }
 #endif
