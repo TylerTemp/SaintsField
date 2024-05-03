@@ -63,11 +63,15 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.1**
+**3.0.2**
 
-1.  UI Toolkit: Fix `SaintsEditor` "Script" field not aligned
-2.  Fix [Issue 20](https://github.com/TylerTemp/SaintsField/issues/20) that `EnumFlags` check contains for mixed bits, and flip bits when toggling a mixed bit.
-3.  UI Toolkit: fix `EnumFlags` layout issue.
+1.  UI Toolkit: fix `AddressableAdress` broken since 3.0.0
+2.  UI Toolkit: fix dropdown button incorrect layout (`Dropdown`, `AdvancedDropdown`, `AddressableAdress` etc)
+3.  UI Toolkit: allow buttons to wrap if `EnumFlags` has both the `AutoExpand` and `DefaultExpand` as `false`
+4.  UI Toolkit: fix `NavMeshAreaMask` incorrect label align.
+5.  Addressable tools now can open addressable groups edit window.
+6.  AnimatorParams now can open the animator edit window.
+7.  Fix `AnimatorParams` for integer type.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
