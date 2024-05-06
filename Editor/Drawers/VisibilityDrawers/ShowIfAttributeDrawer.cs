@@ -49,7 +49,6 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
 
             foreach ((string callback, Enum enumTarget) in showIfAttribute.EnumTargets)
             {
-                // Debug.Log();
                 (string error, Enum result) = Util.GetOf<Enum>(callback, default, property, info, target);
                 if (error != "")
                 {

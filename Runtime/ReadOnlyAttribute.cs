@@ -25,9 +25,7 @@ namespace SaintsField
         {
             EditorMode = editorMode;
 
-            Callbacks = by.Length == 0
-                ? null
-                : by;
+            Callbacks = by;
 
             EnumTargets = Array.Empty<(string, Enum)>();
         }
