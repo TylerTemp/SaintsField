@@ -46,7 +46,7 @@ namespace SaintsField
         public HideIfAttribute(string normalCallback, string enumCallback1, object enumTarget1, string enumCallback2, object enumTarget2): base(normalCallback, enumCallback1, enumTarget1, enumCallback2, enumTarget2){}
 
         // 1+3
-        public HideIfAttribute(EMode editorMode, string normalCallback, string enumCallback1, object enumTarget1, string enumCallback2, object enumTarget2, string enumCallback3, object enumTarget3): base(normalCallback, enumCallback1, enumTarget1, enumCallback2, enumTarget2){}
+        public HideIfAttribute(EMode editorMode, string normalCallback, string enumCallback1, object enumTarget1, string enumCallback2, object enumTarget2, string enumCallback3, object enumTarget3): base(editorMode, normalCallback, enumCallback1, enumTarget1, enumCallback2, enumTarget2, enumCallback3, enumTarget3){}
         public HideIfAttribute(string normalCallback, string enumCallback1, object enumTarget1, string enumCallback2, object enumTarget2, string enumCallback3, object enumTarget3): base(normalCallback, enumCallback1, enumTarget1, enumCallback2, enumTarget2, enumCallback3, enumTarget3){}
 
         // 2+1
