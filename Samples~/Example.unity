@@ -10804,13 +10804,19 @@ MonoBehaviour:
   enum2: 1
   enum3: 1
   enum4: 1
-  bool1: 0
-  bool2: 0
-  bool3: 0
+  bool1: 1
+  bool2: 1
+  bool3: 1
   enum1Show: 
   enum1And2Show: 
   enum1And2And3Show: 
   enum1And2And3And4Show: 
+  bool1AndEnum1Show: 
+  bool1AndEnum12Show: 
+  bool1AndEnum123: 
+  bool12AndEnum1Show: 
+  bool12AndEnum12Show: 
+  bool123AndEnum1Show: 
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
