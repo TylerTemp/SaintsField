@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
                 !editorRequiresPlay || EditorApplication.isPlaying
             );
 
-            string[] bys = targetAttribute.ReadOnlyBys;
+            string[] bys = targetAttribute.Callbacks;
             if (bys == null && editorRequiresEdit && editorRequiresPlay)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
