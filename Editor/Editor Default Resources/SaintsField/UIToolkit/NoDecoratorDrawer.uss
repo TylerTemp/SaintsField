@@ -1,0 +1,3 @@
+.unity-decorator-drawers-container {
+    display: none;
+}

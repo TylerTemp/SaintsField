@@ -43,6 +43,22 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
                 callbackTruly.Add(isTruly);
             }
 
+            foreach ((string callback, Enum enumTarget) in hideIfAttribute.EnumTargets)
+            {
+                (string error, Enum result) = Util.GetOf<Enum>(callback, default, property, info, target);
+                if (error != "")
+                {
+                    errors.Add(error);
+                    callbackTruly.Add(false);
+                }
+                else
+                {
+                    bool isFlag = enumTarget.GetType().GetCustomAttribute<FlagsAttribute>() != null;
+                    bool isTruly = isFlag ? result.HasFlag(enumTarget) : result.Equals(enumTarget);
+                    callbackTruly.Add(isTruly);
+                }
+            }
+
             if (errors.Count > 0)
             {
                 return (string.Join("\n\n", errors), true);

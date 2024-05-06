@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.VisibilityDrawers
 {
@@ -40,7 +41,26 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
                 {
                     errors.Add(error);
                 }
-                callbackTruly.Add(isTruly);
+                else
+                {
+                    callbackTruly.Add(isTruly);
+                }
+            }
+
+            foreach ((string callback, Enum enumTarget) in showIfAttribute.EnumTargets)
+            {
+                // Debug.Log();
+                (string error, Enum result) = Util.GetOf<Enum>(callback, default, property, info, target);
+                if (error != "")
+                {
+                    errors.Add(error);
+                }
+                else
+                {
+                    bool isFlag = enumTarget.GetType().GetCustomAttribute<FlagsAttribute>() != null;
+                    bool isTruly = isFlag ? result.HasFlag(enumTarget) : result.Equals(enumTarget);
+                    callbackTruly.Add(isTruly);
+                }
             }
 
             if (errors.Count > 0)

@@ -2522,6 +2522,12 @@ MonoBehaviour:
   condition: 0
   boolShow: 
   boolHide: 
+  enum1: 0
+  enum2: 0
+  enum1Show: 
+  enum1And2Show: 
+  enumFlag: 0
+  flag1Show: 
 --- !u!1 &609824473
 GameObject:
   m_ObjectHideFlags: 0
@@ -10750,6 +10756,61 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   label: My Dropdown
   floatV: 3.2
+--- !u!1 &1244097642
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1244097643}
+  - component: {fileID: 1244097644}
+  m_Layer: 0
+  m_Name: ShowIfEnum
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1244097643
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1244097642}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2138214539}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1244097644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1244097642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d43a306ece3d7e84192832c946f95880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enum1: 1
+  enum2: 1
+  enum3: 1
+  enum4: 1
+  bool1: 0
+  bool2: 0
+  bool3: 0
+  enum1Show: 
+  enum1And2Show: 
+  enum1And2And3Show: 
+  enum1And2And3And4Show: 
 --- !u!1 &1249628711
 GameObject:
   m_ObjectHideFlags: 0
@@ -19680,6 +19741,7 @@ Transform:
   - {fileID: 1111329122}
   - {fileID: 520027141}
   - {fileID: 1355319187}
+  - {fileID: 1244097643}
   m_Father: {fileID: 0}
   m_RootOrder: 55
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

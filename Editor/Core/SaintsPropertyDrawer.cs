@@ -577,8 +577,15 @@ namespace SaintsField.Editor.Core
 
         }
 
+        private static StyleSheet noDecoratorDrawer;
+
         protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property)
         {
+            if (noDecoratorDrawer == null)
+            {
+                noDecoratorDrawer = Util.LoadResource<StyleSheet>("UIToolkit/NoDecoratorDrawer.uss");
+            }
+
             // PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
             PropertyField propertyField = new PropertyField(property)
             {
@@ -591,6 +598,7 @@ namespace SaintsField.Editor.Core
 
             // propertyField.AddToClassList(SaintsFieldFallbackClass);
             propertyField.AddToClassList(ClassAllowDisable);
+            propertyField.styleSheets.Add(noDecoratorDrawer);
             // propertyField.AddToClassList("unity-base-field__aligned");
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
@@ -1586,6 +1594,9 @@ namespace SaintsField.Editor.Core
                     })
                     .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                Debug.Log($"get dec {dec} for {property.propertyPath}");
+#endif
                 if (dec != null && ImGuiRemoveDecDraw(position, property, label))
                 {
                     return;
