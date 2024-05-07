@@ -1793,15 +1793,15 @@ MonoBehaviour:
   bool2: 0
   bool3: 0
   enum1Hide: 
-  enum1And2Hide: 
-  enum1And2And3Hide: 
-  enum1And2And3And4Hide: 
-  bool1AndEnum1Hide: 
-  bool1AndEnum12Hide: 
-  bool1AndEnum123: 
-  bool12AndEnum1Hide: 
-  bool12AndEnum12Hide: 
-  bool123AndEnum1Hide: 
+  enum1Or2Hide: 
+  enum1Or2Or3Hide: 
+  enum1Or2Or3Or4Hide: 
+  bool1OrEnum1Hide: 
+  bool1OrEnum12Hide: 
+  bool1OrEnum123: 
+  bool12OrEnum1Hide: 
+  bool12OrEnum12Hide: 
+  bool123OrEnum1Hide: 
 --- !u!1 &435171140
 GameObject:
   m_ObjectHideFlags: 0
@@ -9285,10 +9285,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e95f8384edd3443b9d10b54e96f859, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enum1: 0
-  enum2: 0
-  enum3: 1
-  enum4: 1
+  enum1: 1
+  enum2: 1
+  enum3: 0
+  enum4: 0
   bool1: 0
   bool2: 0
   bool3: 0
@@ -13347,9 +13347,9 @@ Transform:
   - {fileID: 1798165822}
   - {fileID: 860315880}
   - {fileID: 1494371784}
+  - {fileID: 1967324951}
   - {fileID: 1050610773}
   - {fileID: 985301983}
-  - {fileID: 1967324951}
   m_Father: {fileID: 0}
   m_RootOrder: 48
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -19262,9 +19262,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enum1: 1
-  enum2: 0
-  enum3: 0
-  enum4: 0
+  enum2: 1
+  enum3: 1
+  enum4: 1
   bool1: 1
   bool2: 1
   bool3: 1

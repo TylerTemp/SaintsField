@@ -1540,9 +1540,11 @@ private void ChangedAnyType(object anyObj, int index=-1)
 
 Arguments:
 
+For callback (functions, fields, properties):
+
 *   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omiting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
 
 *   `string by...`
 
@@ -1571,6 +1573,50 @@ private bool ShouldBeDisabled  // change the logic here
 {
     return true;
 }
+```
+
+It also support `enum` types. The syntax is like this:
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+public EnumToggle enum1;
+[ReadOnly(nameof(enum1), EnumToggle.On)] public string enumReadOnly;
+```
+
+The rule is:
+
+1.  First optional parameter is `EMode editorMode=EMode.Edit | EMode.Play`. Omit to ignore the mode check.
+2.  Then, followed by the name of the field/property/function, and the expected `enum` value, as a pair. You can at most write 4 pairs.
+3.  It's true if the value of the field/property/function is equal to the expected value. If `enum` has `[Flags]` attribute, it will check if the value has the expected bit on.
+4.  It's also OK to mix the normal callback with enum callback check, just ensure:
+
+    1.  the normal callbacks are always before the enum callbacks
+    2.  at most 4 callbacks (normal + enum) in total is allowed
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+
+public EnumToggle enum1;
+public EnumToggle enum2;
+public bool bool1;
+public bool bool2;
+
+// example of checking two normal callbacks and two enum callbacks
+[ShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12Show;
 ```
 
 A more complex example:
@@ -1729,7 +1775,7 @@ Arguments:
 
 *   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omiting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
 
 *   `string by...`
 
@@ -2535,7 +2581,6 @@ Compared with `NaughtyAttributes` and `MarkupAttributes`:
     *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
-    *   When using `UI Toolkit`, it'll try to fix the old style field, change the label behavior like UI Toolkit. (This fix does not work if the fallback drawer is a pure `IMGUI` drawer)
 
 Please note, any `Editor` level component can not work together with each other (it will not cause trouble, but only one will actually work). Which means, `OdinInspector`, `NaughtyAttributes`, `MarkupAttributes`, `SaintsEditor` can not work together.
 
@@ -2712,7 +2757,7 @@ Options are:
 `Horizental` style is buggy, for the following reasons:
 
 1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
-2.  On UI Toolkit we have the well-behaved layout system, but because of its buggy "Label Width" (see "Common Pitfalls & Compatibility" - "UI Toolkit" section for more information), all the field except the first one will get the super-shrank label width which makes it unreadable.
+2.  On UI Toolkit we have the well-behaved layout system, but because Unity will try to align the first label, all the field except the first one will get the super-shrank label width which makes it unreadable.
 
 ![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
 
@@ -3088,7 +3133,7 @@ public class CompatibilityNaAndDefault : MonoBehaviour
 1.  the drawer itself respects the `GUIContent` argument in `OnGUI` for IMGUI, or add `unity-label` class to Label for UI Toolkit
 
     NOTE: `NaughtyAttributes` (IMGUI) uses `property.displayName` instead of `GUIContent`. You need to set `Label(" ")` if you want to use `RichLabel`.
-    Also, `NaughtyAttributes` tread some attributes as first-class citizen, so the compatibility is not guaranteed.
+    Might not work very well with `NaughtyAttributes`'s meta attributes because they are editor level components.
 
 2.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
 
@@ -3103,4 +3148,4 @@ My (not full) test about compatibility:
 
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
 *   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
-*   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good for Odin's `EditorWindow`.
+*   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good when it's inside Odin's own serializer.
