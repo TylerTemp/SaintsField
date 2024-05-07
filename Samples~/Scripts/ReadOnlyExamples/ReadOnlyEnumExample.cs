@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.ReadOnlyExamples
 {
-    public class DisableIfEnumExample : MonoBehaviour
+    public class ReadOnlyEnumExample : MonoBehaviour
     {
         [Serializable]
         public enum EnumToggle
