@@ -2947,7 +2947,9 @@ public string buggy2;
 
 This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
 
-Different from `ShowIf`/`HideIf`: apply on an array will directly show or hide the array itself, rather than each element.
+Different from `ShowIf`/`HideIf`: 
+1.  apply on an array will directly show or hide the array itself, rather than each element.
+2.  Callback function can not receive value and index
 
 ```csharp
 using SaintsField.Playa;
@@ -2995,7 +2997,8 @@ This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `B
 
 Different from `EnableIf`/`DisableIf` in the following:
 1.  apply on an array will directly enable or disable the array itself, rather than each element.
-2.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
+2.  Callback function can not receive value and index
+3.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
 
 ```csharp
 using SaintsField.Playa;
