@@ -6,7 +6,13 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public struct SaintsArray<T>: ISaintsArray, IReadOnlyList<T>
+    public struct SaintsArray<T>: ISaintsArray
+        , IReadOnlyList<T>
+        , ICollection
+        , ICloneable
+        // , IList  this is so fucked up. MS need this for index. Ignore this because IReadOnlyList solved it
+        , IEnumerable
+        , IStructuralComparable
     {
         [SerializeField]
         public T[] value;
@@ -23,14 +29,39 @@ namespace SaintsField
 
         public override string ToString() => value.ToString();
 
-        #region Array
-
+        #region IReadOnlyList
         public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)value).GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public int Count => value.Length;
-        public T this[int index] => value[index];
+        public T this[int index]
+        {
+            get => value[index];
+            set => this.value[index] = value;  // ms just don't give any interface for this
+        }
+
         #endregion
 
+        #region ICollection
+
+        public void CopyTo(Array array, int index) => value.CopyTo(array, index);
+        public bool IsSynchronized => value.IsSynchronized;
+        public object SyncRoot => value.SyncRoot;
+
+        #endregion
+
+        #region ICloneable
+        public object Clone() => value.Clone();
+        #endregion
+
+        #region IStructuralComparable
+
+        // array has this actually
+        public int CompareTo(object other, IComparer comparer)
+        {
+            // ReSharper disable once PossibleNullReferenceException
+            throw null;
+        }
+        #endregion
 
     }
 }

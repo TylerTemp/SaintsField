@@ -17,6 +17,7 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
             GameObject[] impArrDirect = saintsArrayGo;
             SaintsArray<GameObject> expArrDirect = (SaintsArray<GameObject>)impArrDirect;
 
+            saintsArrayGo[0] = new GameObject();
             GameObject firstGameObject = saintsArrayGo[0];
         }
     }

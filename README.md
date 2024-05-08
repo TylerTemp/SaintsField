@@ -17,14 +17,14 @@ Unity: 2019.1 or higher
 ## Highlights ##
 
 1.  Works on deep nested fields!
-2.  Supports UI Toolkit! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
+2.  Supports both IMGUI and UI Toolkit! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
 3.  Use and only use `PropertyDrawer` and `DecoratorDrawer` (except `SaintsEditor`, which is disabled by default), thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
 
 ## Installation ##
 
-*   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741 )
+*   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)
 
 *   Using [OpenUPM](https://openupm.com/packages/today.comes.saintsfield/)
 
@@ -63,15 +63,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.2**
+**3.0.3**
 
-1.  UI Toolkit: fix `AddressableAdress` broken since 3.0.0
-2.  UI Toolkit: fix dropdown button incorrect layout (`Dropdown`, `AdvancedDropdown`, `AddressableAdress` etc)
-3.  UI Toolkit: allow buttons to wrap if `EnumFlags` has both the `AutoExpand` and `DefaultExpand` as `false`
-4.  UI Toolkit: fix `NavMeshAreaMask` incorrect label align.
-5.  Addressable tools now can open addressable groups edit window.
-6.  AnimatorParams now can open the animator edit window.
-7.  Fix `AnimatorParams` for integer type.
+1.  UI Toolkit: fix `DecoratorDrawer` get drawn more than once.
+2.  Add `Enum` support for `ShowIf`/`HideIf`/`EnableIf`/`DisableIf`/`PlayaShowIf`/`PlayaHideIf`/`PlayaEnableIf`/`PlayaDisableIf`
+3.  Improve `SaintsArray` so it works more like an actual array.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -79,7 +75,7 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
 All attributes under this section can be used in your project without any extra setup.
 
-namespace: `SaintsField`;
+namespace: `SaintsField`
 
 ### Label & Text ###
 
@@ -3160,26 +3156,25 @@ will override `PropertyDrawer` follows by. Thus, ensure `SaintsField` is always 
 An example of working with NaughtyAttributes:
 
 ```csharp
-public class CompatibilityNaAndDefault : MonoBehaviour
-{
-    [RichLabel("<color=green>+NA</color>"),
-     NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green),
-     NaughtyAttributes.Label(" ")  // a little hack for label issue
-    ]
-    public AnimationCurve naCurve;
+using SaintsField;
 
-    [RichLabel("<color=green>+Native</color>"), Range(0, 5)]
-    public float nativeRange;
+[RichLabel("<color=green>+NA</color>"),
+ NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green),
+ NaughtyAttributes.Label(" ")  // a little hack for label issue
+]
+public AnimationCurve naCurve;
 
-    // this wont work. Please put `SaintsField` before other drawers
-    [Range(0, 5), RichLabel("<color=green>+Native</color>")]
-    public float nativeRangeHandled;
+[RichLabel("<color=green>+Native</color>"), Range(0, 5)]
+public float nativeRange;
 
-    // this wont work too. Please put `SaintsField` before other drawers
-    [NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
-    [RichLabel("<color=green>+NA</color>")]
-    public AnimationCurve naCurveHandled;
-}
+// this wont work. Please put `SaintsField` before other drawers
+[Range(0, 5), RichLabel("<color=green>+Native</color>")]
+public float nativeRangeHandled;
+
+// this wont work too. Please put `SaintsField` before other drawers
+[NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
+[RichLabel("<color=green>+NA</color>")]
+public AnimationCurve naCurveHandled;
 ```
 
 ### Fallback To Other Drawers ###

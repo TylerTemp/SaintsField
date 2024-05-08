@@ -1,7 +1,8 @@
 ## 3.0.3
 
 1.  UI Toolkit: fix `DecoratorDrawer` get drawn more than once.
-2.  Add `Enum` support for `ShowIf`
+2.  Add `Enum` support for `ShowIf`/`HideIf`/`EnableIf`/`DisableIf`/`PlayaShowIf`/`PlayaHideIf`/`PlayaEnableIf`/`PlayaDisableIf`
+3.  Improve `SaintsArray` so it works more like an actual array.
 
 ## 3.0.2
 
