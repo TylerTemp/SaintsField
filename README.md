@@ -1536,6 +1536,8 @@ private void ChangedAnyType(object anyObj, int index=-1)
 
 #### `ReadOnly`/`DisableIf`/`EnableIf` ####
 
+A tool to set field enable/disable status. Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
+
 `ReadOnly` equals `DisableIf`, `EnableIf` is the opposite of `DisableIf`
 
 Arguments:
@@ -1556,11 +1558,13 @@ For `ReadOnly`/`DisableIf`: The field will be disabled if **ALL** condition is t
 
 For `EnableIf`: The field will be enabled if **ANY** condition is true (`or` operation)
 
-This is the same logic as the `ShowIf`/`HideIf` pair, which `DisableIf` is the major attribute:
+For multiple attributes: The field will be disabled if **ANY** condition is true (`or` operation)
+
+Logic example:
 
 *   `EnableIf(A)` == `DisableIf(!A)`
 *   `EnableIf(A, B)` == `EnableIf(A || B)` == `DisableIf(!(A || B))` == `DisableIf(!A && !B)`
-*   `[EnableIf(A), EnableIf(B)]` == `[DisableIf(!A), DisableIf(!B)]` == `DisableIf(!A || !B)` == `DisableIf(!(A && B))`
+*   `[EnableIf(A), EnableIf(B)]` == `[DisableIf(!A), DisableIf(!B)]` == `DisableIf(!A || !B)`
 
 A simple example:
 
@@ -1598,7 +1602,7 @@ The rule is:
 4.  It's also OK to mix the normal callback with enum callback check, just ensure:
 
     1.  the normal callbacks are always before the enum callbacks
-    2.  at most 4 callbacks (normal + enum) in total is allowed
+    2.  at most 4 callbacks (normal + enum pair) in total is allowed
 
 ```csharp
 using SaintsField;
@@ -1613,10 +1617,12 @@ public enum EnumToggle
 public EnumToggle enum1;
 public EnumToggle enum2;
 public bool bool1;
-public bool bool2;
+public bool bool2 {
+    return true;
+}
 
 // example of checking two normal callbacks and two enum callbacks
-[ShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12Show;
+[EnableIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
 ```
 
 A more complex example:
@@ -1672,6 +1678,166 @@ public bool boolVal;
 [EnableIf(EMode.Edit, nameof(boolVal))] public string enEditOrBool;
 // dis=!editor || dis=!bool => en=editor&&bool
 [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
+```
+
+#### `ShowIf` / `HideIf` ####
+
+Show or hide the field based on a condition. . Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
+
+Arguments:
+
+*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+
+    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
+
+*   `string by...`
+
+    callbacks or attributes for the condition.
+
+*   AllowMultiple: Yes
+
+You can use multiple `ShowIf`, `HideIf`, and even a mix of the two.
+
+For `ShowIf`: The field will be shown if **ALL** condition is true (`and` operation)
+
+For `HideIf`: The field will be hidden if **ANY** condition is true (`or` operation)
+
+For multiple attributes: The field will be shown if **ANY** condition is true (`or` operation)
+
+For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
+
+`HideIf` is the opposite of `ShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
+
+*   `HideIf(A)` == `ShowIf(!A)`
+*   `HideIf(A, B)` == `HideIf(A || B)` == `ShowIf(!(A || B))` == `ShowIf(!A && !B)`
+*   `[Hideif(A), HideIf(B)]` == `[ShowIf(!A), ShowIf(!B)]` == `ShowIf(!A || !B)`
+
+A simple example:
+
+```csharp
+using SaintsField;
+
+[ShowIf(nameof(ShouldShow))]
+public int showMe;
+
+public bool ShouldShow()  // change the logic here
+{
+    return true;
+}
+```
+
+It also support `enum` types. The syntax is like this:
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+public EnumToggle enum1;
+[ShowIf(nameof(enum1), EnumToggle.On)] public string enum1Show;
+```
+
+The rule is:
+
+1.  First optional parameter is `EMode editorMode=EMode.Edit | EMode.Play`. Omit to ignore the mode check.
+2.  Then, followed by the name of the field/property/function, and the expected `enum` value, as a pair. You can at most write 4 pairs.
+3.  It's true if the value of the field/property/function is equal to the expected value. If `enum` has `[Flags]` attribute, it will check if the value has the expected bit on.
+4.  It's also OK to mix the normal callback with enum callback check, just ensure:
+
+    1.  the normal callbacks are always before the enum callbacks
+    2.  at most 4 callbacks (normal + enum pair) in total is allowed
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+
+public EnumToggle enum1;
+public EnumToggle enum2;
+public bool bool1;
+public bool bool2 {
+    return true;
+}
+
+// example of checking two normal callbacks and two enum callbacks
+[ShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
+```
+
+A more complex example:
+
+```csharp
+using SaintsField;
+
+public bool _bool1;
+public bool _bool2;
+public bool _bool3;
+public bool _bool4;
+
+[ShowIf(nameof(_bool1))]
+[ShowIf(nameof(_bool2))]
+[RichLabel("<color=red>show=1||2")]
+public string _showIf1Or2;
+
+
+[ShowIf(nameof(_bool1), nameof(_bool2))]
+[RichLabel("<color=green>show=1&&2")]
+public string _showIf1And2;
+
+[HideIf(nameof(_bool1))]
+[HideIf(nameof(_bool2))]
+[RichLabel("<color=blue>show=!1||!2")]
+public string _hideIf1Or2;
+
+
+[HideIf(nameof(_bool1), nameof(_bool2))]
+[RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
+public string _hideIf1And2;
+
+[ShowIf(nameof(_bool1))]
+[HideIf(nameof(_bool2))]
+[RichLabel("<color=magenta>show=1||!2")]
+public string _showIf1OrNot2;
+
+[ShowIf(nameof(_bool1), nameof(_bool2))]
+[ShowIf(nameof(_bool3), nameof(_bool4))]
+[RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
+public string _showIf1234;
+
+[HideIf(nameof(_bool1), nameof(_bool2))]
+[HideIf(nameof(_bool3), nameof(_bool4))]
+[RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
+public string _hideIf1234;
+```
+
+[![showifhideif](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
+
+Example about EMode:
+
+```csharp
+using SaintsField;
+
+public bool boolValue;
+
+[ShowIf(EMode.Edit)] public string showEdit;
+[ShowIf(EMode.Play)] public string showPlay;
+
+[ShowIf(EMode.Edit, nameof(boolValue))] public string showEditAndBool;
+[ShowIf(EMode.Edit), ShowIf(nameof(boolValue))] public string showEditOrBool;
+
+[HideIf(EMode.Edit)] public string hideEdit;
+[HideIf(EMode.Play)] public string hidePlay;
+
+[HideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
+[HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
 ```
 
 #### `Required` ####
@@ -1766,115 +1932,6 @@ private string ValidateValArr(int v, int index) => $"ValidateValArr[{index}]: {v
 ```
 
 [![validateinput](https://github.com/TylerTemp/SaintsField/assets/6391063/f554084c-78f3-43ca-a6ab-b3f59ecbf44c)](https://github.com/TylerTemp/SaintsField/assets/6391063/9d52e663-c9f8-430a-814c-011b17b67a86)
-
-#### `ShowIf` / `HideIf` ####
-
-Show or hide the field based on a condition.
-
-Arguments:
-
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
-
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
-
-*   `string by...`
-
-    callbacks or attributes for the condition.
-
-*   AllowMultiple: Yes
-
-You can use multiple `ShowIf`, `HideIf`, and even a mix of the two: the field will be shown if **ANY** of them is shown.(`or` operation)
-
-For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
-
-`HideIf` is the opposite of `ShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
-
-*   `HideIf(A)` == `ShowIf(!A)`
-*   `HideIf(A, B)` == `HideIf(A || B)` == `ShowIf(!(A || B))` == `ShowIf(!A && !B)`
-*   `[Hideif(A), HideIf(B)]` == `[ShowIf(!A), ShowIf(!B)]` == `ShowIf(!A || !B)` == `ShowIf(!(A && B))`
-
-A simple example:
-
-```csharp
-using SaintsField;
-
-[ShowIf(nameof(ShouldShow))]
-public int showMe;
-
-public bool ShouldShow()  // change the logic here
-{
-    return true;
-}
-```
-
-A full featured example:
-
-
-```csharp
-using SaintsField;
-
-public bool _bool1;
-public bool _bool2;
-public bool _bool3;
-public bool _bool4;
-
-[ShowIf(nameof(_bool1))]
-[ShowIf(nameof(_bool2))]
-[RichLabel("<color=red>show=1||2")]
-public string _showIf1Or2;
-
-
-[ShowIf(nameof(_bool1), nameof(_bool2))]
-[RichLabel("<color=green>show=1&&2")]
-public string _showIf1And2;
-
-[HideIf(nameof(_bool1))]
-[HideIf(nameof(_bool2))]
-[RichLabel("<color=blue>show=!1||!2")]
-public string _hideIf1Or2;
-
-
-[HideIf(nameof(_bool1), nameof(_bool2))]
-[RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
-public string _hideIf1And2;
-
-[ShowIf(nameof(_bool1))]
-[HideIf(nameof(_bool2))]
-[RichLabel("<color=magenta>show=1||!2")]
-public string _showIf1OrNot2;
-
-[ShowIf(nameof(_bool1), nameof(_bool2))]
-[ShowIf(nameof(_bool3), nameof(_bool4))]
-[RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
-public string _showIf1234;
-
-[HideIf(nameof(_bool1), nameof(_bool2))]
-[HideIf(nameof(_bool3), nameof(_bool4))]
-[RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
-public string _hideIf1234;
-```
-
-[![showifhideif](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
-
-Example about EMode:
-
-```csharp
-using SaintsField;
-
-public bool boolValue;
-
-[ShowIf(EMode.Edit)] public string showEdit;
-[ShowIf(EMode.Play)] public string showPlay;
-
-[ShowIf(EMode.Edit, nameof(boolValue))] public string showEditAndBool;
-[ShowIf(EMode.Edit), ShowIf(nameof(boolValue))] public string showEditOrBool;
-
-[HideIf(EMode.Edit)] public string hideEdit;
-[HideIf(EMode.Play)] public string hidePlay;
-
-[HideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
-[HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
-```
 
 #### `MinValue` / `MaxValue` ####
 
@@ -2298,10 +2355,6 @@ Parameters:
 
     If true, it'll draw the `Serializable` inline like it's directly in the `MonoBehavior`
 
-*   `bool tryFixUIToolkit=defaultValue`
-
-    Deprecated and has no effect now.
-
 *   AllowMultiple: No
 
 Special Note:
@@ -2312,6 +2365,7 @@ Special Note:
 
 ```csharp
 using SaintsField;
+using SaintsField.Playa;
 
 [Serializable]
 public struct Nest
