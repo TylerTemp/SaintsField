@@ -5,19 +5,21 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class ShowInInspectorArrayExample : SaintsMonoBehavior
     {
-        public Color[] colors = {Color.red, Color.green, Color.blue};
+        // public Color[] colors = {Color.red, Color.green, Color.blue};
 
-        [ShowInInspector] private static readonly Color[] StaticReadOnlyField = {Color.red, Color.green, Color.blue};
+        private static readonly Color[] BaseColors = {Color.red, Color.green, Color.blue};
+
+        // [ShowInInspector] private static readonly Color[] StaticReadOnlyField = BaseColors;
         [ShowInInspector] private static readonly Color[][] StaticReadOnlyField2 =
         {
-            StaticReadOnlyField,
-            StaticReadOnlyField,
+            BaseColors,
+            BaseColors,
         };
 
-        [ShowInInspector] private Color[] StaticProp => StaticReadOnlyField;
-        [ShowInInspector] private Color[][] StaticProp2 => new[] {
-            StaticReadOnlyField,
-            StaticReadOnlyField,
+        // [ShowInInspector] private static  Color[] StaticProp => BaseColors;
+        [ShowInInspector] private static Color[][] StaticProp2 => new[] {
+            BaseColors,
+            BaseColors,
         };
     }
 }

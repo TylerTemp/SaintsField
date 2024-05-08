@@ -18,40 +18,38 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreateVisualElement()
         {
-            // Debug.Log($"Native Prop {FieldWithInfo.PropertyInfo.Name}");
-            object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
-            VisualElement child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
-                .PropertyInfo.Name));
+            object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
 
-            VisualElement result = new VisualElement
+            VisualElement container = new VisualElement
             {
                 userData = value,
                 name = $"saints-field--native-property--{FieldWithInfo.PropertyInfo.Name}",
             };
-            result.Add(child);
+            VisualElement result = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name));
+            container.Add(result);
 
             bool callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
-            // call Every in function is broken I dont know why...
-            // result.RegisterCallback<AttachToPanelEvent>(_ => WatchValueChanged(FieldWithInfo, SerializedObject, result, callUpdate));
-            result.RegisterCallback<AttachToPanelEvent>(_ =>
-                result.schedule.Execute(() => WatchValueChanged(FieldWithInfo, SerializedObject, result, callUpdate)).Every(100)
+            container.RegisterCallback<AttachToPanelEvent>(_ =>
+                container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, SerializedObject, container, callUpdate)).Every(100)
             );
 
-            return result;
+            return container;
         }
 
         private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject,  VisualElement container, bool callUpdate)
         {
             object userData = container.userData;
-            object value = fieldWithInfo.PropertyInfo.GetValue(serializedObject.targetObject);
+            object value = fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target);
 
             bool isEqual = Util.GetIsEqual(userData, value);
 
             VisualElement child = container.Children().First();
-            // if (userData != value)
+
             if (!isEqual)
             {
-                // Debug.Log($"update {container.name} {userData} -> {value}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+                Debug.Log($"native property update {container.name} {userData} -> {value}");
+#endif
                 StyleEnum<DisplayStyle> displayStyle = child.style.display;
                 container.Clear();
                 container.userData = value;
