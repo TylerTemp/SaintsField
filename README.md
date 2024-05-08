@@ -1855,7 +1855,6 @@ Parameters:
 *   `string errorMessage = null` Error message. Default is `{label} is required`
 *   AllowMultiple: No
 
-
 ```csharp
 using SaintsField;
 

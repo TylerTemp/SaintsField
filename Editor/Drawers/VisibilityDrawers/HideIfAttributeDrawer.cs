@@ -15,49 +15,14 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             Type type, object target)
         {
             HideIfAttribute hideIfAttribute = (HideIfAttribute)saintsAttribute;
-            EMode editorMode = hideIfAttribute.EditorMode;
-            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
 
-            bool editorModeIsTrue = (
-                !editorRequiresEdit || !EditorApplication.isPlaying
-            ) && (
-                !editorRequiresPlay || EditorApplication.isPlaying
-            );
-
-            List<bool> callbackTruly = new List<bool>();
-            List<string> errors = new List<string>();
-
-            if (!(editorRequiresEdit && editorRequiresPlay))
+            bool editorModeOk = Util.ConditionEditModeChecker(hideIfAttribute.EditorMode);
+            if (!editorModeOk)
             {
-                callbackTruly.Add(editorModeIsTrue);
+                return ("", false);
             }
 
-            foreach (string andCallback in hideIfAttribute.Callbacks)
-            {
-                (string error, bool isTruly) = Util.GetTruly(target, andCallback);
-                if (error != "")
-                {
-                    errors.Add(error);
-                }
-                callbackTruly.Add(isTruly);
-            }
-
-            foreach ((string callback, Enum enumTarget) in hideIfAttribute.EnumTargets)
-            {
-                (string error, Enum result) = Util.GetOf<Enum>(callback, default, property, info, target);
-                if (error != "")
-                {
-                    errors.Add(error);
-                    callbackTruly.Add(false);
-                }
-                else
-                {
-                    bool isFlag = enumTarget.GetType().GetCustomAttribute<FlagsAttribute>() != null;
-                    bool isTruly = isFlag ? result.HasFlag(enumTarget) : result.Equals(enumTarget);
-                    callbackTruly.Add(isTruly);
-                }
-            }
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(hideIfAttribute.Callbacks, hideIfAttribute.EnumTargets, property, info, target);
 
             if (errors.Count > 0)
             {
@@ -67,12 +32,12 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             // or, get hide
             // any(empty) = false, reversed=show(true)
             // we need to manually deal the empty
-            if(callbackTruly.Count == 0)
+            if(boolResults.Count == 0)
             {
                 return ("", false);  // don't show if empty
             }
 
-            bool truly = callbackTruly.Any(each => each);
+            bool truly = boolResults.Any(each => each);
 
             // reverse, get shown
             return ("", !truly);

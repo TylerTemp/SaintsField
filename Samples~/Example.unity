@@ -9285,10 +9285,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e95f8384edd3443b9d10b54e96f859, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enum1: 1
+  enum1: 0
   enum2: 1
   enum3: 0
-  enum4: 0
+  enum4: 1
   bool1: 0
   bool2: 0
   bool3: 0
@@ -12129,7 +12129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba01e03161ad66d4bac2f1ff61a4056a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boolVal: 0
+  boolVal: 1
   enEditMode: 
   enPlayMode: 
   enEditOrBool: 

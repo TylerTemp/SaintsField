@@ -16,50 +16,13 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
         {
             ShowIfAttribute showIfAttribute = (ShowIfAttribute)saintsAttribute;
 
-            EMode editorMode = showIfAttribute.EditorMode;
-            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
-
-            bool editorModeIsTrue = (
-                !editorRequiresEdit || !EditorApplication.isPlaying
-            ) && (
-                !editorRequiresPlay || EditorApplication.isPlaying
-            );
-
-            List<bool> callbackTruly = new List<bool>();
-            List<string> errors = new List<string>();
-            if(!(editorRequiresEdit && editorRequiresPlay))
+            bool editorModeOk = Util.ConditionEditModeChecker(showIfAttribute.EditorMode);
+            if (!editorModeOk)
             {
-                callbackTruly.Add(editorModeIsTrue);
+                return ("", false);
             }
 
-            foreach (string andCallback in showIfAttribute.Callbacks)
-            {
-                (string error, bool isTruly) = Util.GetTruly(target, andCallback);
-                if (error != "")
-                {
-                    errors.Add(error);
-                }
-                else
-                {
-                    callbackTruly.Add(isTruly);
-                }
-            }
-
-            foreach ((string callback, Enum enumTarget) in showIfAttribute.EnumTargets)
-            {
-                (string error, Enum result) = Util.GetOf<Enum>(callback, default, property, info, target);
-                if (error != "")
-                {
-                    errors.Add(error);
-                }
-                else
-                {
-                    bool isFlag = enumTarget.GetType().GetCustomAttribute<FlagsAttribute>() != null;
-                    bool isTruly = isFlag ? result.HasFlag(enumTarget) : result.Equals(enumTarget);
-                    callbackTruly.Add(isTruly);
-                }
-            }
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(showIfAttribute.Callbacks, showIfAttribute.EnumTargets, property, info, target);
 
             if (errors.Count > 0)
             {
@@ -67,7 +30,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             }
 
             // empty = true
-            bool truly = callbackTruly.All(each => each);
+            bool truly = boolResults.All(each => each);
 
             return ("", truly);
         }

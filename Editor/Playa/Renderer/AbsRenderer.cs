@@ -37,21 +37,22 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private enum PreCheckInternalType
         {
-            ShowHide,  // main
-            DisableEnable,  // main
+            Show,
+            Hide,
+            Disable,
+            Enable,
         }
 
         private class PreCheckInternalInfo
         {
             public PreCheckInternalType Type;
-            public bool Reverse;
             public string[] Callbacks;
             public EMode EditorMode;
-            public bool SafeResult;
-            public bool EmptyResult;
             public object Target;
 
-            public bool result;
+            // TODO: handle errors
+            public IReadOnlyList<string> errors;
+            public IReadOnlyList<bool> boolResults;
         }
 
         protected static PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo)
@@ -65,48 +66,36 @@ namespace SaintsField.Editor.Playa.Renderer
                     case PlayaHideIfAttribute hideIfAttribute:
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
-                            Type = PreCheckInternalType.ShowHide,
-                            Reverse = true,
+                            Type = PreCheckInternalType.Hide,
                             Callbacks = hideIfAttribute.Callbacks,
                             EditorMode = hideIfAttribute.EditorMode,
-                            SafeResult = true,
-                            EmptyResult = false,
                             Target = fieldWithInfo.Target,
                         });
                         break;
                     case PlayaShowIfAttribute showIfAttribute:
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
-                            Type = PreCheckInternalType.ShowHide,
-                            Reverse = false,
+                            Type = PreCheckInternalType.Show,
                             Callbacks = showIfAttribute.Callbacks,
                             EditorMode = showIfAttribute.EditorMode,
-                            SafeResult = true,
-                            EmptyResult = true,
                             Target = fieldWithInfo.Target,
                         });
                         break;
                     case PlayaEnableIfAttribute enableIfAttribute:
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
-                            Type = PreCheckInternalType.DisableEnable,
-                            Reverse = true,
+                            Type = PreCheckInternalType.Enable,
                             Callbacks = enableIfAttribute.Callbacks,
                             EditorMode = enableIfAttribute.EditorMode,
-                            SafeResult = false,
-                            EmptyResult = false,
                             Target = fieldWithInfo.Target,
                         });
                         break;
                     case PlayaDisableIfAttribute disableIfAttribute:
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
-                            Type = PreCheckInternalType.DisableEnable,
-                            Reverse = false,
+                            Type = PreCheckInternalType.Disable,
                             Callbacks = disableIfAttribute.Callbacks,
                             EditorMode = disableIfAttribute.EditorMode,
-                            SafeResult = false,
-                            EmptyResult = true,
                             Target = fieldWithInfo.Target,
                         });
                         break;
@@ -121,23 +110,96 @@ namespace SaintsField.Editor.Playa.Renderer
                 FillResult(preCheckInternalInfo);
             }
 
-            // showIf
-            IReadOnlyList<bool> showIfResults = preCheckInternalInfos
-                .Where(each => each.Type == PreCheckInternalType.ShowHide)
-                .Select(each => each.result)
-                .ToList();
-            bool showIfResult = showIfResults.Count == 0 || showIfResults.Any(each => each);
+            // no show attribute: show
+            // any show attribute is true: show; otherwise: not-show
+            bool hasShow = false;
+            bool show = true;
+            // no hide attribute: show
+            // any hide attribute is true: hide; otherwise: not-hide
+            bool hasHide = false;
+            bool hide = false;
+            // no disable attribute: not-disable
+            // any disable attribute is true: disable; otherwise: not-disable
+            bool disable = false;
+            // no enable attribute: enable
+            // any enable attribute is true: enable; otherwise: not-enable
+            bool enable = true;
 
-            // disableIf
-            IReadOnlyList<bool> disableIfResults = preCheckInternalInfos
-                .Where(each => each.Type == PreCheckInternalType.DisableEnable)
-                .Select(each => each.result)
-                .ToList();
-            bool disableIfResult = disableIfResults.Count != 0 && disableIfResults.Any(each => each);
-            // Debug.Log($"disableIfResult={disableIfResult}/{disableIfResults.Count != 0}/{disableIfResults.Any(each => each)}/results={string.Join(",", disableIfResults)}");
+            foreach (PreCheckInternalInfo preCheckInternalInfo in preCheckInternalInfos.Where(each => each.errors.Count == 0))
+            {
+                switch (preCheckInternalInfo.Type)
+                {
+                    case PreCheckInternalType.Show:
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
+                        Debug.Log(
+                            $"show, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
+#endif
+                        hasShow = true;
+                        if (!preCheckInternalInfo.boolResults.All(each => each))
+                        {
+                            show = false;
+                        }
+                        break;
+                    case PreCheckInternalType.Hide:
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
+                        Debug.Log(
+                            $"hide, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
+#endif
+                        hasHide = true;
+                        if (preCheckInternalInfo.boolResults.Count == 0 ||
+                            preCheckInternalInfo.boolResults.Any(each => each))
+                        {
+                            hide = true;
+                        }
+                        break;
+                    case PreCheckInternalType.Disable:
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
+                        Debug.Log(
+                            $"disable, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
+#endif
+                        if (preCheckInternalInfo.boolResults.Count == 0 || preCheckInternalInfo.boolResults.All(each => each))
+                        {
+                            disable = true;
+                        }
+                        break;
+                    case PreCheckInternalType.Enable:
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
+                        Debug.Log(
+                            $"enable, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
+#endif
+                        if (preCheckInternalInfo.boolResults.Count != 0 && !preCheckInternalInfo.boolResults.Any(each => each))
+                        {
+                            enable = false;
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(preCheckInternalInfo.Type), preCheckInternalInfo.Type, null);
+                }
+            }
+            bool showIfResult = true;
+            if (hasShow)
+            {
+                showIfResult = show;
+            }
+
+            if (hasHide)
+            {
+                // ReSharper disable once SimplifyConditionalTernaryExpression
+                showIfResult = (hasShow? show: true) && !hide;
+            }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
+            Debug.Log(
+                $"showIfResult={showIfResult} (hasShow={hasShow}, show={show}, hide={hide})");
+#endif
+            bool disableIfResult = disable || !enable;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
+            Debug.Log(
+                $"disableIfResult={disableIfResult} (disable={disable}, enable={enable})");
+#endif
+
 
             PlayaRichLabelAttribute richLabelAttribute = fieldWithInfo.PlayaAttributes.OfType<PlayaRichLabelAttribute>().FirstOrDefault();
-            // Debug.Log($"richLabelAttribute={richLabelAttribute}");
             bool hasRichLabel = richLabelAttribute != null;
 
             string richLabelXml = "";
@@ -159,34 +221,18 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private static void FillResult(PreCheckInternalInfo preCheckInternalInfo)
         {
-            EMode editorMode = preCheckInternalInfo.EditorMode;
-            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
-
-            bool editorModeIsTrue = (
-                !editorRequiresEdit || !EditorApplication.isPlaying
-            ) && (
-                !editorRequiresPlay || EditorApplication.isPlaying
-            );
-
-            string[] bys = preCheckInternalInfo.Callbacks;
-            if (bys.Length == 0 && editorRequiresEdit && editorRequiresPlay)
+            bool editorModeIsTrue = Util.ConditionEditModeChecker(preCheckInternalInfo.EditorMode);
+            if (!editorModeIsTrue)
             {
-                preCheckInternalInfo.result = preCheckInternalInfo.EmptyResult;
-                // Debug.Log($"return {preCheckInternalInfo.SafeResult}");
+                preCheckInternalInfo.errors = Array.Empty<string>();
+                preCheckInternalInfo.boolResults = new[]{false};
                 return;
             }
 
             List<bool> callbackTruly = new List<bool>();
-            if(!(editorRequiresEdit && editorRequiresPlay))
-            {
-                callbackTruly.Add(editorModeIsTrue);
-            }
-
             List<string> errors = new List<string>();
 
-            // Type targetType = preCheckInternalInfo.Target.GetType();
-            foreach (string callback in bys)
+            foreach (string callback in preCheckInternalInfo.Callbacks)
             {
                 (string error, bool isTruly) = Util.GetTruly(preCheckInternalInfo.Target, callback);
                 if (error != "")
@@ -198,25 +244,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (errors.Count > 0)
             {
-                // return (string.Join("\n\n", errors), false);
-                preCheckInternalInfo.result = preCheckInternalInfo.SafeResult;
+                preCheckInternalInfo.errors = errors;
+                preCheckInternalInfo.boolResults = Array.Empty<bool>();
                 return;
             }
 
-            if (callbackTruly.Count == 0)
-            {
-                preCheckInternalInfo.result = preCheckInternalInfo.EmptyResult;
-                return;
-            }
-
-            if (preCheckInternalInfo.Reverse)  // !or
-            {
-                preCheckInternalInfo.result = !callbackTruly.Any(each => each);
-            }
-            else  // and
-            {
-                preCheckInternalInfo.result = callbackTruly.All(each => each);
-            }
+            preCheckInternalInfo.errors = Array.Empty<string>();
+            preCheckInternalInfo.boolResults = callbackTruly;
         }
 
         private static string ParseRichLabelXml(SaintsFieldWithInfo fieldWithInfo, string richTextXml)
@@ -567,7 +601,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     EditorGUI.EnumPopup(position, label, (Enum)value);
                 }
-                else if (valueType.BaseType == typeof(System.Reflection.TypeInfo))
+                else if (valueType.BaseType == typeof(TypeInfo))
                 {
                     EditorGUI.TextField(position, label, value.ToString());
                 }

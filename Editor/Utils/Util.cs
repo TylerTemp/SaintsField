@@ -489,5 +489,62 @@ namespace SaintsField.Editor.Utils
 
             return result;
         }
+
+        public static bool ConditionEditModeChecker(EMode editorMode)
+        {
+            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
+            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
+            if(editorRequiresEdit && editorRequiresPlay)
+            {
+                return true;
+            }
+
+            return (
+                !editorRequiresEdit || !EditorApplication.isPlaying
+            ) && (
+                !editorRequiresPlay || EditorApplication.isPlaying
+            );
+        }
+
+        public static (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) ConditionChecker(IEnumerable<string> callbacks, IEnumerable<(string callback, Enum enumTarget)> enumTargets, SerializedProperty property, FieldInfo info, object target)
+        {
+            List<bool> callbackBoolResults = new List<bool>();
+            List<string> errors = new List<string>();
+
+            foreach (string andCallback in callbacks)
+            {
+                (string error, bool isTruly) = GetTruly(target, andCallback);
+                if (error != "")
+                {
+                    errors.Add(error);
+                }
+                else
+                {
+                    callbackBoolResults.Add(isTruly);
+                }
+            }
+
+            foreach ((string callback, Enum enumTarget) in enumTargets)
+            {
+                (string error, Enum result) = GetOf<Enum>(callback, default, property, info, target);
+                if (error != "")
+                {
+                    errors.Add(error);
+                }
+                else
+                {
+                    bool isFlag = enumTarget.GetType().GetCustomAttribute<FlagsAttribute>() != null;
+                    bool isTruly = isFlag ? result.HasFlag(enumTarget) : result.Equals(enumTarget);
+                    callbackBoolResults.Add(isTruly);
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                return (errors, Array.Empty<bool>());
+            }
+
+            return (Array.Empty<string>(), callbackBoolResults);
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             GUIContent label, ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info,
             object parent)
         {
-            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, info, parent.GetType(), parent);
+            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, info, parent);
             _error = error;
             EditorGUI.BeginDisabledGroup(disabled);
             return position;
@@ -93,61 +93,25 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
-        protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, Type type, object target)
+        protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object target)
         {
             ReadOnlyAttribute targetAttribute = (ReadOnlyAttribute) saintsAttribute;
 
-            EMode editorMode = targetAttribute.EditorMode;
-            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
-
-            bool editorModeIsTrue = (
-                !editorRequiresEdit || !EditorApplication.isPlaying
-            ) && (
-                !editorRequiresPlay || EditorApplication.isPlaying
-            );
-
-            List<bool> callbackTruly = new List<bool>();
-            if(!(editorRequiresEdit && editorRequiresPlay))
+            bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
+            if (!editorModeOk)
             {
-                callbackTruly.Add(editorModeIsTrue);
+                return ("", true);
             }
 
-            List<string> errors = new List<string>();
-
-            foreach (string andCallback in targetAttribute.Callbacks)
-            {
-                (string error, bool isTruly) = Util.GetTruly(target, andCallback);
-                if (error != "")
-                {
-                    errors.Add(error);
-                }
-                callbackTruly.Add(isTruly);
-            }
-
-            foreach ((string callback, Enum enumTarget) in targetAttribute.EnumTargets)
-            {
-                (string error, Enum result) = Util.GetOf<Enum>(callback, default, property, info, target);
-                if (error != "")
-                {
-                    errors.Add(error);
-                    callbackTruly.Add(false);
-                }
-                else
-                {
-                    bool isFlag = enumTarget.GetType().GetCustomAttribute<FlagsAttribute>() != null;
-                    bool isTruly = isFlag ? result.HasFlag(enumTarget) : result.Equals(enumTarget);
-                    callbackTruly.Add(isTruly);
-                }
-            }
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.Callbacks, targetAttribute.EnumTargets, property, info, target);
 
             if (errors.Count > 0)
             {
                 return (string.Join("\n\n", errors), false);
             }
 
-            // and, get disabled
-            bool truly = callbackTruly.All(each => each);
+            // and, get disabled; empty=true
+            bool truly = boolResults.All(each => each);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
             Debug.Log($"final return={truly}/editor[{editorMode}]={editorModeIsTrue}/bys={string.Join(",", callbackTruly)}");
@@ -214,7 +178,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
             Debug.Log($"curReadOnly={curReadOnly}");
 #endif
-            foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, (ReadOnlyAttribute)each.userData, info,  parent.GetType(), parent)))
+            foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, (ReadOnlyAttribute)each.userData, info, parent)))
             {
                 if (error != "")
                 {
