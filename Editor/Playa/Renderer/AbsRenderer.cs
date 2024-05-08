@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -820,13 +822,83 @@ namespace SaintsField.Editor.Playa.Renderer
                     value = value.ToString(),
                 };
             }
+            else if (value is IEnumerable enumerableValue)
+            {
+                // List<object> values = enumerableValue.Cast<object>().ToList();
+                // Debug.Log($"!!!!!!!!!{value}/{valueType}/{valueType.IsArray}/{valueType.BaseType}");
+                // return new ListView(((IEnumerable<object>)enumerableValue).ToList());
+                VisualElement root = new VisualElement();
+
+                Foldout foldout = new Foldout
+                {
+                    text = label,
+                };
+
+                // this is sooooo buggy.
+                // ListView listView = new ListView(
+                //     values,
+                //     -1f,
+                //     () => new VisualElement(),
+                //     (element, index) => element.Add(UIToolkitLayout(values[index], $"Element {index}")))
+                // {
+                //     showBorder = true,
+                //     showBoundCollectionSize  = true,
+                // };
+                VisualElement listView = new VisualElement
+                {
+                    style =
+                    {
+                        backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f),
+
+                        borderTopWidth = 1,
+                        borderLeftWidth = 1,
+                        borderRightWidth = 1,
+                        borderBottomWidth = 1,
+                        borderTopLeftRadius = 3,
+                        borderTopRightRadius = 3,
+                        borderBottomLeftRadius = 3,
+                        borderBottomRightRadius = 3,
+                        borderLeftColor = EColor.MidnightAsh.GetColor(),
+                        borderRightColor = EColor.MidnightAsh.GetColor(),
+                        borderTopColor = EColor.MidnightAsh.GetColor(),
+                        borderBottomColor = EColor.MidnightAsh.GetColor(),
+
+                        paddingTop = 2,
+                        paddingBottom = 2,
+                        paddingLeft = 2,
+                        paddingRight = 2,
+                    },
+                };
+
+                foreach ((object item, int index) in enumerableValue.Cast<object>().WithIndex())
+                {
+                    VisualElement child = UIToolkitLayout(item, $"Element {index}");
+                    listView.Add(child);
+                }
+
+                listView.SetEnabled(false);
+
+                foldout.RegisterValueChangedCallback(evt =>
+                {
+                    listView.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                });
+
+                root.Add(foldout);
+                root.Add(listView);
+
+                return root;
+            }
             else
             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_IN_INSPECTOR
+//                 Debug.Log($"IEnumerable={value is IEnumerable}");
+// #endif
                 // isDrawn = false;
                 visualElement = new HelpBox($"Unable to draw type {valueType}", HelpBoxMessageType.Error);
             }
 
             visualElement.SetEnabled(false);
+            visualElement.AddToClassList("unity-base-field__aligned");
             return visualElement;
         }
 #endif

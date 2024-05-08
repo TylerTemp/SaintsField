@@ -51,7 +51,9 @@ namespace SaintsField.Editor.Playa.Renderer
             // if (userData != value)
             if (!isEqual)
             {
-                // Debug.Log($"update {container.name} {userData} -> {value}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NON_SERIALIZED_FIELD_RENDERER
+                Debug.Log($"update {container.name} {userData} -> {value}");
+#endif
                 StyleEnum<DisplayStyle> displayStyle = child.style.display;
                 container.Clear();
                 container.userData = value;
