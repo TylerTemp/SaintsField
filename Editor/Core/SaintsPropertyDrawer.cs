@@ -285,14 +285,14 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return GetPropertyHeightFallback(property, label);
+                return GetPropertyHeightFallback(property, label, fieldInfo);
             }
 
             if (SubGetHeightCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideGetHeightCount) && insideGetHeightCount > 0)
             {
                 // Debug.Log($"Sub GetHeight GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return GetPropertyHeightFallback(property, label);
+                return GetPropertyHeightFallback(property, label, fieldInfo);
             }
 
             (PropertyAttribute[] allAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
@@ -369,7 +369,7 @@ namespace SaintsField.Editor.Core
                 ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, fieldInfo, !disabledLabelField, parent)
                 // : EditorGUIUtility.singleLineHeight;
                 // : EditorGUI.GetPropertyHeight(property, label, true);
-                : GetPropertyHeightFallback(property, label);
+                : GetPropertyHeightFallback(property, label, fieldInfo);
 
             // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
             _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
@@ -421,8 +421,21 @@ namespace SaintsField.Editor.Core
             return _labelFieldBasicHeight + aboveHeight + belowHeight;
         }
 
-        private static float GetPropertyHeightFallback(SerializedProperty property, GUIContent label)
+        private static float GetPropertyHeightFallback(SerializedProperty property, GUIContent label, FieldInfo fieldInfo)
         {
+            if (!hasOtherAttributeDrawer(fieldInfo))
+            {
+                Type drawerType = FindOtherPropertyDrawer(fieldInfo);
+                if (drawerType != null)
+                {
+                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo);
+                    if(drawerInstance != null)
+                    {
+                        return drawerInstance.GetPropertyHeight(property, label);
+                    }
+                }
+            }
+
             // TODO: check, if it has dec, this value might be wrong
             using (new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
             {
@@ -1559,22 +1572,21 @@ namespace SaintsField.Editor.Core
 
         private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo)
         {
-            // No, this does not work
-            // if (!hasOtherAttributeDrawer(fieldInfo))
-            // {
-            //     Type drawerType = FindOtherPropertyDrawer(fieldInfo);
-            //     if (drawerType != null)
-            //     {
-            //         PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo);
-            //         if(drawerInstance != null)
-            //         {
-            //             drawerInstance.GetPropertyHeight(property, label);
-            //             // Debug.Log($"Draw OnGUI with other drawer {drawerInstance}");
-            //             drawerInstance.OnGUI(position, property, label);
-            //             return;
-            //         }
-            //     }
-            // }
+            // Wait... it works now?
+            if (!hasOtherAttributeDrawer(fieldInfo))
+            {
+                Type drawerType = FindOtherPropertyDrawer(fieldInfo);
+                if (drawerType != null)
+                {
+                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo);
+                    if(drawerInstance != null)
+                    {
+                        // drawerInstance.GetPropertyHeight(property, label);
+                        drawerInstance.OnGUI(position, property, label);
+                        return;
+                    }
+                }
+            }
 
             using (new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
             {
