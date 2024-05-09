@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using SaintsField.Editor.Core;
-using SaintsField.Playa;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System.Linq;
+using SaintsField.Editor.Core;
+using SaintsField.Playa;
 using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
 #endif
@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             // NaughtyEditorGUI.NativeProperty_Layout(serializedObject.targetObject, fieldWithInfo.propertyInfo);
-            object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
+            object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
             // FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
@@ -91,7 +91,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return 0;
             }
 
-            return FieldHeight(FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject), ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name));
+            return FieldHeight(FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target), ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name));
         }
 
         public override void RenderPosition(Rect position)
@@ -102,7 +102,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            object value = FieldWithInfo.PropertyInfo.GetValue(SerializedObject.targetObject);
+            object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
             FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
         }

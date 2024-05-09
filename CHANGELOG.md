@@ -1,3 +1,7 @@
+## 3.0.4
+
+1.  `ShowInInspector` now support to show array/list
+
 ## 3.0.3
 
 1.  UI Toolkit: fix `DecoratorDrawer` get drawn more than once.

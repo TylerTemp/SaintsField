@@ -16,6 +16,8 @@ namespace SaintsField.Samples.Scripts
             private static readonly List<Color> LisBaseColors = new List<Color>{Color.red, Color.green, Color.blue};
             private static readonly List<List<Color>> LisBaseColors2 = new List<List<Color>>{LisBaseColors, LisBaseColors};
 
+            [ShowInInspector] private Color NormalColor1 => Color.blue;
+
             [ShowInInspector] private static readonly Color[] StaticReadOnlyField = BaseColors;
             [ShowInInspector] private static readonly Color[][] StaticReadOnlyField2 =
             {
@@ -31,6 +33,8 @@ namespace SaintsField.Samples.Scripts
 
             [ShowInInspector] private static List<Color> LisStaticProp => LisBaseColors;
             [ShowInInspector] private static List<List<Color>> LisStaticProp2 => LisBaseColors2;
+
+            [ShowInInspector] private Color NormalColor2 => Color.blue;
         }
 
         [SaintsRow] public MyStruct myStruct;
