@@ -19,6 +19,9 @@ Unity: 2019.1 or higher
 1.  Works on deep nested fields!
 2.  Supports both IMGUI and UI Toolkit! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
 3.  Use and only use `PropertyDrawer` and `DecoratorDrawer` (except `SaintsEditor`, which is disabled by default), thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
+
+    (Note: Fallback to drawer of PropertyAttribute is full supported, fallback to drawer of data type only works on UI Toolkit)
+
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
 
