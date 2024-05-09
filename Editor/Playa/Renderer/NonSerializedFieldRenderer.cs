@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return 0;
             }
 
-            return SaintsPropertyDrawer.SingleLineHeight;
+            return FieldHeight(FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target), ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
         }
 
         public override void RenderPosition(Rect position)

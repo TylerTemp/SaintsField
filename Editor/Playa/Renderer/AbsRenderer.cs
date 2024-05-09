@@ -528,6 +528,48 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
+        protected static float FieldHeight(object value, string label)
+        {
+            if (value == null)
+            {
+                return EditorGUIUtility.singleLineHeight;
+            }
+            Type valueType = value.GetType();
+
+            if (valueType == typeof(bool)
+                || valueType == typeof(short)
+                || valueType == typeof(ushort)
+                || valueType == typeof(int)
+                || valueType == typeof(uint)
+                || valueType == typeof(long)
+                || valueType == typeof(ulong)
+                || valueType == typeof(float)
+                || valueType == typeof(double)
+                || valueType == typeof(string)
+                || valueType == typeof(Vector2)
+                || valueType == typeof(Vector3)
+                || valueType == typeof(Vector4)
+                || valueType == typeof(Vector2Int)
+                || valueType == typeof(Vector3Int)
+                || valueType == typeof(Color)
+                || valueType == typeof(Bounds)
+                || valueType == typeof(Rect)
+                || valueType == typeof(RectInt)
+                || typeof(UnityEngine.Object).IsAssignableFrom(valueType)
+                || valueType.BaseType == typeof(Enum)
+                || valueType.BaseType == typeof(TypeInfo))
+            {
+                return EditorGUIUtility.singleLineHeight;
+            }
+
+            if (value is IEnumerable enumerableValue)
+            {
+                return EditorGUIUtility.singleLineHeight + enumerableValue.Cast<object>().Select((each, index) => FieldHeight(each, $"Element {index}")).Sum();
+            }
+
+            return ImGuiHelpBox.GetHeight($"Type not supported: {valueType}", EditorGUIUtility.currentViewWidth, MessageType.Warning);
+        }
+
         protected static void FieldPosition(Rect position, object value, string label)
         {
             using (new EditorGUI.DisabledScope(true))
@@ -634,6 +676,47 @@ namespace SaintsField.Editor.Playa.Renderer
                 else if (valueType.BaseType == typeof(TypeInfo))
                 {
                     EditorGUI.TextField(position, label, value.ToString());
+                }
+                else if (value is IEnumerable enumerableValue)
+                {
+                    (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
+
+                    using(new EditorGUILayout.VerticalScope(GUI.skin.box))
+                    {
+                        (Rect labelRect, Rect listRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+                        EditorGUI.LabelField(labelRect, label);
+
+                        float numWidth = Mathf.Max(30,
+                            EditorStyles.textField.CalcSize(new GUIContent($"{valueIndexed.Length}")).x);
+
+                        Rect numRect = new Rect(labelRect)
+                        {
+                            width = numWidth,
+                            x = labelRect.x + labelRect.width - numWidth,
+                        };
+
+                        EditorGUI.IntField(numRect, valueIndexed.Length);
+
+                        GUI.Box(listRect, GUIContent.none);
+
+                        float lisAccY = 0;
+                        using(new EditorGUI.IndentLevelScope())
+                        {
+                            foreach ((object item, int index) in valueIndexed)
+                            {
+                                string thisLabel = $"Element {index}";
+                                float thisHeight = FieldHeight(item, thisLabel);
+                                Rect thisRect = new Rect(listRect)
+                                {
+                                    y = listRect.y + lisAccY,
+                                    height = thisHeight,
+                                };
+                                lisAccY += thisHeight;
+
+                                FieldPosition(thisRect, item, thisLabel);
+                            }
+                        }
+                    }
                 }
                 else
                 {
