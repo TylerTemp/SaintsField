@@ -1869,10 +1869,10 @@ public struct MyStruct
 }
 
 [Required]
-public MyStruct warnsYouNow;
+public MyStruct myStruct;
 ```
 
-![required](https://github.com/TylerTemp/SaintsField/assets/6391063/1e93c51c-ada6-4848-8fc8-a963266ee2cf)
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/04d29948-bd1c-4448-9148-ef1103f3feab)
 
 #### `ValidateInput` ####
 

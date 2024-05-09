@@ -10677,16 +10677,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14ec40a5e59537a4db77a9dcf2f6f086, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normal:
-    serializedEntries: []
+  toggle: 0
   withIf:
     serializedEntries:
     - 
-    - 
-    - 
-    - 
-  plain:
-    value:
     - 
     - 
     - 
