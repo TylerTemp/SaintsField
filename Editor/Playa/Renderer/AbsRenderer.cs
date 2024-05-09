@@ -491,6 +491,34 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     EditorGUILayout.TextField(label, value.ToString());
                 }
+                else if (value is IEnumerable enumerableValue)
+                {
+                    (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
+
+                    using(new EditorGUILayout.VerticalScope(GUI.skin.box))
+                    {
+                        Rect labelRect = EditorGUILayout.GetControlRect();
+                        EditorGUI.LabelField(labelRect, label);
+
+                        float numWidth = Mathf.Max(30,
+                            EditorStyles.textField.CalcSize(new GUIContent($"{valueIndexed.Length}")).x);
+
+                        Rect numRect = new Rect(labelRect)
+                        {
+                            width = numWidth,
+                            x = labelRect.x + labelRect.width - numWidth,
+                        };
+
+                        EditorGUI.IntField(numRect, valueIndexed.Length);
+                        using (new EditorGUI.IndentLevelScope())
+                        {
+                            foreach ((object item, int index) in valueIndexed)
+                            {
+                                FieldLayout(item, $"Element {index}");
+                            }
+                        }
+                    }
+                }
                 else
                 {
                     EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
