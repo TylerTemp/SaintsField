@@ -21,36 +21,9 @@ namespace SaintsField.Editor.Drawers
 
         private string _error = "";
 
-        // private bool _expanded;
-
-        // There is a issue that, unity will randomly change _expanded value for IMGUI when clicking.
-        // Plus Unity array uses same drawer instance for every element in an array,
-        // so just use EditorPrefs here.
-
-        // private static string KeyExpanded(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__Expandable_Expanded";
-        //
-        // private static bool GetExpand(SerializedProperty property)
-        // {
-        //     // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-        //     // return isArray
-        //     //     ? EditorPrefs.GetBool(KeyExpanded(property))
-        //     //     : _expanded;
-        //     return inMemoryStorage.TryGetValue(KeyExpanded(property), out object value) && (bool)value;
-        // }
-
-        // private static void SetExpand(SerializedProperty property, bool value) {
-        //     // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-        //     // if(isArray)
-        //     // {
-        //     //     EditorPrefs.SetBool(KeyExpanded(property), value);
-        //     // }
-        //     // else
-        //     // {
-        //     //     _expanded = value;
-        //     // }
-        //     // EditorPrefs.SetBool(KeyExpanded(property), value);
-        //     inMemoryStorage[KeyExpanded(property)] = value;
-        // }
+        // list/array shares the same drawer in Unity
+        // for convenience, we use the propertyPath as key as it already contains the index
+        private Dictionary<string, UnityEditor.Editor> _propertyPathToEditor = new Dictionary<string, UnityEditor.Editor>();
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
@@ -105,31 +78,31 @@ namespace SaintsField.Editor.Drawers
 
             return basicHeight;
 
-            if (!property.isExpanded || property.objectReferenceValue == null)
-            {
-                return basicHeight;
-            }
-
-            // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
-            SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
-
-            // foreach (SerializedProperty serializedProperty in GetAllField(serializedObject))
+            // if (!property.isExpanded || property.objectReferenceValue == null)
             // {
-            //     Debug.Log(serializedProperty);
+            //     return basicHeight;
             // }
-
-            // SerializedProperty childProperty = GetAllField(serializedObject).First();
-            // Debug.Log(childProperty);
-            // Debug.Log(childProperty.displayName);
-            // Debug.Log(EditorGUI.GetPropertyHeight(childProperty, true));
             //
-            // return basicHeight;
-
-            float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
-                EditorGUI.GetPropertyHeight(childProperty, true)).Sum();
-            // float expandedHeight = 0;
-
-            return basicHeight + expandedHeight;
+            // // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
+            // SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
+            //
+            // // foreach (SerializedProperty serializedProperty in GetAllField(serializedObject))
+            // // {
+            // //     Debug.Log(serializedProperty);
+            // // }
+            //
+            // // SerializedProperty childProperty = GetAllField(serializedObject).First();
+            // // Debug.Log(childProperty);
+            // // Debug.Log(childProperty.displayName);
+            // // Debug.Log(EditorGUI.GetPropertyHeight(childProperty, true));
+            // //
+            // // return basicHeight;
+            //
+            // float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
+            //     EditorGUI.GetPropertyHeight(childProperty, true)).Sum();
+            // // float expandedHeight = 0;
+            //
+            // return basicHeight + expandedHeight;
         }
 
         // private UnityEditor.Editor _editor;
@@ -156,7 +129,11 @@ namespace SaintsField.Editor.Drawers
                 return leftRect;
             }
 
-            var editor = UnityEditor.Editor.CreateEditor(scriptableObject);
+            if(!_propertyPathToEditor.TryGetValue(property.propertyPath, out UnityEditor.Editor editor))
+            {
+                _propertyPathToEditor[property.propertyPath] = editor = UnityEditor.Editor.CreateEditor(scriptableObject);
+            }
+
             editor.OnInspectorGUI();
 
             return leftRect;
