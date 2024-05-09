@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class NonSerializedFieldRenderer: AbsRenderer
     {
-        public NonSerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(serializedObject, fieldWithInfo)
+        public NonSerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(fieldWithInfo)
         {
         }
 
@@ -32,13 +32,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
             bool callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
             container.RegisterCallback<AttachToPanelEvent>(_ =>
-                container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, SerializedObject, container, callUpdate)).Every(100)
+                container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
             );
 
             return container;
         }
 
-        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject, VisualElement container, bool callUpdate)
+        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, VisualElement container, bool callUpdate)
         {
             object userData = container.userData;
             object value = fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Target);
@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            object value = FieldWithInfo.FieldInfo.GetValue(SerializedObject.targetObject);
+            object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .FieldInfo.Name));
         }

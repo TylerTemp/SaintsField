@@ -1,6 +1,7 @@
 ## 3.0.4
 
 1.  `ShowInInspector` now support to show array/list
+2.  Fix `ShowInInspector` and some other SaintsEditor tool might not find the correct target in some case (especially inside `SaintsRow`)
 
 ## 3.0.3
 

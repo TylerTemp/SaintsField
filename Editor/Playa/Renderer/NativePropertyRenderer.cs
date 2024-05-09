@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class NativePropertyRenderer: AbsRenderer
     {
-        public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(serializedObject, fieldWithInfo)
+        public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(fieldWithInfo)
         {
         }
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
@@ -30,13 +30,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
             bool callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
             container.RegisterCallback<AttachToPanelEvent>(_ =>
-                container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, SerializedObject, container, callUpdate)).Every(100)
+                container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
             );
 
             return container;
         }
 
-        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject,  VisualElement container, bool callUpdate)
+        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo,  VisualElement container, bool callUpdate)
         {
             object userData = container.userData;
             object value = fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target);
@@ -76,11 +76,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            // NaughtyEditorGUI.NativeProperty_Layout(serializedObject.targetObject, fieldWithInfo.propertyInfo);
             object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
-            // FieldLayout(serializedObject.targetObject, ObjectNames.NicifyVariableName(fieldWithInfo.fieldInfo.Name));
         }
 
         public override float GetHeight()

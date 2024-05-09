@@ -63,11 +63,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.3**
+**3.0.4**
 
-1.  UI Toolkit: fix `DecoratorDrawer` get drawn more than once.
-2.  Add `Enum` support for `ShowIf`/`HideIf`/`EnableIf`/`DisableIf`/`PlayaShowIf`/`PlayaHideIf`/`PlayaEnableIf`/`PlayaDisableIf`
-3.  Improve `SaintsArray` so it works more like an actual array.
+1.  `ShowInInspector` now support to show array/list
+2.  Fix `ShowInInspector` and some other SaintsEditor tool might not find the correct target in some case (especially inside `SaintsRow`)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2357,6 +2356,7 @@ Special Note:
 1.  After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
 2.  IMGUI: `ELayout.Horizontal` does not work here
 3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
+4.  IMGUI: `ShowInInspector` for lists/array type will make the drawer draw a weird empty space at the end of the target. The cause of this issue has not been located yet. But it does not effect the usage.
 
 ```csharp
 using SaintsField;
@@ -2754,8 +2754,6 @@ public Color AutoColor
 `SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
 
 Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
-
-*   `[CallerLineNumber] int order = 0` the order of this field. By default it uses line number of the file. You may not want to override this.
 
 ```csharp
 using SaintsField.Playa;

@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class SerializedFieldRenderer: AbsRenderer
     {
-        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(serializedObject, fieldWithInfo)
+        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(fieldWithInfo)
         {
         }
 
