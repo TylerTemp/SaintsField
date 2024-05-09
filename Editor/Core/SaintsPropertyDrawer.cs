@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Core
         private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubDrawCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
         private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubGetHeightCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
 
-        private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
+        protected static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
 #if UNITY_2022_1_OR_NEWER
         private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
@@ -121,6 +121,14 @@ namespace SaintsField.Editor.Core
 #endif
 
                     Type[] allTypes = asb.GetTypes();
+
+                    // foreach (Type editorType in allTypes.Where(type => type.IsSubclassOf(typeof(UnityEditor.Editor))))
+                    // {
+                    //     foreach (CustomEditor editorTargetType in editorType.GetCustomAttributes<CustomEditor>(true))
+                    //     {
+                    //         Debug.Log($"{editorTargetType} -> {editorType}");
+                    //     }
+                    // }
 
                     List<Type> allSubPropertyDrawers = allTypes
                         // .Where(type => type.IsSubclassOf(typeof(SaintsPropertyDrawer)))
@@ -486,7 +494,7 @@ namespace SaintsField.Editor.Core
                 .Any(fieldAttribute => PropertyAttributeToPropertyDrawers.Keys.Any(checkType => checkType.IsInstanceOfType(fieldAttribute)));
         }
 
-        private static Type FindOtherPropertyDrawer(FieldInfo fieldInfo)
+        protected static Type FindOtherPropertyDrawer(FieldInfo fieldInfo)
         {
             bool isGenericType = fieldInfo.FieldType.IsGenericType;
             foreach (KeyValuePair<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
