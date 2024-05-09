@@ -2356,7 +2356,6 @@ Special Note:
 1.  After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
 2.  IMGUI: `ELayout.Horizontal` does not work here
 3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
-4.  IMGUI: `ShowInInspector` for lists/array type will make the drawer draw a weird empty space at the end of the target. The cause of this issue has not been located yet. But it does not effect the usage.
 
 ```csharp
 using SaintsField;

@@ -32,7 +32,7 @@ namespace SaintsField.Samples.Scripts
             [Ordered][ShowInInspector] private static Color[][] StaticProp2 => BaseColors2;
 
             [Ordered][ShowInInspector] private static List<Color> LisStaticProp => LisBaseColors;
-            [Ordered][ShowInInspector] private static List<List<Color>> LisStaticProp2 => LisBaseColors2;
+            // [Ordered][ShowInInspector] private static List<List<Color>> LisStaticProp2 => LisBaseColors2;
 
             [Ordered] public Color NormalColor2;
         }

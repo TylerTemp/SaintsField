@@ -495,8 +495,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
 
-                    using(new EditorGUILayout.VerticalScope(GUI.skin.box))
-                    {
+                    // using(new EditorGUILayout.VerticalScope(GUI.skin.box))
+                    // {
                         Rect labelRect = EditorGUILayout.GetControlRect();
                         EditorGUI.LabelField(labelRect, label);
 
@@ -517,7 +517,7 @@ namespace SaintsField.Editor.Playa.Renderer
                                 FieldLayout(item, $"Element {index}");
                             }
                         }
-                    }
+                    // }
                 }
                 else
                 {
@@ -681,42 +681,40 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
 
-                    using(new EditorGUILayout.VerticalScope(GUI.skin.box))
+                    (Rect labelRect, Rect listRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+                    EditorGUI.LabelField(labelRect, label);
+
+                    float numWidth = Mathf.Max(30,
+                        EditorStyles.textField.CalcSize(new GUIContent($"{valueIndexed.Length}")).x);
+
+                    Rect numRect = new Rect(labelRect)
                     {
-                        (Rect labelRect, Rect listRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
-                        EditorGUI.LabelField(labelRect, label);
+                        width = numWidth,
+                        x = labelRect.x + labelRect.width - numWidth,
+                    };
 
-                        float numWidth = Mathf.Max(30,
-                            EditorStyles.textField.CalcSize(new GUIContent($"{valueIndexed.Length}")).x);
+                    EditorGUI.IntField(numRect, valueIndexed.Length);
 
-                        Rect numRect = new Rect(labelRect)
+                    GUI.Box(listRect, GUIContent.none);
+
+                    float lisAccY = 0;
+                    using(new EditorGUI.IndentLevelScope())
+                    {
+                        foreach ((object item, int index) in valueIndexed)
                         {
-                            width = numWidth,
-                            x = labelRect.x + labelRect.width - numWidth,
-                        };
-
-                        EditorGUI.IntField(numRect, valueIndexed.Length);
-
-                        GUI.Box(listRect, GUIContent.none);
-
-                        float lisAccY = 0;
-                        using(new EditorGUI.IndentLevelScope())
-                        {
-                            foreach ((object item, int index) in valueIndexed)
+                            string thisLabel = $"Element {index}";
+                            float thisHeight = FieldHeight(item, thisLabel);
+                            Rect thisRect = new Rect(listRect)
                             {
-                                string thisLabel = $"Element {index}";
-                                float thisHeight = FieldHeight(item, thisLabel);
-                                Rect thisRect = new Rect(listRect)
-                                {
-                                    y = listRect.y + lisAccY,
-                                    height = thisHeight,
-                                };
-                                lisAccY += thisHeight;
+                                y = listRect.y + lisAccY,
+                                height = thisHeight,
+                            };
+                            lisAccY += thisHeight;
 
-                                FieldPosition(thisRect, item, thisLabel);
-                            }
+                            FieldPosition(thisRect, item, thisLabel);
                         }
                     }
+
                 }
                 else
                 {
