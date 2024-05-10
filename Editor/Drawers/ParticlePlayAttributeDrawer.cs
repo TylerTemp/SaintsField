@@ -243,6 +243,8 @@ namespace SaintsField.Editor.Drawers
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                     backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                     marginTop = 0,
                     marginBottom = 0,
@@ -267,6 +269,8 @@ namespace SaintsField.Editor.Drawers
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                     backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                     marginTop = 0,
                     marginBottom = 0,
