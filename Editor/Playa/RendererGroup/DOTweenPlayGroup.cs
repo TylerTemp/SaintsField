@@ -545,6 +545,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                         backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                         backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                        unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                     },
                 };
@@ -561,6 +563,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                         backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                         backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                        unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                     },
                 };
