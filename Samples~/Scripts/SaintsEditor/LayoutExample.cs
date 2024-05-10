@@ -1,4 +1,4 @@
-﻿#if SAINTSFIELD_DOTWEEN
+﻿#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.Tweening;
 #endif
 using SaintsField.Playa;
@@ -80,7 +80,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [Layout("Root/V1")]
         [ShowInInspector]
         public static Color color1 = Color.red;
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
         [Ordered]
         [DOTweenPlay("Tween1", "Root/V1")]
         public Tween RootV1Tween1()

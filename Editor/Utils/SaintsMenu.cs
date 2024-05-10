@@ -76,14 +76,24 @@ namespace SaintsField.Editor.Utils
         #endregion
 
         #region DOTween
-#if !SAINTSFIELD_DOTWEEN
+
+#if DOTWEEN
+
+#if SAINTSFIELD_DOTWEEN_DISABLED
         [MenuItem("Window/Saints/Enable DOTween Support")]
-        public static void DOTween() => AddCompileDefine("SAINTSFIELD_DOTWEEN");
-#endif
-#if SAINTSFIELD_DOTWEEN
+        public static void DOTween() => RemoveCompileDefine("SAINTSFIELD_DOTWEEN_DISABLED");
+#else
         [MenuItem("Window/Saints/Disable DOTween Support")]
-        public static void DOTween() => RemoveCompileDefine("SAINTSFIELD_DOTWEEN");
-#endif
+        public static void DOTween() => AddCompileDefine("SAINTSFIELD_DOTWEEN_DISABLED");
+#endif  // SAINTSFIELD_DOTWEEN_DISABLED
+
+#else
+        [MenuItem("Window/Saints/DOTween Not Installed")]
+        public static void DOTweenNotInstalled() { }
+        [MenuItem("Window/Saints/DOTween Not Installed", true)]
+        public static bool DOTweenNotInstalledEnabled() => false;
+#endif  // DOTWEEN
+
         #endregion
 
         #region Addressable

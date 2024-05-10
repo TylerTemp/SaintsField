@@ -1,4 +1,4 @@
-﻿#if SAINTSFIELD_DOTWEEN
+﻿#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ using UnityEngine.UIElements;
 // ReSharper disable once EmptyNamespace
 namespace SaintsField.Editor.Playa.RendererGroup
 {
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
     // ReSharper disable once InconsistentNaming
     public class DOTweenPlayGroup: ISaintsRendererGroup
     {
@@ -453,11 +453,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     width = SaintsPropertyDrawer.SingleLineHeight + 5,
                     height = SaintsPropertyDrawer.SingleLineHeight,
                     backgroundImage = DOTweenEditorPreview.isPreviewing ? _stopIcon : _playIcon,
+
 #if UNITY_2022_2_OR_NEWER
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
                     backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                 },
             };

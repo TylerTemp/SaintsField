@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.DOTweenEditor;
 #endif
 
@@ -26,7 +26,7 @@ namespace SaintsField.Editor
         // private MonoScript _monoScript;
         // private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
 
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
         private static readonly HashSet<IDOTweenPlayRecorder> AliveInstances = new HashSet<IDOTweenPlayRecorder>();
         public static void RemoveInstance(IDOTweenPlayRecorder doTweenPlayRecorder)
         {
@@ -102,7 +102,7 @@ namespace SaintsField.Editor
 
             // root.Add(CreateVisualElement(renderers));
 
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance(this));
 #endif
@@ -127,7 +127,7 @@ namespace SaintsField.Editor
             {
                 _renderers = null;  // just... let IMGUI renderer to deal with it...
             }
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             AliveInstances.Add(this);
 #endif
         }
@@ -142,7 +142,7 @@ namespace SaintsField.Editor
                 }
             }
             _renderers = null;
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             RemoveInstance(this);
 #endif
         }
@@ -156,7 +156,7 @@ namespace SaintsField.Editor
         private void ResetRenderersImGui()
         {
             _renderers = null;
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             AliveInstances.Clear();
             DOTweenEditorPreview.Stop();
 #endif
@@ -169,7 +169,7 @@ namespace SaintsField.Editor
             {
                 _renderers = Setup(serializedObject, target);
             }
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             AliveInstances.Add(this);
 #endif
 
@@ -470,7 +470,7 @@ namespace SaintsField.Editor
                 .ToDictionary(
                     each => each.Key,
                     each =>
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
                         each.Value.isDOTween
                             ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
                             : new SaintsRendererGroup(each.Key, each.Value.eLayout)
@@ -530,27 +530,6 @@ namespace SaintsField.Editor
                     }
                     continue;
                 }
-
-                // Debug.Log($"group {fieldWithInfo.MethodInfo.Name} {fieldWithInfo.groups.Count}: {string.Join(",", fieldWithInfo.groups.Select(each => each.GroupBy))}");
-    // #if SAINTSFIELD_DOTWEEN
-    //             if(fieldWithInfo.groups.Count > 0)
-    //             {
-    //                 ISaintsGroup group = fieldWithInfo.groups[0];
-    //                 Debug.Assert(group.GroupBy == DOTweenPlayAttribute.DOTweenPlayGroupBy);
-    //                 List<SaintsFieldWithInfo> groupFieldWithInfos = fieldWithInfos
-    //                     .Where(each => each.groups.Any(eachGroup => eachGroup.GroupBy == group.GroupBy))
-    //                     .ToList();
-    //
-    // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_DOTWEEN
-    //                 Debug.Assert(_doTweenPlayGroup == null, "doTweenPlayGroup should only be created once");
-    // #endif
-    //                 // Debug.Log($"create doTween play: {groupFieldWithInfos.Count}, {fieldWithInfo.MethodInfo.Name}");
-    //                 _doTweenPlayGroup = new DOTweenPlayGroup(groupFieldWithInfos.Select(each => (each.MethodInfo,
-    //                     (DOTweenPlayAttribute)each.groups[0])), parent);
-    //                 fieldWithInfos.RemoveAll(each => groupFieldWithInfos.Contains(each));
-    //                 return _doTweenPlayGroup;
-    //             }
-    // #endif
 
                 AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo);
                 // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
@@ -647,10 +626,5 @@ namespace SaintsField.Editor
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }
         }
-
-// #if SAINTSFIELD_DOTWEEN
-//         // every inspector instance can only have ONE doTweenPlayGroup
-//         private DOTweenPlayGroup _doTweenPlayGroup = null;
-// #endif
     }
 }

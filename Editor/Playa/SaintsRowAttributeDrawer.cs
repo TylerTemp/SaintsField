@@ -173,7 +173,7 @@ namespace SaintsField.Editor.Playa
                 bodyElement.Add(saintsRenderer.CreateVisualElement());
             }
 
-#if SAINTSFIELD_DOTWEEN
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(this));
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(this));
 #endif

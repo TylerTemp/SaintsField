@@ -13,6 +13,10 @@ namespace SaintsField.Playa
         public readonly ETweenStop DOTweenStop;
         // ReSharper enable InconsistentNaming
 
+        public const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";
+        public string GroupBy { get; }
+        public ELayout Layout => 0;
+
         public DOTweenPlayAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind, string groupBy="")
         {
             Label = label;
@@ -28,9 +32,5 @@ namespace SaintsField.Playa
         public DOTweenPlayAttribute(string label, string groupBy): this(label, ETweenStop.Rewind, groupBy)
         {
         }
-
-        public const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";
-        public string GroupBy { get; }
-        public ELayout Layout => 0;
     }
 }

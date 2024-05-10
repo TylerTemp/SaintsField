@@ -65,7 +65,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 **3.0.5**
 
-IMGUI now can fallback to CustomPropertyDrawer of data type (previously only PropertyAttribute drawer)
+1.  IMGUI now can fallback to CustomPropertyDrawer of data type (previously only PropertyAttribute drawer)
+2.  Add `DOTween` detect using `DOTWEEN` marco added by `DOTween` when setup
+3.  Fix `DOTweenPlay` button on Unity before 2022.2 which uses `unityBackgroundScaleMode`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2694,12 +2696,7 @@ The check of each row means auto play when you click the start in the global con
 
 **Set Up**
 
-`DOTween` is [not a standard Unity package](https://github.com/Demigiant/dotween/issues/673), so `SaintsField` can **NOT** detect if it's installed.
-
-To use `DOTweenPlay`:
-
-1.  `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
-2.  `Window` - `Saints` - `Enable DOTween Support` (See "Add a Macro" section for more information)
+`DOTween` is [not a standard Unity package](https://github.com/Demigiant/dotween/issues/673), To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
 ### `Button` ###
 
@@ -3092,8 +3089,8 @@ Go to `Window` - `Saints` to enable/disable functions you want
 2.  Write marcos like this:
 
     ```bash
-    #"Enable DOTween"
-    -define:SAINTSFIELD_DOTWEEN
+    #"Disable DOTween"
+    -define:SAINTSFIELD_DOTWEEN_DISABLE
 
     #"Disable Addressable"
     -define:SAINTSFIELD_ADDRESSABLE_DISABLE
