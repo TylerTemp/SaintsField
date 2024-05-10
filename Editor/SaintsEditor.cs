@@ -360,7 +360,7 @@ namespace SaintsField.Editor
 
                     // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
 
-                    if(playaAttributes.Any(each => each is ISaintsMethodAttribute))
+                    if(playaAttributes.Any(each => each is IPlayaMethodAttribute))
                     {
                         OrderedAttribute orderProp =
                             playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;

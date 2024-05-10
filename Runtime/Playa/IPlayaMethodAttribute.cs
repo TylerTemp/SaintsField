@@ -1,6 +1,6 @@
 ﻿namespace SaintsField.Playa
 {
-    public interface ISaintsMethodAttribute
+    public interface IPlayaMethodAttribute
     {
 
     }

@@ -4,8 +4,8 @@ using System.Diagnostics;
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
-    public class ButtonAttribute: Attribute, IPlayaAttribute, ISaintsMethodAttribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ButtonAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute
     {
         // public readonly string FuncName;
         public readonly string Label;
