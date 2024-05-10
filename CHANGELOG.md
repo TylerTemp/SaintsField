@@ -2,7 +2,7 @@
 
 1.  IMGUI now can fallback to CustomPropertyDrawer of data type (previously only PropertyAttribute drawer)
 2.  Add `DOTween` detect using `DOTWEEN` marco added by `DOTween` when setup
-3.  Fix `DOTweenPlay` button on Unity before 2022.2 which uses `unityBackgroundScaleMode`
+3.  UI Toolkit: Fix `DOTweenPlay`, `ParticlePlay` button on Unity before 2022.2 which uses `unityBackgroundScaleMode`
 
 ## 3.0.4
 
