@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers
 
         // list/array shares the same drawer in Unity
         // for convenience, we use the propertyPath as key as it already contains the index
-        private Dictionary<string, UnityEditor.Editor> _propertyPathToEditor = new Dictionary<string, UnityEditor.Editor>();
+        // private Dictionary<string, UnityEditor.Editor> _propertyPathToEditor = new Dictionary<string, UnityEditor.Editor>();
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
@@ -76,33 +76,31 @@ namespace SaintsField.Editor.Drawers
         {
             float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-            return basicHeight;
+            if (!property.isExpanded || property.objectReferenceValue == null)
+            {
+                return basicHeight;
+            }
 
-            // if (!property.isExpanded || property.objectReferenceValue == null)
+            // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
+            SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
+
+            // foreach (SerializedProperty serializedProperty in GetAllField(serializedObject))
             // {
-            //     return basicHeight;
+            //     Debug.Log(serializedProperty);
             // }
+
+            // SerializedProperty childProperty = GetAllField(serializedObject).First();
+            // Debug.Log(childProperty);
+            // Debug.Log(childProperty.displayName);
+            // Debug.Log(EditorGUI.GetPropertyHeight(childProperty, true));
             //
-            // // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
-            // SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
-            //
-            // // foreach (SerializedProperty serializedProperty in GetAllField(serializedObject))
-            // // {
-            // //     Debug.Log(serializedProperty);
-            // // }
-            //
-            // // SerializedProperty childProperty = GetAllField(serializedObject).First();
-            // // Debug.Log(childProperty);
-            // // Debug.Log(childProperty.displayName);
-            // // Debug.Log(EditorGUI.GetPropertyHeight(childProperty, true));
-            // //
-            // // return basicHeight;
-            //
-            // float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
-            //     EditorGUI.GetPropertyHeight(childProperty, true)).Sum();
-            // // float expandedHeight = 0;
-            //
-            // return basicHeight + expandedHeight;
+            // return basicHeight;
+
+            float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
+                EditorGUI.GetPropertyHeight(childProperty, true)).Sum();
+            // float expandedHeight = 0;
+
+            return basicHeight + expandedHeight;
         }
 
         // private UnityEditor.Editor _editor;
@@ -129,94 +127,62 @@ namespace SaintsField.Editor.Drawers
                 return leftRect;
             }
 
-            if(!_propertyPathToEditor.TryGetValue(property.propertyPath, out UnityEditor.Editor editor))
+            SerializedObject serializedObject = new SerializedObject(scriptableObject);
+            serializedObject.Update();
+
+            float usedHeight = 0f;
+
+            Rect indentedRect;
+            using (new EditorGUI.IndentLevelScope(1))
             {
-                _propertyPathToEditor[property.propertyPath] = editor = UnityEditor.Editor.CreateEditor(scriptableObject);
+                indentedRect = EditorGUI.IndentedRect(leftRect);
             }
 
-            editor.OnInspectorGUI();
+            // _editor ??= UnityEditor.Editor.CreateEditor(scriptableObject);
+            // _editor.OnInspectorGUI();
 
-            return leftRect;
+            List<(Rect, SerializedProperty)> propertyRects = new List<(Rect, SerializedProperty)>();
 
-//             Debug.Log(scriptableObject.GetType());
-//             Type objType = scriptableObject.GetType();
-//             bool isGenericType = objType.IsGenericType;
-//             foreach (KeyValuePair<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
-//             {
-//                 bool matched = isGenericType
-//                     ? objType.GetGenericTypeDefinition() == propertyAttributeToPropertyDrawer.Key
-//                     : propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(objType);
-//
-//                 // Debug.Log($"fieldInfo.FieldType={fieldInfo.FieldType}, key={propertyAttributeToPropertyDrawer.Key}, {matched}");
-//                 if (matched)
-//                 {
-//                     Type foundDrawer = propertyAttributeToPropertyDrawer.Value.FirstOrDefault(each => !each.isSaints).drawerType;
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-//                     Debug.Log($"foundDrawer={foundDrawer}");
-// #endif
-//                     if(foundDrawer != null)
-//                     {
-//                         Debug.Log($"foundDrawer={foundDrawer}");
-//                     }
-//                 }
-//             }
+            using(new EditorGUI.IndentLevelScope(1))
+            using(new AdaptLabelWidth())
+            using(new ResetIndentScoop())
+            {
+                foreach (SerializedProperty childProperty in GetAllField(serializedObject))
+                {
+                    float childHeight = EditorGUI.GetPropertyHeight(childProperty, true);
+                    Rect childRect = new Rect
+                    {
+                        x = indentedRect.x,
+                        y = indentedRect.y + usedHeight,
+                        width = indentedRect.width,
+                        height = childHeight,
+                    };
 
-            // SerializedObject serializedObject = new SerializedObject(scriptableObject);
-            // serializedObject.Update();
-            //
-            // float usedHeight = 0f;
-            //
-            // Rect indentedRect;
-            // using (new EditorGUI.IndentLevelScope(1))
-            // {
-            //     indentedRect = EditorGUI.IndentedRect(leftRect);
-            // }
-            //
-            // // _editor ??= UnityEditor.Editor.CreateEditor(scriptableObject);
-            // // _editor.OnInspectorGUI();
-            //
-            // List<(Rect, SerializedProperty)> propertyRects = new List<(Rect, SerializedProperty)>();
-            //
-            // using(new EditorGUI.IndentLevelScope(1))
-            // using(new AdaptLabelWidth())
-            // using(new ResetIndentScoop())
-            // {
-            //     foreach (SerializedProperty childProperty in GetAllField(serializedObject))
-            //     {
-            //         float childHeight = EditorGUI.GetPropertyHeight(childProperty, true);
-            //         Rect childRect = new Rect
-            //         {
-            //             x = indentedRect.x,
-            //             y = indentedRect.y + usedHeight,
-            //             width = indentedRect.width,
-            //             height = childHeight,
-            //         };
-            //
-            //         // EditorGUI.PropertyField(childRect, childProperty, true);
-            //         propertyRects.Add((childRect, childProperty));
-            //
-            //         usedHeight += childHeight;
-            //     }
-            // }
-            //
-            // GUI.Box(new Rect(leftRect)
-            // {
-            //     height = usedHeight,
-            // }, GUIContent.none);
-            //
-            // foreach ((Rect childRect, SerializedProperty childProperty) in propertyRects)
-            // {
-            //     EditorGUI.PropertyField(childRect, childProperty, true);
-            //     // EditorGUI.DrawRect(childRect, Color.blue);
-            // }
-            //
-            // serializedObject.ApplyModifiedProperties();
-            //
-            // return new Rect(leftRect)
-            // {
-            //     y = leftRect.y + usedHeight,
-            //     height = leftRect.height - usedHeight,
-            // };
+                    // EditorGUI.PropertyField(childRect, childProperty, true);
+                    propertyRects.Add((childRect, childProperty));
+
+                    usedHeight += childHeight;
+                }
+            }
+
+            GUI.Box(new Rect(leftRect)
+            {
+                height = usedHeight,
+            }, GUIContent.none);
+
+            foreach ((Rect childRect, SerializedProperty childProperty) in propertyRects)
+            {
+                EditorGUI.PropertyField(childRect, childProperty, true);
+                // EditorGUI.DrawRect(childRect, Color.blue);
+            }
+
+            serializedObject.ApplyModifiedProperties();
+
+            return new Rect(leftRect)
+            {
+                y = leftRect.y + usedHeight,
+                height = leftRect.height - usedHeight,
+            };
         }
 
         #endregion

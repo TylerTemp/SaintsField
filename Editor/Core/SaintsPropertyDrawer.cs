@@ -18,8 +18,8 @@ namespace SaintsField.Editor.Core
     // below-
     public abstract class SaintsPropertyDrawer: PropertyDrawer
     {
-        public const int LabelLeftSpace = 4;
-        public const int LabelBaseWidth = 120;
+        protected const int LabelLeftSpace = 4;
+        protected const int LabelBaseWidth = 120;
         public const int IndentWidth = 15;
         public const float SingleLineHeight = 20f;
         // public const string EmptyRectLabel = "                ";
@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Core
         private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubDrawCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
         private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubGetHeightCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
 
-        protected static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
+        private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
 #if UNITY_2022_1_OR_NEWER
         private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
