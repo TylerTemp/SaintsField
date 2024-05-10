@@ -9582,6 +9582,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -10680,12 +10681,6 @@ MonoBehaviour:
   toggle: 0
   withIf:
     serializedEntries:
-    - 
-    - 
-    - 
-    - 
-  dec:
-    value:
     - 
     - 
     - 

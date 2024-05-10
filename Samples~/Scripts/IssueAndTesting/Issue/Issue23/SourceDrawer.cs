@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
 {
-    [CustomPropertyDrawer(typeof(ImGuiFallback.Source))]
+    [CustomPropertyDrawer(typeof(ImGuiFallback.SuperSource))]
     public class SourceDrawer : PropertyDrawer
     {
         #region IMGUI

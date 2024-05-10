@@ -8,7 +8,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
         public bool toggle;
 
         [Serializable]
-        public struct Source
+        public abstract class SuperSource
+        {
+
+        }
+
+        [Serializable]
+        public class Source: SuperSource
         {
             [SerializeField] private string[] serializedEntries;
         }
@@ -18,7 +24,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
 
         // public SaintsArray<string> plain;
 
-        [ShowIf(nameof(toggle)), InfoBox("Type CustomDrawer fallback", above: true)]
-        public SaintsArray<string> dec;
+        // [ShowIf(nameof(toggle)), InfoBox("Type CustomDrawer fallback", above: true)]
+        // public SaintsArray<string> dec;
     }
 }
