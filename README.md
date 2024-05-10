@@ -19,9 +19,6 @@ Unity: 2019.1 or higher
 1.  Works on deep nested fields!
 2.  Supports both IMGUI and UI Toolkit! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
 3.  Use and only use `PropertyDrawer` and `DecoratorDrawer` (except `SaintsEditor`, which is disabled by default), thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
-
-    (Note: Fallback to drawer of PropertyAttribute is full supported, fallback to drawer of data type only works on UI Toolkit)
-
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
 
@@ -66,10 +63,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.4**
+**3.0.5**
 
-1.  `ShowInInspector` now support to show array/list
-2.  Fix `ShowInInspector` and some other SaintsEditor tool might not find the correct target in some case (especially inside `SaintsRow`)
+IMGUI now can fallback to CustomPropertyDrawer of data type (previously only PropertyAttribute drawer)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -539,6 +535,9 @@ Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
 Known issue:
 1.  IMGUI: if the target itself has a custom drawer, the drawer will not be used, because `PropertyDrawer` is not allowed to create an `Editor` class, thus it'll just iterate and draw all fields in the object.
+    
+    For more information about why this is impossible under IMGUI, see [Issue 25](https://github.com/TylerTemp/SaintsField/issues/25)
+
 2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
 3.  UI Toolkit: `ReadOnly` (and `DisableIf`, `EnableIf`) can NOT disable the expanded fields. This is because `InspectorElement` does not work with `SetEnable(false)`, neither with `pickingMode=Ignore`. This can not be fixed unless Unity fixes it.

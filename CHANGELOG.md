@@ -1,3 +1,7 @@
+## 3.0.5
+
+IMGUI now can fallback to CustomPropertyDrawer of data type (previously only PropertyAttribute drawer)
+
 ## 3.0.4
 
 1.  `ShowInInspector` now support to show array/list
