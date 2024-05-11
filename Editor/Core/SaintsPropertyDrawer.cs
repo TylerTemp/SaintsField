@@ -88,9 +88,9 @@ namespace SaintsField.Editor.Core
         {
             // Selection.selectionChanged += OnSelectionChanged;
             // Debug.Log($"OnSaintsCreate Start: {SepTitleAttributeDrawer.drawCounter}/{fieldInfo}");
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-//             Debug.Log($"new SaintsPropertyDrawer {this}");
-// #endif
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+            Debug.Log($"new SaintsPropertyDrawer {this}");
+#endif
             // if (IsSubDrawer)
             // {
             //     return;
@@ -524,7 +524,7 @@ namespace SaintsField.Editor.Core
                 }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"fieldInfo.FieldType={fieldInfo.FieldType}, isGenericType={isGenericType}, GetGenericTypeDefinition={fieldInfo.FieldType.GetGenericTypeDefinition()}, key={propertyAttributeToPropertyDrawer.Key}, {matched}");
+                Debug.Log($"fieldInfo.FieldType={fieldInfo.FieldType}, isGenericType={isGenericType}, GetGenericTypeDefinition={(isGenericType ? fieldInfo.FieldType.GetGenericTypeDefinition().ToString() : "")}, key={propertyAttributeToPropertyDrawer.Key}, {matched}");
 #endif
                 // ReSharper disable once InvertIf
                 if (matched)
