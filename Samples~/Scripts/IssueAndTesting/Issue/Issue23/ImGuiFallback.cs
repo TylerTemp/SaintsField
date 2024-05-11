@@ -32,7 +32,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
             }
         }
 
-        public ContainerChild<GameObject> normal;
+        // public ContainerChild<GameObject> normal;
         [HideIf(nameof(toggle)), InfoBox("Type CustomDrawer fallback", above: true)] public ContainerChild<GameObject> withIf;
 
         // public SaintsArray<string> plain;

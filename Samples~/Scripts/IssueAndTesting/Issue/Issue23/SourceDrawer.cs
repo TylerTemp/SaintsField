@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 #if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
@@ -57,3 +58,4 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
 #endif
     }
 }
+#endif

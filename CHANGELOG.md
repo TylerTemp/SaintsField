@@ -1,3 +1,7 @@
+## 3.0.6
+
+Fix can not check if a generic type is a subclass of another generic type. [#23](https://github.com/TylerTemp/SaintsField/issues/23)
+
 ## 3.0.5
 
 1.  IMGUI now can fallback to CustomPropertyDrawer of data type (previously only PropertyAttribute drawer)
