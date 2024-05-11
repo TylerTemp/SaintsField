@@ -38,7 +38,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
         }
 
         public GameObjectChild normal;
-        [HideIf(nameof(toggle)), InfoBox("Type CustomDrawer fallback", above: true)] public GameObjectChild withIf;
+        [HideIf(nameof(toggle)), InfoBox("Inherent Fallback", above: true)] public GameObjectChild inherent;
+        // won't work on old Unity
+        [HideIf(nameof(toggle)), InfoBox("Direct Fallback", above: true)] public ContainerChild<GameObject> direct;
 
         // public SaintsArray<string> plain;
 

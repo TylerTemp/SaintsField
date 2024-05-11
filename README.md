@@ -65,7 +65,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 **3.0.6**
 
-Fix can not check if a generic type is a subclass of another generic type, and failed to use the custom drawer. [#23](https://github.com/TylerTemp/SaintsField/issues/23)
+Fix can not check if a type is a subclass of another generic type, and failed to use the custom drawer. [#23](https://github.com/TylerTemp/SaintsField/issues/23)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

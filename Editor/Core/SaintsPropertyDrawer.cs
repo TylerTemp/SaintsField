@@ -521,6 +521,10 @@ namespace SaintsField.Editor.Core
                 else
                 {
                     matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldInfo.FieldType);
+                    if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
+                    {
+                        matched = IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldInfo.FieldType);
+                    }
                 }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
@@ -541,6 +545,17 @@ namespace SaintsField.Editor.Core
             }
 
             return null;
+        }
+
+        private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck) {
+            while (toCheck != null && toCheck != typeof(object)) {
+                Type cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                if (generic == cur) {
+                    return true;
+                }
+                toCheck = toCheck.BaseType;
+            }
+            return false;
         }
 
         private static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo)
