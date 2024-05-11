@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
@@ -8,19 +9,31 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
         public bool toggle;
 
         [Serializable]
-        public abstract class SuperSource
+        public class Container<T1, T2>
         {
+            [Serializable]
+            protected sealed class Entry
+            {
+                public T1 Name;
+                public T2 Object;
+            }
 
+            [SerializeField]
+            protected List<Entry> Entries;
         }
 
         [Serializable]
-        public class Source: SuperSource
+        public sealed class ContainerChild<T> : Container<string, T>
         {
-            [SerializeField] private string[] serializedEntries;
+            public T GetByName(string name)
+            {
+                var entry = Entries.Find(e => e.Name == name);
+                return entry == default ? default : entry.Object;
+            }
         }
 
-        // public Source normal;
-        [HideIf(nameof(toggle)), InfoBox("Type CustomDrawer fallback", above: true)] public Source withIf;
+        public ContainerChild<GameObject> normal;
+        [HideIf(nameof(toggle)), InfoBox("Type CustomDrawer fallback", above: true)] public ContainerChild<GameObject> withIf;
 
         // public SaintsArray<string> plain;
 
