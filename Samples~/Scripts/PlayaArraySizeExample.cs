@@ -1,10 +1,10 @@
 using System;
 using SaintsField.Playa;
-using UnityEngine;
+using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class PlayaArraySizeExample : MonoBehaviour
+    public class PlayaArraySizeExample : SaintsMonoBehavior
     {
         [PlayaArraySize(3)] public int[] myArr3;
 

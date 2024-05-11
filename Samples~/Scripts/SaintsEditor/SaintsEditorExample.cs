@@ -3,39 +3,38 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class SaintsEditorExample : MonoBehaviour
+    public class SaintsEditorExample : SaintsMonoBehavior
     {
-        // [InfoBox("Note: Enable SaintsEditor to see this example.", EMessageType.Info, above: true)]
-        // [Ordered] public string myStartField;
-        // [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
-        // [ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
-        //
-        // [ShowInInspector, Ordered]
-        // public Color AutoColor
-        // {
-        //     get => Color.green;
-        //     // ReSharper disable once ValueParameterNotUsed
-        //     set
-        //     {
-        //         // nothing
-        //     }
-        // }
-        //
-        // [Button, Ordered]
-        // private void EditorButton()
-        // {
-        //     Debug.Log("EditorButton");
-        // }
-        //
-        // [Button("Label"), Ordered]
-        // private void EditorLabeledButton()
-        // {
-        //     Debug.Log("EditorLabeledButton");
-        // }
-        //
-        // [Ordered] public string myOtherFieldUnderneath;
-        // [BelowRichLabel(nameof(_testEnum), true)]
-        // [Ordered] public string other;
+        [Ordered] public string myStartField;
+        [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
+        [ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+
+        [ShowInInspector, Ordered]
+        public Color AutoColor
+        {
+            get => Color.green;
+            // ReSharper disable once ValueParameterNotUsed
+            set
+            {
+                // nothing
+            }
+        }
+
+        [Button, Ordered]
+        private void EditorButton()
+        {
+            Debug.Log("EditorButton");
+        }
+
+        [Button("Label"), Ordered]
+        private void EditorLabeledButton()
+        {
+            Debug.Log("EditorLabeledButton");
+        }
+
+        [Ordered] public string myOtherFieldUnderneath;
+        [BelowRichLabel(nameof(_testEnum), true)]
+        [Ordered] public string other;
 
         private enum TestEnum
         {

@@ -7,9 +7,8 @@ using DG.Tweening;
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     // ReSharper disable once InconsistentNaming
-    public class DOTweenExample : MonoBehaviour
+    public class DOTweenExample : SaintsMonoBehavior
     {
-        [InfoBox("Note: Enable SaintsEditor & DOTween supports to see this example.", EMessageType.Info, above: true)]
         [GetComponent]
         public SpriteRenderer spriteRenderer;
 

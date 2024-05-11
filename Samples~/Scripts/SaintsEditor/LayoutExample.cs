@@ -6,9 +6,8 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class LayoutExample: MonoBehaviour
+    public class LayoutExample: SaintsMonoBehavior
     {
-        [InfoBox("Note: Enable SaintsEditor to see this example.", EMessageType.Info, above: true)]
         public string note;
 
         [Layout("Titled", ELayout.Title | ELayout.TitleOut)]

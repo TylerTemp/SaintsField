@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Playa;
-using UnityEngine;
+using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class PlayaRichLabelExample : MonoBehaviour
+    public class PlayaRichLabelExample : SaintsMonoBehavior
     {
         [PlayaRichLabel("<color=lame>It's Labeled!")]
         public List<string> myList;

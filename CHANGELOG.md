@@ -1,6 +1,6 @@
 ## 3.0.6
 
-Fix can not check if a generic type is a subclass of another generic type. [#23](https://github.com/TylerTemp/SaintsField/issues/23)
+Fix can not check if a generic type is a subclass of another generic type, and failed to use the custom drawer. [#23](https://github.com/TylerTemp/SaintsField/issues/23)
 
 ## 3.0.5
 
