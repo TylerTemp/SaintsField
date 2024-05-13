@@ -4,7 +4,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEngine;
+using UnityEngine.Events;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         public MethodRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(fieldWithInfo)
         {
-            Debug.Assert(FieldWithInfo.MethodInfo.GetParameters().All(p => p.IsOptional), $"{FieldWithInfo.MethodInfo.Name} has non-optional parameters");
+            // Debug.Assert(FieldWithInfo.MethodInfo.GetParameters().All(p => p.IsOptional), $"{FieldWithInfo.MethodInfo.Name} has non-optional parameters");
         }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
@@ -25,7 +27,7 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
-            Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
+            // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 
             ButtonAttribute buttonAttribute = null;
             List<IPlayaMethodBindAttribute> methodBindAttributes = new List<IPlayaMethodBindAttribute>();
@@ -44,6 +46,9 @@ namespace SaintsField.Editor.Playa.Renderer
 
             foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in methodBindAttributes)
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+                Debug.Log($"button click {playaMethodBindAttribute}");
+#endif
                 CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
             }
 
@@ -51,6 +56,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 return null;
             }
+            Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 
             string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
             object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
@@ -75,11 +81,40 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private static void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
         {
+            ParameterInfo[] methodParams = fieldWithInfo.MethodInfo.GetParameters();
+            if (methodParams.Length >= 2)
+            {
+                return;
+            }
+
             MethodBind methodBind = playaMethodBindAttribute.MethodBind;
             string buttonTarget = playaMethodBindAttribute.ButtonTarget;
             object value = playaMethodBindAttribute.Value;
 
-            UnityEngine.UI.Button uiButton = GetButton(buttonTarget, fieldWithInfo.Target);
+            UnityEngine.UI.Button uiButton;
+            if (buttonTarget is null)
+            {
+                switch (fieldWithInfo.Target)
+                {
+                    case GameObject go:
+                        uiButton = go.GetComponent<UnityEngine.UI.Button>();
+                        break;
+                    case Component comp:
+                        uiButton = comp.GetComponent<UnityEngine.UI.Button>();
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                uiButton = GetButton(buttonTarget, fieldWithInfo.Target);
+            }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+            Debug.Log($"find button `{uiButton}`");
+#endif
+
             if (uiButton == null)
             {
                 return;
@@ -92,12 +127,138 @@ namespace SaintsField.Editor.Playa.Renderer
                 string persistentMethodName = uiButton.onClick.GetPersistentMethodName(eventIndex);
                 if (ReferenceEquals(persistentTarget, fieldWithInfo.Target) && persistentMethodName == fieldWithInfo.MethodInfo.Name)
                 {
-                    // _error = $"`{funcName}` already added to `{uiButton}`";
-                    // already there
-                    // Debug.Log($"`{funcName}` already added to `{uiButton}`");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+                    Debug.Log($"`{persistentMethodName}` already added to `{uiButton}`");
+#endif
                     return;
                 }
             }
+
+            // UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), fieldWithInfo.Target, fieldWithInfo.MethodInfo);
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+            Debug.Log($"add `{fieldWithInfo.MethodInfo.Name}` to `{uiButton}`.onClick");
+#endif
+
+            Undo.RecordObject(uiButton, "AddOnClick");
+            if (methodParams.Length == 0)
+            {
+                UnityEventTools.AddVoidPersistentListener(
+                    uiButton.onClick,
+                    (UnityAction)Delegate.CreateDelegate(typeof(UnityAction),
+                        fieldWithInfo.Target, fieldWithInfo.MethodInfo));
+                return;
+            }
+
+            if (playaMethodBindAttribute.IsCallback)
+            {
+                List<Type> types = ReflectUtils.GetSelfAndBaseTypes(fieldWithInfo.Target);
+                types.Reverse();
+
+                object genResult = null;
+                bool found = false;
+                foreach (Type type in types)
+                {
+                    (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, (string)playaMethodBindAttribute.Value);
+
+                    switch (getPropType)
+                    {
+                        case ReflectUtils.GetPropType.NotFound:
+                            continue;
+
+                        case ReflectUtils.GetPropType.Property:
+                            genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(fieldWithInfo.Target);
+                            found = true;
+                            break;
+                        case ReflectUtils.GetPropType.Field:
+                            genResult = ((FieldInfo)fieldOrMethodInfo).GetValue(fieldWithInfo.Target);
+                            found = true;
+                            break;
+                        case ReflectUtils.GetPropType.Method:
+                        {
+                            MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                            try
+                            {
+                                genResult = methodInfo.Invoke(fieldWithInfo.Target, Array.Empty<object>());
+                                found = true;
+                            }
+                            catch (TargetInvocationException e)
+                            {
+                                Debug.LogException(e);
+                                Debug.Assert(e.InnerException != null);
+                                continue;
+                            }
+                            catch (Exception e)
+                            {
+                                // _error = e.Message;
+                                Debug.LogException(e);
+                                continue;
+                            }
+
+                            break;
+                        }
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                    }
+                }
+
+                if (!found)
+                {
+                    return;
+                }
+
+                value = genResult;
+            }
+
+            switch (value)
+            {
+                case bool boolValue:
+                    UnityEventTools.AddBoolPersistentListener(
+                        uiButton.onClick,
+                        (UnityAction<bool>)Delegate.CreateDelegate(typeof(UnityAction<bool>),
+                            fieldWithInfo.Target, fieldWithInfo.MethodInfo),
+                        boolValue);
+                    return;
+                case float floatValue:
+                    UnityEventTools.AddFloatPersistentListener(
+                        uiButton.onClick,
+                        (UnityAction<float>)Delegate.CreateDelegate(typeof(UnityAction<float>),
+                            fieldWithInfo.Target, fieldWithInfo.MethodInfo),
+                        floatValue);
+                    return;
+                case int intValue:
+                    UnityEventTools.AddIntPersistentListener(
+                        uiButton.onClick,
+                        (UnityAction<int>)Delegate.CreateDelegate(typeof(UnityAction<int>),
+                            fieldWithInfo.Target, fieldWithInfo.MethodInfo),
+                        intValue);
+                    return;
+
+                case string stringValue:
+                    UnityEventTools.AddStringPersistentListener(
+                        uiButton.onClick,
+                        (UnityAction<string>)Delegate.CreateDelegate(typeof(UnityAction<string>),
+                            fieldWithInfo.Target, fieldWithInfo.MethodInfo),
+                        stringValue);
+                    return;
+
+                case UnityEngine.Object unityObjValue:
+                    UnityEventTools.AddObjectPersistentListener(
+                        uiButton.onClick,
+                        (UnityAction<UnityEngine.Object>)Delegate.CreateDelegate(typeof(UnityAction<UnityEngine.Object>),
+                            fieldWithInfo.Target, fieldWithInfo.MethodInfo),
+                        unityObjValue);
+                    return;
+
+                default:
+                    UnityEventTools.AddPersistentListener(
+                        uiButton.onClick,
+                        (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), fieldWithInfo.Target, fieldWithInfo.MethodInfo)
+                    );
+                    return;
+            }
+            // UnityEventTools.AddPersistentListener(uiButton.onClick, action);
         }
 
         private static UnityEngine.UI.Button GetButton(string by, object target)
