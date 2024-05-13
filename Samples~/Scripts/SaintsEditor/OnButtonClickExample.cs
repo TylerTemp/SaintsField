@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [OnButtonClick]
         public void OnButtonClickVoid()
         {
-            Debug.Log($"OnButtonClick Void");
+            Debug.Log("OnButtonClick Void");
         }
 
         [OnButtonClick(value: 2)]

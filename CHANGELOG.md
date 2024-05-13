@@ -1,3 +1,7 @@
+## 3.0.7
+
+`SaintsEditor` now have `OnButtonClick` to bind a method to a button click event.
+
 ## 3.0.6
 
 Fix can not check if a type is a subclass of another generic type, and failed to use the custom drawer. [#23](https://github.com/TylerTemp/SaintsField/issues/23)

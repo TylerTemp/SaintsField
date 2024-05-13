@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -8,8 +10,6 @@ using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using System;
-using System.Collections.Generic;
 using UnityEngine.UIElements;
 #endif
 
@@ -22,63 +22,6 @@ namespace SaintsField.Editor.Playa.Renderer
             // Debug.Assert(FieldWithInfo.MethodInfo.GetParameters().All(p => p.IsOptional), $"{FieldWithInfo.MethodInfo.Name} has non-optional parameters");
         }
 
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public override VisualElement CreateVisualElement()
-        {
-            object target = FieldWithInfo.Target;
-            MethodInfo methodInfo = FieldWithInfo.MethodInfo;
-            // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
-
-            ButtonAttribute buttonAttribute = null;
-            List<IPlayaMethodBindAttribute> methodBindAttributes = new List<IPlayaMethodBindAttribute>();
-
-            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
-            {
-                if(playaAttribute is ButtonAttribute button)
-                {
-                    buttonAttribute = button;
-                }
-                else if(playaAttribute is IPlayaMethodBindAttribute methodBindAttribute)
-                {
-                    methodBindAttributes.Add(methodBindAttribute);
-                }
-            }
-
-            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in methodBindAttributes)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-                Debug.Log($"button click {playaMethodBindAttribute}");
-#endif
-                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
-            }
-
-            if (buttonAttribute == null)
-            {
-                return null;
-            }
-            Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
-
-            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
-            object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
-
-            Button result = new Button(() => methodInfo.Invoke(target, defaultParams))
-            {
-                text = buttonText,
-                enableRichText = true,
-                style =
-                {
-                    flexGrow = 1,
-                },
-            };
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute || each is PlayaEnableIfAttribute ||
-                                                            each is PlayaDisableIfAttribute) > 0)
-            {
-                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, true)).Every(100));
-            }
-
-            return result;
-        }
-
         private static void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
         {
             ParameterInfo[] methodParams = fieldWithInfo.MethodInfo.GetParameters();
@@ -87,7 +30,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            MethodBind methodBind = playaMethodBindAttribute.MethodBind;
+            // MethodBind methodBind = playaMethodBindAttribute.MethodBind;
             string buttonTarget = playaMethodBindAttribute.ButtonTarget;
             object value = playaMethodBindAttribute.Value;
 
@@ -187,13 +130,11 @@ namespace SaintsField.Editor.Playa.Renderer
                             {
                                 Debug.LogException(e);
                                 Debug.Assert(e.InnerException != null);
-                                continue;
                             }
                             catch (Exception e)
                             {
                                 // _error = e.Message;
                                 Debug.LogException(e);
-                                continue;
                             }
 
                             break;
@@ -340,6 +281,63 @@ namespace SaintsField.Editor.Playa.Renderer
                     return null;
             }
         }
+
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        public override VisualElement CreateVisualElement()
+        {
+            object target = FieldWithInfo.Target;
+            MethodInfo methodInfo = FieldWithInfo.MethodInfo;
+            // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
+
+            ButtonAttribute buttonAttribute = null;
+            List<IPlayaMethodBindAttribute> methodBindAttributes = new List<IPlayaMethodBindAttribute>();
+
+            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
+            {
+                if(playaAttribute is ButtonAttribute button)
+                {
+                    buttonAttribute = button;
+                }
+                else if(playaAttribute is IPlayaMethodBindAttribute methodBindAttribute)
+                {
+                    methodBindAttributes.Add(methodBindAttribute);
+                }
+            }
+
+            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in methodBindAttributes)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+                Debug.Log($"button click {playaMethodBindAttribute}");
+#endif
+                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
+            }
+
+            if (buttonAttribute == null)
+            {
+                return null;
+            }
+            Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
+
+            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
+            object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+
+            Button result = new Button(() => methodInfo.Invoke(target, defaultParams))
+            {
+                text = buttonText,
+                enableRichText = true,
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute || each is PlayaEnableIfAttribute ||
+                                                            each is PlayaDisableIfAttribute) > 0)
+            {
+                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, true)).Every(100));
+            }
+
+            return result;
+        }
 #endif
         public override void OnDestroy()
         {
@@ -350,13 +348,34 @@ namespace SaintsField.Editor.Playa.Renderer
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
-            ButtonAttribute[] buttonAttributes = methodInfo.GetCustomAttributes<ButtonAttribute>(true).ToArray();
-            if (buttonAttributes.Length == 0)
+            ButtonAttribute buttonAttribute = null;
+            List<IPlayaMethodBindAttribute> methodBindAttributes = new List<IPlayaMethodBindAttribute>();
+
+            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
+            {
+                switch (playaAttribute)
+                {
+                    case ButtonAttribute button:
+                        buttonAttribute = button;
+                        break;
+                    case IPlayaMethodBindAttribute methodBindAttribute:
+                        methodBindAttributes.Add(methodBindAttribute);
+                        break;
+                }
+            }
+
+            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in methodBindAttributes)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+                Debug.Log($"button click {playaMethodBindAttribute}");
+#endif
+                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
+            }
+
+            if (buttonAttribute == null)
             {
                 return;
             }
-
-            ButtonAttribute buttonAttribute = buttonAttributes[0];
 
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
             if (!preCheckResult.IsShown)
@@ -381,8 +400,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override float GetHeight()
         {
-            MethodInfo methodInfo = FieldWithInfo.MethodInfo;
-            if(methodInfo.GetCustomAttribute<ButtonAttribute>(true) == null)
+            if(!FieldWithInfo.PlayaAttributes.OfType<ButtonAttribute>().Any())
             {
                 return 0;
             }
@@ -401,10 +419,28 @@ namespace SaintsField.Editor.Playa.Renderer
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
-            ButtonAttribute[] buttonAttributes = methodInfo.GetCustomAttributes<ButtonAttribute>(true).ToArray();
-            if (buttonAttributes.Length == 0)
+            ButtonAttribute buttonAttribute = null;
+            List<IPlayaMethodBindAttribute> methodBindAttributes = new List<IPlayaMethodBindAttribute>();
+
+            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
             {
-                return;
+                switch (playaAttribute)
+                {
+                    case ButtonAttribute button:
+                        buttonAttribute = button;
+                        break;
+                    case IPlayaMethodBindAttribute methodBindAttribute:
+                        methodBindAttributes.Add(methodBindAttribute);
+                        break;
+                }
+            }
+
+            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in methodBindAttributes)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+                Debug.Log($"button click {playaMethodBindAttribute}");
+#endif
+                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
             }
 
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
@@ -412,16 +448,18 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 return;
             }
+            if(buttonAttribute == null)
+            {
+                return;
+            }
 
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
-
-                ButtonAttribute buttonAttribute = buttonAttributes[0];
-
                 string buttonText = string.IsNullOrEmpty(buttonAttribute.Label)
                     ? ObjectNames.NicifyVariableName(methodInfo.Name)
                     : buttonAttribute.Label;
 
+                // ReSharper disable once InvertIf
                 if (GUI.Button(position, buttonText, new GUIStyle(GUI.skin.button) { richText = true }))
                 {
                     object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();

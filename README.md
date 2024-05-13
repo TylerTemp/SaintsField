@@ -63,9 +63,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.6**
+**3.0.7**
 
-Fix can not check if a type is a subclass of another generic type, and failed to use the custom drawer. [#23](https://github.com/TylerTemp/SaintsField/issues/23)
+`SaintsEditor` now have `OnButtonClick` to bind a method to a button click event.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2220,10 +2220,11 @@ using SaintsField;
 
 ![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
 
-
 #### `ButtonAddOnClick` ####
 
 Add a callback to a button's `onClick` event. Note this at this point does only supports callback with no arguments.
+
+Note: `SaintsEditor` has a more powerful `OnButtonClick`. If you have `SaintsEditor` enabled, it's recommended to use `OnButtonClick` instead.
 
 *   `string funcName` the callback function name
 *   `string buttonComp=null` the button component name.
@@ -2624,7 +2625,7 @@ Namespace: `SaintsField.Playa`
 Compared with `NaughtyAttributes` and `MarkupAttributes`:
 
 1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`. It's IMGUI only.
-2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property. It's IMGUI only.
+2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property. It's IMGUI only. It also supports shader editor.
 3.  `SaintsEditor`
 
     *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). However, it does not have a `Scope` for convenience coding.
@@ -2694,7 +2695,7 @@ The check of each row means auto play when you click the start in the global con
 
 **Set Up**
 
-`DOTween` is [not a standard Unity package](https://github.com/Demigiant/dotween/issues/673), To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
 ### `Button` ###
 
@@ -3062,6 +3063,59 @@ private string MethodLabel(string[] values)
 ```
 
 ![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
+
+### `OnButtonClick` ###
+
+This is a method decorator, which will bind this method to the target button's click event.
+
+Parameters:
+
+*   `string buttonTarget=null` the target button. `null` to get it form the current target.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true` 
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual `UnityEngine.Object` value
+
+```csharp
+using SaintsField.Playa;
+
+[OnButtonClick]
+public void OnButtonClickVoid()
+{
+    Debug.Log("OnButtonClick Void");
+}
+
+[OnButtonClick(value: 2)]
+public void OnButtonClickInt(int value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+[OnButtonClick(value: true)]
+public void OnButtonClickBool(bool value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+[OnButtonClick(value: 0.3f)]
+public void OnButtonClickFloat(float value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+private GameObject ThisGo => this.gameObject;
+
+[OnButtonClick(value: nameof(ThisGo), isCallback: true)]
+public void OnButtonClickComp(UnityEngine.Object value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/25c6b4fc-77f4-4731-a9a3-b84573fce179)
+
+Note:
+
+1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
+2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value
 
 ## About GroupBy ##
 
