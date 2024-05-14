@@ -1,3 +1,8 @@
+## 3.0.8
+
+1.  `SaintsEditor` now have `OnEvent` to bind a method to your custom `UnityEvent`
+2.  Fix fallback system broken on generic types [#27](https://github.com/TylerTemp/SaintsField/issues/27)
+
 ## 3.0.7
 
 `SaintsEditor` now have `OnButtonClick` to bind a method to a button click event.

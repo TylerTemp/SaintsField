@@ -63,9 +63,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.7**
+**3.0.8**
 
-`SaintsEditor` now have `OnButtonClick` to bind a method to a button click event.
+1.  `SaintsEditor` now have `OnEvent` to bind a method to your custom `UnityEvent`
+2.  Fix fallback system broken on generic types [#27](https://github.com/TylerTemp/SaintsField/issues/27)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
