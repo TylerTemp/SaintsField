@@ -4,18 +4,18 @@ using System.Diagnostics;
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Method)]
-    public class OnButtonClickAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class OnEventAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute
     {
-        public MethodBind MethodBind => MethodBind.ButtonOnClick;
+        public MethodBind MethodBind => MethodBind.CustomEvent;
 
         public string EventTarget { get; }
         public object Value { get; }
         public bool IsCallback { get; }
 
-        public OnButtonClickAttribute(string buttonTarget=null, object value=null, bool isCallback=false)
+        public OnEventAttribute(string eventTarget, object value=null, bool isCallback=false)
         {
-            EventTarget = buttonTarget;
+            EventTarget = eventTarget;
             Value = value;
             IsCallback = isCallback;
             if (isCallback)

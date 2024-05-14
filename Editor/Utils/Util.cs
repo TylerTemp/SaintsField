@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Utils
 {
@@ -250,7 +248,7 @@ namespace SaintsField.Editor.Utils
             return false;
         }
 
-        public static (string error, bool isTruly) GetTruly(object target, string by)
+        public static (string error, T value) GetOfNoParams<T>(object target, string by, T defaultValue)
         {
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             types.Reverse();
@@ -259,54 +257,82 @@ namespace SaintsField.Editor.Utils
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
-                if (getPropType == ReflectUtils.GetPropType.NotFound)
+                object genResult;
+                switch (getPropType)
                 {
-                    continue;
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+
+                    case ReflectUtils.GetPropType.Property:
+                        genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                        genResult = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        try
+                        {
+                            genResult = methodInfo.Invoke(target, Array.Empty<object>());
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            Debug.LogException(e);
+                            Debug.Assert(e.InnerException != null);
+                            return (e.InnerException.Message, defaultValue);
+                        }
+                        catch (Exception e)
+                        {
+                            // _error = e.Message;
+                            Debug.LogException(e);
+                            return (e.Message, defaultValue);
+                        }
+
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
                 }
 
-                if (getPropType == ReflectUtils.GetPropType.Property)
+                // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
+
+                T finalResult;
+                try
                 {
-                    return ("", ReflectUtils.Truly(((PropertyInfo)fieldOrMethodInfo).GetValue(target)));
+                    // finalResult = (T)genResult;
+                    finalResult = (T)Convert.ChangeType(genResult, typeof(T));
                 }
-                if (getPropType == ReflectUtils.GetPropType.Field)
+                catch (InvalidCastException)
                 {
-                    return ("", ReflectUtils.Truly(((FieldInfo)fieldOrMethodInfo).GetValue(target)));
-                }
-                // ReSharper disable once InvertIf
-                if (getPropType == ReflectUtils.GetPropType.Method)
-                {
-                    MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-                    ParameterInfo[] methodParams = methodInfo.GetParameters();
-                    Debug.Assert(methodParams.All(p => p.IsOptional));
-                    object methodResult;
-                    // try
-                    // {
-                    //     methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray())
-                    // }
+                    // Debug.Log($"{genResult}/{genResult.GetType()} -> {typeof(T)}");
+                    // Debug.LogException(e);
+                    // return (e.Message, defaultValue);
                     try
                     {
-                        methodResult = methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray());
+                        finalResult = (T)genResult;
                     }
-                    catch (TargetInvocationException e)
+                    catch (InvalidCastException e)
                     {
                         Debug.LogException(e);
-                        Debug.Assert(e.InnerException != null);
-                        return (e.InnerException.Message, false);
-
+                        return (e.Message, defaultValue);
                     }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        return (e.Message, false);
-                    }
-                    return ("", ReflectUtils.Truly(methodResult));
                 }
 
+                return ("", finalResult);
             }
 
-            // throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
             string error = $"No field or method named `{by}` found on `{target}`";
-            return (error, false);
+            return (error, defaultValue);
+        }
+
+        public static (string error, bool isTruly) GetTruly(object target, string by)
+        {
+            (string error, object value) = GetOfNoParams<object>(target, by, null);
+            return error != ""
+                ? (error, false)
+                : ("", ReflectUtils.Truly(value));
         }
 
         public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
