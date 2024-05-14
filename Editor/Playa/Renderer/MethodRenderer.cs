@@ -25,10 +25,6 @@ namespace SaintsField.Editor.Playa.Renderer
         private static void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
         {
             ParameterInfo[] methodParams = fieldWithInfo.MethodInfo.GetParameters();
-            // if (methodParams.Length >= 2)
-            // {
-            //     return;
-            // }
 
             MethodBind methodBind = playaMethodBindAttribute.MethodBind;
             string eventTarget = playaMethodBindAttribute.EventTarget;
@@ -38,25 +34,9 @@ namespace SaintsField.Editor.Playa.Renderer
             List<Type> invokeRequiredTypes = new List<Type>();
             if (methodBind == MethodBind.ButtonOnClick)
             {
-                UnityEngine.UI.Button uiButton;
-                if (eventTarget is null)
-                {
-                    switch (fieldWithInfo.Target)
-                    {
-                        case GameObject go:
-                            uiButton = go.GetComponent<UnityEngine.UI.Button>();
-                            break;
-                        case Component comp:
-                            uiButton = comp.GetComponent<UnityEngine.UI.Button>();
-                            break;
-                        default:
-                            return;
-                    }
-                }
-                else
-                {
-                    uiButton = GetButton(eventTarget, fieldWithInfo.Target);
-                }
+                UnityEngine.UI.Button uiButton = eventTarget is null
+                    ? TryFindButton(fieldWithInfo.Target)
+                    : GetButton(eventTarget, fieldWithInfo.Target);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
                 Debug.Log($"find button `{uiButton}`");

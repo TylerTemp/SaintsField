@@ -11,7 +11,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [OnEvent(nameof(intIntEvent), value: 1)]
         [OnEvent(nameof(intEvent))]
-        [OnEvent(nameof(intEvent), value: 1)]
         public void OnInt1(int int1)  // this is static parameter binding
         {
         }

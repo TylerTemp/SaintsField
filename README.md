@@ -3072,7 +3072,7 @@ Parameters:
 
 *   `string buttonTarget=null` the target button. `null` to get it form the current target.
 *   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true` 
-*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual `UnityEngine.Object` value
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
 
 ```csharp
 using SaintsField.Playa;
@@ -3116,6 +3116,16 @@ Note:
 
 1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
 2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value
+
+### `OnEvent` ###
+
+This is a method decorator, which will bind this method to the target `UnityEvent` (allows generic type) invoke event.
+
+Parameters:
+
+*   `string eventTarget` the target `UnityEvent`.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
 
 ## About GroupBy ##
 
