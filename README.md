@@ -3115,7 +3115,7 @@ public void OnButtonClickComp(UnityEngine.Object value)
 Note:
 
 1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
-2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value
+2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
 
 ### `OnEvent` ###
 
@@ -3126,6 +3126,27 @@ Parameters:
 *   `string eventTarget` the target `UnityEvent`.
 *   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
 *   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+```csharp
+public UnityEvent<int, int> intIntEvent;
+
+[OnEvent(nameof(intIntEvent))]
+public void OnInt2(int int1, int int2)  // dynamic parameter binding
+{
+}
+
+[OnEvent(nameof(intIntEvent), value: 1)]
+public void OnInt1(int int1)  // static parameter binding
+{
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/34db0516-6aad-4394-a6bc-e57bd97b6b57)
+
+Note:
+
+1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
+2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
 
 ## About GroupBy ##
 
