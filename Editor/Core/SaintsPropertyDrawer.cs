@@ -508,15 +508,12 @@ namespace SaintsField.Editor.Core
                 if (isGenericType)
                 {
                     matched = fieldInfo.FieldType.GetGenericTypeDefinition() == propertyAttributeToPropertyDrawer.Key;
-                    if (!matched && fieldInfo.FieldType.BaseType != null)
+                    // ReSharper disable once MergeIntoPattern
+                    if (!matched && fieldInfo.FieldType.BaseType != null && fieldInfo.FieldType.BaseType.IsGenericType)
                     {
                         matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldInfo.FieldType.BaseType
                             .GetGenericTypeDefinition());
                     }
-                              // ||
-                              // || fieldInfo.FieldType.GetGenericTypeDefinition()
-                              //     .IsSubclassOf(propertyAttributeToPropertyDrawer.Key)
-                              // || fieldInfo.FieldType.IsSubclassOf(propertyAttributeToPropertyDrawer.Key);
                 }
                 else
                 {
