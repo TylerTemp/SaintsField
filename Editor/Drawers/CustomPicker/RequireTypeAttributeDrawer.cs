@@ -402,8 +402,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            // Debug.Log($"changed: {newValue}");
-
             Object newObjectValue = (Object)newValue;
             RequireTypeAttribute requireTypeAttribute = (RequireTypeAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = requireTypeAttribute.RequiredTypes;

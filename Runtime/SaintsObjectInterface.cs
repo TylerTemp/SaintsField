@@ -1,13 +1,11 @@
-using System;
 using UnityEngine;
 
 namespace SaintsField
 {
-    [Serializable]
-    public class SaintsRef<TObject, TInterface>: ISaintsRef<TObject, TInterface> where TObject: UnityEngine.Object where TInterface: class
+    public class SaintsObjectInterface<TInterface>: ISaintsInterface<Object, TInterface> where TInterface: class
     {
         [field: SerializeField]
-        public TObject V { get; set; }
+        public Object V { get; private set; }
 
         public TInterface I => V as TInterface;
 
