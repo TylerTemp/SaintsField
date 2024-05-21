@@ -508,6 +508,15 @@ namespace SaintsField.Editor.Utils
                         ? (UnityEngine.Object)comp.gameObject
                         : comp.GetComponent(fieldType);
                     break;
+                case ScriptableObject so:
+                    // result = fieldType.IsSubclassOf(typeof())
+                {
+                    if (fieldType.IsInstanceOfType(so))
+                    {
+                        result = so;
+                    }
+                }
+                    break;
                 // default:
                 //     Debug.Log(fieldResult.GetType());
                 //     break;

@@ -119,6 +119,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 }
 
                 Type[] missing = checkTypes.Where(requiredType => Util.GetTypeFromObj(obj, requiredType) == null).ToArray();
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RESOURCE_PATH
+                Debug.Log($"target [{obj}]: {string.Join(",", missing.Cast<object>())}");
+#endif
+
                 return missing.Length > 0 ? $"target {obj} missing {string.Join(", ", missing.Select(t => t.Name))}." : "";
 
                 // if (obj is GameObject go)
