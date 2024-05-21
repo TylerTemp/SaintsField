@@ -186,10 +186,10 @@ namespace SaintsField.Editor.Drawers
             saintsInterfaceField.BindProperty(valueProp);
 
             Type interfaceContainer = fieldInfo.FieldType;
-            Debug.Log(interfaceContainer.IsGenericType);
-            Debug.Log(interfaceContainer.BaseType);
-            Debug.Log(interfaceContainer.GetGenericArguments());
-            Debug.Log(interfaceContainer);
+            // Debug.Log(interfaceContainer.IsGenericType);
+            // Debug.Log(interfaceContainer.BaseType);
+            // Debug.Log(interfaceContainer.GetGenericArguments());
+            // Debug.Log(interfaceContainer);
             IReadOnlyList<Type> genericArguments = GetGenericTypes(interfaceContainer);
             Type valueType = genericArguments[0];
             Type interfaceType = genericArguments[1];
@@ -209,6 +209,27 @@ namespace SaintsField.Editor.Drawers
         }
 #endif
 
+        // private static IReadOnlyList<Type> GetGenericTypes(Type type)
+        // {
+        //     List<Type> types = new List<Type>();
+        //
+        //     types.AddRange(type.GetGenericArguments());
+        //
+        //     if (type.IsGenericType)
+        //     {
+        //         Type[] typeParams = type.GetGenericArguments();
+        //         types.AddRange(typeParams);
+        //
+        //         // Recursively process all types
+        //         foreach (Type t in typeParams)
+        //         {
+        //             types.AddRange(GetGenericTypes(t));
+        //         }
+        //     }
+        //     return types;
+        // }
+
+
         private static IReadOnlyList<Type> GetGenericTypes(Type checkType)
         {
             List<Type> types = new List<Type>();
@@ -216,13 +237,25 @@ namespace SaintsField.Editor.Drawers
             do
             {
                 types.AddRange(checkType.GetGenericArguments());
+                Debug.Log($"Add normal {checkType}: {string.Join<object>(",", checkType.GetGenericArguments())}");
                 if(checkType.IsGenericType)
                 {
-                    types.AddRange(checkType.GetGenericTypeDefinition().GetGenericArguments());
-                }
-                Debug.Log($"Cur {string.Join<object>(",", types)}");
+                    Type genType = checkType.GetGenericTypeDefinition();
+                    Type genBase = genType.BaseType;
 
+                    types.AddRange(genType.GetGenericArguments());
+                    Debug.Log($"Add generic {genType}: {string.Join<object>(",", genType.GetGenericArguments())}");
+
+                    // types.AddRange(GetGenericTypes(checkType.GetGenericTypeDefinition()));
+                    Debug.Log($"gen base {genBase}: {string.Join<object>(",", genBase.GetGenericArguments())}");
+                    if(genBase.IsGenericType)
+                    {
+                        Debug.Log(
+                            $"gen base2 {genBase}: {string.Join<object>(",", genBase.GetGenericTypeDefinition().GetGenericArguments())}");
+                    }
+                }
                 checkType = checkType.BaseType;
+                Debug.Log($"Cur: {string.Join<object>(",", types)}");
             } while (checkType != null);
 
             return types;

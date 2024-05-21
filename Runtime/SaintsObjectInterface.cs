@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace SaintsField
 {
-    public class SaintsObjectInterface<TInterface>: ISaintsInterface<Object, TInterface> where TInterface: class
+    public class SaintsObjectInterface<TInterface>: ISaintsInterface<UnityEngine.Object, TInterface> where TInterface: class
     {
         [field: SerializeField]
         public Object V { get; private set; }
