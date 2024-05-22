@@ -103,12 +103,16 @@ namespace SaintsField.Editor.Drawers
                 if (property.propertyType == SerializedPropertyType.Integer)
                 {
                     property.intValue = evt.newValue;
+                    property.serializedObject.ApplyModifiedProperties();
+                    ReflectUtils.SetValue(property.propertyPath, info, parent, evt.newValue);
                     onValueChangedCallback.Invoke(evt.newValue);
                 }
                 else
                 {
                     string newValue = LayerMask.LayerToName(evt.newValue);
                     property.stringValue = newValue;
+                    property.serializedObject.ApplyModifiedProperties();
+                    ReflectUtils.SetValue(property.propertyPath, info, parent, newValue);
                     onValueChangedCallback.Invoke(newValue);
                 }
             });
