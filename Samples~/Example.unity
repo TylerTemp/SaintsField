@@ -2340,11 +2340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb494a9bb09b44642bd9a8514328bebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myStructs:
-  - toggle: 1
-    value: 0
-  - toggle: 0
-    value: 0
+  myStructs: []
 --- !u!1 &575593403
 GameObject:
   m_ObjectHideFlags: 0

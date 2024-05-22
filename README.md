@@ -63,10 +63,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.8**
+**3.0.9**
 
-1.  `SaintsEditor` now have `OnEvent` to bind a method to your custom `UnityEvent`
-2.  Fix fallback system broken on generic types [#27](https://github.com/TylerTemp/SaintsField/issues/27)
+1.  Fix `ResourcePath` not work on `ScriptableObject`
+2.  UI Toolkit: fix `Layer` won't save the changed value [#28](https://github.com/TylerTemp/SaintsField/issues/28)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -1,3 +1,8 @@
+## 3.0.9
+
+1.  Fix `ResourcePath` not work on `ScriptableObject`
+2.  UI Toolkit: fix `Layer` won't save the changed value [#28](https://github.com/TylerTemp/SaintsField/issues/28)
+
 ## 3.0.8
 
 1.  `SaintsEditor` now have `OnEvent` to bind a method to your custom `UnityEvent`
