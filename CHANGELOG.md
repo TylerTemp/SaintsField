@@ -1,6 +1,6 @@
 ## 3.0.10
 
-1.  Fix in some Unity edition (tested on 2022.3.20) a cached struct object can not correctly report the value inside it after changing [#29](https://github.com/TylerTemp/SaintsField/issues/29)
+Fix in some Unity version (tested on 2022.3.20) a cached struct object can not correctly report the value inside it after changing [#29](https://github.com/TylerTemp/SaintsField/issues/29)
 
 ## 3.0.9
 

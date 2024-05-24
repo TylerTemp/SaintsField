@@ -63,10 +63,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.9**
+**3.0.10**
 
-1.  Fix `ResourcePath` not work on `ScriptableObject`
-2.  UI Toolkit: fix `Layer` won't save the changed value [#28](https://github.com/TylerTemp/SaintsField/issues/28)
+Fix in some Unity version (tested on 2022.3.20) a cached struct object can not correctly report the value inside it after changing [#29](https://github.com/TylerTemp/SaintsField/issues/29)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
