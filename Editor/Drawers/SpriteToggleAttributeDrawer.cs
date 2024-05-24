@@ -332,8 +332,10 @@ namespace SaintsField.Editor.Drawers
             UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
         }
 
-        private static void UpdateToggleDisplay(SerializedProperty property, int index, ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
+        private static void UpdateToggleDisplay(SerializedProperty property, int index, ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object _deprecated)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
             Container dataContainer = GetContainer(property, saintsAttribute, info, parent);
             string error = dataContainer.Error;
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
@@ -349,6 +351,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             Sprite thisSprite = (Sprite)property.objectReferenceValue;
+
             Sprite usingSprite = dataContainer.FieldType == FieldType.Image
                 ? dataContainer.Image.sprite
                 : dataContainer.SpriteRenderer.sprite;

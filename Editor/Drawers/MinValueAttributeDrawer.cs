@@ -105,10 +105,12 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             MinValueAttribute minValueAttribute = (MinValueAttribute)saintsAttribute;
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             (string error, float valueLimit) = GetLimitFloat(property, minValueAttribute, info, parent);
 
             if(helpBox.text != error)

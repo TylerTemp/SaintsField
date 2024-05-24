@@ -144,8 +144,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
             PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
             (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml, targetAttribute.IsCallback, info, parent);
 

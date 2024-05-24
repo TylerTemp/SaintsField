@@ -206,7 +206,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameRequiredBox(property, index));
             MetaInfo metaInfo = (MetaInfo)helpBox.userData;
@@ -215,6 +215,8 @@ namespace SaintsField.Editor.Drawers
             {
                 return;
             }
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
             bool isTruly = Truly(property, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED

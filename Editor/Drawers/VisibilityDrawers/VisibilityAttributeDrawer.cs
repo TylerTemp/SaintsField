@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
             IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassVisibility(property)).ToList();
             VisualElement topElement = visibilityElements[0];
@@ -130,6 +130,8 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             List<string> errors = new List<string>();
             bool nowShow = false;
             // bool isForHidden = ((VisibilityAttribute)saintsAttribute).IsForHide;
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
             foreach ((string error, bool show) in visibilityElements.Select(each => IsShown(property, (ISaintsAttribute)each.userData, info, parent.GetType(), parent)))
             {
                 // bool invertedShow = isForHidden? !show: show;

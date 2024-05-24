@@ -1886,8 +1886,10 @@ namespace SaintsField.Editor.Core
                     // Debug.Log($"changed: {prop.propertyPath}; {prop.propertyPath}; {prop.}");
                     if(SerializedProperty.EqualContents(prop, property))
                     {
+                        object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
                         int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                        object rawValue = fieldInfo.GetValue(parent);
+                        object rawValue = fieldInfo.GetValue(noCacheParent);
                         object curValue = arrayIndex == -1
                             ? rawValue
                             : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);

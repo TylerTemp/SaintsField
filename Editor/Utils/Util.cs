@@ -354,7 +354,11 @@ namespace SaintsField.Editor.Utils
                         genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
                         break;
                     case ReflectUtils.GetPropType.Field:
-                        genResult = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
+                    {
+                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
+                        genResult = fInfo.GetValue(target);
+                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
+                    }
                         break;
                     case ReflectUtils.GetPropType.Method:
                     {

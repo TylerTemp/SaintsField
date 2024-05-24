@@ -213,16 +213,18 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _depracted)
         {
-            if (parent == null)
-            {
-                return;
-            }
+            // if (parent == null)
+            // {
+            //     return;
+            // }
 
             VisualElement labelContainer = container.Query<VisualElement>(className: ClassLabelContainer(property, index)).First();
             string oldXml = (string)labelContainer.userData;
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             (string xmlError, string newXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, parent);
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment

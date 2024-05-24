@@ -13,6 +13,10 @@ namespace SaintsField.Editor.Utils
             {
                 // search parent first
                 (string error, Animator result) = Util.GetOf<Animator>(animatorName, null, property, fieldInfo, parent);
+                if (result == null)
+                {
+                    return ($"Animator {animatorName} can not be null.", null);
+                }
                 if (error == "")
                 {
                     return ("", result);
@@ -26,6 +30,11 @@ namespace SaintsField.Editor.Utils
                 // ReSharper disable once MergeIntoPattern
                 if(animProp?.objectReferenceValue is Animator anim)
                 {
+                    if (anim == null)
+                    {
+                        return ($"Animator {animatorName} can not be null.", null);
+                    }
+
                     return ("", anim);
                 }
             }

@@ -23,6 +23,8 @@ namespace SaintsField.Editor.Drawers
             MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
             string compName = toggleAttribute.CompName;
 
+            Renderer resultRenderer = null;
+
             if(compName != null)
             {
                 SerializedProperty targetProperty =
@@ -32,27 +34,44 @@ namespace SaintsField.Editor.Drawers
                 // ReSharper disable once MergeIntoPattern
                 if (targetProperty?.objectReferenceValue is Renderer propRenderer)
                 {
-                    return ("", propRenderer);
+                    resultRenderer = propRenderer;
+                }
+                else
+                {
+                    (string error, Renderer result) =
+                        Util.GetOf<Renderer>(compName, null, property, info, parent);
+                    if (error != "")
+                    {
+                        return (error, result);
+                    }
+
+                    resultRenderer = result;
+                }
+            }
+
+            else
+            {
+                Component thisComponent;
+                try
+                {
+                    thisComponent = (Component)property.serializedObject.targetObject;
+                }
+                catch (InvalidCastException e)
+                {
+                    Debug.LogException(e);
+                    return ($"target {property.serializedObject.targetObject} is not a Component", null);
                 }
 
-                return Util.GetOf<Renderer>(compName, null, property, info, parent);
+                resultRenderer = thisComponent.GetComponent<Renderer>();
+                if (resultRenderer == null)
+                {
+                    return ($"target {thisComponent} has no Renderer", null);
+                }
             }
 
-            Component thisComponent;
-            try
-            {
-                thisComponent = (Component)property.serializedObject.targetObject;
-            }
-            catch (InvalidCastException e)
-            {
-                Debug.LogException(e);
-                return ($"target {property.serializedObject.targetObject} is not a Component", null);
-            }
-
-            Renderer renderer = thisComponent.GetComponent<Renderer>();
-            return renderer
-                ? ("", renderer)
-                : ($"target {thisComponent} has no Renderer", null);
+            return resultRenderer == null
+                ? ("No renderer found.", null)
+                : ("", resultRenderer);
         }
 
         #region IMGUI
@@ -204,16 +223,18 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container,
             FieldInfo info,
-            object parent, Action<object> onValueChangedCallback, object newValue)
+            object _deprecated, Action<object> onValueChangedCallback, object newValue)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
         }
 

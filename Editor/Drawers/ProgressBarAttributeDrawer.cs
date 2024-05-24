@@ -473,8 +473,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object _deprecated)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             ProgressBar progressBar = container.Q<ProgressBar>(NameProgressBar(property));

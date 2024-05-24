@@ -158,7 +158,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
             IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassReadOnly(property)).ToList();
             VisualElement topElement = visibilityElements[0];
@@ -178,6 +178,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
             Debug.Log($"curReadOnly={curReadOnly}");
 #endif
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, (ReadOnlyAttribute)each.userData, info, parent)))
             {
                 if (error != "")

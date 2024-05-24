@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
-using System;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 
@@ -345,8 +343,10 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             Slider slider = container.Q<Slider>(NameSlider(property));

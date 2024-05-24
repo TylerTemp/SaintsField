@@ -472,13 +472,14 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
             // bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
 
             MinMaxSlider minMaxSlider = container.Q<MinMaxSlider>(NameSlider(property));
             // MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
             MetaInfo oldMetaInfo = (MetaInfo)minMaxSlider.userData;
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             bool changed = false;

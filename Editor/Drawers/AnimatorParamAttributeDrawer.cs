@@ -280,6 +280,8 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     display = DisplayStyle.None,
+                    flexGrow = 1,
+                    flexShrink = 0,
                 },
                 name = NameHelpBox(property),
             };
@@ -373,8 +375,9 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));

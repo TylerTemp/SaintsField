@@ -39,6 +39,7 @@ namespace SaintsField.Editor.Utils
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
             FieldInfo fieldInfo = targetType.GetField(fieldName, bindAttr);
+            // Debug.Log($"init get fieldInfo {fieldInfo}");
             if (fieldInfo == null)
             {
                 fieldInfo = targetType.GetField($"<{fieldName}>k__BackingField", bindAttr);

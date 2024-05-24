@@ -103,6 +103,7 @@ namespace SaintsField.Editor.Drawers
         #endregion
 
 #if UNITY_2021_3_OR_NEWER
+
         #region UIToolkit
 
         private static string NameRichLabelContainer(SerializedProperty property) => $"{property.propertyPath}__RichLabelContainer";
@@ -164,7 +165,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
             string richLabelContainerName;
             try
@@ -182,6 +183,9 @@ namespace SaintsField.Editor.Drawers
             VisualElement richContainer = container.Q<VisualElement>(richLabelContainerName);
             PayloadUIToolkit payload = (PayloadUIToolkit)richContainer.userData;
             RichLabelAttribute richLabelAttribute = (RichLabelAttribute)saintsAttribute;
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
             (string error, string nowXml) = RichTextDrawer.GetLabelXml(property, richLabelAttribute.RichTextXml, richLabelAttribute.IsCallback, info, parent);
             // Debug.Log($"update {nowXml}/{error}");
             if (error == "" && payload.xml != nowXml)

@@ -325,8 +325,11 @@ namespace SaintsField.Editor.Drawers
         }
 
         private void CalcOverlay(SerializedProperty property, int index, OverlayRichLabelAttribute overlayRichLabelAttribute,
-            VisualElement container, FieldInfo info, object parent)
+            VisualElement container, FieldInfo info, object _deprecated)
         {
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
             (string contentString, Rect contentRect) = GetFieldString(container.Q<VisualElement>(className: ClassFieldUIToolkit(property)));
 
             // Debug.Log($"contentString: {contentString}, contentRect: {contentRect}");

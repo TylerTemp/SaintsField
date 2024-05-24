@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
-        private static string InvokeCallback(SerializedProperty property, ISaintsAttribute saintsAttribute, object newValue, int index, FieldInfo info, object target)
+        private static string InvokeCallback(SerializedProperty property, ISaintsAttribute saintsAttribute, object newValue, int index, FieldInfo info, object _deprecated)
         {
             // Debug.Log(saintsAttribute);
             string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
@@ -63,8 +63,9 @@ namespace SaintsField.Editor.Drawers
             // (string error, object _) = Util.GetMethodOf<object>(callback, null, property, info, target);
             // return error != "" ? error : "";
 
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
             types.Reverse();
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
@@ -91,7 +92,7 @@ namespace SaintsField.Editor.Drawers
 
                 try
                 {
-                    methodInfo.Invoke(target, passParams);
+                    methodInfo.Invoke(parent, passParams);
                 }
                 catch (TargetInvocationException e)
                 {
@@ -114,7 +115,7 @@ namespace SaintsField.Editor.Drawers
                 return "";
             }
 
-            return $"No field or method named `{callback}` found on `{target}`";
+            return $"No field or method named `{callback}` found on `{parent}`";
         }
 
 #if UNITY_2021_3_OR_NEWER

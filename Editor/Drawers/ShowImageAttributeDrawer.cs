@@ -388,10 +388,11 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
 
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             (string error, Texture2D preview) = GetImage(property, showImageAttribute.ImageCallback, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));

@@ -82,26 +82,12 @@ namespace SaintsField.Editor.Drawers
             return helpBox;
         }
 
-        // protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-        //     object parent, object newValue)
-        // {
-        //     string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
-        //     string validateResult = CallValidateMethod(callback, property.displayName, parent);
-        //
-        //     HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-        //     // ReSharper disable once InvertIf
-        //     if(helpBox.text != validateResult)
-        //     {
-        //         helpBox.style.display = string.IsNullOrEmpty(validateResult) ? DisplayStyle.None : DisplayStyle.Flex;
-        //         helpBox.text = validateResult;
-        //     }
-        // }
-
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
             string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
+
             string validateResult = CallValidateMethod(callback, property.displayName, property, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
@@ -120,6 +106,7 @@ namespace SaintsField.Editor.Drawers
         private static string CallValidateMethod(string callback, string label, SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
             (string error, object validateResult) = Util.GetMethodOf<object>(callback, null, property, fieldInfo, parent);
+            Debug.Log($"parent {parent}, call {callback} get {validateResult}, error={error}");
             if(error != "")
             {
                 return error;
