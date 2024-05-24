@@ -15,6 +15,15 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         }
 
         [Serializable]
+        public struct SimpleExampleStruct
+        {
+            public Toggle toggle;
+            [ShowIf(nameof(toggle), Toggle.On)] public float value;
+        }
+
+        public SimpleExampleStruct example;
+
+        [Serializable]
         public struct MyStruct
         {
             [OnValueChanged(nameof(Log))]
