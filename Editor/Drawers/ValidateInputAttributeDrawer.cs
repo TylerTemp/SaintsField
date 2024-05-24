@@ -106,7 +106,7 @@ namespace SaintsField.Editor.Drawers
         private static string CallValidateMethod(string callback, string label, SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
             (string error, object validateResult) = Util.GetMethodOf<object>(callback, null, property, fieldInfo, parent);
-            Debug.Log($"parent {parent}, call {callback} get {validateResult}, error={error}");
+            // Debug.Log($"parent {parent}, call {callback} get {validateResult}, error={error}");
             if(error != "")
             {
                 return error;
