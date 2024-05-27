@@ -55,6 +55,9 @@ Unity: 2019.1 or higher
     git submodule add https://github.com/TylerTemp/SaintsField.git Assets/SaintsField
     ```
 
+If you have DOTween installed, please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+
+
 If you're using `unitypackage` or git submodule but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
@@ -537,7 +540,7 @@ Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
 Known issue:
 1.  IMGUI: if the target itself has a custom drawer, the drawer will not be used, because `PropertyDrawer` is not allowed to create an `Editor` class, thus it'll just iterate and draw all fields in the object.
-    
+
     For more information about why this is impossible under IMGUI, see [Issue 25](https://github.com/TylerTemp/SaintsField/issues/25)
 
 2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable.
@@ -2620,7 +2623,7 @@ private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}
 
 #### `SaintsInterface<,>` ####
 
-`SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface. 
+`SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface.
 
 You can access the interface with the `.I` field, and actual object with `.V` field.
 
@@ -2990,7 +2993,7 @@ public string buggy2;
 
 This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
 
-Different from `ShowIf`/`HideIf`: 
+Different from `ShowIf`/`HideIf`:
 1.  apply on an array will directly show or hide the array itself, rather than each element.
 2.  Callback function can not receive value and index
 
@@ -3123,7 +3126,7 @@ This is a method decorator, which will bind this method to the target button's c
 Parameters:
 
 *   `string buttonTarget=null` the target button. `null` to get it form the current target.
-*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true` 
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
 *   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
 
 ```csharp
