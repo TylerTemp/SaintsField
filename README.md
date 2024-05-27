@@ -63,9 +63,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.10**
+**3.0.11**
 
-Fix in some Unity version (tested on 2022.3.20) a cached struct object can not correctly report the value inside it after changing [#29](https://github.com/TylerTemp/SaintsField/issues/29)
+`SaintsInterface` for serializing interface of a `Unity.Object` type (or sub type).
+
+Special thanks for [@dbc](https://stackoverflow.com/users/3744182/dbc)'s [answer in stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347).
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2615,6 +2617,56 @@ private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ff4bcdef-f3e6-4ece-8204-d4ba8798e164)
+
+#### `SaintsInterface<,>` ####
+
+`SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface. 
+
+You can access the interface with the `.I` field, and actual object with `.V` field.
+
+It provide a drawer to let you only select the object that implements the interface.
+
+For `SaintsInterface<TObject, TInterface>`:
+
+*   `TObject` a serializable type. Use `Component` (for your `MonoBehavior`), `ScriptableObject` or even `UnityEngine.Object` (for any serializable object) if you only want any limitation. Don't use `GameObject`.
+*   `TInterface` the interface type.
+*   `.I`: the interface value, which is the instance of `TInterface`
+*   `.V`: the actual object value, which is the instance of `TObject`
+
+```csharp
+using SaintsField;
+
+public SaintsInterface<Component, IInterface1> myInter1;
+
+// for old unity
+[Serializable]
+public class Interface1 : SaintsInterface<Component, IInterface1>
+{
+}
+
+public Interface1 myInherentInterface1;
+
+private void Awake()
+{
+    Debug.Log(myInter1.I);  // the actual interface
+    Debug.Log(myInter1.V);  // the actual serialized object
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/e7ea662d-34d2-4d4b-88b9-0c4bbbbdee33)
+
+Special Note:
+
+Though you can inherit `SaintsInterface`, but don't inherit it with 2 steps of generic, for example:
+
+```csharp
+// Don't do this!
+class AnyObjectInterface<T>: SaintsInterface<UnityEngine.Object, T> {}
+class MyInterface: AnyObjectInterface<IInterface1> {}
+```
+
+The drawer will fail for `AnyObjectInterface` and `MyInterface` because in Unity's C# runtime, it can not report correctly generic arguments.
+For more information, see [the comment of the answer in this stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347).
 
 ## SaintsEditor ##
 

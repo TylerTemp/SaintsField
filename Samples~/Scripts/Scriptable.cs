@@ -1,9 +1,10 @@
+using SaintsField.Samples.Scripts.Interface;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
     [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Scriptable", order = 0)]
-    public class Scriptable : ScriptableObject
+    public class Scriptable : ScriptableObject, IInterface2
     {
         [SerializeField]
         // [RichLabel("<color=red><label /></color>")]

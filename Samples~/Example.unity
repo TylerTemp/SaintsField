@@ -9791,6 +9791,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -19789,11 +19790,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myInter1:
-    <V>k__BackingField: {fileID: 2088148949201590721, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+    <V>k__BackingField: {fileID: 4190710478443201289}
   myInherentInterface1:
-    <V>k__BackingField: {fileID: 4190710479621803395, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+    <V>k__BackingField: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
   myInter2:
-    <V>k__BackingField: {fileID: 4190710479621803395, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+    <V>k__BackingField: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+  mySoInter2:
+    <V>k__BackingField: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  myAnyInter2:
+    <V>k__BackingField: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
 --- !u!1 &2004327240
 GameObject:
   m_ObjectHideFlags: 0
@@ -20650,6 +20655,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+--- !u!114 &4190710478443201289 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+  m_PrefabInstance: {fileID: 4190710478443201288}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fee20865f0f492592fd834d63a10f5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4273993127172390032
 PrefabInstance:
   m_ObjectHideFlags: 0

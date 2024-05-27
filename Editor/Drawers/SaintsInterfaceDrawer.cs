@@ -83,16 +83,104 @@ namespace SaintsField.Editor.Drawers
                     return true;
                 }
 
-                IEnumerable<Type> checkTypes = typeof(Component).IsAssignableFrom(_fieldType)
-                    ? new[]{_fieldType, _interfaceType}
-                    : new[]{_interfaceType};
-                if (itemInfo.Object is GameObject go)
-                {
-                    return checkTypes.All(requiredType => go.GetComponent(requiredType) != null);
-                }
+                // bool fieldTypeIsComponent = typeof(Component).IsAssignableFrom(_fieldType);
+                // IEnumerable<Type> checkTypes = fieldTypeIsComponent
+                //     ? new[]{_fieldType, _interfaceType}
+                //     : new[]{_interfaceType};
+                // switch (itemInfo.Object)
+                // {
+                //     case GameObject go:
+                //         // Debug.Log($"go={go}, fieldType={_fieldType}, interfaceType={_interfaceType}");
+                //         if (fieldTypeIsComponent)
+                //         {
+                //             return go.GetComponents(_fieldType)
+                //                 .FirstOrDefault(each => _interfaceType.IsInstanceOfType(each)) != null;
+                //         }
+                //
+                //         return _fieldType.IsInstanceOfType(go) && go.GetComponents(typeof(Component)).FirstOrDefault(each => _interfaceType.IsInstanceOfType(each)) != null;
+                //     case ScriptableObject so:
+                //         return (_fieldType == typeof(ScriptableObject) || _fieldType.IsSubclassOf(typeof(ScriptableObject)))
+                //                && _interfaceType.IsInstanceOfType(so);
+                //     default:
+                //     {
+                //         return checkTypes.All(requiredType => requiredType.IsInstanceOfType(itemInfo.Object));
+                //         // Type itemType = itemInfo.Object.GetType();
+                //         // return checkTypes.All(requiredType => itemType.IsInstanceOfType(requiredType));
+                //     }
+                // }
+                return GetSerializedObject(itemInfo.Object, _fieldType, _interfaceType).isMatch;
+            }
+        }
 
-                Type itemType = itemInfo.Object.GetType();
-                return checkTypes.All(requiredType => itemType.IsInstanceOfType(requiredType));
+        private static (bool isMatch, Object result) GetSerializedObject(Object selectedObject, Type fieldType,
+            Type interfaceType)
+        {
+            bool fieldTypeIsComponent = typeof(Component).IsAssignableFrom(fieldType);
+
+            switch (selectedObject)
+            {
+                case GameObject go:
+                {
+                    // Debug.Log($"go={go}, fieldType={_fieldType}, interfaceType={_interfaceType}");
+                    if (fieldTypeIsComponent)
+                    {
+                        Component compResult = go.GetComponents(fieldType)
+                            .FirstOrDefault(interfaceType.IsInstanceOfType);
+                        return compResult == null
+                            ? (false, null)
+                            : (true, compResult);
+                    }
+
+                    if (!fieldType.IsInstanceOfType(go))
+                    {
+                        return (false, null);
+                    }
+
+                    Component result = go.GetComponents(typeof(Component))
+                        .FirstOrDefault(interfaceType.IsInstanceOfType);
+                    return result == null
+                        ? (false, null)
+                        : (true, result);
+                }
+                case Component comp:
+                {
+                    if (fieldTypeIsComponent)
+                    {
+                        Component compResult = comp.GetComponents(fieldType)
+                            .FirstOrDefault(interfaceType.IsInstanceOfType);
+                        return compResult == null
+                            ? (false, null)
+                            : (true, compResult);
+                    }
+
+                    if (!fieldType.IsInstanceOfType(comp))
+                    {
+                        return (false, null);
+                    }
+
+                    Component result = comp.GetComponents(typeof(Component))
+                        .FirstOrDefault(interfaceType.IsInstanceOfType);
+                    return result == null
+                        ? (false, null)
+                        : (true, result);
+                }
+                case ScriptableObject so:
+                    return (fieldType == typeof(ScriptableObject) || fieldType.IsSubclassOf(typeof(ScriptableObject)))
+                           && interfaceType.IsInstanceOfType(so)
+                           ? (true, so)
+                           : (false, null);
+                default:
+                    return new[]
+                    {
+                        fieldType,
+                        interfaceType,
+                    }.All(requiredType => requiredType.IsInstanceOfType(selectedObject))
+                        ? (true, selectedObject)
+                        : (false, null);
+
+                    // Type itemType = itemInfo.Object.GetType();
+                    // return checkTypes.All(requiredType => itemType.IsInstanceOfType(requiredType));
+
             }
         }
 
@@ -123,58 +211,85 @@ namespace SaintsField.Editor.Drawers
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if(_imGuiPropInfo == null)
+            using(new EditorGUI.PropertyScope(position, label, property))
             {
-                _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
-            }
-            SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorValuePropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropInfo.EditorValuePropertyName);
+                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+                if (_imGuiPropInfo == null)
+                {
+                    _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
+                }
 
-            Type interfaceContainer = fieldInfo.FieldType;
-            Type mostBaseType = GetMostBaseType(interfaceContainer);
-            Debug.Assert(mostBaseType != null, interfaceContainer);
-            Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
-            IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorValuePropertyName) ??
+                                               SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                                   _imGuiPropInfo.EditorValuePropertyName);
+
+                Type interfaceContainer = fieldInfo.FieldType;
+                Type mostBaseType = GetMostBaseType(interfaceContainer);
+                Debug.Assert(mostBaseType != null, interfaceContainer);
+                Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
+                IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_INTERFACE
-            Debug.Log($"from {interfaceContainer} get types: {string.Join(",", genericArguments)}");
+                Debug.Log($"from {interfaceContainer} get types: {string.Join(",", genericArguments)}");
 #endif
 
-            Type valueType = genericArguments[0];
-            Type interfaceType = genericArguments[1];
+                Type valueType = genericArguments[0];
+                Type interfaceType = genericArguments[1];
 
-            const float buttonWidth = 21;
-            (Rect cutFieldRect, Rect buttonRect) = RectUtils.SplitWidthRect(position, position.width - buttonWidth);
+                const float buttonWidth = 21;
+                (Rect cutFieldRect, Rect buttonRect) = RectUtils.SplitWidthRect(position, position.width - buttonWidth);
 
-            Rect fieldRect = position;
+                Rect fieldRect = position;
 
-            if (_imGuiPropInfo.EditorCustomPicker)
-            {
-                fieldRect = cutFieldRect;
-
-
-                if (GUI.Button(buttonRect, "●"))
+                if (_imGuiPropInfo.EditorCustomPicker)
                 {
-                    FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
+                    fieldRect = cutFieldRect;
+
+                    if (GUI.Button(buttonRect, "●"))
                     {
-                        Object result = Util.GetTypeFromObj(fieldResult, valueType);
-                        valueProp.objectReferenceValue = result;
-                        valueProp.serializedObject.ApplyModifiedProperties();
-                    });
+                        FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType,
+                            fieldResult =>
+                            {
+                                if (fieldResult == null)
+                                {
+                                    valueProp.objectReferenceValue = null;
+                                }
+                                else
+                                {
+                                    (bool match, Object result) =
+                                        GetSerializedObject(fieldResult, valueType, interfaceType);
+                                    // Debug.Log($"match={match}, result={result}");
+                                    // ReSharper disable once InvertIf
+                                    if (match)
+                                    {
+                                        valueProp.objectReferenceValue = result;
+                                        valueProp.serializedObject.ApplyModifiedProperties();
+                                    }
+                                }
+                            });
+                    }
                 }
-            }
 
-            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-            {
-                UnityEngine.Object oldValue = valueProp.objectReferenceValue;
-                EditorGUI.PropertyField(fieldRect, valueProp, label, true);
-                if (changed.changed)
+                // ReSharper disable once ConvertToUsingDeclaration
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
-                    Object newValue = valueProp.objectReferenceValue;
-                    if (newValue != null)
+                    Object oldValue = valueProp.objectReferenceValue;
+                    EditorGUI.PropertyField(fieldRect, valueProp, label, true);
+                    // ReSharper disable once InvertIf
+                    if (changed.changed)
                     {
-                        if (!interfaceType.IsInstanceOfType(newValue))
+                        Object newValue = valueProp.objectReferenceValue;
+                        if (newValue != null)
                         {
-                            valueProp.objectReferenceValue = oldValue;
+                            (bool match, Object result) = GetSerializedObject(newValue, valueType, interfaceType);
+                            // Debug.Log($"newValue={newValue}, match={match}, result={result}");
+                            if (match)
+                            {
+                                valueProp.objectReferenceValue = result;
+                            }
+                            else
+                            {
+                                valueProp.objectReferenceValue = oldValue;
+                            }
                         }
                     }
                 }
@@ -197,12 +312,16 @@ namespace SaintsField.Editor.Drawers
             string displayLabel = curInArrayIndex == -1 ? property.displayName : $"Element {curInArrayIndex}";
             PropertyField propertyField = new PropertyField(valueProp, "")
             {
+                userData = valueProp.objectReferenceValue,
                 style =
                 {
                     flexGrow = 1,
                     flexShrink = 1,
                 },
             };
+
+            StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
+            propertyField.styleSheets.Add(hideStyle);
 
             Button selectButton = new Button
             {
@@ -234,7 +353,7 @@ namespace SaintsField.Editor.Drawers
             saintsInterfaceField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
             saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
-            saintsInterfaceField.BindProperty(valueProp);
+            // saintsInterfaceField.BindProperty(valueProp);
 
             Type interfaceContainer = fieldInfo.FieldType;
             // Debug.Log(interfaceContainer.IsGenericType);
@@ -256,12 +375,48 @@ namespace SaintsField.Editor.Drawers
             {
                 FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
                 {
-                    Object result = Util.GetTypeFromObj(fieldResult, valueType);
-                    valueProp.objectReferenceValue = result;
-                    valueProp.serializedObject.ApplyModifiedProperties();
-                    // ReflectUtils.SetValue(property.propertyPath, fieldInfo, parent, result);
+                    if (fieldResult == null)
+                    {
+                        valueProp.objectReferenceValue = null;
+                        valueProp.serializedObject.ApplyModifiedProperties();
+                    }
+                    else
+                    {
+                        (bool match, Object result) =
+                            GetSerializedObject(fieldResult, valueType, interfaceType);
+                        // ReSharper disable once InvertIf
+                        if (match)
+                        {
+                            valueProp.objectReferenceValue = result;
+                            valueProp.serializedObject.ApplyModifiedProperties();
+                        }
+                    }
+
                 });
             };
+
+            propertyField.RegisterValueChangeCallback(v =>
+            {
+                if (v.changedProperty.objectReferenceValue == null)
+                {
+                    propertyField.userData = null;
+                    return;
+                }
+
+                (bool match, Object result) =
+                    GetSerializedObject(v.changedProperty.objectReferenceValue, valueType, interfaceType);
+                if (match)
+                {
+                    propertyField.userData = v.changedProperty.objectReferenceValue = result;
+                }
+                else
+                {
+                    v.changedProperty.objectReferenceValue = (Object) propertyField.userData;
+                }
+
+                v.changedProperty.serializedObject.ApplyModifiedProperties();
+
+            });
 
             return saintsInterfaceField;
         }

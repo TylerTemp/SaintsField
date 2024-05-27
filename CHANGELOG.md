@@ -1,3 +1,9 @@
+## 3.0.11
+
+`SaintsInterface` for serializing interface of a `Unity.Object` type (or sub type).
+
+Special thanks for [@dbc](https://stackoverflow.com/users/3744182/dbc)'s [answer in stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347)
+
 ## 3.0.10
 
 Fix in some Unity version (tested on 2022.3.20) a cached struct object can not correctly report the value inside it after changing [#29](https://github.com/TylerTemp/SaintsField/issues/29)

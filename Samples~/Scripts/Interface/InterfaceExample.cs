@@ -16,5 +16,17 @@ namespace SaintsField.Samples.Scripts.Interface
         public Interface1 myInherentInterface1;
 
         public SaintsInterface<Component, IInterface2> myInter2;
+        public SaintsInterface<ScriptableObject, IInterface2> mySoInter2;
+
+        [RichLabel("<color=green><label/>")]
+        public SaintsInterface<UnityEngine.Object, IInterface2> myAnyInter2;
+
+        private void Awake()
+        {
+            Debug.Log(myInter1.I);  // the actual interface object
+            Debug.Log(myInter1.V);  // the actual serialized object
+
+            myInter1.I.Method1();
+        }
     }
 }

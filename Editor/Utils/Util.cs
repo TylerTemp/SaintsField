@@ -501,17 +501,6 @@ namespace SaintsField.Editor.Utils
                 case null:
                     // property.objectReferenceValue = null;
                     break;
-                case GameObject go:
-                    // ReSharper disable once RedundantCast
-                    result = fieldType == typeof(GameObject) ? (UnityEngine.Object)go : go.GetComponent(fieldType);
-                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
-                    break;
-                case Component comp:
-                    result = fieldType == typeof(GameObject)
-                        // ReSharper disable once RedundantCast
-                        ? (UnityEngine.Object)comp.gameObject
-                        : comp.GetComponent(fieldType);
-                    break;
                 case ScriptableObject so:
                     // result = fieldType.IsSubclassOf(typeof())
                 {
@@ -521,6 +510,26 @@ namespace SaintsField.Editor.Utils
                     }
                 }
                     break;
+                case GameObject go:
+                    // ReSharper disable once RedundantCast
+                    if (fieldType == typeof(GameObject) || fieldType.IsInstanceOfType(go))
+                    {
+                        result = go;
+                    }
+                    else
+                    {
+                        result = go.GetComponent(fieldType);
+                    }
+
+                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
+                    break;
+                case Component comp:
+                    result = fieldType == typeof(GameObject)
+                        // ReSharper disable once RedundantCast
+                        ? (UnityEngine.Object)comp.gameObject
+                        : comp.GetComponent(fieldType);
+                    break;
+
                 // default:
                 //     Debug.Log(fieldResult.GetType());
                 //     break;
