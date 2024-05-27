@@ -4,7 +4,7 @@ namespace SaintsField
     {
 #if UNITY_EDITOR
         string EditorValuePropertyName { get; }
-        public bool EditorCustomPicker => true;
+        // bool EditorCustomPicker { get; }
 #endif
     }
 }

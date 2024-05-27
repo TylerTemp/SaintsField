@@ -236,37 +236,30 @@ namespace SaintsField.Editor.Drawers
                 Type interfaceType = genericArguments[1];
 
                 const float buttonWidth = 21;
-                (Rect cutFieldRect, Rect buttonRect) = RectUtils.SplitWidthRect(position, position.width - buttonWidth);
+                (Rect fieldRect, Rect buttonRect) = RectUtils.SplitWidthRect(position, position.width - buttonWidth);
 
-                Rect fieldRect = position;
-
-                if (_imGuiPropInfo.EditorCustomPicker)
+                if (GUI.Button(buttonRect, "●"))
                 {
-                    fieldRect = cutFieldRect;
-
-                    if (GUI.Button(buttonRect, "●"))
-                    {
-                        FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType,
-                            fieldResult =>
+                    FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType,
+                        fieldResult =>
+                        {
+                            if (fieldResult == null)
                             {
-                                if (fieldResult == null)
+                                valueProp.objectReferenceValue = null;
+                            }
+                            else
+                            {
+                                (bool match, Object result) =
+                                    GetSerializedObject(fieldResult, valueType, interfaceType);
+                                // Debug.Log($"match={match}, result={result}");
+                                // ReSharper disable once InvertIf
+                                if (match)
                                 {
-                                    valueProp.objectReferenceValue = null;
+                                    valueProp.objectReferenceValue = result;
+                                    valueProp.serializedObject.ApplyModifiedProperties();
                                 }
-                                else
-                                {
-                                    (bool match, Object result) =
-                                        GetSerializedObject(fieldResult, valueType, interfaceType);
-                                    // Debug.Log($"match={match}, result={result}");
-                                    // ReSharper disable once InvertIf
-                                    if (match)
-                                    {
-                                        valueProp.objectReferenceValue = result;
-                                        valueProp.serializedObject.ApplyModifiedProperties();
-                                    }
-                                }
-                            });
-                    }
+                            }
+                        });
                 }
 
                 // ReSharper disable once ConvertToUsingDeclaration
