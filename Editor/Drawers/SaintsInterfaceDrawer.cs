@@ -246,6 +246,7 @@ namespace SaintsField.Editor.Drawers
                             if (fieldResult == null)
                             {
                                 valueProp.objectReferenceValue = null;
+                                valueProp.serializedObject.ApplyModifiedProperties();
                             }
                             else
                             {
