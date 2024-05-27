@@ -16,7 +16,6 @@ using UnityEngine.UIElements;
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(SaintsInterface<,>), true)]
-    [CustomPropertyDrawer(typeof(SaintsObjectInterface<>), true)]
     public class SaintsInterfaceDrawer: PropertyDrawer
     {
         private class FieldInterfaceSelectWindow : ObjectSelectWindow
@@ -97,38 +96,89 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static (string propName, int index, object parent) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
+        private static (ISaintsInterface propInfo, int index, object parent) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
         {
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
             object rawValue = fieldInfo.GetValue(parent);
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            ISaintsInterfacePropName curValue = (ISaintsInterfacePropName)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
+            ISaintsInterface curValue = (ISaintsInterface)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
 
-            return (curValue.EditorValuePropertyName, arrayIndex, parent);
+            return (curValue, arrayIndex, parent);
         }
 
         #region IMGUI
 
-        private string _imGuiPropRawName = "";
+        private ISaintsInterface _imGuiPropInfo;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if(_imGuiPropRawName == "")
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if(_imGuiPropInfo == null)
             {
-                _imGuiPropRawName = GetSerName(property, fieldInfo).propName;
+                _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
             }
-            SerializedProperty arrProperty = property.FindPropertyRelative(_imGuiPropRawName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropRawName);
-            return EditorGUI.GetPropertyHeight(arrProperty, label, true);
+            SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorValuePropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropInfo.EditorValuePropertyName);
+            return EditorGUI.GetPropertyHeight(valueProp, label, true);
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if(_imGuiPropRawName == "")
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if(_imGuiPropInfo == null)
             {
-                _imGuiPropRawName = GetSerName(property, fieldInfo).propName;
+                _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
             }
-            SerializedProperty arrProperty = property.FindPropertyRelative(_imGuiPropRawName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropRawName);
-            EditorGUI.PropertyField(position, arrProperty, label, true);
+            SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorValuePropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropInfo.EditorValuePropertyName);
+
+            Type interfaceContainer = fieldInfo.FieldType;
+            Type mostBaseType = GetMostBaseType(interfaceContainer);
+            Debug.Assert(mostBaseType != null, interfaceContainer);
+            Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
+            IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_INTERFACE
+            Debug.Log($"from {interfaceContainer} get types: {string.Join(",", genericArguments)}");
+#endif
+
+            Type valueType = genericArguments[0];
+            Type interfaceType = genericArguments[1];
+
+            const float buttonWidth = 21;
+            (Rect cutFieldRect, Rect buttonRect) = RectUtils.SplitWidthRect(position, position.width - buttonWidth);
+
+            Rect fieldRect = position;
+
+            if (_imGuiPropInfo.EditorCustomPicker)
+            {
+                fieldRect = cutFieldRect;
+
+
+                if (GUI.Button(buttonRect, "●"))
+                {
+                    FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
+                    {
+                        Object result = Util.GetTypeFromObj(fieldResult, valueType);
+                        valueProp.objectReferenceValue = result;
+                        valueProp.serializedObject.ApplyModifiedProperties();
+                    });
+                }
+            }
+
+            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            {
+                UnityEngine.Object oldValue = valueProp.objectReferenceValue;
+                EditorGUI.PropertyField(fieldRect, valueProp, label, true);
+                if (changed.changed)
+                {
+                    Object newValue = valueProp.objectReferenceValue;
+                    if (newValue != null)
+                    {
+                        if (!interfaceType.IsInstanceOfType(newValue))
+                        {
+                            valueProp.objectReferenceValue = oldValue;
+                        }
+                    }
+                }
+            }
         }
         #endregion
 
@@ -142,8 +192,8 @@ namespace SaintsField.Editor.Drawers
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            (string propRawName, int curInArrayIndex, object parent) = GetSerName(property, fieldInfo);
-            SerializedProperty valueProp = property.FindPropertyRelative(propRawName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propRawName);
+            (ISaintsInterface saintsInterfaceProp, int curInArrayIndex, object _) = GetSerName(property, fieldInfo);
+            SerializedProperty valueProp = property.FindPropertyRelative(saintsInterfaceProp.EditorValuePropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, saintsInterfaceProp.EditorValuePropertyName);
             string displayLabel = curInArrayIndex == -1 ? property.displayName : $"Element {curInArrayIndex}";
             PropertyField propertyField = new PropertyField(valueProp, "")
             {
@@ -182,6 +232,7 @@ namespace SaintsField.Editor.Drawers
 
             SaintsInterfaceField saintsInterfaceField = new SaintsInterfaceField(displayLabel, container);
             saintsInterfaceField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+            saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
             saintsInterfaceField.BindProperty(valueProp);
 
@@ -190,7 +241,14 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log(interfaceContainer.BaseType);
             // Debug.Log(interfaceContainer.GetGenericArguments());
             // Debug.Log(interfaceContainer);
-            IReadOnlyList<Type> genericArguments = GetGenericTypes(interfaceContainer);
+            Type mostBaseType = GetMostBaseType(interfaceContainer);
+            Debug.Assert(mostBaseType != null, interfaceContainer);
+            Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
+            IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_INTERFACE
+            Debug.Log($"from {interfaceContainer} get types: {string.Join(",", genericArguments)}");
+#endif
+
             Type valueType = genericArguments[0];
             Type interfaceType = genericArguments[1];
 
@@ -198,10 +256,10 @@ namespace SaintsField.Editor.Drawers
             {
                 FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
                 {
-                    Object result = OnSelectWindowSelected(fieldResult, valueType);
+                    Object result = Util.GetTypeFromObj(fieldResult, valueType);
                     valueProp.objectReferenceValue = result;
                     valueProp.serializedObject.ApplyModifiedProperties();
-                    ReflectUtils.SetValue(property.propertyPath, fieldInfo, parent, result);
+                    // ReflectUtils.SetValue(property.propertyPath, fieldInfo, parent, result);
                 });
             };
 
@@ -209,80 +267,25 @@ namespace SaintsField.Editor.Drawers
         }
 #endif
 
-        // private static IReadOnlyList<Type> GetGenericTypes(Type type)
-        // {
-        //     List<Type> types = new List<Type>();
-        //
-        //     types.AddRange(type.GetGenericArguments());
-        //
-        //     if (type.IsGenericType)
-        //     {
-        //         Type[] typeParams = type.GetGenericArguments();
-        //         types.AddRange(typeParams);
-        //
-        //         // Recursively process all types
-        //         foreach (Type t in typeParams)
-        //         {
-        //             types.AddRange(GetGenericTypes(t));
-        //         }
-        //     }
-        //     return types;
-        // }
-
-
-        private static IReadOnlyList<Type> GetGenericTypes(Type checkType)
+        private static Type GetMostBaseType(Type type)
         {
-            List<Type> types = new List<Type>();
-
-            do
+            Type lastType = type;
+            while (true)
             {
-                types.AddRange(checkType.GetGenericArguments());
-                Debug.Log($"Add normal {checkType}: {string.Join<object>(",", checkType.GetGenericArguments())}");
-                if(checkType.IsGenericType)
+                Type baseType = lastType.BaseType;
+                if (baseType == null)
                 {
-                    Type genType = checkType.GetGenericTypeDefinition();
-                    Type genBase = genType.BaseType;
-
-                    types.AddRange(genType.GetGenericArguments());
-                    Debug.Log($"Add generic {genType}: {string.Join<object>(",", genType.GetGenericArguments())}");
-
-                    // types.AddRange(GetGenericTypes(checkType.GetGenericTypeDefinition()));
-                    Debug.Log($"gen base {genBase}: {string.Join<object>(",", genBase.GetGenericArguments())}");
-                    if(genBase.IsGenericType)
-                    {
-                        Debug.Log(
-                            $"gen base2 {genBase}: {string.Join<object>(",", genBase.GetGenericTypeDefinition().GetGenericArguments())}");
-                    }
+                    return lastType;
                 }
-                checkType = checkType.BaseType;
-                Debug.Log($"Cur: {string.Join<object>(",", types)}");
-            } while (checkType != null);
 
-            return types;
-        }
+                if (!baseType.IsGenericType)
+                {
+                    return lastType;
+                }
 
-        private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType)
-        {
-            Object result = null;
-            switch (fieldResult)
-            {
-                case null:
-                    // property.objectReferenceValue = null;
-                    break;
-                case GameObject go:
-                    // ReSharper disable once RedundantCast
-                    result = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
-                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
-                    break;
-                case Component comp:
-                    result = fieldType == typeof(GameObject)
-                        // ReSharper disable once RedundantCast
-                        ? (Object)comp.gameObject
-                        : comp.GetComponent(fieldType);
-                    break;
+                lastType = baseType;
             }
-
-            return result;
         }
+
     }
 }
