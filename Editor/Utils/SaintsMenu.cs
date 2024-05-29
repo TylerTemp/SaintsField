@@ -142,7 +142,7 @@ namespace SaintsField.Editor.Utils
         #endregion
 
         // ReSharper disable once UnusedMember.Local
-        private static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
+        public static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
         {
             IEnumerable<BuildTargetGroup> targets = targetGroups ?? Enum.GetValues(typeof(BuildTargetGroup)).Cast<BuildTargetGroup>();
 
