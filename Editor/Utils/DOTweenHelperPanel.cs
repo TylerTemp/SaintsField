@@ -32,6 +32,10 @@ namespace SaintsField.Editor.Utils
         private static bool DoTweenAllGood()
         {
             ScriptableObject doTweenSettings = Resources.Load<ScriptableObject>("DOTweenSettings");
+            if (doTweenSettings is null)  // bypass life circle check
+            {
+                return true;
+            }
             // Debug.Log(doTweenSettings);
             Type doTweenSettingsType = doTweenSettings.GetType();
             FieldInfo fieldInfo = doTweenSettingsType.GetField("createASMDEF", BindingFlags.Instance | BindingFlags.Public);
