@@ -10,6 +10,7 @@ using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 
@@ -262,12 +263,41 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 return null;
             }
-            Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
+            // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 
             string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
-            object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+            // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
+            object[] paraValues = parameters.Select(p =>
+            {
+                if (p.IsOptional)
+                {
+                    return p.DefaultValue;
+                }
 
-            Button result = new Button(() => methodInfo.Invoke(target, defaultParams))
+                return null;
+            }).ToArray();
+
+            VisualElement root = new VisualElement();
+
+            foreach (ParameterInfo parameterInfo in parameters)
+            {
+                var element = UIToolkitLayout(parameterInfo.ParameterType, parameterInfo.Name);
+                element.SetEnabled(true);
+                element.RegisterCallback<SerializedPropertyChangeEvent>(evt => Debug.Log(evt.));
+
+                // PropertyField propertyField;
+                // propertyField.RegisterValueChangeCallback();
+
+                IntegerField inter = new IntegerField();
+                inter.RegisterValueChangedCallback(evt => {})
+                root.Add(element);
+            }
+
+            Button result = new Button(() =>
+            {
+                methodInfo.Invoke(target, paraValues);
+            })
             {
                 text = buttonText,
                 enableRichText = true,
@@ -282,7 +312,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, true)).Every(100));
             }
 
-            return result;
+            root.Add(result);
+
+            return root;
         }
 #endif
         public override void OnDestroy()
