@@ -728,9 +728,9 @@ namespace SaintsField.Editor.Playa.Renderer
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private static StyleSheet nullUss;
 
-        protected static VisualElement UIToolkitLayout(object value, string label)
+        protected static VisualElement UIToolkitLayout(object value, string label, Type type=null)
         {
-            if (value == null)
+            if (type == null && value == null)
             {
                 TextField textField = new TextField(label)
                 {
@@ -753,7 +753,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             VisualElement visualElement;
-            Type valueType = value.GetType();
+            Type valueType = type ?? value.GetType();
 
             if (valueType == typeof(bool))
             {

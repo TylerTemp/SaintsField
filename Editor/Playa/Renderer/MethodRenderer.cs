@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -275,22 +276,79 @@ namespace SaintsField.Editor.Playa.Renderer
                     return p.DefaultValue;
                 }
 
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                if(p.ParameterType.IsValueType)
+                {
+                    return Activator.CreateInstance(p.ParameterType);
+                }
+
                 return null;
             }).ToArray();
 
             VisualElement root = new VisualElement();
 
-            foreach (ParameterInfo parameterInfo in parameters)
+            foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
             {
-                var element = UIToolkitLayout(parameterInfo.ParameterType, parameterInfo.Name);
+                // Debug.Log(parameterInfo.ParameterType);
+                var element = UIToolkitLayout(paraValues[index], parameterInfo.Name, parameterInfo.ParameterType);
                 element.SetEnabled(true);
-                element.RegisterCallback<SerializedPropertyChangeEvent>(evt => Debug.Log(evt.));
+
+                CallbackEventHandler callbackEventHandler = element;
+                Debug.Log(callbackEventHandler);
+                var eventType = typeof(ChangeEvent<>).MakeGenericType(parameterInfo.ParameterType);
+
+                var eventCallback = typeof(EventCallback<>).MakeGenericType(parameterInfo.ParameterType);
+                // Delegate myDelegate = Delegate.CreateDelegate(eventCallbackType, null, typeof(MethodRenderer).GetMethod("MyCallbackMethod", BindingFlags.NonPublic | BindingFlags.Static));
+                // Delegate myDelegate = (UnityEngine.UIElements.EventCallback<UnityEngine.UIElements.ChangeEvent<object>>)(evt => paraValues[index] = evt.newValue);
+
+                var myDelegate = Delegate.CreateDelegate(eventCallback, null, (Action<UnityEngine.UIElements.ChangeEvent<object>>)(evt => paraValues[index] = evt.newValue).Method);
+
+
+                // MethodInfo method = typeof(CallbackEventHandler).GetMethod();
+
+                // callbackEventHandler.RegisterCallback<>(evt => Debug.Log(evt));
+                // callbackEventHandler.RegisterCallback(evt => paraValues[index] = evt.newValue);
+
+                // Debug.Log(eventType);
+                //
+
+                // No, not work...
+
+                MethodInfo[] methods = typeof(CallbackEventHandler)
+                    .GetMethods()
+                    .Where(m => m.Name == "RegisterCallback")
+                    .ToArray();
+                MethodInfo registerCallbackMethod = methods.First(m => m.GetParameters().Length == 2);
+
+                registerCallbackMethod.Invoke(callbackEventHandler, new object[] { myDelegate, UnityEngine.UIElements.TrickleDown.NoTrickleDown });
+                // var registerCallbackGeneric = element.GetType().GetMethod(
+                //     nameof(callbackEventHandler.RegisterCallback),
+                //     1,
+                //     BindingFlags.Instance| BindingFlags.NonPublic | BindingFlags.FlattenHierarchy,
+                //     null,
+                //     default,
+                //     new[] { eventCallback, typeof(TrickleDown) },
+                //     default
+                // );
+                Debug.Log(registerCallbackMethod);
+
+                //
+                // Debug.Log(registerCallbackGeneric);
+                // registerCallbackGeneric.Invoke(element, new object[]
+                // {
+                //     Delegate.CreateDelegate(typeof(EventCallback<>).MakeGenericType(eventType), null, "Debug.Log")
+                //     // evt => Debug.Log(evt)
+                // });
+
+                // (element).RegisterCallback<ChangeEvent<object>>(evt => Debug.Log(evt.newValue));
 
                 // PropertyField propertyField;
                 // propertyField.RegisterValueChangeCallback();
 
-                IntegerField inter = new IntegerField();
-                inter.RegisterValueChangedCallback(evt => {})
+                // IntegerField inter = new IntegerField();
+                // ObjectField
+                // PropertyField
+                // inter.RegisterValueChangedCallback(evt => {})
                 root.Add(element);
             }
 
