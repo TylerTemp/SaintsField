@@ -5,6 +5,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
@@ -66,7 +67,14 @@ namespace SaintsField.Editor.Drawers
                 }
 
                 ImGuiEnsureDispose(target);
-                _previewTexture = AssetPreview.GetAssetPreview(target);
+                try
+                {
+                    _previewTexture = AssetPreview.GetAssetPreview(target);
+                }
+                catch (AssertionException)  // Unity: Assertion failed on expression: 'i->previewArtifactID == found->second.previewArtifactID'
+                {
+                    return null;
+                }
             }
 
             if (_previewTexture == null || _previewTexture.width == 1)

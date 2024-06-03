@@ -4,6 +4,7 @@ using System.Linq;
 using SaintsField.Editor.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils
@@ -599,7 +600,16 @@ namespace SaintsField.Editor.Utils
 
             // itemInfo.triedFirstLoad = true;
 
-            Texture2D result = AssetPreview.GetAssetPreview(itemInfo.Object);
+            // Texture2D result = AssetPreview.GetAssetPreview(itemInfo.Object);
+            Texture2D result;
+            try
+            {
+                result = AssetPreview.GetAssetPreview(itemInfo.Object);
+            }
+            catch (AssertionException)  // Unity: Assertion failed on expression: 'i->previewArtifactID == found->second.previewArtifactID'
+            {
+                return null;
+            }
             // Debug.Log($"return preview {result?.width}");
             if (result && result.width != 1)
             {
