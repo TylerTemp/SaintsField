@@ -432,13 +432,6 @@ namespace SaintsField.Editor.Playa.Renderer
                     return _imGuiParameterValues[index] = FieldLayout(_imGuiParameterValues[index], p.Name, p.ParameterType, false);
                 }).ToArray();
 
-                // object[] parameters = methodInfo.GetParameters().Select(p =>
-                // {
-                //     object defaultValue = GetParameterDefaultValue(p);
-                //     Type parameterType = p.ParameterType;
-                //     return FieldLayout(defaultValue)
-                // }).ToArray();
-
                 if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
                         GUILayout.ExpandWidth(true)))
                 {
@@ -455,7 +448,8 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override float GetHeight()
         {
-            if(!FieldWithInfo.PlayaAttributes.OfType<ButtonAttribute>().Any())
+            ButtonAttribute buttonAttribute = FieldWithInfo.PlayaAttributes.OfType<ButtonAttribute>().FirstOrDefault();
+            if(buttonAttribute == null)
             {
                 return 0;
             }
