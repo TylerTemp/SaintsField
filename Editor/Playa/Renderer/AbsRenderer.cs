@@ -384,11 +384,11 @@ namespace SaintsField.Editor.Playa.Renderer
         public abstract void RenderPosition(Rect position);
 
         // NA: NaughtyEditorGUI
-        protected static void FieldLayout(object value, string label)
+        protected static object FieldLayout(object value, string label, Type type=null, bool disabled=true)
         {
-            using (new EditorGUI.DisabledScope(true))
+            using (new EditorGUI.DisabledScope(disabled))
             {
-                if (value == null)
+                if (type == null && value == null)
                 {
                     Rect rt = GUILayoutUtility.GetRect(new GUIContent(label), EditorStyles.label);
                     EditorGUI.DrawRect(new Rect(rt)
@@ -397,132 +397,135 @@ namespace SaintsField.Editor.Playa.Renderer
                         width = rt.width - EditorGUIUtility.labelWidth,
                     }, Color.yellow * new Color(1, 1,1, 0.2f));
                     EditorGUI.LabelField(rt, label, "null", EditorStyles.label);
-                    return;
+                    return null;
                 }
 
                 // bool isDrawn = true;
-                Type valueType = value.GetType();
+                Type valueType = type ?? value.GetType();
 
                 if (valueType == typeof(bool))
                 {
-                    EditorGUILayout.Toggle(label, (bool)value);
+                    return EditorGUILayout.Toggle(label, (bool)value);
                 }
-                else if (valueType == typeof(short))
+
+                if (valueType == typeof(short))
                 {
-                    EditorGUILayout.IntField(label, (short)value);
+                    return EditorGUILayout.IntField(label, (short)value);
                 }
-                else if (valueType == typeof(ushort))
+                if (valueType == typeof(ushort))
                 {
-                    EditorGUILayout.IntField(label, (ushort)value);
+                    return EditorGUILayout.IntField(label, (ushort)value);
                 }
-                else if (valueType == typeof(int))
+                if (valueType == typeof(int))
                 {
-                    EditorGUILayout.IntField(label, (int)value);
+                    return EditorGUILayout.IntField(label, (int)value);
                 }
-                else if (valueType == typeof(uint))
+                if (valueType == typeof(uint))
                 {
-                    EditorGUILayout.LongField(label, (uint)value);
+                    return EditorGUILayout.LongField(label, (uint)value);
                 }
-                else if (valueType == typeof(long))
+                if (valueType == typeof(long))
                 {
-                    EditorGUILayout.LongField(label, (long)value);
+                    return EditorGUILayout.LongField(label, (long)value);
                 }
-                else if (valueType == typeof(ulong))
+                if (valueType == typeof(ulong))
                 {
-                    EditorGUILayout.TextField(label, ((ulong)value).ToString());
+                    return EditorGUILayout.TextField(label, ((ulong)value).ToString());
                 }
-                else if (valueType == typeof(float))
+                if (valueType == typeof(float))
                 {
-                    EditorGUILayout.FloatField(label, (float)value);
+                    return EditorGUILayout.FloatField(label, (float)value);
                 }
-                else if (valueType == typeof(double))
+                if (valueType == typeof(double))
                 {
-                    EditorGUILayout.DoubleField(label, (double)value);
+                    return EditorGUILayout.DoubleField(label, (double)value);
                 }
-                else if (valueType == typeof(string))
+                if (valueType == typeof(string))
                 {
-                    EditorGUILayout.TextField(label, (string)value);
+                    return EditorGUILayout.TextField(label, (string)value);
                 }
-                else if (valueType == typeof(Vector2))
+                if (valueType == typeof(Vector2))
                 {
-                    EditorGUILayout.Vector2Field(label, (Vector2)value);
+                    return EditorGUILayout.Vector2Field(label, (Vector2)value);
                 }
-                else if (valueType == typeof(Vector3))
+                if (valueType == typeof(Vector3))
                 {
-                    EditorGUILayout.Vector3Field(label, (Vector3)value);
+                    return EditorGUILayout.Vector3Field(label, (Vector3)value);
                 }
-                else if (valueType == typeof(Vector4))
+                if (valueType == typeof(Vector4))
                 {
-                    EditorGUILayout.Vector4Field(label, (Vector4)value);
+                    return EditorGUILayout.Vector4Field(label, (Vector4)value);
                 }
-                else if (valueType == typeof(Vector2Int))
+                if (valueType == typeof(Vector2Int))
                 {
-                    EditorGUILayout.Vector2IntField(label, (Vector2Int)value);
+                    return EditorGUILayout.Vector2IntField(label, (Vector2Int)value);
                 }
-                else if (valueType == typeof(Vector3Int))
+                if (valueType == typeof(Vector3Int))
                 {
-                    EditorGUILayout.Vector3IntField(label, (Vector3Int)value);
+                    return EditorGUILayout.Vector3IntField(label, (Vector3Int)value);
                 }
-                else if (valueType == typeof(Color))
+                if (valueType == typeof(Color))
                 {
-                    EditorGUILayout.ColorField(label, (Color)value);
+                    return EditorGUILayout.ColorField(label, (Color)value);
                 }
-                else if (valueType == typeof(Bounds))
+                if (valueType == typeof(Bounds))
                 {
-                    EditorGUILayout.BoundsField(label, (Bounds)value);
+                    return EditorGUILayout.BoundsField(label, (Bounds)value);
                 }
-                else if (valueType == typeof(Rect))
+                if (valueType == typeof(Rect))
                 {
-                    EditorGUILayout.RectField(label, (Rect)value);
+                    return EditorGUILayout.RectField(label, (Rect)value);
                 }
-                else if (valueType == typeof(RectInt))
+                if (valueType == typeof(RectInt))
                 {
-                    EditorGUILayout.RectIntField(label, (RectInt)value);
+                    return EditorGUILayout.RectIntField(label, (RectInt)value);
                 }
-                else if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
+                if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
                 {
-                    EditorGUILayout.ObjectField(label, (UnityEngine.Object)value, valueType, true);
+                    return EditorGUILayout.ObjectField(label, (UnityEngine.Object)value, valueType, true);
                 }
-                else if (valueType.BaseType == typeof(Enum))
+                if (valueType.BaseType == typeof(Enum))
                 {
-                    EditorGUILayout.EnumPopup(label, (Enum)value);
+                    return EditorGUILayout.EnumPopup(label, (Enum)value);
                 }
-                else if (valueType.BaseType == typeof(TypeInfo))
+                if (valueType.BaseType == typeof(TypeInfo))
                 {
-                    EditorGUILayout.TextField(label, value.ToString());
+                    return EditorGUILayout.TextField(label, value.ToString());
                 }
-                else if (value is IEnumerable enumerableValue)
+                if (value is IEnumerable enumerableValue)
                 {
                     (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
 
                     // using(new EditorGUILayout.VerticalScope(GUI.skin.box))
                     // {
-                        Rect labelRect = EditorGUILayout.GetControlRect();
-                        EditorGUI.LabelField(labelRect, label);
+                    Rect labelRect = EditorGUILayout.GetControlRect();
+                    EditorGUI.LabelField(labelRect, label);
 
-                        float numWidth = Mathf.Max(30,
-                            EditorStyles.textField.CalcSize(new GUIContent($"{valueIndexed.Length}")).x);
+                    float numWidth = Mathf.Max(30,
+                        EditorStyles.textField.CalcSize(new GUIContent($"{valueIndexed.Length}")).x);
 
-                        Rect numRect = new Rect(labelRect)
+                    Rect numRect = new Rect(labelRect)
+                    {
+                        width = numWidth,
+                        x = labelRect.x + labelRect.width - numWidth,
+                    };
+
+                    EditorGUI.IntField(numRect, valueIndexed.Length);
+                    using (new EditorGUI.IndentLevelScope())
+                    {
+                        List<object> listResult = new List<object>();
+                        foreach ((object item, int index) in valueIndexed)
                         {
-                            width = numWidth,
-                            x = labelRect.x + labelRect.width - numWidth,
-                        };
-
-                        EditorGUI.IntField(numRect, valueIndexed.Length);
-                        using (new EditorGUI.IndentLevelScope())
-                        {
-                            foreach ((object item, int index) in valueIndexed)
-                            {
-                                FieldLayout(item, $"Element {index}");
-                            }
+                            object itemValue = FieldLayout(item, $"Element {index}", item.GetType(), disabled);
+                            listResult.Add(itemValue);
                         }
+
+                        return listResult;
+                    }
                     // }
                 }
-                else
-                {
-                    EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
-                }
+                EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
+                return null;
 
                 // return isDrawn;
             }

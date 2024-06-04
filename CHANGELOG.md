@@ -1,3 +1,7 @@
+## 3.0.12
+
+`Button` now allows to have parameters and you can change the value in inspector.
+
 ## 3.0.11
 
 `SaintsInterface` for serializing interface of a `Unity.Object` type (or sub type).

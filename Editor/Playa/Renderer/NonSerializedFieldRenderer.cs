@@ -80,8 +80,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
-            FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
-                .FieldInfo.Name));
+            FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
         }
 
         public override float GetHeight()

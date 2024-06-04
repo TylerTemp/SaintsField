@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -229,6 +230,8 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
+        #region UI Toolkit
+
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreateVisualElement()
         {
@@ -301,19 +304,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 foreach (ParameterInfo parameterInfo in parameters)
                 {
-                    object defaultValue = null;
-                    if (parameterInfo.IsOptional)
-                    {
-                        defaultValue = parameterInfo.DefaultValue;
-                    }
-
-                    // ReSharper disable once ConvertIfStatementToReturnStatement
-                    if(parameterInfo.ParameterType.IsValueType)
-                    {
-                        defaultValue = Activator.CreateInstance(parameterInfo.ParameterType);
-                    }
-
-                    VisualElement element = UIToolkitLayout(defaultValue, parameterInfo.Name, parameterInfo.ParameterType);
+                    VisualElement element = UIToolkitLayout(GetParameterDefaultValue(parameterInfo), parameterInfo.Name, parameterInfo.ParameterType);
                     element.style.marginRight = 3;
                     element.SetEnabled(true);
                     parameterElements.Add(element);
@@ -352,9 +343,30 @@ namespace SaintsField.Editor.Playa.Renderer
             return root;
         }
 #endif
+
+        #endregion
+
+        private static object GetParameterDefaultValue(ParameterInfo parameterInfo)
+        {
+            if (parameterInfo.IsOptional)
+            {
+                return parameterInfo.DefaultValue;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if(parameterInfo.ParameterType.IsValueType)
+            {
+                return Activator.CreateInstance(parameterInfo.ParameterType);
+            }
+
+            return null;
+        }
+
         public override void OnDestroy()
         {
         }
+
+        private object[] _imGuiParameterValues;
 
         public override void Render()
         {
@@ -402,11 +414,41 @@ namespace SaintsField.Editor.Playa.Renderer
                     ? ObjectNames.NicifyVariableName(methodInfo.Name)
                     : buttonAttribute.Label;
 
+                ParameterInfo[] parameters = methodInfo.GetParameters();
+
+                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+                if (_imGuiParameterValues == null)
+                {
+                    _imGuiParameterValues = parameters.Select(GetParameterDefaultValue).ToArray();
+                }
+
+                if (parameters.Length > 0)
+                {
+                    GUILayout.BeginVertical(GUI.skin.box);
+                }
+
+                object[] invokeParams = parameters.Select((p, index) =>
+                {
+                    return _imGuiParameterValues[index] = FieldLayout(_imGuiParameterValues[index], p.Name, p.ParameterType, false);
+                }).ToArray();
+
+                // object[] parameters = methodInfo.GetParameters().Select(p =>
+                // {
+                //     object defaultValue = GetParameterDefaultValue(p);
+                //     Type parameterType = p.ParameterType;
+                //     return FieldLayout(defaultValue)
+                // }).ToArray();
+
                 if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
                         GUILayout.ExpandWidth(true)))
                 {
-                    object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
-                    methodInfo.Invoke(target, defaultParams);
+                    // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+                    methodInfo.Invoke(target, invokeParams);
+                }
+
+                if (parameters.Length > 0)
+                {
+                    GUILayout.EndVertical();
                 }
             }
         }
