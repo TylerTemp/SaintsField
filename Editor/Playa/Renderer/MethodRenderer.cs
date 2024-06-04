@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -269,91 +268,63 @@ namespace SaintsField.Editor.Playa.Renderer
             string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
             // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            object[] paraValues = parameters.Select(p =>
+            bool hasParameters = parameters.Length > 0;
+            List<VisualElement> parameterElements = new List<VisualElement>();
+            VisualElement root = null;
+
+            if (hasParameters)
             {
-                if (p.IsOptional)
+                root = new VisualElement
                 {
-                    return p.DefaultValue;
+                    style =
+                    {
+                        backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f),
+                        borderTopWidth = 1,
+                        borderLeftWidth = 1,
+                        borderRightWidth = 1,
+                        borderBottomWidth = 1,
+                        borderLeftColor = EColor.MidnightAsh.GetColor(),
+                        borderRightColor = EColor.MidnightAsh.GetColor(),
+                        borderTopColor = EColor.MidnightAsh.GetColor(),
+                        borderBottomColor = EColor.MidnightAsh.GetColor(),
+                        borderTopLeftRadius = 3,
+                        borderTopRightRadius = 3,
+                        borderBottomLeftRadius = 3,
+                        borderBottomRightRadius = 3,
+                        marginTop = 1,
+                        marginBottom = 1,
+                        marginLeft = 3,
+                        marginRight = 3,
+                        paddingTop = 3,
+                    },
+                };
+
+                foreach (ParameterInfo parameterInfo in parameters)
+                {
+                    object defaultValue = null;
+                    if (parameterInfo.IsOptional)
+                    {
+                        defaultValue = parameterInfo.DefaultValue;
+                    }
+
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if(parameterInfo.ParameterType.IsValueType)
+                    {
+                        defaultValue = Activator.CreateInstance(parameterInfo.ParameterType);
+                    }
+
+                    VisualElement element = UIToolkitLayout(defaultValue, parameterInfo.Name, parameterInfo.ParameterType);
+                    element.style.marginRight = 3;
+                    element.SetEnabled(true);
+                    parameterElements.Add(element);
+                    root.Add(element);
                 }
 
-                // ReSharper disable once ConvertIfStatementToReturnStatement
-                if(p.ParameterType.IsValueType)
-                {
-                    return Activator.CreateInstance(p.ParameterType);
-                }
-
-                return null;
-            }).ToArray();
-
-            VisualElement root = new VisualElement();
-
-            foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
-            {
-                // Debug.Log(parameterInfo.ParameterType);
-                var element = UIToolkitLayout(paraValues[index], parameterInfo.Name, parameterInfo.ParameterType);
-                element.SetEnabled(true);
-
-                CallbackEventHandler callbackEventHandler = element;
-                Debug.Log(callbackEventHandler);
-                var eventType = typeof(ChangeEvent<>).MakeGenericType(parameterInfo.ParameterType);
-
-                var eventCallback = typeof(EventCallback<>).MakeGenericType(parameterInfo.ParameterType);
-                // Delegate myDelegate = Delegate.CreateDelegate(eventCallbackType, null, typeof(MethodRenderer).GetMethod("MyCallbackMethod", BindingFlags.NonPublic | BindingFlags.Static));
-                // Delegate myDelegate = (UnityEngine.UIElements.EventCallback<UnityEngine.UIElements.ChangeEvent<object>>)(evt => paraValues[index] = evt.newValue);
-
-                var myDelegate = Delegate.CreateDelegate(eventCallback, null, (Action<UnityEngine.UIElements.ChangeEvent<object>>)(evt => paraValues[index] = evt.newValue).Method);
-
-
-                // MethodInfo method = typeof(CallbackEventHandler).GetMethod();
-
-                // callbackEventHandler.RegisterCallback<>(evt => Debug.Log(evt));
-                // callbackEventHandler.RegisterCallback(evt => paraValues[index] = evt.newValue);
-
-                // Debug.Log(eventType);
-                //
-
-                // No, not work...
-
-                MethodInfo[] methods = typeof(CallbackEventHandler)
-                    .GetMethods()
-                    .Where(m => m.Name == "RegisterCallback")
-                    .ToArray();
-                MethodInfo registerCallbackMethod = methods.First(m => m.GetParameters().Length == 2);
-
-                registerCallbackMethod.Invoke(callbackEventHandler, new object[] { myDelegate, UnityEngine.UIElements.TrickleDown.NoTrickleDown });
-                // var registerCallbackGeneric = element.GetType().GetMethod(
-                //     nameof(callbackEventHandler.RegisterCallback),
-                //     1,
-                //     BindingFlags.Instance| BindingFlags.NonPublic | BindingFlags.FlattenHierarchy,
-                //     null,
-                //     default,
-                //     new[] { eventCallback, typeof(TrickleDown) },
-                //     default
-                // );
-                Debug.Log(registerCallbackMethod);
-
-                //
-                // Debug.Log(registerCallbackGeneric);
-                // registerCallbackGeneric.Invoke(element, new object[]
-                // {
-                //     Delegate.CreateDelegate(typeof(EventCallback<>).MakeGenericType(eventType), null, "Debug.Log")
-                //     // evt => Debug.Log(evt)
-                // });
-
-                // (element).RegisterCallback<ChangeEvent<object>>(evt => Debug.Log(evt.newValue));
-
-                // PropertyField propertyField;
-                // propertyField.RegisterValueChangeCallback();
-
-                // IntegerField inter = new IntegerField();
-                // ObjectField
-                // PropertyField
-                // inter.RegisterValueChangedCallback(evt => {})
-                root.Add(element);
             }
 
-            Button result = new Button(() =>
+            Button buttonElement = new Button(() =>
             {
+                object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
                 methodInfo.Invoke(target, paraValues);
             })
             {
@@ -364,14 +335,20 @@ namespace SaintsField.Editor.Playa.Renderer
                     flexGrow = 1,
                 },
             };
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaHideIfAttribute || each is PlayaEnableIfAttribute ||
+            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
                                                             each is PlayaDisableIfAttribute) > 0)
             {
-                result.RegisterCallback<AttachToPanelEvent>(_ => result.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, result, true)).Every(100));
+                buttonElement.RegisterCallback<AttachToPanelEvent>(_ => buttonElement.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, buttonElement, true)).Every(100));
             }
 
-            root.Add(result);
-
+            if (!hasParameters)
+            {
+                return buttonElement;
+            }
+            buttonElement.style.marginTop = buttonElement.style.marginBottom = buttonElement.style.marginLeft = buttonElement.style.marginRight = 0;
+            buttonElement.style.borderTopLeftRadius = buttonElement.style.borderTopRightRadius = 0;
+            buttonElement.style.borderLeftWidth = buttonElement.style.borderRightWidth = buttonElement.style.borderBottomWidth = 0;
+            root.Add(buttonElement);
             return root;
         }
 #endif
