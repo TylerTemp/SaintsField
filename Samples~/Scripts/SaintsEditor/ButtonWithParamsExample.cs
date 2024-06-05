@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class ButtonWithParamsExample : MonoBehaviour
+    public class ButtonWithParamsExample : SaintsMonoBehavior
     {
         [Button]
         private void OnButton()

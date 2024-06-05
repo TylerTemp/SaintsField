@@ -1,6 +1,7 @@
 ## 3.0.12
 
-`Button` now allows to have parameters and you can change the value in inspector.
+1.  `Button` now allows to have parameters and you can change the value in inspector.
+2.  If you have `DOTween` installed without ASMDEF enabled, there will be a popup window to ask you either enable it, or disable SaintsField's DOTween ability.
 
 ## 3.0.11
 

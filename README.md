@@ -66,11 +66,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.11**
+**3.0.12**
 
-`SaintsInterface` for serializing interface of a `Unity.Object` type (or sub type).
-
-Special thanks for [@dbc](https://stackoverflow.com/users/3744182/dbc)'s [answer in stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347).
+1.  `Button` now allows to have parameters and you can change the value in inspector.
+2.  If you have `DOTween` installed without ASMDEF enabled, there will be a popup window to ask you either enable it, or disable SaintsField's DOTween ability.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -371,6 +370,8 @@ All of them have the same arguments:
 
 *   AllowMultiple: Yes
 
+Note: Compared to `Button` in `SaintsEditor`, these buttons can receive the value of the decorated field, and will not get parameter drawers.
+
 ```csharp
 using SaintsField;
 
@@ -401,9 +402,9 @@ private string GetButtonLabelIcon() => _errorOut
     ? "<color=red><icon='eye.png' /></color>"
     : "<color=green><icon='eye.png' /></color>";
 
-private void ClickButton()
+private void ClickButton(int intValue)
 {
-    Debug.Log("CLICKED 2!");
+    Debug.Log($"get value: {intValue}");
     if(_errorOut)
     {
         throw new Exception("Expected exception!");
@@ -413,7 +414,10 @@ private void ClickButton()
 private void ToggleAndError()
 {
     Toggle();
-    ClickButton();
+    if(_errorOut)
+    {
+        throw new Exception("Expected exception!");
+    }
 }
 
 private void Toggle() => _errorOut = !_errorOut;
@@ -2692,7 +2696,7 @@ Please note, any `Editor` level component can not work together with each other 
 
 If you are interested, here is how to use it.
 
-### Set Up SaintsEditor ###
+### Setup SaintsEditor ###
 
 `Window` - `Saints` - `Apply SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
 
@@ -2748,15 +2752,13 @@ The check of each row means auto play when you click the start in the global con
 
 [![dotween_play](https://github.com/TylerTemp/SaintsField/assets/6391063/d9479943-b254-4819-af91-c390a9fb2268)](https://github.com/TylerTemp/SaintsField/assets/6391063/34f36f5d-6697-4b68-9773-ce37672b850c)
 
-**Set Up**
+**Setup**
 
 To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
 ### `Button` ###
 
-Draw a button for a function.
-
-Compared to `NaughtyAttributes`, this does not allow to specific for editing and playing mode. It also does not handle an `IEnumerator` function, it just `Invoke` the target function.
+Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments.
 
 *   `string buttonLabel = null` the button label. If null, it'll use the function name.
 
@@ -2777,6 +2779,20 @@ private void EditorLabeledButton()
 ```
 
 ![button](https://github.com/TylerTemp/SaintsField/assets/6391063/2f32336d-ca8b-46e0-9ac8-7bc44aada54b)
+
+Example with arguments:
+
+```csharp
+using SaintsField.Playa;
+
+[Button]
+private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
+{
+    Debug.Log($"{myObj}, {myInt}, {myStr}");
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/7a79ed1f-e227-4cf4-8885-e2ea81f4df3a)
 
 ### `ShowInInspector` ###
 
