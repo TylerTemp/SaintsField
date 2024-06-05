@@ -12,9 +12,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 
         [Button]
-        private void OnButtonParams(Object obj, int integer, string str = "hi")
+        private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
         {
-            Debug.Log($"{obj}, {integer}, {str}");
+            Debug.Log($"{myObj}, {myInt}, {myStr}");
         }
     }
 }

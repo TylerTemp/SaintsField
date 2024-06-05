@@ -573,11 +573,11 @@ namespace SaintsField.Editor.Playa.Renderer
             return ImGuiHelpBox.GetHeight($"Type not supported: {valueType}", EditorGUIUtility.currentViewWidth, MessageType.Warning);
         }
 
-        protected static void FieldPosition(Rect position, object value, string label)
+        protected static object FieldPosition(Rect position, object value, string label, Type type=null, bool disabled=true)
         {
-            using (new EditorGUI.DisabledScope(true))
+            using (new EditorGUI.DisabledScope(disabled))
             {
-                if (value == null)
+                if (type == null && value == null)
                 {
                     Rect rt = position;
                     EditorGUI.DrawRect(new Rect(rt)
@@ -586,101 +586,102 @@ namespace SaintsField.Editor.Playa.Renderer
                         width = rt.width - EditorGUIUtility.labelWidth,
                     }, Color.yellow * new Color(1, 1,1, 0.2f));
                     EditorGUI.LabelField(rt, label, "null", EditorStyles.label);
-                    return;
+                    return null;
                 }
 
                 // bool isDrawn = true;
-                Type valueType = value.GetType();
+                Type valueType = type ?? value.GetType();
 
                 if (valueType == typeof(bool))
                 {
-                    EditorGUI.Toggle(position, label, (bool)value);
+                    return EditorGUI.Toggle(position, label, (bool)value);
                 }
-                else if (valueType == typeof(short))
+
+                if (valueType == typeof(short))
                 {
-                    EditorGUI.IntField(position, label, (short)value);
+                    return EditorGUI.IntField(position, label, (short)value);
                 }
-                else if (valueType == typeof(ushort))
+                if (valueType == typeof(ushort))
                 {
-                    EditorGUI.IntField(position, label, (ushort)value);
+                    return EditorGUI.IntField(position, label, (ushort)value);
                 }
-                else if (valueType == typeof(int))
+                if (valueType == typeof(int))
                 {
-                    EditorGUI.IntField(position, label, (int)value);
+                    return EditorGUI.IntField(position, label, (int)value);
                 }
-                else if (valueType == typeof(uint))
+                if (valueType == typeof(uint))
                 {
-                    EditorGUI.LongField(position, label, (uint)value);
+                    return EditorGUI.LongField(position, label, (uint)value);
                 }
-                else if (valueType == typeof(long))
+                if (valueType == typeof(long))
                 {
-                    EditorGUI.LongField(position, label, (long)value);
+                    return EditorGUI.LongField(position, label, (long)value);
                 }
-                else if (valueType == typeof(ulong))
+                if (valueType == typeof(ulong))
                 {
-                    EditorGUI.TextField(position, label, ((ulong)value).ToString());
+                    return EditorGUI.TextField(position, label, ((ulong)value).ToString());
                 }
-                else if (valueType == typeof(float))
+                if (valueType == typeof(float))
                 {
-                    EditorGUI.FloatField(position, label, (float)value);
+                    return EditorGUI.FloatField(position, label, (float)value);
                 }
-                else if (valueType == typeof(double))
+                if (valueType == typeof(double))
                 {
-                    EditorGUI.DoubleField(position, label, (double)value);
+                    return EditorGUI.DoubleField(position, label, (double)value);
                 }
-                else if (valueType == typeof(string))
+                if (valueType == typeof(string))
                 {
-                    EditorGUI.TextField(position, label, (string)value);
+                    return EditorGUI.TextField(position, label, (string)value);
                 }
-                else if (valueType == typeof(Vector2))
+                if (valueType == typeof(Vector2))
                 {
-                    EditorGUI.Vector2Field(position, label, (Vector2)value);
+                    return EditorGUI.Vector2Field(position, label, (Vector2)value);
                 }
-                else if (valueType == typeof(Vector3))
+                if (valueType == typeof(Vector3))
                 {
-                    EditorGUI.Vector3Field(position, label, (Vector3)value);
+                    return EditorGUI.Vector3Field(position, label, (Vector3)value);
                 }
-                else if (valueType == typeof(Vector4))
+                if (valueType == typeof(Vector4))
                 {
-                    EditorGUI.Vector4Field(position, label, (Vector4)value);
+                    return EditorGUI.Vector4Field(position, label, (Vector4)value);
                 }
-                else if (valueType == typeof(Vector2Int))
+                if (valueType == typeof(Vector2Int))
                 {
-                    EditorGUI.Vector2IntField(position, label, (Vector2Int)value);
+                    return EditorGUI.Vector2IntField(position, label, (Vector2Int)value);
                 }
-                else if (valueType == typeof(Vector3Int))
+                if (valueType == typeof(Vector3Int))
                 {
-                    EditorGUI.Vector3IntField(position, label, (Vector3Int)value);
+                    return EditorGUI.Vector3IntField(position, label, (Vector3Int)value);
                 }
-                else if (valueType == typeof(Color))
+                if (valueType == typeof(Color))
                 {
-                    EditorGUI.ColorField(position, label, (Color)value);
+                    return EditorGUI.ColorField(position, label, (Color)value);
                 }
-                else if (valueType == typeof(Bounds))
+                if (valueType == typeof(Bounds))
                 {
-                    EditorGUI.BoundsField(position, label, (Bounds)value);
+                    return EditorGUI.BoundsField(position, label, (Bounds)value);
                 }
-                else if (valueType == typeof(Rect))
+                if (valueType == typeof(Rect))
                 {
-                    EditorGUI.RectField(position, label, (Rect)value);
+                    return EditorGUI.RectField(position, label, (Rect)value);
                 }
-                else if (valueType == typeof(RectInt))
+                if (valueType == typeof(RectInt))
                 {
-                    EditorGUI.RectIntField(position, label, (RectInt)value);
+                    return EditorGUI.RectIntField(position, label, (RectInt)value);
                 }
-                else if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
+                if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
                 {
-                    EditorGUI.ObjectField(position, label, (UnityEngine.Object)value, valueType, true);
+                    return EditorGUI.ObjectField(position, label, (UnityEngine.Object)value, valueType, true);
                 }
-                else if (valueType.BaseType == typeof(Enum))
+                if (valueType.BaseType == typeof(Enum))
                 {
-                    EditorGUI.EnumPopup(position, label, (Enum)value);
+                    return EditorGUI.EnumPopup(position, label, (Enum)value);
                 }
-                else if (valueType.BaseType == typeof(TypeInfo))
+                if (valueType.BaseType == typeof(TypeInfo))
                 {
-                    EditorGUI.TextField(position, label, value.ToString());
+                    return EditorGUI.TextField(position, label, value.ToString());
                 }
-                else if (value is IEnumerable enumerableValue)
+                if (value is IEnumerable enumerableValue)
                 {
                     (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
 
@@ -703,6 +704,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     float lisAccY = 0;
                     using(new EditorGUI.IndentLevelScope())
                     {
+                        List<object> results = new List<object>();
                         foreach ((object item, int index) in valueIndexed)
                         {
                             string thisLabel = $"Element {index}";
@@ -714,15 +716,15 @@ namespace SaintsField.Editor.Playa.Renderer
                             };
                             lisAccY += thisHeight;
 
-                            FieldPosition(thisRect, item, thisLabel);
+                            results.Add(FieldPosition(thisRect, item, thisLabel));
                         }
+
+                        return results;
                     }
 
                 }
-                else
-                {
-                    EditorGUI.HelpBox(position, $"Type not supported: {valueType}", MessageType.Warning);
-                }
+                EditorGUI.HelpBox(position, $"Type not supported: {valueType}", MessageType.Warning);
+                return null;
 
                 // return isDrawn;
             }

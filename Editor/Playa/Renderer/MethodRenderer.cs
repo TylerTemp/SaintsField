@@ -304,7 +304,8 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 foreach (ParameterInfo parameterInfo in parameters)
                 {
-                    VisualElement element = UIToolkitLayout(GetParameterDefaultValue(parameterInfo), parameterInfo.Name, parameterInfo.ParameterType);
+                    VisualElement element = UIToolkitLayout(GetParameterDefaultValue(parameterInfo),
+                        ObjectNames.NicifyVariableName(parameterInfo.Name), parameterInfo.ParameterType);
                     element.style.marginRight = 3;
                     element.SetEnabled(true);
                     parameterElements.Add(element);
@@ -429,7 +430,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 object[] invokeParams = parameters.Select((p, index) =>
                 {
-                    return _imGuiParameterValues[index] = FieldLayout(_imGuiParameterValues[index], p.Name, p.ParameterType, false);
+                    return _imGuiParameterValues[index] = FieldLayout(_imGuiParameterValues[index], ObjectNames.NicifyVariableName(p.Name), p.ParameterType, false);
                 }).ToArray();
 
                 if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
@@ -446,6 +447,8 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
+        private const float PaddingBox = 2f;
+
         public override float GetHeight()
         {
             ButtonAttribute buttonAttribute = FieldWithInfo.PlayaAttributes.OfType<ButtonAttribute>().FirstOrDefault();
@@ -460,7 +463,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 return 0;
             }
 
-            return SaintsPropertyDrawer.SingleLineHeight;
+            ParameterInfo[] parameters = FieldWithInfo.MethodInfo.GetParameters();
+
+            return SaintsPropertyDrawer.SingleLineHeight
+                   + parameters.Select(each => FieldHeight(each.ParameterType, each.Name)).Sum()
+                   + (parameters.Length > 0? PaddingBox * 2: 0);
         }
 
         public override void RenderPosition(Rect position)
@@ -502,17 +509,62 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
+            ParameterInfo[] parameters = FieldWithInfo.MethodInfo.GetParameters();
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (_imGuiParameterValues == null)
+            {
+                _imGuiParameterValues = parameters.Select(GetParameterDefaultValue).ToArray();
+            }
+
+            float yAcc = position.y + (parameters.Length > 0 ? PaddingBox : 0);
+
+            // draw box
+            if (parameters.Length > 0)
+            {
+                float[] heights = parameters.Select(each => FieldHeight(each.ParameterType, each.Name)).ToArray();
+
+                Rect boxRect = new Rect(position)
+                {
+                    y = yAcc,
+                    height = position.height - PaddingBox * 2,
+                };
+                GUI.Box(boxRect, GUIContent.none);
+
+                foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
+                {
+                    float height = heights[index];
+                    Rect rect = new Rect(position)
+                    {
+                        y = yAcc,
+                        x = position.x + PaddingBox,
+                        width = position.width - 2 * PaddingBox,
+                        height = height,
+                    };
+                    yAcc += height;
+
+                    _imGuiParameterValues[index] = FieldPosition(rect, _imGuiParameterValues[index],
+                        ObjectNames.NicifyVariableName(parameterInfo.Name), parameterInfo.ParameterType, false);
+                    position.y += rect.height;
+                }
+            }
+
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
                 string buttonText = string.IsNullOrEmpty(buttonAttribute.Label)
                     ? ObjectNames.NicifyVariableName(methodInfo.Name)
                     : buttonAttribute.Label;
 
-                // ReSharper disable once InvertIf
-                if (GUI.Button(position, buttonText, new GUIStyle(GUI.skin.button) { richText = true }))
+                Rect buttonRect = new Rect(position)
                 {
-                    object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
-                    methodInfo.Invoke(target, defaultParams);
+                    y = yAcc,
+                    height = SaintsPropertyDrawer.SingleLineHeight,
+                };
+
+                // ReSharper disable once InvertIf
+                if (GUI.Button(buttonRect, buttonText, new GUIStyle(GUI.skin.button) { richText = true }))
+                {
+                    // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+                    methodInfo.Invoke(target, _imGuiParameterValues);
                 }
             }
         }

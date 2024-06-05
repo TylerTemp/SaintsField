@@ -21,9 +21,9 @@ namespace SaintsField.Samples.Scripts
             }
 
             [Button]
-            private void OnButtonParams(UnityEngine.Object obj, int integer, string str = "hi")
+            private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
             {
-                Debug.Log($"{obj}, {integer}, {str}");
+                Debug.Log($"{myObj}, {myInt}, {myStr}");
             }
         }
 
