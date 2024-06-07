@@ -1,8 +1,11 @@
 ﻿using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
+using System.Collections.Generic;
 using SaintsField.Playa;
 using SaintsField.Editor.Utils;
 using UnityEditor.UIElements;
@@ -36,14 +39,18 @@ namespace SaintsField.Editor.Playa.Renderer
                 friendlyName = FieldWithInfo.SerializedProperty.displayName,
             };
 
-            PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
-            {
-                style =
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
+
+            VisualElement result = listDrawerSettingsAttribute == null
+                ? new PropertyField(FieldWithInfo.SerializedProperty)
                 {
-                    flexGrow = 1,
-                },
-                userData = userDataPayload,
-            };
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                    userData = userDataPayload,
+                }
+                : MakeListDrawerSettingsField(listDrawerSettingsAttribute);
 
             // ReSharper disable once InvertIf
             // if(TryFixUIToolkit && FieldWithInfo.FieldInfo?.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
@@ -85,6 +92,226 @@ namespace SaintsField.Editor.Playa.Renderer
             // });
 
             return result;
+        }
+
+        private const string ListDrawerItemClass = "saintsfield-list-drawer-item";
+
+        private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            SerializedProperty property = FieldWithInfo.SerializedProperty;
+
+            int numberOfItemsPerPage = 0;
+            int curPageIndex = 0;
+
+            VisualElement MakeItem()
+            {
+                PropertyField propertyField = new PropertyField();
+                propertyField.AddToClassList(ListDrawerItemClass);
+                return propertyField;
+            }
+
+            void BindItem(VisualElement propertyFieldRaw, int index)
+            {
+                SerializedProperty prop = property.GetArrayElementAtIndex(index + curPageIndex * numberOfItemsPerPage);
+                PropertyField propertyField = (PropertyField)propertyFieldRaw;
+                propertyField.Unbind();
+                propertyField.BindProperty(prop);
+            }
+
+            ListView listView = new ListView(Enumerable.Range(0, property.arraySize).Select(index => property.GetArrayElementAtIndex(index)).ToList())
+            {
+                makeItem = MakeItem,
+                bindItem = BindItem,
+                selectionType = SelectionType.Multiple,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                showFoldoutHeader = true,
+                headerTitle = property.displayName,
+                showAddRemoveFooter = true,
+                reorderMode = ListViewReorderMode.Animated,
+                reorderable = true,
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+
+            listView.itemsAdded += objects =>
+            {
+                int maxValue = objects.Max();
+                property.arraySize = maxValue + 1;
+                property.serializedObject.ApplyModifiedProperties();
+            };
+            listView.itemsRemoved += objects =>
+            {
+                foreach (int index in objects.OrderByDescending(each => each))
+                {
+                    property.DeleteArrayElementAtIndex(index);
+                }
+                property.serializedObject.ApplyModifiedProperties();
+            };
+
+            VisualElement foldoutContent = listView.Q<VisualElement>(className: "unity-foldout__content");
+
+            VisualElement preContent = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    display = DisplayStyle.None,
+                },
+            };
+
+            #region Search
+
+            ToolbarSearchField searchField = new ToolbarSearchField
+            {
+                style =
+                {
+                    visibility = Visibility.Hidden,
+                    flexGrow = 1,
+                    flexShrink = 1,
+                },
+            };
+            // searchContainer.Add(searchField);
+            preContent.Add(searchField);
+
+            #endregion
+
+            #region Paging
+
+            VisualElement pagingContainer = new VisualElement
+            {
+                style =
+                {
+                    visibility = Visibility.Hidden,
+                    flexDirection = FlexDirection.Row,
+                    flexGrow = 0,
+                    flexShrink = 0,
+                },
+            };
+
+            IntegerField numberOfItemsPerPageField = new IntegerField
+            {
+                isDelayed = true,
+                style =
+                {
+                    minWidth = 30,
+                },
+            };
+            numberOfItemsPerPageField.Q<TextElement>().style.unityTextAlign = TextAnchor.MiddleRight;
+            Label numberOfItemsPerPageLabel = new Label(" / Page")
+            {
+                style =
+                {
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                },
+            };
+
+            Button pagePreButton = new Button
+            {
+                text = "<",
+            };
+            IntegerField pageField = new IntegerField
+            {
+                isDelayed = true,
+                style =
+                {
+                    minWidth = 30,
+                },
+            };
+            pageField.Q<TextElement>().style.unityTextAlign = TextAnchor.MiddleRight;
+            Label pageLabel = new Label(" / 1")
+            {
+                style =
+                {
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                },
+            };
+            Button pageNextButton = new Button
+            {
+                text = ">",
+            };
+
+            void UpdatePage(int newPageIndex)
+            {
+                int pageCount;
+                int skipStart;
+                int itemCount;
+                if (numberOfItemsPerPage <= 0)
+                {
+                    pageCount = 1;
+                    curPageIndex = 0;
+                    skipStart = 0;
+                    itemCount = property.arraySize;
+                }
+                else
+                {
+                    pageCount = Mathf.CeilToInt((float)property.arraySize / numberOfItemsPerPage);
+                    curPageIndex = Mathf.Clamp(newPageIndex, 0, pageCount - 1);
+                    skipStart = curPageIndex * numberOfItemsPerPage;
+                    itemCount = Mathf.Min(numberOfItemsPerPage, property.arraySize - skipStart);
+                }
+
+                pageLabel.text = $" / {pageCount}";
+                pageField.SetValueWithoutNotify(curPageIndex + 1);
+
+                List<SerializedProperty> curPageItems = Enumerable.Range(skipStart, itemCount)
+                    .Select(index => property.GetArrayElementAtIndex(index))
+                    .ToList();
+
+                listView.itemsSource = curPageItems;
+                listView.Rebuild();
+            }
+
+            pagePreButton.clicked += () =>
+            {
+                if(curPageIndex > 0)
+                {
+                    UpdatePage(curPageIndex - 1);
+                }
+            };
+            pageNextButton.clicked += () =>
+            {
+                if(curPageIndex < Mathf.CeilToInt((float)property.arraySize / numberOfItemsPerPage) - 1)
+                {
+                    UpdatePage(curPageIndex + 1);
+                }
+            };
+            pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1));
+
+            void UpdateNumberOfItemsPerPage(int newNumberOfItemsPerPage)
+            {
+                int newValue = Mathf.Clamp(newNumberOfItemsPerPage, 0, property.arraySize);
+                if(numberOfItemsPerPage != newValue)
+                {
+                    numberOfItemsPerPage = newValue;
+                    UpdatePage(curPageIndex);
+                }
+            }
+
+            numberOfItemsPerPageField.RegisterValueChangedCallback(evt => UpdateNumberOfItemsPerPage(evt.newValue));
+            if (listDrawerSettingsAttribute.NumberOfItemsPerPage != 0)
+            {
+                preContent.style.display = DisplayStyle.Flex;
+                pagingContainer.style.visibility = Visibility.Visible;
+                numberOfItemsPerPageField.value = listDrawerSettingsAttribute.NumberOfItemsPerPage;
+            }
+
+            pagingContainer.Add(numberOfItemsPerPageField);
+            pagingContainer.Add(numberOfItemsPerPageLabel);
+
+            pagingContainer.Add(pagePreButton);
+            pagingContainer.Add(pageField);
+            pagingContainer.Add(pageLabel);
+            pagingContainer.Add(pageNextButton);
+
+            preContent.Add(pagingContainer);
+
+            #endregion
+
+            foldoutContent.Insert(0, preContent);
+
+            return listView;
         }
 
         private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition)
