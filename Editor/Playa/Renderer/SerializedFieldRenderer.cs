@@ -159,7 +159,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 style =
                 {
-                    visibility = Visibility.Hidden,
+                    // visibility = Visibility.Hidden,
                     flexGrow = 1,
                     flexShrink = 1,
                 },
@@ -227,6 +227,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
             void UpdatePage(int newPageIndex)
             {
+                string searchTarget = searchField.value;
+                IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(searchTarget)
+                    ? Enumerable.Range(0, property.arraySize).ToList()
+                    : SearchArrayProperty(property, searchTarget).ToList();
+
                 int pageCount;
                 int skipStart;
                 int itemCount;
@@ -239,10 +244,10 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
                 else
                 {
-                    pageCount = Mathf.CeilToInt((float)property.arraySize / numberOfItemsPerPage);
+                    pageCount = Mathf.CeilToInt((float)fullIndexResults.Count / numberOfItemsPerPage);
                     curPageIndex = Mathf.Clamp(newPageIndex, 0, pageCount - 1);
                     skipStart = curPageIndex * numberOfItemsPerPage;
-                    itemCount = Mathf.Min(numberOfItemsPerPage, property.arraySize - skipStart);
+                    itemCount = Mathf.Min(numberOfItemsPerPage, fullIndexResults.Count - skipStart);
                 }
 
                 pageLabel.text = $" / {pageCount}";
@@ -253,6 +258,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 listView.itemsSource = curPageItems;
                 listView.Rebuild();
             }
+
+            searchField.RegisterValueChangedCallback(evt =>
+            {
+                UpdatePage(0);
+            });
 
             pagePreButton.clicked += () =>
             {
@@ -332,6 +342,90 @@ namespace SaintsField.Editor.Playa.Renderer
             foldoutContent.Insert(0, preContent);
 
             return listView;
+        }
+
+        private static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string search)
+        {
+            foreach (int index in Enumerable.Range(0, property.arraySize))
+            {
+                SerializedProperty childProperty = property.GetArrayElementAtIndex(index);
+                if(SearchProp(childProperty, search))
+                {
+                    yield return index;
+                }
+            }
+        }
+
+        private static bool SearchProp(SerializedProperty property, string search)
+        {
+            bool hasChildProp = false;
+            foreach (SerializedProperty child in GetPropertyChildren(property))
+            {
+                hasChildProp = true;
+                if(SearchProp(child, search))
+                {
+                    return true;
+                }
+            }
+
+            if (hasChildProp)
+            {
+                return false;
+            }
+
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                    return property.intValue.ToString().Contains(search);
+                case SerializedPropertyType.Boolean:
+                    return property.boolValue.ToString().Contains(search);
+                case SerializedPropertyType.Float:
+                    return property.floatValue.ToString().Contains(search);
+                case SerializedPropertyType.String:
+                    return property.stringValue.Contains(search);
+                case SerializedPropertyType.Color:
+                    return property.colorValue.ToString().Contains(search);
+                case SerializedPropertyType.ObjectReference:
+                    return property.objectReferenceValue?.name.Contains(search) ?? false;
+                case SerializedPropertyType.LayerMask:
+                    return property.intValue.ToString().Contains(search);
+                case SerializedPropertyType.Enum:
+                    return property.enumNames[property.enumValueIndex].Contains(search);
+                case SerializedPropertyType.Vector2:
+                    return property.vector2Value.ToString().Contains(search);
+                case SerializedPropertyType.Vector3:
+                    return property.vector3Value.ToString().Contains(search);
+                case SerializedPropertyType.Vector4:
+                    return property.vector4Value.ToString().Contains(search);
+                case SerializedPropertyType.Rect:
+                    return property.rectValue.ToString().Contains(search);
+                // case SerializedPropertyType.ArraySize:
+                //     return property.arraySize.ToString().Contains(search);
+                case SerializedPropertyType.Character:
+                    return property.intValue.ToString().Contains(search);
+                case SerializedPropertyType.AnimationCurve:
+                    return property.animationCurveValue.ToString().Contains(search);
+                case SerializedPropertyType.Bounds:
+                    return property.boundsValue.ToString().Contains(search);
+                case SerializedPropertyType.Quaternion:
+                    return property.quaternionValue.ToString().Contains(search);
+                case SerializedPropertyType.ExposedReference:
+                    return property.exposedReferenceValue?.name.Contains(search) ?? false;
+                case SerializedPropertyType.FixedBufferSize:
+                    return property.fixedBufferSize.ToString().Contains(search);
+                case SerializedPropertyType.Vector2Int:
+                    return property.vector2IntValue.ToString().Contains(search);
+                case SerializedPropertyType.Vector3Int:
+                    return property.vector3IntValue.ToString().Contains(search);
+                case SerializedPropertyType.RectInt:
+                    return property.rectIntValue.ToString().Contains(search);
+                case SerializedPropertyType.BoundsInt:
+                    return property.boundsIntValue.ToString().Contains(search);
+                case SerializedPropertyType.ManagedReference:
+                    return property.managedReferenceFullTypename.Contains(search);
+                default:
+                    return false;
+            }
         }
 
         private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition)
@@ -559,6 +653,72 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
             // EditorGUI.DrawRect(position, Color.blue);
+        }
+
+        public static IEnumerable<SerializedProperty> GetPropertyChildren(SerializedProperty property)
+        {
+            if (property != null && string.IsNullOrEmpty(property.propertyPath))
+            {
+                yield break;
+            }
+
+            using (SerializedProperty iterator = property.Copy())
+            {
+                if (!iterator.NextVisible(true))
+                {
+                    yield break;
+                }
+
+                do
+                {
+                    SerializedProperty childProperty = property.FindPropertyRelative(iterator.name);
+                    yield return childProperty;
+                } while (iterator.NextVisible(false));
+            }
+            // var enumerator = property.GetEnumerator();
+            // while (enumerator.MoveNext()) {
+            //     var prop = enumerator.Current as SerializedProperty;
+            //     if (prop == null) continue;
+            //     //Add your treatment to the current child property...
+            //     // EditorGUILayout.PropertyField(prop);
+            //     yield return prop;
+            // }
+
+            // SerializedProperty iterator = property.Copy();
+            // // MyObject myObj = ScriptableObject.CreateInstance<MyObject>();
+            // // SerializedObject mySerializedObject = new UnityEditor.SerializedObject(myObj);
+            // // SerializedProperty iterator = mySerializedObject.FindProperty("PropertyName");
+            // while (iterator.Next(true))
+            // {
+            //     yield return iterator.Copy();
+            //     // Debug.Log(it.name);
+            // }
+
+            // Debug.Log(property.propertyPath);
+            // property = property.Copy();
+            // SerializedProperty nextElement = property.Copy();
+            // bool hasNextElement = nextElement.NextVisible(false);
+            // if (!hasNextElement)
+            // {
+            //     nextElement = null;
+            // }
+            //
+            // property.NextVisible(true);
+            // while (true)
+            // {
+            //     if ((SerializedProperty.EqualContents(property, nextElement)))
+            //     {
+            //         yield break;
+            //     }
+            //
+            //     yield return property;
+            //
+            //     bool hasNext = property.NextVisible(false);
+            //     if (!hasNext)
+            //     {
+            //         break;
+            //     }
+            // }
         }
 
         public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo?.Name ?? FieldWithInfo.SerializedProperty.displayName}>";
