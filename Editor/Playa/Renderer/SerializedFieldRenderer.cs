@@ -94,8 +94,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return result;
         }
 
-        private const string ListDrawerItemClass = "saintsfield-list-drawer-item";
-
+        // private const string ListDrawerItemClass = "saintsfield-list-drawer-item";
         private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)
         {
             SerializedProperty property = FieldWithInfo.SerializedProperty;
@@ -106,7 +105,6 @@ namespace SaintsField.Editor.Playa.Renderer
             VisualElement MakeItem()
             {
                 PropertyField propertyField = new PropertyField();
-                propertyField.AddToClassList(ListDrawerItemClass);
                 return propertyField;
             }
 
@@ -114,11 +112,11 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 SerializedProperty prop = property.GetArrayElementAtIndex(index + curPageIndex * numberOfItemsPerPage);
                 PropertyField propertyField = (PropertyField)propertyFieldRaw;
-                propertyField.Unbind();
                 propertyField.BindProperty(prop);
+                propertyField.userData = index;
             }
 
-            ListView listView = new ListView(Enumerable.Range(0, property.arraySize).Select(index => property.GetArrayElementAtIndex(index)).ToList())
+            ListView listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
             {
                 makeItem = MakeItem,
                 bindItem = BindItem,
@@ -135,20 +133,14 @@ namespace SaintsField.Editor.Playa.Renderer
                 },
             };
 
-            listView.itemsAdded += objects =>
-            {
-                int maxValue = objects.Max();
-                property.arraySize = maxValue + 1;
-                property.serializedObject.ApplyModifiedProperties();
-            };
-            listView.itemsRemoved += objects =>
-            {
-                foreach (int index in objects.OrderByDescending(each => each))
-                {
-                    property.DeleteArrayElementAtIndex(index);
-                }
-                property.serializedObject.ApplyModifiedProperties();
-            };
+            // listView.itemsAdded += objects =>
+            // {
+            //     Debug.Log("itemAdded");
+            //     property.arraySize += objects.Count();
+            //     property.serializedObject.ApplyModifiedProperties();
+            // };
+
+
 
             VisualElement foldoutContent = listView.Q<VisualElement>(className: "unity-foldout__content");
 
@@ -199,7 +191,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 },
             };
             numberOfItemsPerPageField.Q<TextElement>().style.unityTextAlign = TextAnchor.MiddleRight;
-            Label numberOfItemsPerPageLabel = new Label(" / Page")
+            Label numberOfItemsPerPageLabel = new Label($" / {property.arraySize} Items")
             {
                 style =
                 {
@@ -214,6 +206,7 @@ namespace SaintsField.Editor.Playa.Renderer
             IntegerField pageField = new IntegerField
             {
                 isDelayed = true,
+                value = 1,
                 style =
                 {
                     minWidth = 30,
@@ -255,9 +248,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 pageLabel.text = $" / {pageCount}";
                 pageField.SetValueWithoutNotify(curPageIndex + 1);
 
-                List<SerializedProperty> curPageItems = Enumerable.Range(skipStart, itemCount)
-                    .Select(index => property.GetArrayElementAtIndex(index))
-                    .ToList();
+                List<int> curPageItems = Enumerable.Range(skipStart, itemCount).ToList();
 
                 listView.itemsSource = curPageItems;
                 listView.Rebuild();
@@ -290,11 +281,40 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             numberOfItemsPerPageField.RegisterValueChangedCallback(evt => UpdateNumberOfItemsPerPage(evt.newValue));
+
+            listView.Q<Button>("unity-list-view__add-button").clickable = new Clickable(() =>
+            {
+                property.arraySize += 1;
+                property.serializedObject.ApplyModifiedProperties();
+                int totalPage = Mathf.CeilToInt((float)property.arraySize / numberOfItemsPerPage);
+                UpdatePage(totalPage - 1);
+                numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
+            });
+
+            listView.itemsRemoved += objects =>
+            {
+                int[] sources = listView.itemsSource.Cast<int>().ToArray();
+
+                foreach (int index in objects.Select(removeIndex => sources[removeIndex]).OrderByDescending(each => each))
+                {
+                    // Debug.Log(index);
+                    property.DeleteArrayElementAtIndex(index);
+                }
+                property.serializedObject.ApplyModifiedProperties();
+                numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
+
+                UpdatePage(curPageIndex);
+            };
+
             if (listDrawerSettingsAttribute.NumberOfItemsPerPage != 0)
             {
                 preContent.style.display = DisplayStyle.Flex;
                 pagingContainer.style.visibility = Visibility.Visible;
-                numberOfItemsPerPageField.value = listDrawerSettingsAttribute.NumberOfItemsPerPage;
+
+                listView.RegisterCallback<AttachToPanelEvent>(_ =>
+                {
+                    numberOfItemsPerPageField.value = listDrawerSettingsAttribute.NumberOfItemsPerPage;
+                });
             }
 
             pagingContainer.Add(numberOfItemsPerPageField);

@@ -218,9 +218,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myStructArr:
-  - myInt: 0
-    myString: 
-    myGameObject: {fileID: 0}
   - myInt: 1
     myString: 
     myGameObject: {fileID: 0}
@@ -230,16 +227,46 @@ MonoBehaviour:
   - myInt: 3
     myString: 
     myGameObject: {fileID: 0}
-  - myInt: 4
+  - myInt: 3
     myString: 
     myGameObject: {fileID: 0}
-  - myInt: 5
+  - myInt: 3
     myString: 
     myGameObject: {fileID: 0}
-  - myInt: 6
+  - myInt: 3
     myString: 
     myGameObject: {fileID: 0}
-  - myInt: 7
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
+    myString: 
+    myGameObject: {fileID: 0}
+  - myInt: 3
     myString: 
     myGameObject: {fileID: 0}
 --- !u!1 &171104905
