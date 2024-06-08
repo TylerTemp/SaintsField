@@ -651,7 +651,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         foldout.style.borderBottomWidth = 1f;
                     }
                 }
-                foldout.RegisterValueChangedCallback(evt => foldoutAction(evt.newValue));
 
                 root = foldout;
             }
