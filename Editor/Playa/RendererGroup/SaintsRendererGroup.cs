@@ -167,10 +167,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             _foldout = EditorGUILayout.Foldout(_foldout, GUIContent.none, true, _foldoutSmallStyle);
                             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                             {
-                                _curSelected = GUILayout.Toolbar(_curSelected, _orderedKeys.ToArray());
+                                var curSelected = GUILayout.Toolbar(_foldout ? _curSelected : -1, _orderedKeys.ToArray());
                                 if (changed.changed)
                                 {
                                     _foldout = true;
+                                }
+                                
+                                if (curSelected != -1)
+                                {
+                                    _curSelected = curSelected;
                                 }
                             }
                         }
@@ -479,7 +484,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             Dictionary<string, List<VisualElement>> fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
             string curTab = null;
-
+            
+            VisualElement root = null;
+            
             VisualElement titleRow = new VisualElement
             {
                 style =
@@ -511,6 +518,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     },
                 })
                 .ToArray();
+
+            // ReSharper disable once ConvertToLocalFunction
+            Action<(ToolbarToggle toggle, bool value)> setTabToggle = tabToggle =>
+            {
+                tabToggle.toggle.value = tabToggle.value;
+            };
 
             // ReSharper disable once ConvertToLocalFunction
             Action<string> switchTab = tab =>
@@ -638,13 +651,26 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         foldout.style.borderBottomWidth = 1f;
                     }
                 }
-                foldout.RegisterValueChangedCallback(evt => foldoutAction(evt.newValue));
 
-                titleRow.Add(foldout);
+                root = foldout;
+            }
+            else
+            {
+                root = new VisualElement
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        borderTopLeftRadius = radius,
+                        borderTopRightRadius = radius,
+                        borderBottomLeftRadius = radius,
+                        borderBottomRightRadius = radius,
+                    },
+                };
             }
 
             // foldout-tabs:
-            if(hasFoldout && !hasTitle && hasTab)
+            if (hasFoldout && !hasTitle && hasTab)
             {
                 // toolbar.Add(foldout);
                 ToolbarToggle foldoutToggle = new ToolbarToggle
@@ -668,6 +694,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     foldoutAction(evt.newValue);
                     foldoutImage.image = evt.newValue ? dropdownIcon : dropdownRightIcon;
+                    
+                    if (!evt.newValue)
+                    {
+                        foreach (ToolbarToggle toolbarToggle in toolbarToggles)
+                        {
+                            toolbarToggle.SetValueWithoutNotify(false);
+                        }
+                    }
                 });
 
                 toolbar.Add(foldoutToggle);
@@ -675,6 +709,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 foreach (ToolbarToggle eachTab in toolbarToggles)
                 {
                     toolbar.Add(eachTab);
+                    eachTab.RegisterValueChangedCallback(evt =>
+                    {
+                        if (evt.newValue)
+                        {
+                            setTabToggle((foldoutToggle, true));
+                        }
+                    });
                 }
 
                 titleRow.Add(toolbar);
@@ -711,19 +752,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 visualElements.Add(fieldElement);
                 body.Add(fieldElement);
             }
-
-            VisualElement root = new VisualElement
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    borderTopLeftRadius = radius,
-                    borderTopRightRadius = radius,
-                    borderBottomLeftRadius = radius,
-                    borderBottomRightRadius = radius,
-                },
-            };
-
+            
             if(_eLayout.HasFlag(ELayout.Background))
             {
                 root.style.backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f);
