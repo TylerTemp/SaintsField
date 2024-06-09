@@ -285,8 +285,7 @@ namespace SaintsField.Editor
                     // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
                     // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
 
-                    IReadOnlyList<IPlayaAttribute> playaAttributes =
-                        fieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = fieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
 
                     OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                     int order = orderProp?.Order ?? int.MinValue;
@@ -313,8 +312,7 @@ namespace SaintsField.Editor
                     .Where(f => f.GetCustomAttributes(typeof(ShowInInspectorAttribute), true).Length > 0);
                 foreach (FieldInfo nonSerFieldInfo in nonSerFieldInfos)
                 {
-                    IReadOnlyList<IPlayaAttribute> playaAttributes =
-                        nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
 
                     OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                     int order = orderProp?.Order ?? int.MinValue;
@@ -355,12 +353,11 @@ namespace SaintsField.Editor
 
                 foreach (MethodInfo methodInfo in methodInfos)
                 {
-                    IReadOnlyList<IPlayaAttribute> playaAttributes =
-                        methodInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
-
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = methodInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+                    
                     // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
 
-                    if(playaAttributes.Any(each => each is IPlayaMethodAttribute))
+                    if (playaAttributes.Any(each => each is IPlayaMethodAttribute))
                     {
                         OrderedAttribute orderProp =
                             playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
@@ -382,8 +379,6 @@ namespace SaintsField.Editor
                             Order = order,
                         });
                     }
-
-
                 }
                 #endregion
 
@@ -394,8 +389,7 @@ namespace SaintsField.Editor
 
                 foreach (PropertyInfo propertyInfo in propertyInfos)
                 {
-                    IReadOnlyList<IPlayaAttribute> playaAttributes =
-                        propertyInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = propertyInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
 
                     OrderedAttribute orderProp =
                         playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
@@ -447,18 +441,52 @@ namespace SaintsField.Editor
                 .Select(each => each.value)
                 .ToList();
 
-            Dictionary<string, (ELayout eLayout, bool isDOTween)> layoutKeyToInfo = new Dictionary<string, (ELayout eLayout, bool isDOTween)>();
+            // handle GroupAllFieldsUntilNextGroupAttribute
+            List<SaintsFieldWithInfo> fieldInfosWithGroups = new List<SaintsFieldWithInfo>();
+            int previousGroupIndex = -1;
+            for (int i = 0; i < fieldWithInfosSorted.Count; i++)
+            {
+                IReadOnlyList<ISaintsGroup> groups;
+                if (fieldWithInfosSorted[i].Groups.Count == 0 && previousGroupIndex != -1)
+                {
+                    groups = fieldInfosWithGroups.Count >= previousGroupIndex + 1
+                        ? fieldInfosWithGroups[previousGroupIndex].Groups
+                        : fieldWithInfosSorted[previousGroupIndex].Groups;
+                }
+                else
+                {
+                    groups = fieldWithInfosSorted[i].Groups;
+                }
+
+                var fieldWithInfo = fieldWithInfosSorted[i];
+                fieldWithInfo.Groups = groups;
+                fieldInfosWithGroups.Add(fieldWithInfo);
+                
+                foreach (var group in fieldWithInfo.Groups)
+                {
+                    if (group.GroupAllFieldsUntilNextGroupAttribute)
+                    {
+                        previousGroupIndex = fieldInfosWithGroups.Count - 1;
+                        break;
+                    }
+                    
+                    previousGroupIndex = -1;
+                }
+            }
+            fieldWithInfosSorted = fieldInfosWithGroups;
+            
+            Dictionary<string, (ELayout eLayout, bool isDOTween, bool closedByDefault)> layoutKeyToInfo = new Dictionary<string, (ELayout eLayout, bool isDOTween, bool closedByDefault)>();
             foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.Groups))
             {
                 string groupBy = sortedGroup.GroupBy;
                 ELayout config = sortedGroup.Layout;
-                bool configExists = layoutKeyToInfo.TryGetValue(groupBy, out (ELayout eLayout, bool isDOTween) info);
+                bool configExists = layoutKeyToInfo.TryGetValue(groupBy, out (ELayout eLayout, bool isDOTween, bool closedByDefault) info);
                 if (!configExists || (info.eLayout == 0 && config != 0) || (!info.isDOTween && sortedGroup is DOTweenPlayAttribute))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                     Debug.Log($"add key {groupBy}: {config}.{config==0} (origin: {info.eLayout}.{info.eLayout==0})");
 #endif
-                    layoutKeyToInfo[groupBy] = (config, info.isDOTween || sortedGroup is DOTweenPlayAttribute);
+                    layoutKeyToInfo[groupBy] = (config, info.isDOTween || sortedGroup is DOTweenPlayAttribute, sortedGroup.ClosedByDefault);
                 }
                 else
                 {
@@ -473,9 +501,9 @@ namespace SaintsField.Editor
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
                         each.Value.isDOTween
                             ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
-                            : new SaintsRendererGroup(each.Key, each.Value.eLayout)
+                            : new SaintsRendererGroup(each.Key, each.Value.eLayout, each.Value.closedByDefault)
 #else
-                        (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value.eLayout)
+                        (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value.eLayout, each.Value.closedByDefault)
 #endif
                 );
 
@@ -512,7 +540,7 @@ namespace SaintsField.Editor
                     }
 
                     string rootGroup = longestGroup.GroupBy.Split('/')[0];
-                    if(rootGroupAdded.Add(rootGroup))
+                    if (rootGroupAdded.Add(rootGroup))
                     {
                         renderers.Add(layoutKeyToGroup[rootGroup]);
                     }
@@ -521,7 +549,7 @@ namespace SaintsField.Editor
 
                     ISaintsRendererGroup targetGroup = layoutKeyToGroup[longestGroup.GroupBy];
 
-                    if(itemResult != null)
+                    if (itemResult != null)
                     {
     #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                         Debug.Log($"add renderer {itemResult} to {longestGroup.GroupBy}({targetGroup})");
@@ -544,7 +572,7 @@ namespace SaintsField.Editor
 
             return renderers;
         }
-
+        
         private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
         {
             // e.g "a/b/c/d"

@@ -30,12 +30,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
         private GUIStyle _foldoutSmallStyle;
         private GUIStyle _titleLabelStyle;
 
-        private bool _foldout = true;
+        private bool _foldout;
 
-        public SaintsRendererGroup(string groupPath, ELayout eLayout)
+        public SaintsRendererGroup(string groupPath, ELayout eLayout, bool closedByDefault)
         {
             _groupPath = groupPath;
             _eLayout = eLayout;
+            _foldout = !closedByDefault;
         }
 
         public void Add(string groupPath, ISaintsRenderer renderer)
@@ -608,7 +609,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         borderTopRightRadius = radius,
                     },
                 };
-                if(_eLayout.HasFlag(ELayout.TitleOut))
+                if (_eLayout.HasFlag(ELayout.TitleOut))
                 {
                     if(_eLayout.HasFlag(ELayout.Background))
                     {
@@ -638,10 +639,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 Foldout foldout = new Foldout
                 {
                     text = _groupPath.Split('/').Last(),
+                    value = _foldout,
                 };
-                if(_eLayout.HasFlag(ELayout.TitleOut))
+                if (_eLayout.HasFlag(ELayout.TitleOut))
                 {
-                    if(_eLayout.HasFlag(ELayout.Background))
+                    if (_eLayout.HasFlag(ELayout.Background))
                     {
                         foldout.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
                     }

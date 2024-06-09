@@ -75,7 +75,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
             MethodRenderer methodRenderer = renderer as MethodRenderer;
             Debug.Assert(methodRenderer != null, $"You can NOT nest {renderer} in {this}");
-            _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, methodRenderer.FieldWithInfo.MethodInfo.GetCustomAttribute<DOTweenPlayAttribute>()));
+
+            var doTweenPlayAttribute = methodRenderer.FieldWithInfo.Groups.OfType<DOTweenPlayAttribute>().FirstOrDefault();
+            if (doTweenPlayAttribute != null)
+            {
+                _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, doTweenPlayAttribute));
+            }
         }
 
         public void Render()

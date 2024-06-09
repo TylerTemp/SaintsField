@@ -20,8 +20,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string titledBoxItem2;
 
         // foldout
-        [Layout("Foldout", ELayout.Foldout)]
+        [Layout("Foldout", ELayout.Foldout | ELayout.Title | ELayout.Background | ELayout.TitleOut, true, true)]
         public string foldoutItem1, foldoutItem2;
+        public int foldoutItem3, foldoutItem4;
+        [Layout("Foldout/Tab1", ELayout.Foldout, true)]
+        public float foldoutItem5, foldoutItem6;
+        public string foldoutItem7, foldoutItem8;
 
         // tabs
         [Layout("Tabs", ELayout.Tab | ELayout.Foldout)]
