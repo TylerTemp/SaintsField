@@ -316,6 +316,22 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
+            // Debug.Log(property.propertyPath);
+            // var s = property.propertyPath;
+
+//             object managedReference;
+//             try
+//             {
+//                 managedReference = property.managedReferenceValue;
+//             }
+//             catch (Exception e) when (e is ObjectDisposedException || e is NullReferenceException || e is InvalidOperationException)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogException(e);
+// #endif
+//                 return;
+//             }
+
             UpdateLabel(property, container, property.managedReferenceValue);
         }
 

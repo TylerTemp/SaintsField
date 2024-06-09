@@ -1,3 +1,8 @@
+## 3.0.13
+
+1.   (by [@Lx34r](https://github.com/Lx34r)) Fix foldout display error with tab in Layout Attribute [#33](https://github.com/TylerTemp/SaintsField/pull/33)
+2.   Fix [#34](https://github.com/TylerTemp/SaintsField/issues/34) that Unity will dispose the serialized property first before destroy the drawer, leading to errors when drawer is in an array and the target element gets removed.   
+
 ## 3.0.12
 
 1.  `Button` now allows to have parameters and you can change the value in inspector.
@@ -5,7 +10,7 @@
 
 ## 3.0.11
 
-`SaintsInterface` for serializing interface of a `Unity.Object` type (or sub type).
+`SaintsInterface` for serializing interface of a `UnityEngine.Object` type (or sub type).
 
 Special thanks for [@dbc](https://stackoverflow.com/users/3744182/dbc)'s [answer in stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347)
 

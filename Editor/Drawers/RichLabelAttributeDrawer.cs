@@ -167,18 +167,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
         {
-            string richLabelContainerName;
-            try
-            {
-                richLabelContainerName = NameRichLabelContainer(property);
-            }
-            catch (ObjectDisposedException)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
-                Debug.LogError($"property disposed");
-#endif
-                return;
-            }
+            string richLabelContainerName = NameRichLabelContainer(property);
 
             VisualElement richContainer = container.Q<VisualElement>(richLabelContainerName);
             PayloadUIToolkit payload = (PayloadUIToolkit)richContainer.userData;

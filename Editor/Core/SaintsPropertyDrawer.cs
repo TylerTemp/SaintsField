@@ -1950,6 +1950,15 @@ namespace SaintsField.Editor.Core
             FieldInfo info
         )
         {
+            try
+            {
+                string _ = property.propertyPath;
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
                 saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info, parent);

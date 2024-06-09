@@ -66,10 +66,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.12**
+**3.0.13**
 
-1.  `Button` now allows to have parameters and you can change the value in inspector.
-2.  If you have `DOTween` installed without ASMDEF enabled, there will be a popup window to ask you either enable it, or disable SaintsField's DOTween ability.
+1.   (by [@Lx34r](https://github.com/Lx34r)) Fix foldout display error with tab in Layout Attribute [#33](https://github.com/TylerTemp/SaintsField/pull/33)
+2.   Fix [#34](https://github.com/TylerTemp/SaintsField/issues/34) that Unity will dispose the serialized property first before destroy the drawer, leading to errors when drawer is in an array and the target element gets removed.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

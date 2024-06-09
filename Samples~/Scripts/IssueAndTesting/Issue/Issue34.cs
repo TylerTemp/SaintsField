@@ -14,7 +14,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
     public class TestData
     {
         [SerializeReference, ReferencePicker] public InternalTestData[] InternalTestData;
-        [MinMaxSlider(0, 100)] public Vector2 TestMinMax = new Vector2(0, 2);
+        [MinMaxSlider(0, 100)]
+        public Vector2 TestMinMax = new Vector2(0, 2);
     }
 
     [Serializable]

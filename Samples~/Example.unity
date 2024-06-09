@@ -864,25 +864,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TestData:
-  - rid: 5583616021846818822
+  - rid: 5583616021846818877
+  - rid: 5583616021846818878
   references:
     version: 2
     RefIds:
-    - rid: 5583616021846818822
+    - rid: 5583616021846818877
       type: {class: TestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        InternalTestData:
-        - rid: 5583616021846818823
-        - rid: 5583616021846818824
+        InternalTestData: []
         TestMinMax: {x: 0, y: 2}
-    - rid: 5583616021846818823
-      type: {class: InternalTestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+    - rid: 5583616021846818878
+      type: {class: TestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        InternalTestMinMax: {x: 0, y: 2}
-    - rid: 5583616021846818824
-      type: {class: InternalTestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
-      data:
-        InternalTestMinMax: {x: 0, y: 2}
+        InternalTestData: []
+        TestMinMax: {x: 0, y: 2}
 --- !u!1 &246861350
 GameObject:
   m_ObjectHideFlags: 0
