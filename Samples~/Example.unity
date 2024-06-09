@@ -819,6 +819,70 @@ MonoBehaviour:
   myDummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   myDummyPrefab: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   myDummyPrefabFieldType: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+--- !u!1 &225299351
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 225299352}
+  - component: {fileID: 225299353}
+  m_Layer: 0
+  m_Name: Issue34
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &225299352
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225299351}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &225299353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225299351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 263f1a55fa481ed42bcb481f5ac0fe83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TestData:
+  - rid: 5583616021846818822
+  references:
+    version: 2
+    RefIds:
+    - rid: 5583616021846818822
+      type: {class: TestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        InternalTestData:
+        - rid: 5583616021846818823
+        - rid: 5583616021846818824
+        TestMinMax: {x: 0, y: 2}
+    - rid: 5583616021846818823
+      type: {class: InternalTestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        InternalTestMinMax: {x: 0, y: 2}
+    - rid: 5583616021846818824
+      type: {class: InternalTestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        InternalTestMinMax: {x: 0, y: 2}
 --- !u!1 &246861350
 GameObject:
   m_ObjectHideFlags: 0
@@ -9791,6 +9855,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -12592,6 +12657,7 @@ Transform:
   - {fileID: 1416062037}
   - {fileID: 192765833}
   - {fileID: 563946119}
+  - {fileID: 225299352}
   m_Father: {fileID: 0}
   m_RootOrder: 35
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
