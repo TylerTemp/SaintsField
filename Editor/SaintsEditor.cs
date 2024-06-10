@@ -449,7 +449,7 @@ namespace SaintsField.Editor
                 IReadOnlyList<ISaintsGroup> groups;
                 if (fieldWithInfosSorted[i].Groups.Count == 0 && previousGroupIndex != -1)
                 {
-                    groups = fieldInfosWithGroups.Count >= previousGroupIndex + 1
+                    groups = fieldInfosWithGroups.Count > previousGroupIndex
                         ? fieldInfosWithGroups[previousGroupIndex].Groups
                         : fieldWithInfosSorted[previousGroupIndex].Groups;
                 }

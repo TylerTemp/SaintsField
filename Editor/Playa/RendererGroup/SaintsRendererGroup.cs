@@ -487,6 +487,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             string curTab = null;
             
             VisualElement root = null;
+            ToolbarToggle foldoutToggle = null;
             
             VisualElement titleRow = new VisualElement
             {
@@ -519,12 +520,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     },
                 })
                 .ToArray();
-
-            // ReSharper disable once ConvertToLocalFunction
-            Action<(ToolbarToggle toggle, bool value)> setTabToggle = tabToggle =>
-            {
-                tabToggle.toggle.value = tabToggle.value;
-            };
 
             // ReSharper disable once ConvertToLocalFunction
             Action<string> switchTab = tab =>
@@ -576,7 +571,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 if (show)
                 {
-                    if(hasTitle)
+                    if (hasTitle)
                     {
                         toolbar.style.display = DisplayStyle.Flex;
                     }
@@ -584,7 +579,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
                 else
                 {
-                    if(hasTitle)
+                    if (hasTitle)
                     {
                         toolbar.style.display = DisplayStyle.None;
                     }
@@ -675,7 +670,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             if (hasFoldout && !hasTitle && hasTab)
             {
                 // toolbar.Add(foldout);
-                ToolbarToggle foldoutToggle = new ToolbarToggle
+                foldoutToggle = new ToolbarToggle
                 {
                     value = true,
                     style =
@@ -694,10 +689,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 foldoutToggle.Add(foldoutImage);
                 foldoutToggle.RegisterValueChangedCallback(evt =>
                 {
-                    foldoutAction(evt.newValue);
-                    foldoutImage.image = evt.newValue ? dropdownIcon : dropdownRightIcon;
+                    _foldout = evt.newValue;
+                    foldoutToggle.value = _foldout;
+                    foldoutAction(_foldout);
+                    foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
                     
-                    if (!evt.newValue)
+                    if (!_foldout)
                     {
                         foreach (ToolbarToggle toolbarToggle in toolbarToggles)
                         {
@@ -715,7 +712,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         if (evt.newValue)
                         {
-                            setTabToggle((foldoutToggle, true));
+                            foldoutToggle.value = true;
                         }
                     });
                 }
@@ -779,6 +776,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     root.UnregisterCallback(switchOnAttack);
                     toolbarToggles[0].value = true;
+                    if (foldoutToggle != null) foldoutToggle.value = _foldout;
                 };
                 root.RegisterCallback(switchOnAttack);
             }

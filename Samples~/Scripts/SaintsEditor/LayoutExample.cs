@@ -28,7 +28,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string foldoutItem7, foldoutItem8;
 
         // tabs
-        [Layout("Tabs", ELayout.Tab | ELayout.Foldout)]
+        [Layout("Tabs", ELayout.Tab | ELayout.Foldout, closedByDefault: true)]
         [Layout("Tabs/Tab1")]
         public string tab1Item1, tab1Item2;
 
