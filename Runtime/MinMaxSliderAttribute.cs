@@ -5,12 +5,13 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Field)]
     public class MinMaxSliderAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
 
+        // ReSharper disable InconsistentNaming
         public readonly float Min;
         public readonly string MinCallback;
         public readonly float Max;
@@ -19,6 +20,7 @@ namespace SaintsField
 
         public readonly float MinWidth;
         public readonly float MaxWidth;
+        // ReSharper enable InconsistentNaming
 
         private const float DefaultWidth = 50f;
 
