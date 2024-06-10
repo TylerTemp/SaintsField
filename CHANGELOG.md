@@ -1,3 +1,7 @@
+## 3.0.14
+
+UI Toolkit: Fix [#35](https://github.com/TylerTemp/SaintsField/issues/35) float `[MinMaxSlider]` read min value to max value when using input rather than slider.
+
 ## 3.0.13
 
 1.   (by [@Lx34r](https://github.com/Lx34r)) Fix foldout display error with tab in Layout Attribute [#33](https://github.com/TylerTemp/SaintsField/pull/33)

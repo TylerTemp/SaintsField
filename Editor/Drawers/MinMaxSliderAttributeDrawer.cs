@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -449,6 +448,9 @@ namespace SaintsField.Editor.Drawers
                 minFloatField.RegisterValueChangedCallback(changed =>
                 {
                     MetaInfo metaInfo = (MetaInfo)minMaxSlider.userData;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
+                    Debug.Log($"changed={changed.newValue}, maxValue={maxFloatField.value}");
+#endif
                     ApplyFloatValue(property, minMaxSliderAttribute.Step,
                         ToVector2Range(changed.newValue, maxFloatField.value), metaInfo.MinValue,
                         metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback);
@@ -456,8 +458,11 @@ namespace SaintsField.Editor.Drawers
                 maxFloatField.RegisterValueChangedCallback(changed =>
                 {
                     MetaInfo metaInfo = (MetaInfo)minMaxSlider.userData;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
+                    Debug.Log($"changed={changed.newValue}, minValue={minFloatField.value}");
+#endif
                     ApplyFloatValue(property, minMaxSliderAttribute.Step,
-                        ToVector2Range(maxFloatField.value, changed.newValue), metaInfo.MinValue,
+                        ToVector2Range(minFloatField.value, changed.newValue), metaInfo.MinValue,
                         metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback);
                 });
             }

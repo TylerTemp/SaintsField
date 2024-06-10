@@ -66,10 +66,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.13**
+**3.0.14**
 
-1.   (by [@Lx34r](https://github.com/Lx34r)) Fix foldout display error with tab in Layout Attribute [#33](https://github.com/TylerTemp/SaintsField/pull/33)
-2.   Fix [#34](https://github.com/TylerTemp/SaintsField/issues/34) that Unity will dispose the serialized property first before destroy the drawer, leading to errors when drawer is in an array and the target element gets removed.
+UI Toolkit: Fix [#35](https://github.com/TylerTemp/SaintsField/issues/35) float `[MinMaxSlider]` read min value to max value when using input rather than slider.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
