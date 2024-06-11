@@ -15,8 +15,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [Button("Tween under me")]
         private void Nothing1() {}
 
+        [Layout("Color", ELayout.Foldout | ELayout.Background| ELayout.Title | ELayout.TitleOut)]
+        [ReadOnly]
+        public string title = "This is Color Tween";
+
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-        [DOTweenPlay]
+        [DOTweenPlay(groupBy: "Color", groupAllFieldsUntilNextGroupAttribute: true)]
         private Sequence PlayColor()
         {
             return DOTween.Sequence()
@@ -25,9 +29,19 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 .Append(spriteRenderer.DOColor(Color.blue, 1f))
                 .SetLoops(-1);
         }
+        
+        [MarkPlayaMethod]
+        private Sequence PlayColor2()
+        {
+            return DOTween.Sequence()
+                .Append(spriteRenderer.DOColor(Color.cyan, 1f))
+                .Append(spriteRenderer.DOColor(Color.magenta, 1f))
+                .Append(spriteRenderer.DOColor(Color.yellow, 1f))
+                .SetLoops(-1);
+        }
 #endif
 
-        [Button("Tween above me")]
+        [Button("Tween above me"), Layout("")]
         private void Nothing2() {}
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
