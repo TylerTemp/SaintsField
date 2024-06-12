@@ -14,21 +14,21 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string titledItem1, titledItem2;
 
         // title
-        [Layout("Titled Box", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+        [Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
         public string titledBoxItem1;
         [Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
         public string titledBoxItem2;
 
         // foldout
-        [Layout("Foldout", ELayout.Foldout | ELayout.Title | ELayout.Background | ELayout.TitleOut, true, true)]
+        [LayoutGroup("Collapse", ELayout.Collapse | ELayout.Background | ELayout.TitleOut)]
         public string foldoutItem1, foldoutItem2;
         public int foldoutItem3, foldoutItem4;
-        [Layout("Foldout/Tab1", ELayout.Foldout, true)]
+        [LayoutGroup("Collapse/Tab1", ELayout.Foldout)]
         public float foldoutItem5, foldoutItem6;
         public string foldoutItem7, foldoutItem8;
 
         // tabs
-        [Layout("Tabs", ELayout.Tab | ELayout.Foldout, closedByDefault: true)]
+        [Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
         [Layout("Tabs/Tab1")]
         public string tab1Item1, tab1Item2;
 
@@ -39,11 +39,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string tab3Item1, tab3Item2;
 
         // nested groups
-        [Layout("Nested", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+        [Layout("Nested", ELayout.Background | ELayout.TitleOut)]
         public int nestedOne;
-        [Layout("Nested/Nested Group 1", ELayout.Title | ELayout.TitleOut)]
-        public int nestedTwo, nestedThree;
-        [Layout("Nested/Nested Group 2", ELayout.Title | ELayout.TitleOut)]
+
+        [LayoutGroup("Nested/Nested Group 1", ELayout.TitleOut)]
+        public int nestedTwo;
+        public int nestedThree;
+        [Layout("Nested/Nested Group 2", ELayout.TitleOut)]
         public int nestedFour, nestedFive;
 
         // Unlabeled Box

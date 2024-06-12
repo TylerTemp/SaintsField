@@ -109,7 +109,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 using (new EditorGUILayout.VerticalScope())
                 {
                     bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout) || _eLayout.HasFlag(ELayout.Collapse);
-                    bool hasTitle = _eLayout.HasFlag(ELayout.Title);
+                    bool hasTitle = _eLayout.HasFlag(ELayout.Title) || _eLayout.HasFlag(ELayout.TitleOut);
                     bool hasTab = _eLayout.HasFlag(ELayout.Tab);
 
                     // this looks better:
@@ -497,8 +497,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 },
             };
 
-            bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout);
-            bool hasTitle = _eLayout.HasFlag(ELayout.Title);
+            bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout) || _eLayout.HasFlag(ELayout.Collapse);
+            bool hasTitle = _eLayout.HasFlag(ELayout.Title) || _eLayout.HasFlag(ELayout.TitleOut);
             bool hasTab = _eLayout.HasFlag(ELayout.Tab);
 
             Toolbar toolbar = new Toolbar

@@ -514,15 +514,48 @@ namespace SaintsField.Editor
 
             List<ISaintsRenderer> renderers = new List<ISaintsRenderer>();
             HashSet<string> rootGroupAdded = new HashSet<string>();
+            ISaintsGroup lastLongestGroup = null;
+            bool isContinuously = false;
             while (fieldWithInfosSorted.Count > 0)
             {
                 SaintsFieldWithInfo fieldWithInfo = fieldWithInfosSorted[0];
                 fieldWithInfosSorted.RemoveAt(0);
-                if (fieldWithInfo.Groups.Count > 0)
+
+                List<ISaintsGroup> normalGroup = new List<ISaintsGroup>();
+                LayoutEndAttribute layoutEnd = null;
+                foreach (ISaintsGroup saintsGroup in fieldWithInfo.Groups)
                 {
-                    ISaintsGroup longestGroup = fieldWithInfo.Groups
-                        .OrderByDescending(each => each.GroupBy.Length)
-                        .First();
+                    switch (saintsGroup)
+                    {
+                        case LayoutEndAttribute layoutEndAttribute:
+                            layoutEnd = layoutEndAttribute;
+                            break;
+                        default:
+                            normalGroup.Add(saintsGroup);
+                            break;
+                    }
+                }
+
+                // ISaintsGroup[] notEndGroups = fieldWithInfo.Groups.Where(each => !(each is LayoutEndAttribute)).ToArray();
+
+                ISaintsGroup curLongestGroup =
+                    normalGroup.OrderByDescending(each => each.GroupBy.Length).FirstOrDefault();
+
+                bool isNewGroup = curLongestGroup != null && curLongestGroup.GroupBy != lastLongestGroup?.GroupBy;
+                bool layoutEndPrev = layoutEnd != null && lastLongestGroup?.GroupBy == layoutEnd.GroupBy;
+                if (isNewGroup || layoutEndPrev)
+                {
+                    isContinuously = false;
+                    lastLongestGroup = curLongestGroup;
+                }
+
+                if (isContinuously || normalGroup.Count > 0)
+                {
+                    ISaintsGroup longestGroup = isContinuously
+                        ? lastLongestGroup
+                        : normalGroup
+                            .OrderByDescending(each => each.GroupBy.Length)
+                            .First();
 
                     // check if this group need to be connected
                     if (unconnectedSubLayoutKeyToGroup.ContainsKey(longestGroup.GroupBy))
@@ -557,15 +590,21 @@ namespace SaintsField.Editor
     #endif
                         targetGroup.Add(longestGroup.GroupBy, itemResult);
                     }
-                    continue;
+                }
+                else
+                {
+                    AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo);
+                    // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
+
+                    if (result != null)
+                    {
+                        renderers.Add(result);
+                    }
                 }
 
-                AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo);
-                // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
-
-                if (result != null)
+                if (curLongestGroup != null)
                 {
-                    renderers.Add(result);
+                    isContinuously = curLongestGroup.GroupAllFieldsUntilNextGroupAttribute;
                 }
             }
 

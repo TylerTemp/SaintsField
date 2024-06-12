@@ -10,14 +10,12 @@ namespace SaintsField.Playa
         public string GroupBy { get; }
         public ELayout Layout { get; }
         public bool GroupAllFieldsUntilNextGroupAttribute { get; }
-        public bool ClosedByDefault { get; }
 
-        public LayoutAttribute(string groupBy, ELayout layout=0, bool groupAllFieldsUntilNextGroupAttribute = false, bool closedByDefault = false)
+        public LayoutAttribute(string groupBy, ELayout layout=0, bool groupAllFieldsUntilNextGroupAttribute = false)
         {
             GroupBy = groupBy;
             Layout = layout;
             GroupAllFieldsUntilNextGroupAttribute = groupAllFieldsUntilNextGroupAttribute;
-            ClosedByDefault = closedByDefault;
         }
     }
 }
