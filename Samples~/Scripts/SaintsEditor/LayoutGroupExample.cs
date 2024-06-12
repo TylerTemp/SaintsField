@@ -44,7 +44,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string groupLast1;
         public string groupLast2;
         public string groupLast3;
-        [Layout("GroupLast", ELayout.Background | ELayout.TitleOut, keepGrouping: false)]  // close this group, but be included
+        [Layout("GroupLast", ELayout.Background | ELayout.TitleOut)]  // close this group, but be included
         public string groupLast4;
 
         public string afterGroupLast;
