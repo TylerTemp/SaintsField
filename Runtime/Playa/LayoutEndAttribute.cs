@@ -10,7 +10,7 @@ namespace SaintsField.Playa
         public string GroupBy { get; }
         public ELayout Layout => 0;
         public bool GroupAllFieldsUntilNextGroupAttribute => false;
-        public bool ClosedByDefault => true;
+        public bool KeepGrouping => false;
 
         public LayoutEndAttribute(string groupBy)
         {

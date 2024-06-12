@@ -1,9 +1,8 @@
 using SaintsField.Playa;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class LayoutGroupExample : MonoBehaviour
+    public class LayoutGroupExample : SaintsMonoBehavior
     {
         // end group
         public string beforeGroup;

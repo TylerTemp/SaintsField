@@ -17,7 +17,7 @@ namespace SaintsField.Playa
         public string GroupBy { get; }
         public ELayout Layout => 0;
         public bool GroupAllFieldsUntilNextGroupAttribute { get; }
-        public bool ClosedByDefault { get; }
+        public bool KeepGrouping { get; }
 
         public DOTweenPlayAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind, string groupBy="", bool groupAllFieldsUntilNextGroupAttribute = false, bool closedByDefault = false)
         {
@@ -26,7 +26,7 @@ namespace SaintsField.Playa
 
             GroupBy = string.IsNullOrEmpty(groupBy)? DOTweenPlayGroupBy: $"{groupBy}/{DOTweenPlayGroupBy}";
             GroupAllFieldsUntilNextGroupAttribute = groupAllFieldsUntilNextGroupAttribute;
-            ClosedByDefault = closedByDefault;
+            KeepGrouping = closedByDefault;
         }
 
         public DOTweenPlayAttribute(ETweenStop stopAction, string groupBy=""): this(null, stopAction, groupBy)

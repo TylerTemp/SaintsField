@@ -4,6 +4,6 @@
     {
         string GroupBy { get; }
         ELayout Layout { get; }
-        bool GroupAllFieldsUntilNextGroupAttribute { get; }
+        bool KeepGrouping { get; }
     }
 }

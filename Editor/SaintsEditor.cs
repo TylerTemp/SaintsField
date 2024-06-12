@@ -515,7 +515,8 @@ namespace SaintsField.Editor
             List<ISaintsRenderer> renderers = new List<ISaintsRenderer>();
             HashSet<string> rootGroupAdded = new HashSet<string>();
             ISaintsGroup lastLongestGroup = null;
-            bool isContinuously = false;
+            int lastInherentDepth = -1;
+            bool keepGrouping = false;
             while (fieldWithInfosSorted.Count > 0)
             {
                 SaintsFieldWithInfo fieldWithInfo = fieldWithInfosSorted[0];
@@ -543,15 +544,18 @@ namespace SaintsField.Editor
 
                 bool isNewGroup = curLongestGroup != null && curLongestGroup.GroupBy != lastLongestGroup?.GroupBy;
                 bool layoutEndPrev = layoutEnd != null && lastLongestGroup?.GroupBy == layoutEnd.GroupBy;
-                if (isNewGroup || layoutEndPrev)
+                bool newInherent = fieldWithInfo.InherentDepth != lastInherentDepth;
+                if (newInherent || isNewGroup || layoutEndPrev)
                 {
-                    isContinuously = false;
+                    keepGrouping = false;
                     lastLongestGroup = curLongestGroup;
                 }
 
-                if (isContinuously || normalGroup.Count > 0)
+                lastInherentDepth = fieldWithInfo.InherentDepth;
+
+                if (keepGrouping || normalGroup.Count > 0)
                 {
-                    ISaintsGroup longestGroup = isContinuously
+                    ISaintsGroup longestGroup = keepGrouping
                         ? lastLongestGroup
                         : normalGroup
                             .OrderByDescending(each => each.GroupBy.Length)
@@ -602,9 +606,9 @@ namespace SaintsField.Editor
                     }
                 }
 
-                if (curLongestGroup != null)
+                if (isNewGroup)
                 {
-                    isContinuously = curLongestGroup.GroupAllFieldsUntilNextGroupAttribute;
+                    keepGrouping = curLongestGroup.KeepGrouping;
                 }
             }
 

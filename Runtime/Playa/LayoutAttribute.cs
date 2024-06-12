@@ -9,13 +9,13 @@ namespace SaintsField.Playa
     {
         public string GroupBy { get; }
         public ELayout Layout { get; }
-        public bool GroupAllFieldsUntilNextGroupAttribute { get; }
+        public bool KeepGrouping { get; }
 
-        public LayoutAttribute(string groupBy, ELayout layout=0, bool groupAllFieldsUntilNextGroupAttribute = false)
+        public LayoutAttribute(string groupBy, ELayout layout=0, bool keepGrouping = false)
         {
             GroupBy = groupBy;
             Layout = layout;
-            GroupAllFieldsUntilNextGroupAttribute = groupAllFieldsUntilNextGroupAttribute;
+            KeepGrouping = keepGrouping;
         }
     }
 }
