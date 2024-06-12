@@ -2854,17 +2854,19 @@ A layout decorator to group fields.
 
 *   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
 *   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
+*   `bool keepGrouping=false`: See `LayoutGroup` below
 
 Options are:
 
 *   `Vertical`
 *   `Horizontal`
 *   `Background` draw a background color for the whole group
-*   `TitleOut` make `title` more visible if you have `Title` enabled. On `IMGUI` it will draw an separator between title and the rest of the content.
+*   `Title` show the title
+*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw an separator between title and the rest of the content.
     On `UI Toolkit` it will draw a background color for the title.
 *   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
+*   `Collapse` Same as `Foldout` but is collapsed by default.
 *   `Tab` make this group a tab page separated rather than grouping it
-*   `Title` show the title
 
 **Known Issue**
 
@@ -3003,6 +3005,84 @@ public string buggy2;
 ```
 
 [![layout](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
+
+### `LayoutGroup` / `LayoutEnd` ###
+
+`LayoutGroup` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
+
+`LayoutGroup(name)` is the same as `Layout(name, keepGrouping: true)`
+
+For `LayoutGroup`:
+
+*   `string groupBy` same as `Layout`
+*   `ELayout layout=0` same as `Layout`
+
+For `LayoutEnd`:
+
+*   `string groupBy` same as `Layout`
+
+example of using `LayoutGroup` with `LayoutEnd`:
+
+```csharp
+using SaintsField.Playa;
+
+public string beforeGroup;
+
+[LayoutGroup("Group", ELayout.Background | ELayout.TitleOut)]
+public string group1;
+public string group2;  // starts from this will be automatically grouped into "Group"
+public string group3;
+
+[LayoutEnd("Group")]  // this will end the "Group"
+public string afterGroup;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ce1f52ce-9717-4929-95bf-a6dae580631e)
+
+example of using new group name to stop grouping:
+
+```csharp
+using SaintsField.Playa;
+
+public string breakBefore;
+
+[LayoutGroup("break", ELayout.Background | ELayout.TitleOut)]
+public string breakGroup1;
+public string breakGroup2;
+
+// this group will stop the grouping of "break"
+[LayoutGroup("breakIn", ELayout.Background | ELayout.TitleOut)]
+public string breakIn1;
+public string breakIn2;
+
+[LayoutGroup("break")]  // this will be grouped into "break", and also end the "breakIn" group
+public string breakGroup3;
+public string breakGroup4;
+
+[LayoutEnd("break")]  // end, it will not be grouped
+public string breakAfter;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ab45aa2f-0dbb-44e4-be54-e17913e8aba9)
+
+example of using `keepGrouping: false` to stop grouping, but keep the last one in group:
+
+```csharp
+using SaintsField.Playa;
+
+public string beforeGroupLast;
+
+[LayoutGroup("GroupLast")]
+public string groupLast1;
+public string groupLast2;
+public string groupLast3;
+[Layout("GroupLast", ELayout.Background | ELayout.TitleOut)]  // close this group, but be included
+public string groupLast4;
+
+public string afterGroupLast;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
 
 ### `PlayaShowIf`/`PlayaHideIf` ###
 
