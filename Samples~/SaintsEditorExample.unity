@@ -455,6 +455,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9348a1abd94a4f57a8a00c25d207662a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &790202822
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 790202823}
+  - component: {fileID: 790202824}
+  m_Layer: 0
+  m_Name: LayoutGroupExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &790202823
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790202822}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &790202824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790202822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd916de5d8b22a54f8e5b7389491dee3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beforeGroup: 
+  group1: 
+  group2: 
+  group3: 
+  afterGroup: 
 --- !u!1 &861579776
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,6 +851,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 1776789733}
+  title: This is Color Tween
 --- !u!212 &1776789733
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -905,6 +955,12 @@ MonoBehaviour:
   titledBoxItem2: 
   foldoutItem1: 
   foldoutItem2: 
+  foldoutItem3: 0
+  foldoutItem4: 0
+  foldoutItem5: 0
+  foldoutItem6: 0
+  foldoutItem7: 
+  foldoutItem8: 
   tab1Item1: 
   tab1Item2: 
   tab2Item1: 
