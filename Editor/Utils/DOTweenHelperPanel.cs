@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Utils
             // Debug.Log(doTweenSettings);
             Type doTweenSettingsType = doTweenSettings.GetType();
             FieldInfo fieldInfo = doTweenSettingsType.GetField("createASMDEF", BindingFlags.Instance | BindingFlags.Public);
-            bool createAsmdef = (bool) fieldInfo!.GetValue(doTweenSettings);
+            bool createAsmdef = (bool) fieldInfo.GetValue(doTweenSettings);
             // Debug.Log(createAsmdef);
             return createAsmdef;
         }
