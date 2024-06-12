@@ -500,7 +500,7 @@ namespace SaintsField.Editor
                     switch (saintsGroup)
                     {
                         case LayoutEndAttribute layoutEndAttribute:
-                            Debug.Log($"layoutEnd={layoutEndAttribute.GroupBy} for {fieldWithInfo}");
+                            // Debug.Log($"layoutEnd={layoutEndAttribute.GroupBy} for {fieldWithInfo}");
                             layoutEnd = layoutEndAttribute;
                             break;
                         default:
@@ -541,7 +541,7 @@ namespace SaintsField.Editor
                             .OrderByDescending(each => each.GroupBy.Length)
                             .First();
 
-                    Debug.Log($"keep grouping={keepGrouping}, {fieldWithInfo}, group={longestGroup.GroupBy}, layoutEnd={layoutEnd}");
+                    // Debug.Log($"keep grouping={keepGrouping}, {fieldWithInfo}, group={longestGroup.GroupBy}, layoutEnd={layoutEnd}");
                     // check if this group need to be connected
                     if (unconnectedSubLayoutKeyToGroup.ContainsKey(longestGroup.GroupBy))
                     {
