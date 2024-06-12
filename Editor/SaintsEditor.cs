@@ -516,6 +516,11 @@ namespace SaintsField.Editor
                     lastLongestGroup = curLongestGroup;
                 }
 
+                if (curLongestGroup?.KeepGrouping == false)
+                {
+                    keepGrouping = false;
+                }
+
                 lastInherentDepth = fieldWithInfo.InherentDepth;
 
                 if (keepGrouping || normalGroup.Count > 0)

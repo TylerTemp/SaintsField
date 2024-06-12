@@ -16,17 +16,15 @@ namespace SaintsField.Playa
         private const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";
         public string GroupBy { get; }
         public ELayout Layout => 0;
-        public bool GroupAllFieldsUntilNextGroupAttribute { get; }
         public bool KeepGrouping { get; }
 
-        public DOTweenPlayAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind, string groupBy="", bool groupAllFieldsUntilNextGroupAttribute = false, bool closedByDefault = false)
+        public DOTweenPlayAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind, string groupBy="", bool keepGrouping = false)
         {
             Label = label;
             DOTweenStop = stopAction;
 
             GroupBy = string.IsNullOrEmpty(groupBy)? DOTweenPlayGroupBy: $"{groupBy}/{DOTweenPlayGroupBy}";
-            GroupAllFieldsUntilNextGroupAttribute = groupAllFieldsUntilNextGroupAttribute;
-            KeepGrouping = closedByDefault;
+            KeepGrouping = keepGrouping;
         }
 
         public DOTweenPlayAttribute(ETweenStop stopAction, string groupBy=""): this(null, stopAction, groupBy)

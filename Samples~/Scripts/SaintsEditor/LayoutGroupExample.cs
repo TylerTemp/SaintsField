@@ -4,6 +4,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class LayoutGroupExample : SaintsMonoBehavior
     {
+        [SepTitle("Break By End", EColor.Gray)]
         // end group
         public string beforeGroup;
 
@@ -15,7 +16,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [LayoutEnd("Group")]  // this will end the "Group"
         public string afterGroup;
 
-        [SepTitle(EColor.Gray)]
+        [SepTitle("Break By Group", EColor.Gray)]
 
         // break group
         public string breakBefore;
@@ -35,5 +36,17 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [LayoutEnd("break")]  // end, it will not be grouped
         public string breakAfter;
+
+        [SepTitle("Break By Last Group", EColor.Gray)]
+        public string beforeGroupLast;
+
+        [LayoutGroup("GroupLast")]
+        public string groupLast1;
+        public string groupLast2;
+        public string groupLast3;
+        [Layout("GroupLast", ELayout.Background | ELayout.TitleOut, keepGrouping: false)]  // close this group, but be included
+        public string groupLast4;
+
+        public string afterGroupLast;
     }
 }

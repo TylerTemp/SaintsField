@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string title = "This is Color Tween";
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-        [DOTweenPlay(groupBy: "Color", groupAllFieldsUntilNextGroupAttribute: true)]
+        [DOTweenPlay(groupBy: "Color", keepGrouping: true)]
         private Sequence PlayColor()
         {
             return DOTween.Sequence()
