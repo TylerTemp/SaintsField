@@ -512,6 +512,12 @@ MonoBehaviour:
   breakGroup3: 
   breakGroup4: 
   breakAfter: 
+  beforeGroupLast: 
+  groupLast1: 
+  groupLast2: 
+  groupLast3: 
+  groupLast4: 
+  afterGroupLast: 
 --- !u!1 &861579776
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,7 +929,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 1776789733}
-  title: This is Color Tween
 --- !u!212 &1776789733
 SpriteRenderer:
   m_ObjectHideFlags: 0

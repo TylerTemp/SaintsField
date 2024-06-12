@@ -16,11 +16,11 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         private void Nothing1() {}
 
         [Layout("Color", ELayout.Foldout | ELayout.Background | ELayout.TitleOut), Ordered]
-        [ReadOnly]
-        public string title = "This is Color Tween";
+        [ShowInInspector]
+        public const string Title = "This is Color Tween";
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-        [DOTweenPlay(groupBy: "Color", keepGrouping: true), Ordered]
+        [DOTweenPlayGroup(groupBy: "Color"), Ordered]
         private Sequence PlayColor()
         {
             return DOTween.Sequence()
@@ -39,6 +39,19 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 .Append(spriteRenderer.DOColor(Color.yellow, 1f))
                 .SetLoops(-1);
         }
+
+        [Ordered]
+        private Sequence PlayColor3()
+        {
+            return DOTween.Sequence()
+                .Append(spriteRenderer.DOColor(Color.yellow, 1f))
+                .Append(spriteRenderer.DOColor(Color.magenta, 1f))
+                .Append(spriteRenderer.DOColor(Color.cyan, 1f))
+                .SetLoops(-1);
+        }
+
+        [DOTweenPlayEnd("Color"), Ordered]
+        public Tween DoNotIncludeMe() => DOTween.Sequence();
 #endif
 
         [Button("Tween above me"), Ordered]

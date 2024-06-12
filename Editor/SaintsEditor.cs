@@ -351,34 +351,38 @@ namespace SaintsField.Editor
 
                 // IEnumerable<ISaintsMethodAttribute> buttonMethodInfos = methodAllAttribute.OfType<ISaintsMethodAttribute>().Length > 0);
 
+                // method attributes will be collected no matter what, because DOTweenPlayGroup depending on it even
+                // it has no attribute at all
+
                 foreach (MethodInfo methodInfo in methodInfos)
                 {
                     IReadOnlyList<IPlayaAttribute> playaAttributes = methodInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
 
                     // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
 
-                    if (playaAttributes.Any(each => each is IPlayaMethodAttribute))
+                    OrderedAttribute orderProp =
+                        playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
+                    int order = orderProp?.Order ?? int.MinValue;
+
+                    // inspector does not care about inherited/new method. It just need to use the last one
+                    fieldWithInfos.RemoveAll(each => each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
+                    Debug.Log($"[{systemType}] method: {methodInfo.Name}");
+#endif
+
+                    fieldWithInfos.Add(new SaintsFieldWithInfo
                     {
-                        OrderedAttribute orderProp =
-                            playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
-                        int order = orderProp?.Order ?? int.MinValue;
+                        PlayaAttributes = playaAttributes,
+                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                        Target = target,
 
-                        // inspector does not care about inherited/new method. It just need to use the last one
-                        fieldWithInfos.RemoveAll(each => each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
-
-                        fieldWithInfos.Add(new SaintsFieldWithInfo
-                        {
-                            PlayaAttributes = playaAttributes,
-                            Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
-                            Target = target,
-
-                            // memberType = MemberTypes.Method,
-                            RenderType = SaintsRenderType.Method,
-                            MethodInfo = methodInfo,
-                            InherentDepth = inherentDepth,
-                            Order = order,
-                        });
-                    }
+                        // memberType = MemberTypes.Method,
+                        RenderType = SaintsRenderType.Method,
+                        MethodInfo = methodInfo,
+                        InherentDepth = inherentDepth,
+                        Order = order,
+                    });
                 }
                 #endregion
 
@@ -447,10 +451,10 @@ namespace SaintsField.Editor
                 ELayout curConfig = sortedGroup.Layout;
                 bool configExists = layoutKeyToInfo.TryGetValue(curGroupBy, out (ELayout eLayout, bool isDOTween) existConfigInfo);
                 // if there is a config later, use the later one
-                if (!configExists || curConfig != 0 || (!existConfigInfo.isDOTween && sortedGroup is DOTweenPlayAttribute))
+                if (!configExists || curConfig != 0 || sortedGroup is DOTweenPlayAttribute)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"add key {groupBy}: {config}.{config==0} (origin: {info.eLayout}.{info.eLayout==0})");
+                    Debug.Log($"add key {curGroupBy}: {curConfig}.{curConfig==0} (origin: {existConfigInfo.eLayout}.{existConfigInfo.eLayout==0})");
 #endif
                     layoutKeyToInfo[curGroupBy] = (curConfig, existConfigInfo.isDOTween || sortedGroup is DOTweenPlayAttribute);
                 }
@@ -496,6 +500,7 @@ namespace SaintsField.Editor
                     switch (saintsGroup)
                     {
                         case LayoutEndAttribute layoutEndAttribute:
+                            Debug.Log($"layoutEnd={layoutEndAttribute.GroupBy} for {fieldWithInfo}");
                             layoutEnd = layoutEndAttribute;
                             break;
                         default:
@@ -522,6 +527,11 @@ namespace SaintsField.Editor
                 }
 
                 lastInherentDepth = fieldWithInfo.InherentDepth;
+                //
+                // if(fieldWithInfo.MethodInfo?.Name == "PlayColor2") {
+                //     Debug.Log($"field {fieldWithInfo.RenderType}, {fieldWithInfo.InherentDepth}, {fieldWithInfo.Order}, {string.Join(",", fieldWithInfo.Groups.Select(each => each.GroupBy))}");
+                //     Debug.Log($"isNewGroup={isNewGroup}, layoutEndPrev={layoutEndPrev}, newInherent={newInherent}, keepGrouping={keepGrouping}");
+                // }
 
                 if (keepGrouping || normalGroup.Count > 0)
                 {
@@ -531,6 +541,7 @@ namespace SaintsField.Editor
                             .OrderByDescending(each => each.GroupBy.Length)
                             .First();
 
+                    Debug.Log($"keep grouping={keepGrouping}, {fieldWithInfo}, group={longestGroup.GroupBy}, layoutEnd={layoutEnd}");
                     // check if this group need to be connected
                     if (unconnectedSubLayoutKeyToGroup.ContainsKey(longestGroup.GroupBy))
                     {
@@ -559,20 +570,23 @@ namespace SaintsField.Editor
 
                     if (itemResult != null)
                     {
-    #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                         Debug.Log($"add renderer {itemResult} to {longestGroup.GroupBy}({targetGroup})");
-    #endif
+#endif
                         targetGroup.Add(longestGroup.GroupBy, itemResult);
                     }
                 }
                 else
                 {
-                    AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo);
-                    // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
-
-                    if (result != null)
+                    if (fieldWithInfo.RenderType != SaintsRenderType.Method || fieldWithInfo.PlayaAttributes.Count > 0)
                     {
-                        renderers.Add(result);
+                        AbsRenderer result = MakeRenderer(serializedObject, fieldWithInfo);
+                        // Debug.Log($"direct render {result}, {fieldWithInfo.RenderType}, {fieldWithInfo.MethodInfo?.Name}");
+
+                        if (result != null)
+                        {
+                            renderers.Add(result);
+                        }
                     }
                 }
 

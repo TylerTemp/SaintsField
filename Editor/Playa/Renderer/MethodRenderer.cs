@@ -568,5 +568,10 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
         }
+
+        public override string ToString()
+        {
+            return $"<{FieldWithInfo.RenderType} {FieldWithInfo.MethodInfo?.Name}/>";
+        }
     }
 }

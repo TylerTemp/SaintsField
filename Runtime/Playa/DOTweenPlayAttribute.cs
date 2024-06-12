@@ -13,7 +13,7 @@ namespace SaintsField.Playa
         public readonly ETweenStop DOTweenStop;
         // ReSharper enable InconsistentNaming
 
-        private const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";
+        public const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";
         public string GroupBy { get; }
         public ELayout Layout => 0;
         public bool KeepGrouping { get; }
