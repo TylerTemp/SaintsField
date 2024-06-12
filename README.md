@@ -2759,7 +2759,7 @@ The check of each row means auto play when you click the start in the global con
 
 To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
-### `DOTweenPlayGroup` / `DOTweenEnd` ###
+### `DOTweenPlayGroup` / `DOTweenPlayEnd` ###
 
 A convenient way to add many method to `DOTweenPlay`.
 
