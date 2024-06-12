@@ -10,7 +10,8 @@ namespace SaintsField.Playa
         Background = 1 << 1,  // a background for the whole layout. This is used to make it like a GroupBox
         TitleOut = 1 << 2,  // Make title looks different
         Foldout = 1 << 3,  // expandable?
-        Tab = 1 << 4,  // tab page
-        Title = 1 << 5,  // title
+        Collapse = 1 << 4,  // same as expandable, but collapsed by default
+        Tab = 1 << 5,  // tab page
+        Title = 1 << 6,  // title
     }
 }

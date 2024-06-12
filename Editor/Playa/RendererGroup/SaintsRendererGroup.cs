@@ -32,11 +32,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private bool _foldout;
 
-        public SaintsRendererGroup(string groupPath, ELayout eLayout, bool closedByDefault)
+        public SaintsRendererGroup(string groupPath, ELayout eLayout)
         {
             _groupPath = groupPath;
             _eLayout = eLayout;
-            _foldout = !closedByDefault;
+            _foldout = !eLayout.HasFlag(ELayout.Collapse);
         }
 
         public void Add(string groupPath, ISaintsRenderer renderer)
@@ -108,7 +108,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout);
+                    bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout) || _eLayout.HasFlag(ELayout.Collapse);
                     bool hasTitle = _eLayout.HasFlag(ELayout.Title);
                     bool hasTab = _eLayout.HasFlag(ELayout.Tab);
 
@@ -173,7 +173,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                                 {
                                     _foldout = true;
                                 }
-                                
+
                                 if (curSelected != -1)
                                 {
                                     _curSelected = curSelected;
@@ -485,10 +485,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             Dictionary<string, List<VisualElement>> fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
             string curTab = null;
-            
+
             VisualElement root = null;
             ToolbarToggle foldoutToggle = null;
-            
+
             VisualElement titleRow = new VisualElement
             {
                 style =
@@ -693,7 +693,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     foldoutToggle.value = _foldout;
                     foldoutAction(_foldout);
                     foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
-                    
+
                     if (!_foldout)
                     {
                         foreach (ToolbarToggle toolbarToggle in toolbarToggles)
@@ -751,7 +751,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 visualElements.Add(fieldElement);
                 body.Add(fieldElement);
             }
-            
+
             if(_eLayout.HasFlag(ELayout.Background))
             {
                 root.style.backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f);

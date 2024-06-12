@@ -12,6 +12,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string group2;
         public string group3;
 
-        [LayoutEnd("group")] public string afterGroup;
+        [LayoutEnd("group")]
+        public string afterGroup;
     }
 }
