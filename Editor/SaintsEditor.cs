@@ -439,58 +439,25 @@ namespace SaintsField.Editor
                 .Select(each => each.value)
                 .ToList();
 
-            // handle GroupAllFieldsUntilNextGroupAttribute
-            // List<SaintsFieldWithInfo> fieldInfosWithGroups = new List<SaintsFieldWithInfo>();
-            // int previousGroupIndex = -1;
-            // for (int i = 0; i < fieldWithInfosSorted.Count; i++)
-            // {
-            //     IReadOnlyList<ISaintsGroup> groups;
-            //     if (fieldWithInfosSorted[i].Groups.Count == 0 && previousGroupIndex != -1)
-            //     {
-            //         groups = fieldInfosWithGroups.Count > previousGroupIndex
-            //             ? fieldInfosWithGroups[previousGroupIndex].Groups
-            //             : fieldWithInfosSorted[previousGroupIndex].Groups;
-            //     }
-            //     else
-            //     {
-            //         groups = fieldWithInfosSorted[i].Groups;
-            //     }
-            //
-            //     var fieldWithInfo = fieldWithInfosSorted[i];
-            //     fieldWithInfo.Groups = groups;
-            //     fieldInfosWithGroups.Add(fieldWithInfo);
-            //
-            //     foreach (var group in fieldWithInfo.Groups)
-            //     {
-            //         if (group.GroupAllFieldsUntilNextGroupAttribute)
-            //         {
-            //             previousGroupIndex = fieldInfosWithGroups.Count - 1;
-            //             break;
-            //         }
-            //
-            //         previousGroupIndex = -1;
-            //     }
-            // }
-            // fieldWithInfosSorted = fieldInfosWithGroups;
-
             // layout name to it's config
             Dictionary<string, (ELayout eLayout, bool isDOTween)> layoutKeyToInfo = new Dictionary<string, (ELayout eLayout, bool isDOTween)>();
             foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.Groups))
             {
-                string groupBy = sortedGroup.GroupBy;
-                ELayout config = sortedGroup.Layout;
-                bool configExists = layoutKeyToInfo.TryGetValue(groupBy, out (ELayout eLayout, bool isDOTween) info);
-                if (!configExists || (info.eLayout == 0 && config != 0) || (!info.isDOTween && sortedGroup is DOTweenPlayAttribute))
+                string curGroupBy = sortedGroup.GroupBy;
+                ELayout curConfig = sortedGroup.Layout;
+                bool configExists = layoutKeyToInfo.TryGetValue(curGroupBy, out (ELayout eLayout, bool isDOTween) existConfigInfo);
+                // if there is a config later, use the later one
+                if (!configExists || curConfig != 0 || (!existConfigInfo.isDOTween && sortedGroup is DOTweenPlayAttribute))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                     Debug.Log($"add key {groupBy}: {config}.{config==0} (origin: {info.eLayout}.{info.eLayout==0})");
 #endif
-                    layoutKeyToInfo[groupBy] = (config, info.isDOTween || sortedGroup is DOTweenPlayAttribute);
+                    layoutKeyToInfo[curGroupBy] = (curConfig, existConfigInfo.isDOTween || sortedGroup is DOTweenPlayAttribute);
                 }
-                else
-                {
-                    Debug.Assert(info.eLayout == config || config == 0, $"layout config conflict: [{groupBy}] {info.eLayout} vs {config}");
-                }
+                // else
+                // {
+                //     Debug.Assert(existConfigInfo.eLayout == curConfig || curConfig == 0, $"layout config conflict: [{curGroupBy}] {existConfigInfo.eLayout} vs {curConfig}");
+                // }
             }
 
             // layout name to it's (new-created) actual render group
@@ -536,8 +503,6 @@ namespace SaintsField.Editor
                             break;
                     }
                 }
-
-                // ISaintsGroup[] notEndGroups = fieldWithInfo.Groups.Where(each => !(each is LayoutEndAttribute)).ToArray();
 
                 ISaintsGroup curLongestGroup =
                     normalGroup.OrderByDescending(each => each.GroupBy.Length).FirstOrDefault();
