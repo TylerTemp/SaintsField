@@ -66,9 +66,13 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.0.14**
+**3.1.0**
 
-UI Toolkit: Fix [#35](https://github.com/TylerTemp/SaintsField/issues/35) float `[MinMaxSlider]` read min value to max value when using input rather than slider.
+1.  Layout system now have `LayoutGroup`, `LayoutEnd` to quickly group many fields together.
+2.  DOTweenPlay tools now have `DOTweenPlayGroup`, `DOTweenPlayEnd` to quickly group many DOTweenPlay methods together.
+3.  Layout now use the last config for the target group, this is useful when you want to inherent but want to change config of parent's Layout group.
+
+Note: This version re-worked the layout system and might break the existing functions. Report a bug if you face any issues.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2754,6 +2758,50 @@ The check of each row means auto play when you click the start in the global con
 **Setup**
 
 To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+
+### `DOTweenPlayGroup` / `DOTweenEnd` ###
+
+A convenient way to add many method to `DOTweenPlay`.
+
+```csharp
+using SaintsField.Playa;
+
+[DOTweenPlayGroup(groupBy: "Color")]
+private Sequence PlayColor()
+{
+    return DOTween.Sequence()
+        .Append(spriteRenderer.DOColor(Color.red, 1f))
+        .Append(spriteRenderer.DOColor(Color.green, 1f))
+        .Append(spriteRenderer.DOColor(Color.blue, 1f))
+        .SetLoops(-1);
+}
+
+private Sequence PlayColor2()  // this will be automaticlly added to DOTweenPlay
+{
+    return DOTween.Sequence()
+        .Append(spriteRenderer.DOColor(Color.cyan, 1f))
+        .Append(spriteRenderer.DOColor(Color.magenta, 1f))
+        .Append(spriteRenderer.DOColor(Color.yellow, 1f))
+        .SetLoops(-1);
+}
+
+// this will be automaticlly added to DOTweenPlay
+// Note: if you want to add this in DOTweenPlay but also stop the grouping, use:
+// [DOTweenPlay("Color", keepGrouping: false)]
+private Sequence PlayColor3()  
+{
+    return DOTween.Sequence()
+        .Append(spriteRenderer.DOColor(Color.yellow, 1f))
+        .Append(spriteRenderer.DOColor(Color.magenta, 1f))
+        .Append(spriteRenderer.DOColor(Color.cyan, 1f))
+        .SetLoops(-1);
+}
+
+[DOTweenPlayEnd("Color")]
+public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be added
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
 
 ### `Button` ###
 

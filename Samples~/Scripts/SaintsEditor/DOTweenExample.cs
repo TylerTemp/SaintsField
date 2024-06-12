@@ -51,7 +51,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 
         [DOTweenPlayEnd("Color"), Ordered]
-        public Tween DoNotIncludeMe() => DOTween.Sequence();
+        public void DoNotIncludeMe() {}
 #endif
 
         [Button("Tween above me"), Ordered]

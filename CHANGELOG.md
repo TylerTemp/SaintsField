@@ -1,3 +1,11 @@
+## 3.1.0
+
+1.  Layout system now have `LayoutGroup`, `LayoutEnd` to quickly group many fields together.
+2.  DOTweenPlay tools now have `DOTweenPlayGroup`, `DOTweenPlayEnd` to quickly group many DOTweenPlay methods together.
+3.  Layout now use the last config for the target group, this is useful when you want to inherent but want to change config of parent's Layout group.
+
+Note: This version re-worked the layout system and might break the existing functions. Report a bug if you face any issues.
+
 ## 3.0.14
 
 UI Toolkit: Fix [#35](https://github.com/TylerTemp/SaintsField/issues/35) float `[MinMaxSlider]` read min value to max value when using input rather than slider.
