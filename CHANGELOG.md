@@ -1,3 +1,8 @@
+## 3.1.1
+
+1.  Fixed: `AssetPreview` should not destroy the texture and lead to empty image.
+2.  UI Toolkit: Better `ELayout.TitleOut` with foldout mode for `[Layout]`
+
 ## 3.1.0
 
 1.  Layout system now have `LayoutGroup`, `LayoutEnd` to quickly group many fields together.

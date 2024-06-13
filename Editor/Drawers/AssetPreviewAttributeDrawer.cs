@@ -16,6 +16,8 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(AssetPreviewAttribute))]
     public class AssetPreviewAttributeDrawer : SaintsPropertyDrawer
     {
+        private bool _usingUIToolkit;
+
         private Texture2D _previewTexture;
         // private int _cachedWidth;
         // private int _cachedHeight;
@@ -23,26 +25,21 @@ namespace SaintsField.Editor.Drawers
 
         ~AssetPreviewAttributeDrawer()
         {
-            // if (_previewTexture)
-            // {
-            //     Object.DestroyImmediate(_previewTexture);
-            // }
             _previewTexture = null;
-
-            // if (_cachedWidthTexture)
-            // {
-            //     Object.DestroyImmediate(_cachedWidthTexture);
-            // }
         }
 
         protected override void ImGuiOnDispose()
         {
             base.ImGuiOnDispose();
+            if (_usingUIToolkit)
+            {
+                return;
+            }
+
             if (!_previewTexture)
             {
                 return;
             }
-            Object.DestroyImmediate(_previewTexture);
             _previewTexture = null;
         }
 
@@ -337,6 +334,7 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
+            _usingUIToolkit = true;
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             if (!assetPreviewAttribute.Above)
             {
@@ -350,6 +348,7 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
+            _usingUIToolkit = true;
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             if (assetPreviewAttribute.Above)
             {
