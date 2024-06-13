@@ -642,11 +642,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         foldout.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
                     }
-                    else
+
+                    Label foldoutLabel = foldout.Q<Label>(className: "unity-foldout__text");
+                    foldoutLabel.style.flexGrow = 1;
+                    if (_foldout)
                     {
-                        foldout.style.borderBottomColor = EColor.EditorSeparator.GetColor();
-                        foldout.style.borderBottomWidth = 1f;
+                        foldoutLabel.style.borderBottomWidth = 1f;
                     }
+                    foldoutLabel.style.borderBottomColor = EColor.EditorSeparator.GetColor();
+                    foldout.RegisterValueChangedCallback(e => foldoutLabel.style.borderBottomWidth = e.newValue? 1f : 0f);
                 }
 
                 root = foldout;
