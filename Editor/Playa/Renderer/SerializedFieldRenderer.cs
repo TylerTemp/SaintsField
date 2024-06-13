@@ -101,6 +101,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             int numberOfItemsPerPage = 0;
             int curPageIndex = 0;
+            List<int> itemIndexToPropertyIndex = Enumerable.Range(0, property.arraySize).ToList();
 
             VisualElement MakeItem()
             {
@@ -110,7 +111,8 @@ namespace SaintsField.Editor.Playa.Renderer
 
             void BindItem(VisualElement propertyFieldRaw, int index)
             {
-                SerializedProperty prop = property.GetArrayElementAtIndex(index + curPageIndex * numberOfItemsPerPage);
+                // Debug.Log(($"bind: {index}, itemIndex={string.Join(", ", itemIndexToPropertyIndex)}"));
+                SerializedProperty prop = property.GetArrayElementAtIndex(itemIndexToPropertyIndex[index]);
                 PropertyField propertyField = (PropertyField)propertyFieldRaw;
                 propertyField.BindProperty(prop);
                 propertyField.userData = index;
@@ -232,6 +234,11 @@ namespace SaintsField.Editor.Playa.Renderer
                     ? Enumerable.Range(0, property.arraySize).ToList()
                     : SearchArrayProperty(property, searchTarget).ToList();
 
+                Debug.Log($"index search={searchTarget} result: {string.Join(",", fullIndexResults)}");
+
+                itemIndexToPropertyIndex.Clear();
+                itemIndexToPropertyIndex.AddRange(fullIndexResults);
+
                 int pageCount;
                 int skipStart;
                 int itemCount;
@@ -240,20 +247,20 @@ namespace SaintsField.Editor.Playa.Renderer
                     pageCount = 1;
                     curPageIndex = 0;
                     skipStart = 0;
-                    itemCount = property.arraySize;
+                    itemCount = itemIndexToPropertyIndex.Count;
                 }
                 else
                 {
-                    pageCount = Mathf.CeilToInt((float)fullIndexResults.Count / numberOfItemsPerPage);
+                    pageCount = Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPage);
                     curPageIndex = Mathf.Clamp(newPageIndex, 0, pageCount - 1);
                     skipStart = curPageIndex * numberOfItemsPerPage;
-                    itemCount = Mathf.Min(numberOfItemsPerPage, fullIndexResults.Count - skipStart);
+                    itemCount = Mathf.Min(numberOfItemsPerPage, itemIndexToPropertyIndex.Count - skipStart);
                 }
 
                 pageLabel.text = $" / {pageCount}";
                 pageField.SetValueWithoutNotify(curPageIndex + 1);
 
-                List<int> curPageItems = Enumerable.Range(skipStart, itemCount).ToList();
+                List<int> curPageItems = fullIndexResults.Skip(skipStart).Take(itemCount).ToList();
 
                 listView.itemsSource = curPageItems;
                 listView.Rebuild();
@@ -351,6 +358,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 SerializedProperty childProperty = property.GetArrayElementAtIndex(index);
                 if(SearchProp(childProperty, search))
                 {
+                    Debug.Log($"found: {childProperty.propertyPath}");
                     yield return index;
                 }
             }
@@ -358,22 +366,34 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private static bool SearchProp(SerializedProperty property, string search)
         {
-            bool hasChildProp = false;
-            foreach (SerializedProperty child in GetPropertyChildren(property))
-            {
-                hasChildProp = true;
-                if(SearchProp(child, search))
-                {
-                    return true;
-                }
-            }
+            // bool hasChildProp = false;
+            // foreach (SerializedProperty child in GetPropertyChildren(property))
+            // {
+            //     hasChildProp = true;
+            //     if(SearchProp(child, search))
+            //     {
+            //         return true;
+            //     }
+            // }
+            //
+            // if (hasChildProp)
+            // {
+            //     return false;
+            // }
 
-            if (hasChildProp)
+            SerializedPropertyType propertyType;
+            try
+            {
+                propertyType = property.propertyType;
+            }
+            catch (NullReferenceException)
             {
                 return false;
             }
 
-            switch (property.propertyType)
+            // Debug.Log($"{property.propertyPath} is {propertyType}");
+
+            switch (propertyType)
             {
                 case SerializedPropertyType.Integer:
                     return property.intValue.ToString().Contains(search);
@@ -382,7 +402,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 case SerializedPropertyType.Float:
                     return property.floatValue.ToString().Contains(search);
                 case SerializedPropertyType.String:
-                    return property.stringValue.Contains(search);
+                    Debug.Log($"{property.propertyPath}={property.stringValue} contains {search}={property.stringValue?.Contains(search)}");
+                    return property.stringValue?.Contains(search) ?? false;
                 case SerializedPropertyType.Color:
                     return property.colorValue.ToString().Contains(search);
                 case SerializedPropertyType.ObjectReference:
@@ -399,8 +420,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     return property.vector4Value.ToString().Contains(search);
                 case SerializedPropertyType.Rect:
                     return property.rectValue.ToString().Contains(search);
-                // case SerializedPropertyType.ArraySize:
-                //     return property.arraySize.ToString().Contains(search);
+                case SerializedPropertyType.ArraySize:
+                    return property.arraySize.ToString().Contains(search);
                 case SerializedPropertyType.Character:
                     return property.intValue.ToString().Contains(search);
                 case SerializedPropertyType.AnimationCurve:
@@ -423,6 +444,29 @@ namespace SaintsField.Editor.Playa.Renderer
                     return property.boundsIntValue.ToString().Contains(search);
                 case SerializedPropertyType.ManagedReference:
                     return property.managedReferenceFullTypename.Contains(search);
+                case SerializedPropertyType.Generic:
+                {
+                    if (property.isArray)
+                    {
+                        Debug.Log($"is array {property.arraySize}: {property.propertyPath}");
+                        return Enumerable.Range(0, property.arraySize)
+                            .Select(property.GetArrayElementAtIndex)
+                            .Any(childProperty => SearchProp(childProperty, search));
+                    }
+
+                    foreach (SerializedProperty child in GetPropertyChildren(property))
+                    {
+                        if(SearchProp(child, search))
+                        {
+                            Debug.Log($"found child: {child.propertyPath}");
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+                case SerializedPropertyType.Gradient:
+                case SerializedPropertyType.Hash128:
                 default:
                     return false;
             }
