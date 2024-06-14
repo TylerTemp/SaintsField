@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             public int myInt;
             public string myString;
             public GameObject myGameObject;
-            // public string[] myStrings;
+            public string[] myStrings;
         }
 
         [ListDrawerSettings(numberOfItemsPerPage: 5)]

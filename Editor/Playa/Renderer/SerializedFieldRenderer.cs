@@ -99,7 +99,7 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             SerializedProperty property = FieldWithInfo.SerializedProperty;
 
-            int numberOfItemsPerPage = 0;
+            // int numberOfItemsPerPage = 0;
             int curPageIndex = 0;
             List<int> itemIndexToPropertyIndex = Enumerable.Range(0, property.arraySize).ToList();
 
@@ -227,74 +227,73 @@ namespace SaintsField.Editor.Playa.Renderer
                 text = ">",
             };
 
-            void UpdatePage(int newPageIndex)
+            void UpdatePage(int newPageIndex, int numberOfItemsPerPage)
             {
                 string searchTarget = searchField.value;
                 IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(searchTarget)
                     ? Enumerable.Range(0, property.arraySize).ToList()
                     : SearchArrayProperty(property, searchTarget).ToList();
 
-                Debug.Log($"index search={searchTarget} result: {string.Join(",", fullIndexResults)}");
+                Debug.Log($"index search={searchTarget} result: {string.Join(",", fullIndexResults)}; numberOfItemsPerPage={numberOfItemsPerPage}");
 
                 itemIndexToPropertyIndex.Clear();
                 itemIndexToPropertyIndex.AddRange(fullIndexResults);
 
                 int pageCount;
                 int skipStart;
-                int itemCount;
+                // int itemCount;
                 if (numberOfItemsPerPage <= 0)
                 {
                     pageCount = 1;
                     curPageIndex = 0;
                     skipStart = 0;
-                    itemCount = itemIndexToPropertyIndex.Count;
+                    // itemCount = itemIndexToPropertyIndex.Count;
                 }
                 else
                 {
                     pageCount = Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPage);
                     curPageIndex = Mathf.Clamp(newPageIndex, 0, pageCount - 1);
                     skipStart = curPageIndex * numberOfItemsPerPage;
-                    itemCount = Mathf.Min(numberOfItemsPerPage, itemIndexToPropertyIndex.Count - skipStart);
+                    // itemCount = Mathf.Min(numberOfItemsPerPage, itemIndexToPropertyIndex.Count - skipStart);
                 }
 
                 pageLabel.text = $" / {pageCount}";
                 pageField.SetValueWithoutNotify(curPageIndex + 1);
 
-                List<int> curPageItems = fullIndexResults.Skip(skipStart).Take(itemCount).ToList();
+                List<int> curPageItems = fullIndexResults.Skip(skipStart).Take(numberOfItemsPerPage).ToList();
 
+                Debug.Log($"set items: {string.Join(", ", curPageItems)}, itemIndexToPropertyIndex={string.Join(",", itemIndexToPropertyIndex)}");
                 listView.itemsSource = curPageItems;
-                listView.Rebuild();
+                // Debug.Log("rebuild listView");
+                // listView.Rebuild();
             }
 
             searchField.RegisterValueChangedCallback(evt =>
             {
-                UpdatePage(0);
+                UpdatePage(0, numberOfItemsPerPageField.value);
             });
 
             pagePreButton.clicked += () =>
             {
                 if(curPageIndex > 0)
                 {
-                    UpdatePage(curPageIndex - 1);
+                    UpdatePage(curPageIndex - 1, numberOfItemsPerPageField.value);
                 }
             };
             pageNextButton.clicked += () =>
             {
-                if(curPageIndex < Mathf.CeilToInt((float)property.arraySize / numberOfItemsPerPage) - 1)
+                if(curPageIndex < Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPageField.value) - 1)
                 {
-                    UpdatePage(curPageIndex + 1);
+                    UpdatePage(curPageIndex + 1, numberOfItemsPerPageField.value);
                 }
             };
-            pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1));
+            pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1, numberOfItemsPerPageField.value));
 
-            void UpdateNumberOfItemsPerPage(int newNumberOfItemsPerPage)
+            void UpdateNumberOfItemsPerPage(int newValue)
             {
-                int newValue = Mathf.Clamp(newNumberOfItemsPerPage, 0, property.arraySize);
-                if(numberOfItemsPerPage != newValue)
-                {
-                    numberOfItemsPerPage = newValue;
-                    UpdatePage(curPageIndex);
-                }
+                int newValueClamp = Mathf.Max(newValue, 0);
+                Debug.Log($"update number of items per page {newValueClamp}");
+                UpdatePage(curPageIndex, newValueClamp);
             }
 
             numberOfItemsPerPageField.RegisterValueChangedCallback(evt => UpdateNumberOfItemsPerPage(evt.newValue));
@@ -303,24 +302,29 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 property.arraySize += 1;
                 property.serializedObject.ApplyModifiedProperties();
-                int totalPage = Mathf.CeilToInt((float)property.arraySize / numberOfItemsPerPage);
-                UpdatePage(totalPage - 1);
+                int totalVisiblePage = Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPageField.value);
+                UpdatePage(totalVisiblePage - 1, numberOfItemsPerPageField.value);
                 numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
             });
 
             listView.itemsRemoved += objects =>
             {
-                int[] sources = listView.itemsSource.Cast<int>().ToArray();
+                // int[] sources = listView.itemsSource.Cast<int>().ToArray();
+                List<int> curRemoveObjects = objects.ToList();
 
-                foreach (int index in objects.Select(removeIndex => sources[removeIndex]).OrderByDescending(each => each))
+                foreach (int index in curRemoveObjects.Select(removeIndex => itemIndexToPropertyIndex[removeIndex]).OrderByDescending(each => each))
                 {
-                    // Debug.Log(index);
+                    Debug.Log(index);
                     property.DeleteArrayElementAtIndex(index);
                 }
+
+                // itemIndexToPropertyIndex.RemoveAll(each => curRemoveObjects.Contains(each));
                 property.serializedObject.ApplyModifiedProperties();
+                property.serializedObject.Update();
                 numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
 
-                UpdatePage(curPageIndex);
+                Debug.Log($"removed update page to {curPageIndex}");
+                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
             };
 
             if (listDrawerSettingsAttribute.NumberOfItemsPerPage != 0)
@@ -330,6 +334,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 listView.RegisterCallback<AttachToPanelEvent>(_ =>
                 {
+                    Debug.Log($"init update numberOfItemsPerPage={listDrawerSettingsAttribute.NumberOfItemsPerPage}");
                     numberOfItemsPerPageField.value = listDrawerSettingsAttribute.NumberOfItemsPerPage;
                 });
             }
