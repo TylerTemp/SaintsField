@@ -218,12 +218,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myStructArr:
-  - myInt: 1
-    myString: test
+  - myInt: 0
+    myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 1
-    myString: xxx
+  - myInt: 0
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings: []
+  - myInt: 0
+    myString: 
     myGameObject: {fileID: 0}
     myStrings: []
 --- !u!1 &171104905

@@ -15,7 +15,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             public string[] myStrings;
         }
 
-        [ListDrawerSettings(numberOfItemsPerPage: 5)]
+        [ListDrawerSettings(
+            searchable: true
+            , numberOfItemsPerPage: 0
+        )]
         public MyStruct[] myStructArr;
     }
 }

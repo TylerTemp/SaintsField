@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
-using SaintsField.Editor.Linq;
 using SaintsField.Playa;
 using SaintsField.Editor.Utils;
 using UnityEditor.UIElements;
@@ -94,7 +93,6 @@ namespace SaintsField.Editor.Playa.Renderer
             return result;
         }
 
-        // private const string ListDrawerItemClass = "saintsfield-list-drawer-item";
         private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)
         {
             SerializedProperty property = FieldWithInfo.SerializedProperty;
@@ -124,6 +122,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 bindItem = BindItem,
                 selectionType = SelectionType.Multiple,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
                 showFoldoutHeader = true,
                 headerTitle = property.displayName,
                 showAddRemoveFooter = true,
@@ -142,8 +141,6 @@ namespace SaintsField.Editor.Playa.Renderer
             //     property.serializedObject.ApplyModifiedProperties();
             // };
 
-
-
             VisualElement foldoutContent = listView.Q<VisualElement>(className: "unity-foldout__content");
 
             VisualElement preContent = new VisualElement
@@ -151,7 +148,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 style =
                 {
                     flexDirection = FlexDirection.Row,
-                    display = DisplayStyle.None,
+                    display = (listDrawerSettingsAttribute.Searchable || listDrawerSettingsAttribute.NumberOfItemsPerPage > 0)
+                        ? DisplayStyle.Flex
+                        :DisplayStyle.None,
                 },
             };
 
@@ -161,7 +160,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 style =
                 {
-                    // visibility = Visibility.Hidden,
+                    visibility = listDrawerSettingsAttribute.Searchable? Visibility.Visible :Visibility.Hidden,
                     flexGrow = 1,
                     flexShrink = 1,
                 },
@@ -177,7 +176,8 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 style =
                 {
-                    visibility = Visibility.Hidden,
+                    // visibility = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0? Visibility.Hidden: Visibility.Visible,
+                    display = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0? DisplayStyle.None: DisplayStyle.Flex,
                     flexDirection = FlexDirection.Row,
                     flexGrow = 0,
                     flexShrink = 0,
@@ -234,41 +234,45 @@ namespace SaintsField.Editor.Playa.Renderer
                     ? Enumerable.Range(0, property.arraySize).ToList()
                     : SearchArrayProperty(property, searchTarget).ToList();
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"index search={searchTarget} result: {string.Join(",", fullIndexResults)}; numberOfItemsPerPage={numberOfItemsPerPage}");
+#endif
 
                 itemIndexToPropertyIndex.Clear();
                 itemIndexToPropertyIndex.AddRange(fullIndexResults);
 
                 int pageCount;
                 int skipStart;
-                // int itemCount;
+                int itemCount;
                 if (numberOfItemsPerPage <= 0)
                 {
                     pageCount = 1;
                     curPageIndex = 0;
                     skipStart = 0;
-                    // itemCount = itemIndexToPropertyIndex.Count;
+                    itemCount = int.MaxValue;
                 }
                 else
                 {
                     pageCount = Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPage);
                     curPageIndex = Mathf.Clamp(newPageIndex, 0, pageCount - 1);
                     skipStart = curPageIndex * numberOfItemsPerPage;
-                    // itemCount = Mathf.Min(numberOfItemsPerPage, itemIndexToPropertyIndex.Count - skipStart);
+                    itemCount = numberOfItemsPerPage;
                 }
 
                 pageLabel.text = $" / {pageCount}";
                 pageField.SetValueWithoutNotify(curPageIndex + 1);
 
-                List<int> curPageItems = fullIndexResults.Skip(skipStart).Take(numberOfItemsPerPage).ToList();
+                List<int> curPageItems = fullIndexResults.Skip(skipStart).Take(itemCount).ToList();
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"set items: {string.Join(", ", curPageItems)}, itemIndexToPropertyIndex={string.Join(",", itemIndexToPropertyIndex)}");
+#endif
                 listView.itemsSource = curPageItems;
                 // Debug.Log("rebuild listView");
-                // listView.Rebuild();
+                listView.Rebuild();
             }
 
-            searchField.RegisterValueChangedCallback(evt =>
+            searchField.RegisterValueChangedCallback(_ =>
             {
                 UpdatePage(0, numberOfItemsPerPageField.value);
             });
@@ -292,7 +296,9 @@ namespace SaintsField.Editor.Playa.Renderer
             void UpdateNumberOfItemsPerPage(int newValue)
             {
                 int newValueClamp = Mathf.Max(newValue, 0);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"update number of items per page {newValueClamp}");
+#endif
                 UpdatePage(curPageIndex, newValueClamp);
             }
 
@@ -323,18 +329,23 @@ namespace SaintsField.Editor.Playa.Renderer
                 property.serializedObject.Update();
                 numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"removed update page to {curPageIndex}");
-                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+#endif
+
+                listView.schedule.Execute(() => UpdatePage(curPageIndex, numberOfItemsPerPageField.value));
             };
 
             if (listDrawerSettingsAttribute.NumberOfItemsPerPage != 0)
             {
-                preContent.style.display = DisplayStyle.Flex;
-                pagingContainer.style.visibility = Visibility.Visible;
+                // preContent.style.display = DisplayStyle.Flex;
+                // pagingContainer.style.visibility = Visibility.Visible;
 
                 listView.RegisterCallback<AttachToPanelEvent>(_ =>
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"init update numberOfItemsPerPage={listDrawerSettingsAttribute.NumberOfItemsPerPage}");
+#endif
                     numberOfItemsPerPageField.value = listDrawerSettingsAttribute.NumberOfItemsPerPage;
                 });
             }
@@ -363,7 +374,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 SerializedProperty childProperty = property.GetArrayElementAtIndex(index);
                 if(SearchProp(childProperty, search))
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"found: {childProperty.propertyPath}");
+#endif
                     yield return index;
                 }
             }
@@ -405,13 +418,17 @@ namespace SaintsField.Editor.Playa.Renderer
                 case SerializedPropertyType.Boolean:
                     return property.boolValue.ToString().Contains(search);
                 case SerializedPropertyType.Float:
+                    // ReSharper disable once SpecifyACultureInStringConversionExplicitly
                     return property.floatValue.ToString().Contains(search);
                 case SerializedPropertyType.String:
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"{property.propertyPath}={property.stringValue} contains {search}={property.stringValue?.Contains(search)}");
+#endif
                     return property.stringValue?.Contains(search) ?? false;
                 case SerializedPropertyType.Color:
                     return property.colorValue.ToString().Contains(search);
                 case SerializedPropertyType.ObjectReference:
+                    // ReSharper disable once Unity.NoNullPropagation
                     return property.objectReferenceValue?.name.Contains(search) ?? false;
                 case SerializedPropertyType.LayerMask:
                     return property.intValue.ToString().Contains(search);
@@ -436,6 +453,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 case SerializedPropertyType.Quaternion:
                     return property.quaternionValue.ToString().Contains(search);
                 case SerializedPropertyType.ExposedReference:
+                    // ReSharper disable once Unity.NoNullPropagation
                     return property.exposedReferenceValue?.name.Contains(search) ?? false;
                 case SerializedPropertyType.FixedBufferSize:
                     return property.fixedBufferSize.ToString().Contains(search);
@@ -453,17 +471,22 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     if (property.isArray)
                     {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                         Debug.Log($"is array {property.arraySize}: {property.propertyPath}");
+#endif
                         return Enumerable.Range(0, property.arraySize)
                             .Select(property.GetArrayElementAtIndex)
                             .Any(childProperty => SearchProp(childProperty, search));
                     }
 
+                    // ReSharper disable once LoopCanBeConvertedToQuery
                     foreach (SerializedProperty child in GetPropertyChildren(property))
                     {
                         if(SearchProp(child, search))
                         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                             Debug.Log($"found child: {child.propertyPath}");
+#endif
                             return true;
                         }
                     }
@@ -514,6 +537,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 UserDataPayload userDataPayload = (UserDataPayload) result.userData;
                 if (xml != userDataPayload.xml)
                 {
+                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                     if (userDataPayload.richTextDrawer == null)
                     {
                         userDataPayload.richTextDrawer = new RichTextDrawer();
@@ -565,7 +589,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private RichTextDrawer _richTextDrawer;
 
-        private string _curXml = null;
+        private string _curXml;
         private RichTextDrawer.RichTextChunk[] _curXmlChunks;
 
         public override void Render()
@@ -704,13 +728,14 @@ namespace SaintsField.Editor.Playa.Renderer
             // EditorGUI.DrawRect(position, Color.blue);
         }
 
-        public static IEnumerable<SerializedProperty> GetPropertyChildren(SerializedProperty property)
+        private static IEnumerable<SerializedProperty> GetPropertyChildren(SerializedProperty property)
         {
-            if (property != null && string.IsNullOrEmpty(property.propertyPath))
+            if (property == null || string.IsNullOrEmpty(property.propertyPath))
             {
                 yield break;
             }
 
+            // ReSharper disable once ConvertToUsingDeclaration
             using (SerializedProperty iterator = property.Copy())
             {
                 if (!iterator.NextVisible(true))
@@ -724,50 +749,6 @@ namespace SaintsField.Editor.Playa.Renderer
                     yield return childProperty;
                 } while (iterator.NextVisible(false));
             }
-            // var enumerator = property.GetEnumerator();
-            // while (enumerator.MoveNext()) {
-            //     var prop = enumerator.Current as SerializedProperty;
-            //     if (prop == null) continue;
-            //     //Add your treatment to the current child property...
-            //     // EditorGUILayout.PropertyField(prop);
-            //     yield return prop;
-            // }
-
-            // SerializedProperty iterator = property.Copy();
-            // // MyObject myObj = ScriptableObject.CreateInstance<MyObject>();
-            // // SerializedObject mySerializedObject = new UnityEditor.SerializedObject(myObj);
-            // // SerializedProperty iterator = mySerializedObject.FindProperty("PropertyName");
-            // while (iterator.Next(true))
-            // {
-            //     yield return iterator.Copy();
-            //     // Debug.Log(it.name);
-            // }
-
-            // Debug.Log(property.propertyPath);
-            // property = property.Copy();
-            // SerializedProperty nextElement = property.Copy();
-            // bool hasNextElement = nextElement.NextVisible(false);
-            // if (!hasNextElement)
-            // {
-            //     nextElement = null;
-            // }
-            //
-            // property.NextVisible(true);
-            // while (true)
-            // {
-            //     if ((SerializedProperty.EqualContents(property, nextElement)))
-            //     {
-            //         yield break;
-            //     }
-            //
-            //     yield return property;
-            //
-            //     bool hasNext = property.NextVisible(false);
-            //     if (!hasNext)
-            //     {
-            //         break;
-            //     }
-            // }
         }
 
         public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo?.Name ?? FieldWithInfo.SerializedProperty.displayName}>";
