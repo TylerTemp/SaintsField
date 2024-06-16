@@ -2,7 +2,7 @@ using System;
 using SaintsField.Playa;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.SaintsRowExamples
 {
     public class SaintsRowExample : MonoBehaviour
     {

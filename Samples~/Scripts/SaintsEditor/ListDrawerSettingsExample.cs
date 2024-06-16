@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
     public class ListDrawerSettingsExample : MonoBehaviour
     {
         [Serializable]
-        public struct MyStruct
+        public struct MyData
         {
             public int myInt;
             public string myString;
@@ -15,10 +15,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             public string[] myStrings;
         }
 
+        public string above;
+
         [ListDrawerSettings(
-            searchable: true
-            , numberOfItemsPerPage: 0
-        )]
-        public MyStruct[] myStructArr;
+             searchable: true
+             , numberOfItemsPerPage: 3
+         ), PlayaRichLabel("<color=green><icon=star.png/><label/>")]
+        public MyData[] myDataArr;
+
+        public string below;
     }
 }

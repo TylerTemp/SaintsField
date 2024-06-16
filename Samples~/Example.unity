@@ -8532,6 +8532,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 617893025}
+  - {fileID: 1700820807}
   m_Father: {fileID: 0}
   m_RootOrder: 61
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9851,7 +9852,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -13886,6 +13886,78 @@ Transform:
   m_Father: {fileID: 1830778825}
   m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1700820806
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1700820807}
+  - component: {fileID: 1700820808}
+  m_Layer: 0
+  m_Name: ListDrawer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1700820807
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700820806}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 788337260}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1700820808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700820806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dde526b8763227459d287f52cdf4925, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myStruct:
+    myDataArr:
+    - myInt: 0
+      myString: 
+      myGameObject: {fileID: 0}
+      myStrings:
+      - My0Element0
+      - My0Element1Search
+    - myInt: 1
+      myString: 
+      myGameObject: {fileID: 0}
+      myStrings:
+      - My1Element0
+    - myInt: 2
+      myString: 
+      myGameObject: {fileID: 0}
+      myStrings:
+      - My2Element0
+    - myInt: 3
+      myString: 
+      myGameObject: {fileID: 0}
+      myStrings:
+      - My3Element0Search
+    - myInt: 4
+      myString: 
+      myGameObject: {fileID: 0}
+      myStrings:
+      - My4Element0
 --- !u!1 &1730412120
 GameObject:
   m_ObjectHideFlags: 0

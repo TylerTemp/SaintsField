@@ -178,8 +178,14 @@ namespace SaintsField.Editor
             {
                 using (new EditorGUI.DisabledScope(true))
                 {
-                    EditorGUILayout.ObjectField("Script", monoScript, GetType(),
-                        false);
+                    try
+                    {
+                        EditorGUILayout.ObjectField("Script", monoScript, GetType(), false);
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // ignored
+                    }
                 }
             }
 

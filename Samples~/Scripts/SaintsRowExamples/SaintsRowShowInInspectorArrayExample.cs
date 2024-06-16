@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.SaintsRowExamples
 {
     public class SaintsRowShowInInspectorArrayExample : MonoBehaviour
     {
