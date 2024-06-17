@@ -1,7 +1,8 @@
 ## 3.1.1
 
 1.  Fixed: `AssetPreview` should not destroy the texture and lead to empty image.
-2.  UI Toolkit: Better `ELayout.TitleOut` with foldout mode for `[Layout]`
+2.  UI Toolkit: Better `ELayout.TitleOut` with foldout mode for `[Layout]`.
+3.  Add `ListDrawerSettings`  to search and paging a large list/array.
 
 ## 3.1.0
 

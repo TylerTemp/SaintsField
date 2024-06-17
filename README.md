@@ -66,13 +66,11 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.1.0**
+**3.1.1**
 
-1.  Layout system now have `LayoutGroup`, `LayoutEnd` to quickly group many fields together.
-2.  DOTweenPlay tools now have `DOTweenPlayGroup`, `DOTweenPlayEnd` to quickly group many DOTweenPlay methods together.
-3.  Layout now use the last config for the target group, this is useful when you want to inherent but want to change config of parent's Layout group.
-
-Note: This version re-worked the layout system and might break the existing functions. Report a bug if you face any issues.
+1.  Fixed: `AssetPreview` should not destroy the texture and lead to empty image.
+2.  UI Toolkit: Better `ELayout.TitleOut` with foldout mode for `[Layout]`.
+3.  Add `ListDrawerSettings`  to search and paging a large list/array.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
