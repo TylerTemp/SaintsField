@@ -3362,8 +3362,6 @@ public struct MyData
     public string[] myStrings;
 }
 
-public string above;
-
 [ListDrawerSettings(searchable: true, numberOfItemsPerPage: 3)]
 public MyData[] myDataArr;
 ```
