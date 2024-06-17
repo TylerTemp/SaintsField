@@ -1,0 +1,18 @@
+{
+    "name": "today.comes.saintsfield.Editor.FuckDOTween",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

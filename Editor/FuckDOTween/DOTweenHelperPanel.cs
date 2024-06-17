@@ -1,11 +1,13 @@
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using System;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Utils
+namespace SaintsField.Editor.FuckDOTween
 {
+    // ReSharper disable once InconsistentNaming
     public class DOTweenHelperPanel: EditorWindow
     {
 
