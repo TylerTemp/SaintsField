@@ -1057,8 +1057,10 @@ namespace SaintsField.Editor.Playa.Renderer
                     return property.rectIntValue.ToString().Contains(search);
                 case SerializedPropertyType.BoundsInt:
                     return property.boundsIntValue.ToString().Contains(search);
+#if UNITY_2019_3_OR_NEWER
                 case SerializedPropertyType.ManagedReference:
                     return property.managedReferenceFullTypename.Contains(search);
+#endif
                 case SerializedPropertyType.Generic:
                 {
                     if (property.isArray)
@@ -1086,7 +1088,9 @@ namespace SaintsField.Editor.Playa.Renderer
                     return false;
                 }
                 case SerializedPropertyType.Gradient:
+#if UNITY_2021_1_OR_NEWER
                 case SerializedPropertyType.Hash128:
+#endif
                 default:
                     return false;
             }
