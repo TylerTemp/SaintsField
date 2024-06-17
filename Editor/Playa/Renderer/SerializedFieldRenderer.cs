@@ -52,9 +52,10 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         flexGrow = 1,
                     },
-                    userData = userDataPayload,
                 }
                 : MakeListDrawerSettingsField(listDrawerSettingsAttribute);
+
+            result.userData = userDataPayload;
 
             // ReSharper disable once InvertIf
             // if(TryFixUIToolkit && FieldWithInfo.FieldInfo?.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
@@ -114,11 +115,12 @@ namespace SaintsField.Editor.Playa.Renderer
 
             void BindItem(VisualElement propertyFieldRaw, int index)
             {
-                // Debug.Log(($"bind: {index}, itemIndex={string.Join(", ", itemIndexToPropertyIndex)}"));
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                Debug.Log(($"bind: {index}, propIndex: {itemIndexToPropertyIndex[index]}, itemIndexes={string.Join(", ", itemIndexToPropertyIndex)}"));
+#endif
                 SerializedProperty prop = property.GetArrayElementAtIndex(itemIndexToPropertyIndex[index]);
                 PropertyField propertyField = (PropertyField)propertyFieldRaw;
                 propertyField.BindProperty(prop);
-                propertyField.userData = index;
             }
 
             ListView listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
@@ -208,7 +210,19 @@ namespace SaintsField.Editor.Playa.Renderer
 
             Button pagePreButton = new Button
             {
-                text = "<",
+                style =
+                {
+                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-left.png"),
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                },
+                // text = "<",
             };
             IntegerField pageField = new IntegerField
             {
@@ -229,7 +243,19 @@ namespace SaintsField.Editor.Playa.Renderer
             };
             Button pageNextButton = new Button
             {
-                text = ">",
+                style =
+                {
+                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-right.png"),
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                },
+                // text = ">",
             };
 
             void UpdatePage(int newPageIndex, int numberOfItemsPerPage)
@@ -237,11 +263,14 @@ namespace SaintsField.Editor.Playa.Renderer
                 PagingInfo pagingInfo = GetPagingInfo(property, newPageIndex, searchField.value, numberOfItemsPerPage);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
-                Debug.Log($"index search={searchTarget} result: {string.Join(",", fullIndexResults)}; numberOfItemsPerPage={numberOfItemsPerPage}");
+                Debug.Log($"index search={searchField.value} result: {string.Join(",", pagingInfo.IndexesAfterSearch)}; numberOfItemsPerPage={numberOfItemsPerPage}");
 #endif
 
+                pagePreButton.SetEnabled(pagingInfo.CurPageIndex > 0);
+                pageNextButton.SetEnabled(pagingInfo.CurPageIndex < pagingInfo.PageCount - 1);
+
                 itemIndexToPropertyIndex.Clear();
-                itemIndexToPropertyIndex.AddRange(pagingInfo.IndexesAfterSearch);
+                itemIndexToPropertyIndex.AddRange(pagingInfo.IndexesCurPage);
 
                 curPageIndex = pagingInfo.CurPageIndex;
 
@@ -265,17 +294,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
             pagePreButton.clicked += () =>
             {
-                if(curPageIndex > 0)
-                {
-                    UpdatePage(curPageIndex - 1, numberOfItemsPerPageField.value);
-                }
+                UpdatePage(curPageIndex - 1, numberOfItemsPerPageField.value);
             };
             pageNextButton.clicked += () =>
             {
-                if(curPageIndex < Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPageField.value) - 1)
-                {
-                    UpdatePage(curPageIndex + 1, numberOfItemsPerPageField.value);
-                }
+                UpdatePage(curPageIndex + 1, numberOfItemsPerPageField.value);
             };
             pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1, numberOfItemsPerPageField.value));
 
@@ -1099,7 +1122,7 @@ namespace SaintsField.Editor.Playa.Renderer
             List<int> curPageItemIndexes = fullIndexResults.Skip(skipStart).Take(itemCount).ToList();
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
-            Debug.Log($"set items: {string.Join(", ", curPageItems)}, itemIndexToPropertyIndex={string.Join(",", itemIndexToPropertyIndex)}");
+            Debug.Log($"set items: {string.Join(", ", curPageItemIndexes)}, itemIndexToPropertyIndex={string.Join(",", fullIndexResults)}");
 #endif
 
             return new PagingInfo

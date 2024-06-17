@@ -224,41 +224,41 @@ MonoBehaviour:
     myGameObject: {fileID: 0}
     myStrings:
     - ttt
-  - myInt: 0
+  - myInt: 1
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 2
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 3
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 4
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 5
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 6
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 7
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 8
     myString: 
     myGameObject: {fileID: 0}
     myStrings: []
-  - myInt: 0
+  - myInt: 9
     myString: 
-    myGameObject: {fileID: 0}
+    myGameObject: {fileID: 68442101}
     myStrings: []
   below: 
 --- !u!1 &171104905
