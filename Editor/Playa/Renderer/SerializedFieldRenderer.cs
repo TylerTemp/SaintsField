@@ -371,6 +371,18 @@ namespace SaintsField.Editor.Playa.Renderer
 
             #endregion
 
+            listView.itemIndexChanged += (first, second) =>
+            {
+                int fromPropIndex = itemIndexToPropertyIndex[first];
+                int toPropIndex = itemIndexToPropertyIndex[second];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second})");
+#endif
+
+                property.MoveArrayElement(fromPropIndex, toPropIndex);
+                property.serializedObject.ApplyModifiedProperties();
+            };
+
             foldoutContent.Insert(0, preContent);
 
             return listView;

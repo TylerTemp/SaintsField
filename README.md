@@ -3346,6 +3346,37 @@ Note:
 1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
 2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
 
+### `ListDrawerSettings` ###
+
+Allow you to search and paging a large list/array.
+
+Parameters:
+
+*   `bool searchable = false`: allow search in the list/array
+*   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
+
+```csharp
+using SaintsField.Playa;
+
+[Serializable]
+public struct MyData
+{
+    public int myInt;
+    public string myString;
+    public GameObject myGameObject;
+    public string[] myStrings;
+}
+
+public string above;
+
+[ListDrawerSettings(searchable: true, numberOfItemsPerPage: 3)]
+public MyData[] myDataArr;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/08c6da9a-e613-4e94-8933-3d7a92f7cb33)
+
+The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
+
 ## About GroupBy ##
 
 group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
