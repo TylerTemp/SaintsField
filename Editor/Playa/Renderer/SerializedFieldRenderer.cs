@@ -199,7 +199,11 @@ namespace SaintsField.Editor.Playa.Renderer
                     minWidth = 30,
                 },
             };
-            numberOfItemsPerPageField.Q<TextElement>().style.unityTextAlign = TextAnchor.MiddleRight;
+            TextElement numberOfItemsPerPageFieldTextElement = numberOfItemsPerPageField.Q<TextElement>();
+            if(numberOfItemsPerPageFieldTextElement != null)
+            {
+                numberOfItemsPerPageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
+            }
             Label numberOfItemsPerPageLabel = new Label($" / {property.arraySize} Items")
             {
                 style =
@@ -233,7 +237,11 @@ namespace SaintsField.Editor.Playa.Renderer
                     minWidth = 30,
                 },
             };
-            pageField.Q<TextElement>().style.unityTextAlign = TextAnchor.MiddleRight;
+            TextElement pageFieldTextElement = pageField.Q<TextElement>();
+            if(pageFieldTextElement != null)
+            {
+                pageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
+            }
             Label pageLabel = new Label(" / 1")
             {
                 style =
