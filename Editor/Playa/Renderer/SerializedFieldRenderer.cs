@@ -764,7 +764,10 @@ namespace SaintsField.Editor.Playa.Renderer
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
             }
 
-            using(new UnsetGuiStyleFixedHeight(ReorderableList.defaultBehaviours.headerBackground))
+            // Debug.Log(ReorderableList.defaultBehaviours);
+            // Debug.Log(ReorderableList.defaultBehaviours.headerBackground);
+
+            using(new UnsetGuiStyleFixedHeight("RL Header"))
             {
                 _imGuiReorderableList.DoList(usePosition);
             }
