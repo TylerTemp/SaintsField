@@ -18,9 +18,9 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
             object rawValue = fieldInfo.GetValue(parent);
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            ISaintsArray curValue = (ISaintsArray)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
+            IWrapProp curValue = (IWrapProp)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
 
-            return (curValue.EditorArrayPropertyName, arrayIndex);
+            return (curValue.EditorPropertyName, arrayIndex);
         }
 
         #region IMGUI

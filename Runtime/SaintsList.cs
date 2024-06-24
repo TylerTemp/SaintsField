@@ -6,13 +6,13 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public struct SaintsList<T>: ISaintsArray, IList<T>
+    public struct SaintsList<T>: IWrapProp, IList<T>
     {
         [SerializeField]
         public List<T> value;
 
 #if UNITY_EDITOR
-        public string EditorArrayPropertyName => nameof(value);
+        public string EditorPropertyName => nameof(value);
 #endif
 
         public override string ToString()

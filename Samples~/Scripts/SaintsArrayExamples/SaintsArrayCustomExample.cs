@@ -8,12 +8,12 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
     {
         // example: using ISaintsArray so you don't need to specify the type name everytime
         [Serializable]
-        public class MyList : ISaintsArray
+        public class MyList : IWrapProp
         {
             [SerializeField] public List<string> myStrings;
 
 #if UNITY_EDITOR
-            public string EditorArrayPropertyName => nameof(myStrings);
+            public string EditorPropertyName => nameof(myStrings);
 #endif
         }
 

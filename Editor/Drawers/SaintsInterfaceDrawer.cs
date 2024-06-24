@@ -183,19 +183,19 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static (ISaintsInterface propInfo, int index, object parent) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
+        private static (IWrapProp propInfo, int index, object parent) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
         {
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
             object rawValue = fieldInfo.GetValue(parent);
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            ISaintsInterface curValue = (ISaintsInterface)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
+            IWrapProp curValue = (IWrapProp)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
 
             return (curValue, arrayIndex, parent);
         }
 
         #region IMGUI
 
-        private ISaintsInterface _imGuiPropInfo;
+        private IWrapProp _imGuiPropInfo;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -204,7 +204,7 @@ namespace SaintsField.Editor.Drawers
             {
                 _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
             }
-            SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorValuePropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropInfo.EditorValuePropertyName);
+            SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorPropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropInfo.EditorPropertyName);
             return EditorGUI.GetPropertyHeight(valueProp, label, true);
         }
 
@@ -218,9 +218,9 @@ namespace SaintsField.Editor.Drawers
                     _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
                 }
 
-                SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorValuePropertyName) ??
+                SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorPropertyName) ??
                                                SerializedUtils.FindPropertyByAutoPropertyName(property,
-                                                   _imGuiPropInfo.EditorValuePropertyName);
+                                                   _imGuiPropInfo.EditorPropertyName);
 
                 Type interfaceContainer = fieldInfo.FieldType;
                 Type mostBaseType = GetMostBaseType(interfaceContainer);
@@ -300,8 +300,8 @@ namespace SaintsField.Editor.Drawers
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            (ISaintsInterface saintsInterfaceProp, int curInArrayIndex, object _) = GetSerName(property, fieldInfo);
-            SerializedProperty valueProp = property.FindPropertyRelative(saintsInterfaceProp.EditorValuePropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, saintsInterfaceProp.EditorValuePropertyName);
+            (IWrapProp saintsInterfaceProp, int curInArrayIndex, object _) = GetSerName(property, fieldInfo);
+            SerializedProperty valueProp = property.FindPropertyRelative(saintsInterfaceProp.EditorPropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, saintsInterfaceProp.EditorPropertyName);
             string displayLabel = curInArrayIndex == -1 ? property.displayName : $"Element {curInArrayIndex}";
             PropertyField propertyField = new PropertyField(valueProp, "")
             {

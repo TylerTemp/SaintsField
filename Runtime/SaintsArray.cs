@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public struct SaintsArray<T>: ISaintsArray
+    public struct SaintsArray<T>: IWrapProp
         , IReadOnlyList<T>
         , ICollection
         , ICloneable
@@ -18,7 +18,7 @@ namespace SaintsField
         public T[] value;
 
 #if UNITY_EDITOR
-        public string EditorArrayPropertyName => nameof(value);
+        public string EditorPropertyName => nameof(value);
 #endif
 
         // Implicit conversion operator: Converts SaintsArray<T> to T[]

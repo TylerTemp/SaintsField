@@ -2992,143 +2992,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent: {fileID: 1671624918}
   grandParent: {fileID: 1830778824}
---- !u!1 &673204053
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 673204054}
-  - component: {fileID: 673204055}
-  m_Layer: 0
-  m_Name: UIKit
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &673204054
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 673204053}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1583105480}
-  m_Father: {fileID: 1486592967}
-  m_RootOrder: -2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &673204055
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 673204053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c136e3f4a3c5a8441b0e3aa1a443ed4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  normal: 0
-  prop: 
-  propFix: ok wtf emmmm
-  text: 
-  testStruct:
-    normal: 
-    prop: 
-    text: 
-    nest1:
-      normal: 
-      prop: 
-      text: 
-      myStruct:
-        normal: 
-        prop: 
-        propFix: wtf unity you fucking broken?
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
-      myStructList:
-      - normal: 
-        prop: 
-        propFix: 
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
-    nest1List:
-    - normal: 
-      prop: 
-      text: 
-      myStruct:
-        normal: 
-        prop: 
-        propFix: 
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
-      myStructList:
-      - normal: 
-        prop: 
-        propFix: 
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
-  testStructList:
-  - normal: 
-    prop: 
-    text: 
-    nest1:
-      normal: 
-      prop: 
-      text: 
-      myStruct:
-        normal: 
-        prop: 
-        propFix: 
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
-      myStructList:
-      - normal: 
-        prop: 
-        propFix: 
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
-    nest1List:
-    - normal: 
-      prop: 
-      text: 
-      myStruct:
-        normal: 
-        prop: 
-        propFix: 
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
-      myStructList:
-      - normal: 
-        prop: 
-        propFix: 
-        text: 
-        mockKit: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKti: 
-        mockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKitMockKit: 
 --- !u!1 &676684123
 GameObject:
   m_ObjectHideFlags: 0
@@ -9852,6 +9715,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -12626,7 +12490,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 15938814}
-  - {fileID: 673204054}
   - {fileID: 699295718}
   - {fileID: 739215365}
   - {fileID: 1972376715}
@@ -13262,122 +13125,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1578091333}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1583105479
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1583105480}
-  - component: {fileID: 1583105482}
-  - component: {fileID: 1583105481}
-  m_Layer: 0
-  m_Name: unity-base-field__aligned
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1583105480
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1583105479}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 673204054}
-  m_RootOrder: -2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1583105481
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1583105479}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 222baba5065d29b4b97e4a2e8370b819, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout0: {fileID: 0}
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout1: 
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout2: 4
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout3: {fileID: 0}
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout4: 1
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout5: 3
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout6: 0
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout7: {x: 0, y: 0}
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout8: 0
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout9: 
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout10:
-    <layerIndex>k__BackingField: 1
-    <stateNameHash>k__BackingField: 808375644
-    <stateName>k__BackingField: FromTest
-    <stateSpeed>k__BackingField: 8
-    <stateTag>k__BackingField: 
-    <animationClip>k__BackingField: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
-    <subStateMachineNameChain>k__BackingField: []
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout11: Some Bool
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout12: 
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout13: Example
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout14: Default
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout15: 
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout16: Fire2
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout17: 0
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout18:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout19: 6
-  itsALongDriveForPeopleWhoHaveNothingToThinkAbout20: 
---- !u!95 &1583105482
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1583105479}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 891dfeda31f941d4cae65b39a9339bc3, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &1621177995
 GameObject:
   m_ObjectHideFlags: 0
@@ -13931,6 +13678,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myStruct:
+    above: 
     myDataArr:
     - myInt: 0
       myString: 
@@ -13958,6 +13706,7 @@ MonoBehaviour:
       myGameObject: {fileID: 0}
       myStrings:
       - My4Element0
+    below: 
 --- !u!1 &1730412120
 GameObject:
   m_ObjectHideFlags: 0
