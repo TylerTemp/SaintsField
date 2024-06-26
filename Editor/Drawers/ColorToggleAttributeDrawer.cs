@@ -82,7 +82,27 @@ namespace SaintsField.Editor.Drawers
 
                 if (targetProperty != null)
                 {
-                    return SignObject(targetProperty.objectReferenceValue);
+                    if(targetProperty.propertyType == SerializedPropertyType.ObjectReference)
+                    {
+                        return SignObject(targetProperty.objectReferenceValue);
+                    }
+                    if(targetProperty.propertyType == SerializedPropertyType.Generic)
+                    {
+                        object targetValue = SerializedUtils.GetValue(targetProperty, info, parent);
+                        if (targetValue is IWrapProp wrapProp)
+                        {
+                            SerializedUtils.FieldOrProp wrapFieldOrProp = Util.GetWrapProp(wrapProp);
+                            object wrapValue = wrapFieldOrProp.IsField
+                                ? wrapFieldOrProp.FieldInfo.GetValue(wrapProp)
+                                : wrapFieldOrProp.PropertyInfo.GetValue(wrapProp);
+
+                            switch (wrapValue)
+                            {
+                                case
+                            }
+                        }
+                    }
+                    // return SignObject(targetProperty.objectReferenceValue);
                 }
 
                 (string error, object foundObj) =
@@ -175,6 +195,13 @@ namespace SaintsField.Editor.Drawers
                         Renderer = renderer,
                         Error = "",
                     };
+                case GameObject go:
+                    return SignObject(
+                        Util.GetTypeFromObj(go, typeof(Image))
+                        ?? Util.GetTypeFromObj(go, typeof(SpriteRenderer))
+                        ?? Util.GetTypeFromObj(go, typeof(Button))
+                        ?? Util.GetTypeFromObj(go, typeof(Renderer))
+                    );
                 default:
                     string error = $"Not supported type: {(foundObj == null ? "null" : foundObj.GetType().ToString())}";
                     return new Container
@@ -184,6 +211,11 @@ namespace SaintsField.Editor.Drawers
                     };
                     // break;
             }
+        }
+
+        private static UnityEngine.Object GetFromGo(GameObject go)
+        {
+            return (UnityEngine.Object)go.GetComponent<Image>() ?? (UnityEngine.Object)go.GetComponent<SpriteRenderer>() ?? (UnityEngine.Object)go.GetComponent<Button>() ?? go.GetComponent<Renderer>();
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,

@@ -29,6 +29,8 @@ namespace SaintsField.Samples.Scripts.Interface
 #endif
         public Interface1 advDropdown;
 
+        [SerializeField, ColorToggle(nameof(myInherentInterface1))] private Color _onColor;
+
 #if UNITY_EDITOR
         private AdvancedDropdownList<Component> AdvDropdown()
         {
