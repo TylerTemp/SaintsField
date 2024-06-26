@@ -56,29 +56,80 @@ namespace SaintsField.Editor.Utils
             return Mathf.Clamp(newValue, useStart, useEnd);
         }
 
+        public static SerializedUtils.FieldOrProp GetWrapProp(IWrapProp wrapProp)
+        {
+            string propName = wrapProp.EditorPropertyName;
+            const BindingFlags bind = BindingFlags.Instance | BindingFlags.NonPublic |
+                                      BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            foreach (Type selfAndBaseType in ReflectUtils.GetSelfAndBaseTypes(wrapProp))
+            {
+                // Debug.Log(selfAndBaseType);
+                FieldInfo actualFieldInfo = selfAndBaseType.GetField(propName, bind);
+                // Debug.Log(actualFieldInfo);
+                if (actualFieldInfo != null)
+                {
+                    return new SerializedUtils.FieldOrProp
+                    {
+                        IsField = true,
+                        FieldInfo = actualFieldInfo,
+                    };
+                }
+
+                PropertyInfo actualPropertyInfo = selfAndBaseType.GetProperty(propName, bind);
+                // Debug.Log(actualPropertyInfo);
+                if (actualPropertyInfo != null)
+                {
+                    return new SerializedUtils.FieldOrProp
+                    {
+                        IsField = false,
+                        PropertyInfo = actualPropertyInfo,
+                    };
+                }
+                // Debug.Assert(actualFieldInfo != null);
+                // actualFieldInfo.SetValue(wrapProp, curItem);
+            }
+
+            throw new ArgumentException($"No field or property named `{propName}` found on `{wrapProp}`");
+        }
+
         public static void SignFieldValue(UnityEngine.Object targetObject, object curItem, object parentObj, FieldInfo field)
         {
             Undo.RecordObject(targetObject, "SignFieldValue");
-            field.SetValue(parentObj, curItem);
-//             if(parentType.IsValueType)  // hack struct :(
-//             {
-//                 // EditorUtility.SetDirty(property.serializedObject.targetObject);
-//                 // field.SetValue(parentObj, curItem);
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
-//                 Debug.Log($"SetValue {property.propertyType}, {property.propertyPath} on {property.serializedObject.targetObject}: {curItem}");
-// #endif
-//
-//
-//                 property.serializedObject.ApplyModifiedProperties();
-//             }
+            if (field.GetValue(parentObj) is IWrapProp wrapProp)
+            {
+                SerializedUtils.FieldOrProp fieldOrProp = GetWrapProp(wrapProp);
+                if (fieldOrProp.IsField)
+                {
+                    fieldOrProp.FieldInfo.SetValue(wrapProp, curItem);
+                }
+                else
+                {
+                    fieldOrProp.PropertyInfo.SetValue(wrapProp, curItem);
+                }
+            }
+            else
+            {
+                field.SetValue(parentObj, curItem);
+            }
         }
 
-        public static void SignPropertyValue(SerializedProperty property, object newValue)
+        public static void SignPropertyValue(SerializedProperty property, FieldInfo fieldInfo, object parent, object newValue)
         {
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Generic:
-                    property.objectReferenceValue = (UnityEngine.Object) newValue;
+                    if (SerializedUtils.GetValue(property, fieldInfo, parent) is IWrapProp wrapProp)
+                    {
+                        string propName = wrapProp.EditorPropertyName;
+                        SerializedProperty wrapProperty = property.FindPropertyRelative(propName) ??
+                                                          SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                                              propName);
+                        SignPropertyValue(wrapProperty, fieldInfo, parent, newValue);
+                    }
+                    else
+                    {
+                        property.objectReferenceValue = (UnityEngine.Object)newValue;
+                    }
                     break;
                 case SerializedPropertyType.LayerMask:
                 case SerializedPropertyType.Integer:
@@ -219,12 +270,19 @@ namespace SaintsField.Editor.Utils
 
         public static bool GetIsEqual(object curValue, object itemValue)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL
+            Debug.Log($"check equal using both null on {itemValue} -> {curValue}");
+#endif
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (curValue == null && itemValue == null)
             {
                 // Debug.Log($"GetSelected null");
                 return true;
             }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL
+            Debug.Log($"check equal using both UnityEngine.Object on {itemValue} -> {curValue}");
+#endif
             if (curValue is UnityEngine.Object curValueObj
                 && itemValue is UnityEngine.Object itemValueObj
                 && curValueObj == itemValueObj)
@@ -238,6 +296,9 @@ namespace SaintsField.Editor.Utils
                 // nothing
                 return false;
             }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL
+            Debug.Log($"check equal using .Equals on {itemValue} -> {curValue}");
+#endif
             // ReSharper disable once InvertIf
             if (itemValue.Equals(curValue))
             {

@@ -93,7 +93,7 @@ namespace SaintsField.Editor.Drawers
                 ShowGenericMenu(metaInfo, curDisplay, fieldRect, (_, item) =>
                 {
                     Util.SignFieldValue(property.serializedObject.targetObject, item, parent, info);
-                    Util.SignPropertyValue(property, item);
+                    Util.SignPropertyValue(property, info, parent, item);
                     property.serializedObject.ApplyModifiedProperties();
                     onGUIPayload.SetValue(item);
 
@@ -412,7 +412,7 @@ namespace SaintsField.Editor.Drawers
                 ShowGenericMenu(metaInfo, curDisplay, dropdownButtonField.buttonElement.worldBound, (newName, item) =>
                 {
                     Util.SignFieldValue(property.serializedObject.targetObject, item, parent, info);
-                    Util.SignPropertyValue(property, item);
+                    Util.SignPropertyValue(property, info, parent, item);
                     property.serializedObject.ApplyModifiedProperties();
                     onChange(item);
                     dropdownButtonField.buttonLabelElement.text = newName;
@@ -445,7 +445,7 @@ namespace SaintsField.Editor.Drawers
                         genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
                         {
                             Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
-                            Util.SignPropertyValue(property, curItem);
+                            Util.SignPropertyValue(property, info, parent, curItem);
                             property.serializedObject.ApplyModifiedProperties();
                             onChange(curItem);
                             dropdownButtonField.buttonLabelElement.text = curName;

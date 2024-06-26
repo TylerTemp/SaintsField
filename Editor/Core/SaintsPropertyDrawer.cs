@@ -683,20 +683,6 @@ namespace SaintsField.Editor.Core
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
 
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            object rawValue = fieldInfo.GetValue(parent);
-            object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-            SerializedProperty actualProperty = property;
-            if (curValue is IWrapProp wrapProp)
-            {
-                string propName = wrapProp.EditorPropertyName;
-                actualProperty = property.FindPropertyRelative(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propName);
-                Debug.Log(actualProperty.propertyPath);
-
-                FieldInfo actualFieldInfo = curValue.GetType().GetField(propName);
-                Debug.Log(actualFieldInfo);
-            }
-
             // IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
             //     .Select((each, index) => new SaintsWithIndex
             //     {
@@ -733,6 +719,7 @@ namespace SaintsField.Editor.Core
 
             Dictionary<string, VisualElement> aboveGroupByVisualElement = new Dictionary<string, VisualElement>();
 
+            // ReSharper disable once UseDeconstruction
             foreach (KeyValuePair<string, List<SaintsPropertyInfo>> drawerInfoKv in groupedAboveDrawers)
             {
                 string groupBy = drawerInfoKv.Key;
@@ -831,10 +818,6 @@ namespace SaintsField.Editor.Core
             }
 
             #endregion
-
-            // Type fieldDrawer = fieldAttributeWithIndex.Attribute == null
-            //     ? null
-            //     : GetFirstSaintsDrawerType(fieldAttributeWithIndex.Attribute.GetType());
 
             bool fieldIsFallback = fieldAttributeWithIndex.Attribute == null;
 
@@ -1284,13 +1267,7 @@ namespace SaintsField.Editor.Core
                 Type fieldDrawer = fieldAttributeWithIndex.SaintsAttribute == null
                     ? null
                     : GetFirstSaintsDrawerType(fieldAttributeWithIndex.SaintsAttribute.GetType());
-                // Debug.Log($"field {fieldAttributeWithIndex.SaintsAttribute}->{fieldDrawer}");
 
-                // Debug.Log($"{label.text}={_fieldControlName}");
-
-                // EditorGUIUtility.labelWidth = ProperLabelWidth();
-                // Debug.Log($"{property.propertyPath}=false");
-                // EditorGUI.DrawRect(fieldUseRectNoPost, Color.yellow);
                 using (new AdaptLabelWidth())
                 using (new ResetIndentScoop())
                 using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())

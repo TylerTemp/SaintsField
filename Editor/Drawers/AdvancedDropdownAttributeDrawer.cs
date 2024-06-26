@@ -23,7 +23,6 @@ namespace SaintsField.Editor.Drawers
 
     public class SaintsAdvancedDropdown : UnityAdvancedDropdown
     {
-
         private readonly IAdvancedDropdownList _dropdownListValue;
 
         private readonly Dictionary<UnityAdvancedDropdownItem, object> _itemToValue = new Dictionary<UnityAdvancedDropdownItem, object>();
@@ -794,7 +793,9 @@ namespace SaintsField.Editor.Drawers
             #region Get Cur Value
 
             object curValue = field.GetValue(parentObj);
-            // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+//             Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
+// #endif
             // string curDisplay = "";
             (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
             #endregion
@@ -850,32 +851,20 @@ namespace SaintsField.Editor.Drawers
                     Index = index,
                 });
 
+                if (curValue is IWrapProp wrapProp)
+                {
+                    SerializedUtils.FieldOrProp fieldOrProp = Util.GetWrapProp(wrapProp);
+                    curValue = fieldOrProp.IsField ? fieldOrProp.FieldInfo.GetValue(wrapProp) : fieldOrProp.PropertyInfo.GetValue(wrapProp);
+                }
+
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (Util.GetIsEqual(curValue, item.value))
                 {
                     return (thisLoopResult.ToArray(), item.displayName);
                 }
-                // if (curValue == null && item.value == null)
-                // {
-                //     Debug.Log($"GetSelected null {item.displayName}/{index}");
-                //     return thisLoopResult.ToArray();
-                // }
-                // if (curValue is UnityEngine.Object curValueObj
-                //     && curValueObj == item.value as UnityEngine.Object)
-                // {
-                //     Debug.Log($"GetSelected {curValue} {item.displayName}/{index}");
-                //     return thisLoopResult.ToArray();
-                // }
-                // if (item.value == null)
-                // {
-                //     Debug.Log($"GetSelected nothing null {item.displayName}/{index}");
-                //     // nothing
-                // }
-                // else if (item.value.Equals(curValue))
-                // {
-                //     Debug.Log($"GetSelected {curValue} {item.displayName}/{index}");
-                //     return thisLoopResult.ToArray();
-                // }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+                Debug.Log($"Not Equal: {curValue} != {item.value}");
+#endif
             }
 
             // Debug.Log($"GetSelected end in empty");
@@ -984,7 +973,7 @@ namespace SaintsField.Editor.Drawers
                     curItem =>
                     {
                         Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
-                        Util.SignPropertyValue(property, curItem);
+                        Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
                         onGUIPayload.SetValue(curItem);
                     },
@@ -1140,7 +1129,7 @@ namespace SaintsField.Editor.Drawers
                     (newDisplay, curItem) =>
                     {
                         Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
-                        Util.SignPropertyValue(property, curItem);
+                        Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
 
                         dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).buttonLabelElement.text = newDisplay;

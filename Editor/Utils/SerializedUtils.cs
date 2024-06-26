@@ -215,5 +215,12 @@ namespace SaintsField.Editor.Utils
             return -1;
         }
 
+        public static object GetValue(SerializedProperty property, FieldInfo fieldInfo, object parent)
+        {
+            int arrayIndex = PropertyPathIndex(property.propertyPath);
+            object rawValue = fieldInfo.GetValue(parent);
+            return arrayIndex == -1 ? rawValue : GetValueAtIndex(rawValue, arrayIndex);
+        }
+
     }
 }
