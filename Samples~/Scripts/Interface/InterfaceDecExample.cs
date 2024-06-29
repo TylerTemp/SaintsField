@@ -14,6 +14,7 @@ namespace SaintsField.Samples.Scripts.Interface
         }
 
         [AboveButton(nameof(MyFuncLog), buttonLabel: nameof(MyFunc), isCallback: true)]
+        [AssetPreview]
         public Interface1 myInherentInterface1;
 
         private void MyFuncLog(Interface1 interface1) => Debug.Log(MyFunc(interface1));
@@ -29,7 +30,8 @@ namespace SaintsField.Samples.Scripts.Interface
 #endif
         public Interface1 advDropdown;
 
-        [SerializeField, ColorToggle(nameof(myInherentInterface1))] private Color _onColor;
+        [SerializeField, ColorToggle(nameof(myInherentInterface1))]
+        private Color _onColor;
 
 #if UNITY_EDITOR
         private AdvancedDropdownList<Component> AdvDropdown()

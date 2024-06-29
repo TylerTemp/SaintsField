@@ -28,10 +28,17 @@ namespace SaintsField.Editor.Drawers
 
         private Texture2D GetPreview(Object target)
         {
+            // Debug.Log(target);
             if (!target)
             {
                 return null;
             }
+
+            if (target is Component c)
+            {
+                target = c.gameObject;
+            }
+
             // if (property.propertyType != SerializedPropertyType.ObjectReference ||
             //     property.objectReferenceValue == null)
             // {
@@ -116,7 +123,7 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            return ((AssetPreviewAttribute)saintsAttribute).Above? GetExtraHeight(property, width, saintsAttribute): 0;
+            return ((AssetPreviewAttribute)saintsAttribute).Above? GetExtraHeight(property, width, saintsAttribute, info, parent): 0;
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
@@ -153,7 +160,7 @@ namespace SaintsField.Editor.Drawers
                 return ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
             }
 
-            return ((AssetPreviewAttribute)saintsAttribute).Above? 0: GetExtraHeight(property, width, saintsAttribute);
+            return ((AssetPreviewAttribute)saintsAttribute).Above? 0: GetExtraHeight(property, width, saintsAttribute, info, parent);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
@@ -168,7 +175,7 @@ namespace SaintsField.Editor.Drawers
             return Draw(position, property, saintsAttribute);
         }
 
-        private float GetExtraHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute)
+        private float GetExtraHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             // int maxWidth = assetPreviewAttribute.Width;
@@ -180,7 +187,7 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            Texture2D previewTexture = GetPreview(property.objectReferenceValue);
+            Texture2D previewTexture = GetPreview(GetCurObject(property, info, parent));
             if (previewTexture == null)
             {
                 return 0;
@@ -322,8 +329,8 @@ namespace SaintsField.Editor.Drawers
                 return null;
             }
 
-            Texture2D preview = GetPreview(property.objectReferenceValue);
-            return CreateUIToolkitElement(property, index, preview, assetPreviewAttribute);
+            Texture2D preview = GetPreview(GetCurObject(property, info, parent));
+            return CreateUIToolkitElement(property, index, preview, assetPreviewAttribute, info, parent);
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -335,8 +342,8 @@ namespace SaintsField.Editor.Drawers
                 return null;
             }
 
-            Texture2D preview = GetPreview(property.objectReferenceValue);
-            return CreateUIToolkitElement(property, index, preview, assetPreviewAttribute);
+            Texture2D preview = GetPreview(GetCurObject(property, info, parent));
+            return CreateUIToolkitElement(property, index, preview, assetPreviewAttribute, info, parent);
         }
 
         private struct Payload
@@ -347,6 +354,24 @@ namespace SaintsField.Editor.Drawers
             // ReSharper enable InconsistentNaming
         }
 
+        private static Object GetCurObject(SerializedProperty property, FieldInfo info, object parent)
+        {
+            // Object curObject = null;
+            if (property.propertyType != SerializedPropertyType.Generic)
+            {
+                return property.objectReferenceValue;
+            }
+
+            object serValue = SerializedUtils.GetValue(property, info, parent);
+            // Debug.Log(getResult);
+            if (serValue is IWrapProp wrapProp)
+            {
+                return Util.GetWrapValue(wrapProp) as Object;
+            }
+
+            return null;
+        }
+
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -354,11 +379,11 @@ namespace SaintsField.Editor.Drawers
             AssetPreviewField root = container.Q<AssetPreviewField>(NameRoot(property, index));
             Image image = root.imageElement;
             Payload payload = (Payload)image.userData;
-            // ReSharper disable once Unity.NoNullPropagation
-            // int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
+
+            Object curObject = GetCurObject(property, info, parent);
 
             // Debug.Log($"cur={curInstanceId}, pre={preInstanceId}");
-            if (ReferenceEquals(payload.ObjectReferenceValue, property.objectReferenceValue))
+            if (ReferenceEquals(payload.ObjectReferenceValue, curObject))
             {
                 return;
             }
@@ -366,7 +391,7 @@ namespace SaintsField.Editor.Drawers
             _previewTexture = null;
             root.style.display = DisplayStyle.None;
 
-            if(property.objectReferenceValue == null)
+            if(curObject == null)
             {
                 image.userData = new Payload
                 {
@@ -376,7 +401,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            Texture2D preview = GetPreview(property.objectReferenceValue);
+            Texture2D preview = GetPreview(curObject);
 
             // UpdateImage(image, preview, (AssetPreviewAttribute)saintsAttribute);
             if (preview != null)
@@ -391,14 +416,12 @@ namespace SaintsField.Editor.Drawers
 
         // ReSharper disable once SuggestBaseTypeForParameter
         private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index, Texture2D preview,
-            AssetPreviewAttribute assetPreviewAttribute)
+            AssetPreviewAttribute assetPreviewAttribute, FieldInfo info, object parent)
         {
 
             Image image = new Image
             {
                 scaleMode = ScaleMode.ScaleToFit,
-                // ReSharper disable once Unity.NoNullPropagation
-                // userData = property.objectReferenceValue?.GetInstanceID() ?? int.MinValue ,
                 sourceRect = new Rect(0, 0, 0, 0),
                 // style =
                 // {
@@ -460,7 +483,7 @@ namespace SaintsField.Editor.Drawers
                 image.style.height = preview.height;
                 image.userData = new Payload
                 {
-                    ObjectReferenceValue = property.objectReferenceValue,
+                    ObjectReferenceValue = GetCurObject(property, info, parent),
                     ProcessedWidth = 0,
                 };
             }

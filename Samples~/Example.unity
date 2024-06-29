@@ -8955,6 +8955,7 @@ MonoBehaviour:
     <V>k__BackingField: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
   advDropdown:
     <V>k__BackingField: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+  _onColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &911263177
 GameObject:
   m_ObjectHideFlags: 0

@@ -312,6 +312,7 @@ namespace SaintsField.Editor.Drawers
                     flexShrink = 1,
                 },
             };
+            propertyField.BindProperty(valueProp);
 
             StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
             propertyField.styleSheets.Add(hideStyle);

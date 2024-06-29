@@ -92,6 +92,12 @@ namespace SaintsField.Editor.Utils
             throw new ArgumentException($"No field or property named `{propName}` found on `{wrapProp}`");
         }
 
+        public static object GetWrapValue(IWrapProp wrapProp)
+        {
+            SerializedUtils.FieldOrProp fieldOrProp = GetWrapProp(wrapProp);
+            return fieldOrProp.IsField ? fieldOrProp.FieldInfo.GetValue(wrapProp) : fieldOrProp.PropertyInfo.GetValue(wrapProp);
+        }
+
         public static void SignFieldValue(UnityEngine.Object targetObject, object curItem, object parentObj, FieldInfo field)
         {
             Undo.RecordObject(targetObject, "SignFieldValue");
@@ -585,10 +591,18 @@ namespace SaintsField.Editor.Utils
                     // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
                     break;
                 case Component comp:
-                    result = fieldType == typeof(GameObject)
-                        // ReSharper disable once RedundantCast
-                        ? (UnityEngine.Object)comp.gameObject
-                        : comp.GetComponent(fieldType);
+                    if (fieldType == typeof(GameObject))
+                    {
+                        result = comp.gameObject;
+                    }
+                    else
+                    {
+                        Component r = comp.GetComponent(fieldType);
+                        if (r)  // life circle problem, need to check bool first
+                        {
+                            result = r;
+                        }
+                    }
                     break;
 
                 // default:

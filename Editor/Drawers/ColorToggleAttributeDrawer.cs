@@ -88,18 +88,13 @@ namespace SaintsField.Editor.Drawers
                     }
                     if(targetProperty.propertyType == SerializedPropertyType.Generic)
                     {
-                        object targetValue = SerializedUtils.GetValue(targetProperty, info, parent);
-                        if (targetValue is IWrapProp wrapProp)
+                        (string _, IWrapProp getResult) = Util.GetOf<IWrapProp>(compName, null, property, info, parent);
+                        // Debug.Log(getResult);
+                        if (getResult != null)
                         {
-                            SerializedUtils.FieldOrProp wrapFieldOrProp = Util.GetWrapProp(wrapProp);
-                            object wrapValue = wrapFieldOrProp.IsField
-                                ? wrapFieldOrProp.FieldInfo.GetValue(wrapProp)
-                                : wrapFieldOrProp.PropertyInfo.GetValue(wrapProp);
-
-                            switch (wrapValue)
-                            {
-                                case
-                            }
+                            object actualValue = Util.GetWrapValue(getResult);
+                            // Debug.Log(actualValue);
+                            return SignObject(actualValue);
                         }
                     }
                     // return SignObject(targetProperty.objectReferenceValue);
@@ -195,13 +190,20 @@ namespace SaintsField.Editor.Drawers
                         Renderer = renderer,
                         Error = "",
                     };
-                case GameObject go:
+                case GameObject:
+                case Component:
+                {
+                    UnityEngine.Object obj = (UnityEngine.Object)foundObj;
+                    UnityEngine.Object actualObj = Util.GetTypeFromObj(obj, typeof(Image))
+                                                   ?? Util.GetTypeFromObj(obj, typeof(SpriteRenderer))
+                                                   ?? Util.GetTypeFromObj(obj, typeof(Button))
+                                                   ?? Util.GetTypeFromObj(obj, typeof(Renderer));
+                    // Debug.Log($"obj={obj} actual={actualObj}, renderer={((Component)foundObj).GetComponent<Renderer>()}");
+                    // ReSharper disable once TailRecursiveCall
                     return SignObject(
-                        Util.GetTypeFromObj(go, typeof(Image))
-                        ?? Util.GetTypeFromObj(go, typeof(SpriteRenderer))
-                        ?? Util.GetTypeFromObj(go, typeof(Button))
-                        ?? Util.GetTypeFromObj(go, typeof(Renderer))
+                        actualObj
                     );
+                }
                 default:
                     string error = $"Not supported type: {(foundObj == null ? "null" : foundObj.GetType().ToString())}";
                     return new Container

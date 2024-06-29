@@ -853,8 +853,7 @@ namespace SaintsField.Editor.Drawers
 
                 if (curValue is IWrapProp wrapProp)
                 {
-                    SerializedUtils.FieldOrProp fieldOrProp = Util.GetWrapProp(wrapProp);
-                    curValue = fieldOrProp.IsField ? fieldOrProp.FieldInfo.GetValue(wrapProp) : fieldOrProp.PropertyInfo.GetValue(wrapProp);
+                    curValue = Util.GetWrapValue(wrapProp);
                 }
 
                 // ReSharper disable once ConvertIfStatementToSwitchStatement

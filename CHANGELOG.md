@@ -1,3 +1,7 @@
+## 3.1.2
+
+1.  `AssetPreview` now will load the preview of the `gameObject` if the target is a `Component`. Useful when you use a script type to reference a prefab.
+
 ## 3.1.1
 
 1.  Fixed: `AssetPreview` should not destroy the texture and lead to empty image.
