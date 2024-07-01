@@ -9295,6 +9295,8 @@ MonoBehaviour:
   gameObjects2Nest:
     value: []
   gameObjects4: []
+  _saintsArrayWithArraySize:
+    value: 0000000000000000
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
@@ -9825,6 +9827,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:

@@ -50,6 +50,11 @@ namespace SaintsField.Editor.Drawers
 
         private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info)
         {
+            if (property.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return ($"{property.propertyType} is not supported by GetComponent", null);
+            }
+
             if (property.objectReferenceValue != null)
             {
                 return ("", null);

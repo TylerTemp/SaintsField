@@ -130,44 +130,51 @@ namespace SaintsField.Editor.Drawers
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
         {
-            string propertyPath;
-            try
-            {
-                propertyPath = property.propertyPath;
-            }
-            catch (ObjectDisposedException)
-            {
-                // Debug.LogException(e);
-                return;
-            }
-
-            string error;
+            // SerializedProperty targetProperty = property;
+            string error = "";
             SerializedProperty arrProp;
-            try
+
+            object propValue = SerializedUtils.GetValue(property, info, parent);
+            if(propValue is IWrapProp wrapProp)
             {
-                (error, arrProp) = GetArrayProperty(property, propertyPath.Split("."));
+                string targetPropName = wrapProp.EditorPropertyName;
+                arrProp = property.FindPropertyRelative(targetPropName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, targetPropName);
+                if (arrProp == null)
+                {
+                    SetHelpBox($"{targetPropName} not found in {property.propertyPath}", property, container);
+                    // error = $"{targetPropName} not found in {property.propertyPath}";
+                    return;
+                }
             }
-            catch (ObjectDisposedException)
+            else
             {
-                // Debug.LogException(e);
-                return;
+                (error, arrProp) = GetArrayProperty(property, property.propertyPath.Split("."));
             }
 
+            if (error != "" && !arrProp.isArray)
+            {
+                error = $"{arrProp.propertyPath} is not an array/list";
+            }
+
+            SetHelpBox(error, property, container);
+
+            int size = ((ArraySizeAttribute)saintsAttribute).Size;
+
+            // ReSharper disable once InvertIf
+            if (error == "" && arrProp.isArray && arrProp.arraySize != size)
+            {
+                arrProp.arraySize = size;
+                arrProp.serializedObject.ApplyModifiedProperties();
+            }
+        }
+
+        private static void SetHelpBox(string error, SerializedProperty property, VisualElement container)
+        {
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
             if (error != helpBox.text)
             {
                 helpBox.text = error;
                 helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-                return;
-            }
-
-            int size = ((ArraySizeAttribute)saintsAttribute).Size;
-
-            // ReSharper disable once InvertIf
-            if (arrProp.arraySize != size)
-            {
-                arrProp.arraySize = size;
-                arrProp.serializedObject.ApplyModifiedProperties();
             }
         }
 
