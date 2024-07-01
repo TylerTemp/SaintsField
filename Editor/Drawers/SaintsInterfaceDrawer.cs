@@ -164,7 +164,8 @@ namespace SaintsField.Editor.Drawers
                         : (true, result);
                 }
                 case ScriptableObject so:
-                    return (fieldType == typeof(ScriptableObject) || fieldType.IsSubclassOf(typeof(ScriptableObject)))
+                    // Debug.Log(fieldType);
+                    return (fieldType == typeof(ScriptableObject) || fieldType.IsSubclassOf(typeof(ScriptableObject)) || typeof(ScriptableObject).IsSubclassOf(fieldType))
                            && interfaceType.IsInstanceOfType(so)
                            ? (true, so)
                            : (false, null);

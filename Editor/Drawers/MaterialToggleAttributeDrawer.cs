@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers
             MaterialToggleAttribute toggleAttribute = (MaterialToggleAttribute)saintsAttribute;
             string compName = toggleAttribute.CompName;
 
-            Renderer resultRenderer = null;
+            Renderer resultRenderer;
 
             if(compName != null)
             {

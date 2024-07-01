@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info);
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             if (error != "")
             {
                 _error = error;
@@ -50,18 +50,56 @@ namespace SaintsField.Editor.Drawers
 
         #endregion
 
-        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info)
+        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            if (property.objectReferenceValue != null)
+            SerializedProperty targetProperty = property;
+            Type fieldType = info.FieldType;
+            Type interfaceType = null;
+            if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                object propertyValue = SerializedUtils.GetValue(property, info, parent);
+
+                if (propertyValue is IWrapProp wrapProp)
+                {
+                    Type mostBaseType = SaintsInterfaceDrawer.GetMostBaseType(wrapProp.GetType());
+                    if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                    {
+                        IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                        if (genericArguments.Count == 2)
+                        {
+                            interfaceType = genericArguments[1];
+                        }
+                    }
+                    targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
+                                     SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                         wrapProp.EditorPropertyName);
+
+                    if(targetProperty == null)
+                    {
+                        return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", null);
+                    }
+
+                    SerializedUtils.FieldOrProp wrapFieldOrProp = Util.GetWrapProp(wrapProp);
+                    fieldType = wrapFieldOrProp.IsField
+                        ? wrapFieldOrProp.FieldInfo.FieldType
+                        : wrapFieldOrProp.PropertyInfo.PropertyType;
+
+                    if (interfaceType != null && fieldType != typeof(ScriptableObject) && !fieldType.IsSubclassOf(typeof(ScriptableObject)) && typeof(ScriptableObject).IsSubclassOf(fieldType))
+                    {
+                        fieldType = typeof(ScriptableObject);
+                    }
+                }
+            }
+
+            if (targetProperty.objectReferenceValue != null)
             {
                 return ("", null);
             }
 
             GetScriptableObjectAttribute getScriptableObjectAttribute = (GetScriptableObjectAttribute) saintsAttribute;
 
-            Type fieldType = info.FieldType;
             string nameNoArray = fieldType.Name;
-            if(SerializedUtils.PropertyPathIndex(property.propertyPath) != -1)
+            if(SerializedUtils.PropertyPathIndex(targetProperty.propertyPath) != -1)
             {
                 fieldType = fieldType.GetElementType();
                 Debug.Assert(fieldType != null);
@@ -77,14 +115,14 @@ namespace SaintsField.Editor.Drawers
             }
             Object result = paths
                 .Select(each => AssetDatabase.LoadAssetAtPath(each, fieldType))
-                .FirstOrDefault(each => each != null);
+                .FirstOrDefault(each => interfaceType == null? each != null: interfaceType.IsInstanceOfType(each));
 
             if (result == null)
             {
                 return ($"Can not find {nameNoArray} type asset", null);
             }
 
-            property.objectReferenceValue = result;
+            targetProperty.objectReferenceValue = result;
             return ("", result);
         }
 
@@ -102,7 +140,7 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_SCRIPTABLE_OBJECT
             Debug.Log($"GetScriptableObject DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
-            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info);
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)
             {

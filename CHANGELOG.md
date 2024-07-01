@@ -1,6 +1,7 @@
 ## 3.1.2
 
 1.  `AssetPreview` now will load the preview of the `gameObject` if the target is a `Component`. Useful when you use a script type to reference a prefab.
+2.  Fix `SaintsInterface` won't work when T is a super class of ScriptableObject
 
 ## 3.1.1
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -25,7 +26,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info);
+            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             if (error != "")
             {
                 _error = error;
@@ -47,15 +48,53 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
         #endregion
 
-        private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info)
+        private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            if (property.objectReferenceValue != null)
+            SerializedProperty targetProperty = property;
+            Type fieldType = info.FieldType;
+            Type interfaceType = null;
+            if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                object propertyValue = SerializedUtils.GetValue(property, info, parent);
+
+                if (propertyValue is IWrapProp wrapProp)
+                {
+                    Type mostBaseType = SaintsInterfaceDrawer.GetMostBaseType(wrapProp.GetType());
+                    if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                    {
+                        IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                        if (genericArguments.Count == 2)
+                        {
+                            interfaceType = genericArguments[1];
+                        }
+                    }
+                    targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
+                                     SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                         wrapProp.EditorPropertyName);
+
+                    if(targetProperty == null)
+                    {
+                        return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", null);
+                    }
+
+                    SerializedUtils.FieldOrProp wrapFieldOrProp = Util.GetWrapProp(wrapProp);
+                    fieldType = wrapFieldOrProp.IsField
+                        ? wrapFieldOrProp.FieldInfo.FieldType
+                        : wrapFieldOrProp.PropertyInfo.PropertyType;
+
+                    if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
+                    {
+                        fieldType = typeof(Component);
+                    }
+                }
+            }
+
+            if (targetProperty.objectReferenceValue != null)
             {
                 return ("", null);
             }
 
             GetComponentInChildrenAttribute getComponentInChildrenAttribute = (GetComponentInChildrenAttribute) saintsAttribute;
-            Type fieldType = info.FieldType;
 
             if (getComponentInChildrenAttribute.CompType == typeof(GameObject))
             {
@@ -83,7 +122,10 @@ namespace SaintsField.Editor.Drawers
                 // = transform.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
             foreach (Transform directChildTrans in transform.Cast<Transform>())
             {
-                componentInChildren = directChildTrans.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
+                componentInChildren = interfaceType == null
+                    ? directChildTrans.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive)
+                    : directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive).FirstOrDefault(interfaceType.IsInstanceOfType);
+
                 if (componentInChildren != null)
                 {
                     break;
@@ -109,7 +151,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            property.objectReferenceValue = result;
+            targetProperty.objectReferenceValue = result;
             return ("", result);
         }
 
@@ -128,7 +170,7 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT_IN_CHILDREN
             Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
-            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info);
+            (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)
             {

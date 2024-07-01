@@ -43,14 +43,30 @@ namespace SaintsField.Editor.Drawers
 
             if(imageCompName != null)
             {
-                SerializedProperty targetProperty =
-                    property.serializedObject.FindProperty(imageCompName) ??
-                    SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, imageCompName);
-
-                if (targetProperty != null)
-                {
-                    return SignObject(targetProperty.objectReferenceValue);
-                }
+                // SerializedProperty targetProperty =
+                //     property.serializedObject.FindProperty(imageCompName) ??
+                //     SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, imageCompName);
+                //
+                // if (targetProperty != null)
+                // {
+                //     if (property.propertyType == SerializedPropertyType.Generic)
+                //     {
+                //         (string _, IWrapProp getResult) = Util.GetOf<IWrapProp>(property.name, null, property, info, parent);
+                //         // Debug.Log(getResult);
+                //         if (getResult != null)
+                //         {
+                //             object actualValue = Util.GetWrapValue(getResult);
+                //             // Debug.Log(actualValue);
+                //             return SignObject(actualValue);
+                //         }
+                //         return new Container
+                //         {
+                //             Error = $"target {imageCompName} not found",
+                //         };
+                //     }
+                //
+                //     return SignObject(targetProperty.objectReferenceValue);
+                // }
 
                 (string error, object foundObj) =
                     Util.GetOf<object>(imageCompName, null, property, info, parent);
@@ -61,6 +77,11 @@ namespace SaintsField.Editor.Drawers
                     {
                         Error = $"target {imageCompName} not found",
                     };
+                }
+
+                if (foundObj is IWrapProp wrapProp)
+                {
+                    foundObj = Util.GetWrapValue(wrapProp);
                 }
 
                 return SignObject(foundObj);
@@ -128,6 +149,21 @@ namespace SaintsField.Editor.Drawers
                         SpriteRenderer = spriteRenderer,
                         Error = "",
                     };
+                case GameObject:
+                case Component:
+                {
+                    UnityEngine.Object obj = (UnityEngine.Object)foundObj;
+                    UnityEngine.Object actualObj = Util.GetTypeFromObj(obj, typeof(Image))
+                                                   ?? Util.GetTypeFromObj(obj, typeof(SpriteRenderer))
+                                                   // ?? Util.GetTypeFromObj(obj, typeof(Button))
+                                                   // ?? Util.GetTypeFromObj(obj, typeof(Renderer))
+                                                   ;
+                    // Debug.Log($"obj={obj} actual={actualObj}, renderer={((Component)foundObj).GetComponent<Renderer>()}");
+                    // ReSharper disable once TailRecursiveCall
+                    return SignObject(
+                        actualObj
+                    );
+                }
                 // case UnityEngine.UI.Button button:
                 //     return new Container
                 //     {

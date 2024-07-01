@@ -297,10 +297,15 @@ namespace SaintsField.Editor.Drawers
                         return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", targetProperty, fieldType, null);
                     }
 
-                    var wrapFieldOrProp = Util.GetWrapProp(wrapProp);
+                    SerializedUtils.FieldOrProp wrapFieldOrProp = Util.GetWrapProp(wrapProp);
                     fieldType = wrapFieldOrProp.IsField
                         ? wrapFieldOrProp.FieldInfo.FieldType
                         : wrapFieldOrProp.PropertyInfo.PropertyType;
+
+                    if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
+                    {
+                        fieldType = typeof(Component);
+                    }
                 }
             }
 

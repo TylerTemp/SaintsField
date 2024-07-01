@@ -247,18 +247,36 @@ namespace SaintsField.Editor.Drawers
             if (string.IsNullOrEmpty(name))
             {
                 // ReSharper disable once ConvertIfStatementToReturnStatement
-                if(property.propertyType != SerializedPropertyType.ObjectReference)
+                if (property.propertyType == SerializedPropertyType.Generic)
                 {
-                    return ($"Expect ObjectReference for `{name}`, get {property.propertyType}", null);
+                    (string _, IWrapProp getResult) = Util.GetOf<IWrapProp>(property.name, null, property, info, target);
+                    // Debug.Log(getResult);
+                    if (getResult != null)
+                    {
+                        object actualValue = Util.GetWrapValue(getResult);
+                        // Debug.Log(actualValue);
+                        return GetImageFromTarget(actualValue);
+                    }
+                    return ($"property {property.propertyPath} is not supported.", null);
                 }
 
-                return GetImageFromTarget(property.objectReferenceValue);
+                if(property.propertyType != SerializedPropertyType.ObjectReference)
+                {
+                    return ($"Expect ObjectReference for `{property.propertyPath}`, get {property.propertyType}", null);
+                }
+
+                return GetImageFromTarget(GetCurObject(property, info, target));
             }
 
             // search parent first
             (string reflectError, object fieldValue) = Util.GetOf<object>(name, null, property, info, target);
             if(reflectError == "")
             {
+                if (fieldValue is IWrapProp wrapProp)
+                {
+                    fieldValue = Util.GetWrapValue(wrapProp);
+                }
+
                 Texture2D reflect2D;
                 (reflectError, reflect2D) = GetImageFromTarget(fieldValue);
                 if (reflectError == "")
@@ -267,19 +285,41 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
-            if (prop != null)
-            {
-                // ReSharper disable once ConvertIfStatementToReturnStatement
-                if(prop.propertyType != SerializedPropertyType.ObjectReference)
-                {
-                    return ($"Expect ObjectReference for `{name}`, get {prop.propertyType}", null);
-                }
-
-                return GetImageFromTarget(prop.objectReferenceValue);
-            }
+            // SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
+            // if (prop != null)
+            // {
+            //     // ReSharper disable once ConvertIfStatementToReturnStatement
+            //     if (prop.propertyType == SerializedPropertyType.Generic)
+            //     {
+            //         GetCurObject(prop, info, parent);
+            //     }
+            //     else if(prop.propertyType != SerializedPropertyType.ObjectReference)
+            //     {
+            //         return ($"Expect ObjectReference for `{name}`, get {prop.propertyType}", null);
+            //     }
+            //
+            //     return GetImageFromTarget(prop.objectReferenceValue);
+            // }
 
             return ($"not found `{name}` on `{target}`", null);
+        }
+
+        private static UnityEngine.Object GetCurObject(SerializedProperty property, FieldInfo info, object parent)
+        {
+            // Object curObject = null;
+            if (property.propertyType != SerializedPropertyType.Generic)
+            {
+                return property.objectReferenceValue;
+            }
+
+            object serValue = SerializedUtils.GetValue(property, info, parent);
+            // Debug.Log(getResult);
+            if (serValue is IWrapProp wrapProp)
+            {
+                return Util.GetWrapValue(wrapProp) as UnityEngine.Object;
+            }
+
+            return null;
         }
 
         private static (string error, Texture2D image) GetImageFromTarget(object result)
@@ -306,6 +346,21 @@ namespace SaintsField.Editor.Drawers
                     return button.targetGraphic?
                         ("", button.targetGraphic.mainTexture as Texture2D):
                         ("", null);
+                case GameObject:
+                case Component:
+                {
+                    UnityEngine.Object obj = (UnityEngine.Object)result;
+                    UnityEngine.Object actualObj = Util.GetTypeFromObj(obj, typeof(SpriteRenderer))
+                                                   ?? Util.GetTypeFromObj(obj, typeof(UnityEngine.UI.Image))
+                                                   ?? Util.GetTypeFromObj(obj, typeof(RawImage))
+                                                   ?? Util.GetTypeFromObj(obj, typeof(UnityEngine.UI.Button))
+                                                   ;
+                    // Debug.Log($"obj={obj} actual={actualObj}, renderer={((Component)foundObj).GetComponent<Renderer>()}");
+                    // ReSharper disable once TailRecursiveCall
+                    return GetImageFromTarget(
+                        actualObj
+                    );
+                }
                 default:
                     return (
                         $"Unable to find image on {(result == null ? "null" : result.GetType().ToString())}",

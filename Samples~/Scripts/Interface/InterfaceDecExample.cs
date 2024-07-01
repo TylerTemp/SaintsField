@@ -87,10 +87,20 @@ namespace SaintsField.Samples.Scripts.Interface
             Debug.Log(interface1.V);
         }
 
-        private void Start()
+        [Serializable]
+        public class InterfaceAny1 : SaintsInterface<UnityEngine.Object, IInterface1>
         {
-            Debug.Log(getComponent.I);
-            Debug.Log(getComponent.V);
         }
+
+        [FindComponent("Sub")] public InterfaceAny1 findComponent;
+        [ShowImage]
+        [GetComponentInChildren] public InterfaceAny1 getComponentInChildren;
+        [GetComponentInParent] public InterfaceAny1 getComponentInParent;
+        [GetComponentInParents] public InterfaceAny1 getComponentInParents;
+        [GetComponentInScene] public InterfaceAny1 getComponentInScene;
+        [GetPrefabWithComponent] public InterfaceAny1 getPrefabWithComponent;
+        [GetScriptableObject] public InterfaceAny1 getScriptableObject;
+
+        [SpriteToggle(nameof(getComponentInChildren))] public Sprite sprite;
     }
 }
