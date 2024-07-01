@@ -34,11 +34,31 @@ namespace SaintsField.Samples.Scripts.Interface
         private Color _onColor;
 
 #if UNITY_EDITOR
+        [Dropdown(nameof(Dropdown))]
+#endif
+        public Interface1 dropdown;
+
+
+#if UNITY_EDITOR
         private AdvancedDropdownList<Component> AdvDropdown()
         {
             GameObject g1 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface1.prefab");
             GameObject g2 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface12.prefab");
             return new AdvancedDropdownList<Component>("")
+            {
+                {g1.name, g1.GetComponent<MonoInter1>()},
+                {g2.name, g2.GetComponent<MonoInter12>()},
+                // new AdvancedDropdownItem<Component>("Item1", null),
+                // new AdvancedDropdownItem<Component>("Item2", null),
+                // new AdvancedDropdownItem<Component>("Item3", null),
+            };
+        }
+
+        private DropdownList<Component> Dropdown()
+        {
+            GameObject g1 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface1.prefab");
+            GameObject g2 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface12.prefab");
+            return new DropdownList<Component>
             {
                 {g1.name, g1.GetComponent<MonoInter1>()},
                 {g2.name, g2.GetComponent<MonoInter12>()},

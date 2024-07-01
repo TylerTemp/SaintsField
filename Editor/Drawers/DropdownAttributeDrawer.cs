@@ -158,105 +158,15 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            // IDropdownList dropdownListValue;
-            //
-            // string funcName = dropdownAttribute.FuncName;
-            // Debug.Assert(parentObj != null);
-            // Type parentType = parentObj.GetType();
-            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-            //     ReflectUtils.GetProp(parentType, funcName);
-            // switch (getPropType)
-            // {
-            //     case ReflectUtils.GetPropType.NotFound:
-            //         return new MetaInfo
-            //         {
-            //             Error = $"not found `{funcName}` on target `{parentObj}`",
-            //             SelectedIndex = -1,
-            //             DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-            //         };
-            //     case ReflectUtils.GetPropType.Property:
-            //     {
-            //         PropertyInfo foundPropertyInfo = (PropertyInfo)fieldOrMethodInfo;
-            //         dropdownListValue = foundPropertyInfo.GetValue(parentObj) as IDropdownList;
-            //         if (dropdownListValue == null)
-            //         {
-            //             return new MetaInfo
-            //             {
-            //                 Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
-            //                 SelectedIndex = -1,
-            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-            //             };
-            //         }
-            //     }
-            //         break;
-            //     case ReflectUtils.GetPropType.Field:
-            //     {
-            //         FieldInfo foundFieldInfo = (FieldInfo)fieldOrMethodInfo;
-            //         dropdownListValue = foundFieldInfo.GetValue(parentObj) as IDropdownList;
-            //         if (dropdownListValue == null)
-            //         {
-            //             return new MetaInfo
-            //             {
-            //                 Error = $"dropdownListValue is null from `{funcName}` on target `{parentObj}`",
-            //                 SelectedIndex = -1,
-            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-            //             };
-            //         }
-            //     }
-            //         break;
-            //     case ReflectUtils.GetPropType.Method:
-            //     {
-            //         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-            //         ParameterInfo[] methodParams = methodInfo.GetParameters();
-            //         Debug.Assert(methodParams.All(p => p.IsOptional));
-            //
-            //         try
-            //         {
-            //             dropdownListValue =
-            //                 methodInfo.Invoke(parentObj, methodParams.Select(p => p.DefaultValue).ToArray()) as
-            //                     IDropdownList;
-            //         }
-            //         catch (TargetInvocationException e)
-            //         {
-            //             Debug.LogException(e);
-            //             Debug.Assert(e.InnerException != null);
-            //             return new MetaInfo
-            //             {
-            //                 Error = e.InnerException.Message,
-            //                 SelectedIndex = -1,
-            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-            //             };
-            //         }
-            //         catch (Exception e)
-            //         {
-            //             Debug.LogException(e);
-            //             return new MetaInfo
-            //             {
-            //                 Error = e.Message,
-            //                 SelectedIndex = -1,
-            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-            //             };
-            //         }
-            //
-            //         if (dropdownListValue == null)
-            //         {
-            //             return new MetaInfo
-            //             {
-            //                 Error = $"dropdownListValue is null from `{funcName}()` on target `{parentObj}`",
-            //                 SelectedIndex = -1,
-            //                 DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
-            //             };
-            //         }
-            //     }
-            //         break;
-            //     default:
-            //         throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            // }
-
             Debug.Assert(field != null, $"{property.name}/{parentObj}");
             object curValue = field.GetValue(parentObj);
+            if (curValue is IWrapProp wrapProp)
+            {
+                curValue = Util.GetWrapValue(wrapProp);
+            }
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             // string curDisplay = "";
+
             int selectedIndex = -1;
             Debug.Assert(dropdownListValue != null);
 
@@ -270,26 +180,8 @@ namespace SaintsField.Editor.Drawers
                     continue;
                 }
 
-                if (curValue == null && itemValue == null)
+                if (Util.GetIsEqual(curValue, itemValue))
                 {
-                    // Debug.Log($"both null selected index = {dropdownIndex}");
-                    selectedIndex = dropdownIndex;
-                    break;
-                }
-                if (curValue is Object curValueObj
-                    && curValueObj == itemValue as Object)
-                {
-                    // Debug.Log($"Object equal selected index = {dropdownIndex}");
-                    selectedIndex = dropdownIndex;
-                    break;
-                }
-                if (itemValue == null)
-                {
-                    // nothing
-                }
-                else if (itemValue.Equals(curValue))
-                {
-                    // Debug.Log($"Equal selected index = {dropdownIndex}");
                     selectedIndex = dropdownIndex;
                     break;
                 }

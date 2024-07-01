@@ -23,13 +23,13 @@ namespace SaintsField
 
         public override bool Equals(object obj)
         {
-            Debug.Log($"Call Equal: {obj} vs {this}");
+            // Debug.Log($"Call Equal: {obj} vs {this}");
             return obj is SaintsInterface<TObject, TInterface> other && ReferenceEquals(other.V, V);
         }
 
         public static bool operator ==(SaintsInterface<TObject, TInterface> a, SaintsInterface<TObject, TInterface> b)
         {
-            Debug.Log($"Call ==: {a} vs {b}");
+            // Debug.Log($"Call ==: {a} vs {b}");
             // ReSharper disable once Unity.NoNullPropagation
             return a?.V
                    // ReSharper disable once Unity.NoNullPropagation
