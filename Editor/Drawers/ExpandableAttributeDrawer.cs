@@ -271,25 +271,39 @@ namespace SaintsField.Editor.Drawers
             VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
             Object curObject = (Object) propsElement.userData;
 
-            if (ReferenceEquals(property.objectReferenceValue, curObject))
+            Object serObject = null;
+            if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                object serObjectValue = SerializedUtils.GetValue(property, info, parent);
+                if (serObjectValue is IWrapProp wrapProp)
+                {
+                    serObject = (Object)Util.GetWrapValue(wrapProp);
+                }
+            }
+            else
+            {
+                serObject = property.objectReferenceValue;
+            }
+
+            if (ReferenceEquals(serObject, curObject))
             {
                 return;
             }
 
-            DisplayStyle foldoutDisplay = property.objectReferenceValue == null ? DisplayStyle.None : DisplayStyle.Flex;
+            DisplayStyle foldoutDisplay = serObject == null ? DisplayStyle.None : DisplayStyle.Flex;
             if(foldOut.style.display != foldoutDisplay)
             {
                 foldOut.style.display = foldoutDisplay;
             }
 
-            propsElement.userData = property.objectReferenceValue;
+            propsElement.userData = serObject;
             propsElement.Clear();
-            if (property.objectReferenceValue == null)
+            if (serObject == null)
             {
                 return;
             }
 
-            InspectorElement inspectorElement = new InspectorElement(property.objectReferenceValue)
+            InspectorElement inspectorElement = new InspectorElement(serObject)
             {
                 // style =
                 // {

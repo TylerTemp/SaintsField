@@ -38,6 +38,14 @@ namespace SaintsField.Samples.Scripts.Interface
 #endif
         public Interface1 dropdown;
 
+        [Serializable]
+        public class InterfaceSo : SaintsInterface<ScriptableInter12, IInterface1>
+        {
+        }
+
+        // [Expandable]
+        public InterfaceSo interfaceSo;
+
 
 #if UNITY_EDITOR
         private AdvancedDropdownList<Component> AdvDropdown()

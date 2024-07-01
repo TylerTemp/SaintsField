@@ -8958,6 +8958,8 @@ MonoBehaviour:
   _onColor: {r: 1, g: 0, b: 0, a: 1}
   dropdown:
     <V>k__BackingField: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+  interfaceSo:
+    <V>k__BackingField: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
 --- !u!1 &911263177
 GameObject:
   m_ObjectHideFlags: 0
