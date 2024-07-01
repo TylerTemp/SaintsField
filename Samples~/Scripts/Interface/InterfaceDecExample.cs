@@ -77,5 +77,20 @@ namespace SaintsField.Samples.Scripts.Interface
             };
         }
 #endif
+
+        [GetComponent, PostFieldButton(nameof(DebugInterface1), "D")] public Interface1 getComponent;
+        [GetComponentByPath("."), PostFieldButton(nameof(DebugInterface1), "D")] public Interface1 getComponentByPath;
+
+        private void DebugInterface1(Interface1 interface1)
+        {
+            Debug.Log(interface1.I?.GetType().Name ?? "null");
+            Debug.Log(interface1.V);
+        }
+
+        private void Start()
+        {
+            Debug.Log(getComponent.I);
+            Debug.Log(getComponent.V);
+        }
     }
 }

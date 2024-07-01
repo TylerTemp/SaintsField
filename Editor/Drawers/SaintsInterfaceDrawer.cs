@@ -423,7 +423,7 @@ namespace SaintsField.Editor.Drawers
         }
 #endif
 
-        private static Type GetMostBaseType(Type type)
+        public static Type GetMostBaseType(Type type)
         {
             Type lastType = type;
             while (true)

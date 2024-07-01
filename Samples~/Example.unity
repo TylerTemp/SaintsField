@@ -8928,6 +8928,7 @@ GameObject:
   m_Component:
   - component: {fileID: 910818277}
   - component: {fileID: 910818278}
+  - component: {fileID: 910818279}
   m_Layer: 0
   m_Name: InterfaceDec
   m_TagString: Untagged
@@ -8971,6 +8972,22 @@ MonoBehaviour:
     <V>k__BackingField: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
   interfaceSo:
     <V>k__BackingField: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
+  getComponent:
+    <V>k__BackingField: {fileID: 910818279}
+  getComponentByPath:
+    <V>k__BackingField: {fileID: 910818279}
+--- !u!114 &910818279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910818276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5742edbcca3143beb07d55a4686657ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &911263177
 GameObject:
   m_ObjectHideFlags: 0
@@ -9295,7 +9312,7 @@ MonoBehaviour:
   gameObjects2Nest:
     value: []
   gameObjects4: []
-  _saintsArrayWithArraySize:
+  _arrSize:
     value: 0000000000000000
 --- !u!1 &965251183
 GameObject:

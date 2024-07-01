@@ -32,14 +32,14 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info);
+            (string error, SerializedProperty targetProperty, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
             _error = error;
             if (error != "")
             {
                 return 0;
             }
 
-            return ReferenceEquals(property.objectReferenceValue, result) ? 0 : SingleLineHeight;
+            return ReferenceEquals(targetProperty.objectReferenceValue, result) ? 0 : SingleLineHeight;
         }
 
         // private bool _firstOpen = true;
@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Drawers
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;
 
             // match?
-            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info);
+            (string error, SerializedProperty targetProperty, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
             _error = error;
 
             if (error != "")
@@ -67,16 +67,16 @@ namespace SaintsField.Editor.Drawers
             bool firstOpen = !notFirstOpen;
 
             // Debug.Log($"fr={getComponentByPathAttribute.ForceResign}, equal={ReferenceEquals(property.objectReferenceValue, result)}");
-            if(((firstOpen && property.objectReferenceValue == null) || getComponentByPathAttribute.ForceResign) && !ReferenceEquals(property.objectReferenceValue, result))
+            if(((firstOpen && targetProperty.objectReferenceValue == null) || getComponentByPathAttribute.ForceResign) && !ReferenceEquals(targetProperty.objectReferenceValue, result))
             {
                 // Debug.Log($"firstOpen={_firstOpen}; auto sign to {result}");
-                property.objectReferenceValue = result;
+                targetProperty.objectReferenceValue = result;
                 // property.serializedObject.ApplyModifiedProperties();
                 // valueChanged = true;
             }
 
             bool willDraw = false;
-            if(!ReferenceEquals(property.objectReferenceValue, result) && getComponentByPathAttribute.ResignButton)
+            if(!ReferenceEquals(targetProperty.objectReferenceValue, result) && getComponentByPathAttribute.ResignButton)
             {
                 if (_refreshIcon == null)
                 {
@@ -187,15 +187,17 @@ namespace SaintsField.Editor.Drawers
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;
             Button button = getComponentByPathAttribute.ResignButton? container.Q<Button>(NameResignButton(property, index)): null;
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-            if (property.objectReferenceValue == null)
+            (string _, SerializedProperty targetProperty, Type __, Type ___) = GetPropAndType(property, info, parent);
+            // ReSharper disable once MergeIntoPattern
+            if (targetProperty != null && targetProperty.propertyType == SerializedPropertyType.ObjectReference && targetProperty.objectReferenceValue == null)
             {
-                Check(property, getComponentByPathAttribute, info, button, helpBox, onValueChangedCallback, true);
+                Check(property, getComponentByPathAttribute, info, button, helpBox, onValueChangedCallback, true, parent);
             }
 
             if(button != null)
             {
                 button.clicked += () => Check(property, (GetComponentByPathAttribute)saintsAttribute, info, button, helpBox,
-                    onValueChangedCallback, true);
+                    onValueChangedCallback, true, parent);
             }
         }
 
@@ -209,16 +211,16 @@ namespace SaintsField.Editor.Drawers
             {
                 Button button = getComponentByPathAttribute.ResignButton? container.Q<Button>(NameResignButton(property, index)): null;
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-                Check(property, getComponentByPathAttribute, info, button, helpBox, onValueChangedCallback, false);
+                Check(property, getComponentByPathAttribute, info, button, helpBox, onValueChangedCallback, false, parent);
             }
         }
 
         private static void Check(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute,
             FieldInfo info,
             // ReSharper disable once SuggestBaseTypeForParameter
-            Button button, HelpBox helpBox, Action<object> onValueChangedCallback, bool forceResign)
+            Button button, HelpBox helpBox, Action<object> onValueChangedCallback, bool forceResign, object parent)
         {
-            (string error, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info);
+            (string error, SerializedProperty targetProperty, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
             // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if (error != helpBox.text)
             {
@@ -227,7 +229,7 @@ namespace SaintsField.Editor.Drawers
 
                 if (getComponentByPathAttribute.ForceResign && property.objectReferenceValue != null)
                 {
-                    property.objectReferenceValue = null;
+                    targetProperty.objectReferenceValue = null;
                     property.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(null);
                 }
@@ -239,18 +241,19 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            if (!ReferenceEquals(property.objectReferenceValue, result))
+            if (!ReferenceEquals(targetProperty.objectReferenceValue, result))
             {
+                // Debug.Log($"not equal: {targetProperty.objectReferenceValue}, {result}");
                 if (getComponentByPathAttribute.ForceResign || forceResign)
                 {
-                    property.objectReferenceValue = result;
+                    targetProperty.objectReferenceValue = result;
                     property.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(result);
                 }
 
                 if (getComponentByPathAttribute.ResignButton)
                 {
-                    button.style.display = ReferenceEquals(property.objectReferenceValue, result) ?DisplayStyle.None :DisplayStyle.Flex;
+                    button.style.display = ReferenceEquals(targetProperty.objectReferenceValue, result) ?DisplayStyle.None :DisplayStyle.Flex;
                 }
             }
 
@@ -265,12 +268,76 @@ namespace SaintsField.Editor.Drawers
         #endregion
 #endif
 
-        private static (string error, Object result) DoCheckComponent(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info)
+        private static (string error, SerializedProperty targetProperty, Type fieldType, Type interfaceType) GetPropAndType(SerializedProperty property, FieldInfo info, object parent)
         {
+            SerializedProperty targetProperty = property;
             Type fieldType = info.FieldType;
-            // Type type = getComponentByPathAttribute.CompType ?? fieldType;
+            Type interfaceType = null;
+            if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                object propertyValue = SerializedUtils.GetValue(property, info, parent);
 
-            // bool changed = false;
+                if (propertyValue is IWrapProp wrapProp)
+                {
+                    Type mostBaseType = SaintsInterfaceDrawer.GetMostBaseType(wrapProp.GetType());
+                    if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                    {
+                        IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                        if (genericArguments.Count == 2)
+                        {
+                            interfaceType = genericArguments[1];
+                        }
+                    }
+                    targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
+                                     SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                         wrapProp.EditorPropertyName);
+
+                    if(targetProperty == null)
+                    {
+                        return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", targetProperty, fieldType, null);
+                    }
+
+                    var wrapFieldOrProp = Util.GetWrapProp(wrapProp);
+                    fieldType = wrapFieldOrProp.IsField
+                        ? wrapFieldOrProp.FieldInfo.FieldType
+                        : wrapFieldOrProp.PropertyInfo.PropertyType;
+                }
+            }
+
+
+            return ("", targetProperty, fieldType, interfaceType);
+        }
+
+        private static (string error, SerializedProperty targetProperty, Object result) DoCheckComponent(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info, object parent)
+        {
+            // SerializedProperty targetProperty = property;
+            // Type fieldType = info.FieldType;
+            // if (property.propertyType == SerializedPropertyType.Generic)
+            // {
+            //     object propertyValue = SerializedUtils.GetValue(property, info, parent);
+            //     if (propertyValue is IWrapProp wrapProp)
+            //     {
+            //         targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
+            //                          SerializedUtils.FindPropertyByAutoPropertyName(property,
+            //                              wrapProp.EditorPropertyName);
+            //
+            //         if(targetProperty == null)
+            //         {
+            //             return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", null);
+            //         }
+            //
+            //         var wrapFieldOrProp = Util.GetWrapProp(wrapProp);
+            //         fieldType = wrapFieldOrProp.IsField
+            //             ? wrapFieldOrProp.FieldInfo.FieldType
+            //             : wrapFieldOrProp.PropertyInfo.PropertyType;
+            //     }
+            // }
+            (string _, SerializedProperty targetProperty, Type fieldType, Type interfaceType) = GetPropAndType(property, info, parent);
+
+            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return ($"{targetProperty.propertyType} is not supported by GetComponent", targetProperty, null);
+            }
 
             Transform transform;
             switch (property.serializedObject.targetObject)
@@ -286,15 +353,16 @@ namespace SaintsField.Editor.Drawers
                     if(getComponentByPathAttribute.ForceResign && property.objectReferenceValue != null)
                     {
                         // changed = true;
-                        property.objectReferenceValue = null;
+                        targetProperty.objectReferenceValue = null;
+                        property.serializedObject.ApplyModifiedProperties();
                     }
                 }
-                    return ("GetComponentInChildrenAttribute can only be used on Component or GameObject", null);
+                    return ("GetComponentInChildrenAttribute can only be used on Component or GameObject", targetProperty, null);
             }
 
             IReadOnlyList<IReadOnlyList<GetComponentByPathAttribute.Token>> tokensPaths = getComponentByPathAttribute.Paths;
             Object result = tokensPaths
-                .Select(tokens => FindObjectByPath(tokens, fieldType, transform))
+                .Select(tokens => FindObjectByPath(tokens, fieldType, interfaceType, transform))
                 .FirstOrDefault(each => each != null);
 
             // ReSharper disable once InvertIf
@@ -309,7 +377,7 @@ namespace SaintsField.Editor.Drawers
                 string pathList = getComponentByPathAttribute.RawPaths.Count <= 1
                     ? getComponentByPathAttribute.RawPaths[0]
                     : string.Join("", getComponentByPathAttribute.RawPaths.Select(each => "\n* " + each));
-                return ($"No component found in path: {pathList}", null);
+                return ($"No component found in path: {pathList}", targetProperty, null);
             }
 
             // if (!ReferenceEquals(property.objectReferenceValue, result))
@@ -318,14 +386,26 @@ namespace SaintsField.Editor.Drawers
             //     changed = true;
             // }
 
-            return ("", result);
+            return ("", targetProperty, result);
         }
 
-        private static Object FindObjectByPath(IEnumerable<GetComponentByPathAttribute.Token> tokens, Type type, Transform current)
+        private static Object FindObjectByPath(IEnumerable<GetComponentByPathAttribute.Token> tokens, Type type, Type interfaceType, Transform current)
         {
             bool isGameObject = type == typeof(GameObject);
             return IteratePath(new Queue<GetComponentByPathAttribute.Token>(tokens), new[] { current })
-                .Select(each => isGameObject ? (Object)each.gameObject : each.GetComponent(type))
+                .Select(each =>
+                {
+                    if (isGameObject)
+                    {
+                        return (Object)each.gameObject;
+                    }
+
+                    if (interfaceType == null)
+                    {
+                        return each.GetComponent(type);
+                    }
+                    return each.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
+                })
                 .FirstOrDefault(each => each != null);
         }
 

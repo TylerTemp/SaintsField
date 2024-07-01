@@ -21,12 +21,12 @@ namespace SaintsField.Samples.Scripts.Interface
         [RichLabel("<color=green><label/>")]
         public SaintsInterface<UnityEngine.Object, IInterface2> myAnyInter2;
 
-        private void Awake()
-        {
-            Debug.Log(myInter1.I);  // the actual interface object
-            Debug.Log(myInter1.V);  // the actual serialized object
-
-            myInter1.I.Method1();
-        }
+        // private void Awake()
+        // {
+        //     Debug.Log(myInter1.I);  // the actual interface object
+        //     Debug.Log(myInter1.V);  // the actual serialized object
+        //
+        //     myInter1.I.Method1();
+        // }
     }
 }

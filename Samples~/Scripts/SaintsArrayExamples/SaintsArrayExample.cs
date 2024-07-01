@@ -14,13 +14,13 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
 
         [ArraySize(2)] public SaintsArray<int> _arrSize;
 
-        private void Start()
-        {
-            GameObject[] impArrDirect = saintsArrayGo;
-            SaintsArray<GameObject> expArrDirect = (SaintsArray<GameObject>)impArrDirect;
-
-            saintsArrayGo[0] = new GameObject();
-            GameObject firstGameObject = saintsArrayGo[0];
-        }
+        // private void Start()
+        // {
+        //     GameObject[] impArrDirect = saintsArrayGo;
+        //     SaintsArray<GameObject> expArrDirect = (SaintsArray<GameObject>)impArrDirect;
+        //
+        //     saintsArrayGo[0] = new GameObject();
+        //     GameObject firstGameObject = saintsArrayGo[0];
+        // }
     }
 }

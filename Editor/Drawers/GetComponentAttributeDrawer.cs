@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -25,7 +27,7 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info);
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             if (error != "")
             {
                 _error = error;
@@ -48,20 +50,53 @@ namespace SaintsField.Editor.Drawers
 
         #endregion
 
-        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info)
+        private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            if (property.propertyType != SerializedPropertyType.ObjectReference)
+            SerializedProperty targetProperty = property;
+            Type fieldType = info.FieldType;
+            Type interfaceType = null;
+            if (property.propertyType == SerializedPropertyType.Generic)
             {
-                return ($"{property.propertyType} is not supported by GetComponent", null);
+                object propertyValue = SerializedUtils.GetValue(property, info, parent);
+
+                if (propertyValue is IWrapProp wrapProp)
+                {
+                    Type mostBaseType = SaintsInterfaceDrawer.GetMostBaseType(wrapProp.GetType());
+                    if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                    {
+                        IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                        if (genericArguments.Count == 2)
+                        {
+                            interfaceType = genericArguments[1];
+                        }
+                    }
+                    targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
+                                     SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                         wrapProp.EditorPropertyName);
+
+                    if(targetProperty == null)
+                    {
+                        return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", null);
+                    }
+
+                    var wrapFieldOrProp = Util.GetWrapProp(wrapProp);
+                    fieldType = wrapFieldOrProp.IsField
+                        ? wrapFieldOrProp.FieldInfo.FieldType
+                        : wrapFieldOrProp.PropertyInfo.PropertyType;
+                }
             }
 
-            if (property.objectReferenceValue != null)
+            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return ($"{targetProperty.propertyType} is not supported by GetComponent", null);
+            }
+
+            if (targetProperty.objectReferenceValue != null)
             {
                 return ("", null);
             }
 
             GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
-            Type fieldType = info.FieldType;
             Type type = getComponentAttribute.CompType ?? fieldType;
 
             if (type == typeof(GameObject))
@@ -108,19 +143,24 @@ namespace SaintsField.Editor.Drawers
                     return ("GetComponent can only be used on Component or GameObject", null);
             }
 
-            Component componentOnSelf = transform.GetComponent(type);
-            if (componentOnSelf == null)
+            Component[] componentsOnSelf = transform.GetComponents(type);
+            if (componentsOnSelf.Length == 0)
             {
                 return ($"No {type} found on {transform.name}", null);
             }
 
-            Object result = componentOnSelf;
+            Object result = interfaceType == null ? componentsOnSelf[0] : componentsOnSelf.FirstOrDefault(interfaceType.IsInstanceOfType);
+
+            if (result == null)
+            {
+                return ($"No {type} found on {transform.name}", null);
+            }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
             Debug.Log($"GetComponent Add {result} for {property.propertyPath}");
 #endif
 
-            property.objectReferenceValue = result;
+            targetProperty.objectReferenceValue = result;
             return ("", result);
         }
 
@@ -138,7 +178,7 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
             Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
-            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info);
+            (string error, Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)
             {
