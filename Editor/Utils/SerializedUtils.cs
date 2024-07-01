@@ -222,5 +222,28 @@ namespace SaintsField.Editor.Utils
             return arrayIndex == -1 ? rawValue : GetValueAtIndex(rawValue, arrayIndex);
         }
 
+        public static IEnumerable<SerializedProperty> GetPropertyChildren(SerializedProperty property)
+        {
+            if (property == null || string.IsNullOrEmpty(property.propertyPath))
+            {
+                yield break;
+            }
+
+            // ReSharper disable once ConvertToUsingDeclaration
+            using (SerializedProperty iterator = property.Copy())
+            {
+                if (!iterator.NextVisible(true))
+                {
+                    yield break;
+                }
+
+                do
+                {
+                    SerializedProperty childProperty = property.FindPropertyRelative(iterator.name);
+                    yield return childProperty;
+                } while (iterator.NextVisible(false));
+            }
+        }
+
     }
 }

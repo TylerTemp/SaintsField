@@ -518,6 +518,17 @@ MonoBehaviour:
     normal: 0
     myInt: 3
   floatVDisabled: 0
+  nestedStruct:
+    go: {fileID: 90550605}
+    someIntegers: 010000000200000003000000
+    myStruct:
+      go: {fileID: 90550605}
+      someIntegers: 040000000500000006000000
+    myStructs:
+    - go: {fileID: 90550605}
+      someIntegers: 070000000800000009000000
+    - go: {fileID: 90550605}
+      someIntegers: 0a0000000b0000000c000000
 --- !u!1 &94709949
 GameObject:
   m_ObjectHideFlags: 0
@@ -9814,7 +9825,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -134,7 +135,40 @@ namespace SaintsField.Editor.Utils
                     }
                     else
                     {
-                        property.objectReferenceValue = (UnityEngine.Object)newValue;
+                        if (property.isArray)
+                        {
+                            IEnumerable enumerator = (IEnumerable)newValue;
+                            int index = 0;
+                            foreach (object valueObject in enumerator)
+                            {
+                                property.arraySize = index + 1;
+                                SerializedProperty arrayElement = property.GetArrayElementAtIndex(index);
+                                SignPropertyValue(arrayElement, fieldInfo, parent, valueObject);
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            if(newValue != null)
+                            {
+                                foreach (SerializedProperty childProperty in SerializedUtils.GetPropertyChildren(property))
+                                {
+                                    // Debug.Log(newValue);
+                                    // Debug.Log(newValue.GetType());
+                                    // Debug.Log(childProperty.name);
+                                    if(childProperty != null)
+                                    {
+                                        FieldInfo childFieldInfo = newValue.GetType().GetField(childProperty.name);
+                                        if (childFieldInfo != null)
+                                        {
+                                            object childValue = childFieldInfo.GetValue(newValue);
+                                            SignPropertyValue(childProperty, childFieldInfo, newValue, childValue);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // property.objectReferenceValue = (UnityEngine.Object)newValue;
                     }
                     break;
                 case SerializedPropertyType.LayerMask:

@@ -1,4 +1,5 @@
 using System;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -115,5 +116,75 @@ namespace SaintsField.Samples.Scripts
         [ReadOnly]
         [Dropdown(nameof(GetDropdownItems))]
         public float floatVDisabled;
+
+        [Serializable]
+        public struct MyStruct
+        {
+            public GameObject go;
+            public int[] someIntegers;
+        }
+
+        [Serializable]
+        public struct MyStructParent
+        {
+            public GameObject go;
+            public int[] someIntegers;
+            public MyStruct myStruct;
+            public MyStruct[] myStructs;
+        }
+
+        [InfoBox("This works fine, but because we use Equal to compare the struct, it will by default not equal, and does not know when it's actually the same struct", above: true)]
+        [Dropdown(nameof(MyStructParentDropdown))]
+        public MyStructParent nestedStruct;
+
+        public DropdownList<MyStructParent> MyStructParentDropdown() => new DropdownList<MyStructParent>
+        {
+            {"value", new MyStructParent
+            {
+                go = gameObject,
+                someIntegers = new[] {1, 2, 3},
+                myStruct = new MyStruct
+                {
+                    go = gameObject,
+                    someIntegers = new[] {4, 5, 6},
+                },
+                myStructs = new[]
+                {
+                    new MyStruct
+                    {
+                        go = gameObject,
+                        someIntegers = new[] {7, 8, 9},
+                    },
+                    new MyStruct
+                    {
+                        go = gameObject,
+                        someIntegers = new[] {10, 11, 12},
+                    },
+                },
+            }},
+            // {"value2", new MyStructParent
+            // {
+            //     go = gameObject,
+            //     someIntegers = new[] {1, 2, 3},
+            //     // myStruct = new MyStruct
+            //     // {
+            //     //     go = gameObject,
+            //     //     someIntegers = new[] {4, 5, 6},
+            //     // },
+            //     myStructs = new[]
+            //     {
+            //         new MyStruct
+            //         {
+            //             go = gameObject,
+            //             someIntegers = new[] {7, 8, 9},
+            //         },
+            //         new MyStruct
+            //         {
+            //             go = gameObject,
+            //             someIntegers = new[] {10, 11, 12},
+            //         },
+            //     },
+            // }},
+        };
     }
 }
