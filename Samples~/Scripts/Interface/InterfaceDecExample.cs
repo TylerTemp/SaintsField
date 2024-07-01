@@ -15,6 +15,7 @@ namespace SaintsField.Samples.Scripts.Interface
 
         [AboveButton(nameof(MyFuncLog), buttonLabel: nameof(MyFunc), isCallback: true)]
         [AssetPreview]
+        [GameObjectActive]
         public Interface1 myInherentInterface1;
 
         private void MyFuncLog(Interface1 interface1) => Debug.Log(MyFunc(interface1));

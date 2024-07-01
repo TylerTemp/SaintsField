@@ -343,7 +343,14 @@ namespace SaintsField.Editor.Drawers
             container.Add(propertyField);
             container.Add(selectButton);
 
-            SaintsInterfaceField saintsInterfaceField = new SaintsInterfaceField(displayLabel, container);
+            SaintsInterfaceField saintsInterfaceField = new SaintsInterfaceField(displayLabel, container)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexShrink = 1,
+                }
+            };
             saintsInterfaceField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
             saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);

@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Linq;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Utils
 {
@@ -702,6 +704,99 @@ namespace SaintsField.Editor.Utils
             }
 
             return (Array.Empty<string>(), callbackBoolResults);
+        }
+
+        public static void BindEventWithValue(UnityEventBase unityEventBase, MethodInfo methodInfo, Type[] invokeRequiredTypeArr, object target, object value)
+        {
+            switch (value)
+            {
+                case bool boolValue:
+                    UnityEventTools.AddBoolPersistentListener(
+                        unityEventBase,
+                        (UnityAction<bool>)Delegate.CreateDelegate(typeof(UnityAction<bool>),
+                            target, methodInfo),
+                        boolValue);
+                    return;
+                case float floatValue:
+                    UnityEventTools.AddFloatPersistentListener(
+                        unityEventBase,
+                        (UnityAction<float>)Delegate.CreateDelegate(typeof(UnityAction<float>),
+                            target, methodInfo),
+                        floatValue);
+                    return;
+                case int intValue:
+                    UnityEventTools.AddIntPersistentListener(
+                        unityEventBase,
+                        (UnityAction<int>)Delegate.CreateDelegate(typeof(UnityAction<int>),
+                            target, methodInfo),
+                        intValue);
+                    return;
+
+                case string stringValue:
+                    UnityEventTools.AddStringPersistentListener(
+                        unityEventBase,
+                        (UnityAction<string>)Delegate.CreateDelegate(typeof(UnityAction<string>),
+                            target, methodInfo),
+                        stringValue);
+                    return;
+
+                case UnityEngine.Object unityObjValue:
+                    UnityEventTools.AddObjectPersistentListener(
+                        unityEventBase,
+                        (UnityAction<UnityEngine.Object>)Delegate.CreateDelegate(typeof(UnityAction<UnityEngine.Object>),
+                            target, methodInfo),
+                        unityObjValue);
+                    return;
+
+                default:
+                {
+                    // Type[] invokeRequiredTypeArr = invokeRequiredTypes.ToArray();
+                    // when method requires 1 parameter
+                    // if value given, will go to the logic above, which is static parameter value
+                    // otherwise, it's a method dynamic bind
+
+                    // so, all logic here must be dynamic bind
+                    // ParameterInfo[] methodParams = ;
+                    Debug.Assert(methodInfo.GetParameters().Length == invokeRequiredTypeArr.Length);
+
+                    Type genericAction;
+
+                    // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+                    switch (invokeRequiredTypeArr.Length)
+                    {
+                        case 0:
+                            genericAction = typeof(UnityAction);
+                            break;
+                        case 1:
+                            genericAction = typeof(UnityAction<>);
+                            break;
+                        case 2:
+                            genericAction = typeof(UnityAction<,>);
+                            break;
+                        case 3:
+                            genericAction = typeof(UnityAction<,,>);
+                            break;
+                        case 4:
+                            genericAction = typeof(UnityAction<,,,>);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(invokeRequiredTypeArr.Length), invokeRequiredTypeArr.Length, null);
+                    }
+
+                    Type genericActionIns = genericAction.MakeGenericType(invokeRequiredTypeArr);
+                    MethodInfo addPersistentListenerMethod = unityEventBase
+                        .GetType()
+                        .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                        .First(each => each.Name == "AddPersistentListener" && each.GetParameters().Length == 1);
+                    Delegate callback = Delegate.CreateDelegate(genericActionIns, target,
+                        methodInfo);
+                    addPersistentListenerMethod.Invoke(unityEventBase, new object[]
+                    {
+                        callback,
+                    });
+                }
+                    return;
+            }
         }
     }
 }

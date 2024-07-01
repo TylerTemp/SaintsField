@@ -177,14 +177,11 @@ namespace SaintsField.Editor.Drawers
             Button button = container.Q<Button>(NameButton(property, index));
             button.clicked += () =>
             {
-                GameObject go;
-                if (property.objectReferenceValue is GameObject isGo)
+                (string goError, GameObject go) = GetGo(property, info, parent);
+                if(goError != "")
                 {
-                    go = isGo;
-                }
-                else
-                {
-                    go = ((Component) property.objectReferenceValue)?.gameObject;
+                    Debug.LogError(goError);
+                    return;
                 }
 
                 if (go == null)
@@ -198,18 +195,51 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
+        private static (string error, GameObject go) GetGo(SerializedProperty property, FieldInfo info, object parent)
+        {
+            if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                object propValue = SerializedUtils.GetValue(property, info, parent);
+                if (propValue is IWrapProp wrapProp)
+                {
+                    object propWrapValue = Util.GetWrapValue(wrapProp);
+                    switch (propWrapValue)
+                    {
+                        case null:
+                            return ("", null);
+                        case GameObject wrapGo:
+                            return ("", wrapGo);
+                        case Component wrapComp:
+                            return ("", wrapComp.gameObject);
+                        default:
+                            return ($"{propWrapValue} is not GameObject or Component", null);
+                    }
+                }
+
+                return ($"{property.propertyType} is not supported", null);
+            }
+            if (property.objectReferenceValue is GameObject isGo)
+            {
+                return ("", isGo);
+            }
+            if(property.objectReferenceValue is Component comp)
+            {
+                return ("", comp.gameObject);
+                // go = ((Component) property.objectReferenceValue)?.gameObject;
+            }
+
+            return ($"{property.propertyType} is not GameObject or Component", null);
+        }
+
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            GameObject go;
-            if (property.objectReferenceValue is GameObject isGo)
+            (string goError, GameObject go) = GetGo(property, info, parent);
+            if (goError != "")
             {
-                go = isGo;
-            }
-            else
-            {
-                go = ((Component) property.objectReferenceValue)?.gameObject;
+                Debug.LogError(goError);
+                return;
             }
 
             bool goIsNull = go == null;

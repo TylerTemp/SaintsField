@@ -78,9 +78,7 @@ namespace SaintsField.Editor.Drawers
 
             #endregion
 
-            // Debug.Log($"found button {uiButton}");
-
-            #region Func
+            #region Method
 
             if (objTarget == null)
             {
@@ -102,10 +100,37 @@ namespace SaintsField.Editor.Drawers
             }
             #endregion
 
-            // TODO: support arguments action
-            UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), objTarget, funcName);
+            MethodInfo methodInfo = objTarget.GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public);
+            if (methodInfo == null)
+            {
+                return $"Can not find method `{funcName}` in `{objTarget.GetType()}`";
+            }
 
-            UnityEventTools.AddPersistentListener(uiButton.onClick, action);
+            if (methodInfo.GetParameters().Length == 0)
+            {
+                UnityEventTools.AddVoidPersistentListener(
+                    uiButton.onClick,
+                    (UnityAction)Delegate.CreateDelegate(typeof(UnityAction),
+                        objTarget, methodInfo));
+            }
+
+            object value = buttonAddOnClickAttribute.Value;
+            if (buttonAddOnClickAttribute.IsCallback)
+            {
+                (string error, object foundValue) = Util.GetOf<object>((string) value, null, property, info, objTarget);
+
+                if (error != "")
+                {
+                    return error;
+                }
+
+                value = foundValue;
+            }
+
+            Util.BindEventWithValue(uiButton.onClick, methodInfo, Array.Empty<Type>(), objTarget, value);
+            // UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), objTarget, funcName);
+            //
+            // UnityEventTools.AddPersistentListener(uiButton.onClick, action);
             return "";
         }
 
