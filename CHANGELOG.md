@@ -3,8 +3,9 @@
 1.  `AssetPreview` now will load the preview of the `gameObject` if the target is a `Component`. Useful when you use a script type to reference a prefab.
 2.  Fix `SaintsInterface` won't work when T is a super class of ScriptableObject.
 3.  **Breaking Changes**: `ISaintsArray` has been removed, use `IWrapProp` instead.
-4.  Now most decorators can be used on `SaintsArray`, `SaintsList` and `SaintsInterface`
+4.  Now most decorators can be used on `SaintsArray`, `SaintsList` and `SaintsInterface`.
 5.  Now `Dropdown` and `AdvancedDropdown` supports struct value too.
+6.  Add document for `SaintsArray`, `SaintsRow` about custom drawer.
 
 ## 3.1.1
 
