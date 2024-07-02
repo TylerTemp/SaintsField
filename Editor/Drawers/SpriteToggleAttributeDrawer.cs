@@ -149,8 +149,8 @@ namespace SaintsField.Editor.Drawers
                         SpriteRenderer = spriteRenderer,
                         Error = "",
                     };
-                case GameObject:
-                case Component:
+                case GameObject _:
+                case Component _:
                 {
                     UnityEngine.Object obj = (UnityEngine.Object)foundObj;
                     UnityEngine.Object actualObj = Util.GetTypeFromObj(obj, typeof(Image))

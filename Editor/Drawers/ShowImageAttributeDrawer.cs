@@ -346,8 +346,8 @@ namespace SaintsField.Editor.Drawers
                     return button.targetGraphic?
                         ("", button.targetGraphic.mainTexture as Texture2D):
                         ("", null);
-                case GameObject:
-                case Component:
+                case GameObject _:
+                case Component _:
                 {
                     UnityEngine.Object obj = (UnityEngine.Object)result;
                     UnityEngine.Object actualObj = Util.GetTypeFromObj(obj, typeof(SpriteRenderer))
