@@ -8940,8 +8940,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 910818277}
-  - component: {fileID: 910818278}
   - component: {fileID: 910818279}
+  - component: {fileID: 910818280}
   m_Layer: 0
   m_Name: InterfaceDec
   m_TagString: Untagged
@@ -8965,7 +8965,19 @@ Transform:
   m_Father: {fileID: 867320293}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &910818278
+--- !u!114 &910818279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910818276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5742edbcca3143beb07d55a4686657ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &910818280
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8980,10 +8992,10 @@ MonoBehaviour:
   myInherentInterface1:
     <V>k__BackingField: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
   advDropdown:
-    <V>k__BackingField: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
-  _onColor: {r: 1, g: 0, b: 0, a: 1}
-  dropdown:
     <V>k__BackingField: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+  dropdown:
+    <V>k__BackingField: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+  _onColor: {r: 1, g: 0.3646785, b: 0, a: 1}
   interfaceSo:
     <V>k__BackingField: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
   getComponent:
@@ -9005,18 +9017,6 @@ MonoBehaviour:
   getScriptableObject:
     <V>k__BackingField: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
   sprite: {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
---- !u!114 &910818279
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 910818276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5742edbcca3143beb07d55a4686657ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &911263177
 GameObject:
   m_ObjectHideFlags: 0
@@ -9873,7 +9873,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:

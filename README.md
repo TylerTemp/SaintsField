@@ -2412,6 +2412,15 @@ public Nest n1;
 
 ![saints_row](https://github.com/TylerTemp/SaintsField/assets/6391063/d8465de6-0741-4bfb-aa0d-3042422ca56c)
 
+alternatively, you can make a drawer for your data type to omit `[SaintsRow]` everywhere:
+
+```csharp
+using SaintsField.Editor.Playa;
+
+[CustomPropertyDrawer(typeof(Nest))]
+public class MySaintsRowAttributeDrawer: SaintsRowAttributeDrawer {}
+```
+
 To show a `Serializable` inline like it's directly in the `MonoBehavior`:
 
 ```csharp
@@ -2590,14 +2599,14 @@ Because it's actually a struct, you can also implement your own Array/List, usin
 ```csharp
 using SaintsField;
 
-// example: using ISaintsArray so you don't need to specify the type name everytime
+// example: using IWrapProp so you don't need to specify the type name everytime
 [Serializable]
-public class MyList : ISaintsArray
+public class MyList : IWrapProp
 {
     [SerializeField] public List<string> myStrings;
 
 #if UNITY_EDITOR
-    public string EditorArrayPropertyName => nameof(myStrings);
+    public string EditorPropertyName => nameof(myStrings);
 #endif
 }
 
@@ -2623,13 +2632,25 @@ private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ff4bcdef-f3e6-4ece-8204-d4ba8798e164)
 
+alternatively, you can make a custom drawer for your data type to avoid adding `[SaintsArray]` to every field:
+
+```csharp
+// Put it under an Editor folder, or with UNITY_EDITOR
+#if UNITY_EDITOR
+using SaintsField.Editor.Drawers.TypeDrawers;
+
+[CustomPropertyDrawer(typeof(MyList))]
+public class MyArrayDrawer: SaintsArrayDrawer {}
+#endif
+```
+
 #### `SaintsInterface<,>` ####
 
 `SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface.
 
 You can access the interface with the `.I` field, and actual object with `.V` field.
 
-It provide a drawer to let you only select the object that implements the interface.
+It provides a drawer to let you only select the object that implements the interface.
 
 For `SaintsInterface<TObject, TInterface>`:
 

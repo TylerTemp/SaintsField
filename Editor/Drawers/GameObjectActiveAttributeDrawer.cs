@@ -40,17 +40,18 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            error = "";
+            // error = "";
 
-            GameObject go;
-            if (property.objectReferenceValue is GameObject isGO)
-            {
-                go = isGO;
-            }
-            else
-            {
-                go = ((Component) property.objectReferenceValue)?.gameObject;
-            }
+            (string myError, GameObject go) = GetGo(property, info, parent);
+            error = myError;
+            // if (property.objectReferenceValue is GameObject isGO)
+            // {
+            //     go = isGO;
+            // }
+            // else
+            // {
+            //     go = ((Component) property.objectReferenceValue)?.gameObject;
+            // }
 
             bool goIsNull = go == null;
             bool goActive = !goIsNull && go.activeSelf;
@@ -66,7 +67,7 @@ namespace SaintsField.Editor.Drawers
 
             if (goIsNull)
             {
-                error = $"Unable to get GameObject from {property.name}";
+                error = $"Unable to get GameObject from {property.propertyPath}";
             }
             return true;
         }
@@ -91,6 +92,42 @@ namespace SaintsField.Editor.Drawers
                 : ImGuiHelpBox.Draw(position, error, MessageType.Error);
 
         #endregion
+
+        private static (string error, GameObject go) GetGo(SerializedProperty property, FieldInfo info, object parent)
+        {
+            if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                object propValue = SerializedUtils.GetValue(property, info, parent);
+                if (propValue is IWrapProp wrapProp)
+                {
+                    object propWrapValue = Util.GetWrapValue(wrapProp);
+                    switch (propWrapValue)
+                    {
+                        case null:
+                            return ("", null);
+                        case GameObject wrapGo:
+                            return ("", wrapGo);
+                        case Component wrapComp:
+                            return ("", wrapComp.gameObject);
+                        default:
+                            return ($"{propWrapValue} is not GameObject or Component", null);
+                    }
+                }
+
+                return ($"{property.propertyType} is not supported", null);
+            }
+            if (property.objectReferenceValue is GameObject isGo)
+            {
+                return ("", isGo);
+            }
+            if(property.objectReferenceValue is Component comp)
+            {
+                return ("", comp.gameObject);
+                // go = ((Component) property.objectReferenceValue)?.gameObject;
+            }
+
+            return ($"{property.propertyType} is not GameObject or Component", null);
+        }
 
 #if UNITY_2021_3_OR_NEWER
 
@@ -193,42 +230,6 @@ namespace SaintsField.Editor.Drawers
                 go.SetActive(!go.activeSelf);
                 OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, parent);
             };
-        }
-
-        private static (string error, GameObject go) GetGo(SerializedProperty property, FieldInfo info, object parent)
-        {
-            if (property.propertyType == SerializedPropertyType.Generic)
-            {
-                object propValue = SerializedUtils.GetValue(property, info, parent);
-                if (propValue is IWrapProp wrapProp)
-                {
-                    object propWrapValue = Util.GetWrapValue(wrapProp);
-                    switch (propWrapValue)
-                    {
-                        case null:
-                            return ("", null);
-                        case GameObject wrapGo:
-                            return ("", wrapGo);
-                        case Component wrapComp:
-                            return ("", wrapComp.gameObject);
-                        default:
-                            return ($"{propWrapValue} is not GameObject or Component", null);
-                    }
-                }
-
-                return ($"{property.propertyType} is not supported", null);
-            }
-            if (property.objectReferenceValue is GameObject isGo)
-            {
-                return ("", isGo);
-            }
-            if(property.objectReferenceValue is Component comp)
-            {
-                return ("", comp.gameObject);
-                // go = ((Component) property.objectReferenceValue)?.gameObject;
-            }
-
-            return ($"{property.propertyType} is not GameObject or Component", null);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

@@ -28,10 +28,15 @@ namespace SaintsField.Editor.Drawers
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            if(property.objectReferenceValue == null)
+            Object serObject = GetSerObject(property, info, parent);
+            if (serObject == null)
             {
                 return -1;
             }
+            // if(property.objectReferenceValue == null)
+            // {
+            //     return -1;
+            // }
 
             // EditorGUI.DrawRect(position, Color.yellow);
 
@@ -74,15 +79,16 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
+            Object serObject = GetSerObject(property, info, parent);
             float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
-            if (!property.isExpanded || property.objectReferenceValue == null)
+            if (!property.isExpanded || serObject == null)
             {
                 return basicHeight;
             }
 
             // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
-            SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
+            SerializedObject serializedObject = new SerializedObject(serObject);
 
             // foreach (SerializedProperty serializedProperty in GetAllField(serializedObject))
             // {
@@ -108,10 +114,10 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            Object scriptableObject = property.objectReferenceValue;
-            _error = property.propertyType != SerializedPropertyType.ObjectReference
-                ? $"Expected ScriptableObject type, get {property.propertyType}"
-                : "";
+            Object scriptableObject = GetSerObject(property, info, parent);;
+            // _error = property.propertyType != SerializedPropertyType.ObjectReference
+            //     ? $"Expected ScriptableObject type, get {property.propertyType}"
+            //     : "";
 
             Rect leftRect = position;
 
@@ -210,6 +216,22 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
+        private static Object GetSerObject(SerializedProperty property, FieldInfo info, object parent)
+        {
+            if (property.propertyType != SerializedPropertyType.Generic)
+            {
+                return property.objectReferenceValue;
+            }
+
+            object serObjectValue = SerializedUtils.GetValue(property, info, parent);
+            if (serObjectValue is IWrapProp wrapProp)
+            {
+                return (Object)Util.GetWrapValue(wrapProp);
+            }
+
+            return null;
+        }
+
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
@@ -271,19 +293,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
             Object curObject = (Object) propsElement.userData;
 
-            Object serObject = null;
-            if (property.propertyType == SerializedPropertyType.Generic)
-            {
-                object serObjectValue = SerializedUtils.GetValue(property, info, parent);
-                if (serObjectValue is IWrapProp wrapProp)
-                {
-                    serObject = (Object)Util.GetWrapValue(wrapProp);
-                }
-            }
-            else
-            {
-                serObject = property.objectReferenceValue;
-            }
+            Object serObject = GetSerObject(property, info, parent);
 
             if (ReferenceEquals(serObject, curObject))
             {

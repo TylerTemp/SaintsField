@@ -117,7 +117,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            string error = MismatchError(property);
+            string error = MismatchError(property, info, parent);
             if (error != null)
             {
                 return 0;
@@ -129,13 +129,13 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            string error = MismatchError(property);
+            string error = MismatchError(property, info, parent);
             if (error != null)
             {
                 return position;
             }
 
-            return Draw(position, property, saintsAttribute);
+            return Draw(position, property, saintsAttribute, info, parent);
         }
 
 
@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent)
         {
-            if (MismatchError(property) != null)
+            if (MismatchError(property, info, parent) != null)
             {
                 return true;
             }
@@ -154,7 +154,7 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            string error = MismatchError(property);
+            string error = MismatchError(property, info, parent);
             if (error != null)
             {
                 return ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -166,13 +166,13 @@ namespace SaintsField.Editor.Drawers
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            string error = MismatchError(property);
+            string error = MismatchError(property, info, parent);
             if (error != null)
             {
                 return ImGuiHelpBox.Draw(position, error, MessageType.Error);
             }
 
-            return Draw(position, property, saintsAttribute);
+            return Draw(position, property, saintsAttribute, info, parent);
         }
 
         private float GetExtraHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Drawers
             return result;
         }
 
-        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute)
+        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
             // int maxWidth = assetPreviewAttribute.Width;
@@ -228,7 +228,7 @@ namespace SaintsField.Editor.Drawers
                 return position;
             }
 
-            Texture2D previewTexture = GetPreview(property.objectReferenceValue);
+            Texture2D previewTexture = GetPreview(GetCurObject(property, info, parent));
 
             if (previewTexture == null || previewTexture.width == 1)
             {
@@ -292,16 +292,35 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
-        private static string MismatchError(SerializedProperty property)
+        private static string MismatchError(SerializedProperty property, FieldInfo info, object parent)
         {
-            if (property.propertyType != SerializedPropertyType.ObjectReference)
-            {
-                return $"Expect string or int, get {property.propertyType}";
-            }
-            return property.objectReferenceValue == null
+            // if (property.propertyType != SerializedPropertyType.ObjectReference)
+            // {
+            //     return $"Expect string or int, get {property.propertyType}";
+            // }
+            return GetCurObject(property, info, parent) == null
                 ? "field is null"
                 : null;
         }
+
+        private static Object GetCurObject(SerializedProperty property, FieldInfo info, object parent)
+        {
+            // Object curObject = null;
+            if (property.propertyType != SerializedPropertyType.Generic)
+            {
+                return property.objectReferenceValue;
+            }
+
+            object serValue = SerializedUtils.GetValue(property, info, parent);
+            // Debug.Log(getResult);
+            if (serValue is IWrapProp wrapProp)
+            {
+                return Util.GetWrapValue(wrapProp) as Object;
+            }
+
+            return null;
+        }
+
 
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
@@ -354,23 +373,6 @@ namespace SaintsField.Editor.Drawers
             // ReSharper enable InconsistentNaming
         }
 
-        private static Object GetCurObject(SerializedProperty property, FieldInfo info, object parent)
-        {
-            // Object curObject = null;
-            if (property.propertyType != SerializedPropertyType.Generic)
-            {
-                return property.objectReferenceValue;
-            }
-
-            object serValue = SerializedUtils.GetValue(property, info, parent);
-            // Debug.Log(getResult);
-            if (serValue is IWrapProp wrapProp)
-            {
-                return Util.GetWrapValue(wrapProp) as Object;
-            }
-
-            return null;
-        }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
