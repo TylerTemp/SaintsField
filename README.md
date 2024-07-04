@@ -72,7 +72,7 @@ Value Comparison for Show/Hide/Enable/Disable-If
 
 Now the string can have `!` prefix to negate the comparison.
 
-And `==`, `!=`, `>` etc. suffix for more comparison you want. The suffix supports:
+And `==`, `!=`, `>` etc. suffix for more comparison you want.
 
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).

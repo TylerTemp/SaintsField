@@ -4,7 +4,7 @@ Value Comparison for Show/Hide/Enable/Disable-If
 
 Now the string can have `!` prefix to negate the comparison.
 
-And `==`, `!=`, `>` etc. suffix for more comparison you want. The suffix supports:
+And `==`, `!=`, `>` etc. suffix for more comparison you want.
 
 ## 3.1.2
 
