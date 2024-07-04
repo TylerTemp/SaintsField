@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
                 return ("", false);
             }
 
-            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.Callbacks, targetAttribute.EnumTargets, property, info, target);
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);
 
             if (errors.Count > 0)
             {

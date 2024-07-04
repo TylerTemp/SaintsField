@@ -232,18 +232,20 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            List<bool> callbackTruly = new List<bool>();
-            List<string> errors = new List<string>();
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(preCheckInternalInfo.ConditionInfos, null, null, preCheckInternalInfo.Target);
 
-            foreach (string callback in preCheckInternalInfo.Callbacks)
-            {
-                (string error, bool isTruly) = Util.GetTruly(preCheckInternalInfo.Target, callback);
-                if (error != "")
-                {
-                    errors.Add(error);
-                }
-                callbackTruly.Add(isTruly);
-            }
+            // List<bool> callbackTruly = new List<bool>();
+            // List<string> errors = new List<string>();
+
+            // foreach (string callback in preCheckInternalInfo.Callbacks)
+            // {
+            //     (string error, bool isTruly) = Util.GetTruly(preCheckInternalInfo.Target, callback);
+            //     if (error != "")
+            //     {
+            //         errors.Add(error);
+            //     }
+            //     callbackTruly.Add(isTruly);
+            // }
 
             if (errors.Count > 0)
             {
@@ -253,7 +255,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             preCheckInternalInfo.errors = Array.Empty<string>();
-            preCheckInternalInfo.boolResults = callbackTruly;
+            preCheckInternalInfo.boolResults = boolResults;
         }
 
         private static string ParseRichLabelXml(SaintsFieldWithInfo fieldWithInfo, string richTextXml)

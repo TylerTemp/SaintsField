@@ -431,13 +431,13 @@ namespace SaintsField.Editor.Utils
             return (error, defaultValue);
         }
 
-        public static (string error, bool isTruly) GetTruly(object target, string by)
-        {
-            (string error, object value) = GetOfNoParams<object>(target, by, null);
-            return error != ""
-                ? (error, false)
-                : ("", ReflectUtils.Truly(value));
-        }
+        // public static (string error, bool isTruly) GetTruly(object target, string by)
+        // {
+        //     (string error, object value) = GetOfNoParams<object>(target, by, null);
+        //     return error != ""
+        //         ? (error, false)
+        //         : ("", ReflectUtils.Truly(value));
+        // }
 
         public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
         {
@@ -468,19 +468,28 @@ namespace SaintsField.Editor.Utils
                     {
                         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
-                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                        object rawValue = fieldInfo.GetValue(target);
-                        object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                            ? new[]
-                            {
-                                curValue,
-                            }
-                            : new []
-                            {
-                                curValue,
-                                arrayIndex,
-                            });
+                        object[] passParams;
+                        if (property == null)
+                        {
+                            passParams = Array.Empty<object>();
+                        }
+                        else
+                        {
+                            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                            object rawValue = fieldInfo.GetValue(target);
+                            object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                            passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                                ? new[]
+                                {
+                                    curValue,
+                                }
+                                : new []
+                                {
+                                    curValue,
+                                    arrayIndex,
+                                });
+
+                        }
 
                         try
                         {
