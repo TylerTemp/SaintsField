@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace SaintsField.Condition
 {
@@ -15,122 +16,175 @@ namespace SaintsField.Condition
                 if (skipNext)
                 {
                     skipNext = false;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
+                    Debug.Log($"#Condition# Skip {rawConditions[index]}");
+#endif
                     continue;
                 }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
+                Debug.Log($"#Condition# Get {rawConditions[index]}");
+#endif
+
                 string rawCondition = (string)rawConditions[index];
 
+
                 bool reverse = false;
+                object value = null;
 
                 if(rawCondition.StartsWith("!"))
                 {
                     reverse = true;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
+                    Debug.Log($"#Condition# {rawCondition} is reverse");
+#endif
                     rawCondition = rawCondition.Substring(1);
                 }
                 else if (rawCondition.StartsWith("$"))
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
+                    Debug.Log($"#Condition# {rawCondition} remove !");
+#endif
                     rawCondition = rawCondition.Substring(1);
                 }
 
                 LogicCompare logicCompare = LogicCompare.Truly;
-                object value = null;
                 bool valueIsCallback = false;
-                if (rawCondition.EndsWith("=="))
+
+                // bits
+                if (rawCondition.EndsWith("&"))
                 {
-                    logicCompare = LogicCompare.Equal;
-                    value = rawConditions[index + 1];
-                }
-                else if (rawCondition.EndsWith("==$"))
-                {
-                    logicCompare = LogicCompare.Equal;
-                    value = rawConditions[index + 1];
-                    valueIsCallback = true;
-                }
-                else if (rawCondition.EndsWith("!="))
-                {
-                    logicCompare = LogicCompare.NotEqual;
-                    value = rawConditions[index + 1];
-                }
-                else if (rawCondition.EndsWith("!=$"))
-                {
-                    logicCompare = LogicCompare.NotEqual;
-                    value = rawConditions[index + 1];
-                    valueIsCallback = true;
-                }
-                else if (rawCondition.EndsWith(">"))
-                {
-                    logicCompare = LogicCompare.GreaterThan;
-                    value = rawConditions[index + 1];
-                }
-                else if (rawCondition.EndsWith(">$"))
-                {
-                    logicCompare = LogicCompare.GreaterThan;
-                    value = rawConditions[index + 1];
-                    valueIsCallback = true;
-                }
-                else if (rawCondition.EndsWith(">="))
-                {
-                    logicCompare = LogicCompare.GreaterEqual;
-                    value = rawConditions[index + 1];
-                }
-                else if (rawCondition.EndsWith(">=$"))
-                {
-                    logicCompare = LogicCompare.GreaterEqual;
-                    value = rawConditions[index + 1];
-                    valueIsCallback = true;
-                }
-                else if(rawCondition.EndsWith("<"))
-                {
-                    logicCompare = LogicCompare.LessThan;
-                    value = rawConditions[index + 1];
-                }
-                else if (rawCondition.EndsWith("<$"))
-                {
-                    logicCompare = LogicCompare.LessThan;
-                    value = rawConditions[index + 1];
-                    valueIsCallback = true;
-                }
-                else if (rawCondition.EndsWith("<="))
-                {
-                    logicCompare = LogicCompare.LessEqual;
-                    value = rawConditions[index + 1];
-                }
-                else if (rawCondition.EndsWith("<=$"))
-                {
-                    logicCompare = LogicCompare.LessEqual;
-                    value = rawConditions[index + 1];
-                    valueIsCallback = true;
-                }
-                else if (rawCondition.EndsWith("&&"))
-                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
                     logicCompare = LogicCompare.BitAnd;
                     value = rawConditions[index + 1];
                 }
-                else if (rawCondition.EndsWith("&&$"))
+                else if (rawCondition.EndsWith("&$"))
                 {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.BitAnd;
                     value = rawConditions[index + 1];
                     valueIsCallback = true;
                 }
                 else if (rawCondition.EndsWith("^"))
                 {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
                     logicCompare = LogicCompare.BitXor;
                     value = rawConditions[index + 1];
                 }
                 else if (rawCondition.EndsWith("^$"))
                 {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.BitXor;
                     value = rawConditions[index + 1];
                     valueIsCallback = true;
                 }
                 else if (rawCondition.EndsWith("&=="))
                 {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
                     logicCompare = LogicCompare.BitHasFlag;
                     value = rawConditions[index + 1];
                 }
                 else if (rawCondition.EndsWith("&==$"))
                 {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 4);
                     logicCompare = LogicCompare.BitHasFlag;
+                    value = rawConditions[index + 1];
+                    valueIsCallback = true;
+                }
+                // compares
+                else if (rawCondition.EndsWith("=="))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
+                    logicCompare = LogicCompare.Equal;
+                    value = rawConditions[index + 1];
+                }
+                else if (rawCondition.EndsWith("==$"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
+                    logicCompare = LogicCompare.Equal;
+                    value = rawConditions[index + 1];
+                    valueIsCallback = true;
+                }
+                else if (rawCondition.EndsWith("!="))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
+                    logicCompare = LogicCompare.NotEqual;
+                    value = rawConditions[index + 1];
+                }
+                else if (rawCondition.EndsWith("!=$"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
+                    logicCompare = LogicCompare.NotEqual;
+                    value = rawConditions[index + 1];
+                    valueIsCallback = true;
+                }
+                else if (rawCondition.EndsWith(">"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
+                    logicCompare = LogicCompare.GreaterThan;
+                    value = rawConditions[index + 1];
+                }
+                else if (rawCondition.EndsWith(">$"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
+                    logicCompare = LogicCompare.GreaterThan;
+                    value = rawConditions[index + 1];
+                    valueIsCallback = true;
+                }
+                else if (rawCondition.EndsWith(">="))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
+                    logicCompare = LogicCompare.GreaterEqual;
+                    value = rawConditions[index + 1];
+                }
+                else if (rawCondition.EndsWith(">=$"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
+                    logicCompare = LogicCompare.GreaterEqual;
+                    value = rawConditions[index + 1];
+                    valueIsCallback = true;
+                }
+                else if(rawCondition.EndsWith("<"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
+                    logicCompare = LogicCompare.LessThan;
+                    value = rawConditions[index + 1];
+                }
+                else if (rawCondition.EndsWith("<$"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
+                    logicCompare = LogicCompare.LessThan;
+                    value = rawConditions[index + 1];
+                    valueIsCallback = true;
+                }
+                else if (rawCondition.EndsWith("<="))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
+                    logicCompare = LogicCompare.LessEqual;
+                    value = rawConditions[index + 1];
+                }
+                else if (rawCondition.EndsWith("<=$"))
+                {
+                    skipNext = true;
+                    rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
+                    logicCompare = LogicCompare.LessEqual;
                     value = rawConditions[index + 1];
                     valueIsCallback = true;
                 }
@@ -146,20 +200,22 @@ namespace SaintsField.Condition
                                 break;
                             case Enum enumValue:
                             {
+                                skipNext = true;
+
                                 bool isFlag = enumValue.GetType().GetCustomAttribute<FlagsAttribute>() != null;
                                 logicCompare = isFlag
                                     ? LogicCompare.BitHasFlag
                                     : LogicCompare.Equal;
 
                                 value = enumValue;
-                                skipNext = true;
                             }
                                 break;
                             default:
                             {
+                                skipNext = true;
+
                                 value = nextValue;
                                 logicCompare = LogicCompare.Equal;
-                                skipNext = true;
                             }
                                 break;
                         }

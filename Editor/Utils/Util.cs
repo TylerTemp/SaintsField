@@ -686,50 +686,66 @@ namespace SaintsField.Editor.Utils
                 if (error != "")
                 {
                     errors.Add(error);
+                    continue;
                 }
-                else
+
+                object value = conditionInfo.Value;
+                if (conditionInfo.ValueIsCallback)
                 {
-                    bool boolResult;
-                    switch (conditionInfo.Compare)
+                    Debug.Assert(value is string, $"value {value} of target {conditionInfo.Target} is not a string as a callback name");
+                    (string errorValue, object callbackResult) = GetOf<object>((string)value, null, property, info, target);
+                    if (errorValue != "")
                     {
-                        case LogicCompare.Truly:
-                            boolResult = ReflectUtils.Truly(result);
-                            break;
-                        case LogicCompare.Equal:
-                            boolResult = GetIsEqual(result, conditionInfo.Value);
-                            break;
-                        case LogicCompare.NotEqual:
-                            boolResult = !GetIsEqual(result, conditionInfo.Value);
-                            break;
-                        case LogicCompare.GreaterThan:
-                            boolResult = ((IComparable)result).CompareTo((IComparable)conditionInfo.Value) > 0;
-                            break;
-                        case LogicCompare.LessThan:
-                            boolResult = ((IComparable)result).CompareTo((IComparable)conditionInfo.Value) < 0;
-                            break;
-                        case LogicCompare.GreaterEqual:
-                            boolResult = ((IComparable)result).CompareTo((IComparable)conditionInfo.Value) >= 0;
-                            break;
-                        case LogicCompare.LessEqual:
-                            boolResult = ((IComparable)result).CompareTo((IComparable)conditionInfo.Value) <= 0;
-                            break;
-                        case LogicCompare.BitAnd:
-                            boolResult = ((int)result & (int)conditionInfo.Value) != 0;
-                            break;
-                        case LogicCompare.BitXor:
-                            boolResult = ((int)result ^ (int)conditionInfo.Value) != 0;
-                            break;
-                        case LogicCompare.BitHasFlag:
-                        {
-                            int valueInt = (int)conditionInfo.Value;
-                            boolResult = ((int)result & valueInt) == valueInt;
-                        }
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(conditionInfo.Compare), conditionInfo.Compare, null);
+                        errors.Add(errorValue);
+                        continue;
                     }
-                    callbackBoolResults.Add(conditionInfo.Reverse ? !boolResult : boolResult);
+
+                    value = callbackResult;
                 }
+
+                bool boolResult;
+                switch (conditionInfo.Compare)
+                {
+                    case LogicCompare.Truly:
+                        boolResult = ReflectUtils.Truly(result);
+                        break;
+                    case LogicCompare.Equal:
+                        boolResult = GetIsEqual(result, value);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
+                        Debug.Log($"#Condition# {result} == {value} = {boolResult}");
+#endif
+                        break;
+                    case LogicCompare.NotEqual:
+                        boolResult = !GetIsEqual(result, value);
+                        break;
+                    case LogicCompare.GreaterThan:
+                        boolResult = ((IComparable)result).CompareTo((IComparable)value) > 0;
+                        break;
+                    case LogicCompare.LessThan:
+                        boolResult = ((IComparable)result).CompareTo((IComparable)value) < 0;
+                        break;
+                    case LogicCompare.GreaterEqual:
+                        boolResult = ((IComparable)result).CompareTo((IComparable)value) >= 0;
+                        break;
+                    case LogicCompare.LessEqual:
+                        boolResult = ((IComparable)result).CompareTo((IComparable)value) <= 0;
+                        break;
+                    case LogicCompare.BitAnd:
+                        boolResult = ((int)result & (int)value) != 0;
+                        break;
+                    case LogicCompare.BitXor:
+                        boolResult = ((int)result ^ (int)value) != 0;
+                        break;
+                    case LogicCompare.BitHasFlag:
+                    {
+                        int valueInt = (int)value;
+                        boolResult = ((int)result & valueInt) == valueInt;
+                    }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(conditionInfo.Compare), conditionInfo.Compare, null);
+                }
+                callbackBoolResults.Add(conditionInfo.Reverse ? !boolResult : boolResult);
             }
 
             if (errors.Count > 0)

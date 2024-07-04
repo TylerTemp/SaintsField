@@ -13,6 +13,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [PlayaDisableIf(nameof(boolValue))] public int[] disableIf;
         [PlayaEnableIf(nameof(boolValue))] public int[] enableIf;
 
+        [PlayaDisableIf("!" + nameof(boolValue))] public int[] NDisableIf;
+        [PlayaEnableIf("!" + nameof(boolValue))] public int[] NEnableIf;
+
         [PlayaDisableIf(EMode.Edit)] public int[] disableEdit;
         [PlayaDisableIf(EMode.Play)] public int[] disablePlay;
         [PlayaEnableIf(EMode.Edit)] public int[] enableEdit;

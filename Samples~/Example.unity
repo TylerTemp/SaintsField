@@ -9873,6 +9873,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -12773,6 +12774,7 @@ Transform:
   - {fileID: 225299352}
   - {fileID: 1873355719}
   - {fileID: 1971046386}
+  - {fileID: 1702734601}
   m_Father: {fileID: 0}
   m_RootOrder: 35
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -13962,6 +13964,90 @@ MonoBehaviour:
       myStrings:
       - My4Element0
     below: 
+--- !u!1 &1702734600
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1702734601}
+  - component: {fileID: 1702734602}
+  m_Layer: 0
+  m_Name: Issue40
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1702734601
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702734600}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1702734602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702734600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a8e12723a159f546a8e479aed485977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  int01: 1
+  int01Enable1: 
+  int01EnableGt1: 
+  int01EnableGe1: 
+  int01EnableLt1: 
+  int01EnableLe1: 
+  int01EnableNE1: 
+  int01EnableN1: 
+  int01EnableNGt1: 
+  int01EnableNGe1: 
+  int01EnableNLt1: 
+  int01EnableNLe1: 
+  int01EnableNNE1: 
+  int02: 0
+  int01Enable1Callback: 
+  int01EnableGt1Callback: 
+  int01EnableGe1Callback: 
+  int01EnableLt1Callback: 
+  int01EnableLe1Callback: 
+  int01EnableNE1Callback: 
+  int01EnableN1Callback: 
+  int01EnableNGt1Callback: 
+  int01EnableNGe1Callback: 
+  int01EnableNLt1Callback: 
+  int01EnableNLe1Callback: 
+  int01EnableNNE1Callback: 
+  boolValue: 1
+  boolValueEnable: 
+  boolValueEnableN: 
+  enumF: 0
+  enumFEnableA: 
+  enumFEnableB: 
+  enumFEnableAB: 
+  onOff: 2
+  onOffEnableOn: 
+  onOffEnableOff: 
+  enumOnOffBits: 0
+  bitA: 
+  bitB: 
+  hasFlagB: 
 --- !u!1 &1730412120
 GameObject:
   m_ObjectHideFlags: 0
