@@ -22,9 +22,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue40
         [EnableIf("!" + nameof(int01) + "<=", 1), RichLabel("! <=1")] public string int01EnableNLe1;
         [EnableIf("!" + nameof(int01) + "!=", 1), RichLabel("! !=1")] public string int01EnableNNE1;
 
+        [Space]
         [Range(0, 2)] public int int02;
 
-        [Space]
         [EnableIf(nameof(int01) + "==$", nameof(int02)), RichLabel("==$")] public string int01Enable1Callback;
         [EnableIf(nameof(int01) + ">$", nameof(int02)), RichLabel(">$")] public string int01EnableGt1Callback;
         [EnableIf(nameof(int01) + ">=$", nameof(int02)), RichLabel(">=$")] public string int01EnableGe1Callback;

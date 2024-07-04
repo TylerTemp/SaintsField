@@ -1555,7 +1555,7 @@ For callback (functions, fields, properties):
 
     Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
 
-*   `string by...`
+*   `object by...`
 
     callbacks or attributes for the condition.
 
@@ -1586,7 +1586,7 @@ private bool ShouldBeDisabled  // change the logic here
 }
 ```
 
-It also support `enum` types. The syntax is like this:
+It also supports `enum` types. The syntax is like this:
 
 ```csharp
 using SaintsField;
@@ -1601,15 +1601,7 @@ public EnumToggle enum1;
 [ReadOnly(nameof(enum1), EnumToggle.On)] public string enumReadOnly;
 ```
 
-The rule is:
-
-1.  First optional parameter is `EMode editorMode=EMode.Edit | EMode.Play`. Omit to ignore the mode check.
-2.  Then, followed by the name of the field/property/function, and the expected `enum` value, as a pair. You can at most write 4 pairs.
-3.  It's true if the value of the field/property/function is equal to the expected value. If `enum` has `[Flags]` attribute, it will check if the value has the expected bit on.
-4.  It's also OK to mix the normal callback with enum callback check, just ensure:
-
-    1.  the normal callbacks are always before the enum callbacks
-    2.  at most 4 callbacks (normal + enum pair) in total is allowed
+A more complex example:
 
 ```csharp
 using SaintsField;
@@ -1632,7 +1624,7 @@ public bool bool2 {
 [EnableIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
 ```
 
-A more complex example:
+A more complex example about logic operation:
 
 ```csharp
 using SaintsField;
@@ -1687,6 +1679,8 @@ public bool boolVal;
 [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
 ```
 
+It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+
 #### `ShowIf` / `HideIf` ####
 
 Show or hide the field based on a condition. . Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
@@ -1697,7 +1691,7 @@ Arguments:
 
     Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
 
-*   `string by...`
+*   `object by...`
 
     callbacks or attributes for the condition.
 
@@ -1733,7 +1727,7 @@ public bool ShouldShow()  // change the logic here
 }
 ```
 
-It also support `enum` types. The syntax is like this:
+It also supports `enum` types. The syntax is like this:
 
 ```csharp
 using SaintsField;
@@ -1748,15 +1742,7 @@ public EnumToggle enum1;
 [ShowIf(nameof(enum1), EnumToggle.On)] public string enum1Show;
 ```
 
-The rule is:
-
-1.  First optional parameter is `EMode editorMode=EMode.Edit | EMode.Play`. Omit to ignore the mode check.
-2.  Then, followed by the name of the field/property/function, and the expected `enum` value, as a pair. You can at most write 4 pairs.
-3.  It's true if the value of the field/property/function is equal to the expected value. If `enum` has `[Flags]` attribute, it will check if the value has the expected bit on.
-4.  It's also OK to mix the normal callback with enum callback check, just ensure:
-
-    1.  the normal callbacks are always before the enum callbacks
-    2.  at most 4 callbacks (normal + enum pair) in total is allowed
+A more complex example:
 
 ```csharp
 using SaintsField;
@@ -1779,7 +1765,7 @@ public bool bool2 {
 [ShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
 ```
 
-A more complex example:
+A more complex example about logic operation:
 
 ```csharp
 using SaintsField;
@@ -1846,6 +1832,9 @@ public bool boolValue;
 [HideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
 [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
 ```
+
+It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+
 
 #### `Required` ####
 
@@ -3199,6 +3188,8 @@ public bool boolValue;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
 
+It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+
 ### `PlayaEnableIf`/`PlayaDisableIf` ###
 
 This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
@@ -3231,6 +3222,8 @@ using SaintsField.Playa;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
+
+It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
 
 ### `PlayaArraySize` ###
 
@@ -3398,9 +3391,140 @@ The first input is where you can search. The next input can adjust how many item
 
 group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
 
-This only works for decorator draws above or below the field. The above drawer will not grouped with the below drawer, and vice versa.
+This only works for decorator draws above or below the field. The above drawer will not groupd with the below drawer, and vice versa.
 
 `""` means no group.
+
+## Value Comparison for Show/Hide/Enable/Disable-If ##
+
+
+This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
+
+These decorators accept many objects.
+
+**By Default**
+
+Passing many strings, each string is represent either a field, property or a method. SaintsField will check the value accordingly. If it's a method, it'll also receive the field's value and index if it's inside an array/list.
+
+**Value Equality**
+
+You can also pass a string, then followed by a value you want to compare with. For example:
+
+```csharp
+using SaintsField;
+
+public int myInt;
+
+[EnableIf(nameof(myInt), 2] public int enableIfEquals2;
+```
+
+This field will only be enabled if the `myInt` is equal to `2`.
+
+This can be mixed with many pairs:
+
+```csharp
+using SaintsField;
+
+public int myInt1;
+public int myInt2;
+
+[EnableIf(nameof(myInt1), 2, nameof(myInt2), 3] public int enableIfMultipleCondition;
+```
+
+multiple conditions are logically chained accordingly. See each section of these decorators for more information.
+
+**Value Comparison**
+
+The string can have `!` prefix to negate the comparison. 
+
+And `==`, `!=`, `>` etc. suffix for more comparison you want. The suffix supports:
+
+Comparison Suffixes:
+
+*  `==`: equal to the next parameter
+*  `==$`: equal, but the value is a callback by the next parameter
+*  `!=`: not equal to the next parameter
+*  `>`: greater than the next parameter
+*  `>$`: greater than, but the value is a callback by the next parameter
+*  `<`: less than the next parameter
+*  `<$`: less than, but the value is a callback by the next parameter
+*  `>=`: greater or equal to the next parameter
+*  `>=$`: greater or equal, but the value is a callback by the next parameter
+*  `<=`: less or equal to the next parameter
+*  `<=$`: less or equal, but the value is a callback by the next parameter
+
+Bitwise Suffixes:
+
+*  `&`: bitwise and with the next parameter
+*  `&$`: bitwise and, but the value is a callback by the next parameter
+*  `^`: bitwise xor with the next parameter
+*  `^$`: bitwise xor, but the value is a callback by the next parameter
+*  `&==`: bitwise has flag of the next parameter
+*  `&==$`: bitwise has flag, but the value is a callback by the next parameter
+
+Some examples:
+
+```csharp
+using SaintsField;
+
+public bool boolValue;
+[EnableIf("!" + nameof(boolValue)), RichLabel("Reverse!")] public string boolValueEnableN;
+
+[Range(0, 2)] public int int01;
+
+[EnableIf(nameof(int01), 1), RichLabel("default")] public string int01Enable1;
+[EnableIf(nameof(int01) + ">=", 1), RichLabel(">=1")] public string int01EnableGe1;
+[EnableIf("!" + nameof(int01) + "<=", 1), RichLabel("! <=1")] public string int01EnableNLe1;
+
+[Range(0, 2)] public int int02;
+// we need the "==$" to tell the next string is a value callback, not a condition checker
+[EnableIf(nameof(int01) + "==$", nameof(int02)), RichLabel("==$")] public string int01Enable1Callback;
+[EnableIf(nameof(int01) + "<$", nameof(int02)), RichLabel("<$")] public string int01EnableLt1Callback;
+[EnableIf("!" + nameof(int01) + ">$", nameof(int02)), RichLabel("! >$")] public string int01EnableNGt1Callback;
+
+// example of bitwise
+[Serializable]
+public enum EnumOnOff
+{
+    A = 1,
+    B = 1 << 1,
+}
+
+[Space]
+[Range(0, 3)] public int enumOnOffBits;
+
+[EnableIf(nameof(enumOnOffBits) + "&", EnumOnOff.A), RichLabel("&01")] public string bitA;
+[EnableIf(nameof(enumOnOffBits) + "^", EnumOnOff.B), RichLabel("^10")] public string bitB;
+[EnableIf(nameof(enumOnOffBits) + "&==", EnumOnOff.B), RichLabel("hasFlag(B)")] public string hasFlagB;
+```
+
+**Default Value Comparison**
+
+When passing the parameters, any parameter that is not a string, means it's a value comparison to the previous one.
+
+(Which also means, to compare with a literal string value, you need to suffix the previous string with `==`)
+
+`[ShowIf(nameof(MyFunc), 3)]` means it will check if the result of `MyFunc` equals to `3`.
+
+However, if the later parameter is a bitMask (an enum with `[Flags]`), it'll check if the target has the required bit on:
+
+```csharp
+using SaintsField;
+
+[Flags, Serializable]
+public enum EnumF
+{
+    A = 1,
+    B = 1 << 1,
+}
+
+[EnumFlags]
+public EnumF enumF;
+
+[EnableIf(nameof(enumF), EnumF.A), RichLabel("hasFlag(A)")] public string enumFEnableA;
+[EnableIf(nameof(enumF), EnumF.B), RichLabel("hasFlag(B)")] public string enumFEnableB;
+[EnableIf(nameof(enumF), EnumF.A | EnumF.B), RichLabel("hasFlag(A | B)")] public string enumFEnableAB;
+```
 
 ## Add a Macro ##
 
