@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using SaintsField.Condition;
 
 namespace SaintsField.Playa
 {
@@ -8,17 +11,17 @@ namespace SaintsField.Playa
     public class PlayaShowIfAttribute: Attribute, IPlayaAttribute
     {
         // ReSharper disable InconsistentNaming
-        public readonly string[] Callbacks;
+        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
         public readonly EMode EditorMode;
         // ReSharper enable InconsistentNaming
 
-        public PlayaShowIfAttribute(EMode editorMode, params string[] andCallbacks)
+        public PlayaShowIfAttribute(EMode editorMode, params object[] andCallbacks)
         {
             EditorMode = editorMode;
-            Callbacks = andCallbacks;
+            ConditionInfos = Parser.Parse(andCallbacks).ToArray();
         }
 
-        public PlayaShowIfAttribute(params string[] andCallbacks): this(EMode.Edit | EMode.Play, andCallbacks)
+        public PlayaShowIfAttribute(params object[] andCallbacks): this(EMode.Edit | EMode.Play, andCallbacks)
         {
         }
     }

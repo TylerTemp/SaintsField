@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
                 return ("", false);
             }
 
-            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(hideIfAttribute.Callbacks, hideIfAttribute.EnumTargets, property, info, target);
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(hideIfAttribute.ConditionInfos, property, info, target);
 
             if (errors.Count > 0)
             {

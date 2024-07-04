@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Condition;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -48,7 +49,7 @@ namespace SaintsField.Editor.Playa.Renderer
         private class PreCheckInternalInfo
         {
             public PreCheckInternalType Type;
-            public string[] Callbacks;
+            public IReadOnlyList<ConditionInfo> ConditionInfos;
             public EMode EditorMode;
             public object Target;
 
@@ -69,7 +70,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
                             Type = PreCheckInternalType.Hide,
-                            Callbacks = hideIfAttribute.Callbacks,
+                            ConditionInfos = hideIfAttribute.ConditionInfos,
                             EditorMode = hideIfAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
@@ -78,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
                             Type = PreCheckInternalType.Show,
-                            Callbacks = showIfAttribute.Callbacks,
+                            ConditionInfos = showIfAttribute.ConditionInfos,
                             EditorMode = showIfAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
@@ -87,7 +88,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
                             Type = PreCheckInternalType.Enable,
-                            Callbacks = enableIfAttribute.Callbacks,
+                            ConditionInfos = enableIfAttribute.ConditionInfos,
                             EditorMode = enableIfAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
@@ -96,7 +97,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
                             Type = PreCheckInternalType.Disable,
-                            Callbacks = disableIfAttribute.Callbacks,
+                            ConditionInfos = disableIfAttribute.ConditionInfos,
                             EditorMode = disableIfAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
