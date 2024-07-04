@@ -1,3 +1,11 @@
+## 3.1.3
+
+Value Comparison for Show/Hide/Enable/Disable-If
+
+Now the string can have `!` prefix to negate the comparison.
+
+And `==`, `!=`, `>` etc. suffix for more comparison you want. The suffix supports:
+
 ## 3.1.2
 
 1.  `AssetPreview` now will load the preview of the `gameObject` if the target is a `Component`. Useful when you use a script type to reference a prefab.

@@ -66,14 +66,14 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.1.2**
+**3.1.3**
 
-1.  `AssetPreview` now will load the preview of the `gameObject` if the target is a `Component`. Useful when you use a script type to reference a prefab.
-2.  Fix `SaintsInterface` won't work when T is a super class of ScriptableObject.
-3.  **Breaking Changes**: `ISaintsArray` has been removed, use `IWrapProp` instead.
-4.  Now most decorators can be used on `SaintsArray`, `SaintsList` and `SaintsInterface`.
-5.  Now `Dropdown` and `AdvancedDropdown` supports struct value too.
-6.  Add document for `SaintsArray`, `SaintsRow` about custom drawer.
+Value Comparison for Show/Hide/Enable/Disable-If
+
+Now the string can have `!` prefix to negate the comparison.
+
+And `==`, `!=`, `>` etc. suffix for more comparison you want. The suffix supports:
+
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
