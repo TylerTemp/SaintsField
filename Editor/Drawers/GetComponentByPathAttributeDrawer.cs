@@ -279,28 +279,16 @@ namespace SaintsField.Editor.Drawers
 
                 if (propertyValue is IWrapProp wrapProp)
                 {
-                    Type mostBaseType = SaintsInterfaceDrawer.GetMostBaseType(wrapProp.GetType());
-                    if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
-                    {
-                        IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
-                        if (genericArguments.Count == 2)
-                        {
-                            interfaceType = genericArguments[1];
-                        }
-                    }
-                    targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
-                                     SerializedUtils.FindPropertyByAutoPropertyName(property,
-                                         wrapProp.EditorPropertyName);
+                    Util.SaintsInterfaceInfo saintsInterfaceInfo = Util.GetSaintsInterfaceInfo(property, wrapProp);
 
-                    if(targetProperty == null)
+                    if(saintsInterfaceInfo.Error != "")
                     {
-                        return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", targetProperty, fieldType, null);
+                        return (saintsInterfaceInfo.Error, targetProperty, fieldType, null);
                     }
 
-                    SerializedUtils.FieldOrProp wrapFieldOrProp = Util.GetWrapProp(wrapProp);
-                    fieldType = wrapFieldOrProp.IsField
-                        ? wrapFieldOrProp.FieldInfo.FieldType
-                        : wrapFieldOrProp.PropertyInfo.PropertyType;
+                    fieldType = saintsInterfaceInfo.FieldType;
+                    targetProperty = saintsInterfaceInfo.TargetProperty;
+                    interfaceType = saintsInterfaceInfo.InterfaceType;
 
                     if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
                     {

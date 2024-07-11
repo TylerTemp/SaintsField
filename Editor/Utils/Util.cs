@@ -848,5 +848,73 @@ namespace SaintsField.Editor.Utils
                     return;
             }
         }
+
+        public static Type GetMostBaseType(Type type)
+        {
+            Type lastType = type;
+            while (true)
+            {
+                Type baseType = lastType.BaseType;
+                if (baseType == null)
+                {
+                    return lastType;
+                }
+
+                if (!baseType.IsGenericType)
+                {
+                    return lastType;
+                }
+
+                lastType = baseType;
+            }
+        }
+
+        public struct SaintsInterfaceInfo
+        {
+            public string Error;
+            public Type InterfaceType;
+            public Type FieldType;
+            public SerializedProperty TargetProperty;
+        }
+
+        public static SaintsInterfaceInfo GetSaintsInterfaceInfo(SerializedProperty property, IWrapProp wrapProp)
+        {
+            Type interfaceType = null;
+            Type fieldType = wrapProp.GetType();
+
+            Type mostBaseType = GetMostBaseType(fieldType);
+            if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+            {
+                IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                if (genericArguments.Count == 2)
+                {
+                    interfaceType = genericArguments[1];
+                }
+            }
+            SerializedProperty targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
+                             SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                 wrapProp.EditorPropertyName);
+
+            if(targetProperty == null)
+            {
+                return new SaintsInterfaceInfo
+                {
+                    Error = $"{wrapProp.EditorPropertyName} not found in {property.propertyPath}",
+                };
+            }
+
+            SerializedUtils.FieldOrProp wrapFieldOrProp = GetWrapProp(wrapProp);
+            fieldType = wrapFieldOrProp.IsField
+                ? wrapFieldOrProp.FieldInfo.FieldType
+                : wrapFieldOrProp.PropertyInfo.PropertyType;
+
+            return new SaintsInterfaceInfo
+            {
+                Error = "",
+                InterfaceType = interfaceType,
+                FieldType = fieldType,
+                TargetProperty = targetProperty,
+            };
+        }
     }
 }

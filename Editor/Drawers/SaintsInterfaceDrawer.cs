@@ -224,7 +224,7 @@ namespace SaintsField.Editor.Drawers
                                                    _imGuiPropInfo.EditorPropertyName);
 
                 Type interfaceContainer = fieldInfo.FieldType;
-                Type mostBaseType = GetMostBaseType(interfaceContainer);
+                Type mostBaseType = Util.GetMostBaseType(interfaceContainer);
                 Debug.Assert(mostBaseType != null, interfaceContainer);
                 Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
                 IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
@@ -276,14 +276,9 @@ namespace SaintsField.Editor.Drawers
                         {
                             (bool match, Object result) = GetSerializedObject(newValue, valueType, interfaceType);
                             // Debug.Log($"newValue={newValue}, match={match}, result={result}");
-                            if (match)
-                            {
-                                valueProp.objectReferenceValue = result;
-                            }
-                            else
-                            {
-                                valueProp.objectReferenceValue = oldValue;
-                            }
+                            valueProp.objectReferenceValue = match
+                                ? result
+                                : oldValue;
                         }
                     }
                 }
@@ -362,7 +357,7 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log(interfaceContainer.BaseType);
             // Debug.Log(interfaceContainer.GetGenericArguments());
             // Debug.Log(interfaceContainer);
-            Type mostBaseType = GetMostBaseType(interfaceContainer);
+            Type mostBaseType = Util.GetMostBaseType(interfaceContainer);
             Debug.Assert(mostBaseType != null, interfaceContainer);
             Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
             IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
@@ -424,25 +419,7 @@ namespace SaintsField.Editor.Drawers
         }
 #endif
 
-        public static Type GetMostBaseType(Type type)
-        {
-            Type lastType = type;
-            while (true)
-            {
-                Type baseType = lastType.BaseType;
-                if (baseType == null)
-                {
-                    return lastType;
-                }
 
-                if (!baseType.IsGenericType)
-                {
-                    return lastType;
-                }
-
-                lastType = baseType;
-            }
-        }
 
     }
 }
