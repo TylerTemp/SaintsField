@@ -1,6 +1,6 @@
 ## 3.1.4
 
-1.  Fix `DisableIf` not work with Value Comparison
+1.  Fix `EnableIf` not work with Value Comparison
 2.  Fix [#42](https://github.com/TylerTemp/SaintsField/issues/42) GetComponent etc need better error handling and report
 3.  Fix callback won't fill null parameter value when the value of the target is null
 

@@ -9021,8 +9021,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getComponentByPathArray:
   - {fileID: 454510170}
+  - {fileID: 454510169}
+  - {fileID: 454510172}
+  - {fileID: 1902718156}
+  - {fileID: 1902718155}
   getComponentByPathList:
   - {fileID: 1902718156}
+  - {fileID: 1902718155}
 --- !u!1 &847311490
 GameObject:
   m_ObjectHideFlags: 0

@@ -254,10 +254,13 @@ namespace SaintsField.Editor.Drawers
             }
 
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            // Debug.Log(indexInArray);
             Object result = indexInArray == -1
                 // ReSharper disable once ArrangeRedundantParentheses
                 ? (results.Count > 0? results[0]: null)
                 : results[indexInArray];
+
+            // Debug.Log(result);
 
             if (error == "" && !ReferenceEquals(targetProperty.objectReferenceValue, result))
             {
@@ -378,9 +381,10 @@ namespace SaintsField.Editor.Drawers
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
             if (indexInArray == 0)
             {
-                if (property.arraySize != results.Length)
+                SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
+                if (arrayProp.arraySize != results.Length)
                 {
-                    property.arraySize = results.Length;
+                    arrayProp.arraySize = results.Length;
                     property.serializedObject.ApplyModifiedProperties();
                 }
             }
