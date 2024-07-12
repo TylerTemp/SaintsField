@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
-    public class GetComponentByPathAttribute: PropertyAttribute, ISaintsAttribute
+    public class GetComponentByPathAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";

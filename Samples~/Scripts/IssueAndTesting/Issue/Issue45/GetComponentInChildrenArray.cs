@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
-using SaintsField.Samples.Scripts;
 using UnityEngine;
 
-namespace SaintsField.Samples.IssueAndTesting.Issue.Issue45
+namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
     public class GetComponentInChildrenArray : MonoBehaviour
     {
@@ -12,6 +12,25 @@ namespace SaintsField.Samples.IssueAndTesting.Issue.Issue45
         private string DummyNumber(Dummy dummy)
         {
             return dummy? $"{dummy.comment}": "";
+        }
+
+        [Serializable]
+        public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
+
+        [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        public GeneralInterface[] getComponentIArray;
+
+        [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
+
+        private string DummyNumberI(GeneralInterface dummyInter)
+        {
+            return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
+        }
+
+        private string DummyNumberG(SaintsInterface<UnityEngine.Object, IDummy> dummyInter)
+        {
+            return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
         }
     }
 }

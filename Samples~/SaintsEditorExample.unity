@@ -536,6 +536,26 @@ MonoBehaviour:
   - {fileID: 1872824171}
   - {fileID: 187152648}
   - {fileID: 187152646}
+  getComponentIArray:
+  - <V>k__BackingField: {fileID: 1704623437}
+  - <V>k__BackingField: {fileID: 1704623436}
+  - <V>k__BackingField: {fileID: 282662869}
+  - <V>k__BackingField: {fileID: 282662868}
+  - <V>k__BackingField: {fileID: 282662863}
+  - <V>k__BackingField: {fileID: 1872824174}
+  - <V>k__BackingField: {fileID: 1872824171}
+  - <V>k__BackingField: {fileID: 187152648}
+  - <V>k__BackingField: {fileID: 187152646}
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 1704623437}
+  - <V>k__BackingField: {fileID: 1704623436}
+  - <V>k__BackingField: {fileID: 282662869}
+  - <V>k__BackingField: {fileID: 282662868}
+  - <V>k__BackingField: {fileID: 282662863}
+  - <V>k__BackingField: {fileID: 1872824174}
+  - <V>k__BackingField: {fileID: 1872824171}
+  - <V>k__BackingField: {fileID: 187152648}
+  - <V>k__BackingField: {fileID: 187152646}
 --- !u!1 &452664842
 GameObject:
   m_ObjectHideFlags: 0
@@ -1155,8 +1175,8 @@ GameObject:
   - component: {fileID: 1704623438}
   - component: {fileID: 1704623437}
   - component: {fileID: 1704623436}
-  - component: {fileID: 1704623435}
-  - component: {fileID: 1704623434}
+  - component: {fileID: 1704623440}
+  - component: {fileID: 1704623439}
   m_Layer: 0
   m_Name: Issue45
   m_TagString: Untagged
@@ -1164,55 +1184,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1704623434
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1704623433}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0c09a6a0b54656428a1457a6364575b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  getComponentByPathArray:
-  - {fileID: 282662869}
-  - {fileID: 282662868}
-  - {fileID: 282662863}
-  - {fileID: 187152648}
-  - {fileID: 187152646}
-  getComponentByPathList:
-  - {fileID: 187152648}
-  - {fileID: 187152646}
---- !u!114 &1704623435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1704623433}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fbb524b8b9189b43b7cadc1645e79fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  getComponentInChildrenArray:
-  - {fileID: 282662869}
-  - {fileID: 282662868}
-  - {fileID: 282662863}
-  - {fileID: 1872824174}
-  - {fileID: 1872824171}
-  - {fileID: 187152648}
-  - {fileID: 187152646}
-  getComponentInChildrenList:
-  - {fileID: 282662869}
-  - {fileID: 282662868}
-  - {fileID: 282662863}
-  - {fileID: 1872824174}
-  - {fileID: 1872824171}
-  - {fileID: 187152648}
-  - {fileID: 187152646}
 --- !u!114 &1704623436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1256,6 +1227,70 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1704623439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704623433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f275480c0dd0af42aabdb2ae8ce1a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getComponentByPathArray:
+  - {fileID: 282662869}
+  - {fileID: 282662868}
+  - {fileID: 282662863}
+  - {fileID: 187152648}
+  - {fileID: 187152646}
+  getComponentByPathList:
+  - {fileID: 187152648}
+  - {fileID: 187152646}
+  getComponentIArray:
+  - <V>k__BackingField: {fileID: 282662869}
+  - <V>k__BackingField: {fileID: 282662868}
+  - <V>k__BackingField: {fileID: 282662863}
+  - <V>k__BackingField: {fileID: 187152648}
+  - <V>k__BackingField: {fileID: 187152646}
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 187152648}
+  - <V>k__BackingField: {fileID: 187152646}
+--- !u!114 &1704623440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704623433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3bd226af40eb33409bd540641697a4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getComponentInChildrenArray:
+  - {fileID: 282662869}
+  - {fileID: 282662868}
+  - {fileID: 282662863}
+  - {fileID: 1872824174}
+  - {fileID: 1872824171}
+  - {fileID: 187152648}
+  - {fileID: 187152646}
+  getComponentInChildrenList:
+  - {fileID: 282662869}
+  - {fileID: 282662868}
+  - {fileID: 282662863}
+  - {fileID: 1872824174}
+  - {fileID: 1872824171}
+  - {fileID: 187152648}
+  - {fileID: 187152646}
+  getComponentIArray:
+  - <V>k__BackingField: {fileID: 1704623437}
+  - <V>k__BackingField: {fileID: 1704623436}
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 1704623437}
+  - <V>k__BackingField: {fileID: 1704623436}
 --- !u!1 &1772967109
 GameObject:
   m_ObjectHideFlags: 0

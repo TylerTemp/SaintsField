@@ -108,47 +108,23 @@ namespace SaintsField.Editor.Drawers
                     return ("GetComponentInChildrenAttribute can only be used on Component or GameObject", null);
             }
 
-            // var directChildren = transform.Cast<Transform>();
-
-            List<Component> componentInChildrenList = new List<Component>();
-                // = transform.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
-            foreach (Transform directChildTrans in transform.Cast<Transform>())
-            {
-                Component[] componentInChildren = interfaceType == null
-                    ? directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive)
-                    : directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive).Where(interfaceType.IsInstanceOfType).ToArray();
-
-                // if (componentInChildren != null)
-                // {
-                //     break;
-                // }
-
-                componentInChildrenList.AddRange(componentInChildren);
-            }
-
-            if (componentInChildrenList.Count == 0)
-            {
-                return ($"No {type} found in children", null);
-            }
-
             List<UnityEngine.Object> results = new List<UnityEngine.Object>();
 
-            foreach (Component componentInChildren in componentInChildrenList)
+            foreach (Transform directChildTrans in transform.Cast<Transform>())
             {
-                UnityEngine.Object target = componentInChildren;
-
-                if (fieldType != type)
+                IEnumerable<Component> components =
+                    directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
+                if (interfaceType != null)
                 {
-                    if(fieldType == typeof(GameObject))
-                    {
-                        target = componentInChildren.gameObject;
-                    }
-                    else
-                    {
-                        target = componentInChildren.GetComponent(fieldType);
-                    }
+                    components = components.Where(interfaceType.IsInstanceOfType);
                 }
-                results.Add(target);
+
+                results.AddRange(components.SelectMany(each => FilterComponent(each, type, fieldType)));
+            }
+
+            if (results.Count == 0)
+            {
+                return ($"No {type} found in children", null);
             }
 
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -177,6 +153,96 @@ namespace SaintsField.Editor.Drawers
                 return ("", result);
             }
             return ("", null);
+        }
+
+        private static IEnumerable<UnityEngine.Object> FilterComponent(Component component, Type type, Type fieldType)
+        {
+            if (fieldType != type)
+            {
+                if(fieldType == typeof(GameObject))
+                {
+                    yield return component.gameObject;
+                    yield break;
+                }
+
+                foreach (Component target in component.GetComponents(fieldType))
+                {
+                    yield return target;
+                }
+            }
+            else
+            {
+                yield return component;
+            }
+        }
+
+        public static int HelperGetArraySize(SerializedProperty property, GetComponentInChildrenAttribute getComponentInChildrenAttribute, FieldInfo info)
+        {
+            Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
+            // Debug.Log(fieldType);
+            if (fieldType == null)
+            {
+                return -1;
+            }
+
+            Type interfaceType = null;
+
+            if (typeof(IWrapProp).IsAssignableFrom(fieldType))
+            {
+                Type mostBaseType = Util.GetMostBaseType(fieldType);
+                if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                {
+                    IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                    if (genericArguments.Count == 2)
+                    {
+                        fieldType = genericArguments[0];
+                        interfaceType = genericArguments[1];
+                    }
+                }
+
+                if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
+                {
+                    fieldType = typeof(Component);
+                }
+            }
+
+            if (getComponentInChildrenAttribute.CompType == typeof(GameObject))
+            {
+                return -1;
+            }
+
+            Type type = getComponentInChildrenAttribute.CompType ?? fieldType;
+
+            Transform transform;
+            switch (property.serializedObject.targetObject)
+            {
+                case Component component:
+                    transform = component.transform;
+                    break;
+                case GameObject gameObject:
+                    transform = gameObject.transform;
+                    break;
+                default:
+                    return -1;
+            }
+
+            foreach (Transform directChildTrans in transform.Cast<Transform>())
+            {
+                IEnumerable<Component> components =
+                    directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
+                if (interfaceType != null)
+                {
+                    components = components.Where(interfaceType.IsInstanceOfType);
+                }
+
+                if (components.Any(each => FilterComponent(each, type, fieldType).Any()))
+                {
+                    return 1;
+                }
+            }
+
+
+            return 0;
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -248,81 +314,5 @@ namespace SaintsField.Editor.Drawers
         #endregion
 
 #endif
-        public static int HelperGetArraySize(SerializedProperty property, GetComponentInChildrenAttribute getComponentInChildrenAttribute, FieldInfo info)
-        {
-            Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
-            if (fieldType == null)
-            {
-                return -1;
-            }
-
-            Type interfaceType = null;
-
-            if (typeof(IWrapProp).IsAssignableFrom(fieldType))
-            {
-                Type mostBaseType = Util.GetMostBaseType(fieldType);
-                if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
-                {
-                    IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
-                    if (genericArguments.Count == 2)
-                    {
-                        fieldType = genericArguments[0];
-                        interfaceType = genericArguments[1];
-                    }
-                }
-
-                if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
-                {
-                    fieldType = typeof(Component);
-                }
-            }
-
-            if (getComponentInChildrenAttribute.CompType == typeof(GameObject))
-            {
-                return -1;
-            }
-
-            Type type = getComponentInChildrenAttribute.CompType ?? fieldType;
-
-            Transform transform;
-            switch (property.serializedObject.targetObject)
-            {
-                case Component component:
-                    transform = component.transform;
-                    break;
-                case GameObject gameObject:
-                    transform = gameObject.transform;
-                    break;
-                default:
-                    return -1;
-            }
-
-            foreach (Transform directChildTrans in transform.Cast<Transform>())
-            {
-                IEnumerable<Component> componentInChildren = interfaceType == null
-                    ? directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive)
-                    : directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive).Where(interfaceType.IsInstanceOfType);
-
-                foreach (Component component in componentInChildren)
-                {
-                    if (fieldType == type)
-                    {
-                        return 1;
-                    }
-
-                    if(fieldType == typeof(GameObject))
-                    {
-                        return 1;
-                    }
-
-                    if (component.GetComponent(fieldType) != null)
-                    {
-                        return 1;
-                    }
-                }
-            }
-
-            return 0;
-        }
     }
 }

@@ -165,7 +165,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        public static int HelperGetArraySize(SerializedProperty property, GetComponentInSceneAttribute getComponentInSceneAttribute, FieldInfo info)
+        public static int HelperGetArraySize(GetComponentInSceneAttribute getComponentInSceneAttribute, FieldInfo info)
         {
             Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
             if (fieldType == null)

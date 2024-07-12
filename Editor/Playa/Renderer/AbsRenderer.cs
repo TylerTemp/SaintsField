@@ -240,7 +240,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 case GetComponentInParentsAttribute getComponentInParentsAttribute:
                     return GetComponentInParentsAttributeDrawer.HelperGetArraySize(property, getComponentInParentsAttribute, info);
                 case GetComponentInSceneAttribute getComponentInSceneAttribute:
-                    return GetComponentInSceneAttributeDrawer.HelperGetArraySize(property, getComponentInSceneAttribute, info);
+                    return GetComponentInSceneAttributeDrawer.HelperGetArraySize(getComponentInSceneAttribute, info);
+                case GetComponentByPathAttribute getComponentByPathAttribute:
+                    return GetComponentByPathAttributeDrawer.HelperGetArraySize(property, getComponentByPathAttribute, info);
                 default:
                     return -1;
             }

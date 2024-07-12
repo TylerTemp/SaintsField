@@ -398,6 +398,56 @@ namespace SaintsField.Editor.Drawers
             return ("", targetProperty, results);
         }
 
+        public static int HelperGetArraySize(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info)
+        {
+            Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
+            if (fieldType == null)
+            {
+                return -1;
+            }
+
+            Type interfaceType = null;
+
+            if (typeof(IWrapProp).IsAssignableFrom(fieldType))
+            {
+                Type mostBaseType = Util.GetMostBaseType(fieldType);
+                if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                {
+                    IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                    if (genericArguments.Count == 2)
+                    {
+                        fieldType = genericArguments[0];
+                        interfaceType = genericArguments[1];
+                    }
+                }
+
+                if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
+                {
+                    fieldType = typeof(Component);
+                }
+            }
+
+            Transform transform;
+            switch (property.serializedObject.targetObject)
+            {
+                case Component component:
+                    transform = component.transform;
+                    break;
+                case GameObject gameObject:
+                    transform = gameObject.transform;
+                    break;
+                default:
+                    return -1;
+            }
+
+            IReadOnlyList<IReadOnlyList<GetComponentByPathAttribute.Token>> tokensPaths = getComponentByPathAttribute.Paths;
+            bool found = tokensPaths
+                .SelectMany(tokens => FindObjectByPath(tokens, fieldType, interfaceType, transform))
+                .Any(each => each != null);
+
+            return found ? 1 : 0;
+        }
+
         private static IEnumerable<Object> FindObjectByPath(IEnumerable<GetComponentByPathAttribute.Token> tokens, Type type, Type interfaceType, Transform current)
         {
             bool isGameObject = type == typeof(GameObject);
