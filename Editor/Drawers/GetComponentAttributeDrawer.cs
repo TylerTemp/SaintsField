@@ -175,7 +175,7 @@ namespace SaintsField.Editor.Drawers
             return ("", null);
         }
 
-        public static int HelperGetArraySize(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        public static int HelperGetArraySize(SerializedProperty property, GetComponentAttribute getComponentAttribute, FieldInfo info)
         {
             Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
             if (fieldType == null)
@@ -184,8 +184,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             Type interfaceType = null;
-            // Debug.Log(string.Join(",", fieldType.GetInterfaces().Cast<object>()));
-            // if (Array.Exists(fieldType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(SaintsInterface<,>)))
+
             if (typeof(IWrapProp).IsAssignableFrom(fieldType))
             {
                 Type mostBaseType = Util.GetMostBaseType(fieldType);
@@ -199,17 +198,12 @@ namespace SaintsField.Editor.Drawers
                     }
                 }
 
-                // Debug.Log(interfaceType);
-
                 if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
                 {
                     fieldType = typeof(Component);
                 }
-
-                // Debug.Log(fieldType);
             }
 
-            GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
             Type type = getComponentAttribute.CompType ?? fieldType;
 
             if (type == typeof(GameObject))

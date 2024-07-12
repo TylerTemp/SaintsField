@@ -234,11 +234,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 case ArraySizeAttribute arraySizeAttribute:
                     return arraySizeAttribute.Size;
                 case GetComponentAttribute getComponentAttribute:
-                    return GetComponentAttributeDrawer.HelperGetArraySize(property, getComponentAttribute, info,
-                        parent);
-                // case GetComponentInChildrenAttribute getComponentInChildrenAttribute:
-                //     return GetComponentInChildrenAttributeDrawer.HelperGetArraySize(property, getComponentInChildrenAttribute, info,
-                //         parent);
+                    return GetComponentAttributeDrawer.HelperGetArraySize(property, getComponentAttribute, info);
+                case GetComponentInChildrenAttribute getComponentInChildrenAttribute:
+                    return GetComponentInChildrenAttributeDrawer.HelperGetArraySize(property, getComponentInChildrenAttribute, info);
+                case GetComponentInParentsAttribute getComponentInParentsAttribute:
+                    return GetComponentInParentsAttributeDrawer.HelperGetArraySize(property, getComponentInParentsAttribute, info);
                 default:
                     return -1;
             }

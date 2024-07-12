@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class GetComponentInParentsAttribute: PropertyAttribute, ISaintsAttribute
+    public class GetComponentInParentsAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
