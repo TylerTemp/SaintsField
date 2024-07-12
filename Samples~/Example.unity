@@ -458,6 +458,60 @@ MonoBehaviour:
   areaNameReadonly: 0
   areaMask: 0
   areaMaskReadonly: 0
+--- !u!1 &74059528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 74059529}
+  - component: {fileID: 74059530}
+  m_Layer: 0
+  m_Name: GetComponentInParentArray
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &74059529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74059528}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 454510168}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &74059530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74059528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f262b5ad87906ac46b08f52b6e1c5651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getComponentInParentArray:
+  - {fileID: 454510170}
+  - {fileID: 454510169}
+  - {fileID: 454510172}
+  getComponentInParentsList:
+  - {fileID: 454510170}
+  - {fileID: 454510169}
+  - {fileID: 454510172}
+  - {fileID: 842523985}
+  - {fileID: 842523986}
 --- !u!1 &90550605
 GameObject:
   m_ObjectHideFlags: 0
@@ -2044,7 +2098,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 74059529}
   m_Father: {fileID: 842523984}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2094,6 +2149,7 @@ MonoBehaviour:
   - {fileID: 454510170}
   - {fileID: 454510169}
   - {fileID: 454510172}
+  getComponentInParentArray: []
 --- !u!114 &454510172
 MonoBehaviour:
   m_ObjectHideFlags: 0

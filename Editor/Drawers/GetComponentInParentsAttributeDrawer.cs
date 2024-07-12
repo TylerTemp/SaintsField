@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers
         private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, GetComponentInParentsAttribute getComponentInParentsAttribute, FieldInfo info, object parent)
         {
             SerializedProperty targetProperty = property;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);  // ? why this can be array/list type?
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Drawers
                 return ("", null);
             }
 
-            Type type = getComponentInParentsAttribute.CompType ?? fieldType;
+            Type type = getComponentInParentsAttribute.CompType ?? ReflectUtils.GetElementType(fieldType);
 
             Transform transform;
             switch (property.serializedObject.targetObject)
@@ -104,7 +104,7 @@ namespace SaintsField.Editor.Drawers
                     return ($"GetComponentInParent{(multiple? "s": "")} can only be used on Component or GameObject", null);
             }
 
-            Component componentInParent = null;
+            List<Component> componentsInParents = new List<Component>();
 
             Transform curCheckingTrans = transform;
             int levelLimit = getComponentInParentsAttribute.Limit > 0
@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers
 
             bool isGameObject = type == typeof(GameObject);
             List<string> checkingNames = new List<string>();
-            while (componentInParent == null && curCheckingTrans != null && levelLimit > 0)
+            while (curCheckingTrans != null && levelLimit > 0)
             {
                 curCheckingTrans = curCheckingTrans.parent;
                 if (curCheckingTrans == null)
@@ -125,13 +125,18 @@ namespace SaintsField.Editor.Drawers
 
                 if (isGameObject)
                 {
-                    componentInParent = curCheckingTrans;
+                    // componentInParent = curCheckingTrans;
+                    componentsInParents.Add(curCheckingTrans);
                 }
                 else
                 {
-                    componentInParent = interfaceType == null
-                        ? curCheckingTrans.GetComponent(type)
-                        : curCheckingTrans.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
+                    // componentInParent = interfaceType == null
+                    //     ? curCheckingTrans.GetComponent(type)
+                    //     : curCheckingTrans.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
+                    componentsInParents.AddRange(interfaceType == null
+                        ? curCheckingTrans.GetComponents(type)
+                        : curCheckingTrans.GetComponents(type).Where(interfaceType.IsInstanceOfType).ToArray()
+                    );
                 }
                 // componentInParent = isGameObject
                 //     ? curCheckingTrans
@@ -141,38 +146,75 @@ namespace SaintsField.Editor.Drawers
                 Debug.Log($"Search parent {levelLimit}, curCheckingTrans={curCheckingTrans}, componentInParent={componentInParent}");
 #endif
 
-                if (componentInParent != null)
-                {
-                    break;
-                }
+                // if (componentInParent != null)
+                // {
+                //     break;
+                // }
                 levelLimit--;
             }
 
-            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
-            {
-                return ($"{targetProperty.propertyType} type is not supported by GetComponent", null);
-            }
-
-            if (componentInParent == null)
+            if (componentsInParents.Count == 0)
             {
                 return ($"No {type} found in parent{(multiple? "s": "")}: {string.Join(", ", checkingNames)}", null);
             }
 
-            UnityEngine.Object result = componentInParent;
+            List<UnityEngine.Object> results = new List<UnityEngine.Object>();
 
-            if (fieldType != type)
+            // UnityEngine.Object result = componentInParent;
+            Debug.Log($"fieldType={fieldType}, type={type}, propPath={targetProperty.propertyPath}");
+            foreach (Component componentInParent in componentsInParents)
             {
-                if(fieldType == typeof(GameObject))
+                if (fieldType != type)
                 {
-                    result = componentInParent.gameObject;
+                    if(fieldType == typeof(GameObject))
+                    {
+                        results.Add(componentInParent.gameObject);
+                    }
+                    else
+                    {
+                        results.Add(interfaceType == null
+                            ? componentInParent.GetComponent(fieldType)
+                            : componentInParent.GetComponents(fieldType).FirstOrDefault(interfaceType.IsInstanceOfType));
+                    }
                 }
                 else
                 {
-                    result = interfaceType == null
-                        ? componentInParent.GetComponent(fieldType)
-                        : componentInParent.GetComponents(fieldType).FirstOrDefault(interfaceType.IsInstanceOfType);
+                    results.Add(componentInParent);
                 }
             }
+
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            bool insideArray = indexInArray != -1;
+            if (insideArray)
+            {
+                SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
+                if (arrayProp.arraySize != results.Count)
+                {
+                    arrayProp.arraySize = results.Count;
+                }
+            }
+            int useIndexInArray = insideArray ? indexInArray: 0;
+
+            if (useIndexInArray >= results.Count)
+            {
+                return ($"No {type} found on {transform.name}{(indexInArray == -1 ? "": $"[{indexInArray}]")}", null);
+            }
+
+            UnityEngine.Object result = results[useIndexInArray];
+
+            // if (fieldType != type)
+            // {
+            //     if(fieldType == typeof(GameObject))
+            //     {
+            //         result = componentInParent.gameObject;
+            //     }
+            //     else
+            //     {
+            //         result = interfaceType == null
+            //             ? componentInParent.GetComponent(fieldType)
+            //             : componentInParent.GetComponents(fieldType).FirstOrDefault(interfaceType.IsInstanceOfType);
+            //     }
+            // }
 
             targetProperty.objectReferenceValue = result;
             return ("", result);

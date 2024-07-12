@@ -4,12 +4,10 @@ using UnityEngine;
 
 namespace SaintsField.Samples.IssueAndTesting.Issue.Issue45
 {
-    public class GetComponentArray : MonoBehaviour
+    public class GetComponentInParentArray : MonoBehaviour
     {
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentArray;
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentList;
-
         [GetComponentInParent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInParentArray;
+        [GetComponentInParents, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInParentsList;
 
         private string DummyNumber(Dummy dummy)
         {

@@ -122,7 +122,7 @@ namespace SaintsField.Editor.Utils
             return ("", property.serializedObject.FindProperty(string.Join(".", propPathSegments)));
         }
 
-        public static (bool trimed, IEnumerable<string> propPathSegs) TrimEndArray(IReadOnlyList<string> propPathSegments)
+        private static (bool trimed, IEnumerable<string> propPathSegs) TrimEndArray(IReadOnlyList<string> propPathSegments)
         {
 
             int usePathLength = propPathSegments.Count;
