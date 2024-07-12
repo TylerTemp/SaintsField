@@ -418,7 +418,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; preCheckResult.ArraySize={preCheckResult.ArraySize}, curSize={FieldWithInfo.SerializedProperty.arraySize}");
 #endif
                 if (preCheckResult.ArraySize != -1 &&
-                    FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
+                    ((preCheckResult.ArraySize == 0 && FieldWithInfo.SerializedProperty.arraySize > 0)
+                     || (preCheckResult.ArraySize >= 1 && FieldWithInfo.SerializedProperty.arraySize == 0)))
                 {
                     FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
                     FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
@@ -506,7 +507,10 @@ namespace SaintsField.Editor.Playa.Renderer
         public override void Render()
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
+            if (preCheckResult.ArraySize != -1 && (
+                    (preCheckResult.ArraySize == 0 && FieldWithInfo.SerializedProperty.arraySize > 0)
+                    || (preCheckResult.ArraySize > 0 && FieldWithInfo.SerializedProperty.arraySize == 0)
+                ))
             {
                 FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
             }

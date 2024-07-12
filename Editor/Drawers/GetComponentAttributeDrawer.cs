@@ -175,6 +175,74 @@ namespace SaintsField.Editor.Drawers
             return ("", null);
         }
 
+        public static int HelperGetArraySize(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        {
+            Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
+            if (fieldType == null)
+            {
+                return -1;
+            }
+
+            Type interfaceType = null;
+            // Debug.Log(string.Join(",", fieldType.GetInterfaces().Cast<object>()));
+            // if (Array.Exists(fieldType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(SaintsInterface<,>)))
+            if (typeof(IWrapProp).IsAssignableFrom(fieldType))
+            {
+                Type mostBaseType = Util.GetMostBaseType(fieldType);
+                if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                {
+                    IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                    if (genericArguments.Count == 2)
+                    {
+                        fieldType = genericArguments[0];
+                        interfaceType = genericArguments[1];
+                    }
+                }
+
+                // Debug.Log(interfaceType);
+
+                if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
+                {
+                    fieldType = typeof(Component);
+                }
+
+                // Debug.Log(fieldType);
+            }
+
+            GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
+            Type type = getComponentAttribute.CompType ?? fieldType;
+
+            if (type == typeof(GameObject))
+            {
+                if (fieldType != typeof(GameObject))
+                {
+                    return -1;
+                }
+
+                return 1;
+            }
+
+            Transform transform;
+            switch (property.serializedObject.targetObject)
+            {
+                case Component component:
+                    transform = component.transform;
+                    break;
+                case GameObject gameObject:
+                    transform = gameObject.transform;
+                    break;
+                default:
+                    return -1;
+            }
+
+            if (interfaceType == null)
+            {
+                return transform.GetComponent(type) == null ? 0 : 1;
+            }
+
+            return transform.GetComponents(type).Any(interfaceType.IsInstanceOfType) ? 1: 0;
+        }
+
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit

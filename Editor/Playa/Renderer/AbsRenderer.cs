@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Condition;
+using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -27,7 +28,7 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             public bool IsShown;
             public bool IsDisabled;
-            public int ArraySize;
+            public int ArraySize;  // NOTE: -1=No Limit, 0=0, 1=More Than 0
             public bool HasRichLabel;
             public string RichLabelXml;
         }
@@ -103,7 +104,9 @@ namespace SaintsField.Editor.Playa.Renderer
                         });
                         break;
                     case IPlayaArraySizeAttribute arraySizeAttribute:
-                        arraySize = GetArraySize(arraySizeAttribute);
+                        arraySize = fieldWithInfo.SerializedProperty.isArray
+                            ? GetArraySize(arraySizeAttribute, fieldWithInfo.SerializedProperty, fieldWithInfo.FieldInfo, fieldWithInfo.Target)
+                            : -1;
                         break;
                 }
             }
@@ -222,7 +225,7 @@ namespace SaintsField.Editor.Playa.Renderer
             };
         }
 
-        private static int GetArraySize(IPlayaArraySizeAttribute genArraySizeAttribute)
+        private static int GetArraySize(IPlayaArraySizeAttribute genArraySizeAttribute, SerializedProperty property, FieldInfo info, object parent)
         {
             switch (genArraySizeAttribute)
             {
@@ -230,6 +233,12 @@ namespace SaintsField.Editor.Playa.Renderer
                     return playaArraySizeAttribute.Size;
                 case ArraySizeAttribute arraySizeAttribute:
                     return arraySizeAttribute.Size;
+                case GetComponentAttribute getComponentAttribute:
+                    return GetComponentAttributeDrawer.HelperGetArraySize(property, getComponentAttribute, info,
+                        parent);
+                // case GetComponentInChildrenAttribute getComponentInChildrenAttribute:
+                //     return GetComponentInChildrenAttributeDrawer.HelperGetArraySize(property, getComponentInChildrenAttribute, info,
+                //         parent);
                 default:
                     return -1;
             }

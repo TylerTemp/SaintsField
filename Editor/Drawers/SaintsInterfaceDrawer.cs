@@ -352,7 +352,7 @@ namespace SaintsField.Editor.Drawers
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
             // saintsInterfaceField.BindProperty(valueProp);
 
-            Type interfaceContainer = fieldInfo.FieldType;
+            Type interfaceContainer = ReflectUtils.GetElementType(fieldInfo.FieldType);
             // Debug.Log(interfaceContainer.IsGenericType);
             // Debug.Log(interfaceContainer.BaseType);
             // Debug.Log(interfaceContainer.GetGenericArguments());
