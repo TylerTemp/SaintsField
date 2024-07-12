@@ -32,12 +32,18 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            (string error, SerializedProperty targetProperty, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
+            (string error, SerializedProperty targetProperty, IReadOnlyList<Object> results) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
             _error = error;
             if (error != "")
             {
                 return 0;
             }
+
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            Object result = indexInArray == -1
+                // ReSharper disable once ArrangeRedundantParentheses
+                ? (results.Count > 0? results[0]: null)
+                : results[indexInArray];
 
             return ReferenceEquals(targetProperty.objectReferenceValue, result) ? 0 : SingleLineHeight;
         }
@@ -55,7 +61,7 @@ namespace SaintsField.Editor.Drawers
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;
 
             // match?
-            (string error, SerializedProperty targetProperty, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
+            (string error, SerializedProperty targetProperty, IReadOnlyList<Object> results) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
             _error = error;
 
             if (error != "")
@@ -65,6 +71,12 @@ namespace SaintsField.Editor.Drawers
 
             _drawerNotFirstOpenCache.TryGetValue(index, out bool notFirstOpen);
             bool firstOpen = !notFirstOpen;
+
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            Object result = indexInArray == -1
+                // ReSharper disable once ArrangeRedundantParentheses
+                ? (results.Count > 0? results[0]: null)
+                : results[indexInArray];
 
             // Debug.Log($"fr={getComponentByPathAttribute.ForceResign}, equal={ReferenceEquals(property.objectReferenceValue, result)}");
             if(((firstOpen && targetProperty.objectReferenceValue == null) || getComponentByPathAttribute.ForceResign) && !ReferenceEquals(targetProperty.objectReferenceValue, result))
@@ -220,7 +232,7 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once SuggestBaseTypeForParameter
             Button button, HelpBox helpBox, Action<object> onValueChangedCallback, bool forceResign, object parent)
         {
-            (string error, SerializedProperty targetProperty, Object result) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
+            (string error, SerializedProperty targetProperty, IReadOnlyList<Object> results) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
             // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if (error != helpBox.text)
             {
@@ -240,6 +252,12 @@ namespace SaintsField.Editor.Drawers
                 }
                 return;
             }
+
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            Object result = indexInArray == -1
+                // ReSharper disable once ArrangeRedundantParentheses
+                ? (results.Count > 0? results[0]: null)
+                : results[indexInArray];
 
             if (error == "" && !ReferenceEquals(targetProperty.objectReferenceValue, result))
             {
@@ -271,7 +289,7 @@ namespace SaintsField.Editor.Drawers
         private static (string error, SerializedProperty targetProperty, Type fieldType, Type interfaceType) GetPropAndType(SerializedProperty property, FieldInfo info, object parent)
         {
             SerializedProperty targetProperty = property;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
@@ -306,7 +324,7 @@ namespace SaintsField.Editor.Drawers
             return ("", targetProperty, fieldType, interfaceType);
         }
 
-        private static (string error, SerializedProperty targetProperty, Object result) DoCheckComponent(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info, object parent)
+        private static (string error, SerializedProperty targetProperty, IReadOnlyList<Object> results) DoCheckComponent(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info, object parent)
         {
             (string error, SerializedProperty targetProperty, Type fieldType, Type interfaceType) = GetPropAndType(property, info, parent);
 
@@ -333,16 +351,17 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                     }
                 }
-                    return ("GetComponentInChildrenAttribute can only be used on Component or GameObject", targetProperty, null);
+                    return ("GetComponentByPath can only be used on Component or GameObject", targetProperty, null);
             }
 
             IReadOnlyList<IReadOnlyList<GetComponentByPathAttribute.Token>> tokensPaths = getComponentByPathAttribute.Paths;
-            Object result = tokensPaths
-                .Select(tokens => FindObjectByPath(tokens, fieldType, interfaceType, transform))
-                .FirstOrDefault(each => each != null);
+            Object[] results = tokensPaths
+                .SelectMany(tokens => FindObjectByPath(tokens, fieldType, interfaceType, transform))
+                .Where(each => each != null)
+                .ToArray();
 
             // ReSharper disable once InvertIf
-            if (result == null)
+            if (results.Length == 0)
             {
                 // if(getComponentByPathAttribute.ForceResign && property.objectReferenceValue != null)
                 // {
@@ -356,33 +375,43 @@ namespace SaintsField.Editor.Drawers
                 return ($"No component found in path: {pathList}", targetProperty, null);
             }
 
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (indexInArray == 0)
+            {
+                if (property.arraySize != results.Length)
+                {
+                    property.arraySize = results.Length;
+                    property.serializedObject.ApplyModifiedProperties();
+                }
+            }
+
             // if (!ReferenceEquals(property.objectReferenceValue, result))
             // {
             //     property.objectReferenceValue = result;
             //     changed = true;
             // }
 
-            return ("", targetProperty, result);
+            return ("", targetProperty, results);
         }
 
-        private static Object FindObjectByPath(IEnumerable<GetComponentByPathAttribute.Token> tokens, Type type, Type interfaceType, Transform current)
+        private static IEnumerable<Object> FindObjectByPath(IEnumerable<GetComponentByPathAttribute.Token> tokens, Type type, Type interfaceType, Transform current)
         {
             bool isGameObject = type == typeof(GameObject);
             return IteratePath(new Queue<GetComponentByPathAttribute.Token>(tokens), new[] { current })
-                .Select(each =>
+                .SelectMany(each =>
                 {
                     if (isGameObject)
                     {
-                        return (Object)each.gameObject;
+                        return new[]{(Object)each.gameObject};
                     }
 
                     if (interfaceType == null)
                     {
-                        return each.GetComponent(type);
+                        return each.GetComponents(type);
                     }
-                    return each.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
+                    return each.GetComponents(type).Where(interfaceType.IsInstanceOfType).ToArray();
                 })
-                .FirstOrDefault(each => each != null);
+                .Where(each => each != null);
         }
 
         private static IReadOnlyList<Transform> IteratePath(Queue<GetComponentByPathAttribute.Token> tokens, IReadOnlyList<Transform> currents)
