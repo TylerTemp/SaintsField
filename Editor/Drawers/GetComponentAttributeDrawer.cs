@@ -90,19 +90,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
-            Type type;
-            if (getComponentAttribute.CompType != null)
-            {
-                type = getComponentAttribute.CompType;
-            }
-            else
-            {
-                type = fieldType;
-                if (typeof(IEnumerable).IsAssignableFrom(type))
-                {
-                    type = fieldType.GetElementType();
-                }
-            }
+            Type type = getComponentAttribute.CompType ?? ReflectUtils.GetElementType(fieldType);
 
             if (type == typeof(GameObject))
             {
@@ -156,13 +144,17 @@ namespace SaintsField.Editor.Drawers
 
             Component[] results = interfaceType == null? componentsOnSelf: componentsOnSelf.Where(interfaceType.IsInstanceOfType).ToArray();
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            int useIndexInArray = indexInArray == -1 ? 0 : indexInArray;
-            // Object result = interfaceType == null ? componentsOnSelf[0] : componentsOnSelf.FirstOrDefault(interfaceType.IsInstanceOfType);
+            bool insideArray = indexInArray != -1;
+            if (insideArray)
+            {
+                SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
+                if (arrayProp.arraySize != results.Length)
+                {
+                    arrayProp.arraySize = results.Length;
+                }
+            }
+            int useIndexInArray = insideArray ? indexInArray: 0;
 
-            // if (result == null)
-            // {
-            //     return ($"No {type} found on {transform.name}", null);
-            // }
             if (useIndexInArray >= results.Length)
             {
                 return ($"No {type} found on {transform.name}{(indexInArray == -1 ? "": $"[{indexInArray}]")}", null);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -249,6 +250,26 @@ namespace SaintsField.Editor.Utils
                 }
             }
 
+        }
+
+        public static Type GetElementType(Type type)
+        {
+            if (type.IsArray)
+            {
+                return type.GetElementType();
+            }
+
+            if (type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type))
+            {
+                return type.GetGenericArguments()[0];
+            }
+
+            // if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            // {
+            //     return type.GetGenericArguments()[0];
+            // }
+
+            return type;
         }
     }
 }

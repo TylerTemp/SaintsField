@@ -12,19 +12,6 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(ArraySizeAttribute))]
     public class ArraySizeAttributeDrawer: SaintsPropertyDrawer
     {
-        private static (string, SerializedProperty) GetArrayProperty(SerializedProperty property, IReadOnlyList<string> paths)
-        {
-            // Debug.Log(property.propertyPath);
-            // string[] paths = property.propertyPath.Split('.');
-
-            (bool arrayTrim, IEnumerable<string> propPathSegments) = SerializedUtils.TrimEndArray(paths);
-            if (!arrayTrim)
-            {
-                return ($"{property.propertyPath} is not an array/list.", null);
-            }
-
-            return ("", property.serializedObject.FindProperty(string.Join(".", propPathSegments)));
-        }
 
         #region IMGUI
 
@@ -47,7 +34,7 @@ namespace SaintsField.Editor.Drawers
             // SerializedProperty arrProp = property.serializedObject.FindProperty("nests.Array.data[0].arr3");
             // Debug.Log(arrProp);
             // Debug.Log(property.propertyPath);
-            (string error, SerializedProperty arrProp) = GetArrayProperty(property, property.propertyPath.Split('.'));
+            (string error, SerializedProperty arrProp) = SerializedUtils.GetArrayProperty(property);
             _error = error;
             if (_error != "")
             {
@@ -148,7 +135,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                (error, arrProp) = GetArrayProperty(property, property.propertyPath.Split("."));
+                (error, arrProp) = SerializedUtils.GetArrayProperty(property);
             }
 
             if (error != "" && !arrProp.isArray)

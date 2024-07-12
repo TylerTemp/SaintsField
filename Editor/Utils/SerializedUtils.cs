@@ -108,6 +108,20 @@ namespace SaintsField.Editor.Utils
             return (fieldOrProp, sourceObj);
         }
 
+        public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
+        {
+            // Debug.Log(property.propertyPath);
+            string[] paths = property.propertyPath.Split('.');
+
+            (bool arrayTrim, IEnumerable<string> propPathSegments) = TrimEndArray(paths);
+            if (!arrayTrim)
+            {
+                return ($"{property.propertyPath} is not an array/list.", null);
+            }
+
+            return ("", property.serializedObject.FindProperty(string.Join(".", propPathSegments)));
+        }
+
         public static (bool trimed, IEnumerable<string> propPathSegs) TrimEndArray(IReadOnlyList<string> propPathSegments)
         {
 
