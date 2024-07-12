@@ -119,7 +119,19 @@ namespace SaintsField.Editor.Utils
                 return ($"{property.propertyPath} is not an array/list.", null);
             }
 
-            return ("", property.serializedObject.FindProperty(string.Join(".", propPathSegments)));
+            string arrayPath = string.Join(".", propPathSegments);
+            SerializedProperty arrayProp = property.serializedObject.FindProperty(arrayPath);
+            if (arrayProp == null)
+            {
+                return ($"Can't find {arrayPath} on {property.serializedObject}", null);
+            }
+
+            if (!arrayProp.isArray)
+            {
+                return ($"{arrayPath} on {property.serializedObject} is not an array/list", null);
+            }
+
+            return ("", arrayProp);
         }
 
         private static (bool trimed, IEnumerable<string> propPathSegs) TrimEndArray(IReadOnlyList<string> propPathSegments)

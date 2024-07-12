@@ -2317,12 +2317,13 @@ A decorator that limit the size of the array or list.
 
 Note: Because of the limitation of `PropertyDrawer`:
 
+1.  Delete an element will first be deleted, then the array will duplicated the last element.
+2.  UI Toolkit: you might see the UI flicked when you remove an element.
+
+Enable `SaintsEditor` if possible, otherwise:
+
 1.  When the field is 0 length, it'll not be filled to target size.
 2.  You can always change it to 0 size.
-3.  Delete an element will first be deleted, then the array will duplicated the last element.
-4.  UI Toolkit: you might see the UI flicked when you remove an element.
-
-(If you enable `SaintsEditor`, there is a `PlayaArraySize` that does NOT have issue 1 & 2)
 
 Parameters:
 
@@ -3226,6 +3227,8 @@ using SaintsField.Playa;
 It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
 
 ### `PlayaArraySize` ###
+
+**Deprecated**. Use `ArraySize` instead.
 
 Like `ArraySize`, but:
 

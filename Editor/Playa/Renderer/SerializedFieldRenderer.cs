@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Playa.Renderer
                                                                            || each is PlayaEnableIfAttribute
                                                                            // ReSharper disable once MergeIntoLogicalPattern
                                                                            || each is PlayaDisableIfAttribute) > 0;
-            bool arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaArraySizeAttribute);
+            bool arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is IPlayaArraySizeAttribute);
             bool richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaRichLabelAttribute);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
             Debug.Log(

@@ -5,8 +5,9 @@ using UnityEngine;
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
-    public class PlayaArraySizeAttribute: PropertyAttribute, IPlayaAttribute
+    [Obsolete("Use `ArraySize` instead")]
+    [AttributeUsage(AttributeTargets.Field)]
+    public class PlayaArraySizeAttribute: PropertyAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
     {
         public readonly int Size;
 

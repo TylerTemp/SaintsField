@@ -102,8 +102,8 @@ namespace SaintsField.Editor.Playa.Renderer
                             Target = fieldWithInfo.Target,
                         });
                         break;
-                    case PlayaArraySizeAttribute arraySizeAttribute:
-                        arraySize = arraySizeAttribute.Size;
+                    case IPlayaArraySizeAttribute arraySizeAttribute:
+                        arraySize = GetArraySize(arraySizeAttribute);
                         break;
                 }
             }
@@ -220,6 +220,19 @@ namespace SaintsField.Editor.Playa.Renderer
                 HasRichLabel = hasRichLabel,
                 RichLabelXml = richLabelXml,
             };
+        }
+
+        private static int GetArraySize(IPlayaArraySizeAttribute genArraySizeAttribute)
+        {
+            switch (genArraySizeAttribute)
+            {
+                case PlayaArraySizeAttribute playaArraySizeAttribute:
+                    return playaArraySizeAttribute.Size;
+                case ArraySizeAttribute arraySizeAttribute:
+                    return arraySizeAttribute.Size;
+                default:
+                    return -1;
+            }
         }
 
         private static void FillResult(PreCheckInternalInfo preCheckInternalInfo)
