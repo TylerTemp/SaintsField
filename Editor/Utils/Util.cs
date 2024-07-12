@@ -478,6 +478,7 @@ namespace SaintsField.Editor.Utils
                             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
                             object rawValue = fieldInfo.GetValue(target);
                             object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+
                             passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
                                 ? new[]
                                 {
@@ -489,6 +490,9 @@ namespace SaintsField.Editor.Utils
                                     arrayIndex,
                                 });
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_GET_OF
+                            Debug.Log($"#Util# arrayIndex={arrayIndex}, rawValue={rawValue}, curValue={curValue}, fill={string.Join(",", passParams)}");
+#endif
                         }
 
                         try

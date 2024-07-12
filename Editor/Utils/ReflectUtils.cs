@@ -147,7 +147,7 @@ namespace SaintsField.Editor.Utils
                     {
                         object value = toFillQueue.Dequeue();
                         Type paramType = methodParams[index].ParameterType;
-                        if (paramType.IsInstanceOfType(value))
+                        if (value == null || paramType.IsInstanceOfType(value))
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
                             Debug.Log($"Push value {value} for {methodParams[index].Name}");
@@ -172,6 +172,9 @@ namespace SaintsField.Editor.Utils
 
             foreach (object leftOver in toFillQueue)
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+                Debug.Log($"leftOver: {leftOver}");
+#endif
                 leftOverQueue.Enqueue(leftOver);
             }
 
@@ -189,12 +192,21 @@ namespace SaintsField.Editor.Utils
                     {
                         object value = leftOverQueue.Peek();
                         Type paramType = methodParams[index].ParameterType;
-                        if(paramType.IsInstanceOfType(value))
+                        if(value == null || paramType.IsInstanceOfType(value))
                         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+                            Debug.Log($"add optional: {value} -> {methodParams[index].Name}({paramType})");
+#endif
                             leftOverQueue.Dequeue();
                             filledValues[index].value = value;
-                            filledValues[index].signed = false;
+                            filledValues[index].signed = true;
                         }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+                        else
+                        {
+                            Debug.Log($"not fit optional: {value}({value.GetType()}) -> {paramType}");
+                        }
+#endif
                     }
                 }
             }

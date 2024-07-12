@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -89,7 +90,19 @@ namespace SaintsField.Editor.Drawers
             }
 
             GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
-            Type type = getComponentAttribute.CompType ?? fieldType;
+            Type type;
+            if (getComponentAttribute.CompType != null)
+            {
+                type = getComponentAttribute.CompType;
+            }
+            else
+            {
+                type = fieldType;
+                if (typeof(IEnumerable).IsAssignableFrom(type))
+                {
+                    type = fieldType.GetElementType();
+                }
+            }
 
             if (type == typeof(GameObject))
             {
@@ -141,15 +154,24 @@ namespace SaintsField.Editor.Drawers
                 return ($"No {type} found on {transform.name}", null);
             }
 
-            Object result = interfaceType == null ? componentsOnSelf[0] : componentsOnSelf.FirstOrDefault(interfaceType.IsInstanceOfType);
+            Component[] results = interfaceType == null? componentsOnSelf: componentsOnSelf.Where(interfaceType.IsInstanceOfType).ToArray();
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            int useIndexInArray = indexInArray == -1 ? 0 : indexInArray;
+            // Object result = interfaceType == null ? componentsOnSelf[0] : componentsOnSelf.FirstOrDefault(interfaceType.IsInstanceOfType);
 
-            if (result == null)
+            // if (result == null)
+            // {
+            //     return ($"No {type} found on {transform.name}", null);
+            // }
+            if (useIndexInArray >= results.Length)
             {
-                return ($"No {type} found on {transform.name}", null);
+                return ($"No {type} found on {transform.name}{(indexInArray == -1 ? "": $"[{indexInArray}]")}", null);
             }
 
+            Component result = results[useIndexInArray];
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
-            Debug.Log($"GetComponent Add {result} for {property.propertyPath}");
+            Debug.Log($"GetComponent Add {result}@[{useIndexInArray}] for {property.propertyPath}");
 #endif
 
             targetProperty.objectReferenceValue = result;
