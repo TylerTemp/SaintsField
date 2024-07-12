@@ -155,10 +155,8 @@ namespace SaintsField.Editor.Drawers
             if (indexInArray == 0)
             {
                 SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
-                // Debug.Log($"arr size {arrayProp.arraySize} cur count {results.Count}");
                 if (arrayProp.arraySize != results.Count)
                 {
-                    // Debug.Log($"update size {arrayProp.arraySize} to {results.Count}");
                     arrayProp.arraySize = results.Count;
                     arrayProp.serializedObject.ApplyModifiedProperties();
                 }

@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers
         private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             SerializedProperty targetProperty = property;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
@@ -77,21 +77,21 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            if (targetProperty.objectReferenceValue != null)
-            {
-                return ("", null);
-            }
+            // if (targetProperty.objectReferenceValue != null)
+            // {
+            //     return ("", null);
+            // }
 
             GetComponentInSceneAttribute getComponentInSceneAttribute = (GetComponentInSceneAttribute) saintsAttribute;
 
             if (getComponentInSceneAttribute.CompType == typeof(GameObject))
             {
-                return ("You can not use GetComponentInChildrenAttribute with GameObject type", null);
+                return ("You can not use GetComponentInScene with GameObject type", null);
             }
 
             Type type = getComponentInSceneAttribute.CompType ?? fieldType;
 
-            Component componentInScene = null;
+            List<Component> componentsInScene = new List<Component>();
 
             Scene scene = SceneManager.GetActiveScene();
             bool includeInactive = getComponentInSceneAttribute.IncludeInactive;
@@ -102,45 +102,70 @@ namespace SaintsField.Editor.Drawers
                     continue;
                 }
 
-                Component findSelfComponent = interfaceType == null
-                    ? rootGameObject.GetComponent(type)
-                    : rootGameObject.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
-                if (findSelfComponent != null)
-                {
-                    componentInScene = findSelfComponent;
-                    break;
-                }
+                Component[] findSelfComponents = interfaceType == null
+                    ? rootGameObject.GetComponents(type)
+                    : rootGameObject.GetComponents(type).Where(interfaceType.IsInstanceOfType).ToArray();
 
-                Component findComponent  = interfaceType == null
-                    ? rootGameObject.GetComponentInChildren(type, includeInactive)
-                    : rootGameObject.GetComponentsInChildren(type, includeInactive).FirstOrDefault(interfaceType.IsInstanceOfType);
+                componentsInScene.AddRange(findSelfComponents);
 
-                // ReSharper disable once InvertIf
-                if (findComponent != null)
-                {
-                    componentInScene = findComponent;
-                    break;
-                }
+                Component[] findComponents = interfaceType == null
+                    ? rootGameObject.GetComponentsInChildren(type, includeInactive)
+                    : rootGameObject.GetComponentsInChildren(type, includeInactive).Where(interfaceType.IsInstanceOfType).ToArray();
+
+                componentsInScene.AddRange(findComponents);
+
+                // // ReSharper disable once InvertIf
+                // if (findComponent != null)
+                // {
+                //     componentInScene = findComponent;
+                //     break;
+                // }
             }
 
-            if (componentInScene == null)
+            if (componentsInScene.Count == 0)
             {
                 return ($"No {type} found in scene", null);
             }
 
-            UnityEngine.Object result = componentInScene;
+            List<UnityEngine.Object> results = new List<UnityEngine.Object>();
 
-            if (fieldType != type)
+            foreach (Component componentInScene in componentsInScene)
             {
-                if(fieldType == typeof(GameObject))
+                if (fieldType != type)
                 {
-                    result = componentInScene.gameObject;
+                    if(fieldType == typeof(GameObject))
+                    {
+                        results.Add(componentInScene.gameObject);
+                    }
+                    else
+                    {
+                        results.Add(componentInScene.GetComponent(fieldType));
+                    }
                 }
                 else
                 {
-                    result = componentInScene.GetComponent(fieldType);
+                    results.Add(componentInScene);
                 }
             }
+
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (indexInArray == 0)
+            {
+                SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
+                if (arrayProp.arraySize != results.Count)
+                {
+                    arrayProp.arraySize = results.Count;
+                    arrayProp.serializedObject.ApplyModifiedProperties();
+                }
+            }
+            int useIndexInArray = indexInArray != -1 ? indexInArray: 0;
+
+            if (useIndexInArray >= results.Count)
+            {
+                return ($"No {type} found in scene{(indexInArray == -1 ? "": $"[{indexInArray}]")}", null);
+            }
+
+            UnityEngine.Object result = results[useIndexInArray];
 
             if(!ReferenceEquals(targetProperty.objectReferenceValue, result))
             {

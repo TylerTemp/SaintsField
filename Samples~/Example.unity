@@ -2106,6 +2106,7 @@ GameObject:
   - component: {fileID: 454510168}
   - component: {fileID: 454510171}
   - component: {fileID: 454510173}
+  - component: {fileID: 454510174}
   - component: {fileID: 454510170}
   - component: {fileID: 454510169}
   - component: {fileID: 454510172}
@@ -2207,6 +2208,44 @@ MonoBehaviour:
   - {fileID: 74059532}
   - {fileID: 74059534}
   getComponentInChildrenList:
+  - {fileID: 74059532}
+  - {fileID: 74059534}
+--- !u!114 &454510174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454510167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31b39e66b233ea24a99674fe9be5f20d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getComponentInParentArray:
+  - {fileID: 1271404094}
+  - {fileID: 1271404094}
+  - {fileID: 1516486913}
+  - {fileID: 1631756501}
+  - {fileID: 556802675}
+  - {fileID: 842523985}
+  - {fileID: 842523986}
+  - {fileID: 454510170}
+  - {fileID: 454510169}
+  - {fileID: 454510172}
+  - {fileID: 74059532}
+  - {fileID: 74059534}
+  getComponentInParentsList:
+  - {fileID: 1271404094}
+  - {fileID: 1271404094}
+  - {fileID: 1516486913}
+  - {fileID: 1631756501}
+  - {fileID: 556802675}
+  - {fileID: 842523985}
+  - {fileID: 842523986}
+  - {fileID: 454510170}
+  - {fileID: 454510169}
+  - {fileID: 454510172}
   - {fileID: 74059532}
   - {fileID: 74059534}
 --- !u!1 &461560855
