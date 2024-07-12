@@ -52,7 +52,13 @@ namespace SaintsField.Editor.Drawers
 
         private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
+            if (SerializedUtils.PropertyPathIndex(property.propertyPath) != -1)
+            {
+                return ("FindComponent can not be used on array/list", null);
+            }
+
             SerializedProperty targetProperty = property;
+
             Type fieldType = info.FieldType;
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
@@ -95,7 +101,7 @@ namespace SaintsField.Editor.Drawers
                     transform = gameObject.transform;
                     break;
                 default:
-                    return ("GetComponentInChildrenAttribute can only be used on Component or GameObject", null);
+                    return ("FindComponent can only be used on Component or GameObject", null);
             }
 
             Object componentInChildren = null;
