@@ -1920,6 +1920,15 @@ namespace SaintsField.Editor.Core
 //             }
 // #endif
 
+            // try
+            // {
+            //     string _ = property.propertyPath;
+            // }
+            // catch (ObjectDisposedException)
+            // {
+            //     return;
+            // }
+
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
                 saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, fieldInfo, parent);

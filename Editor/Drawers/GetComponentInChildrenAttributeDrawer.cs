@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers
         private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             SerializedProperty targetProperty = property;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
@@ -81,10 +81,10 @@ namespace SaintsField.Editor.Drawers
                 return ($"{targetProperty.propertyType} type is not supported by GetComponentInChildren", null);
             }
 
-            if (targetProperty.objectReferenceValue != null)
-            {
-                return ("", null);
-            }
+            // if (targetProperty.objectReferenceValue != null)
+            // {
+            //     return ("", null);
+            // }
 
             GetComponentInChildrenAttribute getComponentInChildrenAttribute = (GetComponentInChildrenAttribute) saintsAttribute;
 
@@ -110,41 +110,75 @@ namespace SaintsField.Editor.Drawers
 
             // var directChildren = transform.Cast<Transform>();
 
-            Component componentInChildren = null;
+            List<Component> componentInChildrenList = new List<Component>();
                 // = transform.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
             foreach (Transform directChildTrans in transform.Cast<Transform>())
             {
-                componentInChildren = interfaceType == null
-                    ? directChildTrans.GetComponentInChildren(type, getComponentInChildrenAttribute.IncludeInactive)
-                    : directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive).FirstOrDefault(interfaceType.IsInstanceOfType);
+                Component[] componentInChildren = interfaceType == null
+                    ? directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive)
+                    : directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive).Where(interfaceType.IsInstanceOfType).ToArray();
 
-                if (componentInChildren != null)
-                {
-                    break;
-                }
+                // if (componentInChildren != null)
+                // {
+                //     break;
+                // }
+
+                componentInChildrenList.AddRange(componentInChildren);
             }
 
-            if (componentInChildren == null)
+            if (componentInChildrenList.Count == 0)
             {
                 return ($"No {type} found in children", null);
             }
 
-            UnityEngine.Object result = componentInChildren;
+            List<UnityEngine.Object> results = new List<UnityEngine.Object>();
 
-            if (fieldType != type)
+            foreach (Component componentInChildren in componentInChildrenList)
             {
-                if(fieldType == typeof(GameObject))
+                UnityEngine.Object target = componentInChildren;
+
+                if (fieldType != type)
                 {
-                    result = componentInChildren.gameObject;
+                    if(fieldType == typeof(GameObject))
+                    {
+                        target = componentInChildren.gameObject;
+                    }
+                    else
+                    {
+                        target = componentInChildren.GetComponent(fieldType);
+                    }
                 }
-                else
-                {
-                    result = componentInChildren.GetComponent(fieldType);
-                }
+                results.Add(target);
             }
 
-            targetProperty.objectReferenceValue = result;
-            return ("", result);
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (indexInArray == 0)
+            {
+                SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
+                // Debug.Log($"arr size {arrayProp.arraySize} cur count {results.Count}");
+                if (arrayProp.arraySize != results.Count)
+                {
+                    // Debug.Log($"update size {arrayProp.arraySize} to {results.Count}");
+                    arrayProp.arraySize = results.Count;
+                    arrayProp.serializedObject.ApplyModifiedProperties();
+                }
+            }
+            int useIndexInArray = indexInArray != -1 ? indexInArray: 0;
+
+            if (useIndexInArray >= results.Count)
+            {
+                return ($"No {type} found on {transform.name}{(indexInArray == -1 ? "": $"[{indexInArray}]")}", null);
+            }
+
+            UnityEngine.Object result = results[useIndexInArray];
+
+            // targetProperty.objectReferenceValue = result;
+            if (targetProperty.objectReferenceValue != result)
+            {
+                targetProperty.objectReferenceValue = result;
+                return ("", result);
+            }
+            return ("", null);
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -162,6 +196,23 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT_IN_CHILDREN
             Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
+            DoCheckComponentUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, parent);
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        {
+            HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
+            if (helpBox.text != "")
+            {
+                DoCheckComponentUIToolkit(property, saintsAttribute, index, container, onValueChanged, info, parent);
+            }
+        }
+
+        private static void DoCheckComponentUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
             (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)

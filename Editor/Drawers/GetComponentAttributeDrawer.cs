@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers
         private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             SerializedProperty targetProperty = property;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
@@ -84,13 +84,13 @@ namespace SaintsField.Editor.Drawers
                 return ($"{targetProperty.propertyType} type is not supported by GetComponent", null);
             }
 
-            if (targetProperty.objectReferenceValue != null)
-            {
-                return ("", null);
-            }
+            // if (targetProperty.objectReferenceValue != null)
+            // {
+            //     return ("", null);
+            // }
 
             GetComponentAttribute getComponentAttribute = (GetComponentAttribute) saintsAttribute;
-            Type type = getComponentAttribute.CompType ?? ReflectUtils.GetElementType(fieldType);
+            Type type = getComponentAttribute.CompType ?? fieldType;
 
             if (type == typeof(GameObject))
             {
@@ -144,16 +144,17 @@ namespace SaintsField.Editor.Drawers
 
             Component[] results = interfaceType == null? componentsOnSelf: componentsOnSelf.Where(interfaceType.IsInstanceOfType).ToArray();
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            bool insideArray = indexInArray != -1;
-            if (insideArray)
+            // bool insideArray = indexInArray != -1;
+            if (indexInArray == 0)
             {
                 SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
                 if (arrayProp.arraySize != results.Length)
                 {
                     arrayProp.arraySize = results.Length;
+                    arrayProp.serializedObject.ApplyModifiedProperties();
                 }
             }
-            int useIndexInArray = insideArray ? indexInArray: 0;
+            int useIndexInArray = indexInArray != -1 ? indexInArray: 0;
 
             if (useIndexInArray >= results.Length)
             {
@@ -165,9 +166,13 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
             Debug.Log($"GetComponent Add {result}@[{useIndexInArray}] for {property.propertyPath}");
 #endif
+            if (targetProperty.objectReferenceValue != result)
+            {
+                targetProperty.objectReferenceValue = result;
+                return ("", result);
+            }
 
-            targetProperty.objectReferenceValue = result;
-            return ("", result);
+            return ("", null);
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -184,6 +189,23 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT
             Debug.Log($"GetComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
+            DoCheckComponentUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, parent);
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        {
+            HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
+            if (helpBox.text != "")
+            {
+                DoCheckComponentUIToolkit(property, saintsAttribute, index, container, onValueChanged, info, parent);
+            }
+        }
+
+        private static void DoCheckComponentUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
             (string error, Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)

@@ -9,8 +9,6 @@ namespace SaintsField.Samples.IssueAndTesting.Issue.Issue45
         [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentArray;
         [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentList;
 
-        [GetComponentInParent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInParentArray;
-
         private string DummyNumber(Dummy dummy)
         {
             return dummy? $"{dummy.comment}": "";

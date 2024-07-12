@@ -84,12 +84,12 @@ namespace SaintsField.Editor.Drawers
                 return ($"{targetProperty.propertyType} type is not supported by GetComponentInParent{(multiple? "s": "")}", null);
             }
 
-            if (targetProperty.objectReferenceValue != null)
-            {
-                return ("", null);
-            }
+            // if (targetProperty.objectReferenceValue != null)
+            // {
+            //     return ("", null);
+            // }
 
-            Type type = getComponentInParentsAttribute.CompType ?? ReflectUtils.GetElementType(fieldType);
+            Type type = getComponentInParentsAttribute.CompType ?? fieldType;
 
             Transform transform;
             switch (property.serializedObject.targetObject)
@@ -161,7 +161,7 @@ namespace SaintsField.Editor.Drawers
             List<UnityEngine.Object> results = new List<UnityEngine.Object>();
 
             // UnityEngine.Object result = componentInParent;
-            Debug.Log($"fieldType={fieldType}, type={type}, propPath={targetProperty.propertyPath}");
+            // Debug.Log($"fieldType={fieldType}, type={type}, propPath={targetProperty.propertyPath}");
             foreach (Component componentInParent in componentsInParents)
             {
                 if (fieldType != type)
@@ -184,16 +184,17 @@ namespace SaintsField.Editor.Drawers
             }
 
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            bool insideArray = indexInArray != -1;
-            if (insideArray)
+            // bool insideArray = ;
+            if (indexInArray == 0)
             {
                 SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
                 if (arrayProp.arraySize != results.Count)
                 {
                     arrayProp.arraySize = results.Count;
+                    arrayProp.serializedObject.ApplyModifiedProperties();
                 }
             }
-            int useIndexInArray = insideArray ? indexInArray: 0;
+            int useIndexInArray = indexInArray != -1 ? indexInArray: 0;
 
             if (useIndexInArray >= results.Count)
             {
@@ -216,8 +217,13 @@ namespace SaintsField.Editor.Drawers
             //     }
             // }
 
-            targetProperty.objectReferenceValue = result;
-            return ("", result);
+            if (targetProperty.objectReferenceValue != result)
+            {
+                targetProperty.objectReferenceValue = result;
+                return ("", result);
+            }
+
+            return ("", null);
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -235,6 +241,23 @@ namespace SaintsField.Editor.Drawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT_IN_PARENTS
             Debug.Log($"GetComponentInParents DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif
+            DoCheckComponentUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, parent);
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        {
+            HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
+            if (helpBox.text != "")
+            {
+                DoCheckComponentUIToolkit(property, saintsAttribute, index, container, onValueChanged, info, parent);
+            }
+        }
+
+        private static void DoCheckComponentUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
             (string error, UnityEngine.Object result) = DoCheckComponent(property, (GetComponentInParentsAttribute)saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)
