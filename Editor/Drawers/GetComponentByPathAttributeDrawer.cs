@@ -241,7 +241,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            if (!ReferenceEquals(targetProperty.objectReferenceValue, result))
+            if (error == "" && !ReferenceEquals(targetProperty.objectReferenceValue, result))
             {
                 // Debug.Log($"not equal: {targetProperty.objectReferenceValue}, {result}");
                 if (getComponentByPathAttribute.ForceResign || forceResign)
@@ -297,39 +297,22 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
+            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return ($"{targetProperty.propertyType} type is not supported by GetComponentByPath", targetProperty, fieldType, interfaceType);
+            }
+
 
             return ("", targetProperty, fieldType, interfaceType);
         }
 
         private static (string error, SerializedProperty targetProperty, Object result) DoCheckComponent(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info, object parent)
         {
-            // SerializedProperty targetProperty = property;
-            // Type fieldType = info.FieldType;
-            // if (property.propertyType == SerializedPropertyType.Generic)
-            // {
-            //     object propertyValue = SerializedUtils.GetValue(property, info, parent);
-            //     if (propertyValue is IWrapProp wrapProp)
-            //     {
-            //         targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
-            //                          SerializedUtils.FindPropertyByAutoPropertyName(property,
-            //                              wrapProp.EditorPropertyName);
-            //
-            //         if(targetProperty == null)
-            //         {
-            //             return ($"{wrapProp.EditorPropertyName} not found in {property.propertyPath}", null);
-            //         }
-            //
-            //         var wrapFieldOrProp = Util.GetWrapProp(wrapProp);
-            //         fieldType = wrapFieldOrProp.IsField
-            //             ? wrapFieldOrProp.FieldInfo.FieldType
-            //             : wrapFieldOrProp.PropertyInfo.PropertyType;
-            //     }
-            // }
-            (string _, SerializedProperty targetProperty, Type fieldType, Type interfaceType) = GetPropAndType(property, info, parent);
+            (string error, SerializedProperty targetProperty, Type fieldType, Type interfaceType) = GetPropAndType(property, info, parent);
 
-            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
+            if (error != "")
             {
-                return ($"{targetProperty.propertyType} is not supported by GetComponent", targetProperty, null);
+                return (error, targetProperty, null);
             }
 
             Transform transform;

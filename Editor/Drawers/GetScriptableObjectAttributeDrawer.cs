@@ -78,6 +78,11 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
+            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return ($"{targetProperty.propertyType} type is not supported by GetScriptableObject", null);
+            }
+
             if (targetProperty.objectReferenceValue != null)
             {
                 return ("", null);

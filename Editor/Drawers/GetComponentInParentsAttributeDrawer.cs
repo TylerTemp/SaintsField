@@ -77,6 +77,13 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
+            bool multiple = getComponentInParentsAttribute.Limit >= 1;
+
+            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return ($"{targetProperty.propertyType} type is not supported by GetComponentInParent{(multiple? "s": "")}", null);
+            }
+
             if (targetProperty.objectReferenceValue != null)
             {
                 return ("", null);
@@ -94,7 +101,7 @@ namespace SaintsField.Editor.Drawers
                     transform = gameObject.transform;
                     break;
                 default:
-                    return ("GetComponentInParent(s)Attribute can only be used on Component or GameObject", null);
+                    return ($"GetComponentInParent{(multiple? "s": "")} can only be used on Component or GameObject", null);
             }
 
             Component componentInParent = null;
@@ -105,6 +112,7 @@ namespace SaintsField.Editor.Drawers
                 : int.MaxValue;
 
             bool isGameObject = type == typeof(GameObject);
+            List<string> checkingNames = new List<string>();
             while (componentInParent == null && curCheckingTrans != null && levelLimit > 0)
             {
                 curCheckingTrans = curCheckingTrans.parent;
@@ -112,6 +120,8 @@ namespace SaintsField.Editor.Drawers
                 {
                     break;
                 }
+
+                checkingNames.Add(curCheckingTrans.name);
 
                 if (isGameObject)
                 {
@@ -138,9 +148,14 @@ namespace SaintsField.Editor.Drawers
                 levelLimit--;
             }
 
+            if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
+            {
+                return ($"{targetProperty.propertyType} type is not supported by GetComponent", null);
+            }
+
             if (componentInParent == null)
             {
-                return ($"No {type} found in parent(s)", null);
+                return ($"No {type} found in parent{(multiple? "s": "")}: {string.Join(", ", checkingNames)}", null);
             }
 
             UnityEngine.Object result = componentInParent;

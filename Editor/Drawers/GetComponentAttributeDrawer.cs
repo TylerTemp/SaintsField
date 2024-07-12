@@ -80,7 +80,7 @@ namespace SaintsField.Editor.Drawers
 
             if (targetProperty.propertyType != SerializedPropertyType.ObjectReference)
             {
-                return ($"{targetProperty.propertyType} is not supported by GetComponent", null);
+                return ($"{targetProperty.propertyType} type is not supported by GetComponent", null);
             }
 
             if (targetProperty.objectReferenceValue != null)
