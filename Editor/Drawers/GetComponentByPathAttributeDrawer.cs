@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         // private bool _firstOpen = true;
-        private readonly Dictionary<int, bool> _drawerNotFirstOpenCache = new Dictionary<int, bool>();
+        private readonly Dictionary<string, bool> _drawerAlreadyOpenedOnceCache = new Dictionary<string, bool>();
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
@@ -69,19 +69,22 @@ namespace SaintsField.Editor.Drawers
                 return false;
             }
 
-            _drawerNotFirstOpenCache.TryGetValue(index, out bool notFirstOpen);
-            bool firstOpen = !notFirstOpen;
-
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            string cacheKey = $"{indexInArray}_{index}";
+            _drawerAlreadyOpenedOnceCache.TryGetValue(cacheKey, out bool alreadyOpenedOnce);
+            bool firstOpen = !alreadyOpenedOnce;
+
             Object result = indexInArray == -1
                 // ReSharper disable once ArrangeRedundantParentheses
                 ? (results.Count > 0? results[0]: null)
                 : results[indexInArray];
 
+            // Debug.Log($"{indexInArray} firstOpen={firstOpen} cur={targetProperty.objectReferenceValue} result={result}; keys={string.Join(",", _drawerAlreadyOpenedOnceCache.Keys)}");
+
             // Debug.Log($"fr={getComponentByPathAttribute.ForceResign}, equal={ReferenceEquals(property.objectReferenceValue, result)}");
             if(((firstOpen && targetProperty.objectReferenceValue == null) || getComponentByPathAttribute.ForceResign) && !ReferenceEquals(targetProperty.objectReferenceValue, result))
             {
-                // Debug.Log($"firstOpen={_firstOpen}; auto sign to {result}");
+                // Debug.Log($"firstOpen={firstOpen}; auto sign to {result}");
                 targetProperty.objectReferenceValue = result;
                 // property.serializedObject.ApplyModifiedProperties();
                 // valueChanged = true;
@@ -104,7 +107,8 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            _drawerNotFirstOpenCache[index] = true;
+            // Debug.Log($"opened: {cacheKey}");
+            _drawerAlreadyOpenedOnceCache[cacheKey] = true;
 
             return willDraw;
         }
