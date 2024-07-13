@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers
         private static (string error, UnityEngine.Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             SerializedProperty targetProperty = property;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
@@ -81,10 +81,10 @@ namespace SaintsField.Editor.Drawers
                 return ($"{targetProperty.propertyType} type is not supported by GetPrefabWithComponent", null);
             }
 
-            if (targetProperty.objectReferenceValue != null)
-            {
-                return ("", null);
-            }
+            // if (targetProperty.objectReferenceValue != null)
+            // {
+            //     return ("", null);
+            // }
 
             GetPrefabWithComponentAttribute getPrefabWithComponentAttribute = (GetPrefabWithComponentAttribute) saintsAttribute;
 
@@ -95,7 +95,8 @@ namespace SaintsField.Editor.Drawers
 
             Type type = getPrefabWithComponentAttribute.CompType ?? fieldType;
 
-            Component prefabWithComponent = null;
+            // List<Component> prefabWithComponents = new List<Component>();
+            List<UnityEngine.Object> results = new List<UnityEngine.Object>();
 
             string[] guids = AssetDatabase.FindAssets("t:Prefab");
             foreach (string guid in guids)
@@ -113,39 +114,58 @@ namespace SaintsField.Editor.Drawers
 
                 if (findSelfComponent != null)
                 {
-                    prefabWithComponent = findSelfComponent;
-                    break;
-                }
+                    UnityEngine.Object findResult = findSelfComponent;
 
-                // Component findComponent = rootGameObject.GetComponentInChildren(type, includeInactive);
-                // // ReSharper disable once InvertIf
-                // if (findComponent != null)
-                // {
-                //     prefabWithComponent = findComponent;
-                //     break;
-                // }
+                    if (fieldType != type)
+                    {
+                        if(fieldType == typeof(GameObject))
+                        {
+                            findResult = findSelfComponent.gameObject;
+                            results.Add(findResult);
+                        }
+                        else
+                        {
+                            findResult = interfaceType == null
+                                ? findSelfComponent.GetComponent(fieldType)
+                                : findSelfComponent.GetComponents(fieldType).FirstOrDefault(interfaceType.IsInstanceOfType);
+                            if (findResult != null)
+                            {
+                                results.Add(findResult);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        results.Add(findResult);
+                    }
+                }
             }
 
-            if (prefabWithComponent == null)
+            if (results.Count == 0)
             {
                 return ($"No {type} found with prefab", null);
             }
 
-            UnityEngine.Object result = prefabWithComponent;
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-            if (fieldType != type)
+            if (indexInArray == 0)
             {
-                if(fieldType == typeof(GameObject))
+                SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
+                if (arrayProp.arraySize != results.Count)
                 {
-                    result = prefabWithComponent.gameObject;
-                }
-                else
-                {
-                    result = interfaceType == null
-                        ? prefabWithComponent.GetComponent(fieldType)
-                        : prefabWithComponent.GetComponents(fieldType).FirstOrDefault(interfaceType.IsInstanceOfType);
+                    arrayProp.arraySize = results.Count;
+                    arrayProp.serializedObject.ApplyModifiedProperties();
                 }
             }
+
+            int useIndexInArray = indexInArray != -1 ? indexInArray: 0;
+
+            if (useIndexInArray >= results.Count)
+            {
+                return ($"No {type} found on any prefab {(indexInArray == -1 ? "": $"[{indexInArray}]")}", null);
+            }
+
+            UnityEngine.Object result = results[useIndexInArray];
 
             if (targetProperty.objectReferenceValue != result)
             {
@@ -153,6 +173,89 @@ namespace SaintsField.Editor.Drawers
             }
 
             return ("", result);
+        }
+
+        public static int HelperGetArraySize(GetPrefabWithComponentAttribute getPrefabWithComponentAttribute, FieldInfo info)
+        {
+            Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
+            if (fieldType == null)
+            {
+                return -1;
+            }
+
+            Type interfaceType = null;
+
+            if (typeof(IWrapProp).IsAssignableFrom(fieldType))
+            {
+                Type mostBaseType = Util.GetMostBaseType(fieldType);
+                if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                {
+                    IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                    if (genericArguments.Count == 2)
+                    {
+                        fieldType = genericArguments[0];
+                        interfaceType = genericArguments[1];
+                    }
+                }
+
+                if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
+                {
+                    fieldType = typeof(Component);
+                }
+            }
+
+            if (getPrefabWithComponentAttribute.CompType == typeof(GameObject))
+            {
+                return -1;
+            }
+
+            Type type = getPrefabWithComponentAttribute.CompType ?? fieldType;
+
+            List<UnityEngine.Object> results = new List<UnityEngine.Object>();
+
+            string[] guids = AssetDatabase.FindAssets("t:Prefab");
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                GameObject toCheck = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (toCheck == null)
+                {
+                    continue;
+                }
+
+                Component findSelfComponent = interfaceType == null
+                    ? toCheck.GetComponent(type)
+                    : toCheck.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
+
+                if (findSelfComponent != null)
+                {
+                    UnityEngine.Object findResult = findSelfComponent;
+
+                    if (fieldType != type)
+                    {
+                        if(fieldType == typeof(GameObject))
+                        {
+                            return 1;
+                        }
+                        else
+                        {
+                            findResult = interfaceType == null
+                                ? findSelfComponent.GetComponent(fieldType)
+                                : findSelfComponent.GetComponents(fieldType).FirstOrDefault(interfaceType.IsInstanceOfType);
+                            if (findResult != null)
+                            {
+                                return 1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return 1;
+                    }
+                }
+            }
+
+            return 0;
         }
 
 #if UNITY_2021_3_OR_NEWER

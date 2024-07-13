@@ -2210,6 +2210,8 @@ MonoBehaviour:
   getComponentInChildrenList:
   - {fileID: 74059532}
   - {fileID: 74059534}
+  getComponentIArray: []
+  getComponentIList: []
 --- !u!114 &454510174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2224,11 +2226,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getComponentInParentArray:
   - {fileID: 1271404094}
-  - {fileID: 1271404094}
   - {fileID: 1516486913}
   - {fileID: 1631756501}
   - {fileID: 556802675}
   - {fileID: 842523985}
+  - {fileID: 842523986}
   - {fileID: 842523986}
   - {fileID: 454510170}
   - {fileID: 454510169}
@@ -2236,14 +2238,13 @@ MonoBehaviour:
   - {fileID: 74059532}
   - {fileID: 74059534}
   - {fileID: 1902718156}
-  - {fileID: 1902718155}
   getComponentInParentsList:
   - {fileID: 1271404094}
-  - {fileID: 1271404094}
   - {fileID: 1516486913}
   - {fileID: 1631756501}
   - {fileID: 556802675}
   - {fileID: 842523985}
+  - {fileID: 842523986}
   - {fileID: 842523986}
   - {fileID: 454510170}
   - {fileID: 454510169}
@@ -2251,7 +2252,6 @@ MonoBehaviour:
   - {fileID: 74059532}
   - {fileID: 74059534}
   - {fileID: 1902718156}
-  - {fileID: 1902718155}
 --- !u!1 &461560855
 GameObject:
   m_ObjectHideFlags: 0
@@ -8929,6 +8929,7 @@ GameObject:
   - component: {fileID: 842523986}
   - component: {fileID: 842523987}
   - component: {fileID: 842523988}
+  - component: {fileID: 842523989}
   m_Layer: 0
   m_Name: Issue45
   m_TagString: Untagged
@@ -9007,6 +9008,22 @@ MonoBehaviour:
   - {fileID: 74059534}
   - {fileID: 1902718156}
   - {fileID: 1902718155}
+  getComponentIArray:
+  - <V>k__BackingField: {fileID: 454510170}
+  - <V>k__BackingField: {fileID: 454510169}
+  - <V>k__BackingField: {fileID: 454510172}
+  - <V>k__BackingField: {fileID: 74059532}
+  - <V>k__BackingField: {fileID: 74059534}
+  - <V>k__BackingField: {fileID: 1902718156}
+  - <V>k__BackingField: {fileID: 1902718155}
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 454510170}
+  - <V>k__BackingField: {fileID: 454510169}
+  - <V>k__BackingField: {fileID: 454510172}
+  - <V>k__BackingField: {fileID: 74059532}
+  - <V>k__BackingField: {fileID: 74059534}
+  - <V>k__BackingField: {fileID: 1902718156}
+  - <V>k__BackingField: {fileID: 1902718155}
 --- !u!114 &842523988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9028,6 +9045,38 @@ MonoBehaviour:
   getComponentByPathList:
   - {fileID: 1902718156}
   - {fileID: 1902718155}
+--- !u!114 &842523989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 842523983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b870edd8a84301f4580d8461311a4ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dummies:
+  - {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  dummyGos:
+  - {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - {fileID: 5246858966939522138, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  getComponentIArray:
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - <V>k__BackingField: {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - <V>k__BackingField: {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
 --- !u!1 &847311490
 GameObject:
   m_ObjectHideFlags: 0

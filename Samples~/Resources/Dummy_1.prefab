@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2288744733664726437}
   - component: {fileID: -6935260394308745233}
   m_Layer: 0
-  m_Name: Dummy
+  m_Name: Dummy_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1833c50b28d4d34b507e6d12f466f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  comment: p0.0
+  comment: p1.0
 --- !u!114 &2288744733664726437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,4 +71,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1833c50b28d4d34b507e6d12f466f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  comment: p0.1
+  comment: p1.1

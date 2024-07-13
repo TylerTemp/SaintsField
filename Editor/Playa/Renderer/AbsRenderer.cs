@@ -243,6 +243,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     return GetComponentInSceneAttributeDrawer.HelperGetArraySize(getComponentInSceneAttribute, info);
                 case GetComponentByPathAttribute getComponentByPathAttribute:
                     return GetComponentByPathAttributeDrawer.HelperGetArraySize(property, getComponentByPathAttribute, info);
+                case GetPrefabWithComponentAttribute getPrefabWithComponentAttribute:
+                    return GetPrefabWithComponentAttributeDrawer.HelperGetArraySize(getPrefabWithComponentAttribute, info);
                 default:
                     return -1;
             }
