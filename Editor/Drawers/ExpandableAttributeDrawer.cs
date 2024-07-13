@@ -289,6 +289,10 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Foldout foldOut = container.Q<Foldout>(NameFoldout(property));
+            if (!foldOut.value)
+            {
+                return;
+            }
 
             VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
             Object curObject = (Object) propsElement.userData;
