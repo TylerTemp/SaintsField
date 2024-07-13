@@ -128,7 +128,8 @@ namespace SaintsField.Editor.Utils
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Generic:
-                    if (SerializedUtils.GetValue(property, fieldInfo, parent) is IWrapProp wrapProp)
+                    (string error, int _, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+                    if (error == "" && value is IWrapProp wrapProp)
                     {
                         string propName = wrapProp.EditorPropertyName;
                         SerializedProperty wrapProperty = property.FindPropertyRelative(propName) ??
@@ -475,9 +476,11 @@ namespace SaintsField.Editor.Utils
                         }
                         else
                         {
-                            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                            object rawValue = fieldInfo.GetValue(target);
-                            object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+                            (string error, int arrayIndex, object curValue) = SerializedUtils.GetValue(property, fieldInfo, target);
+                            if (error != "")
+                            {
+                                return (error, defaultValue);
+                            }
 
                             passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
                                 ? new[]
@@ -545,8 +548,7 @@ namespace SaintsField.Editor.Utils
                 return ("", finalResult);
             }
 
-            string error = $"No field or method named `{by}` found on `{target}`";
-            return (error, defaultValue);
+            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
         }
 
         public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
@@ -557,9 +559,11 @@ namespace SaintsField.Editor.Utils
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            object rawValue = fieldInfo.GetValue(target);
-            object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+            (string error, int arrayIndex, object curValue) = SerializedUtils.GetValue(property, fieldInfo, target);
+            if (error != "")
+            {
+                return (error, defaultValue);
+            }
 
             foreach (Type type in types)
             {
@@ -606,8 +610,7 @@ namespace SaintsField.Editor.Utils
                 return ("", result);
             }
 
-            string error = $"No field or method named `{by}` found on `{target}`";
-            return (error, defaultValue);
+            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
         }
 
         public static UnityEngine.Object GetTypeFromObj(UnityEngine.Object fieldResult, Type fieldType)

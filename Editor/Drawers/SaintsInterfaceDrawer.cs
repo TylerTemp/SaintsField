@@ -184,14 +184,19 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static (IWrapProp propInfo, int index, object parent) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
+        private static (string error, IWrapProp propInfo, int index, object parent) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
         {
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
-            object rawValue = fieldInfo.GetValue(parent);
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            IWrapProp curValue = (IWrapProp)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
 
-            return (curValue, arrayIndex, parent);
+            (string error, int arrayIndex, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+
+            if (error != "")
+            {
+                return (error, null, -1, null);
+            }
+
+            IWrapProp curValue = (IWrapProp) value;
+            return ("", curValue, arrayIndex, parent);
         }
 
         #region IMGUI
@@ -296,7 +301,11 @@ namespace SaintsField.Editor.Drawers
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            (IWrapProp saintsInterfaceProp, int curInArrayIndex, object _) = GetSerName(property, fieldInfo);
+            (string error, IWrapProp saintsInterfaceProp, int curInArrayIndex, object _) = GetSerName(property, fieldInfo);
+            if (error != "")
+            {
+                return new HelpBox(error, HelpBoxMessageType.Error);
+            }
             SerializedProperty valueProp = property.FindPropertyRelative(saintsInterfaceProp.EditorPropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, saintsInterfaceProp.EditorPropertyName);
             string displayLabel = curInArrayIndex == -1 ? property.displayName : $"Element {curInArrayIndex}";
             PropertyField propertyField = new PropertyField(valueProp, "")

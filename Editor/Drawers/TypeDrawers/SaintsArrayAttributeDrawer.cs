@@ -12,18 +12,17 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
     [CustomPropertyDrawer(typeof(SaintsArrayAttribute))]
     public class SaintsArrayAttributeDrawer: SaintsPropertyDrawer
     {
-        private static (string propName, int index) GetSerName(SerializedProperty property, SaintsArrayAttribute saintsArrayAttribute, FieldInfo fieldInfo, object parent)
+        private static (string error, string propName, int index) GetSerName(SerializedProperty property, SaintsArrayAttribute saintsArrayAttribute, FieldInfo fieldInfo, object parent)
         {
             if(saintsArrayAttribute.PropertyName != null)
             {
-                return (saintsArrayAttribute.PropertyName, SerializedUtils.PropertyPathIndex(property.propertyPath));
+                return ("", saintsArrayAttribute.PropertyName, SerializedUtils.PropertyPathIndex(property.propertyPath));
             }
 
-            object rawValue = fieldInfo.GetValue(parent);
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            IWrapProp curValue = (IWrapProp)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
+            (string error, int arrayIndex, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
 
-            return (curValue.EditorPropertyName, arrayIndex);
+            IWrapProp curValue = (IWrapProp) value;
+            return ("", curValue.EditorPropertyName, arrayIndex);
         }
 
         #region IMGUI
@@ -64,7 +63,11 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
         {
-            (string propName, int index) = GetSerName(property, (SaintsArrayAttribute) saintsAttribute, info, parent);
+            (string error, string propName, int index) = GetSerName(property, (SaintsArrayAttribute) saintsAttribute, info, parent);
+            if (error != "")
+            {
+                return new HelpBox(error, HelpBoxMessageType.Error);
+            }
             SerializedProperty arrProperty = property.FindPropertyRelative(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propName);
             PropertyField propertyField = new PropertyField(arrProperty, index == -1? null: $"Element {index}")
             {

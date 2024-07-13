@@ -26,5 +26,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public MyData[] myDataArr;
 
         public string below;
+
+
+        [ListDrawerSettings(searchable: true), GetScriptableObject] public Scriptable[] searchScriptable;
     }
 }

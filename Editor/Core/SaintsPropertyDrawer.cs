@@ -1295,15 +1295,13 @@ namespace SaintsField.Editor.Core
                     // Debug.Log($"changed.changed={changed.changed}");
                     if (changed.changed && !onGUIPayload.changed)
                     {
-                        // Debug.Log($"set changed to true");
-                        // PropertyPathToShared[property.propertyPath].Changed = true;
-                        // onGUIPayload.changed = true;
                         property.serializedObject.ApplyModifiedProperties();
-                        // onGUIPayload.newValue = fieldInfo.GetValue();
-                        object rawValue = fieldInfo.GetValue(parent);
-                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                        object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-                        onGUIPayload.SetValue(curValue);
+
+                        (string error, int _, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+                        if (error != "")
+                        {
+                            onGUIPayload.SetValue(value);
+                        }
                     }
                 }
 
@@ -1804,6 +1802,15 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute.GetType().Name))}");
 #endif
+            try
+            {
+                string _ = property.propertyPath;
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+
             // ReSharper disable once ConvertToLocalFunction
             Action<object> onValueChangedCallback = null;
             onValueChangedCallback = obj =>
@@ -1879,12 +1886,11 @@ namespace SaintsField.Editor.Core
                     {
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                        object rawValue = fieldInfo.GetValue(noCacheParent);
-                        object curValue = arrayIndex == -1
-                            ? rawValue
-                            : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-                        onValueChangedCallback(curValue);
+                        (string error, int _, object curValue) = SerializedUtils.GetValue(property, fieldInfo, noCacheParent);
+                        if (error != "")
+                        {
+                            onValueChangedCallback(curValue);
+                        }
                     }
                 });
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);

@@ -13,14 +13,20 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
     [CustomPropertyDrawer(typeof(SaintsArray<>))]
     public class SaintsArrayDrawer: PropertyDrawer
     {
-        private static (string propName, int index) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
+        private static (string error, string propName, int index) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
         {
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
             object rawValue = fieldInfo.GetValue(parent);
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            IWrapProp curValue = (IWrapProp)(arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex));
 
-            return (curValue.EditorPropertyName, arrayIndex);
+            (string error, int index, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+            if (error != "")
+            {
+                return (error, null, index);
+            }
+
+            IWrapProp curValue = (IWrapProp) value;
+            return ("", curValue.EditorPropertyName, arrayIndex);
         }
 
         #region IMGUI
@@ -51,7 +57,11 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            (string propRawName, int curInArrayIndex) = GetSerName(property, fieldInfo);
+            (string error, string propRawName, int curInArrayIndex) = GetSerName(property, fieldInfo);
+            if (error != "")
+            {
+                return new HelpBox(error, HelpBoxMessageType.Error);
+            }
             SerializedProperty arrProperty = property.FindPropertyRelative(propRawName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propRawName);
             // return new PropertyField(arrProperty);
             return new PropertyField(arrProperty, curInArrayIndex == -1? property.displayName : $"Element {curInArrayIndex}");

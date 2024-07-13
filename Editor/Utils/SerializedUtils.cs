@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Utils
                     }
 
                     // Debug.Log($"Get index from obj {useObject}[{elemIndex}]");
-                    sourceObj = GetValueAtIndex(useObject, elemIndex);
+                    sourceObj = GetValueAtIndex(useObject, elemIndex).Item2;
                     // Debug.Log($"Get index from obj [{useObject}] returns {sourceObj}");
                     fieldOrProp = default;
                     // Debug.Log($"[index={elemIndex}]={targetObj}");
@@ -206,7 +206,7 @@ namespace SaintsField.Editor.Utils
             throw new Exception($"Unable to get type from {source}");
         }
 
-        public static object GetValueAtIndex(object source, int index)
+        private static (string error, object result) GetValueAtIndex(object source, int index)
         {
             if (!(source is IEnumerable enumerable))
             {
@@ -220,12 +220,12 @@ namespace SaintsField.Editor.Utils
                 // Debug.Log($"check index {searchIndex} in {source}");
                 if(searchIndex == index)
                 {
-                    return result;
+                    return ("", result);
                 }
                 searchIndex++;
             }
 
-            throw new Exception($"Not found index {index} in {source}");
+            return ($"Not found index {index} in {source}", null);
         }
 
         public static int PropertyPathIndex(string propertyPath)
@@ -241,11 +241,23 @@ namespace SaintsField.Editor.Utils
             return -1;
         }
 
-        public static object GetValue(SerializedProperty property, FieldInfo fieldInfo, object parent)
+        public static (string error, int index, object value) GetValue(SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
             int arrayIndex = PropertyPathIndex(property.propertyPath);
             object rawValue = fieldInfo.GetValue(parent);
-            return arrayIndex == -1 ? rawValue : GetValueAtIndex(rawValue, arrayIndex);
+
+            if (arrayIndex == -1)
+            {
+                return ("", -1, rawValue);
+            }
+
+            (string indexError, object indexResult) = GetValueAtIndex(rawValue, arrayIndex);
+            if (indexError != "")
+            {
+                return (indexError, -1, null);
+            }
+
+            return ("", arrayIndex, indexResult);
         }
 
         public static IEnumerable<SerializedProperty> GetPropertyChildren(SerializedProperty property)

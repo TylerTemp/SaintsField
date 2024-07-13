@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -16,15 +17,17 @@ namespace SaintsField.Editor.Playa
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
     public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
     {
-        private static (int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
+        private static (string error, int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            object rawValue = fieldInfo.GetValue(parentValue);
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-            object value = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-            // Debug.Log($"get value {value} at index {arrayIndex} from {rawValue}");
-            return (arrayIndex, parentValue, value);
+            (string error, int index, object value) = SerializedUtils.GetValue(property, fieldInfo, parentValue);
+            if (error != "")
+            {
+                return (error, -1, parentValue, null);
+            }
+
+            return ("", index, parentValue, value);
         }
 
         private static IEnumerable<(string name, SerializedProperty property)> GetSerializableFieldInfo(SerializedProperty property)
@@ -71,9 +74,17 @@ namespace SaintsField.Editor.Playa
             }
 
             // Debug.Log($"create new for {property.propertyPath}");
-            (int index, object _, object current) = GetTargets(fieldInfo, property);
-            Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
-            return _imGuiRenderers[index] = SaintsEditor.GetRenderers(serializedFieldNames, property.serializedObject, current);
+            (string error, int index, object _, object current) = GetTargets(fieldInfo, property);
+            if(error == "" )
+            {
+                Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
+                    .ToDictionary(each => each.name, each => each.property);
+                return _imGuiRenderers[index] =
+                    SaintsEditor.GetRenderers(serializedFieldNames, property.serializedObject, current);
+            }
+
+            Debug.LogWarning(error);
+            return Array.Empty<ISaintsRenderer>();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -155,10 +166,11 @@ namespace SaintsField.Editor.Playa
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            object rawValue = fieldInfo.GetValue(parentValue);
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-
-            object value = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
+            (string error, int index, object value)= SerializedUtils.GetValue(property, fieldInfo, parentValue);
+            if (error != null)
+            {
+                return new HelpBox(error, HelpBoxMessageType.Error);
+            }
 
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
 
