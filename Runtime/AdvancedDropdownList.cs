@@ -23,6 +23,16 @@ namespace SaintsField
         public string icon { get; }
         public bool isSeparator { get; }
 
+        public AdvancedDropdownList()
+        {
+            displayName = "";
+            _typeValue = default;
+            _typeChildren = new List<AdvancedDropdownList<T>>();
+            disabled = false;
+            icon = null;
+            isSeparator = false;
+        }
+
         public AdvancedDropdownList(string displayName, bool disabled = false, string icon = null)
         {
             this.displayName = displayName;

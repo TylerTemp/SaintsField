@@ -2171,6 +2171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79df818bce4963b49a4136431481d698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  getComponent: {fileID: 454510170}
   getComponentArray:
   - {fileID: 454510170}
   - {fileID: 454510169}
@@ -2204,6 +2205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fbb524b8b9189b43b7cadc1645e79fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  getComponentInChildren: {fileID: 74059532}
   getComponentInChildrenArray:
   - {fileID: 74059532}
   - {fileID: 74059534}
@@ -2225,33 +2227,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   getComponentInParentArray:
-  - {fileID: 1271404094}
-  - {fileID: 1516486913}
-  - {fileID: 1631756501}
-  - {fileID: 556802675}
-  - {fileID: 842523985}
-  - {fileID: 842523986}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 842523986}
   - {fileID: 454510170}
   - {fileID: 454510169}
-  - {fileID: 454510172}
-  - {fileID: 74059532}
-  - {fileID: 74059534}
-  - {fileID: 1902718156}
   getComponentInParentsList:
-  - {fileID: 1271404094}
-  - {fileID: 1516486913}
-  - {fileID: 1631756501}
-  - {fileID: 556802675}
-  - {fileID: 842523985}
-  - {fileID: 842523986}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 842523986}
   - {fileID: 454510170}
   - {fileID: 454510169}
-  - {fileID: 454510172}
-  - {fileID: 74059532}
-  - {fileID: 74059534}
-  - {fileID: 1902718156}
 --- !u!1 &461560855
 GameObject:
   m_ObjectHideFlags: 0
@@ -8993,6 +8987,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fbb524b8b9189b43b7cadc1645e79fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  getComponentInChildren: {fileID: 454510170}
   getComponentInChildrenArray:
   - {fileID: 454510170}
   - {fileID: 454510169}
@@ -9037,6 +9032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0c09a6a0b54656428a1457a6364575b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  getComponentByPath: {fileID: 454510170}
   getComponentByPathArray:
   - {fileID: 454510170}
   - {fileID: 454510169}
@@ -9058,6 +9054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b870edd8a84301f4580d8461311a4ff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   dummies:
   - {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   - {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
@@ -9090,6 +9087,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 655f1dbba18b27c46879fbaf6e8c17c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dummy: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
   dummies:
   - {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
   - {fileID: 11400000, guid: b2e57ce1d7fbe5345a38f4feb30cdc6f, type: 2}

@@ -1178,6 +1178,7 @@ GameObject:
   - component: {fileID: 1704623440}
   - component: {fileID: 1704623439}
   - component: {fileID: 1704623441}
+  - component: {fileID: 1704623442}
   m_Layer: 0
   m_Name: Issue45
   m_TagString: Untagged
@@ -1324,6 +1325,22 @@ MonoBehaviour:
   - <V>k__BackingField: {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
   - <V>k__BackingField: {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
   - <V>k__BackingField: {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+--- !u!114 &1704623442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704623433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6e10f3a8cf29b349b91b4c9481a568c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getSoIArray:
+  - <V>k__BackingField: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
+  - <V>k__BackingField: {fileID: 11400000, guid: b2e57ce1d7fbe5345a38f4feb30cdc6f, type: 2}
+  - <V>k__BackingField: {fileID: 11400000, guid: 11616eb928903e14ba9efde4e1a0e90a, type: 2}
 --- !u!1 &1772967109
 GameObject:
   m_ObjectHideFlags: 0

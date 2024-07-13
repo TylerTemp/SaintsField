@@ -172,12 +172,14 @@ namespace SaintsField.Editor.Drawers
             new UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>>();
 
         private bool _isFlat;
+        private float _maxHeight;
 
-        public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width, Action<string, object> setValue)
+        public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width, float maxHeight, Action<string, object> setValue)
         {
             _width = width;
             _metaInfo = metaInfo;
             _setValue = setValue;
+            _maxHeight = maxHeight;
 
             _isFlat = metaInfo.DropdownListValue.All(each => each.ChildCount() == 0);
         }
@@ -409,7 +411,8 @@ namespace SaintsField.Editor.Drawers
 
             float height = contentContainer.resolvedStyle.height + toolbarSearchContainer.resolvedStyle.height + toolbarBreadcrumbs.resolvedStyle.height + 8;
 
-            editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, height);
+            editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, Mathf.Min(height, _maxHeight));
+            // editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, height);
             // VisualElement target = (VisualElement)evt.target;
             // // float newHeight = evt.newRect.height + 5;
             // float newHeight = target.resolvedStyle.height + 1;
@@ -1122,9 +1125,14 @@ namespace SaintsField.Editor.Drawers
             dropdownButton.buttonElement.clicked += () =>
             {
                 MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
+                // Debug.Log(root.worldBound);
+                // Debug.Log(Screen.height);
+                float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 250;
+                // float maxHeight = 4000f;
                 UnityEditor.PopupWindow.Show(root.worldBound, new SaintsAdvancedDropdownUiToolkit(
                     metaInfo,
                     root.worldBound.width,
+                    maxHeight,
                     (newDisplay, curItem) =>
                     {
                         Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
