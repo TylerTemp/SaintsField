@@ -6,6 +6,7 @@ namespace SaintsField.Samples.IssueAndTesting.Issue.Issue45
 {
     public class GetComponentArray : MonoBehaviour
     {
+        [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy getComponent;
         [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentArray;
         [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentList;
 

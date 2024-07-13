@@ -5,6 +5,7 @@
 3.  Fix callback won't fill null parameter value when the value of the target is null
 4.  Deprecated `PlayaArraySize`. Just use `ArraySize` instead.
 5.  Fix `SaintsInterface` drawer did not work inside array.
+6.  [#45](https://github.com/TylerTemp/SaintsField/issues/45): Now `GetComponent*` works with array/list, and will be auto filled if you have `SaintsEditor` enabled. 
 
 ## 3.1.3
 

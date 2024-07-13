@@ -7,6 +7,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
     public class GetScriptableObjectArray : MonoBehaviour
     {
+        [GetScriptableObject] public ScriptableInter12 dummy;
         [GetScriptableObject] public ScriptableInter12[] dummies;
         [GetScriptableObject] public List<ScriptableInter12> dummyGos;
 

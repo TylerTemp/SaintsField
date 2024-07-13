@@ -6,6 +6,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
     public class GetPrefabArray : MonoBehaviour
     {
+        [GetPrefabWithComponent] public Dummy dummy;
         [GetPrefabWithComponent] public Dummy[] dummies;
         [GetPrefabWithComponent(typeof(Dummy))] public List<GameObject> dummyGos;
 
