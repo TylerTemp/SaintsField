@@ -261,6 +261,10 @@ MonoBehaviour:
     myGameObject: {fileID: 68442101}
     myStrings: []
   below: 
+  searchScriptable:
+  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
 --- !u!1 &171104905
 GameObject:
   m_ObjectHideFlags: 0

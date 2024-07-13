@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class ListDrawerSettingsExample : MonoBehaviour
+    public class ListDrawerSettingsExample : SaintsMonoBehavior
     {
         [Serializable]
         public struct MyData
@@ -28,6 +28,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string below;
 
 
-        [ListDrawerSettings(searchable: true), GetScriptableObject] public Scriptable[] searchScriptable;
+        [ListDrawerSettings(searchable: true), GetScriptableObject, Expandable] public Scriptable[] searchScriptable;
     }
 }

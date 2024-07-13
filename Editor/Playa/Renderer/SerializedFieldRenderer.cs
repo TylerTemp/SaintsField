@@ -1033,6 +1033,10 @@ namespace SaintsField.Editor.Playa.Renderer
                     return property.colorValue.ToString().Contains(search);
                 case SerializedPropertyType.ObjectReference:
                     // ReSharper disable once Unity.NoNullPropagation
+                    if (property.objectReferenceValue is ScriptableObject so)
+                    {
+                        return SearchSoProp(so, search);
+                    }
                     return property.objectReferenceValue?.name.Contains(search) ?? false;
                 case SerializedPropertyType.LayerMask:
                     return property.intValue.ToString().Contains(search);
@@ -1106,6 +1110,21 @@ namespace SaintsField.Editor.Playa.Renderer
                 default:
                     return false;
             }
+        }
+
+        private static bool SearchSoProp(ScriptableObject so, string search)
+        {
+            SerializedObject serializedObject = new SerializedObject(so);
+            SerializedProperty iterator = serializedObject.GetIterator();
+            while (iterator.NextVisible(true))
+            {
+                if(SearchProp(iterator, search))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private struct PagingInfo
