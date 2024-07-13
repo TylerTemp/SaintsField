@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers
         private static (string error, Object result) DoCheckComponent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             SerializedProperty targetProperty = property;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
@@ -83,19 +83,13 @@ namespace SaintsField.Editor.Drawers
                 return ($"{targetProperty.propertyType} type is not supported by GetScriptableObject", null);
             }
 
-            if (targetProperty.objectReferenceValue != null)
-            {
-                return ("", null);
-            }
-
             GetScriptableObjectAttribute getScriptableObjectAttribute = (GetScriptableObjectAttribute) saintsAttribute;
 
             string nameNoArray = fieldType.Name;
-            if(SerializedUtils.PropertyPathIndex(targetProperty.propertyPath) != -1)
+            if (nameNoArray.EndsWith("[]"))
             {
-                fieldType = fieldType.GetElementType();
-                Debug.Assert(fieldType != null);
-                nameNoArray = fieldType.Name.Replace("[]", "");
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                nameNoArray = nameNoArray.Substring(0, nameNoArray.Length - 2);
             }
 
             IEnumerable<string> paths = AssetDatabase.FindAssets($"t:{nameNoArray}")
@@ -105,17 +99,93 @@ namespace SaintsField.Editor.Drawers
             {
                 paths = paths.Where(each => each.EndsWith(getScriptableObjectAttribute.PathSuffix));
             }
-            Object result = paths
+            Object[] results = paths
                 .Select(each => AssetDatabase.LoadAssetAtPath(each, fieldType))
-                .FirstOrDefault(each => interfaceType == null? each != null: interfaceType.IsInstanceOfType(each));
+                // ReSharper disable once MergeConditionalExpression
+                .Where(each => interfaceType == null? each != null: interfaceType.IsInstanceOfType(each))
+                .ToArray();
 
-            if (result == null)
+            if (results.Length == 0)
             {
                 return ($"Can not find {nameNoArray} type asset", null);
             }
 
-            targetProperty.objectReferenceValue = result;
+            int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (indexInArray == 0)
+            {
+                SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
+                if (arrayProp.arraySize != results.Length)
+                {
+                    arrayProp.arraySize = results.Length;
+                    arrayProp.serializedObject.ApplyModifiedProperties();
+                }
+            }
+            int useIndexInArray = indexInArray != -1 ? indexInArray: 0;
+
+            if (useIndexInArray >= results.Length)
+            {
+                return ($"Out of range {nameNoArray} type asset{(indexInArray == -1 ? "": $"[{indexInArray}]")}", null);
+            }
+
+            Object result = results[useIndexInArray];
+
+            if (!ReferenceEquals(targetProperty.objectReferenceValue, result))
+            {
+                targetProperty.objectReferenceValue = result;
+            }
+
             return ("", result);
+        }
+
+
+        public static int HelperGetArraySize(GetScriptableObjectAttribute getScriptableObjectAttribute, FieldInfo info)
+        {
+            Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
+            if (fieldType == null)
+            {
+                return -1;
+            }
+
+            Type interfaceType = null;
+
+            if (typeof(IWrapProp).IsAssignableFrom(fieldType))
+            {
+                Type mostBaseType = Util.GetMostBaseType(fieldType);
+                if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                {
+                    IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                    if (genericArguments.Count == 2)
+                    {
+                        fieldType = genericArguments[0];
+                        interfaceType = genericArguments[1];
+                    }
+                }
+
+                if (interfaceType != null && fieldType != typeof(ScriptableObject) && !fieldType.IsSubclassOf(typeof(ScriptableObject)) && typeof(ScriptableObject).IsSubclassOf(fieldType))
+                {
+                    fieldType = typeof(ScriptableObject);
+                }
+            }
+
+            string nameNoArray = fieldType.Name;
+            if (nameNoArray.EndsWith("[]"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                nameNoArray = nameNoArray.Substring(0, nameNoArray.Length - 2);
+            }
+
+            IEnumerable<string> paths = AssetDatabase.FindAssets($"t:{nameNoArray}")
+                .Select(AssetDatabase.GUIDToAssetPath);
+
+            if (getScriptableObjectAttribute.PathSuffix != null)
+            {
+                paths = paths.Where(each => each.EndsWith(getScriptableObjectAttribute.PathSuffix));
+            }
+            bool found = paths
+                .Select(each => AssetDatabase.LoadAssetAtPath(each, fieldType))
+                // ReSharper disable once MergeConditionalExpression
+                .Any(each => interfaceType == null? each != null: interfaceType.IsInstanceOfType(each));
+            return found ? 1 : 0;
         }
 
 #if UNITY_2021_3_OR_NEWER

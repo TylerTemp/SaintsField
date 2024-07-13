@@ -229,8 +229,10 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             switch (genArraySizeAttribute)
             {
+#pragma warning disable 0618
                 case PlayaArraySizeAttribute playaArraySizeAttribute:
                     return playaArraySizeAttribute.Size;
+#pragma warning restore 0618
                 case ArraySizeAttribute arraySizeAttribute:
                     return arraySizeAttribute.Size;
                 case GetComponentAttribute getComponentAttribute:
@@ -245,6 +247,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     return GetComponentByPathAttributeDrawer.HelperGetArraySize(property, getComponentByPathAttribute, info);
                 case GetPrefabWithComponentAttribute getPrefabWithComponentAttribute:
                     return GetPrefabWithComponentAttributeDrawer.HelperGetArraySize(getPrefabWithComponentAttribute, info);
+                case GetScriptableObjectAttribute getScriptableObjectAttribute:
+                    return GetScriptableObjectAttributeDrawer.HelperGetArraySize(getScriptableObjectAttribute, info);
                 default:
                     return -1;
             }

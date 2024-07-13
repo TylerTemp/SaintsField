@@ -1177,6 +1177,7 @@ GameObject:
   - component: {fileID: 1704623436}
   - component: {fileID: 1704623440}
   - component: {fileID: 1704623439}
+  - component: {fileID: 1704623441}
   m_Layer: 0
   m_Name: Issue45
   m_TagString: Untagged
@@ -1291,6 +1292,38 @@ MonoBehaviour:
   getComponentIList:
   - <V>k__BackingField: {fileID: 1704623437}
   - <V>k__BackingField: {fileID: 1704623436}
+--- !u!114 &1704623441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704623433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cb582d430c90ee42931d4fbb0d85a08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dummies:
+  - {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  dummyGos:
+  - {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - {fileID: 5246858966939522138, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  getComponentIArray:
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - <V>k__BackingField: {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - <V>k__BackingField: {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - <V>k__BackingField: {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
 --- !u!1 &1772967109
 GameObject:
   m_ObjectHideFlags: 0

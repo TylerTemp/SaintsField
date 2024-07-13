@@ -3230,24 +3230,6 @@ It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value 
 
 **Deprecated**. Use `ArraySize` instead.
 
-Like `ArraySize`, but:
-
-1.  it will set array size to expected size when the array is empty
-2.  it does not have a `groupBy`, and will not give any error if the target is not an array/list
-
-Parameters:
-
-*   `int size` the size of the array or list
-*   AllowMultiple: No
-
-```csharp
-using SaintsField.Playa;
-
-[PlayaArraySize(3)] public int[] myArr3;
-```
-
-![PlayaArraySize](https://github.com/TylerTemp/SaintsField/assets/6391063/1cf7a58c-9e43-4261-bea8-68b349d60c35)
-
 ### `PlayaRichLabel` ###
 
 This is like `RichLabel`, but it can change label of an array/list

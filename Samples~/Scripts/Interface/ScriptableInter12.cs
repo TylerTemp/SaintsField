@@ -3,7 +3,7 @@
 namespace SaintsField.Samples.Scripts.Interface
 {
     // [CreateAssetMenu(menuName = "SaintsField/Samples/ScriptableInter12")]
-    public class ScriptableInter12: ScriptableObject, IInterface1, IInterface2
+    public class ScriptableInter12: ScriptableObject, IInterface1, IInterface2, IDummy
     {
         [Range(0, 1)] public float defaultRange;
 
@@ -14,5 +14,7 @@ namespace SaintsField.Samples.Scripts.Interface
         {
             Debug.Log("ScriptableInter12 Method1");
         }
+
+        public string GetComment() => name;
     }
 }

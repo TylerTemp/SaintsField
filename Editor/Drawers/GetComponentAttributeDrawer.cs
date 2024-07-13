@@ -143,8 +143,8 @@ namespace SaintsField.Editor.Drawers
             }
 
             Component[] results = interfaceType == null? componentsOnSelf: componentsOnSelf.Where(interfaceType.IsInstanceOfType).ToArray();
+
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            // bool insideArray = indexInArray != -1;
             if (indexInArray == 0)
             {
                 SerializedProperty arrayProp = SerializedUtils.GetArrayProperty(property).property;
