@@ -6,6 +6,7 @@
 4.  Deprecated `PlayaArraySize`. Just use `ArraySize` instead.
 5.  Fix `SaintsInterface` drawer did not work inside array.
 6.  [#45](https://github.com/TylerTemp/SaintsField/issues/45): Now `GetComponent*` works with array/list, and will be auto filled if you have `SaintsEditor` enabled. 
+7.  UI Toolkit: Fix `AdvancedDropdown` out of screen.
 
 ## 3.1.3
 

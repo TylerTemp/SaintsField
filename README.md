@@ -66,14 +66,15 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.1.3**
+**3.1.4**
 
-Value Comparison for Show/Hide/Enable/Disable-If
-
-Now the string can have `!` prefix to negate the comparison.
-
-And `==`, `!=`, `>` etc. suffix for more comparison you want.
-
+1.  Fix `EnableIf` not work with Value Comparison
+2.  Fix [#42](https://github.com/TylerTemp/SaintsField/issues/42) GetComponent etc need better error handling and report
+3.  Fix callback won't fill null parameter value when the value of the target is null
+4.  Deprecated `PlayaArraySize`. Just use `ArraySize` instead.
+5.  Fix `SaintsInterface` drawer did not work inside array.
+6.  [#45](https://github.com/TylerTemp/SaintsField/issues/45): Now `GetComponent*` works with array/list, and will be auto filled if you have `SaintsEditor` enabled.
+7.  UI Toolkit: Fix `AdvancedDropdown` out of screen.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
