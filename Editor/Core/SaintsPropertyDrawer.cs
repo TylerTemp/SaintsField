@@ -1881,13 +1881,11 @@ namespace SaintsField.Editor.Core
                 fallbackField.RegisterValueChangeCallback(evt =>
                 {
                     SerializedProperty prop = evt.changedProperty;
-                    // Debug.Log($"changed: {prop.propertyPath}; {prop.propertyPath}; {prop.}");
                     if(SerializedProperty.EqualContents(prop, property))
                     {
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-
                         (string error, int _, object curValue) = SerializedUtils.GetValue(property, fieldInfo, noCacheParent);
-                        if (error != "")
+                        if (error == "")
                         {
                             onValueChangedCallback(curValue);
                         }
