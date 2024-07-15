@@ -223,8 +223,9 @@ namespace SaintsField.Editor.Drawers
                 return property.objectReferenceValue;
             }
 
-            object serObjectValue = SerializedUtils.GetValue(property, info, parent);
-            if (serObjectValue is IWrapProp wrapProp)
+            (string error, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
+
+            if (error == "" && propertyValue is IWrapProp wrapProp)
             {
                 return (Object)Util.GetWrapValue(wrapProp);
             }

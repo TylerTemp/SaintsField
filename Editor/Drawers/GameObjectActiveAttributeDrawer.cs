@@ -97,8 +97,9 @@ namespace SaintsField.Editor.Drawers
         {
             if (property.propertyType == SerializedPropertyType.Generic)
             {
-                object propValue = SerializedUtils.GetValue(property, info, parent);
-                if (propValue is IWrapProp wrapProp)
+                (string error, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
+
+                if (error == "" && propertyValue is IWrapProp wrapProp)
                 {
                     object propWrapValue = Util.GetWrapValue(wrapProp);
                     switch (propWrapValue)

@@ -312,9 +312,9 @@ namespace SaintsField.Editor.Drawers
                 return property.objectReferenceValue;
             }
 
-            object serValue = SerializedUtils.GetValue(property, info, parent);
-            // Debug.Log(getResult);
-            if (serValue is IWrapProp wrapProp)
+            (string error, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
+
+            if (error == "" && propertyValue is IWrapProp wrapProp)
             {
                 return Util.GetWrapValue(wrapProp) as UnityEngine.Object;
             }

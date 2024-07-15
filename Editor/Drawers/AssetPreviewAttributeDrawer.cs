@@ -311,9 +311,9 @@ namespace SaintsField.Editor.Drawers
                 return property.objectReferenceValue;
             }
 
-            object serValue = SerializedUtils.GetValue(property, info, parent);
-            // Debug.Log(getResult);
-            if (serValue is IWrapProp wrapProp)
+            (string error, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
+
+            if (error == "" && propertyValue is IWrapProp wrapProp)
             {
                 return Util.GetWrapValue(wrapProp) as Object;
             }
@@ -325,15 +325,16 @@ namespace SaintsField.Editor.Drawers
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public class AssetPreviewField : BaseField<string>
         {
-            public readonly VisualElement imageContainerElement;
-            public readonly Image imageElement;
+            public readonly VisualElement ImageContainerElement;
+            public readonly Image ImageElement;
 
             public AssetPreviewField(string label, VisualElement imageContainer, Image image) : base(label, imageContainer)
             {
-                imageContainerElement = imageContainer;
-                imageElement = image;
+                ImageContainerElement = imageContainer;
+                ImageElement = image;
             }
         }
 
@@ -379,7 +380,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             AssetPreviewField root = container.Q<AssetPreviewField>(NameRoot(property, index));
-            Image image = root.imageElement;
+            Image image = root.ImageElement;
             Payload payload = (Payload)image.userData;
 
             Object curObject = GetCurObject(property, info, parent);
@@ -454,11 +455,11 @@ namespace SaintsField.Editor.Drawers
                     break;
                 case EAlign.Center:
                     assetPreviewField.labelElement.style.display = DisplayStyle.None;
-                    assetPreviewField.imageContainerElement.style.justifyContent = Justify.Center;
+                    assetPreviewField.ImageContainerElement.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
                     assetPreviewField.labelElement.style.display = DisplayStyle.None;
-                    assetPreviewField.imageContainerElement.style.justifyContent = Justify.FlexEnd;
+                    assetPreviewField.ImageContainerElement.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
                     break;
@@ -511,7 +512,7 @@ namespace SaintsField.Editor.Drawers
 
         private static void OnRootGeoChanged(AssetPreviewField root, int widthConfig, int heightConfig)
         {
-            Image image = root.imageElement;
+            Image image = root.ImageElement;
             if(root.style.display == DisplayStyle.None)
             {
                 return;

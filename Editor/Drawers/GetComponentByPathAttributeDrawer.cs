@@ -300,9 +300,9 @@ namespace SaintsField.Editor.Drawers
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
-                object propertyValue = SerializedUtils.GetValue(property, info, parent);
+                (string error, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
 
-                if (propertyValue is IWrapProp wrapProp)
+                if (error == "" && propertyValue is IWrapProp wrapProp)
                 {
                     Util.SaintsInterfaceInfo saintsInterfaceInfo = Util.GetSaintsInterfaceInfo(property, wrapProp);
 

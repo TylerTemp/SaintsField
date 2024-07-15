@@ -119,28 +119,36 @@ namespace SaintsField.Editor.Drawers
         {
             // SerializedProperty targetProperty = property;
             string error = "";
-            SerializedProperty arrProp;
+            SerializedProperty arrProp = null;
 
-            object propValue = SerializedUtils.GetValue(property, info, parent);
-            if(propValue is IWrapProp wrapProp)
+            (string propError, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
+            if (propError != "")
             {
-                string targetPropName = wrapProp.EditorPropertyName;
-                arrProp = property.FindPropertyRelative(targetPropName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, targetPropName);
-                if (arrProp == null)
-                {
-                    SetHelpBox($"{targetPropName} not found in {property.propertyPath}", property, container);
-                    // error = $"{targetPropName} not found in {property.propertyPath}";
-                    return;
-                }
+                error = propError;
             }
             else
             {
-                (error, arrProp) = SerializedUtils.GetArrayProperty(property);
+                if (propertyValue is IWrapProp wrapProp)
+                {
+                    string targetPropName = wrapProp.EditorPropertyName;
+                    arrProp = property.FindPropertyRelative(targetPropName) ??
+                              SerializedUtils.FindPropertyByAutoPropertyName(property, targetPropName);
+                    if (arrProp == null)
+                    {
+                        SetHelpBox($"{targetPropName} not found in {property.propertyPath}", property, container);
+                        // error = $"{targetPropName} not found in {property.propertyPath}";
+                        return;
+                    }
+                }
+                else
+                {
+                    (error, arrProp) = SerializedUtils.GetArrayProperty(property);
+                }
             }
 
-            if (error != "" && !arrProp.isArray)
+            if (error != "" && (arrProp == null || !arrProp.isArray))
             {
-                error = $"{arrProp.propertyPath} is not an array/list";
+                error = $"{arrProp?.propertyPath} is not an array/list";
             }
 
             SetHelpBox(error, property, container);
