@@ -167,7 +167,7 @@ namespace SaintsField.Editor.Playa
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             (string error, int index, object value)= SerializedUtils.GetValue(property, fieldInfo, parentValue);
-            if (error != null)
+            if (error != "")
             {
                 return new HelpBox(error, HelpBoxMessageType.Error);
             }
