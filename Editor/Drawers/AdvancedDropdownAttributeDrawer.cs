@@ -1127,7 +1127,7 @@ namespace SaintsField.Editor.Drawers
                 MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
                 // Debug.Log(root.worldBound);
                 // Debug.Log(Screen.height);
-                float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 250;
+                float maxHeight = Mathf.Max(400, Screen.height - root.worldBound.y - root.worldBound.height - 200);
                 // float maxHeight = 4000f;
                 UnityEditor.PopupWindow.Show(root.worldBound, new SaintsAdvancedDropdownUiToolkit(
                     metaInfo,
