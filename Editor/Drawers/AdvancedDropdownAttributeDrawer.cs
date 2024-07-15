@@ -1127,9 +1127,25 @@ namespace SaintsField.Editor.Drawers
                 MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
                 // Debug.Log(root.worldBound);
                 // Debug.Log(Screen.height);
-                float maxHeight = Mathf.Max(400, Screen.height - root.worldBound.y - root.worldBound.height - 200);
+                // float maxHeight = Mathf.Max(400, Screen.height - root.worldBound.y - root.worldBound.height - 200);
+                float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
+                Rect worldBound = root.worldBound;
+                // Debug.Log(worldBound);
+                if (maxHeight < 100)
+                {
+                    // worldBound.x -= 400;
+                    worldBound.y -= 300 + worldBound.height;
+                    // Debug.Log(worldBound);
+                    maxHeight = 300;
+                }
+
+                // Debug.Log(Screen.height - root.worldBound.y - root.worldBound.height);
+                // if (maxHeight < 0)
+                // {
+                //     maxHeight = -400;
+                // }
                 // float maxHeight = 4000f;
-                UnityEditor.PopupWindow.Show(root.worldBound, new SaintsAdvancedDropdownUiToolkit(
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUiToolkit(
                     metaInfo,
                     root.worldBound.width,
                     maxHeight,
