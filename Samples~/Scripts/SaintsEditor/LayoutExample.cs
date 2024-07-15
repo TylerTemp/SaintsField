@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string titledBoxItem2;
 
         // foldout
-        [LayoutGroup("Collapse", ELayout.Collapse | ELayout.Background | ELayout.TitleOut)]
+        [LayoutGroup("Collapse", ELayout.CollapseBox)]
         public string foldoutItem1, foldoutItem2;
         public int foldoutItem3, foldoutItem4;
         [LayoutGroup("Collapse/Tab1", ELayout.Foldout)]

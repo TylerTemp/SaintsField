@@ -13,5 +13,9 @@ namespace SaintsField.Playa
         Collapse = 1 << 4,  // same as expandable, but collapsed by default
         Tab = 1 << 5,  // tab page
         Title = 1 << 6,  // title
+
+        TitleBox = Background | Title | TitleOut,
+        FoldoutBox = Background | Title | TitleOut | Foldout,
+        CollapseBox = Background | Title | TitleOut | Collapse,
     }
 }
