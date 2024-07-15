@@ -1042,7 +1042,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     return property.intValue.ToString().Contains(search);
                 case SerializedPropertyType.Enum:
                     // ReSharper disable once ConvertIfStatementToReturnStatement
-                    if(property.enumNames.Length <= property.enumValueIndex)
+                    if(property.enumNames.Length <= property.enumValueIndex || property.enumValueIndex < 0)
                     {
                         return false;
                     }
