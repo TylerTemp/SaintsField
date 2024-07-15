@@ -1041,6 +1041,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 case SerializedPropertyType.LayerMask:
                     return property.intValue.ToString().Contains(search);
                 case SerializedPropertyType.Enum:
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if(property.enumNames.Length <= property.enumValueIndex)
+                    {
+                        return false;
+                    }
                     return property.enumNames[property.enumValueIndex].Contains(search);
                 case SerializedPropertyType.Vector2:
                     return property.vector2Value.ToString().Contains(search);
