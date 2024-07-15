@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
 
                 if (errors.Count > 0)
                 {
-                    return (string.Join("\n\n", errors), false);
+                    return (string.Join("\n\n", errors), true);
                 }
                 
                 bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
