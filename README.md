@@ -2925,6 +2925,9 @@ Options are:
 *   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
 *   `Collapse` Same as `Foldout` but is collapsed by default.
 *   `Tab` make this group a tab page separated rather than grouping it
+*   `TitleBox` = `Background | Title | TitleOut`
+*   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
+*   `CollapseBox` = `Background | Title | TitleOut | Collapse`
 
 **Known Issue**
 

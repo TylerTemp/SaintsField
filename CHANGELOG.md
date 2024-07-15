@@ -1,3 +1,18 @@
+## 3.1.5 ##
+
+1.  Add `ELayout` shortcut:
+
+    *   `TitleBox` = `Background | Title | TitleOut`
+    *   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
+    *   `CollapseBox` = `Background | Title | TitleOut | Collapse`
+    
+    And improve the appearance for UI Toolkit with foldout/collapse + title.
+
+2.  UI Toolkit: `Layout` now have some space with fields
+3.  Fix drawer fallback not work for array/list
+4.  Fix possible property disposed access
+5.  UI Toolkit: Improved `AdvancedDropdown` position
+
 ## 3.1.4
 
 1.  Fix `EnableIf` not work with Value Comparison
