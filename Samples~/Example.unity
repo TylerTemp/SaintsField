@@ -2227,25 +2227,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   getComponentInParentArray:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1271404094}
+  - {fileID: 1516486913}
+  - {fileID: 1631756501}
+  - {fileID: 556802675}
+  - {fileID: 842523985}
   - {fileID: 842523986}
   - {fileID: 454510170}
   - {fileID: 454510169}
+  - {fileID: 454510172}
+  - {fileID: 74059532}
+  - {fileID: 74059534}
+  - {fileID: 1902718156}
+  - {fileID: 1902718155}
   getComponentInParentsList:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1271404094}
+  - {fileID: 1516486913}
+  - {fileID: 1631756501}
+  - {fileID: 556802675}
+  - {fileID: 842523985}
   - {fileID: 842523986}
   - {fileID: 454510170}
   - {fileID: 454510169}
+  - {fileID: 454510172}
+  - {fileID: 74059532}
+  - {fileID: 74059534}
+  - {fileID: 1902718156}
+  - {fileID: 1902718155}
 --- !u!1 &461560855
 GameObject:
   m_ObjectHideFlags: 0
