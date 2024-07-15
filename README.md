@@ -66,15 +66,22 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.1.4**
+**3.1.5**
 
-1.  Fix `EnableIf` not work with Value Comparison
-2.  Fix [#42](https://github.com/TylerTemp/SaintsField/issues/42) GetComponent etc need better error handling and report
-3.  Fix callback won't fill null parameter value when the value of the target is null
-4.  Deprecated `PlayaArraySize`. Just use `ArraySize` instead.
-5.  Fix `SaintsInterface` drawer did not work inside array.
-6.  [#45](https://github.com/TylerTemp/SaintsField/issues/45): Now `GetComponent*` works with array/list, and will be auto filled if you have `SaintsEditor` enabled.
-7.  UI Toolkit: Fix `AdvancedDropdown` out of screen.
+1.  Add `ELayout` shortcut:
+
+    *   `TitleBox` = `Background | Title | TitleOut`
+    *   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
+    *   `CollapseBox` = `Background | Title | TitleOut | Collapse`
+
+    And improve the appearance for UI Toolkit with foldout/collapse + title.
+
+2.  UI Toolkit: `Layout` now have some space with fields
+3.  Fix drawer fallback not work for array/list
+4.  Fix possible property disposed access
+5.  UI Toolkit: Improved `AdvancedDropdown` position
+6.  Fix `ListDrawerSettings` error when searching a enum field
+7.  `ListDrawerSettings` now can search the child field when the target is a `ScriptableObject`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2798,7 +2805,7 @@ private Sequence PlayColor2()  // this will be automaticlly added to DOTweenPlay
 // this will be automaticlly added to DOTweenPlay
 // Note: if you want to add this in DOTweenPlay but also stop the grouping, use:
 // [DOTweenPlay("Color", keepGrouping: false)]
-private Sequence PlayColor3()  
+private Sequence PlayColor3()
 {
     return DOTween.Sequence()
         .Append(spriteRenderer.DOColor(Color.yellow, 1f))
@@ -3424,7 +3431,7 @@ multiple conditions are logically chained accordingly. See each section of these
 
 **Value Comparison**
 
-The string can have `!` prefix to negate the comparison. 
+The string can have `!` prefix to negate the comparison.
 
 And `==`, `!=`, `>` etc. suffix for more comparison you want. The suffix supports:
 

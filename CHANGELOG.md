@@ -5,13 +5,15 @@
     *   `TitleBox` = `Background | Title | TitleOut`
     *   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
     *   `CollapseBox` = `Background | Title | TitleOut | Collapse`
-    
+
     And improve the appearance for UI Toolkit with foldout/collapse + title.
 
 2.  UI Toolkit: `Layout` now have some space with fields
 3.  Fix drawer fallback not work for array/list
 4.  Fix possible property disposed access
 5.  UI Toolkit: Improved `AdvancedDropdown` position
+6.  Fix `ListDrawerSettings` error when searching a enum field
+7.  `ListDrawerSettings` now can search the child field when the target is a `ScriptableObject`
 
 ## 3.1.4
 
@@ -20,7 +22,7 @@
 3.  Fix callback won't fill null parameter value when the value of the target is null
 4.  Deprecated `PlayaArraySize`. Just use `ArraySize` instead.
 5.  Fix `SaintsInterface` drawer did not work inside array.
-6.  [#45](https://github.com/TylerTemp/SaintsField/issues/45): Now `GetComponent*` works with array/list, and will be auto filled if you have `SaintsEditor` enabled. 
+6.  [#45](https://github.com/TylerTemp/SaintsField/issues/45): Now `GetComponent*` works with array/list, and will be auto filled if you have `SaintsEditor` enabled.
 7.  UI Toolkit: Fix `AdvancedDropdown` out of screen.
 
 ## 3.1.3
@@ -61,7 +63,7 @@ UI Toolkit: Fix [#35](https://github.com/TylerTemp/SaintsField/issues/35) float 
 ## 3.0.13
 
 1.   (by [@Lx34r](https://github.com/Lx34r)) Fix foldout display error with tab in Layout Attribute [#33](https://github.com/TylerTemp/SaintsField/pull/33)
-2.   Fix [#34](https://github.com/TylerTemp/SaintsField/issues/34) that Unity will dispose the serialized property first before destroy the drawer, leading to errors when drawer is in an array and the target element gets removed.   
+2.   Fix [#34](https://github.com/TylerTemp/SaintsField/issues/34) that Unity will dispose the serialized property first before destroy the drawer, leading to errors when drawer is in an array and the target element gets removed.
 
 ## 3.0.12
 
@@ -150,11 +152,11 @@ Fix can not check if a type is a subclass of another generic type, and failed to
 ## 2.4.2
 
 1.  Since this version, UI Toolkit now can property fallback to `CustomPropertyDrawer` of a custom type (previously it only supports to fallback to custom `PropertyAttribute` drawer).
-    
+
     Note: this feature is only for UI Toolkit. IMGUI does not support this feature.
-    
+
     Note: combining with `RichLabel`, UI Toolkit will find the first `unity-label` class label which in some case might not be correct. This feature can not be turned off yet. Please report issue if you face any problem.
-    
+
 2.  `SaintsList`/`SaintsArray` fix working with `RichLabel`, fix deep nesting rendering issue.
 
 ## 2.3.9
@@ -165,7 +167,7 @@ Fix can not check if a type is a subclass of another generic type, and failed to
 ## 2.3.8
 
 *   Add `SaintsArray`, `SaintsList` for nested array/list serialization.
-*   IMGUI: Change the logic of how rich text is rendered when the text is long. 
+*   IMGUI: Change the logic of how rich text is rendered when the text is long.
 *   Fix `AnimatorStateChanged` not excluded Editor fields.
 
 ## 2.3.7
@@ -180,7 +182,7 @@ Fix can not check if a type is a subclass of another generic type, and failed to
 ## 2.3.5
 
 *   Add `ArraySize`
-*   UI Toolkit: Fix `ShowInInspector` for property that the equal operation is incorrect and repeatedly destroy and create elements. Fix a UI Toolkit weird bug that can not update values.  
+*   UI Toolkit: Fix `ShowInInspector` for property that the equal operation is incorrect and repeatedly destroy and create elements. Fix a UI Toolkit weird bug that can not update values.
 *   UI Toolkit: Fix `EnumFlags` icons not display.
 
 ## 2.3.4
