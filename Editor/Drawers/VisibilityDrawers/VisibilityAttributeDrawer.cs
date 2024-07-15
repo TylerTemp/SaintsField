@@ -10,26 +10,18 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.VisibilityDrawers
 {
-    // [CustomPropertyDrawer(typeof(VisibilityAttribute))]
-    // [CustomPropertyDrawer(typeof(ShowIfAttribute))]
-    // [CustomPropertyDrawer(typeof(HideIfAttribute))]
     public abstract class VisibilityAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI
-        protected override bool GetAndVisibility(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        protected override bool GetAndVisibility(SerializedProperty property, FieldInfo info, object parent)
         {
-            // VisibilityAttribute visibilityAttribute = (VisibilityAttribute)saintsAttribute;
-            Type type = parent.GetType();
-
-            (string error, bool show) = IsShown(property, saintsAttribute, info, type, parent);
+            (string error, bool show) = IsShown(property, info, parent);
 
             _error = error;
             return show;
         }
 
-        protected abstract (string error, bool shown) IsShown(SerializedProperty property,
-            ISaintsAttribute visibilityAttribute, FieldInfo info, Type type, object target);
+        protected abstract (string error, bool shown) IsShown(SerializedProperty property, FieldInfo info, object target);
 
         private string _error = "";
 
@@ -132,7 +124,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             // bool isForHidden = ((VisibilityAttribute)saintsAttribute).IsForHide;
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-            foreach ((string error, bool show) in visibilityElements.Select(each => IsShown(property, (ISaintsAttribute)each.userData, info, parent.GetType(), parent)))
+            foreach ((string error, bool show) in visibilityElements.Select(each => IsShown(property, info, parent)))
             {
                 // bool invertedShow = isForHidden? !show: show;
 

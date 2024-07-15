@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             GUIContent label, ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info,
             object parent)
         {
-            (string error, bool disabled) = IsDisabled(property, (ReadOnlyAttribute)saintsAttribute, info, parent);
+            (string error, bool disabled) = IsDisabled(property, info, parent);
             _error = error;
             EditorGUI.BeginDisabledGroup(disabled);
             return position;
@@ -93,28 +93,31 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
         }
 
-        protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object target)
+        protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, FieldInfo info, object target)
         {
-            ReadOnlyAttribute targetAttribute = (ReadOnlyAttribute) saintsAttribute;
-
-            bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
-            if (!editorModeOk)
+            List<bool> allResults = new List<bool>();
+           
+            ReadOnlyAttribute[] targetAttributes = SerializedUtils.GetAttributesAndDirectParent<ReadOnlyAttribute>(property).attributes;
+            foreach (var targetAttribute in targetAttributes)
             {
-                return ("", true);
+                (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);
+
+                if (errors.Count > 0)
+                {
+                    return (string.Join("\n\n", errors), false);
+                }
+                
+                bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
+                // empty = true
+                bool boolResultsOk = boolResults.All(each => each);
+                allResults.Add(editorModeOk && boolResultsOk);
             }
-
-            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);
-
-            if (errors.Count > 0)
-            {
-                return (string.Join("\n\n", errors), false);
-            }
-
-            // and, get disabled; empty=true
-            bool truly = boolResults.All(each => each);
+            
+            // Or/And Mode
+            bool truly = targetAttributes.Length > 1 ? allResults.Any(each => each) : allResults.All(each => each);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
-            Debug.Log($"final return={truly}/editor[{editorMode}]={editorModeIsTrue}/bys={string.Join(",", callbackTruly)}");
+            Debug.Log($"{property.name} final={truly}/ars={string.Join(",", allResults)}");
 #endif
             return ("", truly);
         }
@@ -179,7 +182,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             Debug.Log($"curReadOnly={curReadOnly}");
 #endif
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, (ReadOnlyAttribute)each.userData, info, parent)))
+            foreach ((string error, bool readOnly) in visibilityElements.Select(each => IsDisabled(property, info, parent)))
             {
                 if (error != "")
                 {

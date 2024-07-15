@@ -256,8 +256,7 @@ namespace SaintsField.Editor.Core
 
         private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
-        protected virtual bool GetAndVisibility(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        protected virtual bool GetAndVisibility(SerializedProperty property, FieldInfo info, object parent)
         {
             return true;
         }
@@ -267,10 +266,10 @@ namespace SaintsField.Editor.Core
             List<bool> showAndResults = new List<bool>();
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
-                if(saintsAttributeWithIndex.SaintsAttribute is IImGuiVisibilityAttribute)
+                if (saintsAttributeWithIndex.SaintsAttribute is IImGuiVisibilityAttribute)
                 {
                     SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
-                    showAndResults.Add(drawer.GetAndVisibility(property, saintsAttributeWithIndex.SaintsAttribute, fieldInfo, parent));
+                    showAndResults.Add(drawer.GetAndVisibility(property, fieldInfo, parent));
                 }
             }
             // Debug.Log($"visibility={string.Join(", ", showAndResults)}");

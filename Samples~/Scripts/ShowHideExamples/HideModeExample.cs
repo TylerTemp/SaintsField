@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
         [HideIf(EMode.Edit)] public string hideEdit;
         [HideIf(EMode.Play)] public string hidePlay;
 
-        [HideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
-        [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
+        [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditOrBool;
+        [HideIf(EMode.Edit, nameof(boolValue))] public string hideEditAndBool;
     }
 }
