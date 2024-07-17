@@ -9,8 +9,8 @@ namespace SaintsField.Samples.Scripts.ReadOnlyExamples
         [EnableIf(EMode.Edit)] public string enEditMode;
         [EnableIf(EMode.Play)] public string enPlayMode;
 
-        [EnableIf(EMode.Edit, nameof(boolVal))] public string enEditOrBool;
+        [EnableIf(EMode.Edit, nameof(boolVal))] public string enEditAndBool;
         // dis=!editor || dis=!bool => en=editor&&bool
-        [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
+        [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditOrBool;
     }
 }
