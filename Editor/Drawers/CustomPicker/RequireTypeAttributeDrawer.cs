@@ -248,9 +248,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker
 
         protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
         {
-            FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick, info.FieldType, requireTypeAttribute.RequiredTypes, fieldResult =>
+            FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick,
+                ReflectUtils.GetElementType(info.FieldType), requireTypeAttribute.RequiredTypes, fieldResult =>
             {
-                Object result = OnSelectWindowSelected(fieldResult, info.FieldType);
+                Object result = OnSelectWindowSelected(fieldResult, ReflectUtils.GetElementType(info.FieldType));
                 property.objectReferenceValue = result;
                 property.serializedObject.ApplyModifiedProperties();
                 // onGUIPayload.SetValue(result);

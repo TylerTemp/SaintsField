@@ -152,7 +152,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             Object requiredValue;
             try
             {
@@ -378,7 +378,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type requiredComp = fieldTypeAttribute.CompType;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
             EPick editorPick = fieldTypeAttribute.EditorPick;
 
             ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
