@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Playa.Renderer
             string eventTarget = playaMethodBindAttribute.EventTarget;
             object value = playaMethodBindAttribute.Value;
 
-            UnityEventBase unityEventBase;
+            UnityEventBase unityEventBase = null;
             List<Type> invokeRequiredTypes = new List<Type>();
             if (methodBind == MethodBind.ButtonOnClick)
             {
@@ -53,15 +53,58 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             else  // custom event at the moment
             {
-                (string error, UnityEventBase foundValue) = Util.GetOfNoParams<UnityEventBase>(fieldWithInfo.Target, eventTarget, null);
-                if (error != "")
+                List<string> attrNames = new List<string>();
+                if (eventTarget.Contains("."))
+                {
+                    attrNames.AddRange(eventTarget.Split("."));
+                }
+                else
+                {
+                    attrNames.Add(eventTarget);
+                }
+
+                object target = fieldWithInfo.Target;
+                while (attrNames.Count > 0)
+                {
+                    string searchAttr = attrNames[0];
+                    attrNames.RemoveAt(0);
+                    if (attrNames.Count == 0)
+                    {
+                        (string error, UnityEventBase foundValue) =
+                            Util.GetOfNoParams<UnityEventBase>(target, searchAttr, null);
+                        // Debug.Log($"{searchAttr}, {foundValue}");
+                        if (error != "")
+                        {
+                            return;
+                        }
+
+                        unityEventBase = foundValue;
+                    }
+                    else
+                    {
+                        (string error, object foundValue) =
+                            Util.GetOfNoParams<object>(target, searchAttr, null);
+                        // Debug.Log($"{searchAttr}, {foundValue}");
+                        if (error != "")
+                        {
+                            return;
+                        }
+
+                        if (foundValue == null)
+                        {
+                            return;
+                        }
+
+                        target = foundValue;
+                    }
+                }
+
+                if (unityEventBase == null)
                 {
                     return;
                 }
 
-                unityEventBase = foundValue;
-
-                Type unityEventType = foundValue.GetType();
+                Type unityEventType = unityEventBase.GetType();
                 if (unityEventType.IsGenericType)
                 {
                     invokeRequiredTypes.AddRange(unityEventType.GetGenericArguments());

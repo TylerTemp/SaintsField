@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class CustomEventExample : MonoBehaviour
+    public class CustomEventExample : SaintsMonoBehavior
     {
         public UnityEvent<int, int> intIntEvent;
 
@@ -21,6 +21,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 
         public UnityEvent<int> intEvent;
+
+        [SerializeField, GetComponentInChildren]
+        private CustomEventChild _child;
+
+        [OnEvent(nameof(_child) + "._intEvent", value: 1)]
+        public void OnChildInt(int int1)  // this is static parameter binding
+        {
+        }
 
         // can not bind this one
         // // [OnEvent(nameof(intIntEvent), value: 3)]
