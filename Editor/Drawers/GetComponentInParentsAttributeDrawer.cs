@@ -106,7 +106,10 @@ namespace SaintsField.Editor.Drawers
 
             List<Component> componentsInParents = new List<Component>();
 
-            Transform curCheckingTrans = transform;
+            Transform curCheckingTrans = getComponentInParentsAttribute.ExcludeSelf
+                ? transform.parent
+                : transform;
+
             int levelLimit = getComponentInParentsAttribute.Limit > 0
                 ? getComponentInParentsAttribute.Limit
                 : int.MaxValue;
@@ -115,10 +118,11 @@ namespace SaintsField.Editor.Drawers
             List<string> checkingNames = new List<string>();
             while (curCheckingTrans != null && levelLimit > 0)
             {
-                curCheckingTrans = curCheckingTrans.parent;
-                if (curCheckingTrans == null)
+                if(!getComponentInParentsAttribute.IncludeInactive && !curCheckingTrans.gameObject.activeSelf)
                 {
-                    break;
+                    levelLimit--;
+                    curCheckingTrans = curCheckingTrans.parent;
+                    continue;
                 }
 
                 checkingNames.Add(curCheckingTrans.name);
@@ -151,6 +155,7 @@ namespace SaintsField.Editor.Drawers
                 //     break;
                 // }
                 levelLimit--;
+                curCheckingTrans = curCheckingTrans.parent;
             }
 
             if (componentsInParents.Count == 0)
@@ -256,7 +261,10 @@ namespace SaintsField.Editor.Drawers
                     return -1;
             }
 
-            Transform curCheckingTrans = transform;
+            Transform curCheckingTrans = getComponentInParentsAttribute.ExcludeSelf
+                ? transform.parent
+                : transform;
+
             int levelLimit = getComponentInParentsAttribute.Limit > 0
                 ? getComponentInParentsAttribute.Limit
                 : int.MaxValue;
@@ -264,10 +272,11 @@ namespace SaintsField.Editor.Drawers
             bool isGameObject = type == typeof(GameObject);
             while (curCheckingTrans != null && levelLimit > 0)
             {
-                curCheckingTrans = curCheckingTrans.parent;
-                if (curCheckingTrans == null)
+                if(!getComponentInParentsAttribute.IncludeInactive && !curCheckingTrans.gameObject.activeSelf)
                 {
-                    return 0;
+                    levelLimit--;
+                    curCheckingTrans = curCheckingTrans.parent;
+                    continue;
                 }
 
                 if (isGameObject)
@@ -306,6 +315,7 @@ namespace SaintsField.Editor.Drawers
                 //     break;
                 // }
                 levelLimit--;
+                curCheckingTrans = curCheckingTrans.parent;
             }
 
             return 0;

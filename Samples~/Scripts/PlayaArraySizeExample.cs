@@ -4,7 +4,7 @@ using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class PlayaArraySizeExample : SaintsMonoBehavior
+    public class PlayaArraySizeExample : SaintsMonoBehaviour
     {
         [PlayaArraySize(3)] public int[] myArr3;
 

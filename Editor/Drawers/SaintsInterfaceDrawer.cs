@@ -228,7 +228,7 @@ namespace SaintsField.Editor.Drawers
                                                SerializedUtils.FindPropertyByAutoPropertyName(property,
                                                    _imGuiPropInfo.EditorPropertyName);
 
-                Type interfaceContainer = fieldInfo.FieldType;
+                Type interfaceContainer = ReflectUtils.GetElementType(fieldInfo.FieldType);
                 Type mostBaseType = Util.GetMostBaseType(interfaceContainer);
                 Debug.Assert(mostBaseType != null, interfaceContainer);
                 Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");

@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Editor
 {
-    [CustomEditor(typeof(SaintsMonoBehavior), true), CanEditMultipleObjects]
+    [CustomEditor(typeof(SaintsMonoBehaviour), true), CanEditMultipleObjects]
     public class SaintsMonoBehaviorDrawer : ApplySaintsEditorBase
     {
     }

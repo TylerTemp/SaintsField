@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class DisableEnableExample : SaintsMonoBehavior
+    public class DisableEnableExample : SaintsMonoBehaviour
     {
         public bool boolValue;
 

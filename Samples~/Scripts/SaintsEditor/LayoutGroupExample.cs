@@ -2,7 +2,7 @@ using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class LayoutGroupExample : SaintsMonoBehavior
+    public class LayoutGroupExample : SaintsMonoBehaviour
     {
         [SepTitle("Break By End", EColor.Gray)]
         // end group

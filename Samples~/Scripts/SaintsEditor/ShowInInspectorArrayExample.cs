@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class ShowInInspectorArrayExample : SaintsMonoBehavior
+    public class ShowInInspectorArrayExample : SaintsMonoBehaviour
     {
         private static readonly Color[] BaseColors = {Color.red, Color.green, Color.blue};
         private static readonly Color[][] BaseColors2 = {BaseColors, BaseColors};

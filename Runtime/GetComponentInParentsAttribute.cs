@@ -12,14 +12,17 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
-        // ReSharper disable once InconsistentNaming
+        public readonly bool IncludeInactive;
         public readonly Type CompType;
+        public readonly bool ExcludeSelf;
 
         public virtual int Limit => 0;
 
-        public GetComponentInParentsAttribute(Type compType = null, string groupBy = "")
+        public GetComponentInParentsAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
+            IncludeInactive = includeInactive;
             CompType = compType;
+            ExcludeSelf = excludeSelf;
             GroupBy = groupBy;
         }
     }

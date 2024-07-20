@@ -5,7 +5,7 @@ using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class PlayaRichLabelExample : SaintsMonoBehavior
+    public class PlayaRichLabelExample : SaintsMonoBehaviour
     {
         [PlayaRichLabel("<color=lame>It's Labeled!")]
         public List<string> myList;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class ArraySizeExample : SaintsMonoBehavior
+    public class ArraySizeExample : SaintsMonoBehaviour
     {
         [ArraySize(3)]
         public string[] myStrings;

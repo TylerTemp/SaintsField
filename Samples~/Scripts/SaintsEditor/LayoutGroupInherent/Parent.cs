@@ -2,7 +2,7 @@ using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.LayoutGroupInherent
 {
-    public class Parent : SaintsMonoBehavior
+    public class Parent : SaintsMonoBehaviour
     {
         [LayoutGroup("Parent", ELayout.Collapse)]
         public string parent1;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issue45
 {
-    public class GetComponentInParentArray : SaintsMonoBehavior
+    public class GetComponentInParentArray : SaintsMonoBehaviour
     {
         [GetComponentInParent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInParentArray;
         [GetComponentInParents, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInParentsList;

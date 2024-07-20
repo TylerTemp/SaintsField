@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class ListDrawerSettingsExample : SaintsMonoBehavior
+    public class ListDrawerSettingsExample : SaintsMonoBehaviour
     {
         [Serializable]
         public struct MyData

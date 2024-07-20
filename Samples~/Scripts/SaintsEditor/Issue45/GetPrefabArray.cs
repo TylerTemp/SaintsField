@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issue45
 {
-    public class GetPrefabArray : SaintsMonoBehavior
+    public class GetPrefabArray : SaintsMonoBehaviour
     {
         [GetPrefabWithComponent] public Dummy[] dummies;
         [GetPrefabWithComponent(typeof(Dummy))] public List<GameObject> dummyGos;

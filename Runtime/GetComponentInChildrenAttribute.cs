@@ -13,11 +13,13 @@ namespace SaintsField
 
         public readonly Type CompType;
         public readonly bool IncludeInactive;
+        public readonly bool ExcludeSelf;
 
-        public GetComponentInChildrenAttribute(bool includeInactive = false, Type compType = null, string groupBy = "")
+        public GetComponentInChildrenAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
             CompType = compType;
             IncludeInactive = includeInactive;
+            ExcludeSelf = excludeSelf;
             GroupBy = groupBy;
         }
     }

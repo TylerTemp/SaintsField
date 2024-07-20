@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class CustomEventExample : SaintsMonoBehavior
+    public class CustomEventExample : SaintsMonoBehaviour
     {
         public UnityEvent<int, int> intIntEvent;
 

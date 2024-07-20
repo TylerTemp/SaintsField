@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class SaintsEditorExample : SaintsMonoBehavior
+    public class SaintsEditorExample : SaintsMonoBehaviour
     {
         [Ordered] public string myStartField;
         [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;

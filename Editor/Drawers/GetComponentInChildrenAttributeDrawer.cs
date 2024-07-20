@@ -110,7 +110,11 @@ namespace SaintsField.Editor.Drawers
 
             List<UnityEngine.Object> results = new List<UnityEngine.Object>();
 
-            foreach (Transform directChildTrans in transform.Cast<Transform>())
+            IEnumerable<Transform> searchTargets = getComponentInChildrenAttribute.ExcludeSelf
+                ? transform.Cast<Transform>()
+                : new[]{ transform };
+
+            foreach (Transform directChildTrans in searchTargets)
             {
                 IEnumerable<Component> components =
                     directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive);
@@ -124,7 +128,7 @@ namespace SaintsField.Editor.Drawers
 
             if (results.Count == 0)
             {
-                return ($"No {type} found in children", null);
+                return ($"No {type} found in {(getComponentInChildrenAttribute.ExcludeSelf ? "children" : "self or children")}", null);
             }
 
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -226,7 +230,11 @@ namespace SaintsField.Editor.Drawers
                     return -1;
             }
 
-            foreach (Transform directChildTrans in transform.Cast<Transform>())
+            IEnumerable<Transform> searchTargets = getComponentInChildrenAttribute.ExcludeSelf
+                ? transform.Cast<Transform>()
+                : new[]{ transform };
+
+            foreach (Transform directChildTrans in searchTargets)
             {
                 IEnumerable<Component> components =
                     directChildTrans.GetComponentsInChildren(type, getComponentInChildrenAttribute.IncludeInactive);

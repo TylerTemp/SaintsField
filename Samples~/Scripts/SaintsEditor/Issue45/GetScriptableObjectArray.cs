@@ -4,7 +4,7 @@ using SaintsField.Samples.Scripts.Interface;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issue45
 {
-    public class GetScriptableObjectArray : SaintsMonoBehavior
+    public class GetScriptableObjectArray : SaintsMonoBehaviour
     {
         // [GetScriptableObject] public ScriptableInter12[] dummies;
         // [GetScriptableObject] public List<ScriptableInter12> dummyGos;

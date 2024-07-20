@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class LayoutExample: SaintsMonoBehavior
+    public class LayoutExample: SaintsMonoBehaviour
     {
         public string note;
 

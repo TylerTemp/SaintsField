@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts
         [GetComponentInParent] public BoxCollider directNoSuch;
 
         [GetComponentInParents] public SpriteRenderer searchParent;
-        [GetComponentInParents(typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
+        [GetComponentInParents(true, typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
         [GetComponentInParents] public BoxCollider searchNoSuch;
     }
 }

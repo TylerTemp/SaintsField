@@ -8,7 +8,8 @@ namespace SaintsField
     {
         public override int Limit => 1;
 
-        public GetComponentInParentAttribute(Type compType = null, string groupBy = ""): base(compType, groupBy)
+        public GetComponentInParentAttribute(Type compType = null, bool excludeSelf = false, string groupBy = "")
+            : base(true, compType, excludeSelf, groupBy)
         {
         }
     }
