@@ -1982,9 +1982,9 @@ using SaintsField;
 
 #### `GetComponentInChildren` ####
 
-Automatically sign a component to a field, if the field value is null and the component is already attached to its child GameObjects. (First one found will be used)
+Automatically sign a component to a field, if the field value is null and the component is already attached to itself or its child GameObjects. (First one found will be used)
 
-NOTE: Unlike `GetComponentInChildren` by Unity, this will **NOT** check the target object itself.
+NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target object itself.
 
 *   `bool includeInactive = false`
 
@@ -1993,6 +1993,10 @@ NOTE: Unlike `GetComponentInChildren` by Unity, this will **NOT** check the targ
 *   `Type compType = null`
 
     The component type to sign. If null, it'll use the field type.
+
+*   `bool excludeSelf = false`
+    
+    When `true`, skip checking the target itself.
 
 *   `string groupBy = ""`
 
@@ -2034,6 +2038,20 @@ using SaintsField;
 
 Automatically sign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
 
+Note:
+
+1.  Like Unity's `GetComponentInParent`, this **will** check the target object itself.
+2.  `GetComponentInParent` will only check the target & its direct parent. `GetComponentInParents` will search all the way up to the root.
+
+
+Parameters:
+
+*   (For `GetComponentInParents` only) `bool includeInactive = false`
+
+    Should inactive GameObject be included? `true` to include inactive GameObject.
+
+    Note: **only `GetComponentInParents` has this parameter!**
+
 *   `Type compType = null`
 
     The component type to sign. If null, it'll use the field type.
@@ -2052,7 +2070,7 @@ using SaintsField;
 [GetComponentInParent] public BoxCollider directNoSuch;
 
 [GetComponentInParents] public SpriteRenderer searchParent;
-[GetComponentInParents(typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
+[GetComponentInParents(compType: typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
 [GetComponentInParents] public BoxCollider searchNoSuch;
 ```
 
@@ -3324,9 +3342,16 @@ This is a method decorator, which will bind this method to the target `UnityEven
 
 Parameters:
 
-*   `string eventTarget` the target `UnityEvent`.
+*   `string eventTarget` the target `UnityEvent`. If you have dot in it, it will first find the field (or property/function), then find the target event on the found field using the name after the dot(s) recursively. 
 *   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
 *   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+Note:
+
+1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
+2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
+
+Example: 
 
 ```csharp
 public UnityEvent<int, int> intIntEvent;
@@ -3344,10 +3369,27 @@ public void OnInt1(int int1)  // static parameter binding
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/34db0516-6aad-4394-a6bc-e57bd97b6b57)
 
-Note:
+Example of using dot(s):
 
-1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
-2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
+```csharp
+// CustomEventChild.cs
+public class CustomEventChild : MonoBehaviour
+{
+    [field: SerializeField] private UnityEvent<int> _intEvent;
+}
+
+// CustomEventExample.cs
+public class CustomEventExample : SaintsMonoBehaviour
+{
+    public CustomEventChild _child;
+
+    // it will find the `_intEvent` on the `_child` field
+    [OnEvent(nameof(_child) + "._intEvent")]  
+    public void OnChildInt(int int1)
+    {
+    }
+}
+```
 
 ### `ListDrawerSettings` ###
 
