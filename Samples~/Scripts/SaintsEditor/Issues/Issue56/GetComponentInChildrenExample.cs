@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.SaintsEditor.Issue56
+namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue56
 {
     public class GetComponentInChildrenExample : MonoBehaviour
     {

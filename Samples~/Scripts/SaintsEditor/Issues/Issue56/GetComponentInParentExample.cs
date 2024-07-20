@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.SaintsEditor.Issue56
+namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue56
 {
-    public class GetComponentInParentExample : SaintsMonoBehavior
+    public class GetComponentInParentExample : SaintsMonoBehaviour
     {
         [GetComponentInParents, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] parentsWithSelf;
         [GetComponentInParents(excludeSelf: true), PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] parentsNoSelf;

@@ -66,22 +66,17 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.1.5**
+**3.2.0**
 
-1.  Add `ELayout` shortcut:
+1.  **Breaking Changes**: `GetComponentInChildren`, `GetComponentInParent`, `GetComponentInParents` will search the target itself, which means it's now the same behavior as Unity's build-in functions. No more surprises. Fixes [#56](https://github.com/TylerTemp/SaintsField/issues/56)
+2.  **Breaking Changes**: `GetComponentInParents` now have `bool includeInactive = false` as the first argument to align with Unity's build-in function. Be aware this might break your existing code
+3.  `GetComponentInChildren`, `GetComponentInParent`, `GetComponentInParents` now have `bool excludeSelf = false` argument to exclude the target itself from searching.
+4.  `OnEvent` name now support dot to fetch property
+5.  **Breaking Changes**: Since this version, for `Enable`/`Disable`/`Show`/`Hide`-`If`, the `EMode` argument now has the same operation logic with other arguments (in previous version it has a higher priority to shadow other arguments). This might break your existing code.
 
-    *   `TitleBox` = `Background | Title | TitleOut`
-    *   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
-    *   `CollapseBox` = `Background | Title | TitleOut | Collapse`
-
-    And improve the appearance for UI Toolkit with foldout/collapse + title.
-
-2.  UI Toolkit: `Layout` now have some space with fields
-3.  Fix drawer fallback not work for array/list
-4.  Fix possible property disposed access
-5.  UI Toolkit: Improved `AdvancedDropdown` position
-6.  Fix `ListDrawerSettings` error when searching a enum field
-7.  `ListDrawerSettings` now can search the child field when the target is a `ScriptableObject`
+    Thanks, [@Lx34r](https://github.com/Lx34r), for [PR55](https://github.com/TylerTemp/SaintsField/pull/55)
+6.  `ShowInInspector` now can show a dictionary (or any object implements `IDictionary<,>`), fixes [#57](https://github.com/TylerTemp/SaintsField/issues/57)
+7.  `ShowInInspector` now can show public fields & properties of any type
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

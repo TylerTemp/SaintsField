@@ -856,26 +856,6 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static Type GetMostBaseType(Type type)
-        {
-            Type lastType = type;
-            while (true)
-            {
-                Type baseType = lastType.BaseType;
-                if (baseType == null)
-                {
-                    return lastType;
-                }
-
-                if (!baseType.IsGenericType)
-                {
-                    return lastType;
-                }
-
-                lastType = baseType;
-            }
-        }
-
         public struct SaintsInterfaceInfo
         {
             public string Error;
@@ -889,7 +869,7 @@ namespace SaintsField.Editor.Utils
             Type interfaceType = null;
             Type fieldType = wrapProp.GetType();
 
-            Type mostBaseType = GetMostBaseType(fieldType);
+            Type mostBaseType = ReflectUtils.GetMostBaseType(fieldType);
             if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
             {
                 IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();

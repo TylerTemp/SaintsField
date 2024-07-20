@@ -187,7 +187,7 @@ namespace SaintsField.Editor.Drawers
 
             if (typeof(IWrapProp).IsAssignableFrom(fieldType))
             {
-                Type mostBaseType = Util.GetMostBaseType(fieldType);
+                Type mostBaseType = ReflectUtils.GetMostBaseType(fieldType);
                 if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
                 {
                     IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();

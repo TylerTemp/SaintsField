@@ -229,7 +229,7 @@ namespace SaintsField.Editor.Drawers
                                                    _imGuiPropInfo.EditorPropertyName);
 
                 Type interfaceContainer = ReflectUtils.GetElementType(fieldInfo.FieldType);
-                Type mostBaseType = Util.GetMostBaseType(interfaceContainer);
+                Type mostBaseType = ReflectUtils.GetMostBaseType(interfaceContainer);
                 Debug.Assert(mostBaseType != null, interfaceContainer);
                 Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
                 IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
@@ -366,7 +366,7 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log(interfaceContainer.BaseType);
             // Debug.Log(interfaceContainer.GetGenericArguments());
             // Debug.Log(interfaceContainer);
-            Type mostBaseType = Util.GetMostBaseType(interfaceContainer);
+            Type mostBaseType = ReflectUtils.GetMostBaseType(interfaceContainer);
             Debug.Assert(mostBaseType != null, interfaceContainer);
             Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
             IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();

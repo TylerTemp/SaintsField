@@ -271,5 +271,25 @@ namespace SaintsField.Editor.Utils
 
             return type;
         }
+
+        public static Type GetMostBaseType(Type type)
+        {
+            Type lastType = type;
+            while (true)
+            {
+                Type baseType = lastType.BaseType;
+                if (baseType == null)
+                {
+                    return lastType;
+                }
+
+                if (!baseType.IsGenericType)
+                {
+                    return lastType;
+                }
+
+                lastType = baseType;
+            }
+        }
     }
 }

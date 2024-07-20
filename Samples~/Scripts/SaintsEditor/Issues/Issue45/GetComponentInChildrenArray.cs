@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace SaintsField.Samples.Scripts.SaintsEditor.Issue45
+namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
-    public class GetComponentArray : SaintsMonoBehaviour
+    public class GetComponentInChildrenArray : SaintsMonoBehaviour
     {
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentArray;
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentList;
+        [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInChildrenArray;
+        [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInChildrenList;
 
         [Serializable]
         public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }

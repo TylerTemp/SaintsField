@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace SaintsField.Samples.Scripts.SaintsEditor.Issue45
+namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
-    public class GetComponentInSceneArray : SaintsMonoBehaviour
+    public class GetComponentInParentArray : SaintsMonoBehaviour
     {
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInSceneArray;
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInSceneList;
+        [GetComponentInParent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInParentArray;
+        [GetComponentInParents, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInParentsList;
 
         private string DummyNumber(Dummy dummy)
         {
@@ -16,10 +16,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issue45
         [Serializable]
         public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
 
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        [GetComponentInParent, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getComponentIArray;
 
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        [GetComponentInParents, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
         public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
 
         private string DummyNumberI(GeneralInterface dummyInter)

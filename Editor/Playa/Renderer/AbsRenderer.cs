@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Condition;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
@@ -527,6 +528,52 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     return EditorGUILayout.TextField(label, value.ToString());
                 }
+                if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+                {
+                    GUIStyle style = new GUIStyle(GUI.skin.label)
+                    {
+                        richText = true,
+                    };
+
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
+
+                    EditorGUILayout.LabelField($"{label} <i>(Dictionary x{kvPairs.Length})</i>", style);
+
+                    const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                                  BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+                    foreach ((object kvPair, int index) in kvPairs.WithIndex())
+                    {
+                        Type kvPairType = kvPair.GetType();
+                        PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
+                        if (keyProp == null)
+                        {
+                            EditorGUILayout.HelpBox($"Failed to obtain key on element {index}: {kvPair}", MessageType.Error);
+                            continue;
+                        }
+                        PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
+                        if (valueProp == null)
+                        {
+                            EditorGUILayout.HelpBox($"Failed to obtain value on element {index}: {kvPair}", MessageType.Error);
+                            continue;
+                        }
+
+                        object dictKey = keyProp.GetValue(kvPair);
+                        using (new EditorGUI.IndentLevelScope())
+                        {
+                            FieldLayout(dictKey, $"{dictKey}");
+                            using (new EditorGUI.IndentLevelScope())
+                            {
+                                object dictValue = valueProp.GetValue(kvPair);
+                                FieldLayout(dictValue, $"{dictValue}");
+                            }
+                        }
+                    }
+
+                    return null;
+                    // return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
+                }
                 if (value is IEnumerable enumerableValue)
                 {
                     (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
@@ -559,7 +606,26 @@ namespace SaintsField.Editor.Playa.Renderer
                     }
                     // }
                 }
-                EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
+                // EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
+                EditorGUILayout.LabelField(label);
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    const BindingFlags bindAttrNormal =
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+                    foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
+                    {
+                        object fieldValue = fieldInfo.GetValue(value);
+                        FieldLayout(fieldValue, fieldInfo.Name, fieldInfo.FieldType);
+                    }
+
+                    foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
+                    {
+                        object propertyValue = propertyInfo.GetValue(value);
+                        FieldLayout(propertyValue, propertyInfo.Name, propertyInfo.PropertyType);
+                    }
+                }
+
                 return null;
 
                 // return isDrawn;
@@ -600,12 +666,70 @@ namespace SaintsField.Editor.Playa.Renderer
                 return EditorGUIUtility.singleLineHeight;
             }
 
+            if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+            {
+                float resultHeight = EditorGUIUtility.singleLineHeight;
+
+                // ReSharper disable once AssignNullToNotNullAttribute
+                object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
+
+                const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                              BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+                foreach ((object kvPair, int index) in kvPairs.WithIndex())
+                {
+                    Type kvPairType = kvPair.GetType();
+                    PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
+                    if (keyProp == null)
+                    {
+                        string errMsg = $"Failed to obtain key on element {index}: {kvPair}";
+                        resultHeight += ImGuiHelpBox.GetHeight(errMsg, EditorGUIUtility.currentViewWidth, MessageType.Error);
+                        continue;
+                    }
+                    PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
+                    if (valueProp == null)
+                    {
+                        string errMsg = $"Failed to obtain value on element {index}: {kvPair}";
+                        resultHeight += ImGuiHelpBox.GetHeight(errMsg, EditorGUIUtility.currentViewWidth, MessageType.Error);
+                        continue;
+                    }
+
+                    object dictKey = keyProp.GetValue(kvPair);
+                    resultHeight += FieldHeight(dictKey, $"{dictKey}");
+
+                    object dictValue = valueProp.GetValue(kvPair);
+                    resultHeight += FieldHeight(dictValue, $"{dictValue}");
+                }
+
+                return resultHeight;
+                // return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
+            }
+
             if (value is IEnumerable enumerableValue)
             {
                 return EditorGUIUtility.singleLineHeight + enumerableValue.Cast<object>().Select((each, index) => FieldHeight(each, $"Element {index}")).Sum();
             }
 
-            return ImGuiHelpBox.GetHeight($"Type not supported: {valueType}", EditorGUIUtility.currentViewWidth, MessageType.Warning);
+            {  // generic fields & properties
+                float resultHeight = EditorGUIUtility.singleLineHeight;
+
+                const BindingFlags bindAttrNormal =
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+                foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
+                {
+                    object fieldValue = fieldInfo.GetValue(value);
+                    resultHeight += FieldHeight(fieldValue, fieldInfo.Name);
+                }
+
+                foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
+                {
+                    object propertyValue = propertyInfo.GetValue(value);
+                    resultHeight += FieldHeight(propertyValue, propertyInfo.Name);
+                }
+
+                return resultHeight;
+            }
         }
 
         protected static object FieldPosition(Rect position, object value, string label, Type type=null, bool disabled=true)
@@ -716,6 +840,75 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     return EditorGUI.TextField(position, label, value.ToString());
                 }
+                if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+                {
+                    GUIStyle style = new GUIStyle(GUI.skin.label)
+                    {
+                        richText = true,
+                    };
+
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
+
+                    (Rect labelRect, Rect leftRect) =
+                        RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+
+                    EditorGUI.LabelField(labelRect, $"{label} <i>(Dictionary x{kvPairs.Length})</i>", style);
+
+                    const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                                  BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+                    Rect accRect = leftRect;
+                    foreach ((object kvPair, int index) in kvPairs.WithIndex())
+                    {
+                        Type kvPairType = kvPair.GetType();
+                        PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
+                        if (keyProp == null)
+                        {
+                            string errMsg = $"Failed to obtain key on element {index}: {kvPair}";
+                            float height = ImGuiHelpBox.GetHeight(errMsg, position.width, MessageType.Error);
+                            (Rect helpRect, Rect nowLeftRect) = RectUtils.SplitHeightRect(accRect, height);
+                            accRect = nowLeftRect;
+                            EditorGUI.HelpBox(helpRect, errMsg, MessageType.Error);
+                            continue;
+                        }
+                        PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
+                        if (valueProp == null)
+                        {
+                            string errMsg = $"Failed to obtain value on element {index}: {kvPair}";
+                            float height = ImGuiHelpBox.GetHeight(errMsg, position.width, MessageType.Error);
+                            (Rect helpRect, Rect nowLeftRect) = RectUtils.SplitHeightRect(accRect, height);
+                            accRect = nowLeftRect;
+                            EditorGUI.HelpBox(helpRect, errMsg, MessageType.Error);
+                            continue;
+                        }
+
+                        object dictKey = keyProp.GetValue(kvPair);
+                        string dictKeyLabel = $"{dictKey}";
+                        float dictKeyHeight = FieldHeight(dictKey, $"{dictKey}");
+                        (Rect dictKeyUseRect, Rect dictLeftRect) = RectUtils.SplitHeightRect(accRect, dictKeyHeight);
+                        accRect = dictLeftRect;
+                        FieldPosition(new Rect(dictKeyUseRect)
+                        {
+                            x = dictKeyUseRect.x + SaintsPropertyDrawer.IndentWidth,
+                            width = dictKeyUseRect.width - SaintsPropertyDrawer.IndentWidth,
+                        }, dictKey, dictKeyLabel);
+
+                        object dictValue = valueProp.GetValue(kvPair);
+                        string dictValueLabel = $"{dictValue}";
+                        float dictValueHeight = FieldHeight(dictValue, $"{dictValue}");
+                        (Rect dictValueUseRect, Rect dictValueLeftRect) = RectUtils.SplitHeightRect(accRect, dictValueHeight);
+                        accRect = dictValueLeftRect;
+                        FieldPosition(new Rect(dictValueUseRect)
+                        {
+                            x = dictValueUseRect.x + SaintsPropertyDrawer.IndentWidth,
+                            width = dictValueUseRect.width - SaintsPropertyDrawer.IndentWidth,
+                        }, dictValue, dictValueLabel);
+                    }
+
+                    return null;
+                    // return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
+                }
                 if (value is IEnumerable enumerableValue)
                 {
                     (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
@@ -758,7 +951,46 @@ namespace SaintsField.Editor.Playa.Renderer
                     }
 
                 }
-                EditorGUI.HelpBox(position, $"Type not supported: {valueType}", MessageType.Warning);
+
+                {  // fallback draw properties and fields
+                    (Rect labelRect, Rect leftRect) =
+                        RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+
+                    EditorGUI.LabelField(labelRect, label);
+
+                    List<(object value, string label, Type type)> listResult = new List<(object value, string label, Type type)>();
+
+                    const BindingFlags bindAttrNormal =
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+                    foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
+                    {
+                        object fieldValue = fieldInfo.GetValue(value);
+                        listResult.Add((fieldValue, fieldInfo.Name, fieldInfo.FieldType));
+                    }
+
+                    foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
+                    {
+                        object propertyValue = propertyInfo.GetValue(value);
+                        listResult.Add((propertyValue, propertyInfo.Name, propertyInfo.PropertyType));
+                    }
+
+                    Rect accRect = leftRect;
+                    foreach ((object eachValue, string eachLabel, Type eachType) in listResult)
+                    {
+                        float height = FieldHeight(eachValue, eachLabel);
+                        (Rect useRect, Rect newLeftRect) = RectUtils.SplitHeightRect(accRect, height);
+                        accRect = newLeftRect;
+                        Rect thisRect = new Rect(useRect)
+                        {
+                            x = useRect.x + SaintsPropertyDrawer.IndentWidth,
+                            width = useRect.width - SaintsPropertyDrawer.IndentWidth,
+                        };
+
+                        FieldPosition(thisRect, eachValue, eachLabel, eachType);
+                    }
+                }
+                // EditorGUI.HelpBox(position, $"Type not supported: {valueType}", MessageType.Warning);
                 return null;
 
                 // return isDrawn;
@@ -788,190 +1020,239 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
                 textField.styleSheets.Add(nullUss);
 
-                textField.SetEnabled(false);
-                return textField;
+                return WrapVisualElement(textField);
             }
 
-            VisualElement visualElement;
+            // VisualElement visualElement;
             Type valueType = type ?? value.GetType();
+
+            // Debug.Log(valueBaseGenericType);
 
             if (valueType == typeof(bool))
             {
-                visualElement = new Toggle(label)
+                return WrapVisualElement(new Toggle(label)
                 {
                     value = (bool)value,
-                };
+                });
             }
-            else if (valueType == typeof(short))
+
+            if (valueType == typeof(short))
             {
                 // EditorGUILayout.IntField(label, (short)value);
-                visualElement = new IntegerField(label)
+                return WrapVisualElement(new IntegerField(label)
                 {
                     value = (short)value,
-                };
+                });
             }
-            else if (valueType == typeof(ushort))
+            if (valueType == typeof(ushort))
             {
                 // EditorGUILayout.IntField(label, (ushort)value);
-                visualElement = new IntegerField(label)
+                return WrapVisualElement(new IntegerField(label)
                 {
                     value = (ushort)value,
-                };
+                });
             }
-            else if (valueType == typeof(int))
+            if (valueType == typeof(int))
             {
                 // EditorGUILayout.IntField(label, (int)value);
-                visualElement = new IntegerField(label)
+                return WrapVisualElement(new IntegerField(label)
                 {
                     value = (int)value,
-                };
+                });
             }
-            else if (valueType == typeof(uint))
+            if (valueType == typeof(uint))
             {
                 // EditorGUILayout.LongField(label, (uint)value);
-                visualElement = new LongField(label)
+                return WrapVisualElement(new LongField(label)
                 {
                     value = (uint)value,
-                };
+                });
             }
-            else if (valueType == typeof(long))
+            if (valueType == typeof(long))
             {
                 // EditorGUILayout.LongField(label, (long)value);
-                visualElement = new LongField(label)
+                return WrapVisualElement(new LongField(label)
                 {
                     value = (long)value,
-                };
+                });
             }
-            else if (valueType == typeof(ulong))
+            if (valueType == typeof(ulong))
             {
                 // EditorGUILayout.TextField(label, ((ulong)value).ToString());
-                visualElement = new TextField(label)
+                return WrapVisualElement(new TextField(label)
                 {
                     value = ((ulong)value).ToString(),
-                };
+                });
             }
-            else if (valueType == typeof(float))
+            if (valueType == typeof(float))
             {
                 // EditorGUILayout.FloatField(label, (float)value);
-                visualElement = new FloatField(label)
+                return WrapVisualElement(new FloatField(label)
                 {
                     value = (float)value,
-                };
+                });
             }
-            else if (valueType == typeof(double))
+            if (valueType == typeof(double))
             {
                 // EditorGUILayout.DoubleField(label, (double)value);
-                visualElement = new DoubleField(label)
+                return WrapVisualElement(new DoubleField(label)
                 {
                     value = (double)value,
-                };
+                });
             }
-            else if (valueType == typeof(string))
+            if (valueType == typeof(string))
             {
                 // EditorGUILayout.TextField(label, (string)value);
-                visualElement = new TextField(label)
+                return WrapVisualElement(new TextField(label)
                 {
                     value = (string)value,
-                };
+                });
             }
-            else if (valueType == typeof(Vector2))
+            if (valueType == typeof(Vector2))
             {
                 // EditorGUILayout.Vector2Field(label, (Vector2)value);
-                visualElement = new Vector2Field(label)
+                return WrapVisualElement(new Vector2Field(label)
                 {
                     value = (Vector2)value,
-                };
+                });
             }
-            else if (valueType == typeof(Vector3))
+            if (valueType == typeof(Vector3))
             {
                 // EditorGUILayout.Vector3Field(label, (Vector3)value);
-                visualElement = new Vector3Field(label)
+                return WrapVisualElement(new Vector3Field(label)
                 {
                     value = (Vector3)value,
-                };
+                });
             }
-            else if (valueType == typeof(Vector4))
+            if (valueType == typeof(Vector4))
             {
                 // EditorGUILayout.Vector4Field(label, (Vector4)value);
-                visualElement = new Vector4Field(label)
+                return WrapVisualElement(new Vector4Field(label)
                 {
                     value = (Vector4)value,
-                };
+                });
             }
-            else if (valueType == typeof(Vector2Int))
+            if (valueType == typeof(Vector2Int))
             {
                 // EditorGUILayout.Vector2IntField(label, (Vector2Int)value);
-                visualElement = new Vector2IntField(label)
+                return WrapVisualElement(new Vector2IntField(label)
                 {
                     value = (Vector2Int)value,
-                };
+                });
             }
-            else if (valueType == typeof(Vector3Int))
+            if (valueType == typeof(Vector3Int))
             {
                 // EditorGUILayout.Vector3IntField(label, (Vector3Int)value);
-                visualElement = new Vector3IntField(label)
+                return WrapVisualElement(new Vector3IntField(label)
                 {
                     value = (Vector3Int)value,
-                };
+                });
             }
-            else if (valueType == typeof(Color))
+            if (valueType == typeof(Color))
             {
                 // EditorGUILayout.ColorField(label, (Color)value);
-                visualElement = new ColorField(label)
+                return WrapVisualElement(new ColorField(label)
                 {
                     value = (Color)value,
-                };
+                });
             }
-            else if (valueType == typeof(Bounds))
+            if (valueType == typeof(Bounds))
             {
                 // EditorGUILayout.BoundsField(label, (Bounds)value);
-                visualElement = new BoundsField(label)
+                return WrapVisualElement(new BoundsField(label)
                 {
                     value = (Bounds)value,
-                };
+                });
             }
-            else if (valueType == typeof(Rect))
+            if (valueType == typeof(Rect))
             {
                 // EditorGUILayout.RectField(label, (Rect)value);
-                visualElement = new RectField(label)
+                return WrapVisualElement(new RectField(label)
                 {
                     value = (Rect)value,
-                };
+                });
             }
-            else if (valueType == typeof(RectInt))
+            if (valueType == typeof(RectInt))
             {
                 // EditorGUILayout.RectIntField(label, (RectInt)value);
-                visualElement = new RectIntField(label)
+                return WrapVisualElement(new RectIntField(label)
                 {
                     value = (RectInt)value,
-                };
+                });
             }
-            else if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
+            if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
             {
                 // EditorGUILayout.ObjectField(label, (UnityEngine.Object)value, valueType, true);
-                visualElement = new ObjectField(label)
+                return WrapVisualElement(new ObjectField(label)
                 {
                     value = (UnityEngine.Object)value,
                     objectType = valueType,
-                };
+                });
             }
-            else if (valueType.BaseType == typeof(Enum))
+            if (valueType.BaseType == typeof(Enum))
             {
-                visualElement = new EnumField((Enum)value)
+                return WrapVisualElement(new EnumField((Enum)value)
                 {
                     label = label,
                     value = (Enum)value,
-                };
+                });
             }
-            else if (valueType.BaseType == typeof(TypeInfo))
+            if (valueType.BaseType == typeof(TypeInfo))
             {
                 // EditorGUILayout.TextField(label, value.ToString());
-                visualElement = new TextField(label)
+                return WrapVisualElement(new TextField(label)
                 {
                     value = value.ToString(),
-                };
+                });
             }
-            else if (value is IEnumerable enumerableValue)
+            if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+            {
+                // ReSharper disable once AssignNullToNotNullAttribute
+                object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
+
+                Foldout foldout = new Foldout
+                {
+                    text = $"{label} <color=#808080ff>(Dictionary x{kvPairs.Length})</color>",
+                };
+
+                const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                              BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+
+                foreach ((object kvPair, int index) in kvPairs.WithIndex())
+                {
+                    Type kvPairType = kvPair.GetType();
+                    PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
+                    if (keyProp == null)
+                    {
+                        foldout.Add(new HelpBox($"Failed to obtain key on element {index}: {kvPair}", HelpBoxMessageType.Error));
+                        continue;
+                    }
+                    PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
+                    if (valueProp == null)
+                    {
+                        foldout.Add(new HelpBox($"Failed to obtain value on element {index}: {kvPair}", HelpBoxMessageType.Error));
+                        continue;
+                    }
+
+                    object dictKey = keyProp.GetValue(kvPair);
+                    object dictValue = valueProp.GetValue(kvPair);
+                    foldout.Add(UIToolkitLayout(dictKey, $"{dictKey} <color=#808080ff>(Key {index})</color>"));
+                    VisualElement valueContainer = new VisualElement
+                    {
+                        style =
+                        {
+                            paddingLeft = SaintsPropertyDrawer.IndentWidth,
+                        },
+                    };
+                    valueContainer.Add(UIToolkitLayout(dictValue, $"{dictValue} <color=#808080ff>(Value {index})</color>"));
+                    foldout.Add(valueContainer);
+                }
+
+                return foldout;
+                // return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
+            }
+            if (value is IEnumerable enumerableValue)
             {
                 // List<object> values = enumerableValue.Cast<object>().ToList();
                 // Debug.Log($"!!!!!!!!!{value}/{valueType}/{valueType.IsArray}/{valueType.BaseType}");
@@ -1035,17 +1316,32 @@ namespace SaintsField.Editor.Playa.Renderer
                 root.Add(foldout);
                 root.Add(listView);
 
-                return root;
-            }
-            else
-            {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_IN_INSPECTOR
-//                 Debug.Log($"IEnumerable={value is IEnumerable}");
-// #endif
-                // isDrawn = false;
-                visualElement = new HelpBox($"Unable to draw type {valueType}", HelpBoxMessageType.Error);
+                return WrapVisualElement(root);
             }
 
+            // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            Foldout genFoldout = new Foldout
+            {
+                text = label,
+            };
+            foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
+            {
+                object fieldValue = fieldInfo.GetValue(value);
+                genFoldout.Add(UIToolkitLayout(fieldValue, fieldInfo.Name, fieldInfo.FieldType));
+            }
+
+            foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
+            {
+                object propertyValue = propertyInfo.GetValue(value);
+                genFoldout.Add(UIToolkitLayout(propertyValue, propertyInfo.Name, propertyInfo.PropertyType));
+            }
+
+            return genFoldout;
+        }
+
+        private static VisualElement WrapVisualElement(VisualElement visualElement)
+        {
             visualElement.SetEnabled(false);
             visualElement.AddToClassList("unity-base-field__aligned");
             return visualElement;

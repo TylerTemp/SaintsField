@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using SaintsField.Samples.Scripts.Interface;
 
-namespace SaintsField.Samples.Scripts.SaintsEditor.Issue45
+namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
     public class GetScriptableObjectArray : SaintsMonoBehaviour
     {
