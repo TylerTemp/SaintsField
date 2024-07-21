@@ -656,7 +656,8 @@ namespace SaintsField.Editor.Utils
                 Object go = property.pptrValue;
                 if (go == null)
                 {
-                    go = null;  // Object(null) is not null in Unity because Unity overrides `==`
+                    // go = null;  // Object(null) is not null in Unity because Unity overrides `==`
+                    continue;
                 }
 
                 yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name, GuiLabel = new GUIContent(property.name)};
