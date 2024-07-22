@@ -153,7 +153,7 @@ namespace SaintsField.Editor.Core
 
         // NOTE: Unity rich text is NOT xml; This is not Unity rich text as
         // Unity will treat invalid rich text as plain text. This will try to fix the broken xml
-        public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText)
+        public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, object parent)
         {
             List<string> colors = new List<string>();
 
@@ -219,6 +219,9 @@ namespace SaintsField.Editor.Core
                             break;
                         case "label":
                             richText.Append(labelText);
+                            break;
+                        case "typeName":
+                            richText.Append(parent == null ? "null": parent.GetType().Name);
                             break;
                         case "icon":
                         {

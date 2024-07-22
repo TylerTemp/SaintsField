@@ -102,7 +102,7 @@ namespace SaintsField.Editor.Drawers
 #endif
 
             ImGuiEnsureDispose(property.serializedObject.targetObject);
-            _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(xml, labelText));
+            _richTextDrawer.DrawChunks(curRect, label, RichTextDrawer.ParseRichXml(xml, labelText, parent));
             return leftRect;
         }
 
@@ -275,7 +275,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     fullWidthLabelContainer.Clear();
                     fullWidthLabelContainer.style.display = DisplayStyle.Flex;
-                    foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(xml, property.displayName)))
+                    foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(xml, property.displayName, parent)))
                     {
                         fullWidthLabelContainer.Add(rich);
                     }

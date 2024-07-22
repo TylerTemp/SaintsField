@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.Separator
 {
     public class SeparatorExample: MonoBehaviour
     {
@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts
 
         [Separator(10)]  // this behaves like a space
         [Separator("[ Hi <color=LightBlue>Above</color> ]", EColor.Aqua, EAlign.Center)]
-        [BelowSeparator("[ Hi <color=Blue>Below</color> ]", EColor.Brown, EAlign.Center)]
+        [BelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
         [BelowSeparator(10)]
         public string hi;
 

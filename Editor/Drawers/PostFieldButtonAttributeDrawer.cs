@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text).ToArray();
+                richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, parent).ToArray();
             }
 
             return PaddingWidth * 2 + Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, richChunks)));

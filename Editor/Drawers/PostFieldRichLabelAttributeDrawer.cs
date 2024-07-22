@@ -43,7 +43,7 @@ namespace SaintsField.Editor.Drawers
                 return 0;
             }
 
-            _payloads = RichTextDrawer.ParseRichXml(xml, label.text).ToArray();
+            _payloads = RichTextDrawer.ParseRichXml(xml, label.text, parent).ToArray();
             return _richTextDrawer.GetWidth(label, position.height, _payloads) + targetAttribute.Padding;
         }
 
@@ -169,7 +169,7 @@ namespace SaintsField.Editor.Drawers
                 // ReSharper disable once InvertIf
                 if (xml != null)
                 {
-                    IReadOnlyList<RichTextDrawer.RichTextChunk> payloads = RichTextDrawer.ParseRichXml(xml, property.displayName).ToArray();
+                    IReadOnlyList<RichTextDrawer.RichTextChunk> payloads = RichTextDrawer.ParseRichXml(xml, property.displayName, parent).ToArray();
                     foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(payloads))
                     {
                         richLabel.Add(richChunk);

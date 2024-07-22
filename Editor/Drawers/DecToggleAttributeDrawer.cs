@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers
             RichTextDrawer.Dispose();
         }
 
-        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, string labelXml, bool isActive, Action<bool> activeCallback)
+        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, string labelXml, bool isActive, Action<bool> activeCallback, object target)
         {
             (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text).ToArray();
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, target).ToArray();
             float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
             Rect labelRect = buttonRect;
             if (textWidth < labelRect.width)
