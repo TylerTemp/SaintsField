@@ -88,6 +88,7 @@ namespace: `SaintsField`
     *   All Unity rich label tag, like `<color=#ff0000>red</color>`
     *   `<label />` for current field name
     *   `<icon=path/to/image.png />` for icon
+    *   `<typeName />` for the class/struct name of the container of the field
 
     `null` means no label
 
