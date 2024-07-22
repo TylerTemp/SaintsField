@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace SaintsField
 {
@@ -29,8 +30,11 @@ namespace SaintsField
         public SeparatorAttribute(int space): this(null, EColor.Clear, EAlign.Start, false, space) {}
         public SeparatorAttribute(int space, bool below): this(null, EColor.Clear, EAlign.Start, false, space, below) {}
 
+        public SeparatorAttribute(string title, EAlign eAlign, bool isCallback=false, int space=0, bool below=false) : this(title, EColor.Gray, eAlign, isCallback, space, below) {}
+
         public SeparatorAttribute(string title, EColor color=EColor.Gray, EAlign eAlign=EAlign.Start, bool isCallback=false, int space=0, bool below=false)
         {
+            Debug.Assert(eAlign != EAlign.FieldStart, $"{EAlign.FieldStart} is not supported");
             Title = title;
             Color = color;
             EAlign = eAlign;
