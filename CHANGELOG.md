@@ -1,3 +1,8 @@
+## 3.2.1 ##
+
+1.  Rich label now supports `<typeName />` to display the class/struct name of the container of the field.
+2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support. 
+
 ## 3.2.0 ##
 
 1.  **Breaking Changes**: `GetComponentInChildren`, `GetComponentInParent`, `GetComponentInParents` will search the target itself, which means it's now the same behavior as Unity's build-in functions. No more surprises. Fixes [#56](https://github.com/TylerTemp/SaintsField/issues/56)

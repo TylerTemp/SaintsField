@@ -66,17 +66,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.2.0**
+**3.2.1**
 
-1.  **Breaking Changes**: `GetComponentInChildren`, `GetComponentInParent`, `GetComponentInParents` will search the target itself, which means it's now the same behavior as Unity's build-in functions. No more surprises. Fixes [#56](https://github.com/TylerTemp/SaintsField/issues/56)
-2.  **Breaking Changes**: `GetComponentInParents` now have `bool includeInactive = false` as the first argument to align with Unity's build-in function. Be aware this might break your existing code
-3.  `GetComponentInChildren`, `GetComponentInParent`, `GetComponentInParents` now have `bool excludeSelf = false` argument to exclude the target itself from searching.
-4.  `OnEvent` name now support dot to fetch property
-5.  **Breaking Changes**: Since this version, for `Enable`/`Disable`/`Show`/`Hide`-`If`, the `EMode` argument now has the same operation logic with other arguments (in previous version it has a higher priority to shadow other arguments). This might break your existing code.
-
-    Thanks, [@Lx34r](https://github.com/Lx34r), for [PR55](https://github.com/TylerTemp/SaintsField/pull/55)
-6.  `ShowInInspector` now can show a dictionary (or any object implements `IDictionary<,>`), fixes [#57](https://github.com/TylerTemp/SaintsField/issues/57)
-7.  `ShowInInspector` now can show public fields & properties of any type
+1.  Rich label now supports `<typeName />` to display the class/struct name of the container of the field.
+2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -327,10 +320,74 @@ private string DynamicMessage() => _content ? "False" : "True";
 
 [![infobox](https://github.com/TylerTemp/SaintsField/assets/6391063/c96b4b14-594d-4bfd-9cc4-e53390ed99be)](https://github.com/TylerTemp/SaintsField/assets/6391063/03ac649a-9e89-407d-a59d-3e224a7f84c8)
 
+#### `Separator` / `BelowSeparator` ####
+
+Draw text, separator, spaces for field on above / below with rich text & dynamic text support.
+
+
+Parameters:
+
+*   `string title=null` display a title. `null` for no title, only separator.
+*   `EColor color=EColor.Gray` color for the title and the separator
+*   `EAlign eAlign=EAlign.Start` how the title is positioned, options are:
+    *   `EAlign.Start`
+    *   `EAlign.Center`
+    *   `EAlign.End`
+*   `bool isCallback=false` when `true`, use `title` as a callback to get a dynamic title
+*   `int space=0` leave some space above or below the separator, like what `Space` does.
+*   `bool below=false` when `true`, draw the separator below the field.
+
+```csharp
+using SaintsField;
+
+[Space(50)]
+
+[Separator("Start")]
+[Separator("Center", EAlign.Center)]
+[Separator("End", EAlign.End)]
+[BelowSeparator(nameof(Callback), isCallback: true)]
+public string s3;
+public string Callback() => s3;
+
+[Space(50)]
+
+[Separator]
+public string s1;
+
+[Separator(10)]  // this behaves like a space
+[Separator("[ Hi <color=LightBlue>Above</color> ]", EColor.Aqua, EAlign.Center)]
+[BelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
+[BelowSeparator(10)]
+public string hi;
+
+[BelowSeparator]
+public string s2;
+```
+
+![image](https://github.com/user-attachments/assets/ae7f5eae-d94f-4cb3-88dc-8250a4e0a4ec)
+
+This is very useful when you what to separate parent fields from the inherent:
+
+```csharp
+using SaintsField;
+
+public class SeparatorParent : MonoBehaviour
+{
+    [BelowSeparator("End Of <b><color=Aqua><typeName/></color></b>", EAlign.Center, space: 10)]
+    public string parent;
+}
+
+public class SeparatorInherent : SeparatorParent
+{
+    public string inherent;
+}
+```
+
+![image](https://github.com/user-attachments/assets/5564a35d-5456-4b90-b07c-7f7c8e742efd)
 
 #### `SepTitle` ####
 
-A separator with text
+A separator with text. (Recommend to use `Separator` instead.)
 
 *   `string title=null` title, `null` for no title at all. Does **NOT** support rich text
 *   `EColor color`, color for title and line separator

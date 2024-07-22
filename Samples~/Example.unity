@@ -8920,6 +8920,7 @@ GameObject:
   m_Component:
   - component: {fileID: 841111316}
   - component: {fileID: 841111315}
+  - component: {fileID: 841111317}
   m_Layer: 0
   m_Name: SeparatorExample
   m_TagString: Untagged
@@ -8939,10 +8940,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b3da6b7ae2e4f5096cf300ea78c8097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  s3: Dynamic Content
   s1: 
   hi: 
   s2: 
-  s3: Dynamic Content
 --- !u!4 &841111316
 Transform:
   m_ObjectHideFlags: 0
@@ -8958,6 +8959,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 72
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &841111317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841111314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8944c5e37e731ac4aba7c766606e8a9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: 
+  inherent: 
 --- !u!1 &842523983
 GameObject:
   m_ObjectHideFlags: 0

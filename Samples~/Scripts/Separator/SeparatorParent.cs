@@ -1,13 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using SaintsField;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.Separator
 {
     public class SeparatorParent : MonoBehaviour
     {
-        [BelowSeparator("End Of <color=Aqua><typeName/></color>", EAlign.Center, space: 10)]
+        [BelowSeparator("End Of <b><color=Aqua><typeName/></color></b>", EAlign.Center, space: 10)]
         public string parent;
     }
 
