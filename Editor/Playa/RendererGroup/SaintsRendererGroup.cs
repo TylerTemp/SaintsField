@@ -15,6 +15,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
 {
     public class SaintsRendererGroup: ISaintsRendererGroup
     {
+        public class Config
+        {
+            public ELayout eLayout;
+            public bool isDOTween;
+            public float marginTop;
+            public float marginBottom;
+        }
+
         private int _curSelected;
 
         private readonly Dictionary<string, List<ISaintsRenderer>> _groupIdToRenderer =
@@ -32,11 +40,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private bool _foldout;
 
-        public SaintsRendererGroup(string groupPath, ELayout eLayout)
+        public SaintsRendererGroup(string groupPath, Config config)
         {
             _groupPath = groupPath;
-            _eLayout = eLayout;
-            _foldout = !eLayout.HasFlag(ELayout.Collapse);
+            _eLayout = config.eLayout;
+            _foldout = !config.eLayout.HasFlag(ELayout.Collapse);
         }
 
         public void Add(string groupPath, ISaintsRenderer renderer)

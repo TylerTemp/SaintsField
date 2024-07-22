@@ -18,6 +18,9 @@ namespace SaintsField.Playa
         public ELayout Layout => 0;
         public bool KeepGrouping { get; }
 
+        public float MarginTop => -1f;
+        public float MarginBottom => -1f;
+
         public DOTweenPlayAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind, string groupBy="", bool keepGrouping = false)
         {
             Label = label;

@@ -9,8 +9,11 @@ namespace SaintsField.Playa
     {
         public string GroupBy { get; }
         public ELayout Layout => 0;
-        public bool GroupAllFieldsUntilNextGroupAttribute => false;
+
         public bool KeepGrouping => false;
+
+        public float MarginTop => -1f;
+        public float MarginBottom => -1f;
 
         public LayoutEndAttribute(string groupBy)
         {

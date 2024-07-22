@@ -11,11 +11,17 @@ namespace SaintsField.Playa
         public ELayout Layout { get; }
         public bool KeepGrouping { get; }
 
-        public LayoutAttribute(string groupBy, ELayout layout=0, bool keepGrouping = false)
+        public float MarginTop { get; }
+        public float MarginBottom { get; }
+
+        public LayoutAttribute(string groupBy, ELayout layout = 0, bool keepGrouping = false, float marginTop = -1f, float marginBottom = -1f)
         {
             GroupBy = groupBy;
             Layout = layout;
             KeepGrouping = keepGrouping;
+
+            MarginTop = marginTop;
+            MarginBottom = marginBottom;
         }
     }
 }

@@ -450,19 +450,25 @@ namespace SaintsField.Editor
                 .ToList();
 
             // layout name to it's config
-            Dictionary<string, (ELayout eLayout, bool isDOTween)> layoutKeyToInfo = new Dictionary<string, (ELayout eLayout, bool isDOTween)>();
+            Dictionary<string, SaintsRendererGroup.Config> layoutKeyToInfo = new Dictionary<string, SaintsRendererGroup.Config>();
             foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.Groups))
             {
                 string curGroupBy = sortedGroup.GroupBy;
                 ELayout curConfig = sortedGroup.Layout;
-                bool configExists = layoutKeyToInfo.TryGetValue(curGroupBy, out (ELayout eLayout, bool isDOTween) existConfigInfo);
+                bool configExists = layoutKeyToInfo.TryGetValue(curGroupBy, out SaintsRendererGroup.Config existConfigInfo);
                 // if there is a config later, use the later one
                 if (!configExists || curConfig != 0 || sortedGroup is DOTweenPlayAttribute)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                     Debug.Log($"add key {curGroupBy}: {curConfig}.{curConfig==0} (origin: {existConfigInfo.eLayout}.{existConfigInfo.eLayout==0})");
 #endif
-                    layoutKeyToInfo[curGroupBy] = (curConfig, existConfigInfo.isDOTween || sortedGroup is DOTweenPlayAttribute);
+                    layoutKeyToInfo[curGroupBy] = new SaintsRendererGroup.Config
+                    {
+                        eLayout = curConfig,
+                        isDOTween = existConfigInfo!.isDOTween || sortedGroup is DOTweenPlayAttribute,
+                        marginTop = sortedGroup.MarginTop,
+                        marginBottom = sortedGroup.MarginBottom,
+                    };
                 }
                 // else
                 // {
@@ -478,7 +484,7 @@ namespace SaintsField.Editor
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
                         each.Value.isDOTween
                             ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
-                            : new SaintsRendererGroup(each.Key, each.Value.eLayout)
+                            : new SaintsRendererGroup(each.Key, each.Value)
 #else
                         (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value.eLayout)
 #endif
