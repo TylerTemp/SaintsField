@@ -2994,6 +2994,8 @@ A layout decorator to group fields.
 *   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
 *   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
 *   `bool keepGrouping=false`: See `LayoutGroup` below
+*   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
+*   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
 
 Options are:
 
@@ -3158,6 +3160,8 @@ For `LayoutGroup`:
 
 *   `string groupBy` same as `Layout`
 *   `ELayout layout=0` same as `Layout`
+*   `float marginTop = -1f` same as `Layout`
+*   `float marginBottom = -1f` same as `Layout`
 
 For `LayoutEnd`:
 
