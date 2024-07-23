@@ -454,22 +454,46 @@ namespace SaintsField.Editor
             foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.Groups))
             {
                 string curGroupBy = sortedGroup.GroupBy;
-                ELayout curConfig = sortedGroup.Layout;
-                bool configExists = layoutKeyToInfo.TryGetValue(curGroupBy, out SaintsRendererGroup.Config existConfigInfo);
-                // if there is a config later, use the later one
-                if (!configExists || curConfig != 0 || sortedGroup is DOTweenPlayAttribute)
+                ELayout curLayout = sortedGroup.Layout;
+                SaintsRendererGroup.Config oldConfig = layoutKeyToInfo.GetValueOrDefault(curGroupBy);
+                SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                    Debug.Log($"add key {curGroupBy}: {curConfig}.{curConfig==0} (origin: {existConfigInfo.eLayout}.{existConfigInfo.eLayout==0})");
-#endif
+                    eLayout = curLayout,
+                    isDOTween = sortedGroup is DOTweenPlayAttribute,
+                    marginTop = sortedGroup.MarginTop,
+                    marginBottom = sortedGroup.MarginBottom,
+                };
+
+                if (oldConfig is null)
+                {
+                    layoutKeyToInfo[curGroupBy] = newConfig;
+                }
+                else
+                {
                     layoutKeyToInfo[curGroupBy] = new SaintsRendererGroup.Config
                     {
-                        eLayout = curConfig,
-                        isDOTween = existConfigInfo!.isDOTween || sortedGroup is DOTweenPlayAttribute,
-                        marginTop = sortedGroup.MarginTop,
-                        marginBottom = sortedGroup.MarginBottom,
+                        eLayout = oldConfig.eLayout == 0? newConfig.eLayout: oldConfig.eLayout,
+                        isDOTween = oldConfig.isDOTween || newConfig.isDOTween,
+                        marginTop = newConfig.marginTop >= 0? newConfig.marginTop: oldConfig.marginTop,
+                        marginBottom = newConfig.marginBottom >= 0? newConfig.marginBottom: oldConfig.marginBottom,
                     };
                 }
+
+//                 bool configExists = layoutKeyToInfo.TryGetValue(curGroupBy, out SaintsRendererGroup.Config existConfigInfo);
+//                 // if there is a config later, use the later one
+//                 if (!configExists || curLayout != 0 || sortedGroup is DOTweenPlayAttribute)
+//                 {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
+//                     Debug.Log($"add key {curGroupBy}: {curConfig}.{curConfig==0} (origin: {existConfigInfo.eLayout}.{existConfigInfo.eLayout==0})");
+// #endif
+//                     layoutKeyToInfo[curGroupBy] = new SaintsRendererGroup.Config
+//                     {
+//                         eLayout = curLayout,
+//                         isDOTween = existConfigInfo!.isDOTween || sortedGroup is DOTweenPlayAttribute,
+//                         marginTop = sortedGroup.MarginTop,
+//                         marginBottom = sortedGroup.MarginBottom,
+//                     };
+//                 }
                 // else
                 // {
                 //     Debug.Assert(existConfigInfo.eLayout == curConfig || curConfig == 0, $"layout config conflict: [{curGroupBy}] {existConfigInfo.eLayout} vs {curConfig}");
