@@ -387,7 +387,7 @@ public class SeparatorInherent : SeparatorParent
 }
 ```
 
-![image](https://github.com/user-attachments/assets/5564a35d-5456-4b90-b07c-7f7c8e742efd)
+![image](https://github.com/user-attachments/assets/2f6e369d-1260-4379-9504-6036fb89e15b)
 
 #### `SepTitle` ####
 
