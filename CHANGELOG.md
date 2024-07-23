@@ -1,7 +1,9 @@
 ## 3.2.1 ##
 
-1.  Rich label now supports `<containerType />` to display the class/struct name of the container of the field.
+1.  Rich label now supports `<container.Type />` to display the class/struct name of the container of the field, and `<container.Type.BaseType />`.
 2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support. 
+3.  `Layout`, `LayoutGroup` now supports `marginTop`, `marginBottom`, fixes [#52](https://github.com/TylerTemp/SaintsField/issues/52)
+4.  IMGUI: fixes `Layout` broken inside `SaintsRow`
 
 ## 3.2.0 ##
 

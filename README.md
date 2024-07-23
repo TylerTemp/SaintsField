@@ -88,7 +88,8 @@ namespace: `SaintsField`
     *   All Unity rich label tag, like `<color=#ff0000>red</color>`
     *   `<label />` for current field name
     *   `<icon=path/to/image.png />` for icon
-    *   `<containerType />` for the class/struct name of the container of the field
+    *   `<container.Type />` for the class/struct name of the container of the field
+    *   `<container.Type.BaseType />` for the class/struct name of the field's container's parent
 
     `null` means no label
 
@@ -374,7 +375,7 @@ using SaintsField;
 
 public class SeparatorParent : MonoBehaviour
 {
-    [BelowSeparator("End Of <b><color=Aqua><containerType/></color></b>", EAlign.Center, space: 10)]
+    [BelowSeparator("End Of <b><color=Aqua><container.Type/></color></b>", EAlign.Center, space: 10)]
     public string parent;
 }
 

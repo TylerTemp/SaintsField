@@ -104,6 +104,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
+            float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
+            EditorGUILayout.GetControlRect(false, marginTop);
+
             GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
                 ? GUI.skin.box
                 : GUIStyle.none;
@@ -219,6 +222,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                 }
             }
+
+            float marginBottom = _config.marginBottom >= 0 ? _config.marginBottom : 2;
+            EditorGUILayout.GetControlRect(false, marginBottom);
         }
 
         private IEnumerable<ISaintsRenderer> GetRenderer()
@@ -308,11 +314,23 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
             }
 
-            return titleHeight + contentHeight;
+            float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
+            float marginBottom = _config.marginBottom >= 0 ? _config.marginBottom : 2;
+
+            return titleHeight + contentHeight + marginTop + marginBottom;
         }
 
         public void RenderPosition(Rect position)
         {
+            float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
+            float marginBottom = _config.marginBottom >= 0 ? _config.marginBottom : 2;
+
+            Rect marginedRect = new Rect(position)
+            {
+                y = position.y + marginTop,
+                height = position.height - marginTop - marginBottom,
+            };
+
             Debug.Assert(!_eLayout.HasFlag(ELayout.Horizontal), $"Horizontal is not supported for IMGUI in SaintsEditorAttribute mode");
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -333,9 +351,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
-            GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
-                ? GUI.skin.box
-                : GUIStyle.none;
+            if (_eLayout.HasFlag(ELayout.Background))
+            {
+                GUI.Box(marginedRect, GUIContent.none);
+            }
+
+            // GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
+            //     ? GUI.skin.box
+            //     : GUIStyle.none;
             // IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
             //     // ReSharper disable once RedundantCast
             //     ? (IDisposable)new EditorGUILayout.HorizontalScope(fullBoxStyle)
@@ -354,7 +377,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     bool hasTitle = _eLayout.HasFlag(ELayout.Title);
                     bool hasTab = _eLayout.HasFlag(ELayout.Tab);
 
-                    Rect titleRect = new Rect(position)
+                    Rect titleRect = new Rect(marginedRect)
                     {
                         height = 0,
                     };
@@ -466,14 +489,20 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                 if(_foldout)
                 {
-                    Rect bodyRect = new Rect(position)
-                    {
-                        y = position.y + titleUsedHeight,
-                        height = position.height - titleUsedHeight,
-                    };
+                    // Rect bodyRect = new Rect(marginedRect)
+                    // {
+                    //     y = marginedRect.y + titleUsedHeight,
+                    //     height = marginedRect.height - titleUsedHeight,
+                    // };
+                    Rect bodyRect = RectUtils.SplitHeightRect(marginedRect, titleUsedHeight).leftRect;
+
+                    Rect accRect = bodyRect;
                     foreach (ISaintsRenderer renderer in GetRenderer())
                     {
-                        renderer.RenderPosition(bodyRect);
+                        float height = renderer.GetHeight();
+                        (Rect useRect, Rect leftRect) = RectUtils.SplitHeightRect(accRect, height);
+                        renderer.RenderPosition(useRect);
+                        accRect = leftRect;
                     }
 
                 }
