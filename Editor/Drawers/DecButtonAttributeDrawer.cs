@@ -70,7 +70,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text, target).ToArray();
+                richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text, info, target).ToArray();
             }
 
             // GetWidth
@@ -246,7 +246,7 @@ namespace SaintsField.Editor.Drawers
 
             labelContainer.userData = newXml;
             labelContainer.Clear();
-            IEnumerable<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(newXml, property.displayName, parent);
+            IEnumerable<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(newXml, property.displayName, info, parent);
             foreach (VisualElement visualElement in RichTextDrawer.DrawChunksUIToolKit(richChunks))
             {
                 labelContainer.Add(visualElement);

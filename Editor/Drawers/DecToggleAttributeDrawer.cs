@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -21,7 +22,7 @@ namespace SaintsField.Editor.Drawers
             RichTextDrawer.Dispose();
         }
 
-        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, string labelXml, bool isActive, Action<bool> activeCallback, object target)
+        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, string labelXml, bool isActive, Action<bool> activeCallback, FieldInfo info, object target)
         {
             (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
@@ -39,7 +40,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, target).ToArray();
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, info, target).ToArray();
             float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
             Rect labelRect = buttonRect;
             if (textWidth < labelRect.width)

@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System.Reflection;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
@@ -78,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 result.RegisterCallback<AttachToPanelEvent>(_ =>
                     result.schedule
-                        .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition, richLabelCondition, FieldWithInfo.Target))
+                        .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition, richLabelCondition, FieldWithInfo.FieldInfo, FieldWithInfo.Target))
                         .Every(100)
                 );
             }
@@ -395,7 +396,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
 
 
-        private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, object parent)
+        private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
         {
             PreCheckResult preCheckResult = default;
             // Debug.Log(preCheckResult.RichLabelXml);
@@ -460,7 +461,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     else
                     {
                         userDataPayload.xml = xml;
-                        UIToolkitUtils.SetLabel(userDataPayload.label, RichTextDrawer.ParseRichXml(xml, userDataPayload.friendlyName, parent), userDataPayload.richTextDrawer);
+                        UIToolkitUtils.SetLabel(userDataPayload.label, RichTextDrawer.ParseRichXml(xml, userDataPayload.friendlyName, info, parent), userDataPayload.richTextDrawer);
                     }
                 }
             }
@@ -564,7 +565,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         _curXmlChunks =
                             RichTextDrawer
-                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.Target)
+                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
                                 .ToArray();
                     }
 
@@ -693,7 +694,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         _curXmlChunks =
                             RichTextDrawer
-                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.Target)
+                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
                                 .ToArray();
                     }
 
@@ -820,7 +821,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     _curXmlChunks =
                         RichTextDrawer
-                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.Target)
+                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
                             .ToArray();
                 }
 

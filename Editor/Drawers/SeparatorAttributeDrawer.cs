@@ -203,7 +203,7 @@ namespace SaintsField.Editor.Drawers
 #endif
 
             ImGuiEnsureDispose(property.serializedObject.targetObject);
-            RichTextDrawer.RichTextChunk[] chunks = RichTextDrawer.ParseRichXml(xml, labelText, parent).ToArray();
+            RichTextDrawer.RichTextChunk[] chunks = RichTextDrawer.ParseRichXml(xml, labelText, info, parent).ToArray();
             float width = _richTextDrawer.GetWidth(new GUIContent(label) { text = labelText }, EditorGUIUtility.singleLineHeight, chunks);
 
             List<Rect> sepRects = new List<Rect>();
@@ -495,7 +495,7 @@ namespace SaintsField.Editor.Drawers
                     // titleElement.style.display = DisplayStyle.Flex;
                     if(curTitleXml != null)
                     {
-                        foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(curTitleXml, property.displayName, parent)))
+                        foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(curTitleXml, property.displayName, info, parent)))
                         {
                             titleElement.Add(rich);
                         }

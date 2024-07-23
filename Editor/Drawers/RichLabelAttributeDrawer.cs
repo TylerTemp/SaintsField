@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers
             labelText = property.displayName;
 #endif
 
-            RichTextDrawer.RichTextChunk[] parsedXmlNode = RichTextDrawer.ParseRichXml(labelXml, labelText, parent).ToArray();
+            RichTextDrawer.RichTextChunk[] parsedXmlNode = RichTextDrawer.ParseRichXml(labelXml, labelText, info, parent).ToArray();
             _richTextDrawer.DrawChunks(position, label, parsedXmlNode);
         }
 
@@ -183,7 +183,7 @@ namespace SaintsField.Editor.Drawers
 
                 IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = nowXml == null
                     ? null
-                    : RichTextDrawer.ParseRichXml(nowXml, property.displayName, parent).ToArray();
+                    : RichTextDrawer.ParseRichXml(nowXml, property.displayName, info, parent).ToArray();
 
                 bool tryProcess = payload.TargetField != null;
 

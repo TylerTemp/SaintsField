@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers
 
             float labelWidth = hasLabel? EditorGUIUtility.labelWidth : 0;
 
-            RichTextDrawer.RichTextChunk[] payloads = RichTextDrawer.ParseRichXml(labelXml, label.text, parent).ToArray();
+            RichTextDrawer.RichTextChunk[] payloads = RichTextDrawer.ParseRichXml(labelXml, label.text, info, parent).ToArray();
             float overlayWidth = _richTextDrawer.GetWidth(label, position.height, payloads);
 
             float leftWidth = position.width - labelWidth - contentWidth;
@@ -385,7 +385,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     element.RemoveFromHierarchy();
                 }
-                foreach (VisualElement visualElement in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(xml, property.displayName, parent)))
+                foreach (VisualElement visualElement in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(xml, property.displayName, info, parent)))
                 {
                     // Debug.Log(visualElement);
                     visualElement.AddToClassList(ClassRichLabelElement(property, index));
