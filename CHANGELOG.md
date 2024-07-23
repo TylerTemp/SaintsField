@@ -1,6 +1,6 @@
 ## 3.2.1 ##
 
-1.  Rich label now supports `<typeName />` to display the class/struct name of the container of the field.
+1.  Rich label now supports `<containerType />` to display the class/struct name of the container of the field.
 2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support. 
 
 ## 3.2.0 ##

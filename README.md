@@ -68,7 +68,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 **3.2.1**
 
-1.  Rich label now supports `<typeName />` to display the class/struct name of the container of the field.
+1.  Rich label now supports `<containerType />` to display the class/struct name of the container of the field.
 2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
@@ -88,7 +88,7 @@ namespace: `SaintsField`
     *   All Unity rich label tag, like `<color=#ff0000>red</color>`
     *   `<label />` for current field name
     *   `<icon=path/to/image.png />` for icon
-    *   `<typeName />` for the class/struct name of the container of the field
+    *   `<containerType />` for the class/struct name of the container of the field
 
     `null` means no label
 
@@ -374,7 +374,7 @@ using SaintsField;
 
 public class SeparatorParent : MonoBehaviour
 {
-    [BelowSeparator("End Of <b><color=Aqua><typeName/></color></b>", EAlign.Center, space: 10)]
+    [BelowSeparator("End Of <b><color=Aqua><containerType/></color></b>", EAlign.Center, space: 10)]
     public string parent;
 }
 

@@ -220,7 +220,7 @@ namespace SaintsField.Editor.Core
                         case "label":
                             richText.Append(labelText);
                             break;
-                        case "typeName":
+                        case "containerType":
                             richText.Append(parent == null ? "null": parent.GetType().Name);
                             break;
                         case "icon":
