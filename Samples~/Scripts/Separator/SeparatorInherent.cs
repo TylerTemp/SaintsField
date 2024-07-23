@@ -2,8 +2,8 @@ namespace SaintsField.Samples.Scripts.Separator
 {
     public class SeparatorInherent : SeparatorParent
     {
-        [Separator("End of <b><containerType.BaseType/></b>")]
-        [Separator("Start of <b><containerType/></b>")]
+        [Separator("End of <b><container.Type.BaseType/></b>")]
+        [Separator("Start of <b><container.Type/></b>")]
         public string inherent;
     }
 }

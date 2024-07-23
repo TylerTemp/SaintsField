@@ -220,13 +220,13 @@ namespace SaintsField.Editor.Core
                         case "label":
                             richText.Append(labelText);
                             break;
-                        case "containerType":
+                        case "container.Type":
                         {
                             Type decType = fieldInfo?.DeclaringType;
                             richText.Append(decType == null ? "null" : decType.Name);
                         }
                             break;
-                        case "containerType.BaseType":
+                        case "container.Type.BaseType":
                         {
                             Type baseType = fieldInfo?.DeclaringType?.BaseType;
                             richText.Append(baseType == null? "null": baseType.Name);
