@@ -221,8 +221,16 @@ namespace SaintsField.Editor.Core
                             richText.Append(labelText);
                             break;
                         case "containerType":
+                        {
                             Type decType = fieldInfo?.DeclaringType;
-                            richText.Append(decType == null ? "null": decType.Name);
+                            richText.Append(decType == null ? "null" : decType.Name);
+                        }
+                            break;
+                        case "containerType.BaseType":
+                        {
+                            Type baseType = fieldInfo?.DeclaringType?.BaseType;
+                            richText.Append(baseType == null? "null": baseType.Name);
+                        }
                             break;
                         case "icon":
                         {
