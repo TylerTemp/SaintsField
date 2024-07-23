@@ -455,7 +455,7 @@ namespace SaintsField.Editor
             {
                 string curGroupBy = sortedGroup.GroupBy;
                 ELayout curLayout = sortedGroup.Layout;
-                SaintsRendererGroup.Config oldConfig = layoutKeyToInfo.GetValueOrDefault(curGroupBy);
+                layoutKeyToInfo.TryGetValue(curGroupBy, out SaintsRendererGroup.Config oldConfig);
                 SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
                 {
                     eLayout = curLayout,
@@ -510,7 +510,7 @@ namespace SaintsField.Editor
                             ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
                             : new SaintsRendererGroup(each.Key, each.Value)
 #else
-                        (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value.eLayout)
+                        (ISaintsRendererGroup)new SaintsRendererGroup(each.Key, each.Value)
 #endif
                 );
 
