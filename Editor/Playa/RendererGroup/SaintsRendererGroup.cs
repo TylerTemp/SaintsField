@@ -34,6 +34,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private readonly string _groupPath;
         private readonly ELayout _eLayout;
+        private readonly Config _config;
 
         private GUIStyle _foldoutSmallStyle;
         private GUIStyle _titleLabelStyle;
@@ -43,6 +44,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         public SaintsRendererGroup(string groupPath, Config config)
         {
             _groupPath = groupPath;
+            _config = config;
             _eLayout = config.eLayout;
             _foldout = !config.eLayout.HasFlag(ELayout.Collapse);
         }
@@ -885,8 +887,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 root.RegisterCallback(switchOnAttack);
             }
 
-            root.style.marginTop = 2;
-            root.style.marginBottom = 2;
+            float marginTop = _config.marginTop > 0 ? _config.marginTop : 2;
+            float marginBottom = _config.marginBottom > 0 ? _config.marginBottom : 0;
+
+            root.style.marginTop = marginTop;
+            root.style.marginBottom = marginBottom;
 
             // root.RegisterCallback<DetachFromPanelEvent>(_ =>
             // {

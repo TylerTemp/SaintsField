@@ -12,12 +12,14 @@ namespace SaintsField.Playa
 
         public bool KeepGrouping => false;
 
-        public float MarginTop => -1f;
-        public float MarginBottom => -1f;
+        public float MarginTop { get; }
+        public float MarginBottom { get; }
 
-        public LayoutEndAttribute(string groupBy)
+        public LayoutEndAttribute(string groupBy, float marginTop = -1f, float marginBottom = -1f)
         {
             GroupBy = groupBy;
+            MarginTop = marginTop;
+            MarginBottom = marginBottom;
         }
     }
 }
