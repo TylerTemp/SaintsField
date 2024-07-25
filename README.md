@@ -69,7 +69,7 @@ If you're using `unitypackage` or git submodule but you put this project under a
 **3.2.2**
 
 1.  Fix possible disposed attribute access, fixes [#62](https://github.com/TylerTemp/SaintsField/issues/62)
-2.  Pause `GetComponent*`, `GetScriptableObject` etc. when entering play mode
+2.  Pause `GetComponent*`, `GetScriptableObject`, `OnButtonClick` etc. when entering play mode
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -26,6 +26,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private static void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return;
+            }
+
             ParameterInfo[] methodParams = fieldWithInfo.MethodInfo.GetParameters();
 
             MethodBind methodBind = playaMethodBindAttribute.MethodBind;
