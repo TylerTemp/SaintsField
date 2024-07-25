@@ -26,6 +26,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return false;
+            }
+
             (string error, UnityEngine.Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             if (error != "")
             {
@@ -177,6 +182,11 @@ namespace SaintsField.Editor.Drawers
 
         public static int HelperGetArraySize(GetPrefabWithComponentAttribute getPrefabWithComponentAttribute, FieldInfo info)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return -1;
+            }
+
             Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
             if (fieldType == null)
             {
@@ -269,6 +279,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return;
+            }
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_PREFAB_WITH_COMPONENT
             Debug.Log($"GetPrefabWithComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif

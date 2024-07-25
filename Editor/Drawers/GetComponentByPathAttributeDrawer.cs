@@ -243,6 +243,11 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once SuggestBaseTypeForParameter
             Button button, HelpBox helpBox, Action<object> onValueChangedCallback, bool forceResign, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return;
+            }
+
             (string error, SerializedProperty targetProperty, IReadOnlyList<Object> results) = DoCheckComponent(property, getComponentByPathAttribute, info, parent);
             // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             if (error != helpBox.text)
@@ -411,6 +416,11 @@ namespace SaintsField.Editor.Drawers
 
         public static int HelperGetArraySize(SerializedProperty property, GetComponentByPathAttribute getComponentByPathAttribute, FieldInfo info)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return -1;
+            }
+
             Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
             if (fieldType == null)
             {

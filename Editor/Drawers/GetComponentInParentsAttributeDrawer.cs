@@ -27,6 +27,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return false;
+            }
+
             (string error, UnityEngine.Object result) = DoCheckComponent(property, (GetComponentInParentsAttribute)saintsAttribute, info, parent);
             if (error != "")
             {
@@ -219,6 +224,11 @@ namespace SaintsField.Editor.Drawers
 
         public static int HelperGetArraySize(SerializedProperty property, GetComponentInParentsAttribute getComponentInParentsAttribute, FieldInfo info)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return -1;
+            }
+
             Type fieldType = info.FieldType.IsGenericType? info.FieldType.GetGenericArguments()[0]: info.FieldType.GetElementType();
             if (fieldType == null)
             {
@@ -388,6 +398,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return;
+            }
+
             (string error, UnityEngine.Object result) = DoCheckComponent(property, (GetComponentInParentsAttribute)saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NamePlaceholder(property, index));
             if (error != helpBox.text)

@@ -66,12 +66,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.2.1**
+**3.2.2**
 
-1.  Rich label now supports `<container.Type />` to display the class/struct name of the container of the field, and `<container.Type.BaseType />`.
-2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support.
-3.  `Layout`, `LayoutGroup` now supports `marginTop`, `marginBottom`, fixes [#52](https://github.com/TylerTemp/SaintsField/issues/52)
-4.  IMGUI: fixes `Layout` broken inside `SaintsRow`
+1.  Fix possible disposed attribute access, fixes [#62](https://github.com/TylerTemp/SaintsField/issues/62)
+2.  Pause `GetComponent*`, `GetScriptableObject` etc. when entering play mode
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

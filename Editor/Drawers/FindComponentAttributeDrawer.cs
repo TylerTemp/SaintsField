@@ -27,6 +27,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return false;
+            }
+
             (string error, Object result) = DoCheckComponent(property, saintsAttribute, info, parent);
             if (error != "")
             {
@@ -165,6 +170,11 @@ namespace SaintsField.Editor.Drawers
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return;
+            }
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_FIND_COMPONENT
             Debug.Log($"FindComponent DrawPostFieldUIToolkit for {property.propertyPath}");
 #endif

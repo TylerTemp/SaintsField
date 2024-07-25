@@ -1,3 +1,8 @@
+## 3.2.2 ##
+
+1.  Fix possible disposed attribute access, fixes [#62](https://github.com/TylerTemp/SaintsField/issues/62)
+2.  Pause `GetComponent*`, `GetScriptableObject` etc. when entering play mode
+
 ## 3.2.1 ##
 
 1.  Rich label now supports `<container.Type />` to display the class/struct name of the container of the field, and `<container.Type.BaseType />`.
