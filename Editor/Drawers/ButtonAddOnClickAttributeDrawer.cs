@@ -184,8 +184,15 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly");
+                return;
+            }
+
             string error = BindButtonEvent(property, saintsAttribute, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             // ReSharper disable once InvertIf

@@ -862,8 +862,9 @@ namespace SaintsField.Editor.Drawers
             SetExpandStatus(useExpand, enumFlagsField, foldout);
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             EnumFlagsField enumFlagsField = container.Q<EnumFlagsField>(NameEnumFlags(property));
             if (enumFlagsField.inlineWidth < 0)

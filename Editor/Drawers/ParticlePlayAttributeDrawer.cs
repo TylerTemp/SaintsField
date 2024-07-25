@@ -409,8 +409,9 @@ namespace SaintsField.Editor.Drawers
             // SceneView.RepaintAll();
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             VisualElement root = container.Q<VisualElement>(NameContainer(property));
             UserPayload userPayload = (UserPayload)root.userData;

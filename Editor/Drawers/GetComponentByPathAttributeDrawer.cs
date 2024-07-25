@@ -219,12 +219,19 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;
             // ReSharper disable once InvertIf
             if(getComponentByPathAttribute.ForceResign || getComponentByPathAttribute.ResignButton)
             {
+                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if (parent == null)
+                {
+                    Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                    return;
+                }
+
                 Button button = getComponentByPathAttribute.ResignButton? container.Q<Button>(NameResignButton(property, index)): null;
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
                 Check(property, getComponentByPathAttribute, info, button, helpBox, onValueChangedCallback, false, parent);

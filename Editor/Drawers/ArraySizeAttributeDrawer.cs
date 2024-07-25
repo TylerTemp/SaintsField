@@ -114,12 +114,19 @@ namespace SaintsField.Editor.Drawers
         // }
 
         // much error...
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             // SerializedProperty targetProperty = property;
             string error = "";
             SerializedProperty arrProp = null;
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectly");
+                return;
+            }
 
             (string propError, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
             if (propError != "")

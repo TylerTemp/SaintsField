@@ -377,8 +377,15 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectly");
+                return;
+            }
+
             AssetPreviewField root = container.Q<AssetPreviewField>(NameRoot(property, index));
             Image image = root.ImageElement;
             Payload payload = (Payload)image.userData;

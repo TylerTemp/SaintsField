@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
-        private static string InvokeCallback(SerializedProperty property, ISaintsAttribute saintsAttribute, object newValue, int index, FieldInfo info, object _deprecated)
+        private static string InvokeCallback(SerializedProperty property, ISaintsAttribute saintsAttribute, object newValue, int index, FieldInfo info, object parent)
         {
             // Debug.Log(saintsAttribute);
             string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers
             // (string error, object _) = Util.GetMethodOf<object>(callback, null, property, info, target);
             // return error != "" ? error : "";
 
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            // object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
             types.Reverse();

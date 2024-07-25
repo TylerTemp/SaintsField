@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Utils
 
                     // Debug.Log($"Get index from obj {useObject}[{elemIndex}]");
                     sourceObj = GetValueAtIndex(useObject, elemIndex).Item2;
-                    // Debug.Log($"Get index from obj [{useObject}] returns {sourceObj}");
+                    // Debug.Log($"Get index from obj `{useObject}` returns {sourceObj}");
                     fieldOrProp = default;
                     // Debug.Log($"[index={elemIndex}]={targetObj}");
                     continue;
@@ -88,7 +88,13 @@ namespace SaintsField.Editor.Utils
                 //     propSegName = propSegName.Substring(1, propSegName.Length - 17);
                 // }
 
-                // Debug.Log($"get obj {sourceObj}.{propSegName}");
+                // Debug.Log($"get obj {sourceObj}.{propSegName}")
+                //
+                if (sourceObj == null)  // TODO: better error handling
+                {
+                    return (default, null);
+                }
+                // ;
                 if(fieldOrProp.FieldInfo is null && fieldOrProp.PropertyInfo is null)
                 {
                     fieldOrProp = GetFileOrProp(sourceObj, propSegName);

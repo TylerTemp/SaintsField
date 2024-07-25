@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             MaskField maskField = container.Q<MaskField>(NameMaskField(property));
             List<AiNavigationUtils.NavMeshArea> oldData = (List<AiNavigationUtils.NavMeshArea>)maskField.userData;

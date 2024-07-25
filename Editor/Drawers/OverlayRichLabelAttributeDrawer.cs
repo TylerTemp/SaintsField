@@ -318,17 +318,24 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                return;
+            }
+
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute) saintsAttribute;
             CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);
         }
 
         private void CalcOverlay(SerializedProperty property, int index, OverlayRichLabelAttribute overlayRichLabelAttribute,
-            VisualElement container, FieldInfo info, object _deprecated)
+            VisualElement container, FieldInfo info, object parent)
         {
 
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            // object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
             (string contentString, Rect contentRect) = GetFieldString(container.Q<VisualElement>(className: ClassFieldUIToolkit(property)));
 

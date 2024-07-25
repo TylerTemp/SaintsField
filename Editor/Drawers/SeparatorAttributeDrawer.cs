@@ -460,8 +460,9 @@ namespace SaintsField.Editor.Drawers
         {
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
             string title = separatorAttribute.Title;
@@ -495,6 +496,13 @@ namespace SaintsField.Editor.Drawers
                     // titleElement.style.display = DisplayStyle.Flex;
                     if(curTitleXml != null)
                     {
+                        object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                        if (parent == null)
+                        {
+                            Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                            return;
+                        }
+
                         foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(curTitleXml, property.displayName, info, parent)))
                         {
                             titleElement.Add(rich);

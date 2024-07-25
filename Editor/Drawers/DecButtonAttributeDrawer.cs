@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _depracted)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             // if (parent == null)
             // {

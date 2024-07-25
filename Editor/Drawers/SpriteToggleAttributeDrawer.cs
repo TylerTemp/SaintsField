@@ -355,9 +355,9 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
-            UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
+            UpdateToggleDisplay(property, index, saintsAttribute, container, info);
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -365,12 +365,17 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            UpdateToggleDisplay(property, index, saintsAttribute, container, info, parent);
+            UpdateToggleDisplay(property, index, saintsAttribute, container, info);
         }
 
-        private static void UpdateToggleDisplay(SerializedProperty property, int index, ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object _deprecated)
+        private static void UpdateToggleDisplay(SerializedProperty property, int index, ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                return;
+            }
 
             Container dataContainer = GetContainer(property, saintsAttribute, info, parent);
             string error = dataContainer.Error;

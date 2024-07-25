@@ -473,9 +473,14 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object _deprecated)
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                return;
+            }
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 

@@ -180,7 +180,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             UIToolkitUtils.DropdownButtonField button = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
             ButtonData buttonData = (ButtonData) button.userData;

@@ -477,7 +477,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             // bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
 

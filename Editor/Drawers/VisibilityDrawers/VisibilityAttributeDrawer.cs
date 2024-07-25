@@ -108,7 +108,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object _deprecated)
+            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassVisibility(property)).ToList();
             VisualElement topElement = visibilityElements[0];

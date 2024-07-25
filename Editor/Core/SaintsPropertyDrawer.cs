@@ -1829,11 +1829,18 @@ namespace SaintsField.Editor.Core
             Action<object> onValueChangedCallback = null;
             onValueChangedCallback = obj =>
             {
+                object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if (newFetchParent == null)
+                {
+                    Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                    return;
+                }
+
                 foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
                 {
                     saintsPropertyInfo.Drawer.OnValueChanged(
                         property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement,
-                        fieldInfo, parent,
+                        fieldInfo, newFetchParent,
                         onValueChangedCallback,
                         obj);
                 }
@@ -1979,7 +1986,7 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info, parent);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info);
             }
 
             container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(100);
@@ -1999,7 +2006,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
         }
 

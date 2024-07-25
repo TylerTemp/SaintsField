@@ -230,7 +230,7 @@ namespace SaintsField.Editor.Drawers.Addressable
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
             {

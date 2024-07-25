@@ -229,14 +229,21 @@ namespace SaintsField.Editor.Drawers
 
                 Undo.RecordObject(go, $"GameObjectActive: {property.propertyPath}");
                 go.SetActive(!go.activeSelf);
-                OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, parent);
+                OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info);
             };
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                return;
+            }
+
             (string goError, GameObject go) = GetGo(property, info, parent);
             if (goError != "")
             {
