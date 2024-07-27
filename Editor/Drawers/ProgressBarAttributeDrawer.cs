@@ -377,7 +377,7 @@ namespace SaintsField.Editor.Drawers
 
             #region ProgrssBar
 
-            float curValue = property.propertyType == SerializedPropertyType.Integer
+            float propValue = property.propertyType == SerializedPropertyType.Integer
                 ? property.intValue
                 : property.floatValue;
 
@@ -385,10 +385,10 @@ namespace SaintsField.Editor.Drawers
             {
                 name = NameProgressBar(property),
 
-                title = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, metaInfo.Min, metaInfo.Max, parent).title,
+                title = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, propValue, metaInfo.Min, metaInfo.Max, parent).title,
                 lowValue = 0,
                 highValue = metaInfo.Max - metaInfo.Min,
-                value = curValue,
+                value = propValue - metaInfo.Min,
 
                 style =
                 {
