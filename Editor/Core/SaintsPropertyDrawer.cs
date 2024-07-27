@@ -303,6 +303,13 @@ namespace SaintsField.Editor.Core
             }
 
             (PropertyAttribute[] allAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+
+            if (parent == null)
+            {
+                Debug.LogWarning($"Property {property.propertyPath} disposed unexpectedly.");
+                return 0;
+            }
+
             // (ISaintsAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
             SaintsWithIndex[] saintsAttributeWithIndexes = allAttributes
                 .OfType<ISaintsAttribute>()
@@ -1027,6 +1034,12 @@ namespace SaintsField.Editor.Core
             OnGUIPayload onGUIPayload = new OnGUIPayload();
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
+
+            if (parent == null)
+            {
+                Debug.LogWarning($"Property {property.propertyPath} disposed unexpectedly.");
+                return;
+            }
 
             IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
                 .Select((each, index) => new SaintsWithIndex
@@ -1905,6 +1918,11 @@ namespace SaintsField.Editor.Core
                     if(SerializedProperty.EqualContents(prop, property))
                     {
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                        if (noCacheParent == null)
+                        {
+                            Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
+                            return;
+                        }
                         (string error, int _, object curValue) = SerializedUtils.GetValue(property, fieldInfo, noCacheParent);
                         if (error == "")
                         {

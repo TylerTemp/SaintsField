@@ -12,5 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f15ece9aaec0d94a88cc9a003510019, type: 3}
   m_Name: Main
   m_EditorClassIdentifier: 
-  alliances: []
-  neutralRange: {x: -10, y: 10}
+  layers:
+    serializedVersion: 2
+    m_Bits: 0
+  alliances:
+  - team: {fileID: 11400000, guid: 1e14812d151b49f4496289d2e176c519, type: 2}
+    affinity: -15
+    neutralRange: {x: -10, y: -6}
+  - team: {fileID: 11400000, guid: cdec352df6772fb4184b68ab86d394ad, type: 2}
+    affinity: -4
+    neutralRange: {x: -10, y: -6}
+  neutralRange: {x: -10, y: -6}

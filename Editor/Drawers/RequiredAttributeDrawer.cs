@@ -38,44 +38,13 @@ namespace SaintsField.Editor.Drawers
         }
 
         #region IMGUI
-        // private string _error = "";
-
-//         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-//             ISaintsAttribute saintsAttribute, bool valueChanged, FieldInfo info, object parent)
-//         {
-//             _error = ValidateType(property, info.FieldType);
-//             if(_error != "")
-//             {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
-//                 Debug.Log($"get error=`{_error}`");
-// #endif
-//
-//                 return true;
-//             }
-//
-//             property.serializedObject.ApplyModifiedProperties();
-//             bool isTruly = Truly(property, parent);
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
-//             Debug.Log(isTruly);
-// #endif
-//             if (isTruly)
-//             {
-//                 _error = "";
-//                 return true;
-//             }
-//
-//             string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
-//             _error = errorMessage ?? $"{property.displayName} is required";
-//             return true;
-//         }
-
         private static string GetErrorImGui(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info, object parent)
         {
             string error = ValidateType(property, info.FieldType);
             if(error != "")
             {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
                 Debug.Log($"get error=`{error}`");
 #endif
 
@@ -84,7 +53,7 @@ namespace SaintsField.Editor.Drawers
 
             // property.serializedObject.ApplyModifiedProperties();
             bool isTruly = Truly(property, parent);
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
 //             Debug.Log($"truly?={isTruly}");
 // #endif
             if (isTruly)
@@ -101,7 +70,7 @@ namespace SaintsField.Editor.Drawers
             object parent)
         {
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"WillDrawBelow error=`{error}`");
 #endif
             return error != "";
@@ -113,7 +82,7 @@ namespace SaintsField.Editor.Drawers
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
             float belowHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"belowHeight={belowHeight}/{MessageType.Error}; width={width}");
 #endif
             // return 50;
@@ -124,7 +93,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"belowHeight has={position.height}/width={position.width}");
 #endif
             // EditorGUI.DrawRect(new Rect(position)
@@ -224,7 +193,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             bool isTruly = Truly(property, parent);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_REQUIRED
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log(isTruly);
 #endif
 
