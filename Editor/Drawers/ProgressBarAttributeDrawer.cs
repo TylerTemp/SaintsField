@@ -422,7 +422,7 @@ namespace SaintsField.Editor.Drawers
             {
                 name = NameProgressBar(property),
             };
-            progressBarField.AddToClassList("unity-base-field__aligned");
+            progressBarField.AddToClassList(ProgressBarField.alignedFieldUssClassName);
 
             progressBarField.AddToClassList(ClassAllowDisable);
 
