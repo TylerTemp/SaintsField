@@ -387,7 +387,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         private static string NameProgressBar(SerializedProperty property) => $"{property.propertyPath}__ProgressBar";
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_Label";
+        // private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_Label";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__ProgressBar_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,

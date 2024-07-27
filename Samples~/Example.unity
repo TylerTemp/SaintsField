@@ -12910,6 +12910,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: {fileID: 11400000, guid: 5b5ff1ec6a3e3a04c8402dbba186835d, type: 2}
+  _health: 100
+  rigidBody: {fileID: 1452621602}
+  targetOffset: {fileID: 0}
 --- !u!1 &1455216908
 GameObject:
   m_ObjectHideFlags: 0

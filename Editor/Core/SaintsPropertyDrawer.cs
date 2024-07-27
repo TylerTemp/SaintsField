@@ -1918,6 +1918,11 @@ namespace SaintsField.Editor.Core
                     if(SerializedProperty.EqualContents(prop, property))
                     {
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                        if (noCacheParent == null)
+                        {
+                            Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
+                            return;
+                        }
                         (string error, int _, object curValue) = SerializedUtils.GetValue(property, fieldInfo, noCacheParent);
                         if (error == "")
                         {

@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue46
         {
             for (var i = alliances.Count - 1; i >= 0; i--) {
                 var a = alliances[i];
-                Undo.RecordObject(this, name);
+                // Undo.RecordObject(this, name);
                 a.neutralRange = neutralRange;
                 if (a.team == this)
                 {
