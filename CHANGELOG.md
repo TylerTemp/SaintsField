@@ -1,3 +1,8 @@
+## 3.2.3 ##
+
+1.  IMGUI: fix disposed access.
+2.  IMGUI: fix `ProgressBar` dragging changes all instance inside array. 
+
 ## 3.2.2 ##
 
 1.  Fix possible disposed attribute access, fixes [#62](https://github.com/TylerTemp/SaintsField/issues/62)

@@ -66,10 +66,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.2.2**
+**3.2.3**
 
-1.  Fix possible disposed attribute access, fixes [#62](https://github.com/TylerTemp/SaintsField/issues/62)
-2.  Pause `GetComponent*`, `GetScriptableObject`, `OnButtonClick` etc. when entering play mode
+1.  IMGUI: fix disposed access.
+2.  IMGUI: fix `ProgressBar` dragging changes all instance inside array.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
