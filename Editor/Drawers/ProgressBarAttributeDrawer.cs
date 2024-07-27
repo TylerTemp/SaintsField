@@ -214,7 +214,7 @@ namespace SaintsField.Editor.Drawers
 
         private string _imGuiError = "";
 
-        private bool _imgGuiMousePressed;
+        // private bool _imgGuiMousePressed;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
@@ -224,12 +224,20 @@ namespace SaintsField.Editor.Drawers
             return EditorGUIUtility.singleLineHeight;
         }
 
+        private readonly Dictionary<string, bool> inArrayMousePressed = new Dictionary<string, bool>();
+
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             OnGUIPayload onGUIPayload,
             FieldInfo info,
             object parent)
         {
+            string arrayKey = $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+            if(!inArrayMousePressed.ContainsKey(arrayKey))
+            {
+                inArrayMousePressed[arrayKey] = false;
+            }
+
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
             int controlId = GUIUtility.GetControlID(FocusType.Passive, position);
@@ -268,7 +276,10 @@ namespace SaintsField.Editor.Drawers
             }
 
             Event e = Event.current;
-            // Debug.Log($"{e.isMouse}, {e.mousePosition}");
+
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
+//             Debug.Log($"{e.isMouse}, {e.mousePosition}");
+// #endif
             // ReSharper disable once InvertIf
             // Debug.Log($"{e.type} {e.isMouse}, {e.button}, {e.mousePosition}");
 
@@ -276,14 +287,19 @@ namespace SaintsField.Editor.Drawers
             {
                 // GUIUtility.hotControl = 0;
                 // Debug.Log($"UP!");
-                _imgGuiMousePressed = false;
-                // Debug.Log("mouse up");
+                inArrayMousePressed[arrayKey] = false;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
+                Debug.Log($"mouse up {property.propertyPath}: {inArrayMousePressed[arrayKey]}");
+#endif
             }
 
             if (e.type == EventType.MouseDown && e.button == 0)
             {
-                _imgGuiMousePressed = position.Contains(e.mousePosition);
-                // Debug.Log($"mouse down: {_imgGuiMousePressed}");
+                // arrayMousePressed[arrayIndex] = position.Contains(e.mousePosition);
+                inArrayMousePressed[arrayKey] = position.Contains(e.mousePosition);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
+                Debug.Log($"mouse down {position}: {inArrayMousePressed[arrayKey]}/{property.propertyPath}");
+#endif
             }
 
             (string titleError, string title) = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, curValue, metaInfo.Min, metaInfo.Max, parent);
@@ -294,8 +310,15 @@ namespace SaintsField.Editor.Drawers
 
             // string title = null;
 
-            if (GUI.enabled && (e.type == EventType.MouseDown || e.type == EventType.MouseDrag) && _imgGuiMousePressed)
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
+            Debug.Log($"{property.propertyPath}/{inArrayMousePressed[arrayKey]}/{GetHashCode()}");
+#endif
+
+            if (GUI.enabled && (e.type == EventType.MouseDown || e.type == EventType.MouseDrag) && inArrayMousePressed[arrayKey])
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
+                Debug.Log($"{property.propertyPath}/{inArrayMousePressed[arrayKey]}");
+#endif
                 float newPercent = (e.mousePosition.x - fieldRect.x) / fieldRect.width;
                 float newValue = Mathf.Lerp(metaInfo.Min, metaInfo.Max, newPercent);
                 float boundValue = BoundValue(newValue, metaInfo.Min, metaInfo.Max, progressBarAttribute.Step, isInt);
