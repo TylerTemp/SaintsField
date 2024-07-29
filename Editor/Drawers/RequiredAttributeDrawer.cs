@@ -13,28 +13,36 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(RequiredAttribute))]
     public class RequiredAttributeDrawer: SaintsPropertyDrawer
     {
-        private static bool Truly(SerializedProperty property, object target)
+        private static (string error, bool result) Truly(SerializedProperty property, object target)
         {
             // UnityEngine.Object target = property.serializedObject.targetObject;
-            (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), property.name);
-
-            // Debug.Log($"found={found.getPropType}; {found.fieldOrMethodInfo} / {property.name}, {target}");
-
-            if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
+            (string error, object value) = Util.GetOfNoParams<object>(target, property.name, null);
+            if (error != "")
             {
-                return ReflectUtils.Truly(propertyInfo.GetValue(target));
+                return (error, false);
             }
 
-            if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
-            {
-                return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
-            }
-            if (found.getPropType == ReflectUtils.GetPropType.NotFound || found.getPropType == ReflectUtils.GetPropType.Method)
-            {
-                throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
-            }
-            // Handle any other cases here, if needed
-            throw new NotImplementedException("Unexpected case");
+            return ("", ReflectUtils.Truly(value));
+
+            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), property.name);
+            //
+            // // Debug.Log($"found={found.getPropType}; {found.fieldOrMethodInfo} / {property.name}, {target}");
+            //
+            // if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
+            // {
+            //     return ReflectUtils.Truly(propertyInfo.GetValue(target));
+            // }
+            //
+            // if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
+            // {
+            //     return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
+            // }
+            // if (found.getPropType == ReflectUtils.GetPropType.NotFound || found.getPropType == ReflectUtils.GetPropType.Method)
+            // {
+            //     throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
+            // }
+            // // Handle any other cases here, if needed
+            // throw new NotImplementedException("Unexpected case");
         }
 
         #region IMGUI
@@ -52,7 +60,17 @@ namespace SaintsField.Editor.Drawers
             }
 
             // property.serializedObject.ApplyModifiedProperties();
-            bool isTruly = Truly(property, parent);
+            (string trulyError, bool isTruly) = Truly(property, parent);
+
+            if(trulyError != "")
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
+                Debug.Log($"get error=`{error}`");
+#endif
+
+                return trulyError;
+            }
+
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
 //             Debug.Log($"truly?={isTruly}");
 // #endif
@@ -142,7 +160,7 @@ namespace SaintsField.Editor.Drawers
         private struct MetaInfo
         {
             public bool TypeError;
-            public bool IsTruly;
+            // public bool IsTruly;
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -165,7 +183,7 @@ namespace SaintsField.Editor.Drawers
                 userData = new MetaInfo
                 {
                     TypeError = typeError != "",
-                    IsTruly = true,
+                    // IsTruly = true,
                 },
             };
 
@@ -192,30 +210,43 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            bool isTruly = Truly(property, parent);
+            (string trulyError, bool isTruly) = Truly(property, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log(isTruly);
 #endif
 
-            // ReSharper disable once InvertIf
-            if(isTruly != metaInfo.IsTruly)
+            string error;
+            if (trulyError == "")
             {
-
-                // Debug.Log($"isTruly={isTruly}; meta.isTruly={metaInfo.IsTruly}");
-                helpBox.style.display = isTruly ? DisplayStyle.None : DisplayStyle.Flex;
-
-                string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
-                string error = errorMessage ?? $"{property.displayName} is required";
-                helpBox.text = error;
-
-                helpBox.userData = new MetaInfo
+                // Debug.Log($"{isTruly}/{metaInfo.IsTruly}");
+                if(!isTruly)
                 {
-                    TypeError = false,
-                    IsTruly = isTruly,
-                };
+                    string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
+                    error = errorMessage ?? $"{property.displayName} is required";
+                }
+                else
+                {
+                    error = "";
+                }
+            }
+            else
+            {
+                error = trulyError;
             }
 
+            if (error != helpBox.text)
+            {
+                // Debug.Log($"Update error: {error}");
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
 
+                // helpBox.userData = new MetaInfo
+                // {
+                //     TypeError = false,
+                //     // IsTruly = isTruly,
+                // };
+
+            }
         }
 
         #endregion

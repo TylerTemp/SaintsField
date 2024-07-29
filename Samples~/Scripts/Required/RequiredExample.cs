@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.Required
 {
     public class RequiredExample: MonoBehaviour
     {
