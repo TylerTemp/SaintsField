@@ -67,6 +67,7 @@ namespace SaintsField.Editor.Drawers
             {
                 (string error, Color value) =
                     GetCallbackColor(progressBarAttribute.ColorCallback, color, property, info, parent);
+
                 if (error != "")
                 {
                     return new MetaInfo
@@ -337,6 +338,10 @@ namespace SaintsField.Editor.Drawers
                     {
                         property.floatValue = boundValue;
                         onGUIPayload.SetValue(boundValue);
+                    }
+                    if(ExpandableIMGUIScoop.IsInScoop)
+                    {
+                        property.serializedObject.ApplyModifiedProperties();
                     }
 
                     (string titleError, string title) changedTitle = GetTitle(property, progressBarAttribute.TitleCallback, progressBarAttribute.Step, boundValue, metaInfo.Min, metaInfo.Max, parent);

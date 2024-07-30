@@ -978,6 +978,10 @@ namespace SaintsField.Editor.Drawers
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
                         onGUIPayload.SetValue(curItem);
+                        if(ExpandableIMGUIScoop.IsInScoop)
+                        {
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
                     },
                     GetIcon);
                 dropdown.Show(position);

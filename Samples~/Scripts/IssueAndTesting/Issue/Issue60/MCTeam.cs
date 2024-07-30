@@ -73,7 +73,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue46
             [HideInInspector]
             public Vector2 neutralRange;
 #if UNITY_EDITOR
-            private EColor FillColor() => alliance == ALLIANCETYPE.ENEMY ? EColor.Red : (alliance == ALLIANCETYPE.FRIEND ? EColor.Green : EColor.Gray);
+            private EColor FillColor(float v)
+            {
+                Debug.Log($"{v}/{affinity}/{neutralRange}");
+                return alliance == ALLIANCETYPE.ENEMY
+                    ? EColor.Red
+                    : (alliance == ALLIANCETYPE.FRIEND ? EColor.Green : EColor.Gray);
+            }
 #endif
         }
     }

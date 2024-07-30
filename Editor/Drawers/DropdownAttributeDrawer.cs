@@ -96,6 +96,10 @@ namespace SaintsField.Editor.Drawers
                     Util.SignPropertyValue(property, info, parent, item);
                     property.serializedObject.ApplyModifiedProperties();
                     onGUIPayload.SetValue(item);
+                    if(ExpandableIMGUIScoop.IsInScoop)
+                    {
+                        property.serializedObject.ApplyModifiedProperties();
+                    }
 
                 }, !dropdownAttribute.SlashAsSub);
             }

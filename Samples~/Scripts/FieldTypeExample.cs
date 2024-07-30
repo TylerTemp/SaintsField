@@ -16,5 +16,8 @@ namespace SaintsField.Samples.Scripts
         [ReadOnly]
         [SerializeField, FieldType(typeof(Collider))]
         private Dummy dummyDisabled;
+
+        [FieldType(EPick.Assets)] public Dummy dummyPrefab;
+        [FieldType(EPick.Assets)] public Dummy[] dummyPrefabs;
     }
 }

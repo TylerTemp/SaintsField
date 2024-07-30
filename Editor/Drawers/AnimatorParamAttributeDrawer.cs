@@ -143,6 +143,10 @@ namespace SaintsField.Editor.Drawers
                         int newValue = metaInfo.AnimatorParameters[newIndex].nameHash;
                         property.intValue = newValue;
                         onGUIPayload.SetValue(newValue);
+                        if(ExpandableIMGUIScoop.IsInScoop)
+                        {
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
                     }
                     else
                     {
@@ -182,6 +186,10 @@ namespace SaintsField.Editor.Drawers
                         string newValue = metaInfo.AnimatorParameters[newIndex].name;
                         property.stringValue = newValue;
                         onGUIPayload.SetValue(newValue);
+                        if(ExpandableIMGUIScoop.IsInScoop)
+                        {
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
                     }
                     else
                     {

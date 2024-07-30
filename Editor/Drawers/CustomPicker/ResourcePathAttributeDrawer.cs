@@ -340,7 +340,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 },
             };
 
-            objectField.AddToClassList("unity-base-field__aligned");
+            objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
 
             objectField.Bind(property.serializedObject);
 

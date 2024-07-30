@@ -2391,7 +2391,7 @@ GameObject:
   - component: {fileID: 539722466}
   - component: {fileID: 539722465}
   m_Layer: 0
-  m_Name: RequiredTypeExample
+  m_Name: RequireTypeExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2415,6 +2415,9 @@ MonoBehaviour:
   goNoPickerFreeSign: {fileID: 539722464}
   fieldGo: {fileID: 4273993126308263894, guid: bfe71e2debe494743bb20374ae988950, type: 3}
   fieldGoDisable: {fileID: 0}
+  interSrs:
+  - {fileID: 4273993127172390034}
+  - {fileID: 7009648041155977125, guid: bfe71e2debe494743bb20374ae988950, type: 3}
 --- !u!4 &539722466
 Transform:
   m_ObjectHideFlags: 0
@@ -9066,14 +9069,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getComponentIList:
   - <V>k__BackingField: {fileID: 842523985}
-  - <V>k__BackingField: {fileID: 842523985}
+  - <V>k__BackingField: {fileID: 842523986}
   - <V>k__BackingField: {fileID: 454510170}
-  - <V>k__BackingField: {fileID: 454510170}
-  - <V>k__BackingField: {fileID: 454510170}
+  - <V>k__BackingField: {fileID: 454510169}
+  - <V>k__BackingField: {fileID: 454510172}
   - <V>k__BackingField: {fileID: 74059532}
-  - <V>k__BackingField: {fileID: 74059532}
+  - <V>k__BackingField: {fileID: 74059534}
   - <V>k__BackingField: {fileID: 1902718156}
-  - <V>k__BackingField: {fileID: 1902718156}
+  - <V>k__BackingField: {fileID: 1902718155}
 --- !u!114 &842523988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11293,6 +11296,10 @@ MonoBehaviour:
   _sr: {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
   dummy: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   dummyDisabled: {fileID: 0}
+  dummyPrefab: {fileID: 0}
+  dummyPrefabs:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!4 &1131818497
 Transform:
   m_ObjectHideFlags: 0

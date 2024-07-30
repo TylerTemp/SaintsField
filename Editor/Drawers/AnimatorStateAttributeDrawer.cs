@@ -97,6 +97,10 @@ namespace SaintsField.Editor.Drawers
                         // Debug.Log($"IMGUI init changed");
                         // ReSharper disable once RedundantCast
                         onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? (object)metaInfo.AnimatorStates[curIndex].state.name : metaInfo.AnimatorStates[curIndex]);
+                        if(ExpandableIMGUIScoop.IsInScoop)
+                        {
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
                     }
                 }
             }
@@ -130,6 +134,10 @@ namespace SaintsField.Editor.Drawers
                         SetPropValue(property, metaInfo.AnimatorStates[newIndex]);
                         // ReSharper disable once RedundantCast
                         onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String? (object)metaInfo.AnimatorStates[newIndex].state.name : metaInfo.AnimatorStates[newIndex]);
+                        if(ExpandableIMGUIScoop.IsInScoop)
+                        {
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
                     }
                 }
             }

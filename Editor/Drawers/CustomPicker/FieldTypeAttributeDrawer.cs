@@ -151,8 +151,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
-            Type requiredComp = fieldTypeAttribute.CompType;
             Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
             Object requiredValue;
             try
             {
@@ -308,8 +308,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             bool customPicker = fieldTypeAttribute.CustomPicker;
-            Type requiredComp = fieldTypeAttribute.CompType;
-            Type fieldType = info.FieldType;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
             Object requiredValue;
 
             // Debug.Log($"property.Object={property.objectReferenceValue}");
@@ -377,8 +377,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
-            Type requiredComp = fieldTypeAttribute.CompType;
             Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
             EPick editorPick = fieldTypeAttribute.EditorPick;
 
             ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));

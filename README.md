@@ -777,14 +777,17 @@ Ask the inspector to display another type of field rather than the field's origi
 
 This is useful when you want to have a `GameObject` prefab, but you want this target prefab to have a specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you force the inspector to sign the required object that has your expected component but still gives you the original typed value to field.
 
+This can also be used when you just want a type reference to a prefab, but Unity does not allow you to pick a prefab because "performance consideration".
+
 Overload:
 
 *   `FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
 *   `FieldTypeAttribute(Type compType, bool customPicker)`
+*   `FieldTypeAttribute(EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
 
 For each argument:
 
-*   `Type compType` the type of the component you want to pick
+*   `Type compType` the type of the component you want to pick. `null` for using current type
 *   `EPick editorPick` where you want to pick the component. Options are:
     *   `EPick.Assets` for assets
     *   `EPick.Scene` for scene objects
@@ -804,6 +807,9 @@ private GameObject _go;
 
 [SerializeField, FieldType(typeof(FieldTypeExample))]
 private ParticleSystem _ps;
+
+// this allows you to pick a perfab with field component on, which Unity will only give an empty picker.
+[FieldType(EPick.Assets)] public Dummy dummyPrefab;
 ```
 
 ![field_type](https://github.com/TylerTemp/SaintsField/assets/6391063/7bcc058f-5cb4-4a4f-9d8e-ec08bcb8da2c)

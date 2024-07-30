@@ -2,7 +2,7 @@
 
 namespace SaintsField.Samples.Scripts.RequiredTypeExample
 {
-    public class RequiredTypeMono: MonoBehaviour
+    public class RequireTypeExample: MonoBehaviour
     {
         [RequireType(typeof(IMyInterface))] public SpriteRenderer interSr;
         [RequireType(typeof(IMyInterface), typeof(SpriteRenderer))] public GameObject interfaceGo;
@@ -18,5 +18,6 @@ namespace SaintsField.Samples.Scripts.RequiredTypeExample
         [RequireType(typeof(IMyInterface), typeof(SpriteRenderer)),
          FieldType(typeof(SpriteRenderer), false)] public GameObject fieldGoDisable;
 
+        [RequireType(typeof(IMyInterface))] public SpriteRenderer[] interSrs;
     }
 }

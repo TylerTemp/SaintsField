@@ -47,6 +47,10 @@ namespace SaintsField.Editor.Drawers
                 {
                     property.floatValue = valueLimit;
                     onGUIPayload.SetValue(valueLimit);
+                    if(ExpandableIMGUIScoop.IsInScoop)
+                    {
+                        property.serializedObject.ApplyModifiedProperties();
+                    }
                 }
             }
             else if (property.propertyType == SerializedPropertyType.Integer)
@@ -57,6 +61,10 @@ namespace SaintsField.Editor.Drawers
                 {
                     property.intValue = (int)valueLimit;
                     onGUIPayload.SetValue((int)valueLimit);
+                    if(ExpandableIMGUIScoop.IsInScoop)
+                    {
+                        property.serializedObject.ApplyModifiedProperties();
+                    }
                 }
             }
             return true;

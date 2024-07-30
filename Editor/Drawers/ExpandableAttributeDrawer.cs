@@ -14,6 +14,23 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
+    public class ExpandableIMGUIScoop: IDisposable
+    {
+        private static int _scoopCount;
+
+        public static bool IsInScoop => _scoopCount > 0;
+
+        public ExpandableIMGUIScoop()
+        {
+            _scoopCount++;
+        }
+
+        public void Dispose()
+        {
+            _scoopCount--;
+        }
+    }
+
     [CustomPropertyDrawer(typeof(ExpandableAttribute))]
     public class ExpandableAttributeDrawer: SaintsPropertyDrawer
     {
@@ -176,10 +193,13 @@ namespace SaintsField.Editor.Drawers
                 height = usedHeight,
             }, GUIContent.none);
 
-            foreach ((Rect childRect, SerializedProperty childProperty) in propertyRects)
+            using(new ExpandableIMGUIScoop())
             {
-                EditorGUI.PropertyField(childRect, childProperty, true);
-                // EditorGUI.DrawRect(childRect, Color.blue);
+                foreach ((Rect childRect, SerializedProperty childProperty) in propertyRects)
+                {
+                    EditorGUI.PropertyField(childRect, childProperty, true);
+                    // EditorGUI.DrawRect(childRect, Color.blue);
+                }
             }
 
             serializedObject.ApplyModifiedProperties();

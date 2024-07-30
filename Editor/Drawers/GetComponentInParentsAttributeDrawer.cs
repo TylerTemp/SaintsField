@@ -41,6 +41,10 @@ namespace SaintsField.Editor.Drawers
             if(result != null)
             {
                 onGUIPayload.SetValue(result);
+                if(ExpandableIMGUIScoop.IsInScoop)
+                {
+                    property.serializedObject.ApplyModifiedProperties();
+                }
             }
             return true;
         }

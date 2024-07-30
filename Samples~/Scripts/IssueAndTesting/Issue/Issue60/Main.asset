@@ -16,10 +16,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   alliances:
-  - team: {fileID: 11400000, guid: 1e14812d151b49f4496289d2e176c519, type: 2}
-    affinity: -15
-    neutralRange: {x: -10, y: -6}
   - team: {fileID: 11400000, guid: cdec352df6772fb4184b68ab86d394ad, type: 2}
-    affinity: -4
+    affinity: -9
     neutralRange: {x: -10, y: -6}
   neutralRange: {x: -10, y: -6}

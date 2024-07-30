@@ -129,6 +129,10 @@ namespace SaintsField.Editor.Drawers
                     property.managedReferenceValue = null;
                     property.serializedObject.ApplyModifiedProperties();
                     onGUIPayload.SetValue(null);
+                    if(ExpandableIMGUIScoop.IsInScoop)
+                    {
+                        property.serializedObject.ApplyModifiedProperties();
+                    }
                 });
                 genericDropdownMenu.AddSeparator("");
 
@@ -144,6 +148,10 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                         // property.serializedObject.SetIsDifferentCacheDirty();
                         onGUIPayload.SetValue(instance);
+                        if(ExpandableIMGUIScoop.IsInScoop)
+                        {
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
                     });
                 }
                 genericDropdownMenu.DropDown(new Rect(position)

@@ -28,5 +28,9 @@ namespace SaintsField
         public FieldTypeAttribute(Type compType, bool customPicker): this(compType, EPick.Assets | EPick.Scene, customPicker)
         {
         }
+
+        public FieldTypeAttribute(EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true): this(null, editorPick, customPicker)
+        {
+        }
     }
 }
