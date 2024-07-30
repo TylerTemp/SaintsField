@@ -66,10 +66,12 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.2.3**
+**3.2.4**
 
-1.  IMGUI: fix disposed access.
-2.  IMGUI: fix `ProgressBar` dragging changes all instance inside array.
+1.  IMGUI: fix `Expandable` won't save the changed value.
+2.  Fix `Required` won't work in parent of an inherited class.
+3.  Fix `FieldType` won't work in array/list.
+4.  Allow `FieldType` with `compType=null` to by-pass the issue that Unity won't show all the prefabs with expected component in the picker.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
