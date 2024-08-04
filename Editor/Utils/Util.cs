@@ -657,7 +657,17 @@ namespace SaintsField.Editor.Utils
                         }
                     }
                     break;
-
+                
+                // Unity Build-in Object
+                case Texture:
+                case Sprite:
+                case Material:
+                case Mesh:
+                case Motion:
+                case AudioClip:
+                    result = fieldResult;
+                    break;
+                
                 // default:
                 //     Debug.Log(fieldResult.GetType());
                 //     break;

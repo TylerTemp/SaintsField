@@ -108,14 +108,14 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
                 }
                 
                 bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
-                // empty = true
+                // And Mode
                 bool boolResultsOk = boolResults.All(each => each);
                 allResults.Add(editorModeOk && boolResultsOk);
             }
             
-            // Or/And Mode
-            bool truly = targetAttributes.Length > 1 ? allResults.Any(each => each) : allResults.All(each => each);
-
+            // Or Mode
+            bool truly = allResults.Any(each => each);
+            
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
             Debug.Log($"{property.name} final={truly}/ars={string.Join(",", allResults)}");
 #endif
