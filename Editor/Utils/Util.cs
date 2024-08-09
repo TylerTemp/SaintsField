@@ -638,13 +638,26 @@ namespace SaintsField.Editor.Utils
                     }
                     else
                     {
-                        result = go.GetComponent(fieldType);
+                        Component r = null;
+                        try
+                        {
+                            r = go.GetComponent(fieldType);
+                        }
+                        catch (ArgumentException)
+                        {
+                            // ignore
+                        }
+
+                        if (r)
+                        {
+                            result = r;
+                        }
                     }
 
                     // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
                     break;
                 case Component comp:
-                    if (fieldType == typeof(GameObject))
+                    if (fieldType == typeof(GameObject) || fieldType.IsSubclassOf(typeof(GameObject)))
                     {
                         result = comp.gameObject;
                     }
@@ -657,18 +670,25 @@ namespace SaintsField.Editor.Utils
                         }
                     }
                     break;
-                
+
                 // Unity Build-in Object
-                case Texture:
-                case Sprite:
-                case Material:
-                case Mesh:
-                case Motion:
-                case AudioClip:
-                    result = fieldResult;
+                // case Texture:
+                // case Sprite:
+                // case Material:
+                // case Mesh:
+                // case Motion:
+                // case AudioClip:
+                //     result = fieldResult;
+                //     break;
+
+                default:
+                    // Debug.Log($"{fieldType}/{fieldResult}: {fieldType.IsInstanceOfType(fieldResult)}");
+                    if (fieldType.IsInstanceOfType(fieldResult))
+                    {
+                        result = fieldResult;
+                    }
+
                     break;
-                
-                // default:
                 //     Debug.Log(fieldResult.GetType());
                 //     break;
             }

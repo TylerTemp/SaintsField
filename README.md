@@ -66,12 +66,9 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.2.4**
+**3.2.5**
 
-1.  IMGUI: fix `Expandable` won't save the changed value.
-2.  Fix `Required` won't work in parent of an inherited class.
-3.  Fix `FieldType` won't work in array/list.
-4.  Allow `FieldType` with `compType=null` to by-pass the issue that Unity won't show all the prefabs with expected component in the picker.
+`GetResourcePath` etc. support some build-in object types like `AudioClip`. [#69](https://github.com/TylerTemp/SaintsField/pull/69)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -1,3 +1,7 @@
+## 3.2.5 ##
+
+`GetResourcePath` etc. support some build-in object types like `AudioClip`. [#69](https://github.com/TylerTemp/SaintsField/pull/69)
+
 ## 3.2.4 ##
 
 1.  IMGUI: fix `Expandable` won't save the changed value.
