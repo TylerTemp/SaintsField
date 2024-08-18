@@ -16,7 +16,7 @@ namespace SaintsField.Playa
 
         public LayoutAttribute(string groupBy, ELayout layout = 0, bool keepGrouping = false, float marginTop = -1f, float marginBottom = -1f)
         {
-            GroupBy = groupBy;
+            GroupBy = groupBy.Trim('/');
             Layout = layout;
             KeepGrouping = keepGrouping;
 

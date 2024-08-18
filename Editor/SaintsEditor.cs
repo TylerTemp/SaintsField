@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Linq;
@@ -232,6 +233,11 @@ namespace SaintsField.Editor
             return GetRenderers(serializedPropertyDict, serializedObject, target);
         }
 
+        private class RendererGroupInfo {
+            public string AbsGroupBy;
+            public List<ISaintsRenderer> Renderers;
+        }
+
         public static IReadOnlyList<ISaintsRenderer> GetRenderers(
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject,
             object target)
@@ -449,15 +455,111 @@ namespace SaintsField.Editor
                 .Select(each => each.value)
                 .ToList();
 
+            List<RendererGroupInfo> rendererGroupInfos = new List<RendererGroupInfo>();
+            Dictionary<string, RendererGroupInfo> absGroupByToRendererGroupInfo =
+                new Dictionary<string, RendererGroupInfo>();
+
+            RendererGroupInfo keepGroupingInfo = null;
+            RendererGroupInfo lastLongestGroupInfo = null;
+            foreach (SaintsFieldWithInfo saintsFieldWithInfo in fieldWithInfosSorted)
+            {
+                IReadOnlyList<ISaintsGroup> groups = saintsFieldWithInfo.Groups;
+                if (groups.Count > 0)
+                {
+                    RendererGroupInfo curLongestGroupInfo = null;
+                    foreach (ISaintsGroup saintsGroup in groups)
+                    {
+                        switch (saintsGroup)
+                        {
+                            case LayoutEndAttribute layoutEndAttribute:
+                            {
+                                string endGroupBy = layoutEndAttribute.GroupBy;
+                                if (endGroupBy == null)
+                                {
+                                    keepGroupingInfo = null;
+                                }
+                                else if (keepGroupingInfo == null)
+                                {
+                                    // do nothing. End a layout when it's not in a layout is meaningless
+                                }
+                                else
+                                {
+                                    if (endGroupBy.StartsWith("."))
+                                    {
+                                        string openGroupTo = JoinGroupBy(keepGroupingInfo.AbsGroupBy, endGroupBy);
+                                        if (!absGroupByToRendererGroupInfo.TryGetValue(openGroupTo,
+                                                out RendererGroupInfo info))
+                                        {
+                                            absGroupByToRendererGroupInfo[openGroupTo] = info = new RendererGroupInfo
+                                            {
+                                                AbsGroupBy = openGroupTo,
+                                                Renderers = new List<ISaintsRenderer>(),
+                                            };
+                                        }
+
+                                        keepGroupingInfo = info;
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                }
+                            }
+                                break;
+                            default:
+                            {
+                                string groupBy = saintsGroup.GroupBy;
+                                if (groupBy.StartsWith("."))
+                                {
+                                    groupBy = JoinGroupBy(keepGroupingInfo!.AbsGroupBy, groupBy);
+                                }
+
+                                if (!absGroupByToRendererGroupInfo.TryGetValue(groupBy,
+                                        out RendererGroupInfo info))
+                                {
+                                    absGroupByToRendererGroupInfo[groupBy] = info = new RendererGroupInfo
+                                    {
+                                        AbsGroupBy = groupBy,
+                                        Renderers = new List<ISaintsRenderer>(),
+                                    };
+                                }
+
+                                if (curLongestGroupInfo == null)
+                                {
+                                    curLongestGroupInfo = info;
+                                }
+                                else
+                                {
+                                    curLongestGroupInfo = info.AbsGroupBy.Length > curLongestGroupInfo.AbsGroupBy.Length
+                                        ? info
+                                        : curLongestGroupInfo;
+                                }
+
+
+                            }
+                                break;
+                        }
+                    }
+                }
+            }
+
             // layout name to it's config
+            string layoutGroupByAcc = "";
             Dictionary<string, SaintsRendererGroup.Config> layoutKeyToInfo = new Dictionary<string, SaintsRendererGroup.Config>();
             foreach (ISaintsGroup sortedGroup in fieldWithInfosSorted.SelectMany(each => each.Groups))
             {
                 string curGroupBy = sortedGroup.GroupBy;
+                if (curGroupBy.StartsWith("."))
+                {
+                    curGroupBy = JoinGroupBy(layoutGroupByAcc, curGroupBy);
+                }
+                layoutGroupByAcc = curGroupBy;
+
                 ELayout curLayout = sortedGroup.Layout;
                 layoutKeyToInfo.TryGetValue(curGroupBy, out SaintsRendererGroup.Config oldConfig);
                 SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
                 {
+                    absGroupBy = curGroupBy,
                     eLayout = curLayout,
                     isDOTween = sortedGroup is DOTweenPlayAttribute,
                     marginTop = sortedGroup.MarginTop,
@@ -472,32 +574,13 @@ namespace SaintsField.Editor
                 {
                     layoutKeyToInfo[curGroupBy] = new SaintsRendererGroup.Config
                     {
+                        absGroupBy = curGroupBy,
                         eLayout = oldConfig.eLayout == 0? newConfig.eLayout: oldConfig.eLayout,
                         isDOTween = oldConfig.isDOTween || newConfig.isDOTween,
                         marginTop = newConfig.marginTop >= 0? newConfig.marginTop: oldConfig.marginTop,
                         marginBottom = newConfig.marginBottom >= 0? newConfig.marginBottom: oldConfig.marginBottom,
                     };
                 }
-
-//                 bool configExists = layoutKeyToInfo.TryGetValue(curGroupBy, out SaintsRendererGroup.Config existConfigInfo);
-//                 // if there is a config later, use the later one
-//                 if (!configExists || curLayout != 0 || sortedGroup is DOTweenPlayAttribute)
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-//                     Debug.Log($"add key {curGroupBy}: {curConfig}.{curConfig==0} (origin: {existConfigInfo.eLayout}.{existConfigInfo.eLayout==0})");
-// #endif
-//                     layoutKeyToInfo[curGroupBy] = new SaintsRendererGroup.Config
-//                     {
-//                         eLayout = curLayout,
-//                         isDOTween = existConfigInfo!.isDOTween || sortedGroup is DOTweenPlayAttribute,
-//                         marginTop = sortedGroup.MarginTop,
-//                         marginBottom = sortedGroup.MarginBottom,
-//                     };
-//                 }
-                // else
-                // {
-                //     Debug.Assert(existConfigInfo.eLayout == curConfig || curConfig == 0, $"layout config conflict: [{curGroupBy}] {existConfigInfo.eLayout} vs {curConfig}");
-                // }
             }
 
             // layout name to it's (new-created) actual render group
@@ -521,9 +604,10 @@ namespace SaintsField.Editor
 
             List<ISaintsRenderer> renderers = new List<ISaintsRenderer>();
             HashSet<string> rootGroupAdded = new HashSet<string>();
-            ISaintsGroup lastLongestGroup = null;
+            // ISaintsGroup lastLongestGroup = null;
+            string lastLongestGroupBy = "";
             int lastInherentDepth = -1;
-            bool keepGrouping = false;
+            string keepGrouping = "";
             while (fieldWithInfosSorted.Count > 0)
             {
                 SaintsFieldWithInfo fieldWithInfo = fieldWithInfosSorted[0];
@@ -533,15 +617,14 @@ namespace SaintsField.Editor
                 LayoutEndAttribute layoutEnd = null;
                 foreach (ISaintsGroup saintsGroup in fieldWithInfo.Groups)
                 {
-                    switch (saintsGroup)
+                    if (saintsGroup is LayoutEndAttribute layoutEndAttribute)
+                        // Debug.Log($"layoutEnd={layoutEndAttribute.GroupBy} for {fieldWithInfo}");
                     {
-                        case LayoutEndAttribute layoutEndAttribute:
-                            // Debug.Log($"layoutEnd={layoutEndAttribute.GroupBy} for {fieldWithInfo}");
-                            layoutEnd = layoutEndAttribute;
-                            break;
-                        default:
-                            normalGroup.Add(saintsGroup);
-                            break;
+                        layoutEnd = layoutEndAttribute;
+                    }
+                    else
+                    {
+                        normalGroup.Add(saintsGroup);
                     }
                 }
 
@@ -549,17 +632,38 @@ namespace SaintsField.Editor
                     normalGroup.OrderByDescending(each => each.GroupBy.Length).FirstOrDefault();
 
                 bool isNewGroup = curLongestGroup != null && curLongestGroup.GroupBy != lastLongestGroup?.GroupBy;
-                bool layoutEndPrev = layoutEnd != null && lastLongestGroup?.GroupBy == layoutEnd.GroupBy;
+                // bool layoutEndPrev = layoutEnd != null && lastLongestGroup?.GroupBy == layoutEnd.GroupBy;
                 bool newInherent = fieldWithInfo.InherentDepth != lastInherentDepth;
-                if (newInherent || isNewGroup || layoutEndPrev)
+                if (newInherent || isNewGroup)
                 {
-                    keepGrouping = false;
+                    keepGrouping = "";
                     lastLongestGroup = curLongestGroup;
+                }
+
+                if (layoutEnd != null)
+                {
+                    string layoutEndGroupBy = layoutEnd.GroupBy;
+                    if (layoutEndGroupBy == null)
+                    {
+                        keepGrouping = "";
+                    }
+                    else
+                    {
+                        if (lastLongestGroup == null)
+                        {
+                            keepGrouping = "";
+                        }
+                        else
+                        {
+                            keepGrouping = JoinGroupBy(lastLongestGroup.GroupBy, layoutEndGroupBy);
+                        }
+                    }
+
                 }
 
                 if (curLongestGroup?.KeepGrouping == false)
                 {
-                    keepGrouping = false;
+                    keepGrouping = "";
                 }
 
                 lastInherentDepth = fieldWithInfo.InherentDepth;
@@ -569,9 +673,9 @@ namespace SaintsField.Editor
                 //     Debug.Log($"isNewGroup={isNewGroup}, layoutEndPrev={layoutEndPrev}, newInherent={newInherent}, keepGrouping={keepGrouping}");
                 // }
 
-                if (keepGrouping || normalGroup.Count > 0)
+                if (keepGrouping != "" || normalGroup.Count > 0)
                 {
-                    ISaintsGroup longestGroup = keepGrouping
+                    ISaintsGroup longestGroup = keepGrouping != ""
                         ? lastLongestGroup
                         : normalGroup
                             .OrderByDescending(each => each.GroupBy.Length)
@@ -628,11 +732,37 @@ namespace SaintsField.Editor
 
                 if (isNewGroup)
                 {
-                    keepGrouping = curLongestGroup.KeepGrouping;
+                    keepGrouping = curLongestGroup.KeepGrouping? curLongestGroup.GroupBy: "";
                 }
             }
 
             return renderers;
+        }
+
+        private static string JoinGroupBy(string layoutGroupByAcc, string curGroupBy)
+        {
+            List<string> ori = layoutGroupByAcc.Split('/').ToList();
+
+            foreach (string eachPart in curGroupBy.Split('/'))
+            {
+                switch (eachPart)
+                {
+                    case ".":
+                        break;
+                    case "..":
+                        if (ori.Count > 0)
+                        {
+                            ori.RemoveAt(ori.Count - 1);
+                        }
+
+                        break;
+                    default:
+                        ori.Add(eachPart);
+                        break;
+                }
+            }
+
+            return ori.Count == 0? "": string.Join("/", ori);
         }
 
         private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
