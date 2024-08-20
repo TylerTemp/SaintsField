@@ -451,7 +451,7 @@ namespace SaintsField.Editor
                 .ToList();
 
             IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted);
-            return FlattenRendererGroupInfoIntoRenderers(serializedObject, chainedGroups).Select(each => each.saintsRenderer).ToArray();
+            return FlattenRendererGroupInfoIntoRenderers(chainedGroups, serializedObject, target).Select(each => each.saintsRenderer).ToArray();
 
 //             // layout name to it's config
 //             string layoutGroupByAcc = "";
@@ -649,7 +649,7 @@ namespace SaintsField.Editor
             // return renderers;
         }
 
-        private static IEnumerable<(string absGroupBy, ISaintsRenderer saintsRenderer)> FlattenRendererGroupInfoIntoRenderers(SerializedObject serializedObject, IReadOnlyList<RendererGroupInfo> chainedGroups)
+        private static IEnumerable<(string absGroupBy, ISaintsRenderer saintsRenderer)> FlattenRendererGroupInfoIntoRenderers(IReadOnlyList<RendererGroupInfo> chainedGroups, SerializedObject serializedObject, object target)
         {
             foreach (RendererGroupInfo rendererGroupInfo in chainedGroups)
             {
@@ -668,12 +668,22 @@ namespace SaintsField.Editor
                 }
                 else
                 {
-                    (string absGroupBy, ISaintsRenderer saintsRenderer)[] children = FlattenRendererGroupInfoIntoRenderers(serializedObject, rendererGroupInfo.Children).ToArray();
+                    (string absGroupBy, ISaintsRenderer saintsRenderer)[] children = FlattenRendererGroupInfoIntoRenderers(rendererGroupInfo.Children, serializedObject, target).ToArray();
                     if (children.Length > 0)
                     {
 
                         string curGroupAbs = rendererGroupInfo.AbsGroupBy;
-                        ISaintsRendererGroup group = new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config);
+
+                        ISaintsRendererGroup group =
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+                            rendererGroupInfo.Config.isDOTween
+                                ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
+                                : new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config)
+#else
+                            new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config)
+#endif
+                        ;
+
                         foreach ((string eachChildGroupBy, ISaintsRenderer eachChild) in children)
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
