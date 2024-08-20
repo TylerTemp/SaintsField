@@ -1,5 +1,4 @@
 using SaintsField.Playa;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 {
@@ -13,11 +12,15 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
         public string sub1;
         public string sub2;
 
+        [LayoutGroup("../Another", ELayout.FoldoutBox)]  // equals "Root/Sub"
+        public string another1;
+        public string another2;
+
         [LayoutEnd(".")]  // equals "Root/Sub"
         public string root3;  // this should still belong to "Root"
         public string root4;
 
-        // [LayoutEnd]  // this should close any existing group
-        // public string outOfAll;
+        [LayoutEnd]  // this should close any existing group
+        public string outOfAll;
     }
 }

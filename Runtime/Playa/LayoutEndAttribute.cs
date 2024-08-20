@@ -15,7 +15,7 @@ namespace SaintsField.Playa
         public float MarginTop { get; }
         public float MarginBottom { get; }
 
-        public LayoutEndAttribute(string groupBy, float marginTop = -1f, float marginBottom = -1f)
+        public LayoutEndAttribute(string groupBy = null, float marginTop = -1f, float marginBottom = -1f)
         {
             GroupBy = groupBy?.Trim('/');
             MarginTop = marginTop;

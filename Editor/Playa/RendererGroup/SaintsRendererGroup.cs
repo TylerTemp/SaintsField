@@ -17,6 +17,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
         public class Config
         {
+            public bool KeepGrouping;
+
             public ELayout eLayout;
             public bool isDOTween;
             public float marginTop;
@@ -520,7 +522,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             const int radius = 3;
 
             Texture2D dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
-            Texture2D dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
+            Texture2D dropdownLeftIcon = Util.LoadResource<Texture2D>("classic-dropdown-left.png");
 
             Dictionary<string, List<VisualElement>> fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
             string curTab = null;
@@ -699,6 +701,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 bool fancy = titleOut && background;
                 if (fancy)  // title clickable foldout
                 {
+                    const float imageSize = 16;
+
                     Button title = new Button
                     {
                         text = _groupPath.Split('/').Last(),
@@ -709,7 +713,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             marginLeft = 0,
                             marginRight = 0,
                             unityTextAlign = TextAnchor.MiddleLeft,
-                            paddingLeft = 5,
+                            paddingLeft = imageSize,
                             paddingTop = 2,
                             paddingBottom = 2,
                             // borderTopLeftRadius = radius,
@@ -724,19 +728,24 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             borderTopWidth = 0,
                             borderBottomWidth = 0,
 
-                            alignItems = Align.FlexEnd,
+                            // alignItems = Align.FlexEnd,
                         },
                     };
                     Image foldoutImage = new Image
                     {
-                        image = _foldout? dropdownIcon: dropdownRightIcon,
+                        image = _foldout? dropdownIcon: dropdownLeftIcon,
+                        tintColor = Color.gray,
                         style =
                         {
-                            width = 16,
-                            height = 16,
+                            width = imageSize,
+                            height = imageSize,
+                            marginLeft = -imageSize,
+                        },
+                        transform =
+                        {
+                            scale = new Vector3(-1, 1, 1),
                         },
                     };
-                    foldoutImage.transform.scale = new Vector3(-1, 1, 1);
 
                     title.Add(foldoutImage);
 
@@ -762,14 +771,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                         _foldout = !_foldout;
                         body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
-                        foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
+                        foldoutImage.image = _foldout ? dropdownIcon : dropdownLeftIcon;
                     };
 
                     switchTabActions.Add(_ =>
                     {
                         _foldout = true;
                         body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
-                        foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
+                        foldoutImage.image = _foldout ? dropdownIcon : dropdownLeftIcon;
                     });
                     titleRow.Add(title);
                 }
@@ -827,7 +836,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     _foldout = evt.newValue;
                     foldoutToggle.value = _foldout;
                     foldoutAction(_foldout);
-                    foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
+                    foldoutImage.image = _foldout ? dropdownIcon : dropdownLeftIcon;
 
                     if (!_foldout)
                     {
@@ -917,10 +926,17 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
 
             float marginTop = _config.marginTop > 0 ? _config.marginTop : 2;
+
             float marginBottom = _config.marginBottom > 0 ? _config.marginBottom : 0;
 
             root.style.marginTop = marginTop;
             root.style.marginBottom = marginBottom;
+
+            // sub container has some space left
+            if(_groupPath.Contains('/') && _eLayout.HasFlag(ELayout.Background) && _eLayout.HasFlag(ELayout.Title) && _eLayout.HasFlag(ELayout.TitleOut))
+            {
+                root.style.marginLeft = 4;
+            }
 
             // root.RegisterCallback<DetachFromPanelEvent>(_ =>
             // {
