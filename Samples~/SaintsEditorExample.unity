@@ -912,8 +912,15 @@ MonoBehaviour:
   root2: 
   sub1: 
   sub2: 
+  another1: 
+  another2: 
   root3: 
   root4: 
+  outOfAll: 
+  tab1Item1: 
+  tab1Item2: 0
+  tab2Item1: 
+  tab2Item2: 0
 --- !u!4 &690734320
 Transform:
   m_ObjectHideFlags: 0
@@ -1640,8 +1647,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent1: 
   parent2: 
-  sub1: 
-  sub2: 
+  sub: 
   subPumpToParent: 
 --- !u!4 &1544318740
 Transform:
@@ -2150,25 +2156,21 @@ MonoBehaviour:
   titledItem2: 
   titledBoxItem1: 
   titledBoxItem2: 
+  collapseItem1: 
+  collapseItem2: 
   foldoutItem1: 
   foldoutItem2: 
-  foldoutItem3: 0
-  foldoutItem4: 0
-  foldoutItem5: 0
-  foldoutItem6: 0
-  foldoutItem7: 
-  foldoutItem8: 
   tab1Item1: 
-  tab1Item2: 
+  tab1Item2: 0
   tab2Item1: 
-  tab2Item2: 
+  tab2Item2: 0
   tab3Item1: 
-  tab3Item2: 
+  tab3Item2: 0
   nestedOne: 0
   nestedTwo: 0
   nestedThree: 0
   nestedFour: 0
-  nestedFive: 0
+  nestedFive: 
   unlabeledBoxItem1: 0
   unlabeledBoxItem2: 0
   foldoutInABoxItem1: 0

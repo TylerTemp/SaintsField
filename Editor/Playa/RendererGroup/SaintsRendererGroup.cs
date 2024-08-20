@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 _groupIdToRenderer[lastId] = renderers = new List<ISaintsRenderer>();
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                Debug.Log($"Add Key: {lastId} of {groupPath}");
+                Debug.Log($"Add Key to {_groupPath}: {lastId} of {groupPath}");
 #endif
                 _orderedKeys.Add(lastId);
             }
@@ -571,6 +571,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         flexGrow = 1,
                         unityTextAlign = TextAnchor.MiddleCenter,
+                        unityFontStyleAndWeight = FontStyle.Bold,
                     },
                 })
                 .ToArray();
@@ -828,6 +829,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 Image foldoutImage = new Image
                 {
                     image = dropdownIcon,
+                    transform =
+                    {
+                        scale = new Vector3(-1, 1, 1),
+                    },
+                    // tintColor = Color.gray,
                 };
                 foldoutToggle.style.width = SaintsPropertyDrawer.SingleLineHeight;
                 foldoutToggle.Add(foldoutImage);
@@ -880,7 +886,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
                 string groupId = groupPath.Substring(groupPath.LastIndexOf('/') + 1);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
-                Debug.Log($"add item@{groupPath}: {renderer}");
+                Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
                 VisualElement fieldElement = renderer.CreateVisualElement();
                 // if(_eLayout.HasFlag(ELayout.Background))
@@ -896,7 +902,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 body.Add(fieldElement);
             }
 
-            if(_eLayout.HasFlag(ELayout.Background))
+            if(_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
             {
                 root.style.backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f);
                 root.style.borderTopWidth = 1;
@@ -949,6 +955,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
 #endif
         #endregion
+
+        public override string ToString() => $"<Group path={_groupPath} layout={_eLayout}/>";
 
     }
 }

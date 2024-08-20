@@ -4,10 +4,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.LayoutGroupInherent
 {
     public class Sub : Parent
     {
-        public string sub1;
-        public string sub2;
+        public string sub;
 
-        [LayoutGroup("Parent", ELayout.Background | ELayout.TitleOut)]  // override config
+        [Layout("Parent", ELayout.TitleBox)]  // override config
         public string subPumpToParent;
     }
 }

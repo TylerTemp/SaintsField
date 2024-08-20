@@ -21,32 +21,38 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         // foldout
         [LayoutGroup("Collapse", ELayout.CollapseBox)]
-        public string foldoutItem1, foldoutItem2;
-        public int foldoutItem3, foldoutItem4;
-        [LayoutGroup("Collapse/Tab1", ELayout.Foldout)]
-        public float foldoutItem5, foldoutItem6;
-        public string foldoutItem7, foldoutItem8;
+        public string collapseItem1;
+        public string collapseItem2;
+
+        [LayoutGroup("Foldout", ELayout.FoldoutBox)]
+        public string foldoutItem1;
+        public string foldoutItem2;
 
         // tabs
         [Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-        [Layout("Tabs/Tab1")]
-        public string tab1Item1, tab1Item2;
+        [LayoutGroup("./Tab1")]
+        public string tab1Item1;
+        public int tab1Item2;
 
-        [Layout("Tabs/Tab2")]
-        public string tab2Item1, tab2Item2;
+        [LayoutGroup("../Tab2")]
+        public string tab2Item1;
+        public int tab2Item2;
 
-        [Layout("Tabs/Tab3")]
-        public string tab3Item1, tab3Item2;
+        [LayoutGroup("../Tab3")]
+        public string tab3Item1;
+        public int tab3Item2;
 
         // nested groups
-        [Layout("Nested", ELayout.Background | ELayout.TitleOut)]
+        [LayoutGroup("Nested", ELayout.Background | ELayout.TitleOut)]
         public int nestedOne;
 
-        [LayoutGroup("Nested/Nested Group 1", ELayout.TitleOut)]
+        [LayoutGroup("./Nested Group 1", ELayout.TitleOut)]
         public int nestedTwo;
         public int nestedThree;
-        [Layout("Nested/Nested Group 2", ELayout.TitleOut)]
-        public int nestedFour, nestedFive;
+
+        [LayoutGroup("./Nested Group 2", ELayout.TitleOut)]
+        public int nestedFour;
+        public string nestedFive;
 
         // Unlabeled Box
         [Layout("Unlabeled Box", ELayout.Background)]

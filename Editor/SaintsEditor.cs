@@ -451,7 +451,7 @@ namespace SaintsField.Editor
                 .ToList();
 
             IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted);
-            return FlattenRendererGroupInfoIntoRenderers(serializedObject, chainedGroups).ToArray();
+            return FlattenRendererGroupInfoIntoRenderers(serializedObject, chainedGroups).Select(each => each.saintsRenderer).ToArray();
 
 //             // layout name to it's config
 //             string layoutGroupByAcc = "";
@@ -649,7 +649,7 @@ namespace SaintsField.Editor
             // return renderers;
         }
 
-        private static IEnumerable<ISaintsRenderer> FlattenRendererGroupInfoIntoRenderers(SerializedObject serializedObject, IReadOnlyList<RendererGroupInfo> chainedGroups)
+        private static IEnumerable<(string absGroupBy, ISaintsRenderer saintsRenderer)> FlattenRendererGroupInfoIntoRenderers(SerializedObject serializedObject, IReadOnlyList<RendererGroupInfo> chainedGroups)
         {
             foreach (RendererGroupInfo rendererGroupInfo in chainedGroups)
             {
@@ -659,32 +659,35 @@ namespace SaintsField.Editor
                 {
                     var result =  MakeRenderer(serializedObject, rendererGroupInfo.FieldWithInfo);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                    Debug.Log($"Flatten EndNode return {result}");
+                    if(rendererGroupInfo.FieldWithInfo.MethodInfo == null)
+                    {
+                        Debug.Log($"Flatten EndNode return {result}");
+                    }
 #endif
-                    yield return result;
+                    yield return ("", result);
                 }
                 else
                 {
-                    ISaintsRenderer[] children = FlattenRendererGroupInfoIntoRenderers(serializedObject, rendererGroupInfo.Children).ToArray();
+                    (string absGroupBy, ISaintsRenderer saintsRenderer)[] children = FlattenRendererGroupInfoIntoRenderers(serializedObject, rendererGroupInfo.Children).ToArray();
                     if (children.Length > 0)
                     {
 
                         string curGroupAbs = rendererGroupInfo.AbsGroupBy;
                         ISaintsRendererGroup group = new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config);
-                        foreach (ISaintsRenderer eachChild in children)
+                        foreach ((string eachChildGroupBy, ISaintsRenderer eachChild) in children)
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                            Debug.Log($"Flatten {rendererGroupInfo.AbsGroupBy} add renderer {eachChild}");
+                            Debug.Log($"Flatten {group} add renderer {eachChild}");
 #endif
 
-                            group.Add(curGroupAbs, eachChild);
+                            group.Add(eachChildGroupBy, eachChild);
                         }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                        Debug.Log($"Flatten {rendererGroupInfo.AbsGroupBy} return with {children.Length} children");
+                        Debug.Log($"Flatten {group} return with {children.Length} children");
 #endif
 
-                        yield return group;
+                        yield return (rendererGroupInfo.AbsGroupBy, group);
                     }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                     else
@@ -710,13 +713,24 @@ namespace SaintsField.Editor
                 new Dictionary<string, RendererGroupInfo>();
 
             RendererGroupInfo keepGroupingInfo = null;
-            // RendererGroupInfo lastLongestGroupInfo = null;
+            int inherent = -1;
             foreach (SaintsFieldWithInfo saintsFieldWithInfo in fieldWithInfosSorted)
             {
+                bool isNewInherent = saintsFieldWithInfo.InherentDepth != inherent;
+                inherent = saintsFieldWithInfo.InherentDepth;
+
                 IReadOnlyList<ISaintsGroup> groups = saintsFieldWithInfo.Groups;
                 RendererGroupInfo lastGroupInfo = null;
+
+                if (isNewInherent)
+                {
+                    keepGroupingInfo = null;
+                    lastGroupInfo = null;
+                }
+
                 if (groups.Count > 0)
                 {
+                    string preAbsGroupBy = null;
                     foreach (ISaintsGroup saintsGroup in groups)
                     {
                         switch (saintsGroup)
@@ -801,11 +815,21 @@ namespace SaintsField.Editor
                             default:
                             {
                                 string groupBy = saintsGroup.GroupBy;
-                                if (groupBy.StartsWith(".") && keepGroupingInfo != null)
+                                if (groupBy.StartsWith("."))
                                 {
-                                    groupBy = JoinGroupBy(keepGroupingInfo.AbsGroupBy, groupBy);
+                                    string preGroupBy = keepGroupingInfo?.AbsGroupBy ?? preAbsGroupBy;
+                                    if(preGroupBy != null)
+                                    {
+                                        groupBy = JoinGroupBy(preGroupBy, groupBy);
+                                    }
                                 }
-                                RendererGroupInfo targetGroup = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy);
+                                preAbsGroupBy = groupBy;
+
+                                (bool newRoot, RendererGroupInfo targetGroup) = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy);
+                                if (newRoot)
+                                {
+                                    rendererGroupInfos.Add(targetGroup);
+                                }
                                 lastGroupInfo = targetGroup;
 
                                 SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
@@ -819,7 +843,7 @@ namespace SaintsField.Editor
 
                                 targetGroup.Config = new SaintsRendererGroup.Config
                                 {
-                                    eLayout = oldConfig.eLayout == 0? newConfig.eLayout: oldConfig.eLayout,
+                                    eLayout = newConfig.eLayout == 0? oldConfig.eLayout: newConfig.eLayout,
                                     isDOTween = oldConfig.isDOTween || newConfig.isDOTween,
                                     marginTop = newConfig.marginTop >= 0? newConfig.marginTop: oldConfig.marginTop,
                                     marginBottom = newConfig.marginBottom >= 0? newConfig.marginBottom: oldConfig.marginBottom,
@@ -830,11 +854,15 @@ namespace SaintsField.Editor
                                 {
                                     keepGroupingInfo = targetGroup;
                                 }
+                                else if (keepGroupingInfo != null &&
+                                         targetGroup.AbsGroupBy != keepGroupingInfo.AbsGroupBy)
+                                {
+                                    keepGroupingInfo = null;
+                                }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                                Debug.Log($"Layout item, {groupBy}: {keepGroupingInfo?.AbsGroupBy}");
+                                Debug.Log($"Layout item {groupBy}, newRoot={newRoot}, eLayout={targetGroup.Config.eLayout}, keepGroupingInfo={keepGroupingInfo?.AbsGroupBy}");
 #endif
-
                             }
                                 break;
                         }
@@ -852,7 +880,7 @@ namespace SaintsField.Editor
                 if (lastGroupInfo == null && keepGroupingInfo != null)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                    Debug.Log($"Layout keep grouping: {keepGroupingInfo.AbsGroupBy}");
+                    Debug.Log($"Layout lastGroupInfo set to keepGrouping: {keepGroupingInfo.AbsGroupBy}");
 #endif
                     lastGroupInfo = keepGroupingInfo;
                 }
@@ -870,23 +898,24 @@ namespace SaintsField.Editor
                     Debug.Log($"Layout add field under {lastGroupInfo.AbsGroupBy}: {saintsFieldWithInfo.FieldInfo?.Name ?? saintsFieldWithInfo.PropertyInfo?.Name ?? saintsFieldWithInfo.MethodInfo?.Name}");
 #endif
                     lastGroupInfo.Children.Add(endNode);
-
-                    if (!lastGroupInfo.AbsGroupBy.Contains('/') && !rendererGroupInfos.Contains(lastGroupInfo))
-                    {
-                        rendererGroupInfos.Add(lastGroupInfo);
-                    }
+                    // if (!lastGroupInfo.AbsGroupBy.Contains('/') && !rendererGroupInfos.Contains(lastGroupInfo))
+                    // {
+                    //     rendererGroupInfos.Add(lastGroupInfo);
+                    // }
                 }
             }
 
             return rendererGroupInfos;
         }
 
-        private static RendererGroupInfo GetOrCreateGroupInfo(Dictionary<string, RendererGroupInfo> rootToRendererGroupInfo, string path)
+        private static (bool newRoot, RendererGroupInfo rendererGroupInfo) GetOrCreateGroupInfo(Dictionary<string, RendererGroupInfo> rootToRendererGroupInfo, string path)
         {
+            bool newRoot = false;
             if (!path.Contains('/'))
             {
                 if(!rootToRendererGroupInfo.TryGetValue(path, out RendererGroupInfo info))
                 {
+                    newRoot = true;
                     rootToRendererGroupInfo[path] = info = new RendererGroupInfo
                     {
                         AbsGroupBy = path,
@@ -898,13 +927,14 @@ namespace SaintsField.Editor
 #endif
                 }
 
-                return info;
+                return (newRoot, info);
             }
 
             string[] groupByParts = path.Split('/');
             string rootGroup = groupByParts[0];
             if (!rootToRendererGroupInfo.TryGetValue(rootGroup, out RendererGroupInfo accInfo))
             {
+                newRoot = true;
                 rootToRendererGroupInfo[rootGroup] = accInfo = new RendererGroupInfo
                 {
                     AbsGroupBy = rootGroup,
@@ -922,8 +952,8 @@ namespace SaintsField.Editor
 
             foreach (string part in groupByParts.Skip(1))
             {
-                RendererGroupInfo found = accInfo.Children.FirstOrDefault(each => each.AbsGroupBy == part);
                 pathAcc += $"/{part}";
+                RendererGroupInfo found = accInfo.Children.FirstOrDefault(each => each.AbsGroupBy == pathAcc);
                 if (found == null)
                 {
                     found = new RendererGroupInfo
@@ -941,7 +971,7 @@ namespace SaintsField.Editor
                 accInfo = found;
             }
 
-            return accInfo;
+            return (newRoot, accInfo);
         }
 
         private static string JoinGroupBy(string layoutGroupByAcc, string curGroupBy)
