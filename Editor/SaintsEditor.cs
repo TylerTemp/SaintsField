@@ -657,7 +657,7 @@ namespace SaintsField.Editor
 
                 if (isEndNode)
                 {
-                    var result =  MakeRenderer(serializedObject, rendererGroupInfo.FieldWithInfo);
+                    AbsRenderer result =  MakeRenderer(serializedObject, rendererGroupInfo.FieldWithInfo);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                     if(rendererGroupInfo.FieldWithInfo.MethodInfo == null)
                     {
@@ -770,7 +770,9 @@ namespace SaintsField.Editor
                                         string closeGroup = JoinGroupBy(keepGroupingInfo.AbsGroupBy, endGroupBy);
                                         if(closeGroup.Contains('/'))
                                         {
-                                            string openGroupTo = string.Join("/", closeGroup.Split('/').SkipLast(1));
+                                            List<string> splitCloseGroup = closeGroup.Split('/').ToList();
+                                            splitCloseGroup.RemoveAt(splitCloseGroup.Count - 1);
+                                            string openGroupTo = string.Join("/", splitCloseGroup);
                                             if (!rootToRendererGroupInfo.TryGetValue(openGroupTo,
                                                     out RendererGroupInfo info))
                                             {
@@ -797,11 +799,19 @@ namespace SaintsField.Editor
                                     }
                                     else
                                     {
-                                        string parentGroupBy = endGroupBy.Contains('/')
-                                            ? string.Join("/", endGroupBy.Split('/').SkipLast(1))
-                                            : "";
+                                        string parentGroupBy;
+                                        if (endGroupBy.Contains('/'))
+                                        {
+                                            List<string> endGroupBySplit = endGroupBy.Split('/').ToList();
+                                            endGroupBySplit.RemoveAt(endGroupBySplit.Count - 1);
+                                            parentGroupBy = string.Join("/", endGroupBySplit);
+                                        }
+                                        else
+                                        {
+                                            parentGroupBy = "";
+                                        }
                                         if (parentGroupBy != "" && rootToRendererGroupInfo.TryGetValue(parentGroupBy,
-                                                     out RendererGroupInfo info))
+                                                out RendererGroupInfo info))
                                         {
                                             keepGroupingInfo = info.Config.KeepGrouping
                                                 ? info
