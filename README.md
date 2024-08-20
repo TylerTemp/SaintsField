@@ -66,9 +66,10 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.2.5**
+**3.2.6**
 
-`GetResourcePath` etc. support some build-in object types like `AudioClip`. [#69](https://github.com/TylerTemp/SaintsField/pull/69)
+1.  Improved `LayoutGroup` which supports `./GroupName` to add nested subgroup. [#67](https://github.com/TylerTemp/SaintsField/issues/67)
+2.  IMGUI: better visual display for `TitledBox`, `FoldoutBox` and foldout tabs. [#64](https://github.com/TylerTemp/SaintsField/issues/64)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3026,7 +3027,7 @@ Options are:
 
 **Appearance**
 
-![layout_compare](https://github.com/TylerTemp/SaintsField/assets/6391063/d34c317d-3c24-42f9-8efa-831195167490)
+![layout](https://github.com/user-attachments/assets/1e2e6dfa-85a9-4225-ac8f-8beefc26ae52)
 
 **Example**
 
@@ -3038,33 +3039,45 @@ using SaintsField.Playa;
 public string titledItem1, titledItem2;
 
 // title
-[Layout("Titled Box", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+[Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
 public string titledBoxItem1;
 [Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
 public string titledBoxItem2;
 
 // foldout
-[Layout("Foldout", ELayout.Foldout)]
-public string foldoutItem1, foldoutItem2;
+[LayoutGroup("Collapse", ELayout.CollapseBox)]
+public string collapseItem1;
+public string collapseItem2;
+
+[LayoutGroup("Foldout", ELayout.FoldoutBox)]
+public string foldoutItem1;
+public string foldoutItem2;
 
 // tabs
-[Layout("Tabs", ELayout.Tab | ELayout.Foldout)]
-[Layout("Tabs/Tab1")]
-public string tab1Item1, tab1Item2;
+[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
+[LayoutGroup("./Tab1")]
+public string tab1Item1;
+public int tab1Item2;
 
-[Layout("Tabs/Tab2")]
-public string tab2Item1, tab2Item2;
+[LayoutGroup("../Tab2")]
+public string tab2Item1;
+public int tab2Item2;
 
-[Layout("Tabs/Tab3")]
-public string tab3Item1, tab3Item2;
+[LayoutGroup("../Tab3")]
+public string tab3Item1;
+public int tab3Item2;
 
 // nested groups
-[Layout("Nested", ELayout.Title | ELayout.Background | ELayout.TitleOut)]
+[LayoutGroup("Nested", ELayout.Background | ELayout.TitleOut)]
 public int nestedOne;
-[Layout("Nested/Nested Group 1", ELayout.Title | ELayout.TitleOut)]
-public int nestedTwo, nestedThree;
-[Layout("Nested/Nested Group 2", ELayout.Title | ELayout.TitleOut)]
-public int nestedFour, nestedFive;
+
+[LayoutGroup("./Nested Group 1", ELayout.TitleOut)]
+public int nestedTwo;
+public int nestedThree;
+
+[LayoutGroup("./Nested Group 2", ELayout.TitleOut)]
+public int nestedFour;
+public string nestedFive;
 
 // Unlabeled Box
 [Layout("Unlabeled Box", ELayout.Background)]
@@ -3076,7 +3089,7 @@ public int foldoutInABoxItem1, foldoutInABoxItem2;
 
 // Complex example. Button and ShowInInspector works too
 [Ordered]
-[Layout("Root", ELayout.Tab | ELayout.TitleOut | ELayout.Foldout | ELayout.Background)]
+[Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
 [Layout("Root/V1")]
 [SepTitle("Basic", EColor.Pink)]
 public string hv1Item1;
@@ -3089,7 +3102,7 @@ public void RootV1Button()
     Debug.Log("Root/V1 Button");
 }
 [Ordered]
-[Layout("Root/V1/buttons", ELayout.Horizontal)]
+[Layout("Root/V1/buttons")]
 [Button("Root/V1 Button2")]
 public void RootV1Button2()
 {
@@ -3145,10 +3158,25 @@ public string buggy = "See below:";
 
 [Ordered]
 [Layout("Root/Buggy/H", ELayout.Horizontal)]
-public string buggy1;
+public string buggy1, buggy2, buggy3;
+
 [Ordered]
-[Layout("Root/Buggy/H", ELayout.Horizontal)]
-public string buggy2;
+[Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
+[Layout("Title+Tab/g1")]
+public string titleTabG11, titleTabG21;
+
+[Ordered]
+[Layout("Title+Tab/g2")]
+public string titleTabG12, titleTabG22;
+
+[Ordered]
+[Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
+[Layout("All Together/g1")]
+public string allTogetherG11, allTogetherG21;
+
+[Ordered]
+[Layout("All Together/g2")]
+public string allTogetherG12, allTogetherG22;
 ```
 
 [![layout](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
@@ -3168,7 +3196,43 @@ For `LayoutGroup`:
 
 For `LayoutEnd`:
 
-*   `string groupBy` same as `Layout`
+*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
+
+It supports `./SubGroup` to create a nested subgroup:
+
+```csharp
+using SaintsField.Playa;
+
+[LayoutGroup("Root", ELayout.FoldoutBox)]
+public string root1;
+public string root2;
+
+[LayoutGroup("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
+public string sub1;
+public string sub2;
+
+[LayoutGroup("../Another", ELayout.FoldoutBox)]  // equals "Root/Another"
+public string another1;
+public string another2;
+
+[LayoutEnd(".")]  // equals "Root"
+public string root3;  // this should still belong to "Root"
+public string root4;
+
+[LayoutEnd]  // this should close any existing group
+public string outOfAll;
+
+[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
+[LayoutGroup("./Tab1")]
+public string tab1Item1;
+public int tab1Item2;
+
+[LayoutGroup("../Tab2")]
+public string tab2Item1;
+public int tab2Item2;
+``` 
+
+![image](https://github.com/user-attachments/assets/ebd29cbe-cd84-4f76-8834-91d1ae44fd59)
 
 example of using `LayoutGroup` with `LayoutEnd`:
 

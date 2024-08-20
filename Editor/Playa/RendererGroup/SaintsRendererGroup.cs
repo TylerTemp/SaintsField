@@ -85,18 +85,43 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         #region IMGUI
 
-        private static GUIStyle _fancyBoxButtonStyle;
+        // private static Texture2D _outlineBg;
+        private static GUIStyle _fancyBoxLeftIconButtonStyle;
 
-        private static GUIStyle GetFancyBoxButtonStyle()
+        private static GUIStyle GetFancyBoxLeftIconButtonStyle()
         {
-            if (_fancyBoxButtonStyle != null)
+            if (_fancyBoxLeftIconButtonStyle != null)
             {
-                return _fancyBoxButtonStyle;
+                return _fancyBoxLeftIconButtonStyle;
             }
 
-            _fancyBoxButtonStyle = GUI.skin.button;
+            _fancyBoxLeftIconButtonStyle = new GUIStyle(GUI.skin.box)
+            {
+                padding = new RectOffset(15, 0, 0, 0),
+                margin = new RectOffset(0, 0, 0, 0),
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Bold,
+                fontSize = 13,
+            };
 
-            return _fancyBoxButtonStyle;
+            return _fancyBoxLeftIconButtonStyle;
+        }
+
+        // TODO: dispose it, but... does it really matters
+        private static Texture2D _dropdownIcon;
+        private static Texture2D _dropdownRightIcon;
+
+        private static (Texture2D dropdownIcon, Texture2D dropdownRightIcon) GetDropdownIcons()
+        {
+            if (_dropdownIcon != null)
+            {
+                return (_dropdownIcon, _dropdownRightIcon);
+            }
+
+            _dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
+            _dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
+
+            return (_dropdownIcon, _dropdownRightIcon);
         }
 
         public void Render()
@@ -122,7 +147,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
             EditorGUILayout.GetControlRect(false, marginTop);
 
-            GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
+            GUIStyle fullBoxStyle = (_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
                 ? EditorStyles.helpBox
                 : GUIStyle.none;
             IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
@@ -180,10 +205,21 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         bool fancy = _eLayout.HasFlag(ELayout.TitleOut) && _eLayout.HasFlag(ELayout.Background);
                         if (fancy) // title clickable foldout
                         {
-                            if (GUILayout.Button(_groupPath.Split('/').Last(), GetFancyBoxButtonStyle()))
+                            // var oriColor = GUI.color;
+                            // GUI.color = Color.clear;
+                            if (GUILayout.Button(_groupPath.Split('/').Last(), GetFancyBoxLeftIconButtonStyle(), GUILayout.ExpandWidth(true)))
                             {
                                 _foldout = !_foldout;
                             }
+
+                            Rect iconRect = GUILayoutUtility.GetLastRect();
+                            iconRect.width = 16;
+
+                            (Texture2D dropdownIcon, Texture2D dropdownRightIcon) = GetDropdownIcons();
+                            Texture2D icon = _foldout ? dropdownIcon : dropdownRightIcon;
+                            GUI.DrawTexture(iconRect, icon);
+
+                            // GUI.color = oriColor;
                             // titleRect.height = EditorGUIUtility.singleLineHeight;
                         }
                         else
@@ -205,20 +241,33 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     //  v      | x     | v   | x           | [f] tab
                     if(hasFoldout && !hasTitle && hasTab)
                     {
+                        List<GUIContent> tabsGuiContent = new List<GUIContent>
+                        {
+                            new GUIContent
+                            {
+                                image = _foldout
+                                    ? GetDropdownIcons().dropdownIcon
+                                    : GetDropdownIcons().dropdownRightIcon,
+                            },
+                        };
+                        tabsGuiContent.AddRange(_orderedKeys.Select(each => new GUIContent(each)));
+
                         using (new EditorGUILayout.HorizontalScope())
                         {
-                            _foldout = EditorGUILayout.Foldout(_foldout, GUIContent.none, true, _foldoutSmallStyle);
                             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                             {
-                                var curSelected = GUILayout.Toolbar(_foldout ? _curSelected : -1, _orderedKeys.ToArray());
+                                int curSelected = GUILayout.Toolbar(_foldout ? (_curSelected + 1) : -1, tabsGuiContent.ToArray(), GUILayout.MaxHeight(18));
                                 if (changed.changed)
                                 {
-                                    _foldout = true;
-                                }
-
-                                if (curSelected != -1)
-                                {
-                                    _curSelected = curSelected;
+                                    if (curSelected == 0)
+                                    {
+                                        _foldout = !_foldout;
+                                    }
+                                    else
+                                    {
+                                        _curSelected = curSelected - 1;
+                                        _foldout = true;
+                                    }
                                 }
                             }
                         }
@@ -346,7 +395,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
             float marginBottom = _config.marginBottom >= 0 ? _config.marginBottom : 2;
 
-            return titleHeight + contentHeight + marginTop + marginBottom;
+            return titleHeight + contentHeight + marginTop + marginBottom + 4;
         }
 
         public void RenderPosition(Rect position)
@@ -356,8 +405,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             Rect marginedRect = new Rect(position)
             {
-                y = position.y + marginTop,
-                height = position.height - marginTop - marginBottom,
+                y = position.y + marginTop + 2,
+                height = position.height - marginTop - marginBottom - 4,
             };
 
             Debug.Assert(!_eLayout.HasFlag(ELayout.Horizontal), $"Horizontal is not supported for IMGUI in SaintsEditorAttribute mode");
@@ -380,9 +429,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
-            if (_eLayout.HasFlag(ELayout.Background))
+            if (_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
             {
-                GUI.Box(marginedRect, GUIContent.none);
+                GUI.Box(marginedRect, GUIContent.none, EditorStyles.helpBox);
             }
 
             // GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
@@ -402,7 +451,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                 // using (new EditorGUILayout.VerticalScope())
                 {
-                    bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout);
+                    bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout) || _eLayout.HasFlag(ELayout.Collapse);
                     bool hasTitle = _eLayout.HasFlag(ELayout.Title);
                     bool hasTab = _eLayout.HasFlag(ELayout.Tab);
 
@@ -454,19 +503,46 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             || hasTitle
                             || !hasTab))
                     {
-                        titleRect.height = EditorGUIUtility.singleLineHeight;
-                        _foldout = EditorGUI.Foldout(titleRect, _foldout, _groupPath.Split('/').Last(), true, new GUIStyle(EditorStyles.foldout){
-                            fontStyle = FontStyle.Bold,
-                        });
-                        titleRect.y += titleRect.height;
-                        titleUsedHeight += titleRect.height;
-
-                        if(_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                        bool fancy = _eLayout.HasFlag(ELayout.TitleOut) && _eLayout.HasFlag(ELayout.Background);
+                        if (fancy) // title clickable foldout
                         {
-                            titleRect.height = 1;
-                            EditorGUI.DrawRect(titleRect, EColor.EditorSeparator.GetColor());
+                            titleRect.height = EditorGUIUtility.singleLineHeight;
+
+                            if (GUI.Button(titleRect, _groupPath.Split('/').Last(), GetFancyBoxLeftIconButtonStyle()))
+                            {
+                                _foldout = !_foldout;
+                            }
+
+                            Rect iconRect = new Rect(titleRect)
+                            {
+                                width = 16,
+                            };
+
+                            (Texture2D dropdownIcon, Texture2D dropdownRightIcon) = GetDropdownIcons();
+                            Texture2D icon = _foldout ? dropdownIcon : dropdownRightIcon;
+                            GUI.DrawTexture(iconRect, icon);
+
                             titleRect.y += titleRect.height;
                             titleUsedHeight += titleRect.height;
+                        }
+                        else
+                        {
+                            titleRect.height = EditorGUIUtility.singleLineHeight;
+                            _foldout = EditorGUI.Foldout(titleRect, _foldout, _groupPath.Split('/').Last(), true,
+                                new GUIStyle(EditorStyles.foldout)
+                                {
+                                    fontStyle = FontStyle.Bold,
+                                });
+                            titleRect.y += titleRect.height;
+                            titleUsedHeight += titleRect.height;
+
+                            if (_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                            {
+                                titleRect.height = 1;
+                                EditorGUI.DrawRect(titleRect, EColor.EditorSeparator.GetColor());
+                                titleRect.y += titleRect.height;
+                                titleUsedHeight += titleRect.height;
+                            }
                         }
                     }
 
@@ -475,24 +551,58 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     if(hasFoldout && !hasTitle && hasTab)
                     {
                         // using (new EditorGUILayout.HorizontalScope())
-                        {
-                            titleRect.height = EditorGUIUtility.singleLineHeight;
-                            _foldout = EditorGUI.Foldout(titleRect, _foldout, GUIContent.none, true, _foldoutSmallStyle);
-                            titleRect.y += titleRect.height;
-                            titleUsedHeight += titleRect.height;
+                        // {
 
-                            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                        titleRect.height = EditorGUIUtility.singleLineHeight;
+
+                        List<GUIContent> tabsGuiContent = new List<GUIContent>
+                        {
+                            new GUIContent
                             {
-                                titleRect.height = EditorGUIUtility.singleLineHeight;
-                                _curSelected = GUI.Toolbar(titleRect, _curSelected, _orderedKeys.ToArray());
-                                titleRect.y += titleRect.height;
-                                titleUsedHeight += titleRect.height;
-                                if (changed.changed)
+                                image = _foldout
+                                    ? GetDropdownIcons().dropdownIcon
+                                    : GetDropdownIcons().dropdownRightIcon,
+                            },
+                        };
+                        tabsGuiContent.AddRange(_orderedKeys.Select(each => new GUIContent(each)));
+
+                        using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                        {
+                            int curSelected = GUI.Toolbar(titleRect, _foldout ? (_curSelected + 1) : -1, tabsGuiContent.ToArray());
+                            if (changed.changed)
+                            {
+                                if (curSelected == 0)
                                 {
+                                    _foldout = !_foldout;
+                                }
+                                else
+                                {
+                                    _curSelected = curSelected - 1;
                                     _foldout = true;
                                 }
                             }
                         }
+
+                        titleUsedHeight += titleRect.height;
+                        titleRect.y += titleRect.height;
+
+                        // titleRect.height = EditorGUIUtility.singleLineHeight;
+                        // _foldout = EditorGUI.Foldout(titleRect, _foldout, GUIContent.none, true, _foldoutSmallStyle);
+                        // titleRect.y += titleRect.height;
+                        // titleUsedHeight += titleRect.height;
+                        //
+                        // using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                        // {
+                        //     titleRect.height = EditorGUIUtility.singleLineHeight;
+                        //     _curSelected = GUI.Toolbar(titleRect, _curSelected, _orderedKeys.ToArray());
+                        //     titleRect.y += titleRect.height;
+                        //     titleUsedHeight += titleRect.height;
+                        //     if (changed.changed)
+                        //     {
+                        //         _foldout = true;
+                        //     }
+                        // }
+                        // }
                     }
 
                     // tabs
@@ -530,7 +640,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         float height = renderer.GetHeight();
                         (Rect useRect, Rect leftRect) = RectUtils.SplitHeightRect(accRect, height);
-                        renderer.RenderPosition(useRect);
+                        Rect marginRect = new Rect(useRect)
+                        {
+                            x = useRect.x + 2,
+                            width = useRect.width - 4,
+                        };
+                        renderer.RenderPosition(marginRect);
                         accRect = leftRect;
                     }
 
@@ -549,7 +664,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             const int radius = 3;
 
             Texture2D dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
-            Texture2D dropdownLeftIcon = Util.LoadResource<Texture2D>("classic-dropdown-left.png");
+            Texture2D dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
 
             Dictionary<string, List<VisualElement>> fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
             string curTab = null;
@@ -761,17 +876,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     };
                     Image foldoutImage = new Image
                     {
-                        image = _foldout? dropdownIcon: dropdownLeftIcon,
+                        image = _foldout? dropdownIcon: dropdownRightIcon,
                         tintColor = Color.gray,
                         style =
                         {
                             width = imageSize,
                             height = imageSize,
                             marginLeft = -imageSize,
-                        },
-                        transform =
-                        {
-                            scale = new Vector3(-1, 1, 1),
                         },
                     };
 
@@ -799,14 +910,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                         _foldout = !_foldout;
                         body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
-                        foldoutImage.image = _foldout ? dropdownIcon : dropdownLeftIcon;
+                        foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
                     };
 
                     switchTabActions.Add(_ =>
                     {
                         _foldout = true;
                         body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
-                        foldoutImage.image = _foldout ? dropdownIcon : dropdownLeftIcon;
+                        foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
                     });
                     titleRow.Add(title);
                 }
@@ -856,10 +967,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 Image foldoutImage = new Image
                 {
                     image = dropdownIcon,
-                    transform =
-                    {
-                        scale = new Vector3(-1, 1, 1),
-                    },
                     // tintColor = Color.gray,
                 };
                 foldoutToggle.style.width = SaintsPropertyDrawer.SingleLineHeight;
@@ -869,7 +976,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     _foldout = evt.newValue;
                     foldoutToggle.value = _foldout;
                     foldoutAction(_foldout);
-                    foldoutImage.image = _foldout ? dropdownIcon : dropdownLeftIcon;
+                    foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
 
                     if (!_foldout)
                     {

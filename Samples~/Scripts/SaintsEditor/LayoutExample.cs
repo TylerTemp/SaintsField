@@ -64,7 +64,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         // Complex example. Button and ShowInInspector works too
         [Ordered]
-        [Layout("Root", ELayout.Tab | ELayout.TitleOut | ELayout.Foldout | ELayout.Background)]
+        [Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
         // [Layout("Root", ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
         // [Layout("Root", ELayout.Title)]
         // [Layout("Root", ELayout.Title | ELayout.Background)]
@@ -140,7 +140,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string buggy1, buggy2, buggy3;
 
         [Ordered]
-        [Layout("Title+Tab", ELayout.Tab | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
+        [Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
         [Layout("Title+Tab/g1")]
         public string titleTabG11, titleTabG21;
 

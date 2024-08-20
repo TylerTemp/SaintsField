@@ -1,3 +1,8 @@
+## 3.2.6 ##
+
+1.  Improved `LayoutGroup` which supports `./GroupName` to add nested subgroup. [#67](https://github.com/TylerTemp/SaintsField/issues/67)
+2.  IMGUI: better visual display for `TitledBox`, `FoldoutBox` and foldout tabs. [#64](https://github.com/TylerTemp/SaintsField/issues/64)
+
 ## 3.2.5 ##
 
 `GetResourcePath` etc. support some build-in object types like `AudioClip`. [#69](https://github.com/TylerTemp/SaintsField/pull/69)
