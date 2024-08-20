@@ -85,6 +85,19 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         #region IMGUI
 
+        private static GUIStyle _fancyBoxButtonStyle;
+
+        private static GUIStyle GetFancyBoxButtonStyle()
+        {
+            if (_fancyBoxButtonStyle != null)
+            {
+                return _fancyBoxButtonStyle;
+            }
+
+            _fancyBoxButtonStyle = GUI.skin.button;
+
+            return _fancyBoxButtonStyle;
+        }
 
         public void Render()
         {
@@ -110,7 +123,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             EditorGUILayout.GetControlRect(false, marginTop);
 
             GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
-                ? GUI.skin.box
+                ? EditorStyles.helpBox
                 : GUIStyle.none;
             IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
                 // ReSharper disable once RedundantCast
@@ -164,13 +177,27 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             || hasTitle
                             || !hasTab))
                     {
-                        _foldout = EditorGUILayout.Foldout(_foldout, _groupPath.Split('/').Last(), true, new GUIStyle(EditorStyles.foldout){
-                            fontStyle = FontStyle.Bold,
-                        });
-                        if(_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                        bool fancy = _eLayout.HasFlag(ELayout.TitleOut) && _eLayout.HasFlag(ELayout.Background);
+                        if (fancy) // title clickable foldout
                         {
-                            Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
-                            EditorGUI.DrawRect(lineSep, EColor.EditorSeparator.GetColor());
+                            if (GUILayout.Button(_groupPath.Split('/').Last(), GetFancyBoxButtonStyle()))
+                            {
+                                _foldout = !_foldout;
+                            }
+                            // titleRect.height = EditorGUIUtility.singleLineHeight;
+                        }
+                        else
+                        {
+                            _foldout = EditorGUILayout.Foldout(_foldout, _groupPath.Split('/').Last(), true,
+                                new GUIStyle(EditorStyles.foldout)
+                                {
+                                    fontStyle = FontStyle.Bold,
+                                });
+                            if (_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                            {
+                                Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
+                                EditorGUI.DrawRect(lineSep, EColor.EditorSeparator.GetColor());
+                            }
                         }
                     }
 

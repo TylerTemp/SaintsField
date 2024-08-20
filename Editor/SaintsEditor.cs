@@ -767,7 +767,6 @@ namespace SaintsField.Editor
                                 {
                                     if (endGroupBy.StartsWith("."))
                                     {
-                                        Debug.Log(keepGroupingInfo.AbsGroupBy);
                                         string closeGroup = JoinGroupBy(keepGroupingInfo.AbsGroupBy, endGroupBy);
                                         if(closeGroup.Contains('/'))
                                         {
