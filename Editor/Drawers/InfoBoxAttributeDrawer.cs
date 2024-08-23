@@ -13,6 +13,7 @@ using UnityEngine.UIElements;
 namespace SaintsField.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(InfoBoxAttribute))]
+    [CustomPropertyDrawer(typeof(BelowInfoBoxAttribute))]
     public class InfoBoxAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI
@@ -28,7 +29,7 @@ namespace SaintsField.Editor.Drawers
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if(!infoboxAttribute.Above)
+            if(infoboxAttribute.Below)
             {
                 return false;
             }
@@ -44,7 +45,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            if (!infoboxAttribute.Above)
+            if (infoboxAttribute.Below)
             {
                 return 0;
             }
@@ -78,7 +79,7 @@ namespace SaintsField.Editor.Drawers
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if(infoboxAttribute.Above)
+            if(!infoboxAttribute.Below)
             {
                 return false;
             }
@@ -94,7 +95,7 @@ namespace SaintsField.Editor.Drawers
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
 
             float boxHeight = 0f;
-            if (!infoboxAttribute.Above)
+            if (infoboxAttribute.Below)
             {
                 MetaInfo metaInfo = GetMetaInfo(property, infoboxAttribute, info, parent);
                 _error = metaInfo.Error;
@@ -227,7 +228,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            if (!infoboxAttribute.Above)
+            if (infoboxAttribute.Below)
             {
                 return null;
             }
@@ -264,7 +265,7 @@ namespace SaintsField.Editor.Drawers
             };
 
             InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
-            if(infoboxAttribute.Above)
+            if(!infoboxAttribute.Below)
             {
                 return errorBox;
             }

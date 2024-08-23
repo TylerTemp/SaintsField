@@ -1003,8 +1003,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _show: 1
   _content: 0
-  _modInt: 72
-  _defaultInt: 32
+  _modInt: 50
+  _defaultInt: 44
   canSell: 0
   canSellDisabled: 0
 --- !u!4 &246861352
@@ -10503,7 +10503,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:

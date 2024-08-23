@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -10,20 +11,26 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
-        public readonly bool Above;
+        // public readonly bool Above;
+        public readonly bool Below;
         public readonly string Content;
         public readonly EMessageType MessageType;
         public readonly bool IsCallback;
         public readonly string ShowCallback;
 
-        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool above=false, string groupBy="")
+        // above is kept for compatibility reason...
+        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool above=false, bool below=false, string groupBy="")
         {
             GroupBy = groupBy;
+            Below = below;
 
-            Above = above;
-            Content = content;
+            (string contentParsed, bool isCallbackParsed) = RuntimeUtil.ParseCallback(content, isCallback);
+
+            Content = contentParsed;
+            IsCallback = isCallbackParsed;
+
+            // Above = above;
             MessageType = messageType;
-            IsCallback = isCallback;
             ShowCallback = show;
         }
 

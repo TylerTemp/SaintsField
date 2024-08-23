@@ -7,16 +7,16 @@ namespace SaintsField.Samples.Scripts
         [field: SerializeField] private bool _show;
 
         // [Space]
-        [InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None, above: true)]
-        [InfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true, above: true)]
-        [InfoBox(nameof(DynamicMessageWithIcon), isCallback: true)]
-        [InfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
+        [InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None)]
+        [InfoBox("$" + nameof(DynamicMessage), EMessageType.Warning)]
+        [BelowInfoBox("$" + nameof(DynamicMessageWithIcon))]
+        [BelowInfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
         public bool _content;
 
         private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");
         private string DynamicMessage() => _content ? "False" : "True";
 
-        [InfoBox("does not modify label & field")]
+        [InfoBox("\\$This is not a callback by using \\ to escape $")]
         public int _modInt;
 
         public int _defaultInt;
