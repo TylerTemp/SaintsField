@@ -703,6 +703,7 @@ namespace SaintsField.Editor.Core
             };
 
             (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
+            Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);
 
             // IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
             //     .Select((each, index) => new SaintsWithIndex
