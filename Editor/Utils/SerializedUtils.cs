@@ -95,18 +95,17 @@ namespace SaintsField.Editor.Utils
                     return (default, null);
                 }
                 // ;
-                if(fieldOrProp.FieldInfo is null && fieldOrProp.PropertyInfo is null)
-                {
-                    fieldOrProp = GetFileOrProp(sourceObj, propSegName);
-                }
-                else
+                if (fieldOrProp.FieldInfo is not null || fieldOrProp.PropertyInfo is not null)
                 {
                     sourceObj = fieldOrProp.IsField
                         // ReSharper disable once PossibleNullReferenceException
                         ? fieldOrProp.FieldInfo.GetValue(sourceObj)
                         : fieldOrProp.PropertyInfo.GetValue(sourceObj);
-                    fieldOrProp = GetFileOrProp(sourceObj, propSegName);
+                    // Debug.Log($"get key {propSegName} sourceObj = {sourceObj}");
                 }
+
+                fieldOrProp = GetFileOrProp(sourceObj, propSegName);
+                // Debug.Log($"get key {propSegName} => {(fieldOrProp.IsField ? fieldOrProp.FieldInfo.Name : fieldOrProp.PropertyInfo.Name)}");
                 // targetFieldName = propSegName;
                 // Debug.Log($"[{propSegName}]={targetObj}");
             }
@@ -168,9 +167,19 @@ namespace SaintsField.Editor.Utils
         public static (T[] attributes, object parent) GetAttributesAndDirectParent<T>(SerializedProperty property) where T : class
         {
             (FieldOrProp fieldOrProp, object sourceObj) = GetFieldInfoAndDirectParent(property);
+            // Debug.Log(fieldOrProp.IsField);
+            // Debug.Log(fieldOrProp.PropertyInfo);
+            // Debug.Log(fieldOrProp.PropertyInfo.GetCustomAttributes());
+            // this does not work with interface type
+            // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute)));
+            // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes());
             T[] attributes = fieldOrProp.IsField
-                ? fieldOrProp.FieldInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray()
-                : fieldOrProp.PropertyInfo.GetCustomAttributes(typeof(T), true).Cast<T>().ToArray();
+                ? fieldOrProp.FieldInfo.GetCustomAttributes()
+                    .OfType<T>()
+                    .ToArray()
+                : fieldOrProp.PropertyInfo.GetCustomAttributes()
+                    .OfType<T>()
+                    .ToArray();
             return (attributes, sourceObj);
         }
 
@@ -184,7 +193,7 @@ namespace SaintsField.Editor.Utils
                 FieldInfo field = type.GetField(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                 if (field != null)
                 {
-                    // Debug.Log($"return field {field.Name}");
+                    // Debug.Log($"return field {field.Name} by {name}");
                     return new FieldOrProp
                     {
                         IsField = true,
@@ -193,11 +202,11 @@ namespace SaintsField.Editor.Utils
                     };
                 }
 
-                PropertyInfo property = type.GetProperty(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                PropertyInfo property = type.GetProperty(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                 if (property != null)
                 {
                     // return property.GetValue(source, null);
-                    // Debug.Log($"return prop {property.Name}");
+                    // Debug.Log($"return prop {property.Name} by {name}");
                     return new FieldOrProp
                     {
                         IsField = false,
@@ -214,6 +223,7 @@ namespace SaintsField.Editor.Utils
 
         private static (string error, object result) GetValueAtIndex(object source, int index)
         {
+            // ReSharper disable once UseNegatedPatternInIsExpression
             if (!(source is IEnumerable enumerable))
             {
                 throw new Exception($"Not a enumerable {source}");

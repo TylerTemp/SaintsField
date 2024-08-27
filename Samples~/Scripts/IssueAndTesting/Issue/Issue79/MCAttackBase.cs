@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue79
     {
         public bool noPanda;
 
-        // [LayoutGroup("ATTACK", ELayout.Title | ELayout.Background)]
+        [LayoutGroup("ATTACK", ELayout.Title | ELayout.Background)]
         [SerializeField]
         [MinMaxSlider(0, 20f)]
         private Vector2 range = new Vector2(2, 10);

@@ -148,7 +148,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
             EditorGUILayout.GetControlRect(false, marginTop);
 
             GUIStyle fullBoxStyle = (_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
-                ? EditorStyles.helpBox
+                ? new GUIStyle(EditorStyles.helpBox)
+                {
+                    padding = new RectOffset(EditorStyles.helpBox.padding.left, EditorStyles.helpBox.padding.right + 4, EditorStyles.helpBox.padding.top, EditorStyles.helpBox.padding.bottom),
+                }
                 : GUIStyle.none;
             IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
                 // ReSharper disable once RedundantCast

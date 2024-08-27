@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue79
 {
-    public class MCDamageProvider: MonoBehaviour
+    public class MCDamageProvider: SaintsMonoBehaviour
     {
 
     }
