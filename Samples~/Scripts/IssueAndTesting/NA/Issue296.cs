@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             NaughtyAttributes.ShowAssetPreview,
             NaughtyAttributes.Label(" "),
 #else
-            InfoBox("NaughtyAttributes not installed", above: true),
+            InfoBox("NaughtyAttributes not installed"),
 #endif
         ]
         // ReSharper disable once NotAccessedField.Local

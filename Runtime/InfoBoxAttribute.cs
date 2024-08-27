@@ -19,7 +19,7 @@ namespace SaintsField
         public readonly string ShowCallback;
 
         // above is kept for compatibility reason...
-        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool above=false, bool below=false, string groupBy="")
+        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool below=false, string groupBy="")
         {
             GroupBy = groupBy;
             Below = below;

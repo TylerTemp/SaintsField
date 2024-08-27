@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             NaughtyAttributes.Expandable,
             NaughtyAttributes.ReadOnly,
 #else
-            InfoBox("NaughtyAttributes not installed", above: true),
+            InfoBox("NaughtyAttributes not installed"),
 #endif
         ]
         public Scriptable naScriptable;

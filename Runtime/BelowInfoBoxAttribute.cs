@@ -7,7 +7,7 @@ namespace SaintsField
     public class BelowInfoBoxAttribute: InfoBoxAttribute
     {
         public BelowInfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, string groupBy="")
-        : base(content, messageType, show, isCallback, false, true, groupBy)
+        : base(content, messageType, show, isCallback, true, groupBy)
         {
         }
 

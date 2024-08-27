@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
 #if SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES
             NaughtyAttributes.Required,
 #else
-            InfoBox("NaughtyAttributes not installed", above: true),
+            InfoBox("NaughtyAttributes not installed"),
 #endif
         ]
         // ReSharper disable once NotAccessedField.Local

@@ -133,7 +133,7 @@ namespace SaintsField.Samples.Scripts
             public MyStruct[] myStructs;
         }
 
-        [InfoBox("This works fine, but because we use Equal to compare the struct, it will by default not equal, and does not know when it's actually the same struct", above: true)]
+        [InfoBox("This works fine, but because we use Equal to compare the struct, it will by default not equal, and does not know when it's actually the same struct")]
         [Dropdown(nameof(MyStructParentDropdown))]
         public MyStructParent nestedStruct;
 
