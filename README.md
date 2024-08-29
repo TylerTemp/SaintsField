@@ -66,10 +66,13 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.2.6**
+**3.3.0**
 
-1.  Improved `LayoutGroup` which supports `./GroupName` to add nested subgroup. [#67](https://github.com/TylerTemp/SaintsField/issues/67)
-2.  IMGUI: better visual display for `TitledBox`, `FoldoutBox` and foldout tabs. [#64](https://github.com/TylerTemp/SaintsField/issues/64)
+This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
+
+1.  **Breaking Changes**: `InfoBox` now default at top. parameter `above` has been renamed to `below`. If you use `[InfoBox(..., above: true)]`, you will need to remove the `above`, or change it to `below`
+2.  Add `BelowInfoBox` to show at below.
+3.  Fix `Attribute`-s finding error when there is an `abstruct class` in inherent, related to [#79](https://github.com/TylerTemp/SaintsField/issues/79)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -267,7 +270,7 @@ public string TakeAGuess()
 
 ![post_field_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bdd9446b-97fe-4cd2-900a-f5ed5f1ccb56)
 
-#### `InfoBox` ####
+#### `InfoBox`/`BelowInfoBox` ####
 
 Draw an info box above/below the field.
 
@@ -296,13 +299,21 @@ Draw an info box above/below the field.
 
     If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
 
-*   `bool above=false`
+*   ~~`bool above=false`~~
 
-    Draw the info box above the field instead of below
+    ~~Draw the info box above the field instead of below~~
+    
+    Renamed to `below` since version `3.3.0`
+
+*   `bool below=false`
+
+    Draw the info box below the field instead of above
 
 *   `string groupBy=""` See `GroupBy` section
 
 *   AllowMultiple: Yes
+
+`BelowInfoBox` is a shortcut for `[InfoBox(..., below: true)]`
 
 ```csharp
 using SaintsField;
