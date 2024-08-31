@@ -1,9 +1,8 @@
 using SaintsField.Playa;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class PlayaInfoBoxExample : MonoBehaviour
+    public class PlayaInfoBoxExample : SaintsMonoBehaviour
     {
         [PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
         [PlayaBelowInfoBox("$" + nameof(DynamicFromArray))]
