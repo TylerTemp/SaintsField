@@ -2,8 +2,6 @@
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Linq;
-using SaintsField.Editor.Core;
-using SaintsField.Playa;
 using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
 #endif
@@ -12,10 +10,12 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class NativePropertyRenderer: AbsRenderer
     {
-        public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(fieldWithInfo)
+        public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
         {
         }
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        private VisualElement _fieldElement;
+        // private bool _callUpdate;
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
             object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
@@ -28,22 +28,24 @@ namespace SaintsField.Editor.Playa.Renderer
             VisualElement result = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name));
             container.Add(result);
 
-            bool callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
-            container.RegisterCallback<AttachToPanelEvent>(_ =>
-                container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
-            );
+            // _callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
+            // container.RegisterCallback<AttachToPanelEvent>(_ =>
+            //     container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
+            // );
 
-            return (container, false);
+            return (_fieldElement = container, true);
         }
 
-        private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo,  VisualElement container, bool callUpdate)
+        protected override PreCheckResult OnUpdateUIToolKit()
+        // private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo,  VisualElement container, bool callUpdate)
         {
-            object userData = container.userData;
-            object value = fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target);
+            PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
+            object userData = _fieldElement.userData;
+            object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
 
             bool isEqual = Util.GetIsEqual(userData, value);
 
-            VisualElement child = container.Children().First();
+            VisualElement child = _fieldElement.Children().First();
 
             if (!isEqual)
             {
@@ -51,16 +53,13 @@ namespace SaintsField.Editor.Playa.Renderer
                 Debug.Log($"native property update {container.name} {userData} -> {value}");
 #endif
                 StyleEnum<DisplayStyle> displayStyle = child.style.display;
-                container.Clear();
-                container.userData = value;
-                container.Add(child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name)));
+                _fieldElement.Clear();
+                _fieldElement.userData = value;
+                _fieldElement.Add(child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name)));
                 child.style.display = displayStyle;
             }
 
-            if (callUpdate)
-            {
-                UIToolkitOnUpdate(fieldWithInfo, child, false);
-            }
+            return preCheckResult;
             // container.schedule.Execute(() => WatchValueChanged(fieldWithInfo, serializedObject, container, callUpdate)).Every(100);
         }
 #endif
@@ -68,14 +67,8 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
-        public override void Render()
+        protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (!preCheckResult.IsShown)
-            {
-                return;
-            }
-
             object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));

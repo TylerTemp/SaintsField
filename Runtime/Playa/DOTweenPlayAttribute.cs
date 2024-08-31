@@ -14,7 +14,7 @@ namespace SaintsField.Playa
         // ReSharper enable InconsistentNaming
 
         public const string DOTweenPlayGroupBy = "__SAINTSFIELD_DOTWEEN_PLAY__";
-        public string GroupBy { get; }
+        public string LayoutBy { get; }
         public ELayout Layout => 0;
         public bool KeepGrouping { get; }
 
@@ -26,7 +26,7 @@ namespace SaintsField.Playa
             Label = label;
             DOTweenStop = stopAction;
 
-            GroupBy = string.IsNullOrEmpty(groupBy)? DOTweenPlayGroupBy: $"{groupBy}/{DOTweenPlayGroupBy}";
+            LayoutBy = string.IsNullOrEmpty(groupBy)? DOTweenPlayGroupBy: $"{groupBy}/{DOTweenPlayGroupBy}";
             KeepGrouping = keepGrouping;
         }
 

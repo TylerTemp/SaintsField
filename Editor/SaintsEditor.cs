@@ -552,7 +552,7 @@ namespace SaintsField.Editor
                         {
                             case LayoutEndAttribute layoutEndAttribute:
                             {
-                                string endGroupBy = layoutEndAttribute.GroupBy;
+                                string endGroupBy = layoutEndAttribute.LayoutBy;
                                 if (endGroupBy == null)
                                 {
                                     keepGroupingInfo = null;
@@ -638,7 +638,7 @@ namespace SaintsField.Editor
                                 break;
                             default:
                             {
-                                string groupBy = saintsGroup.GroupBy;
+                                string groupBy = saintsGroup.LayoutBy;
                                 if (groupBy.StartsWith("."))
                                 {
                                     string preGroupBy = keepGroupingInfo?.AbsGroupBy ?? preAbsGroupBy;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -53,13 +52,26 @@ namespace SaintsField.Editor.Core
         // ReSharper disable once InconsistentNaming
         protected readonly string FieldControlName;
 
-        private struct SaintsWithIndex
+        private struct SaintsWithIndex : IEquatable<SaintsWithIndex>
         {
-            // ReSharper disable InconsistentNaming
             public ISaintsAttribute SaintsAttribute;
             // ReSharper disable once NotAccessedField.Local
             public int Index;
-            // ReSharper enable InconsistentNaming
+
+            public bool Equals(SaintsWithIndex other)
+            {
+                return Equals(SaintsAttribute, other.SaintsAttribute) && Index == other.Index;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is SaintsWithIndex other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(SaintsAttribute, Index);
+            }
         }
 
         private readonly Dictionary<SaintsWithIndex, SaintsPropertyDrawer> _cachedDrawer = new Dictionary<SaintsWithIndex, SaintsPropertyDrawer>();
@@ -80,7 +92,7 @@ namespace SaintsField.Editor.Core
 
         // private string _cachedPropPath;
 #if UNITY_2022_1_OR_NEWER
-        private static Assembly UnityEditorAssemble;
+        private static Assembly _unityEditorAssemble;
 #endif
 
         // ReSharper disable once PublicConstructorInAbstractClass
@@ -116,7 +128,7 @@ namespace SaintsField.Editor.Core
 #if UNITY_2022_1_OR_NEWER
                     if (asb.GetName().Name == "UnityEditor")
                     {
-                        UnityEditorAssemble = asb;
+                        _unityEditorAssemble = asb;
                     }
 #endif
 
@@ -346,11 +358,11 @@ namespace SaintsField.Editor.Core
             //         _usedAttributes[each] = drawer;
             //     }
             // }
-            Dictionary<SaintsWithIndex, SaintsPropertyDrawer> _usedAttributes = saintsAttributeWithIndexes
+            Dictionary<SaintsWithIndex, SaintsPropertyDrawer> usedAttributes = saintsAttributeWithIndexes
                 .ToDictionary(each => each, GetOrCreateSaintsDrawer);
 
             // float defaultHeight = base.GetPropertyHeight(property, label);
-            (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer)[] filedOrLabel = _usedAttributes
+            (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer)[] filedOrLabel = usedAttributes
                 .Where(each => each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Field || each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Label)
                 .Select(each => (IsaintsAttribute: each.Key.SaintsAttribute, each.Value))
                 .ToArray();
@@ -399,7 +411,7 @@ namespace SaintsField.Editor.Core
             // float fullWidth = 100;
             // Debug.Log($"fullWidth={fullWidth}, _filedWidthCache={_filedWidthCache}; EditorGUIUtility.currentViewWidth={EditorGUIUtility.currentViewWidth}, EditorGUI.indentLevel={EditorGUI.indentLevel}");
 
-            foreach (IGrouping<string, KeyValuePair<SaintsWithIndex, SaintsPropertyDrawer>> grouped in _usedAttributes.ToLookup(each => each.Key.SaintsAttribute.GroupBy))
+            foreach (IGrouping<string, KeyValuePair<SaintsWithIndex, SaintsPropertyDrawer>> grouped in usedAttributes.ToLookup(each => each.Key.SaintsAttribute.GroupBy))
             {
                 float eachWidth = grouped.Key == ""
                     ? fullWidth
@@ -602,9 +614,10 @@ namespace SaintsField.Editor.Core
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
-        public const string ClassAllowDisable = "saints-field-allow-disable";
+        protected const string ClassAllowDisable = "saints-field-allow-disable";
 
 #if UNITY_2021_3_OR_NEWER
+        // ReSharper disable once UnusedMember.Local
         private static VisualElement UnityFallbackUIToolkit(FieldInfo fieldInfo, SerializedProperty property)
         {
             // check if any property has drawer. If so, just use PropertyField
@@ -1684,7 +1697,7 @@ namespace SaintsField.Editor.Core
 #if UNITY_2022_1_OR_NEWER
         private static bool ImGuiRemoveDecDraw(Rect position, SerializedProperty property, GUIContent label)
         {
-            Assembly assembly = UnityEditorAssemble;
+            Assembly assembly = _unityEditorAssemble;
             if (assembly == null)
             {
                 return false;
@@ -1824,6 +1837,7 @@ namespace SaintsField.Editor.Core
             throw new NotImplementedException();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
             object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
@@ -1984,11 +1998,10 @@ namespace SaintsField.Editor.Core
             }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
-            OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
+            OnUpdateUiToolKitInternal(property, containerElement, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
         }
 
         private static void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement container,
-            object parent,
             // ReSharper disable once ParameterTypeCanBeEnumerable.Local
             IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, Action<object> onValueChangedCallback,
             FieldInfo info
@@ -2008,7 +2021,7 @@ namespace SaintsField.Editor.Core
                 saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info);
             }
 
-            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, parent, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(100);
+            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(100);
         }
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

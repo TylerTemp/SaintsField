@@ -2,13 +2,13 @@ using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class LayoutGroupExample : SaintsMonoBehaviour
+    public class LayoutStartExample : SaintsMonoBehaviour
     {
         [SepTitle("Break By End", EColor.Gray)]
         // end group
         public string beforeGroup;
 
-        [LayoutGroup("Group", ELayout.Background | ELayout.TitleOut)]
+        [LayoutStart("Group", ELayout.Background | ELayout.TitleOut)]
         public string group1;
         public string group2;  // starts from this will be automatically grouped into "Group"
         public string group3;
@@ -21,16 +21,16 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         // break group
         public string breakBefore;
 
-        [LayoutGroup("break", ELayout.Background | ELayout.TitleOut)]
+        [LayoutStart("break", ELayout.Background | ELayout.TitleOut)]
         public string breakGroup1;
         public string breakGroup2;
 
         // this group will stop the grouping of "break"
-        [LayoutGroup("breakIn", ELayout.Background | ELayout.TitleOut)]
+        [LayoutStart("breakIn", ELayout.Background | ELayout.TitleOut)]
         public string breakIn1;
         public string breakIn2;
 
-        [LayoutGroup("break")]  // this will be grouped into "break", and also end the "breakIn" group
+        [LayoutStart("break")]  // this will be grouped into "break", and also end the "breakIn" group
         public string breakGroup3;
         public string breakGroup4;
 
@@ -40,7 +40,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [SepTitle("Break By Last Group", EColor.Gray)]
         public string beforeGroupLast;
 
-        [LayoutGroup("GroupLast")]
+        [LayoutStart("GroupLast")]
         public string groupLast1;
         public string groupLast2;
         public string groupLast3;

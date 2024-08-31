@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class SerializedFieldRenderer: AbsRenderer
     {
-        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(fieldWithInfo)
+        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
         {
         }
 
@@ -33,6 +33,10 @@ namespace SaintsField.Editor.Playa.Renderer
             public string friendlyName;
             public RichTextDrawer richTextDrawer;
         }
+
+        private VisualElement _fieldElement;
+        private bool _arraySizeCondition;
+        private bool _richLabelCondition;
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
@@ -61,20 +65,22 @@ namespace SaintsField.Editor.Playa.Renderer
                                                                            || each is PlayaEnableIfAttribute
                                                                            // ReSharper disable once MergeIntoLogicalPattern
                                                                            || each is PlayaDisableIfAttribute) > 0;
-            bool arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is IPlayaArraySizeAttribute);
-            bool richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaRichLabelAttribute);
+            _arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is IPlayaArraySizeAttribute);
+            _richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaRichLabelAttribute);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
             Debug.Log(
                 $"SerField: {FieldWithInfo.SerializedProperty.displayName}({FieldWithInfo.SerializedProperty.propertyPath}); if={ifCondition}; arraySize={arraySizeCondition}, richLabel={richLabelCondition}");
 #endif
-            if (ifCondition || arraySizeCondition || richLabelCondition)
-            {
-                result.RegisterCallback<AttachToPanelEvent>(_ =>
-                    result.schedule
-                        .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition, richLabelCondition, FieldWithInfo.FieldInfo, FieldWithInfo.Target))
-                        .Every(100)
-                );
-            }
+
+            bool needUpdate = ifCondition || _arraySizeCondition || _richLabelCondition;
+            // if ()
+            // {
+            //     result.RegisterCallback<AttachToPanelEvent>(_ =>
+            //         result.schedule
+            //             .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition, richLabelCondition, FieldWithInfo.FieldInfo, FieldWithInfo.Target))
+            //             .Every(100)
+            //     );
+            // }
             //
             // result.RegisterCallback<DetachFromPanelEvent>(_ =>
             // {
@@ -86,7 +92,7 @@ namespace SaintsField.Editor.Playa.Renderer
             //     }
             // });
 
-            return (result, false);
+            return (_fieldElement = result, needUpdate);
         }
 
         private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)
@@ -386,24 +392,12 @@ namespace SaintsField.Editor.Playa.Renderer
             return listView;
         }
 
-
-
-        private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
+        protected override PreCheckResult OnUpdateUIToolKit()
+        // private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
         {
-            PreCheckResult preCheckResult = default;
-            // Debug.Log(preCheckResult.RichLabelXml);
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if (ifCondition)
-            {
-                preCheckResult = UIToolkitOnUpdate(FieldWithInfo, result, true);
-            }
+            PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
 
-            if(!ifCondition && (arraySizeCondition || richLabelCondition))
-            {
-                preCheckResult = GetPreCheckResult(FieldWithInfo);
-            }
-
-            if(arraySizeCondition)
+            if(_arraySizeCondition)
             {
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
@@ -419,11 +413,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
-            if (richLabelCondition)
+            if (_richLabelCondition)
             {
                 string xml = preCheckResult.RichLabelXml;
                 // Debug.Log(xml);
-                UserDataPayload userDataPayload = (UserDataPayload) result.userData;
+                UserDataPayload userDataPayload = (UserDataPayload) _fieldElement.userData;
                 if (xml != userDataPayload.xml)
                 {
                     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -434,10 +428,10 @@ namespace SaintsField.Editor.Playa.Renderer
                     if(userDataPayload.label == null)
                     {
                         UIToolkitUtils.WaitUntilThenDo(
-                            result,
+                            _fieldElement,
                             () =>
                             {
-                                Label label = result.Q<Label>(className: "unity-label");
+                                Label label = _fieldElement.Q<Label>(className: "unity-label");
                                 if (label == null)
                                 {
                                     return (false, null);
@@ -453,10 +447,12 @@ namespace SaintsField.Editor.Playa.Renderer
                     else
                     {
                         userDataPayload.xml = xml;
-                        UIToolkitUtils.SetLabel(userDataPayload.label, RichTextDrawer.ParseRichXml(xml, userDataPayload.friendlyName, info, parent), userDataPayload.richTextDrawer);
+                        UIToolkitUtils.SetLabel(userDataPayload.label, RichTextDrawer.ParseRichXml(xml, userDataPayload.friendlyName, GetMemberInfo(FieldWithInfo), FieldWithInfo.Target), userDataPayload.richTextDrawer);
                     }
                 }
             }
+
+            return preCheckResult;
         }
 
         // private void OnGeometryChangedEvent(GeometryChangedEvent evt)
@@ -483,23 +479,22 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private class ImGuiListInfo
         {
-            public SerializedProperty property;
-            public PreCheckResult preCheckResult;
+            public SerializedProperty Property;
+            public PreCheckResult PreCheckResult;
 
-            public bool hasSearch;
-            public bool hasPaging;
-            public PagingInfo pagingInfo;
-            public string searchText = string.Empty;
-            public int pageIndex = 0;
-            public int numberOfItemsPrePage = 0;
+            public bool HasSearch;
+            public bool HasPaging;
+            public PagingInfo PagingInfo;
+            public string SearchText = string.Empty;
+            public int PageIndex = 0;
+            public int NumberOfItemsPrePage = 0;
         }
 
         private ReorderableList _imGuiReorderableList;
         private ImGuiListInfo _imGuiListInfo;
 
-        public override void Render()
+        protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
             if (preCheckResult.ArraySize != -1 && (
                     (preCheckResult.ArraySize == 0 && FieldWithInfo.SerializedProperty.arraySize > 0)
                     || (preCheckResult.ArraySize > 0 && FieldWithInfo.SerializedProperty.arraySize == 0)
@@ -508,63 +503,55 @@ namespace SaintsField.Editor.Playa.Renderer
                 FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
             }
 
-            if (!preCheckResult.IsShown)
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+            Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
+#endif
+
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
+
+            bool hasSearch = listDrawerSettingsAttribute?.Searchable ?? false;
+            bool hasPaging = listDrawerSettingsAttribute?.NumberOfItemsPerPage > 0;
+
+            if(hasSearch || hasPaging)
             {
+                float listDrawerHeight = GetHeight();
+                Rect position = GUILayoutUtility.GetRect(0, listDrawerHeight);
+                DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position);
                 return;
             }
 
-            using(new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+            GUIContent useGUIContent = preCheckResult.HasRichLabel
+                ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length))
+                : new GUIContent(FieldWithInfo.SerializedProperty.displayName);
+
+            EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent, GUILayout.ExpandWidth(true));
+
+            if (preCheckResult.HasRichLabel)
             {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
-                Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
-#endif
-
-                ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
-
-                bool hasSearch = listDrawerSettingsAttribute?.Searchable ?? false;
-                bool hasPaging = listDrawerSettingsAttribute?.NumberOfItemsPerPage > 0;
-
-                if(hasSearch || hasPaging)
+                Rect lastRect = GUILayoutUtility.GetLastRect();
+                // GUILayout.Label("Mouse over!");
+                Rect richRect = new Rect(lastRect)
                 {
-                    float listDrawerHeight = GetHeight();
-                    Rect position = GUILayoutUtility.GetRect(0, listDrawerHeight);
-                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position);
-                    return;
+                    height = SaintsPropertyDrawer.SingleLineHeight,
+                };
+                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+                if(_richTextDrawer == null)
+                {
+                    _richTextDrawer = new RichTextDrawer();
                 }
 
-                GUIContent useGUIContent = preCheckResult.HasRichLabel
-                    ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length))
-                    : new GUIContent(FieldWithInfo.SerializedProperty.displayName);
-
-                EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent, GUILayout.ExpandWidth(true));
-
-                if (preCheckResult.HasRichLabel)
+                // Debug.Log(preCheckResult.RichLabelXml);
+                if (_curXml != preCheckResult.RichLabelXml)
                 {
-                    Rect lastRect = GUILayoutUtility.GetLastRect();
-                    // GUILayout.Label("Mouse over!");
-                    Rect richRect = new Rect(lastRect)
-                    {
-                        height = SaintsPropertyDrawer.SingleLineHeight,
-                    };
-                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-                    if(_richTextDrawer == null)
-                    {
-                        _richTextDrawer = new RichTextDrawer();
-                    }
-
-                    // Debug.Log(preCheckResult.RichLabelXml);
-                    if (_curXml != preCheckResult.RichLabelXml)
-                    {
-                        _curXmlChunks =
-                            RichTextDrawer
-                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
-                                .ToArray();
-                    }
-
-                    _curXml = preCheckResult.RichLabelXml;
-
-                    _richTextDrawer.DrawChunks(richRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
+                    _curXmlChunks =
+                        RichTextDrawer
+                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
+                            .ToArray();
                 }
+
+                _curXml = preCheckResult.RichLabelXml;
+
+                _richTextDrawer.DrawChunks(richRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
             }
         }
 
@@ -607,14 +594,14 @@ namespace SaintsField.Editor.Playa.Renderer
                 int numberOfItemsPrePage = listDrawerSettingsAttribute.NumberOfItemsPerPage;
                 _imGuiListInfo = new ImGuiListInfo
                 {
-                    property = FieldWithInfo.SerializedProperty,
-                    preCheckResult = preCheckResult,
-                    hasSearch = hasSearch,
-                    hasPaging = hasPaging,
-                    pagingInfo = GetPagingInfo(FieldWithInfo.SerializedProperty, 0, "", numberOfItemsPrePage),
-                    numberOfItemsPrePage = numberOfItemsPrePage,
-                    pageIndex = 0,
-                    searchText = "",
+                    Property = FieldWithInfo.SerializedProperty,
+                    PreCheckResult = preCheckResult,
+                    HasSearch = hasSearch,
+                    HasPaging = hasPaging,
+                    PagingInfo = GetPagingInfo(FieldWithInfo.SerializedProperty, 0, "", numberOfItemsPrePage),
+                    NumberOfItemsPrePage = numberOfItemsPrePage,
+                    PageIndex = 0,
+                    SearchText = "",
                 };
                 FieldWithInfo.SerializedProperty.isExpanded = true;
             }
@@ -624,10 +611,10 @@ namespace SaintsField.Editor.Playa.Renderer
                 return SaintsPropertyDrawer.SingleLineHeight;
             }
 
-            float height = _imGuiListInfo.pagingInfo.IndexesCurPage
+            float height = _imGuiListInfo.PagingInfo.IndexesCurPage
                                .Select(index => EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(index), true))
                                .Sum()
-                           + (_imGuiListInfo.pagingInfo.IndexesCurPage.Count == 0? EditorGUIUtility.singleLineHeight: 0)
+                           + (_imGuiListInfo.PagingInfo.IndexesCurPage.Count == 0? EditorGUIUtility.singleLineHeight: 0)
                            + SaintsPropertyDrawer.SingleLineHeight * 4;  // header with controller line, footer (plus, minus)
             return height;
         }
@@ -655,7 +642,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
                 if(_imGuiListInfo != null && listDrawerSettingsAttribute != null)
                 {
-                    _imGuiListInfo.preCheckResult = preCheckResult;
+                    _imGuiListInfo.PreCheckResult = preCheckResult;
                     DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position);
                     return;
                 }
@@ -747,13 +734,13 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            PagingInfo newPagingInfo = GetPagingInfo(property, _imGuiListInfo.pageIndex, _imGuiListInfo.searchText, _imGuiListInfo.numberOfItemsPrePage);
-            if (!newPagingInfo.IndexesCurPage.SequenceEqual(_imGuiListInfo.pagingInfo.IndexesCurPage))
+            PagingInfo newPagingInfo = GetPagingInfo(property, _imGuiListInfo.PageIndex, _imGuiListInfo.SearchText, _imGuiListInfo.NumberOfItemsPrePage);
+            if (!newPagingInfo.IndexesCurPage.SequenceEqual(_imGuiListInfo.PagingInfo.IndexesCurPage))
             {
                 _imGuiReorderableList = null;
             }
 
-            _imGuiListInfo.pagingInfo = newPagingInfo;
+            _imGuiListInfo.PagingInfo = newPagingInfo;
 
             if (_imGuiReorderableList == null)
             {
@@ -796,11 +783,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if(GUI.Button(titleRect, "", GUIStyle.none))
             {
-                _imGuiListInfo.property.isExpanded = !_imGuiListInfo.property.isExpanded;
+                _imGuiListInfo.Property.isExpanded = !_imGuiListInfo.Property.isExpanded;
                 return;
             }
 
-            PreCheckResult preCheckResult = _imGuiListInfo.preCheckResult;
+            PreCheckResult preCheckResult = _imGuiListInfo.PreCheckResult;
             if (preCheckResult.HasRichLabel)
             {
                 if(_richTextDrawer == null)
@@ -823,10 +810,10 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             else
             {
-                EditorGUI.LabelField(titleRect, _imGuiListInfo.property.displayName);
+                EditorGUI.LabelField(titleRect, _imGuiListInfo.Property.displayName);
             }
 
-            if (_imGuiListInfo.property.isExpanded)
+            if (_imGuiListInfo.Property.isExpanded)
             {
                 if (!_iconDown)
                 {
@@ -854,15 +841,15 @@ namespace SaintsField.Editor.Playa.Renderer
 
             float searchInputWidth = rect.width - inputWidth * 2 - itemsLabelWidth - buttonWidth * 2 - pagingLabelWidth;
 
-            (Rect searchRect, Rect pagingRect) = RectUtils.SplitWidthRect(controlRect, _imGuiListInfo.hasPaging? searchInputWidth: controlRect.width);
+            (Rect searchRect, Rect pagingRect) = RectUtils.SplitWidthRect(controlRect, _imGuiListInfo.HasPaging? searchInputWidth: controlRect.width);
 
-            if(_imGuiListInfo.hasSearch)
+            if(_imGuiListInfo.HasSearch)
             {
-                _imGuiListInfo.searchText = EditorGUI.TextField(new Rect(searchRect)
+                _imGuiListInfo.SearchText = EditorGUI.TextField(new Rect(searchRect)
                 {
                     width = searchRect.width - gap,
-                }, GUIContent.none, _imGuiListInfo.searchText);
-                if (string.IsNullOrEmpty(_imGuiListInfo.searchText))
+                }, GUIContent.none, _imGuiListInfo.SearchText);
+                if (string.IsNullOrEmpty(_imGuiListInfo.SearchText))
                 {
                     EditorGUI.LabelField(new Rect(searchRect)
                     {
@@ -874,21 +861,21 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
-            if(_imGuiListInfo.hasPaging)
+            if(_imGuiListInfo.HasPaging)
             {
                 Rect numberOfItemsPerPageRect = new Rect(pagingRect)
                 {
                     width = inputWidth,
                 };
-                _imGuiListInfo.numberOfItemsPrePage = EditorGUI.IntField(numberOfItemsPerPageRect, GUIContent.none,
-                    _imGuiListInfo.numberOfItemsPrePage);
+                _imGuiListInfo.NumberOfItemsPrePage = EditorGUI.IntField(numberOfItemsPerPageRect, GUIContent.none,
+                    _imGuiListInfo.NumberOfItemsPrePage);
 
                 Rect totalItemRect = new Rect(numberOfItemsPerPageRect)
                 {
                     x = numberOfItemsPerPageRect.x + numberOfItemsPerPageRect.width,
                     width = itemsLabelWidth,
                 };
-                EditorGUI.LabelField(totalItemRect, $"/ {_imGuiListInfo.pagingInfo.IndexesAfterSearch.Count} Items");
+                EditorGUI.LabelField(totalItemRect, $"/ {_imGuiListInfo.PagingInfo.IndexesAfterSearch.Count} Items");
                 // EditorGUI.LabelField(totalItemRect, $"/ 8888 Items");
 
                 Rect prePageRect = new Rect(totalItemRect)
@@ -896,7 +883,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     x = totalItemRect.x + totalItemRect.width,
                     width = buttonWidth,
                 };
-                using (new EditorGUI.DisabledScope(_imGuiListInfo.pagingInfo.CurPageIndex <= 0))
+                using (new EditorGUI.DisabledScope(_imGuiListInfo.PagingInfo.CurPageIndex <= 0))
                 {
                     if (!_iconLeft)
                     {
@@ -904,9 +891,9 @@ namespace SaintsField.Editor.Playa.Renderer
                     }
                     if (GUI.Button(prePageRect, _iconLeft, EditorStyles.miniButtonLeft))
                     {
-                        if (_imGuiListInfo.pagingInfo.CurPageIndex > 0)
+                        if (_imGuiListInfo.PagingInfo.CurPageIndex > 0)
                         {
-                            _imGuiListInfo.pageIndex -= 1;
+                            _imGuiListInfo.PageIndex -= 1;
                         }
                     }
                 }
@@ -916,14 +903,14 @@ namespace SaintsField.Editor.Playa.Renderer
                     x = prePageRect.x + prePageRect.width,
                     width = inputWidth,
                 };
-                _imGuiListInfo.pageIndex =
-                    EditorGUI.IntField(pageRect, GUIContent.none, _imGuiListInfo.pageIndex + 1) - 1;
+                _imGuiListInfo.PageIndex =
+                    EditorGUI.IntField(pageRect, GUIContent.none, _imGuiListInfo.PageIndex + 1) - 1;
                 Rect totalPageRect = new Rect(pageRect)
                 {
                     x = pageRect.x + pageRect.width,
                     width = pagingLabelWidth,
                 };
-                EditorGUI.LabelField(totalPageRect, $"/ {_imGuiListInfo.pagingInfo.PageCount}");
+                EditorGUI.LabelField(totalPageRect, $"/ {_imGuiListInfo.PagingInfo.PageCount}");
                 // EditorGUI.LabelField(totalPageRect, $"/ 888");
 
                 Rect nextPageRect = new Rect(totalPageRect)
@@ -931,8 +918,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     x = totalPageRect.x + totalPageRect.width,
                     width = buttonWidth,
                 };
-                using (new EditorGUI.DisabledScope(_imGuiListInfo.pagingInfo.CurPageIndex >=
-                                                   _imGuiListInfo.pagingInfo.PageCount - 1))
+                using (new EditorGUI.DisabledScope(_imGuiListInfo.PagingInfo.CurPageIndex >=
+                                                   _imGuiListInfo.PagingInfo.PageCount - 1))
                 {
                     if (!_iconRight)
                     {
@@ -940,9 +927,9 @@ namespace SaintsField.Editor.Playa.Renderer
                     }
                     if (GUI.Button(nextPageRect, _iconRight, EditorStyles.miniButtonRight))
                     {
-                        if (_imGuiListInfo.pagingInfo.CurPageIndex < _imGuiListInfo.pagingInfo.PageCount - 1)
+                        if (_imGuiListInfo.PagingInfo.CurPageIndex < _imGuiListInfo.PagingInfo.PageCount - 1)
                         {
-                            _imGuiListInfo.pageIndex += 1;
+                            _imGuiListInfo.PageIndex += 1;
                         }
                     }
                 }
@@ -951,7 +938,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private float DrawListDrawerItemHeight(int index)
         {
-            return _imGuiListInfo.pagingInfo.IndexesCurPage.Contains(index)
+            return _imGuiListInfo.PagingInfo.IndexesCurPage.Contains(index)
                 ? EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(index), true)
                 : 0;
         }
@@ -963,7 +950,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            SerializedProperty property = _imGuiListInfo.property.GetArrayElementAtIndex(index);
+            SerializedProperty property = _imGuiListInfo.Property.GetArrayElementAtIndex(index);
 
             Rect useRect = property.propertyType == SerializedPropertyType.Generic
                 ? new Rect(rect)

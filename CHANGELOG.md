@@ -4,7 +4,8 @@ This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
 
 1.  **Breaking Changes**: `InfoBox` now default at top. parameter `above` has been renamed to `below`. If you use `[InfoBox(..., above: true)]`, you will need to remove the `above`, or change it to `below`
 2.  Add `BelowInfoBox` to show at below.
-3.  Fix `Attribute`-s finding error when there is an `abstruct class` in inherent, related to [#79](https://github.com/TylerTemp/SaintsField/issues/79) 
+3.  Fix `Attribute`-s finding error when there is an `abstruct class` in inherent, related to [#79](https://github.com/TylerTemp/SaintsField/issues/79)
+4.  Add `LayoutStart` as an alias of `LayoutGroup`. `LayoutGroup` is now deprecated (not removed).
 
 ## 3.2.6 ##
 

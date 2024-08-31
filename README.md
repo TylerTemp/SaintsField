@@ -3008,7 +3008,7 @@ A layout decorator to group fields.
 
 *   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
 *   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
-*   `bool keepGrouping=false`: See `LayoutGroup` below
+*   `bool keepGrouping=false`: See `LayoutStart` below
 *   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
 *   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
 
@@ -3056,37 +3056,37 @@ public string titledBoxItem1;
 public string titledBoxItem2;
 
 // foldout
-[LayoutGroup("Collapse", ELayout.CollapseBox)]
+[LayoutStart("Collapse", ELayout.CollapseBox)]
 public string collapseItem1;
 public string collapseItem2;
 
-[LayoutGroup("Foldout", ELayout.FoldoutBox)]
+[LayoutStart("Foldout", ELayout.FoldoutBox)]
 public string foldoutItem1;
 public string foldoutItem2;
 
 // tabs
 [Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutGroup("./Tab1")]
+[LayoutStart("./Tab1")]
 public string tab1Item1;
 public int tab1Item2;
 
-[LayoutGroup("../Tab2")]
+[LayoutStart("../Tab2")]
 public string tab2Item1;
 public int tab2Item2;
 
-[LayoutGroup("../Tab3")]
+[LayoutStart("../Tab3")]
 public string tab3Item1;
 public int tab3Item2;
 
 // nested groups
-[LayoutGroup("Nested", ELayout.Background | ELayout.TitleOut)]
+[LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
 public int nestedOne;
 
-[LayoutGroup("./Nested Group 1", ELayout.TitleOut)]
+[LayoutStart("./Nested Group 1", ELayout.TitleOut)]
 public int nestedTwo;
 public int nestedThree;
 
-[LayoutGroup("./Nested Group 2", ELayout.TitleOut)]
+[LayoutStart("./Nested Group 2", ELayout.TitleOut)]
 public int nestedFour;
 public string nestedFive;
 
@@ -3192,13 +3192,13 @@ public string allTogetherG12, allTogetherG22;
 
 [![layout](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
 
-### `LayoutGroup` / `LayoutEnd` ###
+### `LayoutStart` / `LayoutEnd` ###
 
-`LayoutGroup` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
+`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
 
-`LayoutGroup(name)` is the same as `Layout(name, keepGrouping: true)`
+`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
 
-For `LayoutGroup`:
+For `LayoutStart`:
 
 *   `string groupBy` same as `Layout`
 *   `ELayout layout=0` same as `Layout`
@@ -3214,15 +3214,15 @@ It supports `./SubGroup` to create a nested subgroup:
 ```csharp
 using SaintsField.Playa;
 
-[LayoutGroup("Root", ELayout.FoldoutBox)]
+[LayoutStart("Root", ELayout.FoldoutBox)]
 public string root1;
 public string root2;
 
-[LayoutGroup("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
+[LayoutStart("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
 public string sub1;
 public string sub2;
 
-[LayoutGroup("../Another", ELayout.FoldoutBox)]  // equals "Root/Another"
+[LayoutStart("../Another", ELayout.FoldoutBox)]  // equals "Root/Another"
 public string another1;
 public string another2;
 
@@ -3234,25 +3234,25 @@ public string root4;
 public string outOfAll;
 
 [Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutGroup("./Tab1")]
+[LayoutStart("./Tab1")]
 public string tab1Item1;
 public int tab1Item2;
 
-[LayoutGroup("../Tab2")]
+[LayoutStart("../Tab2")]
 public string tab2Item1;
 public int tab2Item2;
 ``` 
 
 ![image](https://github.com/user-attachments/assets/ebd29cbe-cd84-4f76-8834-91d1ae44fd59)
 
-example of using `LayoutGroup` with `LayoutEnd`:
+example of using `LayoutStart` with `LayoutEnd`:
 
 ```csharp
 using SaintsField.Playa;
 
 public string beforeGroup;
 
-[LayoutGroup("Group", ELayout.Background | ELayout.TitleOut)]
+[LayoutStart("Group", ELayout.Background | ELayout.TitleOut)]
 public string group1;
 public string group2;  // starts from this will be automatically grouped into "Group"
 public string group3;
@@ -3270,16 +3270,16 @@ using SaintsField.Playa;
 
 public string breakBefore;
 
-[LayoutGroup("break", ELayout.Background | ELayout.TitleOut)]
+[LayoutStart("break", ELayout.Background | ELayout.TitleOut)]
 public string breakGroup1;
 public string breakGroup2;
 
 // this group will stop the grouping of "break"
-[LayoutGroup("breakIn", ELayout.Background | ELayout.TitleOut)]
+[LayoutStart("breakIn", ELayout.Background | ELayout.TitleOut)]
 public string breakIn1;
 public string breakIn2;
 
-[LayoutGroup("break")]  // this will be grouped into "break", and also end the "breakIn" group
+[LayoutStart("break")]  // this will be grouped into "break", and also end the "breakIn" group
 public string breakGroup3;
 public string breakGroup4;
 
@@ -3296,7 +3296,7 @@ using SaintsField.Playa;
 
 public string beforeGroupLast;
 
-[LayoutGroup("GroupLast")]
+[LayoutStart("GroupLast")]
 public string groupLast1;
 public string groupLast2;
 public string groupLast3;

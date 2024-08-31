@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
         {
             // public string normalField;
 
-            [PlayaRichLabel("<color=green><icon=star.png/><label/>")]
+            [PlayaRichLabel("<color=green><icon=star.png/><label/>"), PlayaInfoBox("Info box for array")]
             public string[] myStrings;
 
             [Button]

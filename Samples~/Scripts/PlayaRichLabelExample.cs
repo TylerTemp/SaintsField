@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class PlayaRichLabelExample : SaintsMonoBehaviour
     {
-        [PlayaRichLabel("<color=lame>It's Labeled!")]
+        [PlayaRichLabel("<color=lime>It's Labeled!")]
         public List<string> myList;
 
         [PlayaRichLabel(nameof(MethodLabel), true)]

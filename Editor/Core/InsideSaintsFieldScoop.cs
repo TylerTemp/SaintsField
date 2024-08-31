@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Core
 {
     public class InsideSaintsFieldScoop: IDisposable
     {
-        public struct PropertyKey
+        public struct PropertyKey : IEquatable<PropertyKey>
         {
             public int ObjectHash;
             public string PropertyPath;
@@ -15,6 +15,21 @@ namespace SaintsField.Editor.Core
             public override string ToString()
             {
                 return $"{ObjectHash}.{PropertyPath}";
+            }
+
+            public bool Equals(PropertyKey other)
+            {
+                return ObjectHash == other.ObjectHash && PropertyPath == other.PropertyPath;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is PropertyKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(ObjectHash, PropertyPath);
             }
         }
 

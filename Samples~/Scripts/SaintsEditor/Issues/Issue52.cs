@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
     {
         public string start;
 
-        [LayoutGroup("Group", ELayout.FoldoutBox, marginTop: 10, marginBottom: 10)]
+        [LayoutStart("Group", ELayout.FoldoutBox, marginTop: 10, marginBottom: 10)]
         public string group1;
         public string group2;
         public string group3;
@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
         {
             public string start;
 
-            [LayoutGroup("Group", ELayout.FoldoutBox, marginTop: 10, marginBottom: 10)]
+            [LayoutStart("Group", ELayout.FoldoutBox, marginTop: 10, marginBottom: 10)]
             public string group1;
             public string group2;
             public string group3;

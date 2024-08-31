@@ -20,37 +20,37 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string titledBoxItem2;
 
         // foldout
-        [LayoutGroup("Collapse", ELayout.CollapseBox)]
+        [LayoutStart("Collapse", ELayout.CollapseBox)]
         public string collapseItem1;
         public string collapseItem2;
 
-        [LayoutGroup("Foldout", ELayout.FoldoutBox)]
+        [LayoutStart("Foldout", ELayout.FoldoutBox)]
         public string foldoutItem1;
         public string foldoutItem2;
 
         // tabs
         [Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-        [LayoutGroup("./Tab1")]
+        [LayoutStart("./Tab1")]
         public string tab1Item1;
         public int tab1Item2;
 
-        [LayoutGroup("../Tab2")]
+        [LayoutStart("../Tab2")]
         public string tab2Item1;
         public int tab2Item2;
 
-        [LayoutGroup("../Tab3")]
+        [LayoutStart("../Tab3")]
         public string tab3Item1;
         public int tab3Item2;
 
         // nested groups
-        [LayoutGroup("Nested", ELayout.Background | ELayout.TitleOut)]
+        [LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
         public int nestedOne;
 
-        [LayoutGroup("./Nested Group 1", ELayout.TitleOut)]
+        [LayoutStart("./Nested Group 1", ELayout.TitleOut)]
         public int nestedTwo;
         public int nestedThree;
 
-        [LayoutGroup("./Nested Group 2", ELayout.TitleOut)]
+        [LayoutStart("./Nested Group 2", ELayout.TitleOut)]
         public int nestedFour;
         public string nestedFive;
 

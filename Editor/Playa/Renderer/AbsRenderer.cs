@@ -40,6 +40,23 @@ namespace SaintsField.Editor.Playa.Renderer
             // SerializedObject = serializedObject;
         }
 
+        protected static MemberInfo GetMemberInfo(SaintsFieldWithInfo info)
+        {
+            switch (info.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                    return info.FieldInfo;
+                case SaintsRenderType.NonSerializedField:
+                    return info.FieldInfo;
+                case SaintsRenderType.Method:
+                    return info.MethodInfo;
+                case SaintsRenderType.NativeProperty:
+                    return info.PropertyInfo;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(info.RenderType), info.RenderType, null);
+            }
+        }
+
         private enum PreCheckInternalType
         {
             Show,
@@ -283,19 +300,6 @@ namespace SaintsField.Editor.Playa.Renderer
 
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(preCheckInternalInfo.ConditionInfos, null, null, preCheckInternalInfo.Target);
 
-            // List<bool> callbackTruly = new List<bool>();
-            // List<string> errors = new List<string>();
-
-            // foreach (string callback in preCheckInternalInfo.Callbacks)
-            // {
-            //     (string error, bool isTruly) = Util.GetTruly(preCheckInternalInfo.Target, callback);
-            //     if (error != "")
-            //     {
-            //         errors.Add(error);
-            //     }
-            //     callbackTruly.Add(isTruly);
-            // }
-
             if (errors.Count > 0)
             {
                 preCheckInternalInfo.errors = errors;
@@ -337,7 +341,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         switch (fieldWithInfo.RenderType)
                         {
                             case SaintsRenderType.SerializedField:
-                                // this can not be an list element because Editor component do not obtain it
+                                // this can not be a list element because Editor component do not obtain it
                                 curValue = fieldWithInfo.FieldInfo.GetValue(target);
                                 break;
                             case SaintsRenderType.NonSerializedField:
@@ -396,6 +400,8 @@ namespace SaintsField.Editor.Playa.Renderer
         public virtual VisualElement CreateVisualElement()
         {
             VisualElement root = new VisualElement();
+            root.AddToClassList(ClassSaintsFieldPlaya);
+
             (VisualElement aboveTarget, bool aboveNeedUpdate) = CreateAboveUIToolkit();
             if (aboveTarget != null)
             {
@@ -414,7 +420,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (aboveNeedUpdate || targetNeedUpdate || belowNeedUpdate)
             {
-                root.schedule.Execute(OnUpdateUIToolKit).Every(100);
+                root.RegisterCallback<AttachToPanelEvent>(_ =>
+                {
+                    OnUpdateUIToolKit();
+                    root.schedule.Execute(() => OnUpdateUIToolKit()).Every(100);
+                });
             }
 
             return _rootElement = root;
@@ -663,35 +673,20 @@ namespace SaintsField.Editor.Playa.Renderer
             helpBox.style.display = DisplayStyle.Flex;
         }
 
-        private static MemberInfo GetMemberInfo(SaintsFieldWithInfo info)
-        {
-            switch (info.RenderType)
-            {
-                case SaintsRenderType.SerializedField:
-                    return info.FieldInfo;
-                case SaintsRenderType.NonSerializedField:
-                    return info.FieldInfo;
-                case SaintsRenderType.Method:
-                    return info.MethodInfo;
-                case SaintsRenderType.NativeProperty:
-                    return info.PropertyInfo;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(info.RenderType), info.RenderType, null);
-            }
-        }
-
-        protected virtual void OnUpdateUIToolKit()
+        protected virtual PreCheckResult OnUpdateUIToolKit()
         {
             foreach (HelpBox helpBox in _rootElement.Query<HelpBox>(className: ClassInfoBox).ToList())
             {
                 UpdateInfoBox(helpBox);
             }
+
+            return UpdatePreCheckUIToolkit(FieldWithInfo, _rootElement);
         }
 
-        protected static PreCheckResult UIToolkitOnUpdate(SaintsFieldWithInfo fieldWithInfo, VisualElement result, bool checkDisable)
+        protected static PreCheckResult UpdatePreCheckUIToolkit(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo);
-            if(checkDisable && result.enabledSelf != !preCheckResult.IsDisabled)
+            if(result.enabledSelf != !preCheckResult.IsDisabled)
             {
                 result.SetEnabled(!preCheckResult.IsDisabled);
             }
@@ -710,7 +705,175 @@ namespace SaintsField.Editor.Playa.Renderer
             return preCheckResult;
         }
 #endif
-        public abstract void Render();
+        public virtual void Render()
+        {
+            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
+            if (!preCheckResult.IsShown)
+            {
+                return;
+            }
+            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+            {
+                RenderAboveIMGUI();
+                RenderTargetIMGUI(preCheckResult);
+                RenderBelowIMGUI();
+            }
+        }
+
+        private class FakeDisposable : IDisposable
+        {
+            public void Dispose()
+            {
+                // do nothing
+            }
+        }
+
+        protected virtual void RenderAboveIMGUI()
+        {
+            List<(string, List<IPlayaAttribute>)> groupWithAttributes = new List<(string, List<IPlayaAttribute>)>();
+            Dictionary<string, List<IPlayaAttribute>> groupToAttributes = new Dictionary<string, List<IPlayaAttribute>>();
+
+            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
+            {
+                string groupBy = "";
+                if (playaAttribute is IPlayaIMGUIGroupBy imguiGroupBy)
+                {
+                    groupBy = imguiGroupBy.GroupBy;
+                }
+
+                if (string.IsNullOrEmpty(groupBy))
+                {
+                    groupWithAttributes.Add(("", new List<IPlayaAttribute>(){playaAttribute}));
+                }
+                else
+                {
+                    if (!groupToAttributes.TryGetValue(groupBy, out List<IPlayaAttribute> list))
+                    {
+                        list = new List<IPlayaAttribute>();
+                        groupToAttributes.Add(groupBy, list);
+                        groupWithAttributes.Add((groupBy, list));
+                    }
+
+                    list.Add(playaAttribute);
+                }
+            }
+
+            foreach ((string, List<IPlayaAttribute>) groupWithAttribute in groupWithAttributes)
+            {
+                List<IPlayaAttribute> attributes = groupWithAttribute.Item2;
+
+                IDisposable layout = attributes.Count > 1
+                    // ReSharper disable once RedundantCast
+                    ? (IDisposable)new EditorGUILayout.HorizontalScope()
+                    : new FakeDisposable();
+                using (layout)
+                {
+                    foreach (IPlayaAttribute playaAttribute in attributes)
+                    {
+                        switch (playaAttribute)
+                        {
+                            case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
+                            {
+                                RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
+                            }
+                                break;
+
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RenderInfoBoxLayoutIMGUI(PlayaInfoBoxAttribute infoBoxAttribute)
+        {
+            string xmlContent = infoBoxAttribute.Content;
+            MessageType helpBoxType = infoBoxAttribute.MessageType.GetMessageType();
+
+            if (infoBoxAttribute.IsCallback)
+            {
+                (string error, object rawResult) = GetCallback(FieldWithInfo, infoBoxAttribute.Content);
+
+                if (error != "")
+                {
+                    EditorGUILayout.HelpBox(error, MessageType.Error);
+                    return;
+                }
+
+                if (rawResult is ValueTuple<EMessageType, string> resultTuple)
+                {
+                    helpBoxType = resultTuple.Item1.GetMessageType();
+                    xmlContent = resultTuple.Item2;
+                }
+                else
+                {
+                    xmlContent = rawResult?.ToString() ?? "";
+                }
+            }
+
+            if(!string.IsNullOrEmpty(xmlContent))
+            {
+                EditorGUILayout.HelpBox(xmlContent, helpBoxType);
+            }
+        }
+
+        protected abstract void RenderTargetIMGUI(PreCheckResult preCheckResult);
+
+        protected virtual void RenderBelowIMGUI()
+        {
+            List<(string, List<IPlayaAttribute>)> groupWithAttributes = new List<(string, List<IPlayaAttribute>)>();
+            Dictionary<string, List<IPlayaAttribute>> groupToAttributes = new Dictionary<string, List<IPlayaAttribute>>();
+
+            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
+            {
+                string groupBy = "";
+                if (playaAttribute is IPlayaIMGUIGroupBy imguiGroupBy)
+                {
+                    groupBy = imguiGroupBy.GroupBy;
+                }
+
+                if (string.IsNullOrEmpty(groupBy))
+                {
+                    groupWithAttributes.Add(("", new List<IPlayaAttribute>(){playaAttribute}));
+                }
+                else
+                {
+                    if (!groupToAttributes.TryGetValue(groupBy, out List<IPlayaAttribute> list))
+                    {
+                        list = new List<IPlayaAttribute>();
+                        groupToAttributes.Add(groupBy, list);
+                        groupWithAttributes.Add((groupBy, list));
+                    }
+
+                    list.Add(playaAttribute);
+                }
+            }
+
+            foreach ((string, List<IPlayaAttribute>) groupWithAttribute in groupWithAttributes)
+            {
+                List<IPlayaAttribute> attributes = groupWithAttribute.Item2;
+
+                IDisposable layout = attributes.Count > 1
+                    // ReSharper disable once RedundantCast
+                    ? (IDisposable)new EditorGUILayout.HorizontalScope()
+                    : new FakeDisposable();
+                using (layout)
+                {
+                    foreach (IPlayaAttribute playaAttribute in attributes)
+                    {
+                        switch (playaAttribute)
+                        {
+                            case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
+                            {
+                                RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
+                            }
+                                break;
+
+                        }
+                    }
+                }
+            }
+        }
+
         public abstract float GetHeight();
 
         public abstract void RenderPosition(Rect position);

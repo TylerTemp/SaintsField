@@ -2,7 +2,7 @@
 {
     public interface ISaintsGroup
     {
-        string GroupBy { get; }
+        string LayoutBy { get; }
         ELayout Layout { get; }
         bool KeepGrouping { get; }
 

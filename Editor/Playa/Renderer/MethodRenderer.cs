@@ -19,9 +19,8 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class MethodRenderer: AbsRenderer
     {
-        public MethodRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, bool tryFixUIToolkit=false) : base(fieldWithInfo)
+        public MethodRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
         {
-            // Debug.Assert(FieldWithInfo.MethodInfo.GetParameters().All(p => p.IsOptional), $"{FieldWithInfo.MethodInfo.Name} has non-optional parameters");
         }
 
         private static void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
@@ -159,96 +158,6 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Target, value);
-
-            // switch (value)
-            // {
-            //     case bool boolValue:
-            //         UnityEventTools.AddBoolPersistentListener(
-            //             unityEventBase,
-            //             (UnityAction<bool>)Delegate.CreateDelegate(typeof(UnityAction<bool>),
-            //                 fieldWithInfo.Target, fieldWithInfo.MethodInfo),
-            //             boolValue);
-            //         return;
-            //     case float floatValue:
-            //         UnityEventTools.AddFloatPersistentListener(
-            //             unityEventBase,
-            //             (UnityAction<float>)Delegate.CreateDelegate(typeof(UnityAction<float>),
-            //                 fieldWithInfo.Target, fieldWithInfo.MethodInfo),
-            //             floatValue);
-            //         return;
-            //     case int intValue:
-            //         UnityEventTools.AddIntPersistentListener(
-            //             unityEventBase,
-            //             (UnityAction<int>)Delegate.CreateDelegate(typeof(UnityAction<int>),
-            //                 fieldWithInfo.Target, fieldWithInfo.MethodInfo),
-            //             intValue);
-            //         return;
-            //
-            //     case string stringValue:
-            //         UnityEventTools.AddStringPersistentListener(
-            //             unityEventBase,
-            //             (UnityAction<string>)Delegate.CreateDelegate(typeof(UnityAction<string>),
-            //                 fieldWithInfo.Target, fieldWithInfo.MethodInfo),
-            //             stringValue);
-            //         return;
-            //
-            //     case UnityEngine.Object unityObjValue:
-            //         UnityEventTools.AddObjectPersistentListener(
-            //             unityEventBase,
-            //             (UnityAction<UnityEngine.Object>)Delegate.CreateDelegate(typeof(UnityAction<UnityEngine.Object>),
-            //                 fieldWithInfo.Target, fieldWithInfo.MethodInfo),
-            //             unityObjValue);
-            //         return;
-            //
-            //     default:
-            //     {
-            //         Type[] invokeRequiredTypeArr = invokeRequiredTypes.ToArray();
-            //         // when method requires 1 parameter
-            //         // if value given, will go to the logic above, which is static parameter value
-            //         // otherwise, it's a method dynamic bind
-            //
-            //         // so, all logic here must be dynamic bind
-            //         Debug.Assert(methodParams.Length == invokeRequiredTypeArr.Length);
-            //
-            //         Type genericAction;
-            //
-            //         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            //         switch (invokeRequiredTypeArr.Length)
-            //         {
-            //             case 0:
-            //                 genericAction = typeof(UnityAction);
-            //                 break;
-            //             case 1:
-            //                 genericAction = typeof(UnityAction<>);
-            //                 break;
-            //             case 2:
-            //                 genericAction = typeof(UnityAction<,>);
-            //                 break;
-            //             case 3:
-            //                 genericAction = typeof(UnityAction<,,>);
-            //                 break;
-            //             case 4:
-            //                 genericAction = typeof(UnityAction<,,,>);
-            //                 break;
-            //             default:
-            //                 throw new ArgumentOutOfRangeException(nameof(invokeRequiredTypeArr.Length), invokeRequiredTypeArr.Length, null);
-            //         }
-            //
-            //         Type genericActionIns = genericAction.MakeGenericType(invokeRequiredTypeArr);
-            //         MethodInfo addPersistentListenerMethod = unityEventBase
-            //             .GetType()
-            //             .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-            //             .First(each => each.Name == "AddPersistentListener" && each.GetParameters().Length == 1);
-            //         Delegate callback = Delegate.CreateDelegate(genericActionIns, fieldWithInfo.Target,
-            //             fieldWithInfo.MethodInfo);
-            //         addPersistentListenerMethod.Invoke(unityEventBase, new object[]
-            //         {
-            //             callback,
-            //         });
-            //     }
-            //         return;
-            // }
-            // UnityEventTools.AddPersistentListener(uiButton.onClick, action);
         }
 
         private static UnityEngine.UI.Button GetButton(string by, object target)
@@ -377,21 +286,24 @@ namespace SaintsField.Editor.Playa.Renderer
                     flexGrow = 1,
                 },
             };
-            if (FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
-                                                            each is PlayaDisableIfAttribute) > 0)
-            {
-                buttonElement.RegisterCallback<AttachToPanelEvent>(_ => buttonElement.schedule.Execute(() => UIToolkitOnUpdate(FieldWithInfo, buttonElement, true)).Every(100));
-            }
+            bool needUpdate = FieldWithInfo.PlayaAttributes.Count(each =>
+                each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
+                each is PlayaDisableIfAttribute) > 0;
+
+            // if ()
+            // {
+            //     buttonElement.RegisterCallback<AttachToPanelEvent>(_ => buttonElement.schedule.Execute(() => UpdatePreCheckUIToolkit(FieldWithInfo, buttonElement, true)).Every(100));
+            // }
 
             if (!hasParameters)
             {
-                return (buttonElement, false);
+                return (buttonElement, needUpdate);
             }
             buttonElement.style.marginTop = buttonElement.style.marginBottom = buttonElement.style.marginLeft = buttonElement.style.marginRight = 0;
             buttonElement.style.borderTopLeftRadius = buttonElement.style.borderTopRightRadius = 0;
             buttonElement.style.borderLeftWidth = buttonElement.style.borderRightWidth = buttonElement.style.borderBottomWidth = 0;
             root.Add(buttonElement);
-            return (root, false);
+            return (root, needUpdate);
         }
 #endif
 
@@ -419,7 +331,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private object[] _imGuiParameterValues;
 
-        public override void Render()
+        protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
@@ -453,47 +365,38 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (!preCheckResult.IsShown)
+            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label)
+                ? ObjectNames.NicifyVariableName(methodInfo.Name)
+                : buttonAttribute.Label;
+
+            ParameterInfo[] parameters = methodInfo.GetParameters();
+
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (_imGuiParameterValues == null)
             {
-                return;
+                _imGuiParameterValues = parameters.Select(GetParameterDefaultValue).ToArray();
             }
 
-            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+            if (parameters.Length > 0)
             {
-                string buttonText = string.IsNullOrEmpty(buttonAttribute.Label)
-                    ? ObjectNames.NicifyVariableName(methodInfo.Name)
-                    : buttonAttribute.Label;
+                GUILayout.BeginVertical(GUI.skin.box);
+            }
 
-                ParameterInfo[] parameters = methodInfo.GetParameters();
+            object[] invokeParams = parameters.Select((p, index) =>
+            {
+                return _imGuiParameterValues[index] = FieldLayout(_imGuiParameterValues[index], ObjectNames.NicifyVariableName(p.Name), p.ParameterType, false);
+            }).ToArray();
 
-                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-                if (_imGuiParameterValues == null)
-                {
-                    _imGuiParameterValues = parameters.Select(GetParameterDefaultValue).ToArray();
-                }
+            if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
+                    GUILayout.ExpandWidth(true)))
+            {
+                // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
+                methodInfo.Invoke(target, invokeParams);
+            }
 
-                if (parameters.Length > 0)
-                {
-                    GUILayout.BeginVertical(GUI.skin.box);
-                }
-
-                object[] invokeParams = parameters.Select((p, index) =>
-                {
-                    return _imGuiParameterValues[index] = FieldLayout(_imGuiParameterValues[index], ObjectNames.NicifyVariableName(p.Name), p.ParameterType, false);
-                }).ToArray();
-
-                if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
-                        GUILayout.ExpandWidth(true)))
-                {
-                    // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
-                    methodInfo.Invoke(target, invokeParams);
-                }
-
-                if (parameters.Length > 0)
-                {
-                    GUILayout.EndVertical();
-                }
+            if (parameters.Length > 0)
+            {
+                GUILayout.EndVertical();
             }
         }
 

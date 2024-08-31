@@ -1348,9 +1348,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   strings:
-  - content <color=red>ok</color> some text here we go
-  - ok
-  - greetings!
+  - content1
+  - content2
   dynamic: Dynamic <color=green>content</color>!
 --- !u!4 &1014307406
 Transform:

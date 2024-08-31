@@ -7,9 +7,10 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaInfoBoxAttribute: Attribute, IPlayaAttribute, IPlayaTextDecorationAttribute
+    public class PlayaInfoBoxAttribute: Attribute, IPlayaAttribute, IPlayaIMGUIGroupBy
     {
-        public readonly string GroupBy;
+        // public readonly string GroupBy;
+        public string GroupBy { get; }
 
         // public readonly bool Above;
         public readonly bool Below;
