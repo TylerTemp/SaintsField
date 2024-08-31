@@ -283,7 +283,7 @@ namespace SaintsField.Editor.Playa.Renderer
         #region UI Toolkit
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public override VisualElement CreateVisualElement()
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
@@ -314,7 +314,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (buttonAttribute == null)
             {
-                return null;
+                return (null, false);
             }
             // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 
@@ -385,13 +385,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (!hasParameters)
             {
-                return buttonElement;
+                return (buttonElement, false);
             }
             buttonElement.style.marginTop = buttonElement.style.marginBottom = buttonElement.style.marginLeft = buttonElement.style.marginRight = 0;
             buttonElement.style.borderTopLeftRadius = buttonElement.style.borderTopRightRadius = 0;
             buttonElement.style.borderLeftWidth = buttonElement.style.borderRightWidth = buttonElement.style.borderBottomWidth = 0;
             root.Add(buttonElement);
-            return root;
+            return (root, false);
         }
 #endif
 

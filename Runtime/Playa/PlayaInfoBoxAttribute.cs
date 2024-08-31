@@ -1,11 +1,12 @@
 using System;
 using System.Diagnostics;
 using SaintsField.Utils;
+using Debug = UnityEngine.Debug;
 
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
     public class PlayaInfoBoxAttribute: Attribute, IPlayaAttribute, IPlayaTextDecorationAttribute
     {
         public readonly string GroupBy;

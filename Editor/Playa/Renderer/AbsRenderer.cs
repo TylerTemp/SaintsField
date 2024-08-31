@@ -210,9 +210,25 @@ namespace SaintsField.Editor.Playa.Renderer
             bool hasRichLabel = richLabelAttribute != null;
 
             string richLabelXml = "";
+            // ReSharper disable once InvertIf
             if (hasRichLabel)
             {
-                richLabelXml = richLabelAttribute.IsCallback ? ParseRichLabelXml(fieldWithInfo, richLabelAttribute.RichTextXml) : richLabelAttribute.RichTextXml;
+                if (richLabelAttribute.IsCallback)
+                {
+                    (string error, object rawResult) = GetCallback(fieldWithInfo, richLabelAttribute.RichTextXml);
+                    if (error == "")
+                    {
+                        richLabelXml = rawResult == null ? "" : rawResult.ToString();
+                    }
+                    else
+                    {
+                        richLabelXml = ObjectNames.NicifyVariableName(GetMemberInfo(fieldWithInfo).Name);
+                    }
+                }
+                else
+                {
+                    richLabelXml = richLabelAttribute.RichTextXml;
+                }
             }
 
             return new PreCheckResult
@@ -291,7 +307,7 @@ namespace SaintsField.Editor.Playa.Renderer
             preCheckInternalInfo.boolResults = boolResults;
         }
 
-        private static string ParseRichLabelXml(SaintsFieldWithInfo fieldWithInfo, string richTextXml)
+        private static (string error, object rawResult) GetCallback(SaintsFieldWithInfo fieldWithInfo, string by)
         {
             object target = fieldWithInfo.Target;
 
@@ -300,44 +316,39 @@ namespace SaintsField.Editor.Playa.Renderer
             foreach (Type eachType in types)
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                    ReflectUtils.GetProp(eachType, richTextXml);
+                    ReflectUtils.GetProp(eachType, by);
                 switch (getPropType)
                 {
                     case ReflectUtils.GetPropType.Field:
                     {
-                        object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-                        return result == null ? string.Empty : result.ToString();
+                        return ("", ((FieldInfo)fieldOrMethodInfo).GetValue(target));
                     }
 
                     case ReflectUtils.GetPropType.Property:
                     {
-                        object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                        return result == null ? string.Empty : result.ToString();
+                        return ("", ((PropertyInfo)fieldOrMethodInfo).GetValue(target));
                     }
                     case ReflectUtils.GetPropType.Method:
                     {
                         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
                         object curValue;
-                        string fallbackName;
 
                         switch (fieldWithInfo.RenderType)
                         {
                             case SaintsRenderType.SerializedField:
                                 // this can not be an list element because Editor component do not obtain it
                                 curValue = fieldWithInfo.FieldInfo.GetValue(target);
-                                // Debug.Log($"ser curValue={curValue}/{fieldWithInfo.FieldInfo.Name}/type={curValue.GetType()}");
-                                fallbackName = ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
                                 break;
                             case SaintsRenderType.NonSerializedField:
                                 curValue = fieldWithInfo.FieldInfo.GetValue(target);
-                                fallbackName = ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
                                 break;
                             case SaintsRenderType.NativeProperty:
                                 curValue = fieldWithInfo.PropertyInfo.GetValue(target);
-                                fallbackName = ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name);
                                 break;
-                            case SaintsRenderType.Method:  // not work for method atm
+                            case SaintsRenderType.Method:
+                                curValue = fieldWithInfo.MethodInfo;
+                                break;
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
                         }
@@ -348,22 +359,22 @@ namespace SaintsField.Editor.Playa.Renderer
 
                         try
                         {
-                            return (string)methodInfo.Invoke(
+                            return ("", methodInfo.Invoke(
                                 target,
                                 passParams
-                            );
+                            ));
                         }
                         catch (TargetInvocationException e)
                         {
                             Debug.LogException(e);
                             Debug.Assert(e.InnerException != null);
-                            return fallbackName;
+                            return (e.InnerException.Message, null);
                         }
                         catch (Exception e)
                         {
                             // _error = e.Message;
                             Debug.LogException(e);
-                            return fallbackName;
+                            return (e.Message, null);
                         }
                     }
                     case ReflectUtils.GetPropType.NotFound:
@@ -372,25 +383,310 @@ namespace SaintsField.Editor.Playa.Renderer
                         throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
                 }
             }
-
-            switch (fieldWithInfo.RenderType)
-            {
-                case SaintsRenderType.SerializedField:
-                    return ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
-                case SaintsRenderType.NonSerializedField:
-                    return ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
-                case SaintsRenderType.NativeProperty:
-                    return ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name);
-                case SaintsRenderType.Method:  // not work for method atm
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
-            }
+            return ($"{by} not found in {GetMemberInfo(fieldWithInfo).Name}", null);
         }
 
         public abstract void OnDestroy();
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public abstract VisualElement CreateVisualElement();
+        private const string ClassSaintsFieldPlaya = "saints-field-playa";
+
+        private VisualElement _rootElement;
+
+        public virtual VisualElement CreateVisualElement()
+        {
+            VisualElement root = new VisualElement();
+            (VisualElement aboveTarget, bool aboveNeedUpdate) = CreateAboveUIToolkit();
+            if (aboveTarget != null)
+            {
+                root.Add(aboveTarget);
+            }
+            (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit();
+            if (target != null)
+            {
+                root.Add(target);
+            }
+            (VisualElement belowTarget, bool belowNeedUpdate) = CreateBelowUIToolkit();
+            if (belowTarget != null)
+            {
+                root.Add(belowTarget);
+            }
+
+            if (aboveNeedUpdate || targetNeedUpdate || belowNeedUpdate)
+            {
+                root.schedule.Execute(OnUpdateUIToolKit).Every(100);
+            }
+
+            return _rootElement = root;
+        }
+
+        protected virtual (VisualElement target, bool needUpdate) CreateAboveUIToolkit()
+        {
+            VisualElement visualElement = new VisualElement();
+            visualElement.AddToClassList($"${ClassSaintsFieldPlaya}-above");
+
+            Dictionary<string, VisualElement> groupElements = new Dictionary<string, VisualElement>();
+
+            bool needUpdate = false;
+
+            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
+            {
+                switch (playaAttribute)
+                {
+                    case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
+                    {
+                        (HelpBox helpBox, bool helpBoxNeedUpdate) = CreateInfoBox(FieldWithInfo, infoBoxAttribute);
+                        MergeIntoGroup(groupElements, infoBoxAttribute.GroupBy, visualElement, helpBox);
+                        if (helpBoxNeedUpdate)
+                        {
+                            needUpdate = true;
+                        }
+                    }
+                        break;
+                }
+            }
+
+            return (visualElement, needUpdate);
+        }
+
+        protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit();
+
+        protected virtual (VisualElement target, bool needUpdate) CreateBelowUIToolkit()
+        {
+            VisualElement visualElement = new VisualElement();
+            visualElement.AddToClassList($"${ClassSaintsFieldPlaya}-above");
+
+            Dictionary<string, VisualElement> groupElements = new Dictionary<string, VisualElement>();
+
+            bool needUpdate = false;
+
+            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
+            {
+                switch (playaAttribute)
+                {
+                    case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
+                    {
+                        (HelpBox helpBox, bool helpBoxNeedUpdate) = CreateInfoBox(FieldWithInfo, infoBoxAttribute);
+                        MergeIntoGroup(groupElements, infoBoxAttribute.GroupBy, visualElement, helpBox);
+                        if (helpBoxNeedUpdate)
+                        {
+                            needUpdate = true;
+                        }
+                    }
+                        break;
+                }
+            }
+
+            return (visualElement, needUpdate);
+        }
+
+        private static void MergeIntoGroup(Dictionary<string, VisualElement> groupElements, string groupBy, VisualElement root, VisualElement child)
+        {
+            if (string.IsNullOrEmpty(groupBy))
+            {
+                root.Add(child);
+                return;
+            }
+
+            bool exists = groupElements.TryGetValue(groupBy, out VisualElement groupElement);
+            if (!exists)
+            {
+                groupElement = new VisualElement
+                {
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                    }
+                };
+                groupElement.AddToClassList($"{ClassSaintsFieldPlaya}-group-{groupBy}");
+                groupElements.Add(groupBy, groupElement);
+                root.Add(groupElement);
+            }
+
+            groupElement.Add(child);
+        }
+
+        private class InfoBoxUserData
+        {
+            public string XmlContent;
+            public EMessageType MessageType;
+
+            public PlayaInfoBoxAttribute InfoBoxAttribute;
+            public SaintsFieldWithInfo FieldWithInfo;
+            public RichTextDrawer RichTextDrawer;
+        }
+
+        private const string ClassInfoBox = ClassSaintsFieldPlaya + "-info-box";
+
+        private static (HelpBox helpBox, bool needUpdate) CreateInfoBox(SaintsFieldWithInfo fieldWithInfo, PlayaInfoBoxAttribute infoBoxAttribute)
+        {
+            RichTextDrawer richTextDrawer = new RichTextDrawer();
+            InfoBoxUserData infoBoxUserData = new InfoBoxUserData
+            {
+                XmlContent = "",
+                MessageType = infoBoxAttribute.MessageType,
+
+                InfoBoxAttribute = infoBoxAttribute,
+                FieldWithInfo = fieldWithInfo,
+                RichTextDrawer = richTextDrawer,
+            };
+
+            HelpBox helpBox = new HelpBox
+            {
+                userData = infoBoxUserData,
+                messageType = infoBoxAttribute.MessageType.GetUIToolkitMessageType(),
+                style =
+                {
+                    display = DisplayStyle.Flex,
+                    flexGrow = 1,
+                    flexShrink = 0,
+                },
+            };
+            helpBox.AddToClassList(ClassInfoBox);
+
+            UpdateInfoBox(helpBox);
+
+            helpBox.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                richTextDrawer.Dispose();
+            });
+
+            return (helpBox, !string.IsNullOrEmpty(infoBoxAttribute.ShowCallback) || infoBoxAttribute.IsCallback);
+        }
+
+        private static void UpdateInfoBox(HelpBox helpBox)
+        {
+            InfoBoxUserData infoBoxUserData = (InfoBoxUserData)helpBox.userData;
+
+            bool showHasError = false;
+            if (!string.IsNullOrEmpty(infoBoxUserData.InfoBoxAttribute.ShowCallback))
+            {
+                string showError = UpdateInfoBoxShow(helpBox, infoBoxUserData);
+
+                showHasError = showError != "";
+            }
+
+            if (!showHasError)
+            {
+                UpdateInfoBoxContent(helpBox, infoBoxUserData);
+            }
+        }
+
+        private static string UpdateInfoBoxShow(HelpBox helpBox,
+            InfoBoxUserData infoBoxUserData)
+        {
+            (string showError, object showResult) = Util.GetOfNoParams<object>(infoBoxUserData.FieldWithInfo.Target,
+                infoBoxUserData.InfoBoxAttribute.ShowCallback, null);
+            if (showError != "")
+            {
+                infoBoxUserData.XmlContent = showError;
+                infoBoxUserData.MessageType = EMessageType.Error;
+
+                helpBox.text = showError;
+                helpBox.style.display = DisplayStyle.Flex;
+                return showError;
+            }
+
+            bool willShow = ReflectUtils.Truly(showResult);
+            helpBox.style.display = willShow ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!willShow)
+            {
+                infoBoxUserData.XmlContent = "";
+            }
+
+            return "";
+        }
+
+        private static void UpdateInfoBoxContent(HelpBox helpBox, InfoBoxUserData infoBoxUserData)
+        {
+            string xmlContent = ((InfoBoxUserData)helpBox.userData).InfoBoxAttribute.Content;
+
+            if (infoBoxUserData.InfoBoxAttribute.IsCallback)
+            {
+                (string error, object rawResult) =
+                    GetCallback(infoBoxUserData.FieldWithInfo, infoBoxUserData.InfoBoxAttribute.Content);
+
+                if (error != "")
+                {
+                    infoBoxUserData.XmlContent = error;
+                    infoBoxUserData.MessageType = EMessageType.Error;
+
+                    helpBox.text = error;
+                    helpBox.style.display = DisplayStyle.Flex;
+                    return;
+                }
+
+                if (rawResult is ValueTuple<EMessageType, string> resultTuple)
+                {
+                    infoBoxUserData.MessageType = resultTuple.Item1;
+                    HelpBoxMessageType helpBoxType = infoBoxUserData.MessageType.GetUIToolkitMessageType();
+                    if (helpBoxType != helpBox.messageType)
+                    {
+                        helpBox.messageType = helpBoxType;
+                    }
+
+                    xmlContent = resultTuple.Item2;
+                }
+                else
+                {
+                    xmlContent = rawResult?.ToString() ?? "";
+                }
+            }
+
+            if (infoBoxUserData.XmlContent == xmlContent)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(xmlContent))
+            {
+                helpBox.style.display = DisplayStyle.None;
+                infoBoxUserData.XmlContent = "";
+                return;
+            }
+
+            infoBoxUserData.XmlContent = xmlContent;
+            Label label = helpBox.Q<Label>();
+            label.text = "";
+            label.style.flexDirection = FlexDirection.Row;
+
+            MemberInfo member = GetMemberInfo(infoBoxUserData.FieldWithInfo);
+            string useLabel = ObjectNames.NicifyVariableName(member.Name);
+
+            label.Clear();
+            foreach (VisualElement richTextElement in infoBoxUserData.RichTextDrawer.DrawChunksUIToolKit(
+                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, member, infoBoxUserData.FieldWithInfo.Target))
+                     )
+            {
+                label.Add(richTextElement);
+            }
+            helpBox.style.display = DisplayStyle.Flex;
+        }
+
+        private static MemberInfo GetMemberInfo(SaintsFieldWithInfo info)
+        {
+            switch (info.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                    return info.FieldInfo;
+                case SaintsRenderType.NonSerializedField:
+                    return info.FieldInfo;
+                case SaintsRenderType.Method:
+                    return info.MethodInfo;
+                case SaintsRenderType.NativeProperty:
+                    return info.PropertyInfo;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(info.RenderType), info.RenderType, null);
+            }
+        }
+
+        protected virtual void OnUpdateUIToolKit()
+        {
+            foreach (HelpBox helpBox in _rootElement.Query<HelpBox>(className: ClassInfoBox).ToList())
+            {
+                UpdateInfoBox(helpBox);
+            }
+        }
 
         protected static PreCheckResult UIToolkitOnUpdate(SaintsFieldWithInfo fieldWithInfo, VisualElement result, bool checkDisable)
         {

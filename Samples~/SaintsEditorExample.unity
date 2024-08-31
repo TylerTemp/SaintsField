@@ -921,6 +921,20 @@ MonoBehaviour:
   tab1Item2: 0
   tab2Item1: 
   tab2Item2: 0
+  myStruct:
+    root1: 
+    root2: 
+    sub1: 
+    sub2: 
+    another1: 
+    another2: 
+    root3: 
+    root4: 
+    outOfAll: 
+    tab1Item1: 
+    tab1Item2: 0
+    tab2Item1: 
+    tab2Item2: 0
 --- !u!4 &690734320
 Transform:
   m_ObjectHideFlags: 0
@@ -971,7 +985,7 @@ Transform:
   - {fileID: 690734320}
   - {fileID: 2117085779}
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &790202822
 GameObject:
@@ -1304,6 +1318,55 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &1014307404
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1014307406}
+  - component: {fileID: 1014307405}
+  m_Layer: 0
+  m_Name: PlayaInfoBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1014307405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014307404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c31a09088ba108b4f9707dba8fef6fd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  strings:
+  - content <color=red>ok</color> some text here we go
+  - ok
+  - greetings!
+  dynamic: Dynamic <color=green>content</color>!
+--- !u!4 &1014307406
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014307404}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1056404278
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer
         }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public override VisualElement CreateVisualElement()
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
 
@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
             );
 
-            return container;
+            return (container, false);
         }
 
         private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, VisualElement container, bool callUpdate)

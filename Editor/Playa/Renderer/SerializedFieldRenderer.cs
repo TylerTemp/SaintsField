@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Playa.Renderer
             public RichTextDrawer richTextDrawer;
         }
 
-        public override VisualElement CreateVisualElement()
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
             UserDataPayload userDataPayload = new UserDataPayload
             {
@@ -54,14 +54,6 @@ namespace SaintsField.Editor.Playa.Renderer
                 : MakeListDrawerSettingsField(listDrawerSettingsAttribute);
 
             result.userData = userDataPayload;
-
-            // ReSharper disable once InvertIf
-            // if(TryFixUIToolkit && FieldWithInfo.FieldInfo?.GetCustomAttributes(typeof(ISaintsAttribute), true).Length == 0)
-            // {
-            //     // Debug.Log($"{fieldWithInfo.fieldInfo.Name} {arr.Length}");
-            //     _result = result;
-            //     _result.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
-            // }
 
             // disable/enable/show/hide
             bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute
@@ -94,7 +86,7 @@ namespace SaintsField.Editor.Playa.Renderer
             //     }
             // });
 
-            return result;
+            return (result, false);
         }
 
         private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)

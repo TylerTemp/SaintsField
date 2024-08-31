@@ -113,8 +113,8 @@ namespace SaintsField.Editor.Drawers
         {
             // ReSharper disable once InconsistentNaming
             public readonly PropertyField TargetField;
-            public string xml;
-            public string error = "";
+            public string XmlContent;
+            public string Error = "";
 
             public PayloadUIToolkit(PropertyField targetField)
             {
@@ -159,7 +159,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement richContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
             richContainer.userData = new PayloadUIToolkit(container.Q<PropertyField>(name: UIToolkitFallbackName(property)))
             {
-                xml = property.displayName,
+                XmlContent = property.displayName,
             };
         }
 
@@ -177,9 +177,9 @@ namespace SaintsField.Editor.Drawers
 
             (string error, string nowXml) = RichTextDrawer.GetLabelXml(property, richLabelAttribute.RichTextXml, richLabelAttribute.IsCallback, info, parent);
             // Debug.Log($"update {nowXml}/{error}");
-            if (error == "" && payload.xml != nowXml)
+            if (error == "" && payload.XmlContent != nowXml)
             {
-                payload.xml = nowXml;
+                payload.XmlContent = nowXml;
 
                 IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = nowXml == null
                     ? null
@@ -201,9 +201,9 @@ namespace SaintsField.Editor.Drawers
             }
 
             // ReSharper disable once InvertIf
-            if (payload.error != error)
+            if (payload.Error != error)
             {
-                payload.error = error;
+                payload.Error = error;
                 HelpBox helpBox = container.Q<HelpBox>(NameRichLabelHelpBox(property));
                 helpBox.userData = error;
                 helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
