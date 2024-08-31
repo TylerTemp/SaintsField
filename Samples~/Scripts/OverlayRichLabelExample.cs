@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts
         [OverlayRichLabel("<color=grey>/int")] public int count = int.MinValue;
         [OverlayRichLabel("<color=grey>/long")] public long longInt = long.MinValue;
         [OverlayRichLabel("<color=grey>suffix", end: true)] public string atEnd;
-        [OverlayRichLabel(nameof(TakeAGuess), isCallback: true)] public int guess;
+        [OverlayRichLabel("$" + nameof(TakeAGuess))] public int guess;
         [Space]
         [OverlayRichLabel("not ok", end: true)] public GameObject notSupported;
 

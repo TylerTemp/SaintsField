@@ -14,17 +14,17 @@ namespace SaintsField.Samples.Scripts
         [RichLabel("<color=indigo><icon=star.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
         public RichLabelExample _rainbow;
 
-        [RichLabel(nameof(LabelCallback), true)]
+        [RichLabel("$" + nameof(LabelCallback))]
         public bool _callbackToggle;
         private string LabelCallback() => _callbackToggle ? "<color=" + EColor.Green + "><icon=star.png /></color> <label/>" : "<icon=star-slash.png /> <label/>";
 
-        [RichLabel(nameof(ArrayLabels), true)]
+        [RichLabel("$" + nameof(ArrayLabels))]
         public string[] arrayLabels;
 
         private string ArrayLabels(int index) => $"<color=pink>[{(char)('A' + index)}]";
 
         [Space]
-        [RichLabel(nameof(_propertyLabel), true)]
+        [RichLabel("$" + nameof(_propertyLabel))]
         public string _propertyLabel;
 
         [Space]

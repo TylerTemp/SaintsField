@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -16,8 +17,11 @@ namespace SaintsField
         protected DecButtonAttribute(string funcName, string buttonLabel=null, bool isCallback=false, string groupBy = "")
         {
             FuncName = funcName;
-            ButtonLabel = buttonLabel;
-            IsCallback = isCallback;
+
+            (string content, bool isCallback) parsed = RuntimeUtil.ParseCallback(buttonLabel, isCallback);
+            ButtonLabel = parsed.content;
+            IsCallback = parsed.isCallback;
+
             GroupBy = groupBy;
         }
     }

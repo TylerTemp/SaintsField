@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -20,8 +21,11 @@ namespace SaintsField
             GroupBy = groupBy;
 
             Above = above;
-            RichTextXml = richTextXml;
-            IsCallback = isCallback;
+
+            (string parsedRich, bool parsedIsCallback) = RuntimeUtil.ParseCallback(richTextXml, isCallback);
+
+            RichTextXml = parsedRich;
+            IsCallback = parsedIsCallback;
         }
     }
 }

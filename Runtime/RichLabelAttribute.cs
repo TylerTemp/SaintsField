@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -18,8 +19,10 @@ namespace SaintsField
 
         public RichLabelAttribute(string richTextXml, bool isCallback=false)
         {
-            RichTextXml = richTextXml;
-            IsCallback = isCallback;
+            (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(richTextXml, isCallback);
+
+            RichTextXml = parsedContent;
+            IsCallback = parsedIsCallback;
         }
     }
 }

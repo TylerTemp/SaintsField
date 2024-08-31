@@ -1,3 +1,5 @@
+# Changelog
+
 ## 3.3.0 ##
 
 This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
@@ -6,6 +8,8 @@ This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
 2.  Add `BelowInfoBox` to show at below.
 3.  Fix `Attribute`-s finding error when there is an `abstruct class` in inherent, related to [#79](https://github.com/TylerTemp/SaintsField/issues/79)
 4.  Add `LayoutStart` as an alias of `LayoutGroup`. `LayoutGroup` is now deprecated (not removed).
+5.  Add `PlayaInfoBox` for any property/field/method, implements [#71](https://github.com/TylerTemp/SaintsField/issues/71)
+6.  IMGUI: fix incorrect display for `Separator` when `EAlign` is `End`.
 
 ## 3.2.6 ##
 

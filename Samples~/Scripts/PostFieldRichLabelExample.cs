@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
     {
         [PostFieldRichLabel("<color=grey>km/s")] public float speed;
         [PostFieldRichLabel("<icon=eye.png/>", padding: 0)] public Sprite eye;
-        [PostFieldRichLabel(nameof(TakeAGuess), isCallback: true)] public int guess;
+        [PostFieldRichLabel("$" + nameof(TakeAGuess))] public int guess;
         // [PostFieldRichLabel(nameof(Error), isCallback: true)] public GameObject errorCallback;
 
         [ReadOnly]

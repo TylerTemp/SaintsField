@@ -204,7 +204,7 @@ namespace SaintsField.Editor.Drawers
 
             ImGuiEnsureDispose(property.serializedObject.targetObject);
             RichTextDrawer.RichTextChunk[] chunks = RichTextDrawer.ParseRichXml(xml, labelText, info, parent).ToArray();
-            float width = _richTextDrawer.GetWidth(new GUIContent(label) { text = labelText }, EditorGUIUtility.singleLineHeight, chunks);
+            float textWidth = _richTextDrawer.GetWidth(new GUIContent(label) { text = labelText }, EditorGUIUtility.singleLineHeight, chunks);
 
             List<Rect> sepRects = new List<Rect>();
             Rect titleRect = curRect;
@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Drawers
             {
                 case EAlign.Start:
                 {
-                    Rect endSepSpace = RectUtils.SplitWidthRect(curRect, width + 2).leftRect;
+                    Rect endSepSpace = RectUtils.SplitWidthRect(curRect, textWidth + 2).leftRect;
                     if (endSepSpace.width > 0)
                     {
                         sepRects.Add(new Rect(endSepSpace)
@@ -226,9 +226,9 @@ namespace SaintsField.Editor.Drawers
                     break;
                 case EAlign.Center:
                 {
-                    if (width + 2 * 2 < curRect.width)
+                    if (textWidth + 2 * 2 < curRect.width)
                     {
-                        float barWidth = (curRect.width - width - 2 * 2) / 2f;
+                        float barWidth = (curRect.width - textWidth - 2 * 2) / 2f;
                         Rect leftSepSpace = new Rect(curRect)
                         {
                             y = curRect.y + EditorGUIUtility.singleLineHeight / 2 - 0.5f,
@@ -254,7 +254,7 @@ namespace SaintsField.Editor.Drawers
                     break;
                 case EAlign.End:
                 {
-                    Rect startSepSpace = RectUtils.SplitWidthRect(curRect, curRect.width - width - 2).leftRect;
+                    Rect startSepSpace = RectUtils.SplitWidthRect(curRect, curRect.width - textWidth - 2).curRect;
                     if (startSepSpace.width > 0)
                     {
                         sepRects.Add(new Rect(startSepSpace)

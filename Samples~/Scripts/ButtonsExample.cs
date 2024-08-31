@@ -9,16 +9,16 @@ namespace SaintsField.Samples.Scripts
 
         [field: SerializeField] private string _labelByField;
 
-        [AboveButton(nameof(ClickErrorButton), nameof(_labelByField), true)]
+        [AboveButton(nameof(ClickErrorButton), "$" + nameof(_labelByField))]
         [AboveButton(nameof(ClickErrorButton), "Click <color=green><icon='eye.png' /></color>!")]
-        [AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-        [AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+        [AboveButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+        [AboveButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
 
-        [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
-        [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
+        [PostFieldButton(nameof(ToggleAndError), "$" + nameof(GetButtonLabelIcon))]
+        [PostFieldButton(nameof(ToggleAndError), "$" + nameof(GetButtonLabelIcon))]
 
-        [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-        [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+        [BelowButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+        [BelowButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
         [BelowButton(nameof(ClickErrorButton), "Below <color=green><icon='eye.png' /></color>!")]
         public int _someInt;
 

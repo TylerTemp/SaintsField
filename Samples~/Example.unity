@@ -8787,8 +8787,6 @@ MonoBehaviour:
     myStrings:
     - 
     - 
-  myStructInline:
-    myStrings: []
 --- !u!4 &788337260
 Transform:
   m_ObjectHideFlags: 0
@@ -10503,7 +10501,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -14051,7 +14048,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rainbow: {fileID: 0}
   _callbackToggle: 0
-  arrayLabels: []
+  arrayLabels:
+  - 
+  - 
+  - 
   _propertyLabel: 
   colorAqua: Aqua
   colorBlack: Black

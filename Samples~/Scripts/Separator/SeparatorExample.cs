@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.Separator
         [Separator("Start")]
         [Separator("Center", EAlign.Center)]
         [Separator("End", EAlign.End)]
-        [BelowSeparator(nameof(Callback), isCallback: true)]
+        [BelowSeparator("$" + nameof(Callback))]
         public string s3;
         public string Callback() => s3;
 
