@@ -315,7 +315,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 : _renderers.Select(each => each.renderer);
         }
 
-        public float GetHeight()
+        public float GetHeightIMGUI(float width)
         {
             float titleHeight = 0f;
 
@@ -391,7 +391,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 foreach (ISaintsRenderer renderer in GetRenderer())
                 {
-                    contentHeight += renderer.GetHeight();
+                    contentHeight += renderer.GetHeightIMGUI(width);
                 }
             }
 
@@ -641,7 +641,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     Rect accRect = bodyRect;
                     foreach (ISaintsRenderer renderer in GetRenderer())
                     {
-                        float height = renderer.GetHeight();
+                        float height = renderer.GetHeightIMGUI(position.width);
                         (Rect useRect, Rect leftRect) = RectUtils.SplitHeightRect(accRect, height);
                         Rect marginRect = new Rect(useRect)
                         {

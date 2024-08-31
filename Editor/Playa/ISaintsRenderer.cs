@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Playa
 
         void Render();
 
-        float GetHeight();
+        float GetHeightIMGUI(float width);
 
         void RenderPosition(Rect position);
 

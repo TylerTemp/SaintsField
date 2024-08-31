@@ -81,25 +81,13 @@ namespace SaintsField.Editor.Playa.Renderer
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
         }
 
-        public override float GetHeight()
+        protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (!preCheckResult.IsShown)
-            {
-                return 0;
-            }
-
             return FieldHeight(FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target), ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
         }
 
-        public override void RenderPosition(Rect position)
+        protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (!preCheckResult.IsShown)
-            {
-                return;
-            }
-
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
             FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .FieldInfo.Name));

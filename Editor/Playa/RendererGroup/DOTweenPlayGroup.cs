@@ -242,7 +242,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         }
 
-        public float GetHeight()
+        public float GetHeightIMGUI(float width)
         {
             return EditorGUIUtility.singleLineHeight * (_doTweenMethods.Count + 1);
         }

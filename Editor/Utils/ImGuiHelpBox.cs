@@ -13,7 +13,8 @@ namespace SaintsField.Editor.Utils
             // return helpBoxStyle.CalcHeight(new GUIContent(content), width);
             GUIStyle helpBoxStyle = messageType == MessageType.None
                 ? GUI.skin.box
-                : GUI.skin.GetStyle("helpbox");
+                // : GUI.skin.GetStyle("helpbox");
+                : EditorStyles.helpBox;
             float basicHeight = helpBoxStyle.CalcHeight(new GUIContent(content), width);
             return messageType == MessageType.None
                 ? basicHeight

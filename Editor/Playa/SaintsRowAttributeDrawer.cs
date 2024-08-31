@@ -54,6 +54,7 @@ namespace SaintsField.Editor.Playa
 
         // private IReadOnlyList<ISaintsRenderer> _imGuiRenderers;
         private readonly Dictionary<int, IReadOnlyList<ISaintsRenderer>> _imGuiRenderers = new Dictionary<int, IReadOnlyList<ISaintsRenderer>>();
+        private float _filedWidthCache = -1;
 
         private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(SerializedProperty property)
         {
@@ -89,7 +90,10 @@ namespace SaintsField.Editor.Playa
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            // return EditorGUIUtility.singleLineHeight;
+            float fullWidth = _filedWidthCache <= 0
+                ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
+                : _filedWidthCache;
+
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
             float baseLineHeight = saintsRowAttribute.Inline ? 0 : SaintsPropertyDrawer.SingleLineHeight;
             float fieldHeight = 0f;
@@ -99,7 +103,7 @@ namespace SaintsField.Editor.Playa
                 // ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
                 {
-                    fieldHeight += saintsRenderer.GetHeight();
+                    fieldHeight += saintsRenderer.GetHeightIMGUI(fullWidth);
                 }
             }
 
@@ -110,6 +114,11 @@ namespace SaintsField.Editor.Playa
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+
+            if(position.width - 1 > Mathf.Epsilon)
+            {
+                _filedWidthCache = position.width;
+            }
             // Debug.Log(property.propertyPath);
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
             using (new EditorGUI.PropertyScope(position, label, property))
@@ -145,7 +154,7 @@ namespace SaintsField.Editor.Playa
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTSROW
                     Debug.Log($"saintsRow: {saintsRenderer}");
 #endif
-                    float height = saintsRenderer.GetHeight();
+                    float height = saintsRenderer.GetHeightIMGUI(position.width);
                     Rect rect = new Rect(leftRect)
                     {
                         y = yAcc,

@@ -486,8 +486,8 @@ namespace SaintsField.Editor.Playa.Renderer
             public bool HasPaging;
             public PagingInfo PagingInfo;
             public string SearchText = string.Empty;
-            public int PageIndex = 0;
-            public int NumberOfItemsPrePage = 0;
+            public int PageIndex;
+            public int NumberOfItemsPrePage;
         }
 
         private ReorderableList _imGuiReorderableList;
@@ -514,7 +514,8 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if(hasSearch || hasPaging)
             {
-                float listDrawerHeight = GetHeight();
+                Rect rect = EditorGUILayout.GetControlRect(true, 0f);
+                float listDrawerHeight = GetHeightIMGUI(rect.width);
                 Rect position = GUILayoutUtility.GetRect(0, listDrawerHeight);
                 DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position);
                 return;
@@ -566,14 +567,8 @@ namespace SaintsField.Editor.Playa.Renderer
             _richTextDrawer = null;
         }
 
-        public override float GetHeight()
+        protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (!preCheckResult.IsShown)
-            {
-                return 0;
-            }
-
             ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
             if(listDrawerSettingsAttribute is null)
             {
@@ -619,18 +614,11 @@ namespace SaintsField.Editor.Playa.Renderer
             return height;
         }
 
-        public override void RenderPosition(Rect position)
+        protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-
             if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
             {
                 FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
-            }
-
-            if (!preCheckResult.IsShown)
-            {
-                return;
             }
 
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))

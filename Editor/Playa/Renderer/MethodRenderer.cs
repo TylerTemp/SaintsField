@@ -402,16 +402,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private const float PaddingBox = 2f;
 
-        public override float GetHeight()
+        protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             ButtonAttribute buttonAttribute = FieldWithInfo.PlayaAttributes.OfType<ButtonAttribute>().FirstOrDefault();
             if(buttonAttribute == null)
-            {
-                return 0;
-            }
-
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (!preCheckResult.IsShown)
             {
                 return 0;
             }
@@ -423,7 +417,7 @@ namespace SaintsField.Editor.Playa.Renderer
                    + (parameters.Length > 0? PaddingBox * 2: 0);
         }
 
-        public override void RenderPosition(Rect position)
+        protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
         {
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
@@ -452,11 +446,6 @@ namespace SaintsField.Editor.Playa.Renderer
                 CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
             }
 
-            PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo);
-            if (!preCheckResult.IsShown)
-            {
-                return;
-            }
             if(buttonAttribute == null)
             {
                 return;
