@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ namespace SaintsField.Editor.Core
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(ObjectHash, PropertyPath);
+                return Util.ComnbileHashCode(ObjectHash, PropertyPath);
             }
         }
 

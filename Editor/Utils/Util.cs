@@ -933,5 +933,15 @@ namespace SaintsField.Editor.Utils
                 TargetProperty = targetProperty,
             };
         }
+
+        public static int ComnbileHashCode(object object1, object object2)
+        {
+            // HashCode.Combine does not exists in old Unity
+#if UNITY_2021_1_OR_NEWER
+            return HashCode.Combine(object1, object2);
+#else
+            return 17 * 31 + (object1?.GetHashCode() ?? 0) * 31 + (object2?.GetHashCode() ?? 0);
+#endif
+        }
     }
 }

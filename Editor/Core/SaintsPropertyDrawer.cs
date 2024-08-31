@@ -71,7 +71,8 @@ namespace SaintsField.Editor.Core
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(SaintsAttribute, Index);
+                // return HashCode.Combine(SaintsAttribute, Index);
+                return Util.ComnbileHashCode(SaintsAttribute, Index);
             }
         }
 
