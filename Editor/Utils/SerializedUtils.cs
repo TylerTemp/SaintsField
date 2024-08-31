@@ -95,7 +95,7 @@ namespace SaintsField.Editor.Utils
                     return (default, null);
                 }
                 // ;
-                if (fieldOrProp.FieldInfo is not null || fieldOrProp.PropertyInfo is not null)
+                if (!(fieldOrProp.FieldInfo is null) || !(fieldOrProp.PropertyInfo is null))
                 {
                     sourceObj = fieldOrProp.IsField
                         // ReSharper disable once PossibleNullReferenceException

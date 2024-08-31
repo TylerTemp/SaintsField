@@ -777,9 +777,12 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         switch (playaAttribute)
                         {
-                            case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
+                            case PlayaInfoBoxAttribute infoBoxAttribute:
                             {
-                                RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
+                                if(!infoBoxAttribute.Below)
+                                {
+                                    RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
+                                }
                             }
                                 break;
 
@@ -848,9 +851,12 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         switch (playaAttribute)
                         {
-                            case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
+                            case PlayaInfoBoxAttribute infoBoxAttribute:
                             {
-                                RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
+                                if(infoBoxAttribute.Below)
+                                {
+                                    RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
+                                }
                             }
                                 break;
 
@@ -882,8 +888,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     switch (playaAttribute)
                     {
-                        case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
-                            maxHeight = Mathf.Max(maxHeight, GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
+                        case PlayaInfoBoxAttribute infoBoxAttribute:
+                            if(!infoBoxAttribute.Below)
+                            {
+                                maxHeight = Mathf.Max(maxHeight, GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
+                            }
                             break;
                     }
                 }
@@ -912,8 +921,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     switch (playaAttribute)
                     {
-                        case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
-                            accHeight.Add(GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
+                        case PlayaInfoBoxAttribute infoBoxAttribute:
+                            if(infoBoxAttribute.Below)
+                            {
+                                accHeight.Add(GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
+                            }
                             break;
                     }
                 }
@@ -951,21 +963,26 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     switch (playaAttribute)
                     {
-                        case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
+                        // case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
+                        case PlayaInfoBoxAttribute infoBoxAttribute:
                         {
-                            (MessageType messageType, string content) = GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
+                            if(!infoBoxAttribute.Below)
+                            {
+                                (MessageType messageType, string content) =
+                                    GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
 
-                            float useHeight = ImGuiHelpBox.GetHeight(content, eachWidth, messageType);
-                            groupUseHeight = Mathf.Max(groupUseHeight, useHeight);
-                            Rect thisRect = new Rect(result)
-                            {
-                                width = eachWidth,
-                                x = result.x + eachWidth * index,
-                                height = useHeight,
-                            };
-                            using(new ImGuiHelpBox.RichTextHelpBoxScoop())
-                            {
-                                EditorGUI.HelpBox(thisRect, content, messageType);
+                                float useHeight = ImGuiHelpBox.GetHeight(content, eachWidth, messageType);
+                                groupUseHeight = Mathf.Max(groupUseHeight, useHeight);
+                                Rect thisRect = new Rect(result)
+                                {
+                                    width = eachWidth,
+                                    x = result.x + eachWidth * index,
+                                    height = useHeight,
+                                };
+                                using (new ImGuiHelpBox.RichTextHelpBoxScoop())
+                                {
+                                    EditorGUI.HelpBox(thisRect, content, messageType);
+                                }
                             }
 
                         }
@@ -993,21 +1010,26 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     switch (playaAttribute)
                     {
-                        case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
+                        // case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
+                        case PlayaInfoBoxAttribute infoBoxAttribute:
                         {
-                            (MessageType messageType, string content) = GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
+                            if(infoBoxAttribute.Below)
+                            {
+                                (MessageType messageType, string content) =
+                                    GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
 
-                            float useHeight = ImGuiHelpBox.GetHeight(content, eachWidth, messageType);
-                            groupUseHeight = Mathf.Max(groupUseHeight, useHeight);
-                            Rect thisRect = new Rect(result)
-                            {
-                                width = eachWidth,
-                                x = result.x + eachWidth * index,
-                                height = useHeight,
-                            };
-                            using(new ImGuiHelpBox.RichTextHelpBoxScoop())
-                            {
-                                EditorGUI.HelpBox(thisRect, content, messageType);
+                                float useHeight = ImGuiHelpBox.GetHeight(content, eachWidth, messageType);
+                                groupUseHeight = Mathf.Max(groupUseHeight, useHeight);
+                                Rect thisRect = new Rect(result)
+                                {
+                                    width = eachWidth,
+                                    x = result.x + eachWidth * index,
+                                    height = useHeight,
+                                };
+                                using (new ImGuiHelpBox.RichTextHelpBoxScoop())
+                                {
+                                    EditorGUI.HelpBox(thisRect, content, messageType);
+                                }
                             }
 
                         }
