@@ -74,7 +74,9 @@ This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
 2.  Add `BelowInfoBox` to show at below.
 3.  Fix `Attribute`-s finding error when there is an `abstruct class` in inherent, related to [#79](https://github.com/TylerTemp/SaintsField/issues/79)
 4.  Add `LayoutStart` as an alias of `LayoutGroup`. `LayoutGroup` is now deprecated (not removed).
-5.  Add `PlayaInfoBox` for any property/field/method, implements [#71](https://github.com/TylerTemp/SaintsField/issues/71)
+5.  Add `PlayaInfoBox` for any property/field/method with rich text supports, implements [#71](https://github.com/TylerTemp/SaintsField/issues/71)
+6.  IMGUI: fix incorrect display for `Separator` when `EAlign` is `End`.
+7.  `$` prefix to set parameter as a callback/property
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3443,6 +3445,73 @@ private string MethodLabel(string[] values)
 ```
 
 ![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
+
+### `PlayaInfoBox`/`PlayaBelowInfoBox` ###
+
+This is like `InfoBox`, but it can be applied to array/list/button etc.
+
+*   `string content`
+
+    The content of the info box.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
+*   `EMessageType messageType=EMessageType.Info`
+
+    Message icon. Options are
+
+    *   `None`
+    *   `Info`
+    *   `Warning`
+    *   `Error`
+
+*   `string show=null`
+
+    a callback name or property name for show or hide this info box.
+
+*   `bool isCallback=false`
+
+    if true, the `content` will be interpreted as a property/callback function.
+
+    If the value (or returned value) is a string, then the content will be changed
+
+    If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
+
+*   `bool below=false`
+
+    Draw the info box below the field instead of above
+
+*   `string groupBy=""` See `GroupBy` section
+
+*   AllowMultiple: Yes
+
+```csharp
+using SaintsField.Playa;
+
+[PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
+[PlayaBelowInfoBox("$" + nameof(DynamicFromArray))]  // callback
+public string[] strings = {};
+
+public string dynamic;
+
+private string DynamicFromArray(string[] value) => value.Length > 0? string.Join("\n", value): "null";
+
+[PlayaInfoBox("MethodWithButton")]
+[Button("Click Me!")]
+[PlayaBelowInfoBox("GroupExample", groupBy: "group")]
+[PlayaBelowInfoBox("$" + nameof(dynamic), groupBy: "group")]
+public void MethodWithButton()
+{
+}
+
+[PlayaInfoBox("Method")]
+[PlayaBelowInfoBox("$" + nameof(dynamic))]
+public void Method()
+{
+}
+```
+
+![image](https://github.com/user-attachments/assets/81d82ee4-4f8d-4ae3-bae5-dcb13d3af7c5)
 
 ### `OnButtonClick` ###
 
