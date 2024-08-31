@@ -123,9 +123,13 @@ namespace: `SaintsField`
 
     ![color_list_ui_toolkit_add](https://github.com/TylerTemp/SaintsField/assets/6391063/50ec511b-b914-4395-8b42-793a4389c8da)
 
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
 *   `bool isCallback=false`
 
-    if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
+    if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content.
+
+    This is override to be `true` when `richLabelXml` starts with `$`
 
 *   AllowMultiple: No. A field can only have one `RichLabel`
 
@@ -134,7 +138,7 @@ Special Note:
 Use it on an array/list will apply it to all the direct child element instead of the field label itself.
 You can use this to modify elements of an array/list field, in this way:
 
-1.  Ensure you make it a callback: `isCallback=true`
+1.  Ensure you make it a callback: `isCallback=true`, or the `richTextXml` starts with `$`
 2.  It'll pass the element value and index to your function
 3.  Return the desired label content from the function
 
@@ -144,12 +148,12 @@ using SaintsField;
 [RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
 public string _rainbow;
 
-[RichLabel(nameof(LabelCallback), true)]
+[RichLabel("$" + nameof(LabelCallback))]
 public bool _callbackToggle;
 private string LabelCallback() => _callbackToggle ? "<color=green><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
 
 [Space]
-[RichLabel(nameof(_propertyLabel), true)]
+[RichLabel("$" + nameof(_propertyLabel))]
 public string _propertyLabel;
 private string _rainbow;
 
@@ -197,7 +201,7 @@ using SaintsField;
 [SerializeField]
 [AboveRichLabel("┌<icon=eye.png/><label />┐")]
 [RichLabel("├<icon=eye.png/><label />┤")]
-[BelowRichLabel(nameof(BelowLabel), true)]
+[BelowRichLabel("$" + nameof(BelowLabel))]
 [BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
 [BelowRichLabel("==================================", groupBy: "example")]
 private int _intValue;
@@ -217,6 +221,9 @@ Only supports string/number type of field. Does not work with any kind of `TextA
 Parameters:
 
 *   `string richTextXml` the content of the label, or a property/callback. Supports tags like `RichLabel`
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
 *   `bool isCallback=false` if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
 *   `float padding=5f` padding between your input and the label. Not work when `end=true`
 *   `bool end=false` when false, the label will follow the end of your input. Otherwise, it will stay at the end of the field.
@@ -242,6 +249,9 @@ Like `RichLabel`, but it's rendered at the end of the field.
 Parameters:
 
 *   `string richTextXml` the content of the label, or a property/callback. Supports tags like `RichLabel`
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
 *   `bool isCallback=false` if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
 *   `float padding=5f` padding between the field and the label.
 *   `string GroupBy=""` this is only for the error message box.
@@ -252,7 +262,7 @@ using SaintsField;
 
 [PostFieldRichLabel("<color=grey>km/s")] public float speed;
 [PostFieldRichLabel("<icon=eye.png/>", padding: 0)] public GameObject eye;
-[PostFieldRichLabel(nameof(TakeAGuess), isCallback: true)] public int guess;
+[PostFieldRichLabel("$" + nameof(TakeAGuess))] public int guess;
 
 public string TakeAGuess()
 {
@@ -278,7 +288,9 @@ Draw an info box above/below the field.
 
 *   `string content`
 
-    The content of the info box
+    The content of the info box.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
 
 *   `EMessageType messageType=EMessageType.Info`
 
@@ -323,10 +335,10 @@ using SaintsField;
 [field: SerializeField] private bool _show;
 
 [Space]
-[InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None, above: true)]
-[InfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true, above: true)]
-[InfoBox(nameof(DynamicMessageWithIcon), isCallback: true)]
-[InfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
+[InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None)]
+[BelowInfoBox("$" + nameof(DynamicMessage), EMessageType.Warning)]
+[BelowInfoBox("$" + nameof(DynamicMessageWithIcon))]
+[BelowInfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
 public bool _content;
 
 private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");
@@ -339,10 +351,12 @@ private string DynamicMessage() => _content ? "False" : "True";
 
 Draw text, separator, spaces for field on above / below with rich text & dynamic text support.
 
-
 Parameters:
 
 *   `string title=null` display a title. `null` for no title, only separator.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
 *   `EColor color=EColor.Gray` color for the title and the separator
 *   `EAlign eAlign=EAlign.Start` how the title is positioned, options are:
     *   `EAlign.Start`
@@ -360,7 +374,7 @@ using SaintsField;
 [Separator("Start")]
 [Separator("Center", EAlign.Center)]
 [Separator("End", EAlign.End)]
-[BelowSeparator(nameof(Callback), isCallback: true)]
+[BelowSeparator("$" + nameof(Callback))]
 public string s3;
 public string Callback() => s3;
 
@@ -437,7 +451,9 @@ All of them have the same arguments:
 
 *   `string buttonLabel=null`
 
-    label of the button, support tags like `RichLabel`. `null` means using function name as label
+    label of the button, support tags like `RichLabel`. `null` means using function name as label.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
 
 *   `bool isCallback = false`
 
@@ -460,13 +476,13 @@ using SaintsField;
 
 [AboveButton(nameof(ClickErrorButton), nameof(_labelByField), true)]
 [AboveButton(nameof(ClickErrorButton), "Click <color=green><icon='eye.png' /></color>!")]
-[AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-[AboveButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+[AboveButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+[AboveButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy:  "OK")]
 
 [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
 
-[BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
-[BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+[BelowButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+[BelowButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
 [BelowButton(nameof(ClickErrorButton), "Below <color=green><icon='eye.png' /></color>!")]
 public int _someInt;
 
@@ -3408,7 +3424,7 @@ serialized fields.
 
 Parameters:
 
-*   `string richTextXml` the rich text xml for the label
+*   `string richTextXml` the rich text xml for the label. Note: custom rich label tag created by this project only works in UI Toolkit mode.
 *   `bool isCallback=false` if it's a callback (a method/property/field)
 
 ```csharp

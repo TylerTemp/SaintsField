@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils
@@ -29,10 +30,29 @@ namespace SaintsField.Editor.Utils
             float height = GetHeight(content, position.width, messageType);
             // Debug.Log($"will draw height {height}/{messageType}, pos height={position.height}; content={content}");
             (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, height);
-            EditorGUI.HelpBox(curRect, content, messageType);
+            using(new RichTextHelpBoxScoop())
+            {
+                EditorGUI.HelpBox(curRect, content, messageType);
+            }
+
             return leftRect;
         }
 
+        public class RichTextHelpBoxScoop : IDisposable
+        {
+            private readonly bool Origin;
+
+            public RichTextHelpBoxScoop()
+            {
+                Origin = EditorStyles.helpBox.richText;
+                EditorStyles.helpBox.richText = true;
+            }
+
+            public void Dispose()
+            {
+                EditorStyles.helpBox.richText = Origin;
+            }
+        }
         // public static void DrawAt(Rect position, string content, EMessageType messageType) => DrawAt(position, content, messageType.GetMessageType());
         //
         // public static void DrawAt(Rect position, string content, MessageType messageType)

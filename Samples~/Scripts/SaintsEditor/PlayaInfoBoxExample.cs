@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class PlayaInfoBoxExample : MonoBehaviour
     {
-        [PlayaInfoBox("Please Note: label only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
+        [PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
         [PlayaBelowInfoBox("$" + nameof(DynamicFromArray))]
         public string[] strings = {};
 

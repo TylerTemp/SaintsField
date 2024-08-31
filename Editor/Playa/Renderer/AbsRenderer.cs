@@ -556,10 +556,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
             UpdateInfoBox(helpBox);
 
-            helpBox.RegisterCallback<DetachFromPanelEvent>(evt =>
-            {
-                richTextDrawer.Dispose();
-            });
+            // helpBox.RegisterCallback<DetachFromPanelEvent>(evt =>
+            // {
+            //     richTextDrawer.Dispose();
+            // });
 
             return (helpBox, !string.IsNullOrEmpty(infoBoxAttribute.ShowCallback) || infoBoxAttribute.IsCallback);
         }
@@ -795,7 +795,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if(!string.IsNullOrEmpty(content))
             {
-                EditorGUILayout.HelpBox(content, messageType);
+                using(new ImGuiHelpBox.RichTextHelpBoxScoop())
+                {
+                    EditorGUILayout.HelpBox(content, messageType);
+                }
             }
         }
 
@@ -960,7 +963,10 @@ namespace SaintsField.Editor.Playa.Renderer
                                 x = result.x + eachWidth * index,
                                 height = useHeight,
                             };
-                            EditorGUI.HelpBox(thisRect, content, messageType);
+                            using(new ImGuiHelpBox.RichTextHelpBoxScoop())
+                            {
+                                EditorGUI.HelpBox(thisRect, content, messageType);
+                            }
 
                         }
                             break;
@@ -999,7 +1005,10 @@ namespace SaintsField.Editor.Playa.Renderer
                                 x = result.x + eachWidth * index,
                                 height = useHeight,
                             };
-                            EditorGUI.HelpBox(thisRect, content, messageType);
+                            using(new ImGuiHelpBox.RichTextHelpBoxScoop())
+                            {
+                                EditorGUI.HelpBox(thisRect, content, messageType);
+                            }
 
                         }
                             break;
@@ -1199,7 +1208,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     }
                     // }
                 }
-                // EditorGUILayout.HelpBox($"Type not supported: {valueType}", MessageType.Warning);
+
                 EditorGUILayout.LabelField(label);
                 using (new EditorGUI.IndentLevelScope())
                 {
@@ -1583,7 +1592,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         FieldPosition(thisRect, eachValue, eachLabel, eachType);
                     }
                 }
-                // EditorGUI.HelpBox(position, $"Type not supported: {valueType}", MessageType.Warning);
+
                 return null;
 
                 // return isDrawn;
