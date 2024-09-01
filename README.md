@@ -3241,8 +3241,9 @@ public string root2;
 [LayoutStart("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
 public string sub1;
 public string sub2;
-
-[LayoutStart("../Another", ELayout.FoldoutBox)]  // equals "Root/Another"
+[LayoutEnd(".")]
+    
+[LayoutStart("./Another", ELayout.FoldoutBox)]  // equals "Root/Another"
 public string another1;
 public string another2;
 
@@ -3253,12 +3254,13 @@ public string root4;
 [LayoutEnd]  // this should close any existing group
 public string outOfAll;
 
-[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
+[LayoutStart("Tabs", ELayout.Tab | ELayout.Collapse)]
 [LayoutStart("./Tab1")]
 public string tab1Item1;
 public int tab1Item2;
-
-[LayoutStart("../Tab2")]
+[LayoutEnd(".")]
+    
+[LayoutStart("./Tab2")]
 public string tab2Item1;
 public int tab2Item2;
 ``` 

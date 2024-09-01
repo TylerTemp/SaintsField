@@ -970,7 +970,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 Image foldoutImage = new Image
                 {
                     image = dropdownIcon,
-                    // tintColor = Color.gray,
+                    tintColor = Color.gray,
                 };
                 foldoutToggle.style.width = SaintsPropertyDrawer.SingleLineHeight;
                 foldoutToggle.Add(foldoutImage);

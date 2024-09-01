@@ -548,6 +548,10 @@ namespace SaintsField.Editor
                     string preAbsGroupBy = null;
                     foreach (ISaintsGroup saintsGroup in groups)
                     {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
+                        Debug.Log($"Layout processing {saintsGroup}/{saintsGroup.LayoutBy}");
+#endif
+
                         switch (saintsGroup)
                         {
                             case LayoutEndAttribute layoutEndAttribute:
