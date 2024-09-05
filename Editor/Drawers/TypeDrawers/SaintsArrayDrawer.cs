@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
             object rawValue = fieldInfo.GetValue(parent);
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-            (string error, int index, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+            (string error, int index, object value) = Util.GetValue(property, fieldInfo, parent);
             if (error != "")
             {
                 return (error, null, index);

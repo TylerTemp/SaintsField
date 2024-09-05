@@ -163,7 +163,17 @@ namespace SaintsField.Editor.Drawers
             }
 
             Debug.Assert(field != null, $"{property.name}/{parentObj}");
-            object curValue = ReflectUtils.GetValue(property.propertyPath, field, parentObj);
+            (string curError, int _, object curValue) = Util.GetValue(property, field, parentObj);
+            if (curError != "")
+            {
+                return new MetaInfo
+                {
+                    Error = curError,
+                    SelectedIndex = -1,
+                    DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+                };
+            }
+
             if (curValue is IWrapProp wrapProp)
             {
                 curValue = Util.GetWrapValue(wrapProp);

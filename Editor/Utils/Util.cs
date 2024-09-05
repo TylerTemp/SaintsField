@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Utils
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Generic:
-                    (string error, int _, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+                    (string error, int _, object value) = GetValue(property, fieldInfo, parent);
                     if (error == "" && value is IWrapProp wrapProp)
                     {
                         string propName = wrapProp.EditorPropertyName;
@@ -476,7 +476,7 @@ namespace SaintsField.Editor.Utils
                         }
                         else
                         {
-                            (string error, int arrayIndex, object curValue) = SerializedUtils.GetValue(property, fieldInfo, target);
+                            (string error, int arrayIndex, object curValue) = GetValue(property, fieldInfo, target);
                             if (error != "")
                             {
                                 return (error, defaultValue);
@@ -559,7 +559,7 @@ namespace SaintsField.Editor.Utils
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            (string error, int arrayIndex, object curValue) = SerializedUtils.GetValue(property, fieldInfo, target);
+            (string error, int arrayIndex, object curValue) = GetValue(property, fieldInfo, target);
             if (error != "")
             {
                 return (error, defaultValue);
@@ -942,6 +942,49 @@ namespace SaintsField.Editor.Utils
 #else
             return 17 * 31 + (object1?.GetHashCode() ?? 0) * 31 + (object2?.GetHashCode() ?? 0);
 #endif
+        }
+
+        public static (string error, int index, object value) GetValue(SerializedProperty property, FieldInfo fieldInfo, object parent)
+        {
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            object rawValue = fieldInfo.GetValue(parent);
+
+            if (arrayIndex == -1)
+            {
+                return ("", -1, rawValue);
+            }
+
+            (string indexError, object indexResult) = GetValueAtIndex(rawValue, arrayIndex);
+            if (indexError != "")
+            {
+                return (indexError, -1, null);
+            }
+
+            return ("", arrayIndex, indexResult);
+        }
+        
+        
+        public static (string error, object result) GetValueAtIndex(object source, int index)
+        {
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(source is IEnumerable enumerable))
+            {
+                throw new Exception($"Not a enumerable {source}");
+            }
+
+            int searchIndex = 0;
+            // Debug.Log($"start check index in {source}");
+            foreach (object result in enumerable)
+            {
+                // Debug.Log($"check index {searchIndex} in {source}");
+                if(searchIndex == index)
+                {
+                    return ("", result);
+                }
+                searchIndex++;
+            }
+
+            return ($"Not found index {index} in {source}", null);
         }
     }
 }

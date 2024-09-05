@@ -1340,7 +1340,7 @@ namespace SaintsField.Editor.Core
                     {
                         property.serializedObject.ApplyModifiedProperties();
 
-                        (string error, int _, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+                        (string error, int _, object value) = Util.GetValue(property, fieldInfo, parent);
                         if (error != "")
                         {
                             onGUIPayload.SetValue(value);
@@ -1940,7 +1940,7 @@ namespace SaintsField.Editor.Core
                             Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
                             return;
                         }
-                        (string error, int _, object curValue) = SerializedUtils.GetValue(property, fieldInfo, noCacheParent);
+                        (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
                         if (error == "")
                         {
                             onValueChangedCallback(curValue);

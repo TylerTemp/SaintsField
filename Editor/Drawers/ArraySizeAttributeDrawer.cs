@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            (string propError, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
+            (string propError, int _, object propertyValue) = Util.GetValue(property, info, parent);
             if (propError != "")
             {
                 error = propError;

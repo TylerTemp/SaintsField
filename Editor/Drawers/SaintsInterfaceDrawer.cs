@@ -188,7 +188,7 @@ namespace SaintsField.Editor.Drawers
         {
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
 
-            (string error, int arrayIndex, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+            (string error, int arrayIndex, object value) = Util.GetValue(property, fieldInfo, parent);
 
             if (error != "")
             {

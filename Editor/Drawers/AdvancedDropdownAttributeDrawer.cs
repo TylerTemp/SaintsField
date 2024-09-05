@@ -809,10 +809,26 @@ namespace SaintsField.Editor.Drawers
 
             #region Get Cur Value
 
-            object curValue = ReflectUtils.GetValue(property.propertyPath, field, parentObj);
+            (string curError, int _, object curValue)  = Util.GetValue(property, field, parentObj);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
             Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
 #endif
+            if (curError != "")
+            {
+                return new MetaInfo
+                {
+                    Error = curError,
+                    CurDisplay = "[Error]",
+                    CurValue = null,
+                    DropdownListValue = null,
+                    SelectStacks = Array.Empty<SelectStack>(),
+                };
+            }
+            if (curValue is IWrapProp wrapProp)
+            {
+                curValue = Util.GetWrapValue(wrapProp);
+            }
+
             // string curDisplay = "";
             (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
             #endregion

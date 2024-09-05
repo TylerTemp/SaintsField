@@ -290,29 +290,6 @@ namespace SaintsField.Editor.Utils
 
         }
 
-        public static object GetValue(string propertyPath, FieldInfo info, object parent)
-        {
-            int index = SerializedUtils.PropertyPathIndex(propertyPath);
-            if (index == -1)
-            {
-                return info.GetValue(parent);
-            }
-
-            object fieldValue = info.GetValue(parent);
-
-            if (fieldValue is Array array)
-            {
-                return array.GetValue(index);
-            }
-
-            if(fieldValue is IList<object> list)
-            {
-                return list[index];
-            }
-
-            return info.GetValue(parent);
-        }
-
         public static Type GetElementType(Type type)
         {
             if (type.IsArray)
