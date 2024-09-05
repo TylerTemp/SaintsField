@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -96,5 +97,8 @@ namespace SaintsField.Samples.Scripts
         [ReadOnly]
         [RichLabel("This Is a Long Drive for Someone with Nothing to Think About")]
         public int richLabelDisabled;
+
+        [RichLabel("<color=lime>Get Rich!</color>")]
+        public UnityEvent<int, GameObject> richEvent;
     }
 }
