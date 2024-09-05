@@ -934,9 +934,9 @@ namespace SaintsField.Editor.Utils
             };
         }
 
-        public static int ComnbileHashCode(object object1, object object2)
+        public static int CombineHashCode(object object1, object object2)
         {
-            // HashCode.Combine does not exists in old Unity
+            // HashCode.Combine does not exist in old Unity
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2);
 #else
@@ -962,8 +962,8 @@ namespace SaintsField.Editor.Utils
 
             return ("", arrayIndex, indexResult);
         }
-        
-        
+
+
         public static (string error, object result) GetValueAtIndex(object source, int index)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression

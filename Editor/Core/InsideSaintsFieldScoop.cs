@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Core
 
             public override int GetHashCode()
             {
-                return Util.ComnbileHashCode(ObjectHash, PropertyPath);
+                return Util.CombineHashCode(ObjectHash, PropertyPath);
             }
         }
 
