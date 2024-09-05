@@ -22,21 +22,17 @@ namespace SaintsField.Editor.Utils
                 // this is readonly, put it to last so user  can easily override it
                 "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField", // Unity UPM
             };
-
-            T result = resourceSearchFolder
-                .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{resourcePath}"))
-                // .Where(each => each != null)
-                // .DefaultIfEmpty((T)EditorGUIUtility.Load(relativePath))
-                .FirstOrDefault(each => each != null);
-            if (result == null)
+            foreach (T each in resourceSearchFolder
+                         .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{resourcePath}")))
             {
-                result = (T)EditorGUIUtility.Load(resourcePath);
+                // ReSharper disable once Unity.PerformanceCriticalCodeNullComparison
+                if(each != null)
+                {
+                    return each;
+                }
             }
 
-            // if (result == null)
-            // {
-            //     result = AssetDatabase.LoadAssetAtPath<T>(Path.Combine("Assets", iconPath).Replace("\\", "/"));
-            // }
+            T result = (T)EditorGUIUtility.Load(resourcePath);
             Debug.Assert(result != null, $"{resourcePath} not found in {string.Join(", ", resourceSearchFolder)}");
             return result;
         }
@@ -101,27 +97,6 @@ namespace SaintsField.Editor.Utils
             SerializedUtils.FieldOrProp fieldOrProp = GetWrapProp(wrapProp);
             return fieldOrProp.IsField ? fieldOrProp.FieldInfo.GetValue(wrapProp) : fieldOrProp.PropertyInfo.GetValue(wrapProp);
         }
-
-        // public static void SignFieldValue(UnityEngine.Object targetObject, object curItem, object parentObj, FieldInfo field)
-        // {
-        //     Undo.RecordObject(targetObject, "SignFieldValue");
-        //     if (field.GetValue(parentObj) is IWrapProp wrapProp)
-        //     {
-        //         SerializedUtils.FieldOrProp fieldOrProp = GetWrapProp(wrapProp);
-        //         if (fieldOrProp.IsField)
-        //         {
-        //             fieldOrProp.FieldInfo.SetValue(wrapProp, curItem);
-        //         }
-        //         else
-        //         {
-        //             fieldOrProp.PropertyInfo.SetValue(wrapProp, curItem);
-        //         }
-        //     }
-        //     else if(!field.FieldType.IsArray)
-        //     {
-        //         field.SetValue(parentObj, curItem);
-        //     }
-        // }
 
         public static void SignPropertyValue(SerializedProperty property, FieldInfo fieldInfo, object parent, object newValue)
         {
@@ -190,7 +165,7 @@ namespace SaintsField.Editor.Utils
                     property.floatValue = (float) newValue;
                     break;
                 case SerializedPropertyType.String:
-                    property.stringValue = newValue.ToString();
+                    property.stringValue = newValue?.ToString();
                     break;
                 case SerializedPropertyType.Color:
                     property.colorValue = (Color) newValue;
@@ -222,16 +197,16 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.Bounds:
                     property.boundsValue = (Bounds) newValue;
                     break;
-                // case SerializedPropertyType.Gradient:
-                //     property.gradientValue = (Gradient) curItem;
-                //     break;
+                case SerializedPropertyType.Gradient:
+                    property.gradientValue = (Gradient) newValue;
+                    break;
                 case SerializedPropertyType.Quaternion:
                     property.quaternionValue = (Quaternion) newValue;
                     break;
                 case SerializedPropertyType.ExposedReference:
                     property.exposedReferenceValue = (UnityEngine.Object) newValue;
                     break;
-                // case SerializedPropertyType.FixedBufferSize:
+                // case SerializedPropertyType.FixedBufferSize:  // this is readonly
                 //     property.fixedBufferSize = (int) curItem;
                 //     break;
                 case SerializedPropertyType.Vector2Int:
@@ -251,45 +226,12 @@ namespace SaintsField.Editor.Utils
                     property.managedReferenceValue = (UnityEngine.Object) newValue;
                     break;
 #endif
-                case SerializedPropertyType.Gradient:
+                // case SerializedPropertyType.Gradient:
                 case SerializedPropertyType.FixedBufferSize:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
             }
         }
-
-        // public static string GetLabelString(SaintsPropertyDrawer.LabelState labelState)
-        // {
-        //     // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-        //     switch (labelState)
-        //     {
-        //         case SaintsPropertyDrawer.LabelState.None:
-        //             return "";
-        //
-        //         case SaintsPropertyDrawer.LabelState.AsIs:
-        //             return null;
-        //
-        //         case SaintsPropertyDrawer.LabelState.EmptySpace:
-        //             return " ";
-        //         default:
-        //             throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
-        //     }
-        // }
-
-        // public static Label PrefixLabelUIToolKit(string label, int indentLevel)
-        // {
-        //     return new Label(label)
-        //     {
-        //         // style =
-        //         // {
-        //         //     flexShrink = 0,
-        //         //     flexGrow = 0,
-        //         //     minWidth = SaintsPropertyDrawer.LabelBaseWidth - indentLevel * 15,
-        //         //     left = SaintsPropertyDrawer.LabelLeftSpace,
-        //         //     unityTextAlign = TextAnchor.MiddleLeft,
-        //         // },
-        //     };
-        // }
 
         public static int ListIndexOfAction<T>(IEnumerable<T> lis, Func<T, bool> callback)
         {
