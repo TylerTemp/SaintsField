@@ -56,6 +56,30 @@ namespace SaintsField.Samples.Scripts
 
         public MyStruct strTyp;
 
+        [Serializable]
+        public enum ListEnum
+        {
+            Zero,
+            One,
+            Two,
+            Three,
+        }
 
+        [AdvancedDropdown(nameof(ListEnumDropdown))]
+        [RichLabel("$" + nameof(ListEnumLabel))]
+        public ListEnum[] listEnum;
+
+        private AdvancedDropdownList<ListEnum> ListEnumDropdown()
+        {
+            return new AdvancedDropdownList<ListEnum>
+            {
+                new AdvancedDropdownList<ListEnum>("Zero", ListEnum.Zero),
+                new AdvancedDropdownList<ListEnum>("One", ListEnum.One),
+                new AdvancedDropdownList<ListEnum>("Two", ListEnum.Two),
+                new AdvancedDropdownList<ListEnum>("Three", ListEnum.Three),
+            };
+        }
+
+        private string ListEnumLabel(ListEnum value, int index) => $"{value}/{listEnum[index]}";
     }
 }

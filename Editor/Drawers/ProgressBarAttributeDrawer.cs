@@ -615,7 +615,7 @@ namespace SaintsField.Editor.Drawers
             if (property.propertyType == SerializedPropertyType.Integer)
             {
                 int intValue = (int)newValue;
-                Util.SignFieldValue(property.serializedObject.targetObject, intValue, parent, info);
+                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, intValue);
                 property.intValue = intValue;
                 property.serializedObject.ApplyModifiedProperties();
                 progressBar.SetValueWithoutNotify(intValue - minValue);
@@ -623,7 +623,7 @@ namespace SaintsField.Editor.Drawers
             }
             else
             {
-                Util.SignFieldValue(property.serializedObject.targetObject, newValue, parent, info);
+                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
                 property.floatValue = newValue;
                 property.serializedObject.ApplyModifiedProperties();
                 progressBar.SetValueWithoutNotify(newValue - minValue);

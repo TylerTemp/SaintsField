@@ -198,7 +198,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                         property.stringValue = result;
                         // has issue on null, need to use reflection
                         // nah... not work... still get an empty string if it's null
-                        ReflectUtils.SetValue(property.propertyPath, info, parent, result);
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, result);
                         onGUIPayload.SetValue(result);
                         property.serializedObject.ApplyModifiedProperties();
                         // Debug.Log($"set value to {result}");
@@ -210,7 +210,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         protected override void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent)
         {
             property.stringValue = _previousValue;
-            ReflectUtils.SetValue(property.propertyPath, info, parent, _previousValue);
+            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, _previousValue);
         }
 
         protected override object GetPreviousValue() => _previousValue;
@@ -232,7 +232,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 // Debug.Log($"get new value {fieldResult}, null={fieldResult==null}, result={result}, null={result==null}");
                 property.stringValue = result;
                 property.serializedObject.ApplyModifiedProperties();
-                ReflectUtils.SetValue(property.propertyPath, info, parent, result);
+                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, result);
                 onChangeCallback(result);
             });
         }
@@ -372,7 +372,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                         // Debug.Log(newValue.GetType());
                         string newStringValue = (string)newValue;
                         objectField.SetValueWithoutNotify(GetObjFromStr(newStringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr));
-                        ReflectUtils.SetValue(property.propertyPath, info, parent, newStringValue);
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newStringValue);
                         onValueChangedCallback(newValue);
                     }, parent);
                 };
@@ -417,7 +417,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
                 // ObjectField target = container.Q<ObjectField>(NameObjectField(property));
                 string newStringValue = property.stringValue = GetNewValue(newValue, resourcePathAttribute.EStr);
                 property.serializedObject.ApplyModifiedProperties();
-                ReflectUtils.SetValue(property.propertyPath, info, parent, newStringValue);
+                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newStringValue);
                 // info.SetValue(parent, newStringValue);
                 // object fieldValue = info.GetValue(parent);
                 // if (fieldValue is Array array)

@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers
         {
             container.Q<Toggle>(NameLeftToggle(property)).RegisterValueChangedCallback(evt =>
             {
-                ReflectUtils.SetValue(property.propertyPath, info, parent, evt.newValue);
+                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, evt.newValue);
                 onValueChangedCallback.Invoke(evt.newValue);
             });
         }

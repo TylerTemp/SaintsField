@@ -262,7 +262,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
         protected virtual void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent)
         {
             property.objectReferenceValue = _previousValue;
-            ReflectUtils.SetValue(property.propertyPath, info, parent, _previousValue);
+            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, _previousValue);
         }
 
         protected virtual object GetPreviousValue() => _previousValue;

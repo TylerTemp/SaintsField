@@ -104,7 +104,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     property.intValue = evt.newValue;
                     property.serializedObject.ApplyModifiedProperties();
-                    ReflectUtils.SetValue(property.propertyPath, info, parent, evt.newValue);
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, evt.newValue);
                     onValueChangedCallback.Invoke(evt.newValue);
                 }
                 else
@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Drawers
                     string newValue = LayerMask.LayerToName(evt.newValue);
                     property.stringValue = newValue;
                     property.serializedObject.ApplyModifiedProperties();
-                    ReflectUtils.SetValue(property.propertyPath, info, parent, newValue);
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
                     onValueChangedCallback.Invoke(newValue);
                 }
             });

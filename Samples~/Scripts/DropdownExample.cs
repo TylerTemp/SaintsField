@@ -186,5 +186,32 @@ namespace SaintsField.Samples.Scripts
             //     },
             // }},
         };
+
+        [Serializable]
+        public enum ListEnum
+        {
+            Zero,
+            One,
+            Two,
+            Three,
+        }
+
+
+        [Dropdown(nameof(ListEnumDropdown))]
+        [RichLabel("$" + nameof(ListEnumLabel))]
+        public ListEnum[] listEnum;
+
+        private DropdownList<ListEnum> ListEnumDropdown()
+        {
+            return new DropdownList<ListEnum>
+            {
+                {"Zero", ListEnum.Zero},
+                {"One", ListEnum.One},
+                {"Two", ListEnum.Two},
+                {"Three", ListEnum.Three},
+            };
+        }
+
+        private string ListEnumLabel(ListEnum value, int index) => $"{value}/{listEnum[index]}";
     }
 }

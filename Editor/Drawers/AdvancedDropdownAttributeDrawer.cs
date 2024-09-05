@@ -171,8 +171,8 @@ namespace SaintsField.Editor.Drawers
         private readonly UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> GoToStackEvent =
             new UnityEvent<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>>();
 
-        private bool _isFlat;
-        private float _maxHeight;
+        private readonly bool _isFlat;
+        private readonly float _maxHeight;
 
         public SaintsAdvancedDropdownUiToolkit(AdvancedDropdownAttributeDrawer.MetaInfo metaInfo, float width, float maxHeight, Action<string, object> setValue)
         {
@@ -231,7 +231,7 @@ namespace SaintsField.Editor.Drawers
             Texture2D checkGroup = Util.LoadResource<Texture2D>("arrow-right.png");
             Texture2D check = Util.LoadResource<Texture2D>("check.png");
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
             Debug.Log($"selectStack={string.Join("->", _metaInfo.SelectStacks.Select(each => $"{each.Display}/{each.Index}"))}");
 #endif
 
@@ -336,7 +336,7 @@ namespace SaintsField.Editor.Drawers
                         itemContainer.Q<Label>("item-content").text = display;
 
                         bool curSelect = _metaInfo.SelectStacks.Count > 0 && Util.GetIsEqual(_metaInfo.CurValue, value);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                         Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValue}, value={value}, _metaInfo.CurValue == value: {_metaInfo.CurValue == value}");
 #endif
 
@@ -355,7 +355,7 @@ namespace SaintsField.Editor.Drawers
                         if (curSelect)
                         {
                             itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                             Debug.Log($"cur selected: {value}");
 #endif
                             selectImage.visible = true;
@@ -458,7 +458,7 @@ namespace SaintsField.Editor.Drawers
             {
                 // int curStackDepth = stackDepth;
                 AdvancedDropdownAttributeDrawer.SelectStack[] curStack = pageStack.Take(stackDepth+1).ToArray();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                 Debug.Log($"push {stack.Display}: {string.Join("->", curStack.Select(each => $"{each.Display}/{each.Index}"))}");
 #endif
                 toolbarBreadcrumbs.PushItem(stack.Display, () =>
@@ -483,7 +483,7 @@ namespace SaintsField.Editor.Drawers
             StyleSheet hackSliderStyle,
             Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack, Action<string, object> setValue)
         {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
             Debug.Log($"pageStack={string.Join("->", pageStack.Select(each => $"{each.Display}/{each.Index}"))}");
 #endif
@@ -703,7 +703,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     selectIndex = selectStack.Dequeue().Index;
                 }
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                 Debug.Log($"return page {dropdownList.displayName}");
 #endif
                 return (dropdownList.children, selectIndex);
@@ -711,7 +711,7 @@ namespace SaintsField.Editor.Drawers
 
             AdvancedDropdownAttributeDrawer.SelectStack first = pageStack.Dequeue();
             int index = first.Index;
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
             Debug.Log($"check page {dropdownList.displayName}[{index}]->{dropdownList.children[index].displayName}");
 #endif
 
@@ -728,7 +728,7 @@ namespace SaintsField.Editor.Drawers
             return GetPage(dropdownList.children[index], pageStack, selectStack);
         }
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
         public override void OnClose()
         {
             Debug.Log("Popup closed: " + this);
@@ -752,13 +752,27 @@ namespace SaintsField.Editor.Drawers
 
         #region Util
 
-        public struct SelectStack
+        public struct SelectStack : IEquatable<SelectStack>
         {
             // ReSharper disable InconsistentNaming
             public int Index;
             public string Display;
             // public object Value;
             // ReSharper enable InconsistentNaming
+            public bool Equals(SelectStack other)
+            {
+                return Index == other.Index && Display == other.Display;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is SelectStack other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return Util.ComnbileHashCode(Index, Display);
+            }
         }
 
         public struct MetaInfo
@@ -795,10 +809,10 @@ namespace SaintsField.Editor.Drawers
 
             #region Get Cur Value
 
-            object curValue = field.GetValue(parentObj);
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
-//             Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
-// #endif
+            object curValue = ReflectUtils.GetValue(property.propertyPath, field, parentObj);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
+            Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
+#endif
             // string curDisplay = "";
             (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
             #endregion
@@ -832,7 +846,7 @@ namespace SaintsField.Editor.Drawers
 
                 if (item.children.Count > 0)  // it's a group
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                     Debug.Log($"GetSelected group {dropdownPage.displayName}");
 #endif
                     (IReadOnlyList<SelectStack> subResult, string display) = GetSelected(curValue, curStacks.Append(new SelectStack
@@ -864,7 +878,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     return (thisLoopResult.ToArray(), item.displayName);
                 }
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_ADVANCED_DROPDOWN
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                 Debug.Log($"Not Equal: {curValue} != {item.value}");
 #endif
             }
@@ -932,14 +946,17 @@ namespace SaintsField.Editor.Drawers
         {
             AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute)saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(property, advancedDropdownAttribute, info, parent);
+            _error = metaInfo.Error;
 
             #region Dropdown
 
             Rect leftRect = EditorGUI.PrefixLabel(position, label);
 
             GUI.SetNextControlName(FieldControlName);
+            string display = GetMetaStackDisplay(metaInfo);
+            // Debug.Assert(false, "Here");
             // ReSharper disable once InvertIf
-            if (EditorGUI.DropdownButton(leftRect, new GUIContent(GetMetaStackDisplay(metaInfo)), FocusType.Keyboard))
+            if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
             {
                 float minHeight = advancedDropdownAttribute.MinHeight;
                 float itemHeight = advancedDropdownAttribute.ItemHeight > 0
@@ -974,7 +991,7 @@ namespace SaintsField.Editor.Drawers
                     new AdvancedDropdownState(),
                     curItem =>
                     {
-                        Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
                         onGUIPayload.SetValue(curItem);
@@ -1120,6 +1137,22 @@ namespace SaintsField.Editor.Drawers
             return dropdownButton;
         }
 
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
+        {
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NameHelpBox(property),
+            };
+
+            return helpBox;
+        }
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -1143,25 +1176,20 @@ namespace SaintsField.Editor.Drawers
                     maxHeight = 300;
                 }
 
-                // Debug.Log(Screen.height - root.worldBound.y - root.worldBound.height);
-                // if (maxHeight < 0)
-                // {
-                //     maxHeight = -400;
-                // }
-                // float maxHeight = 4000f;
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUiToolkit(
                     metaInfo,
                     root.worldBound.width,
                     maxHeight,
                     (newDisplay, curItem) =>
                     {
-                        Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
 
                         dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).buttonLabelElement.text = newDisplay;
                         dropdownButton.userData = curItem;
                         onValueChangedCallback(curItem);
+                        // dropdownButton.buttonLabelElement.text = newDisplay;
                     }
                 ));
 
@@ -1176,23 +1204,11 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, FieldInfo info, object parent)
-        {
-            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
-            {
-                style =
-                {
-                    display = DisplayStyle.None,
-                },
-                name = NameHelpBox(property),
-            };
-
-            return helpBox;
-        }
-        // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, object parent) => new HelpBox("Not supported for UI Toolkit", HelpBoxMessageType.Error);
+        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        //     VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        // {
+        //
+        // }
 #endif
     }
 }

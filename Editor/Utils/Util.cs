@@ -102,26 +102,26 @@ namespace SaintsField.Editor.Utils
             return fieldOrProp.IsField ? fieldOrProp.FieldInfo.GetValue(wrapProp) : fieldOrProp.PropertyInfo.GetValue(wrapProp);
         }
 
-        public static void SignFieldValue(UnityEngine.Object targetObject, object curItem, object parentObj, FieldInfo field)
-        {
-            Undo.RecordObject(targetObject, "SignFieldValue");
-            if (field.GetValue(parentObj) is IWrapProp wrapProp)
-            {
-                SerializedUtils.FieldOrProp fieldOrProp = GetWrapProp(wrapProp);
-                if (fieldOrProp.IsField)
-                {
-                    fieldOrProp.FieldInfo.SetValue(wrapProp, curItem);
-                }
-                else
-                {
-                    fieldOrProp.PropertyInfo.SetValue(wrapProp, curItem);
-                }
-            }
-            else
-            {
-                field.SetValue(parentObj, curItem);
-            }
-        }
+        // public static void SignFieldValue(UnityEngine.Object targetObject, object curItem, object parentObj, FieldInfo field)
+        // {
+        //     Undo.RecordObject(targetObject, "SignFieldValue");
+        //     if (field.GetValue(parentObj) is IWrapProp wrapProp)
+        //     {
+        //         SerializedUtils.FieldOrProp fieldOrProp = GetWrapProp(wrapProp);
+        //         if (fieldOrProp.IsField)
+        //         {
+        //             fieldOrProp.FieldInfo.SetValue(wrapProp, curItem);
+        //         }
+        //         else
+        //         {
+        //             fieldOrProp.PropertyInfo.SetValue(wrapProp, curItem);
+        //         }
+        //     }
+        //     else if(!field.FieldType.IsArray)
+        //     {
+        //         field.SetValue(parentObj, curItem);
+        //     }
+        // }
 
         public static void SignPropertyValue(SerializedProperty property, FieldInfo fieldInfo, object parent, object newValue)
         {

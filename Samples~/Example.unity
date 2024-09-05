@@ -611,6 +611,7 @@ MonoBehaviour:
       someIntegers: 070000000800000009000000
     - go: {fileID: 90550605}
       someIntegers: 0a0000000b0000000c000000
+  listEnum: 00000000010000000200000003000000
 --- !u!1 &94709949
 GameObject:
   m_ObjectHideFlags: 0
@@ -13819,7 +13820,8 @@ MonoBehaviour:
   place3: 19
   place4: 33
   strTyp:
-    selectIt: 8
+    selectIt: 6
+  listEnum: 00000000010000000200000003000000
 --- !u!4 &1509173913
 Transform:
   m_ObjectHideFlags: 0

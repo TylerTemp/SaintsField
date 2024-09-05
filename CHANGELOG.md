@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.1 ##
+
+Fix `Dropdown` & `AdvancedDropdown` not work on list/array.
+
 ## 3.3.0 ##
 
 This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.

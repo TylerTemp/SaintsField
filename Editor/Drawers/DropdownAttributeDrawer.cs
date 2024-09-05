@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers
             {
                 ShowGenericMenu(metaInfo, curDisplay, fieldRect, (_, item) =>
                 {
-                    Util.SignFieldValue(property.serializedObject.targetObject, item, parent, info);
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, item);
                     Util.SignPropertyValue(property, info, parent, item);
                     property.serializedObject.ApplyModifiedProperties();
                     onGUIPayload.SetValue(item);
@@ -163,7 +163,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             Debug.Assert(field != null, $"{property.name}/{parentObj}");
-            object curValue = field.GetValue(parentObj);
+            object curValue = ReflectUtils.GetValue(property.propertyPath, field, parentObj);
             if (curValue is IWrapProp wrapProp)
             {
                 curValue = Util.GetWrapValue(wrapProp);
@@ -314,7 +314,7 @@ namespace SaintsField.Editor.Drawers
                 string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
                 ShowGenericMenu(metaInfo, curDisplay, dropdownButtonField.buttonElement.worldBound, (newName, item) =>
                 {
-                    Util.SignFieldValue(property.serializedObject.targetObject, item, parent, info);
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, item);
                     Util.SignPropertyValue(property, info, parent, item);
                     property.serializedObject.ApplyModifiedProperties();
                     onChange(item);
@@ -347,7 +347,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
                         {
-                            Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
+                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
                             Util.SignPropertyValue(property, info, parent, curItem);
                             property.serializedObject.ApplyModifiedProperties();
                             onChange(curItem);

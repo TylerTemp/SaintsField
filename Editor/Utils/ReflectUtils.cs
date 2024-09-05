@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils
@@ -102,12 +103,12 @@ namespace SaintsField.Editor.Utils
 
         private class MethodParamFiller
         {
-            public string name;
-            public bool isOptional;
-            public object defaultValue;
+            public string Name;
+            public bool IsOptional;
+            public object DefaultValue;
 
-            public bool signed;
-            public object value;
+            public bool Signed;
+            public object Value;
         }
 
         public static object[] MethodParamsFill(IReadOnlyList<ParameterInfo> methodParams, IEnumerable<object> toFillValues)
@@ -117,13 +118,13 @@ namespace SaintsField.Editor.Utils
                 .Select(param => param.IsOptional
                     ? new MethodParamFiller
                     {
-                        name = param.Name,
-                        isOptional = true,
-                        defaultValue = param.DefaultValue,
+                        Name = param.Name,
+                        IsOptional = true,
+                        DefaultValue = param.DefaultValue,
                     }
                     : new MethodParamFiller
                     {
-                        name = param.Name,
+                        Name = param.Name,
                     })
                 .ToArray();
             // then we check for each params:
@@ -153,8 +154,8 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
                             Debug.Log($"Push value {value} for {methodParams[index].Name}");
 #endif
-                            filledValues[index].value = value;
-                            filledValues[index].signed = true;
+                            filledValues[index].Value = value;
+                            filledValues[index].Signed = true;
                             break;
                         }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
@@ -199,8 +200,8 @@ namespace SaintsField.Editor.Utils
                             Debug.Log($"add optional: {value} -> {methodParams[index].Name}({paramType})");
 #endif
                             leftOverQueue.Dequeue();
-                            filledValues[index].value = value;
-                            filledValues[index].signed = true;
+                            filledValues[index].Value = value;
+                            filledValues[index].Signed = true;
                         }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
                         else
@@ -214,22 +215,45 @@ namespace SaintsField.Editor.Utils
 
             return filledValues.Select(each =>
             {
-                if (each.signed)
+                if (each.Signed)
                 {
-                    return each.value;
+                    return each.Value;
                 }
-                Debug.Assert(each.isOptional, $"No value for required parameter `{each.name}` in method.");
-                return each.defaultValue;
+                Debug.Assert(each.IsOptional, $"No value for required parameter `{each.Name}` in method.");
+                return each.DefaultValue;
             }).ToArray();
         }
 
-        public static void SetValue(string propertyPath, FieldInfo info, object parent, object value)
+        private static void SetIWrapPropValue(IWrapProp wrapProp, object value)
         {
+            SerializedUtils.FieldOrProp fieldOrProp = Util.GetWrapProp(wrapProp);
+            if (fieldOrProp.IsField)
+            {
+                fieldOrProp.FieldInfo.SetValue(wrapProp, value);
+            }
+            else
+            {
+                fieldOrProp.PropertyInfo.SetValue(wrapProp, value);
+            }
+        }
+
+        public static void SetValue(string propertyPath, UnityEngine.Object targetObject, FieldInfo info, object parent, object value)
+        {
+            Undo.RecordObject(targetObject, "SetValue");
             int index = SerializedUtils.PropertyPathIndex(propertyPath);
             if (index == -1)
             {
                 // Debug.Log($"direct set value {value} to {info} on {parent}");
-                info.SetValue(parent, value);
+                // info.SetValue(parent, value);
+
+                if (info.GetValue(parent) is IWrapProp wrapProp)
+                {
+                    SetIWrapPropValue(wrapProp, value);
+                }
+                else
+                {
+                    info.SetValue(parent, value);
+                }
             }
             else
             {
@@ -237,11 +261,25 @@ namespace SaintsField.Editor.Utils
                 // Debug.Log($"try set value {value} at {index} to {info} on {parent}");
                 if (fieldValue is Array array)
                 {
-                    array.SetValue(value, index);
+                    if (array.GetValue(index) is IWrapProp wrapProp)
+                    {
+                        SetIWrapPropValue(wrapProp, value);
+                    }
+                    else
+                    {
+                        array.SetValue(value, index);
+                    }
                 }
                 else if(fieldValue is IList<object> list)
                 {
-                    list[index] = value;
+                    if (list[index] is IWrapProp wrapProp)
+                    {
+                        SetIWrapPropValue(wrapProp, value);
+                    }
+                    else
+                    {
+                        list[index] = value;
+                    }
                 }
                 else
                 {
@@ -250,6 +288,29 @@ namespace SaintsField.Editor.Utils
                 }
             }
 
+        }
+
+        public static object GetValue(string propertyPath, FieldInfo info, object parent)
+        {
+            int index = SerializedUtils.PropertyPathIndex(propertyPath);
+            if (index == -1)
+            {
+                return info.GetValue(parent);
+            }
+
+            object fieldValue = info.GetValue(parent);
+
+            if (fieldValue is Array array)
+            {
+                return array.GetValue(index);
+            }
+
+            if(fieldValue is IList<object> list)
+            {
+                return list[index];
+            }
+
+            return info.GetValue(parent);
         }
 
         public static Type GetElementType(Type type)
