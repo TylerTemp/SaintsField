@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using SaintsField.Playa;
+using UnityEditor.Graphs.AnimationBlendTree;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
 namespace SaintsField
 {
@@ -27,20 +30,50 @@ namespace SaintsField
             // other like /following-sibling::*, /preceding-sibling::*, ... is not supported
         }
 
+        public enum StartAt
+        {
+            Current,
+            Root,
+            Assets,
+        }
+
+        public enum Axes
+        {
+            Child,
+            Ancestor,
+        }
+
+        public enum PredicateType
+        {
+            Index,
+            Component,
+        }
+
+        public struct Predicate
+        {
+            public PredicateType PredicateType;
+            public string Value;
+        }
+
         public struct Token
         {
-            // ReSharper disable InconsistentNaming
-            public Locate Locate;
+            public Axes Axes;
             public string Node;
+            public IReadOnlyList<Predicate> Predicates;
+
+            // ReSharper disable InconsistentNaming
+            // public Locate Locate;
+            // public Axes Axes;
+            // public string Node;
             // this is not index, but at this point it's OK.
             // e.g. [1], [last()], [*](has children), [position()>2], ...
             // at this point just number, last()
             // empty string for no index (do NOT use null)
-            public string Index;
+            // public string Index;
             // ReSharper enable InconsistentNaming
 
 #if UNITY_EDITOR
-            public override string ToString() => $"{Locate}::{EditorNodeToString(Node)}::{Index}";
+            public override string ToString() => $"{Axes}::{EditorNodeToString(Node)}[{string.Join("][", Predicates)}]";
             private static string EditorNodeToString(string node)
             {
                 // ReSharper disable once ConvertSwitchStatementToSwitchExpression
@@ -57,28 +90,36 @@ namespace SaintsField
 #endif
         }
 
+        public struct XPath
+        {
+            public StartAt StartAt;
+            public IReadOnlyList<Token> Tokens;
+        }
+
         // ReSharper disable InconsistentNaming
         // public readonly Type CompType;
-        public readonly IReadOnlyList<IReadOnlyList<Token>> Paths;
-        public readonly IReadOnlyList<string> RawPaths;
+        public readonly IReadOnlyList<XPath> Paths;
+        // public readonly IReadOnlyList<string> RawPaths;
         public readonly bool ForceResign;
         public readonly bool ResignButton = true;
         // ReSharper enable InconsistentNaming
 
         public GetComponentByPathAttribute(string path, params string[] paths)
         {
-            RawPaths = paths
+            // RawPaths = paths
+            //     .Prepend(path)
+            //     .ToArray();
+            Paths = paths
                 .Prepend(path)
-                .ToArray();
-            Paths = RawPaths
-                .Select(each =>
-                {
-                    IReadOnlyList<Token> result = ParsePath(each).ToArray();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DROW_PROCESS_GET_COMPONENT_BY_PATH
-                    Debug.Log($"ParsePath: {each} => {string.Join(", ", result)}");
-#endif
-                    return result;
-                })
+                .Select(ParsePath)
+//                 .Select(each =>
+//                 {
+//                     IReadOnlyList<Token> result = ParsePath(each).ToArray();
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DROW_PROCESS_GET_COMPONENT_BY_PATH
+//                     Debug.Log($"ParsePath: {each} => {string.Join(", ", result)}");
+// #endif
+//                     return result;
+//                 })
                 .ToArray();
         }
 
@@ -98,8 +139,44 @@ namespace SaintsField
         //     CompType = compType;
         // }
 
-        private static IEnumerable<Token> ParsePath(string path)
+        private static XPath ParsePath(string path)
         {
+            StartAt startAt;
+            string usePath;
+            if (path.StartsWith("/"))
+            {
+                startAt = StartAt.Root;
+                if (path.StartsWith("///"))  // root + descendant
+                {
+                    usePath = path.Substring(1);
+                }
+                else if (path.StartsWith("//"))
+                {
+                    usePath = path.Substring(2);
+                }
+                else
+                {
+                    usePath = path;
+                }
+            }
+            else if (path.StartsWith(":"))
+            {
+                startAt = StartAt.Assets;
+                usePath = path.Substring(1);
+            }
+            else
+            {
+                startAt = StartAt.Current;
+                usePath = path;
+            }
+
+            foreach ((bool isAncestor, string step) in ChunkPath(usePath))
+            {
+                (Axes axes, string node, IReadOnlyList<Predicate> predicates) = ParseStep(step);
+            }
+
+
+
             // "./sth" equals "sth", relative, so, (child::sth)
 
             // `//` means "anywhere", to say, "a//b" means any b descendant of a (child::a, descendant::b)
@@ -126,7 +203,7 @@ namespace SaintsField
                 // //sth[index] => root::::, /sth
                 // ///sth[index] => root::::, //sth
                 // /./sth[index] => root::::, /.
-                Match rootMatch = Regex.Match(path, $"^/([^/]+)");
+                Match rootMatch = Regex.Match(path, "^/([^/]+)");
                 string rootNode = "*";
                 string rootIndex = "";
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
@@ -203,6 +280,55 @@ namespace SaintsField
                     Node = content,
                     Index = index,
                 };
+            }
+        }
+
+        private static (Axes axes, string node, IReadOnlyList<Predicate> predicates) ParseStep(string step)
+        {
+            Axes axes = Axes.Child;
+            string[] split = step.Split("::");
+
+            if (split.Length > 1)
+            {
+                string axesName = split[0];
+                string leftContent = string.Join("::", split.Skip(1));
+            }
+
+        }
+
+        private static IEnumerable<(bool ancestor, string segment)> ChunkPath(string usePath)
+        {
+            StringBuilder sb = new StringBuilder();
+            bool hasContent = false;
+            bool ancestor = false;
+            foreach (char c in usePath)
+            {
+                if (c == '/')
+                {
+                    if (hasContent)
+                    {
+                        yield return (ancestor, sb.ToString());
+                        sb.Clear();
+                        hasContent = false;
+                        ancestor = false;
+                    }
+                    else
+                    {
+                        Debug.Assert(!ancestor, sb.ToString());
+                        ancestor = true;
+                    }
+                }
+                else
+                {
+                    sb.Append(c);
+                    hasContent = true;
+                }
+            }
+
+            string leftContent = sb.ToString();
+            if (!string.IsNullOrEmpty(leftContent))
+            {
+                yield return (ancestor, leftContent);
             }
         }
     }
