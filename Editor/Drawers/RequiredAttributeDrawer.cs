@@ -13,36 +13,12 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(RequiredAttribute))]
     public class RequiredAttributeDrawer: SaintsPropertyDrawer
     {
-        private static (string error, bool result) Truly(SerializedProperty property, object target)
+        private static (string error, bool result) Truly(SerializedProperty property, FieldInfo field, object target)
         {
-            // UnityEngine.Object target = property.serializedObject.targetObject;
-            (string error, object value) = Util.GetOfNoParams<object>(target, property.name, null);
-            if (error != "")
-            {
-                return (error, false);
-            }
-
-            return ("", ReflectUtils.Truly(value));
-
-            // (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) found = ReflectUtils.GetProp(target.GetType(), property.name);
-            //
-            // // Debug.Log($"found={found.getPropType}; {found.fieldOrMethodInfo} / {property.name}, {target}");
-            //
-            // if (found.getPropType == ReflectUtils.GetPropType.Property && found.fieldOrMethodInfo is PropertyInfo propertyInfo)
-            // {
-            //     return ReflectUtils.Truly(propertyInfo.GetValue(target));
-            // }
-            //
-            // if (found.getPropType == ReflectUtils.GetPropType.Field && found.fieldOrMethodInfo is FieldInfo foundFieldInfo)
-            // {
-            //     return ReflectUtils.Truly(foundFieldInfo.GetValue(target));
-            // }
-            // if (found.getPropType == ReflectUtils.GetPropType.NotFound || found.getPropType == ReflectUtils.GetPropType.Method)
-            // {
-            //     throw new ArgumentOutOfRangeException(nameof(found.getPropType), found.getPropType, null);
-            // }
-            // // Handle any other cases here, if needed
-            // throw new NotImplementedException("Unexpected case");
+            (string curError, int _, object curValue) = Util.GetValue(property, field, target);
+            return curError != ""
+                ? (curError, false)
+                : ("", ReflectUtils.Truly(curValue));
         }
 
         #region IMGUI
@@ -60,7 +36,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             // property.serializedObject.ApplyModifiedProperties();
-            (string trulyError, bool isTruly) = Truly(property, parent);
+            (string trulyError, bool isTruly) = Truly(property, info, parent);
 
             if(trulyError != "")
             {
@@ -210,7 +186,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            (string trulyError, bool isTruly) = Truly(property, parent);
+            (string trulyError, bool isTruly) = Truly(property, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log(isTruly);
 #endif
@@ -222,7 +198,20 @@ namespace SaintsField.Editor.Drawers
                 if(!isTruly)
                 {
                     string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
-                    error = errorMessage ?? $"{property.displayName} is required";
+                    if (errorMessage == null)
+                    {
+                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                        string propertyName = property.displayName;
+                        if (arrayIndex != -1)
+                        {
+                            propertyName = $"{ObjectNames.NicifyVariableName(info.Name)}[{arrayIndex}]";
+                        }
+                        error = $"{propertyName} is required";
+                    }
+                    else
+                    {
+                        error = errorMessage;
+                    }
                 }
                 else
                 {
