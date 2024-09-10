@@ -2843,7 +2843,7 @@ Parameters:
     *   `Rewind`: rewind to the start state
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 using SaintsField;
 
@@ -2888,7 +2888,7 @@ To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Cr
 A convenient way to add many method to `DOTweenPlay`.
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [DOTweenPlayGroup(groupBy: "Color")]
@@ -2935,7 +2935,7 @@ Draw a button for a function. If the method have arguments (required or optional
 *   `string buttonLabel = null` the button label. If null, it'll use the function name.
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Button]
@@ -2956,7 +2956,7 @@ private void EditorLabeledButton()
 Example with arguments:
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Button]
@@ -2973,7 +2973,7 @@ private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = 
 Show a non-field property.
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 // const
@@ -2999,7 +2999,7 @@ public Color AutoColor
 Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Ordered] public string myStartField;
@@ -3067,7 +3067,7 @@ Options are:
 
 ```csharp
 using SaintsField;
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Layout("Titled", ELayout.Title | ELayout.TitleOut)]
@@ -3236,7 +3236,7 @@ For `LayoutEnd`:
 It supports `./SubGroup` to create a nested subgroup:
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [LayoutStart("Root", ELayout.FoldoutBox)]
@@ -3275,7 +3275,7 @@ public int tab2Item2;
 example of using `LayoutStart` with `LayoutEnd`:
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public string beforeGroup;
@@ -3294,7 +3294,7 @@ public string afterGroup;
 example of using new group name to stop grouping:
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public string breakBefore;
@@ -3321,7 +3321,7 @@ public string breakAfter;
 example of using `keepGrouping: false` to stop grouping, but keep the last one in group:
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public string beforeGroupLast;
@@ -3347,7 +3347,7 @@ Different from `ShowIf`/`HideIf`:
 2.  Callback function can not receive value and index
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public bool boolValue;
@@ -3399,7 +3399,7 @@ Different from `EnableIf`/`DisableIf` in the following:
 3.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [PlayaDisableIf] public int[] justDisable;
@@ -3442,7 +3442,7 @@ Parameters:
 *   `bool isCallback=false` if it's a callback (a method/property/field)
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [PlayaRichLabel("<color=lame>It's Labeled!")]
@@ -3499,7 +3499,7 @@ This is like `InfoBox`, but it can be applied to array/list/button etc.
 *   AllowMultiple: Yes
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
@@ -3538,7 +3538,7 @@ Parameters:
 *   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [OnButtonClick]
@@ -3646,7 +3646,7 @@ Parameters:
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
 
 ```csharp
-// Ensure SaintsEditor is enabled before trying this example
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Serializable]
