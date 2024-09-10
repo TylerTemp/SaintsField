@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Playa
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-            (string error, int index, object value) = SerializedUtils.GetValue(property, fieldInfo, parentValue);
+            (string error, int index, object value) = Util.GetValue(property, fieldInfo, parentValue);
             if (error != "")
             {
                 return (error, -1, parentValue, null);
@@ -175,7 +175,7 @@ namespace SaintsField.Editor.Playa
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            (string error, int index, object value)= SerializedUtils.GetValue(property, fieldInfo, parentValue);
+            (string error, int _, object value)= Util.GetValue(property, fieldInfo, parentValue);
             if (error != "")
             {
                 return new HelpBox(error, HelpBoxMessageType.Error);

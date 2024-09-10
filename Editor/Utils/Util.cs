@@ -22,21 +22,17 @@ namespace SaintsField.Editor.Utils
                 // this is readonly, put it to last so user  can easily override it
                 "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField", // Unity UPM
             };
-
-            T result = resourceSearchFolder
-                .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{resourcePath}"))
-                // .Where(each => each != null)
-                // .DefaultIfEmpty((T)EditorGUIUtility.Load(relativePath))
-                .FirstOrDefault(each => each != null);
-            if (result == null)
+            foreach (T each in resourceSearchFolder
+                         .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{resourcePath}")))
             {
-                result = (T)EditorGUIUtility.Load(resourcePath);
+                // ReSharper disable once Unity.PerformanceCriticalCodeNullComparison
+                if(each != null)
+                {
+                    return each;
+                }
             }
 
-            // if (result == null)
-            // {
-            //     result = AssetDatabase.LoadAssetAtPath<T>(Path.Combine("Assets", iconPath).Replace("\\", "/"));
-            // }
+            T result = (T)EditorGUIUtility.Load(resourcePath);
             Debug.Assert(result != null, $"{resourcePath} not found in {string.Join(", ", resourceSearchFolder)}");
             return result;
         }
@@ -102,33 +98,12 @@ namespace SaintsField.Editor.Utils
             return fieldOrProp.IsField ? fieldOrProp.FieldInfo.GetValue(wrapProp) : fieldOrProp.PropertyInfo.GetValue(wrapProp);
         }
 
-        // public static void SignFieldValue(UnityEngine.Object targetObject, object curItem, object parentObj, FieldInfo field)
-        // {
-        //     Undo.RecordObject(targetObject, "SignFieldValue");
-        //     if (field.GetValue(parentObj) is IWrapProp wrapProp)
-        //     {
-        //         SerializedUtils.FieldOrProp fieldOrProp = GetWrapProp(wrapProp);
-        //         if (fieldOrProp.IsField)
-        //         {
-        //             fieldOrProp.FieldInfo.SetValue(wrapProp, curItem);
-        //         }
-        //         else
-        //         {
-        //             fieldOrProp.PropertyInfo.SetValue(wrapProp, curItem);
-        //         }
-        //     }
-        //     else if(!field.FieldType.IsArray)
-        //     {
-        //         field.SetValue(parentObj, curItem);
-        //     }
-        // }
-
         public static void SignPropertyValue(SerializedProperty property, FieldInfo fieldInfo, object parent, object newValue)
         {
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Generic:
-                    (string error, int _, object value) = SerializedUtils.GetValue(property, fieldInfo, parent);
+                    (string error, int _, object value) = GetValue(property, fieldInfo, parent);
                     if (error == "" && value is IWrapProp wrapProp)
                     {
                         string propName = wrapProp.EditorPropertyName;
@@ -190,7 +165,7 @@ namespace SaintsField.Editor.Utils
                     property.floatValue = (float) newValue;
                     break;
                 case SerializedPropertyType.String:
-                    property.stringValue = newValue.ToString();
+                    property.stringValue = newValue?.ToString();
                     break;
                 case SerializedPropertyType.Color:
                     property.colorValue = (Color) newValue;
@@ -222,16 +197,16 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.Bounds:
                     property.boundsValue = (Bounds) newValue;
                     break;
-                // case SerializedPropertyType.Gradient:
-                //     property.gradientValue = (Gradient) curItem;
-                //     break;
+                case SerializedPropertyType.Gradient:
+                    property.gradientValue = (Gradient) newValue;
+                    break;
                 case SerializedPropertyType.Quaternion:
                     property.quaternionValue = (Quaternion) newValue;
                     break;
                 case SerializedPropertyType.ExposedReference:
                     property.exposedReferenceValue = (UnityEngine.Object) newValue;
                     break;
-                // case SerializedPropertyType.FixedBufferSize:
+                // case SerializedPropertyType.FixedBufferSize:  // this is readonly
                 //     property.fixedBufferSize = (int) curItem;
                 //     break;
                 case SerializedPropertyType.Vector2Int:
@@ -251,45 +226,12 @@ namespace SaintsField.Editor.Utils
                     property.managedReferenceValue = (UnityEngine.Object) newValue;
                     break;
 #endif
-                case SerializedPropertyType.Gradient:
+                // case SerializedPropertyType.Gradient:
                 case SerializedPropertyType.FixedBufferSize:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
             }
         }
-
-        // public static string GetLabelString(SaintsPropertyDrawer.LabelState labelState)
-        // {
-        //     // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-        //     switch (labelState)
-        //     {
-        //         case SaintsPropertyDrawer.LabelState.None:
-        //             return "";
-        //
-        //         case SaintsPropertyDrawer.LabelState.AsIs:
-        //             return null;
-        //
-        //         case SaintsPropertyDrawer.LabelState.EmptySpace:
-        //             return " ";
-        //         default:
-        //             throw new ArgumentOutOfRangeException(nameof(labelState), labelState, null);
-        //     }
-        // }
-
-        // public static Label PrefixLabelUIToolKit(string label, int indentLevel)
-        // {
-        //     return new Label(label)
-        //     {
-        //         // style =
-        //         // {
-        //         //     flexShrink = 0,
-        //         //     flexGrow = 0,
-        //         //     minWidth = SaintsPropertyDrawer.LabelBaseWidth - indentLevel * 15,
-        //         //     left = SaintsPropertyDrawer.LabelLeftSpace,
-        //         //     unityTextAlign = TextAnchor.MiddleLeft,
-        //         // },
-        //     };
-        // }
 
         public static int ListIndexOfAction<T>(IEnumerable<T> lis, Func<T, bool> callback)
         {
@@ -476,7 +418,7 @@ namespace SaintsField.Editor.Utils
                         }
                         else
                         {
-                            (string error, int arrayIndex, object curValue) = SerializedUtils.GetValue(property, fieldInfo, target);
+                            (string error, int arrayIndex, object curValue) = GetValue(property, fieldInfo, target);
                             if (error != "")
                             {
                                 return (error, defaultValue);
@@ -559,7 +501,7 @@ namespace SaintsField.Editor.Utils
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            (string error, int arrayIndex, object curValue) = SerializedUtils.GetValue(property, fieldInfo, target);
+            (string error, int arrayIndex, object curValue) = GetValue(property, fieldInfo, target);
             if (error != "")
             {
                 return (error, defaultValue);
@@ -942,6 +884,49 @@ namespace SaintsField.Editor.Utils
 #else
             return 17 * 31 + (object1?.GetHashCode() ?? 0) * 31 + (object2?.GetHashCode() ?? 0);
 #endif
+        }
+
+        public static (string error, int index, object value) GetValue(SerializedProperty property, FieldInfo fieldInfo, object parent)
+        {
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            object rawValue = fieldInfo.GetValue(parent);
+
+            if (arrayIndex == -1)
+            {
+                return ("", -1, rawValue);
+            }
+
+            (string indexError, object indexResult) = GetValueAtIndex(rawValue, arrayIndex);
+            if (indexError != "")
+            {
+                return (indexError, -1, null);
+            }
+
+            return ("", arrayIndex, indexResult);
+        }
+
+
+        public static (string error, object result) GetValueAtIndex(object source, int index)
+        {
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(source is IEnumerable enumerable))
+            {
+                throw new Exception($"Not a enumerable {source}");
+            }
+
+            int searchIndex = 0;
+            // Debug.Log($"start check index in {source}");
+            foreach (object result in enumerable)
+            {
+                // Debug.Log($"check index {searchIndex} in {source}");
+                if(searchIndex == index)
+                {
+                    return ("", result);
+                }
+                searchIndex++;
+            }
+
+            return ($"Not found index {index} in {source}", null);
         }
     }
 }

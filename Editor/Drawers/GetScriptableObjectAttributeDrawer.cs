@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Drawers
             Type interfaceType = null;
             if (property.propertyType == SerializedPropertyType.Generic)
             {
-                (string error, int _, object propertyValue) = SerializedUtils.GetValue(property, info, parent);
+                (string error, int _, object propertyValue) = Util.GetValue(property, info, parent);
 
                 if (error == "" && propertyValue is IWrapProp wrapProp)
                 {
