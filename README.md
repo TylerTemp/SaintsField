@@ -55,7 +55,10 @@ Unity: 2019.1 or higher
     git submodule add https://github.com/TylerTemp/SaintsField.git Assets/SaintsField
     ```
 
-If you have DOTween installed, please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`; Or disable related functions with `Window` - `Saints` - `Disable DOTween Support`. If you can not find this menu, please read "Add a Macro" section about how to manually disable DOTween support in SaintsField.
+If you have DOTween installed
+*   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+*   Or disable related functions with `Window` - `Saints` - `Disable DOTween Support`
+*   If you can not find this menu, please read "Add a Macro" section about how to manually disable DOTween support in SaintsField.
 
 To use the full functions of this project, please also do: `Window` - `Saints` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`. 
 
