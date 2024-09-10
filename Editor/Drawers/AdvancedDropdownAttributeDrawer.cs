@@ -771,7 +771,7 @@ namespace SaintsField.Editor.Drawers
 
             public override int GetHashCode()
             {
-                return Util.ComnbileHashCode(Index, Display);
+                return Util.CombineHashCode(Index, Display);
             }
         }
 
