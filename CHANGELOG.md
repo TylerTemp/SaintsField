@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.3.2 ##
+
+1.  Fix `Required` not work on every element of list/array.
+2.  Fix `RichLabel` etc. failed to find a correct fallback drawer like `UnityEvent`
+
 ## 3.3.1 ##
 
 Fix `Dropdown` & `AdvancedDropdown` not work on list/array.
