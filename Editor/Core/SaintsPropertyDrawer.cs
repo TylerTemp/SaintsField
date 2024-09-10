@@ -541,7 +541,12 @@ namespace SaintsField.Editor.Core
                     bool matched;
                     if (isGenericType)
                     {
-                        matched = fieldType.GetGenericTypeDefinition() == propertyAttributeToPropertyDrawer.Key;
+                        Type genericType = fieldType.GetGenericTypeDefinition();
+                        // maybe we only need the first one condition?
+                        matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType) || genericType == propertyAttributeToPropertyDrawer.Key || genericType.IsSubclassOf(propertyAttributeToPropertyDrawer.Key);
+                        // Debug.Log(fieldType.GetGenericTypeDefinition().IsSubclassOf(propertyAttributeToPropertyDrawer.Key));
+                        // Debug.Log(fieldType.IsAssignableFrom(propertyAttributeToPropertyDrawer.Key));
+                        // Debug.Log(propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType));
                         // ReSharper disable once MergeIntoPattern
                         if (!matched && fieldType.BaseType != null && fieldType.BaseType.IsGenericType)
                         {
