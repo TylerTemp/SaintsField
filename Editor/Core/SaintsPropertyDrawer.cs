@@ -571,7 +571,7 @@ namespace SaintsField.Editor.Core
                     {
                         Type foundDrawer = propertyAttributeToPropertyDrawer.Value.FirstOrDefault(each => !each.isSaints).drawerType;
     #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                        Debug.Log($"foundDrawer={foundDrawer}");
+                        Debug.Log($"foundDrawer={foundDrawer} for {fieldType}");
     #endif
                         if(foundDrawer != null)
                         {
@@ -642,9 +642,46 @@ namespace SaintsField.Editor.Core
             }
 
             MethodInfo uiToolkitMethod = foundDrawer.GetMethod("CreatePropertyGUI");
-            if (uiToolkitMethod == null)
+            // Debug.Assert(uiToolkitMethod != null, foundDrawer);
+            // Debug.Log($"uiToolkitMethod: {uiToolkitMethod}");
+            // if (uiToolkitMethod == null)
+            // {
+            //     return PropertyFieldFallbackUIToolkit(property);
+            // }
+
+            if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType != foundDrawer)  // null: old Unity || did not override
             {
-                return PropertyFieldFallbackUIToolkit(property);
+                PropertyDrawer imGuiDrawer = MakePropertyDrawer(foundDrawer, fieldInfo);
+                MethodInfo imGuiGetPropertyHeightMethod = foundDrawer.GetMethod("GetPropertyHeight");
+                MethodInfo imGuiOnGUIMethodInfo = foundDrawer.GetMethod("OnGUI");
+                Debug.Assert(imGuiGetPropertyHeightMethod != null);
+                Debug.Assert(imGuiOnGUIMethodInfo != null);
+
+                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+
+                IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
+                {
+                    GUIContent label = imguiLabelHelper.NoLabel
+                        ? GUIContent.none
+                        : new GUIContent(imguiLabelHelper.RichLabel);
+                    // string displayName = imguiLabelHelper.RichLabel ?? property.displayName;
+                    // GUIContent label = new GUIContent(displayName);
+                    float height =
+                        (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
+                    Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
+                    imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
+                })
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 0,
+                    },
+                    userData = imguiLabelHelper,
+                };
+                imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
+
+                return imGuiContainer;
             }
 
             // Debug.Log("Yes");

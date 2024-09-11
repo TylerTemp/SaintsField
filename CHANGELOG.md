@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.3 ##
+
+1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (but label in `RichLabel` might not work as it's depended on the IMGUI drawer itself, especially `<color>` & `<icon>`)
+
 ## 3.3.2 ##
 
 1.  Fix `Required` not work on every element of list/array.

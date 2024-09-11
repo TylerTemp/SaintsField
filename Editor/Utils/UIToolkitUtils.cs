@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using UnityEditor;
 using System;
+using System.Linq;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
@@ -80,6 +81,21 @@ namespace SaintsField.Editor.Utils
         {
             if (delayTime > 1f)  // stop trying after 1 second
             {
+                IMGUIContainer imguiContainer = container.Q<IMGUIContainer>(className: IMGUILabelHelper.ClassName);
+                if (imguiContainer?.userData is IMGUILabelHelper imguiLabelHelper)
+                {
+                    if (chunksOrNull is null)
+                    {
+                        imguiLabelHelper.NoLabel = true;
+                        return;
+                    }
+
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    RichTextDrawer.RichTextChunk[] chunks = chunksOrNull.ToArray();
+                    string labelString = string.Join("", chunks.Where(each => !each.IsIcon).Select(each => each.Content));
+                    imguiLabelHelper.RichLabel = labelString;
+                    imguiLabelHelper.NoLabel = false;
+                }
                 return;
             }
 

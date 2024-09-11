@@ -70,10 +70,9 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.3.2**
+**3.3.3**
 
-1.  Fix `Required` not work on every element of list/array.
-2.  Fix `RichLabel` etc. failed to find a correct fallback drawer like `UnityEvent`
+1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (but label in `RichLabel` might not work as it's depended on the IMGUI drawer itself, especially `<color>` & `<icon>`)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
