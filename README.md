@@ -72,7 +72,7 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 **3.3.3**
 
-1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (but label in `RichLabel` might not work as it's depended on the IMGUI drawer itself, especially `<color>` & `<icon>`)
+1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (note: `<icon>` in `RichLabel` will not work and will get removed)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

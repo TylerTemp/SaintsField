@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 #if AYELLOWPAPER_SERIALIZEDCOLLECTIONS
         public SerializedDictionary<string, int> serDic;
 
-        [RichLabel("Fallback Drawer!")]
+        [RichLabel("Fallback <color=green>Drawer</color> for <container.Type />!")]
         public SerializedDictionary<string, int> serDicLabel;
 #endif
     }

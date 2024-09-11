@@ -659,17 +659,24 @@ namespace SaintsField.Editor.Core
 
                 IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
 
+                EditorStyles.label.richText = true;
+                EditorStyles.foldout.richText = true;
+
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
                     GUIContent label = imguiLabelHelper.NoLabel
                         ? GUIContent.none
                         : new GUIContent(imguiLabelHelper.RichLabel);
-                    // string displayName = imguiLabelHelper.RichLabel ?? property.displayName;
-                    // GUIContent label = new GUIContent(displayName);
+
                     float height =
                         (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
                     Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-                    imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
+
+                    using(new ImGuiFoldoutStyleRichTextScoop())
+                    using(new ImGuiLabelStyleRichTextScoop())
+                    {
+                        imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
+                    }
                 })
                 {
                     style =
