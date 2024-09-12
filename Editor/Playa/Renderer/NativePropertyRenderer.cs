@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class NativePropertyRenderer: AbsRenderer
     {
-        private bool _renderField;
+        private readonly bool _renderField;
 
         public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
         {
@@ -23,6 +23,11 @@ namespace SaintsField.Editor.Playa.Renderer
         // private bool _callUpdate;
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
+            if (!_renderField)
+            {
+                return (null, false);
+            }
+
             object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
 
             VisualElement container = new VisualElement
@@ -45,6 +50,11 @@ namespace SaintsField.Editor.Playa.Renderer
         // private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo,  VisualElement container, bool callUpdate)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
+            if (!_renderField)
+            {
+                return preCheckResult;
+            }
+
             object userData = _fieldElement.userData;
             object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
 
@@ -60,7 +70,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 StyleEnum<DisplayStyle> displayStyle = child.style.display;
                 _fieldElement.Clear();
                 _fieldElement.userData = value;
-                _fieldElement.Add(child = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name)));
+                _fieldElement.Add(child = UIToolkitLayout(value,
+                    ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name)));
                 child.style.display = displayStyle;
             }
 

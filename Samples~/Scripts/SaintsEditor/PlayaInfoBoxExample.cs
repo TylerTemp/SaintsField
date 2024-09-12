@@ -25,5 +25,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public void Method()
         {
         }
+
+        [PlayaInfoBox("Property")] public string V => "V";
     }
 }
