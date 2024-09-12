@@ -249,175 +249,141 @@ namespace SaintsField.Editor
             {
                 Type systemType = types[inherentDepth];
 
-                FieldInfo[] allFields = systemType
-                    .GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                               BindingFlags.Public | BindingFlags.DeclaredOnly);
-
-                // foreach (FieldInfo fieldInfo in allFields)
-                // {
-                //     Debug.Log($"[{systemType}]: {fieldInfo.Name}");
-                // }
-                // Debug.Log($"[{systemType}] allFields count: {allFields.Length}");
-
-                #region SerializedField
-
-                IEnumerable<FieldInfo> serializableFieldInfos =
-                    allFields.Where(fieldInfo =>
+                foreach (MemberInfo memberInfo in systemType
+                             .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                         BindingFlags.Public | BindingFlags.DeclaredOnly)
+                             .OrderBy(memberInfo => memberInfo.MetadataToken))
+                {
+                    switch (memberInfo)
+                    {
+                        case FieldInfo fieldInfo:
                         {
+                            #region SerializedField
+
                             if (serializedPropertyDict.ContainsKey(fieldInfo.Name))
                             {
-                                return true;
+                                // Debug.Log($"Name            : {fieldInfo.Name}");
+                                // Debug.Log($"Declaring Type  : {fieldInfo.DeclaringType}");
+                                // Debug.Log($"IsPublic        : {fieldInfo.IsPublic}");
+                                // Debug.Log($"MemberType      : {fieldInfo.MemberType}");
+                                // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
+                                // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
+
+                                IReadOnlyList<IPlayaAttribute> playaAttributes = fieldInfo
+                                    .GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+
+                                OrderedAttribute orderProp =
+                                    playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                int order = orderProp?.Order ?? int.MinValue;
+
+                                fieldWithInfos.Add(new SaintsFieldWithInfo
+                                {
+                                    PlayaAttributes = playaAttributes,
+                                    Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                    Target = target,
+
+                                    RenderType = SaintsRenderType.SerializedField,
+                                    SerializedProperty = pendingSerializedProperties[fieldInfo.Name],
+                                    FieldInfo = fieldInfo,
+                                    InherentDepth = inherentDepth,
+                                    Order = order,
+                                    // serializable = true,
+                                });
+                                pendingSerializedProperties.Remove(fieldInfo.Name);
                             }
+                            #endregion
 
-                            // Name            : <GetHitPoint>k__BackingField
-                            // if (fieldInfo.Name.StartsWith("<") && fieldInfo.Name.EndsWith(">k__BackingField"))
-                            // {
-                            //     return serializedObject.FindProperty(fieldInfo.Name) != null;
-                            // }
+                            #region nonSerFieldInfo
 
-                            // return !fieldInfo.IsLiteral // const
-                            //        && !fieldInfo.IsStatic // static
-                            //        && !fieldInfo.IsInitOnly;
-                            return false;
+                            if (fieldInfo.GetCustomAttributes(typeof(ShowInInspectorAttribute), true).Length > 0)
+                            {
+                                IReadOnlyList<IPlayaAttribute> playaAttributes = fieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+
+                                OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                int order = orderProp?.Order ?? int.MinValue;
+                                fieldWithInfos.Add(new SaintsFieldWithInfo
+                                {
+                                    PlayaAttributes = playaAttributes,
+                                    Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                    Target = target,
+
+                                    RenderType = SaintsRenderType.NonSerializedField,
+                                    // memberType = nonSerFieldInfo.MemberType,
+                                    FieldInfo = fieldInfo,
+                                    InherentDepth = inherentDepth,
+                                    Order = order,
+                                    // serializable = false,
+                                });
+                            }
+                            #endregion
                         }
-                        // readonly
-                    );
+                            break;
+                        case MethodInfo methodInfo:
+                        {
+                            #region Method
+                            // method attributes will be collected no matter what, because DOTweenPlayGroup depending on it even
+                            // it has no attribute at all
 
-                foreach (FieldInfo fieldInfo in serializableFieldInfos)
-                {
-                    // Debug.Log($"Name            : {fieldInfo.Name}");
-                    // Debug.Log($"Declaring Type  : {fieldInfo.DeclaringType}");
-                    // Debug.Log($"IsPublic        : {fieldInfo.IsPublic}");
-                    // Debug.Log($"MemberType      : {fieldInfo.MemberType}");
-                    // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
-                    // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
+                            IReadOnlyList<IPlayaAttribute> playaAttributes = methodInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
 
-                    IReadOnlyList<IPlayaAttribute> playaAttributes = fieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+                            // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
 
-                    OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
-                    int order = orderProp?.Order ?? int.MinValue;
+                            OrderedAttribute orderProp =
+                                playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
+                            int order = orderProp?.Order ?? int.MinValue;
 
-                    fieldWithInfos.Add(new SaintsFieldWithInfo
-                    {
-                        PlayaAttributes = playaAttributes,
-                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
-                        Target = target,
-
-                        RenderType = SaintsRenderType.SerializedField,
-                        SerializedProperty = pendingSerializedProperties[fieldInfo.Name],
-                        FieldInfo = fieldInfo,
-                        InherentDepth = inherentDepth,
-                        Order = order,
-                        // serializable = true,
-                    });
-                    pendingSerializedProperties.Remove(fieldInfo.Name);
-                }
-                #endregion
-
-                #region nonSerFieldInfo
-                IEnumerable<FieldInfo> nonSerFieldInfos = allFields
-                    .Where(f => f.GetCustomAttributes(typeof(ShowInInspectorAttribute), true).Length > 0);
-                foreach (FieldInfo nonSerFieldInfo in nonSerFieldInfos)
-                {
-                    IReadOnlyList<IPlayaAttribute> playaAttributes = nonSerFieldInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
-
-                    OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
-                    int order = orderProp?.Order ?? int.MinValue;
-                    fieldWithInfos.Add(new SaintsFieldWithInfo
-                    {
-                        PlayaAttributes = playaAttributes,
-                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
-                        Target = target,
-
-                        RenderType = SaintsRenderType.NonSerializedField,
-                        // memberType = nonSerFieldInfo.MemberType,
-                        FieldInfo = nonSerFieldInfo,
-                        InherentDepth = inherentDepth,
-                        Order = order,
-                        // serializable = false,
-                    });
-                }
-                #endregion
-
-                #region Method
-
-                MethodInfo[] methodInfos = systemType
-                    .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                BindingFlags.Public | BindingFlags.DeclaredOnly);
-
-                // Debug.Log($"[{systemType}] methodInfos count: {methodInfos.Length}");
-                // foreach (MethodInfo methodInfo in methodInfos)
-                // {
-                //     Debug.Log($"[{systemType}] method: {methodInfo.Name}");
-                // }
-
-                // var methodAllAttribute = methodInfos
-                //     .SelectMany(each => each.GetCustomAttributes<Attribute>())
-                //     .Where(each => each is ISaintsMethodAttribute)
-                //     .ToArray();
-
-                // IEnumerable<ISaintsMethodAttribute> buttonMethodInfos = methodAllAttribute.OfType<ISaintsMethodAttribute>().Length > 0);
-
-                // method attributes will be collected no matter what, because DOTweenPlayGroup depending on it even
-                // it has no attribute at all
-
-                foreach (MethodInfo methodInfo in methodInfos)
-                {
-                    IReadOnlyList<IPlayaAttribute> playaAttributes = methodInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
-
-                    // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
-
-                    OrderedAttribute orderProp =
-                        playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
-                    int order = orderProp?.Order ?? int.MinValue;
-
-                    // inspector does not care about inherited/new method. It just need to use the last one
-                    fieldWithInfos.RemoveAll(each => each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
+                            // inspector does not care about inherited/new method. It just need to use the last one
+                            fieldWithInfos.RemoveAll(each => each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
-                    Debug.Log($"[{systemType}] method: {methodInfo.Name}");
+                                Debug.Log($"[{systemType}] method: {methodInfo.Name}");
 #endif
 
-                    fieldWithInfos.Add(new SaintsFieldWithInfo
-                    {
-                        PlayaAttributes = playaAttributes,
-                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
-                        Target = target,
+                            fieldWithInfos.Add(new SaintsFieldWithInfo
+                            {
+                                PlayaAttributes = playaAttributes,
+                                Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                Target = target,
 
-                        // memberType = MemberTypes.Method,
-                        RenderType = SaintsRenderType.Method,
-                        MethodInfo = methodInfo,
-                        InherentDepth = inherentDepth,
-                        Order = order,
-                    });
+                                // memberType = MemberTypes.Method,
+                                RenderType = SaintsRenderType.Method,
+                                MethodInfo = methodInfo,
+                                InherentDepth = inherentDepth,
+                                Order = order,
+                            });
+                            #endregion
+                        }
+                            break;
+
+                        case PropertyInfo propertyInfo:
+                        {
+                            #region NativeProperty
+                            if(propertyInfo.GetCustomAttributes(typeof(IPlayaAttribute), true).Length > 0)
+                            {
+                                IReadOnlyList<IPlayaAttribute> playaAttributes = propertyInfo
+                                    .GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+
+                                OrderedAttribute orderProp =
+                                    playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                int order = orderProp?.Order ?? int.MinValue;
+                                fieldWithInfos.Add(new SaintsFieldWithInfo
+                                {
+                                    PlayaAttributes = playaAttributes,
+                                    Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                    Target = target,
+
+                                    RenderType = SaintsRenderType.NativeProperty,
+                                    PropertyInfo = propertyInfo,
+                                    InherentDepth = inherentDepth,
+                                    Order = order,
+                                });
+                            }
+                            #endregion
+
+                        }
+                            break;
+                    }
                 }
-                #endregion
-
-                #region NativeProperty
-                IEnumerable<PropertyInfo> propertyInfos = systemType
-                    .GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                    .Where(p => p.GetCustomAttributes(typeof(ShowInInspectorAttribute), true).Length > 0);
-
-                foreach (PropertyInfo propertyInfo in propertyInfos)
-                {
-                    IReadOnlyList<IPlayaAttribute> playaAttributes = propertyInfo.GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
-
-                    OrderedAttribute orderProp =
-                        playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
-                    int order = orderProp?.Order ?? int.MinValue;
-                    fieldWithInfos.Add(new SaintsFieldWithInfo
-                    {
-                        PlayaAttributes = playaAttributes,
-                        Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
-                        Target = target,
-
-                        RenderType = SaintsRenderType.NativeProperty,
-                        PropertyInfo = propertyInfo,
-                        InherentDepth = inherentDepth,
-                        Order = order,
-                    });
-                }
-                #endregion
             }
 
             if (pendingSerializedProperties.Count > 0)

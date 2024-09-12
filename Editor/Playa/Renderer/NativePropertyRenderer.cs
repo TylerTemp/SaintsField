@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using System.Reflection;
+using SaintsField.Playa;
+using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Linq;
@@ -10,8 +12,11 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class NativePropertyRenderer: AbsRenderer
     {
+        private bool _renderField;
+
         public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
         {
+            _renderField = fieldWithInfo.PropertyInfo.GetCustomAttribute<ShowInInspectorAttribute>() != null;
         }
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private VisualElement _fieldElement;
@@ -69,6 +74,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
+            if (!_renderField)
+            {
+                return;
+            }
+
             object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
@@ -76,11 +86,20 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
+            if (!_renderField)
+            {
+                return 0f;
+            }
             return FieldHeight(FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target), ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name));
         }
 
         protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
         {
+            if (!_renderField)
+            {
+                return;
+            }
+
             object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
             FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .PropertyInfo.Name));
