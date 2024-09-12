@@ -5,11 +5,11 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
 using Button = UnityEngine.UI.Button;
-using Image = UnityEngine.UI.Image;
 
 namespace SaintsField.Editor.Drawers
 {
@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers
         private enum FieldType
         {
             NotFoundOrValid,
-            Image,
+            Graphic,
             SpriteRenderer,
             Button,
             Renderer,
@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable InconsistentNaming
             public string Error;
             public FieldType FieldType;
-            public Image Image;
+            public Graphic Graphic;
             public SpriteRenderer SpriteRenderer;
             public Button Button;
             public Renderer Renderer;
@@ -42,11 +42,6 @@ namespace SaintsField.Editor.Drawers
         }
 
         private Container _container;
-
-        // private SerializedProperty _containerProperty;
-        // private bool _isUiImage;
-        // private Image _image;
-        // private SpriteRenderer _spriteRenderer;
 
         private const string SelectedStr = "●";
         private const string NonSelectedStr = "○";
@@ -128,10 +123,10 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            Image image = thisComponent.GetComponent<Image>();
-            if (image != null)
+            Graphic graphic = thisComponent.GetComponent<Graphic>();
+            if (graphic != null)
             {
-                return SignObject(image);
+                return SignObject(graphic);
             }
 
             Button button = thisComponent.GetComponent<Button>();
@@ -162,11 +157,11 @@ namespace SaintsField.Editor.Drawers
         {
             switch (foundObj)
             {
-                case Image image:
+                case Graphic graphic:
                     return new Container
                     {
-                        FieldType = FieldType.Image,
-                        Image = image,
+                        FieldType = FieldType.Graphic,
+                        Graphic = graphic,
                         Error = "",
                     };
                 case SpriteRenderer spriteRenderer:
@@ -194,7 +189,7 @@ namespace SaintsField.Editor.Drawers
                 case Component _:
                 {
                     UnityEngine.Object obj = (UnityEngine.Object)foundObj;
-                    UnityEngine.Object actualObj = Util.GetTypeFromObj(obj, typeof(Image))
+                    UnityEngine.Object actualObj = Util.GetTypeFromObj(obj, typeof(Graphic))
                                                    ?? Util.GetTypeFromObj(obj, typeof(SpriteRenderer))
                                                    ?? Util.GetTypeFromObj(obj, typeof(Button))
                                                    ?? Util.GetTypeFromObj(obj, typeof(Renderer));
@@ -213,11 +208,6 @@ namespace SaintsField.Editor.Drawers
                     };
                     // break;
             }
-        }
-
-        private static UnityEngine.Object GetFromGo(GameObject go)
-        {
-            return (UnityEngine.Object)go.GetComponent<Image>() ?? (UnityEngine.Object)go.GetComponent<SpriteRenderer>() ?? (UnityEngine.Object)go.GetComponent<Button>() ?? go.GetComponent<Renderer>();
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
@@ -246,11 +236,6 @@ namespace SaintsField.Editor.Drawers
                 {
                     // Debug.Log("Changed!");
                     SetColor(_container, thisColor, toggleAttribute.Index);
-                    // SerializedObject containerSer = _isUiImage
-                    //     ? new SerializedObject(_image)
-                    //     : new SerializedObject(_spriteRenderer);
-                    // containerSer.FindProperty("m_Sprite").objectReferenceValue = thisSprite;
-                    // containerSer.ApplyModifiedProperties();
                 }
             }
 
@@ -263,15 +248,34 @@ namespace SaintsField.Editor.Drawers
 
             switch (container.FieldType)
             {
-                case FieldType.Image:
-                    serializedObject = new SerializedObject(container.Image);
-                    serializedObject.FindProperty("m_Color").colorValue = thisColor;
-                    serializedObject.ApplyModifiedProperties();
+                case FieldType.Graphic:
+                    serializedObject = new SerializedObject(container.Graphic);
+                    SerializedProperty fontColorProp = serializedObject.FindProperty("m_fontColor");  // TMP_Pro
+                    if (fontColorProp != null)
+                    {
+                        fontColorProp.colorValue = thisColor;
+                        serializedObject.ApplyModifiedProperties();
+                    }
+                    else
+                    {
+                        SerializedProperty colorProp = serializedObject.FindProperty("m_Color");
+                        if(colorProp != null)
+                        {
+                            colorProp.colorValue = thisColor;
+                            serializedObject.ApplyModifiedProperties();
+                        }
+                    }
+
+                    Undo.RecordObject(container.Graphic, "ColorToggle");
+                    container.Graphic.color = thisColor;
                     break;
                 case FieldType.SpriteRenderer:
                     serializedObject = new SerializedObject(container.SpriteRenderer);
                     serializedObject.FindProperty("m_Color").colorValue = thisColor;
                     serializedObject.ApplyModifiedProperties();
+
+                    Undo.RecordObject(container.SpriteRenderer, "ColorToggle");
+                    container.SpriteRenderer.color = thisColor;
                     break;
                 case FieldType.Button:
                     // Undo.RecordObject(container.Button.targetGraphic, "ColorToggle");
@@ -279,6 +283,9 @@ namespace SaintsField.Editor.Drawers
                     serializedObject = new SerializedObject(container.Button.targetGraphic);
                     serializedObject.FindProperty("m_Color").colorValue = thisColor;
                     serializedObject.ApplyModifiedProperties();
+
+                    Undo.RecordObject(container.Button.targetGraphic, "ColorToggle");
+                    container.Button.targetGraphic.color = thisColor;
                     break;
                 case FieldType.Renderer:
                     // Undo.RecordObject(container.Renderer, "ColorToggle");
@@ -298,8 +305,8 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (container.FieldType)
             {
-                case FieldType.Image:
-                    return container.Image.color;
+                case FieldType.Graphic:
+                    return container.Graphic.color;
                 case FieldType.SpriteRenderer:
                     return container.SpriteRenderer.color;
                 case FieldType.Button:
