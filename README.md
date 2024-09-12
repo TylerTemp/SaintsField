@@ -72,7 +72,10 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 **3.3.3**
 
-1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (note: `<icon>` in `RichLabel` will not work and will get removed)
+1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (note: `<icon>` in `RichLabel` will not work and will get removed).
+2.  Change the order of static/readonly field of `ShowInInspector` so it can stay at the position where it declared. Change the order of `property` to be above `method`.
+3.  Fix compile error on old Unity version.
+4.  `ColorToggle` supports `Graphic` (`text`, `TMP_Text`, `Image` etc). [#83](https://github.com/TylerTemp/SaintsField/issues/83)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
