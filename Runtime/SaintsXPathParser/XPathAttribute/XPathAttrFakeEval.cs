@@ -1,0 +1,208 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SaintsField.SaintsXPathParser.XPathFilter;
+using UnityEngine;
+
+namespace SaintsField.SaintsXPathParser.XPathAttribute
+{
+    public class XPathAttrFakeEval: XPathAttrBase
+    {
+        // @{GetComponent(MyComponent)...}
+        // @{GetComponents(MyComponent)...}
+        // @{GetComponents(MyComponent)[0]...}
+        // @{GetComponents(MyComponent)[last()]...}
+        // @{GetComponents(MyComponent)[index() > 1]...}
+        // but `@{` and `}` are removed already
+
+        // GetComponent(MyComponent) equals to GetComponents(MyComponent)[0]
+
+        public enum ExecuteType
+        {
+            FieldOrProperty,
+            Method,
+            GetComponents,
+            // Index,
+            // DictionaryKey,
+        }
+
+        public struct ExecuteFragment
+        {
+            public ExecuteType ExecuteType;
+            public string ExecuteString;
+
+            public IReadOnlyList<FilterComparerBase> ExecuteIndexer;
+        }
+
+        // public readonly string ComponentName;
+        // public XPathAttrIndexComparer IndexComparer;
+
+        public IReadOnlyList<ExecuteFragment> ExecuteFragments;
+
+        public XPathAttrFakeEval(string evalString)
+        {
+            List<ExecuteFragment> executeFragments = new List<ExecuteFragment>();
+            // string[] endRoundBracketSplit = evalString.Split(')', 2);
+            // ComponentName = endRoundBracketSplit[0].Split('(', 2)[1].Trim();
+            // string indexFilterAndRest = endRoundBracketSplit[1];
+            //
+            // string restQuery;
+            //
+            // if (evalString.StartsWith("GetComponent("))
+            // {
+            //     restQuery = indexFilterAndRest;
+            //     IndexComparer = new XPathAttrIndexComparer(XPathAttrIndexComparer.IndexComparer.Equal, 0);
+            // }
+            // else
+            // {
+            //     if (indexFilterAndRest.StartsWith('['))
+            //     {
+            //         string[] squareBracketSplit = indexFilterAndRest.Split(']', 2);
+            //         string indexFilterStr = squareBracketSplit[0].Substring(1);
+            //         restQuery = squareBracketSplit[1];
+            //
+            //         IndexComparer = XPathAttrIndexComparer.Parse(indexFilterStr).indexComparer;
+            //     }
+            //     else
+            //     {
+            //         restQuery = indexFilterAndRest;
+            //         IndexComparer = null;
+            //     }
+            // }
+            //
+            // if (restQuery == "")
+            // {
+            //     return;
+            // }
+            //
+            // Debug.Assert(restQuery.StartsWith('.'), evalString);
+
+            // ReSharper disable once ReplaceSubstringWithRangeIndexer
+            // string toSplitQuery = restQuery.Substring(1);
+
+            Queue<string> evalFragmentQuery = new Queue<string>(evalString.Split('.'));
+            while (evalFragmentQuery.Count > 0)
+            {
+                string fragmentStr = evalFragmentQuery.Dequeue();
+                bool isGetComponent = fragmentStr.StartsWith("GetComponent(");
+                if (isGetComponent || fragmentStr.StartsWith("GetComponents("))
+                {
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                    string getComponentLeftPart = fragmentStr.Substring(fragmentStr.IndexOf('('));
+                    (string getComponentTarget, string leftFragmentStr) = ReadUntilEndBracket(getComponentLeftPart, evalFragmentQuery);
+
+                    FilterComparerBase[] leftFilter = leftFragmentStr.StartsWith('[')
+                        ? XPathBracketParser.ParseFilter(leftFragmentStr)
+                            .Select(each => each.filterComparerBase)
+                            .ToArray()
+                        : Array.Empty<FilterComparerBase>();
+
+                    if (isGetComponent)
+                    {
+                        Debug.Assert(getComponentTarget != "", fragmentStr);
+                        executeFragments.Add(new ExecuteFragment
+                        {
+                            ExecuteType = ExecuteType.GetComponents,
+                            ExecuteString = getComponentTarget,
+                            ExecuteIndexer = leftFilter.Prepend(new FilterComparerInt(FilterComparer.Equal, 0)).ToArray(),
+                        });
+                    }
+                    else // GetComponents
+                    {
+                        executeFragments.Add(new ExecuteFragment
+                        {
+                            ExecuteType = ExecuteType.GetComponents,
+                            ExecuteString = string.IsNullOrEmpty(getComponentTarget)? null: getComponentTarget,
+                            ExecuteIndexer = leftFilter,
+                        });
+                    }
+                }
+                else
+                {
+                    int indexerIndex = fragmentStr.IndexOf('(');
+                    string nameFragment;
+                    string filterFragment;
+                    if (indexerIndex == -1)
+                    {
+                        nameFragment = fragmentStr;
+                        filterFragment = null;
+                    }
+                    else
+                    {
+                        nameFragment = fragmentStr.Substring(0, indexerIndex);
+                        filterFragment = fragmentStr.Substring(indexerIndex);
+                    }
+
+                    FilterComparerBase[] leftFilter = filterFragment ==  null
+                        ? Array.Empty<FilterComparerBase>()
+                        : XPathBracketParser.ParseFilter(filterFragment)
+                            .Select(each => each.filterComparerBase)
+                            .ToArray();
+
+                    if(nameFragment == "rectComponent")
+                    {
+                        executeFragments.Add(new ExecuteFragment
+                        {
+                            ExecuteType = ExecuteType.GetComponents,
+                            ExecuteString = typeof(RectTransform).FullName,
+                            ExecuteIndexer = leftFilter.Prepend(new FilterComparerInt(FilterComparer.Equal, 0)).ToArray(),
+                        });
+                    }
+                    else if (nameFragment.EndsWith("()"))
+                    {
+                        executeFragments.Add(new ExecuteFragment
+                        {
+                            ExecuteType = ExecuteType.Method,
+                            // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                            ExecuteString = nameFragment.Substring(0, nameFragment.Length - 2),
+                            ExecuteIndexer = leftFilter,
+                        });
+                    }
+                    else
+                    {
+                        executeFragments.Add(new ExecuteFragment
+                        {
+                            ExecuteType = ExecuteType.FieldOrProperty,
+                            ExecuteString = nameFragment,
+                            ExecuteIndexer = leftFilter,
+                        });
+                    }
+                }
+            }
+
+            ExecuteFragments = executeFragments;
+        }
+
+        private static (string getComponentTarget, string leftFragmentStr) ReadUntilEndBracket(string getComponentLeftPart, Queue<string> evalFragmentQuery)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            Queue<char> chars = new Queue<char>(getComponentLeftPart);
+            while(chars.Count > 0)
+            {
+                char c = chars.Dequeue();
+                if (c == ')')
+                {
+                    return (stringBuilder.ToString(), new string(chars.ToArray()));
+                }
+
+                stringBuilder.Append(c);
+            }
+
+            while (evalFragmentQuery.Count > 0)
+            {
+                string fragmentStr = evalFragmentQuery.Dequeue();
+                int endBracketIndex = fragmentStr.IndexOf(')');
+                if (endBracketIndex != -1)
+                {
+                    stringBuilder.Append(fragmentStr.Substring(0, endBracketIndex));
+                    return (stringBuilder.ToString(), fragmentStr.Substring(endBracketIndex + 1));
+                }
+
+                stringBuilder.Append(fragmentStr);
+            }
+
+            throw new ArgumentException($"No end bracket found in `{getComponentLeftPart}` and rest parts");
+        }
+    }
+}
