@@ -541,7 +541,12 @@ namespace SaintsField.Editor.Core
                     bool matched;
                     if (isGenericType)
                     {
-                        matched = fieldType.GetGenericTypeDefinition() == propertyAttributeToPropertyDrawer.Key;
+                        Type genericType = fieldType.GetGenericTypeDefinition();
+                        // maybe we only need the first one condition?
+                        matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType) || genericType == propertyAttributeToPropertyDrawer.Key || genericType.IsSubclassOf(propertyAttributeToPropertyDrawer.Key);
+                        // Debug.Log(fieldType.GetGenericTypeDefinition().IsSubclassOf(propertyAttributeToPropertyDrawer.Key));
+                        // Debug.Log(fieldType.IsAssignableFrom(propertyAttributeToPropertyDrawer.Key));
+                        // Debug.Log(propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType));
                         // ReSharper disable once MergeIntoPattern
                         if (!matched && fieldType.BaseType != null && fieldType.BaseType.IsGenericType)
                         {
@@ -566,7 +571,7 @@ namespace SaintsField.Editor.Core
                     {
                         Type foundDrawer = propertyAttributeToPropertyDrawer.Value.FirstOrDefault(each => !each.isSaints).drawerType;
     #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                        Debug.Log($"foundDrawer={foundDrawer}");
+                        Debug.Log($"foundDrawer={foundDrawer} for {fieldType}");
     #endif
                         if(foundDrawer != null)
                         {
@@ -637,9 +642,53 @@ namespace SaintsField.Editor.Core
             }
 
             MethodInfo uiToolkitMethod = foundDrawer.GetMethod("CreatePropertyGUI");
-            if (uiToolkitMethod == null)
+            // Debug.Assert(uiToolkitMethod != null, foundDrawer);
+            // Debug.Log($"uiToolkitMethod: {uiToolkitMethod}");
+            // if (uiToolkitMethod == null)
+            // {
+            //     return PropertyFieldFallbackUIToolkit(property);
+            // }
+
+            if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType != foundDrawer)  // null: old Unity || did not override
             {
-                return PropertyFieldFallbackUIToolkit(property);
+                PropertyDrawer imGuiDrawer = MakePropertyDrawer(foundDrawer, fieldInfo);
+                MethodInfo imGuiGetPropertyHeightMethod = foundDrawer.GetMethod("GetPropertyHeight");
+                MethodInfo imGuiOnGUIMethodInfo = foundDrawer.GetMethod("OnGUI");
+                Debug.Assert(imGuiGetPropertyHeightMethod != null);
+                Debug.Assert(imGuiOnGUIMethodInfo != null);
+
+                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+
+                EditorStyles.label.richText = true;
+                EditorStyles.foldout.richText = true;
+
+                IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
+                {
+                    GUIContent label = imguiLabelHelper.NoLabel
+                        ? GUIContent.none
+                        : new GUIContent(imguiLabelHelper.RichLabel);
+
+                    float height =
+                        (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
+                    Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
+
+                    using(new ImGuiFoldoutStyleRichTextScoop())
+                    using(new ImGuiLabelStyleRichTextScoop())
+                    {
+                        imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
+                    }
+                })
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 0,
+                    },
+                    userData = imguiLabelHelper,
+                };
+                imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
+
+                return imGuiContainer;
             }
 
             // Debug.Log("Yes");
@@ -1031,9 +1080,10 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // Debug.Log($"{position.width}/{Event.current.type}");
             // Debug.Log($"OnGui Start: {SepTitleAttributeDrawer.drawCounter}");
             // this is so weird... because of Unity's repaint, layout etc.
-            if(position.width - 1 > Mathf.Epsilon)
+            if(position.width - 1 > Mathf.Epsilon && Event.current.type == EventType.Repaint)
             {
                 _filedWidthCache = position.width;
             }
@@ -1665,30 +1715,32 @@ namespace SaintsField.Editor.Core
 
             using (new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
             {
-#if UNITY_2022_1_OR_NEWER
-                Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
-                    .Select(propertyAttribute =>
-                    {
-                        // Debug.Log(propertyAttribute.GetType());
-                        Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-                            out IReadOnlyList<Type> eachDrawers)
-                            ? eachDrawers[0]
-                            : null;
-
-                        // Debug.Log($"Found {results}");
-
-                        return results;
-                    })
-                    .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"get dec {dec} for {property.propertyPath}");
-#endif
-                if (dec != null && ImGuiRemoveDecDraw(position, property, label))
-                {
-                    return;
-                }
-#endif
+                // this is no longer needed for no good reason. Need more investigation and testing
+                // this code is used to prevent the decorator to be drawn everytime a fallback happens
+// #if UNITY_2022_1_OR_NEWER
+//                 Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
+//                     .Select(propertyAttribute =>
+//                     {
+//                         // Debug.Log(propertyAttribute.GetType());
+//                         Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
+//                             out IReadOnlyList<Type> eachDrawers)
+//                             ? eachDrawers[0]
+//                             : null;
+//
+//                         // Debug.Log($"Found {results}");
+//
+//                         return results;
+//                     })
+//                     .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
+//
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+//                 Debug.Log($"get dec {dec} for {property.propertyPath}");
+// #endif
+//                 if (dec != null && ImGuiRemoveDecDraw(position, property, label))
+//                 {
+//                     return;
+//                 }
+// #endif
 
                 EditorGUI.PropertyField(position, property, label, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");

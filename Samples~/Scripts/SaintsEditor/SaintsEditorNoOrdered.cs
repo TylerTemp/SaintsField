@@ -1,15 +1,15 @@
-using SaintsField.Playa;
+﻿using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class SaintsEditorExample : SaintsMonoBehaviour
+    public class SaintsEditorNoOrdered : SaintsMonoBehaviour
     {
-        [Ordered] public string myStartField;
-        [ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
-        [ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+        public string myStartField;
+        [ShowInInspector] public const float MyConstFloat = 3.14f;
+        [ShowInInspector] public static readonly Color MyColor = Color.green;
 
-        [ShowInInspector, Ordered]
+        [ShowInInspector]
         public Color AutoColor
         {
             get => Color.green;
@@ -20,21 +20,21 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             }
         }
 
-        [Button, Ordered]
+        [Button]
         private void EditorButton()
         {
             Debug.Log("EditorButton");
         }
 
-        [Button("Label"), Ordered]
+        [Button("Label")]
         private void EditorLabeledButton()
         {
             Debug.Log("EditorLabeledButton");
         }
 
-        [Ordered] public string myOtherFieldUnderneath;
+        public string myOtherFieldUnderneath;
         [BelowRichLabel(nameof(_testEnum), true)]
-        [Ordered] public string other;
+        public string other;
 
         private enum TestEnum
         {
@@ -42,10 +42,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             Second = 2,
         }
 
-        [ShowInInspector, Ordered]
+        [ShowInInspector]
         private TestEnum _testEnum;
 
-        [Button("Set Value"), Ordered]
+        [Button("Set Value")]
         private void SetEnumValue()
         {
             // Debug.Log(_testEnum);

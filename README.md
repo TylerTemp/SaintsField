@@ -55,10 +55,14 @@ Unity: 2019.1 or higher
     git submodule add https://github.com/TylerTemp/SaintsField.git Assets/SaintsField
     ```
 
-If you have DOTween installed, please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+If you have DOTween installed
+*   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+*   Or disable related functions with `Window` - `Saints` - `Disable DOTween Support`
+*   If you can not find this menu, please read "Add a Macro" section about how to manually disable DOTween support in SaintsField.
 
+[**Optional**] To use the full functions of this project, please also do: `Window` - `Saints` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`. 
 
-If you're using `unitypackage` or git submodule but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
+If you're using `unitypackage` or git submodule, but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy files from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
@@ -66,9 +70,12 @@ If you're using `unitypackage` or git submodule but you put this project under a
 
 ## Change Log ##
 
-**3.3.1**
+**3.3.3**
 
-Fix `Dropdown` & `AdvancedDropdown` not work on list/array.
+1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (note: `<icon>` in `RichLabel` will not work and will get removed).
+2.  Change the order of static/readonly field of `ShowInInspector` so it can stay at the position where it declared. Change the order of `property` to be above `method`.
+3.  Fix compile error on old Unity version.
+4.  `ColorToggle` supports `Graphic` (`text`, `TMP_Text`, `Image` etc). [#83](https://github.com/TylerTemp/SaintsField/issues/83)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2471,7 +2478,7 @@ Special Note:
 
 ```csharp
 using SaintsField;
-using SaintsField.Playa;
+using SaintsField.Playa;  // SaintsEditor is not required here
 
 [Serializable]
 public struct Nest
@@ -2819,7 +2826,7 @@ If you are interested, here is how to use it.
 
 ### Setup SaintsEditor ###
 
-`Window` - `Saints` - `Apply SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
+`Window` - `Saints` - `Enable SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
@@ -2838,6 +2845,7 @@ Parameters:
     *   `Rewind`: rewind to the start state
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 using SaintsField;
 
@@ -2869,7 +2877,7 @@ private Sequence PlayTween2()
 
 The first row is global control. Stop it there will stop all preview.
 
-The check of each row means auto play when you click the start in the global control.
+The check of each row means autoplay when you click the start in the global control.
 
 [![dotween_play](https://github.com/TylerTemp/SaintsField/assets/6391063/d9479943-b254-4819-af91-c390a9fb2268)](https://github.com/TylerTemp/SaintsField/assets/6391063/34f36f5d-6697-4b68-9773-ce37672b850c)
 
@@ -2882,6 +2890,7 @@ To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Cr
 A convenient way to add many method to `DOTweenPlay`.
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [DOTweenPlayGroup(groupBy: "Color")]
@@ -2928,6 +2937,7 @@ Draw a button for a function. If the method have arguments (required or optional
 *   `string buttonLabel = null` the button label. If null, it'll use the function name.
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Button]
@@ -2948,6 +2958,7 @@ private void EditorLabeledButton()
 Example with arguments:
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Button]
@@ -2964,6 +2975,7 @@ private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = 
 Show a non-field property.
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 // const
@@ -2989,6 +3001,7 @@ public Color AutoColor
 Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Ordered] public string myStartField;
@@ -3056,6 +3069,7 @@ Options are:
 
 ```csharp
 using SaintsField;
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Layout("Titled", ELayout.Title | ELayout.TitleOut)]
@@ -3224,6 +3238,7 @@ For `LayoutEnd`:
 It supports `./SubGroup` to create a nested subgroup:
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [LayoutStart("Root", ELayout.FoldoutBox)]
@@ -3262,6 +3277,7 @@ public int tab2Item2;
 example of using `LayoutStart` with `LayoutEnd`:
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public string beforeGroup;
@@ -3280,6 +3296,7 @@ public string afterGroup;
 example of using new group name to stop grouping:
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public string breakBefore;
@@ -3306,6 +3323,7 @@ public string breakAfter;
 example of using `keepGrouping: false` to stop grouping, but keep the last one in group:
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public string beforeGroupLast;
@@ -3331,6 +3349,7 @@ Different from `ShowIf`/`HideIf`:
 2.  Callback function can not receive value and index
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 public bool boolValue;
@@ -3382,6 +3401,7 @@ Different from `EnableIf`/`DisableIf` in the following:
 3.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [PlayaDisableIf] public int[] justDisable;
@@ -3424,6 +3444,7 @@ Parameters:
 *   `bool isCallback=false` if it's a callback (a method/property/field)
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [PlayaRichLabel("<color=lame>It's Labeled!")]
@@ -3480,6 +3501,7 @@ This is like `InfoBox`, but it can be applied to array/list/button etc.
 *   AllowMultiple: Yes
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
@@ -3518,6 +3540,7 @@ Parameters:
 *   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [OnButtonClick]
@@ -3625,6 +3648,7 @@ Parameters:
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 [Serializable]

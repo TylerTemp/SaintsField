@@ -35,29 +35,8 @@ namespace SaintsField.Editor.Utils
         #region SaintsEditor
 
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY
-        [MenuItem("Window/Saints/SaintsEditor/Unapply")]
+        [MenuItem("Window/Saints/SaintsEditor/Disable SaintsEditor")]
         public static void SaintsEditorUnapply() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_APPLY");
-
-//         #region Enable UI Toolkit Label Fix
-// #if SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE
-//         [MenuItem("Window/Saints/SaintsEditor/Enable UI Toolkit Label Fix")]
-//         public static void SaintsEditorTryFixUIToolkit() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE");
-//
-// #if SAINTSFIELD_UI_TOOLKIT_DISABLE
-//         [MenuItem("Window/Saints/SaintsEditor/Enable UI Toolkit Label Fix", true)]
-//         public static bool SaintsEditorTryFixUIToolkitEnabled() => false;
-// #endif
-//
-// #else
-//         [MenuItem("Window/Saints/SaintsEditor/Disable UI Toolkit Label Fix")]
-//         public static void SaintsEditorTryFixUIToolkit() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_UI_TOOLKIT_LABEL_FIX_DISABLE");
-// #if SAINTSFIELD_UI_TOOLKIT_DISABLE
-//         [MenuItem("Window/Saints/SaintsEditor/Disable UI Toolkit Label Fix", true)]
-//         public static bool SaintsEditorTryFixUIToolkitEnabled() => false;
-// #endif
-//
-// #endif
-//         #endregion
 
         #region IMGUI Constant Repaint
 #if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
@@ -69,7 +48,7 @@ namespace SaintsField.Editor.Utils
 #endif
         #endregion
 #else
-        [MenuItem("Window/Saints/Apply SaintsEditor")]
+        [MenuItem("Window/Saints/Enable SaintsEditor")]
         public static void ApplySaintsEditor() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_APPLY");
 #endif
 

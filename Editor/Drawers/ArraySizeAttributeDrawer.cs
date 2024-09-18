@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Drawers
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             if (parent == null)
             {
-                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectly");
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly");
                 return;
             }
 
@@ -153,6 +153,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
+            // ReSharper disable once MergeIntoNegatedPattern
             if (error != "" && (arrProp == null || !arrProp.isArray))
             {
                 error = $"{arrProp?.propertyPath} is not an array/list";
@@ -163,7 +164,8 @@ namespace SaintsField.Editor.Drawers
             int size = ((ArraySizeAttribute)saintsAttribute).Size;
 
             // ReSharper disable once InvertIf
-            if (error == "" && arrProp.isArray && arrProp.arraySize != size)
+            // ReSharper disable once MergeIntoPattern
+            if (error == "" && arrProp != null && arrProp.isArray && arrProp.arraySize != size)
             {
                 arrProp.arraySize = size;
                 arrProp.serializedObject.ApplyModifiedProperties();

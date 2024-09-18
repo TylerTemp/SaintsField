@@ -197,9 +197,11 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.Bounds:
                     property.boundsValue = (Bounds) newValue;
                     break;
+#if UNITY_2022_2_OR_NEWER
                 case SerializedPropertyType.Gradient:
                     property.gradientValue = (Gradient) newValue;
                     break;
+#endif
                 case SerializedPropertyType.Quaternion:
                     property.quaternionValue = (Quaternion) newValue;
                     break;
