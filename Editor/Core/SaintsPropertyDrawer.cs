@@ -1080,9 +1080,10 @@ namespace SaintsField.Editor.Core
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // Debug.Log($"{position.width}/{Event.current.type}");
             // Debug.Log($"OnGui Start: {SepTitleAttributeDrawer.drawCounter}");
             // this is so weird... because of Unity's repaint, layout etc.
-            if(position.width - 1 > Mathf.Epsilon)
+            if(position.width - 1 > Mathf.Epsilon && Event.current.type == EventType.Repaint)
             {
                 _filedWidthCache = position.width;
             }
@@ -1714,30 +1715,32 @@ namespace SaintsField.Editor.Core
 
             using (new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
             {
-#if UNITY_2022_1_OR_NEWER
-                Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
-                    .Select(propertyAttribute =>
-                    {
-                        // Debug.Log(propertyAttribute.GetType());
-                        Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-                            out IReadOnlyList<Type> eachDrawers)
-                            ? eachDrawers[0]
-                            : null;
-
-                        // Debug.Log($"Found {results}");
-
-                        return results;
-                    })
-                    .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"get dec {dec} for {property.propertyPath}");
-#endif
-                if (dec != null && ImGuiRemoveDecDraw(position, property, label))
-                {
-                    return;
-                }
-#endif
+                // this is no longer needed for no good reason. Need more investigation and testing
+                // this code is used to prevent the decorator to be drawn everytime a fallback happens
+// #if UNITY_2022_1_OR_NEWER
+//                 Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
+//                     .Select(propertyAttribute =>
+//                     {
+//                         // Debug.Log(propertyAttribute.GetType());
+//                         Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
+//                             out IReadOnlyList<Type> eachDrawers)
+//                             ? eachDrawers[0]
+//                             : null;
+//
+//                         // Debug.Log($"Found {results}");
+//
+//                         return results;
+//                     })
+//                     .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
+//
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+//                 Debug.Log($"get dec {dec} for {property.propertyPath}");
+// #endif
+//                 if (dec != null && ImGuiRemoveDecDraw(position, property, label))
+//                 {
+//                     return;
+//                 }
+// #endif
 
                 EditorGUI.PropertyField(position, property, label, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
