@@ -6,6 +6,6 @@ namespace SaintsField.SaintsXPathParser
     public struct XPathPredicate
     {
         public XPathAttrBase Attr;
-        public FilterComparer FilterComparer;
+        public FilterComparerBase FilterComparer;
     }
 }
