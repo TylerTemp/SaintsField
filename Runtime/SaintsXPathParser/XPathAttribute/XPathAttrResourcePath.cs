@@ -1,9 +1,7 @@
-﻿namespace SaintsField.SaintsXPathParser.XPathAttribute
+namespace SaintsField.SaintsXPathParser.XPathAttribute
 {
-    public class XPathAttrResourcePath: XPathAttrBasePath
+    public class XPathAttrResourcePath: XPathAttrBase
     {
-        public XPathAttrResourcePath(string basePath): base(basePath)
-        {
-        }
+
     }
 }

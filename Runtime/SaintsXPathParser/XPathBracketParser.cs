@@ -34,25 +34,14 @@ namespace SaintsField.SaintsXPathParser
         {
             foreach (string chunk in Parse(value, '[', ']'))
             {
-                if (chunk == "last()")
+                if(int.TryParse(value, out int num))
                 {
-                    yield return (
-                        new XPathAttrIndex(),
-                        new FilterComparerInt(FilterComparer.Equal, -1)
-                    );
-                }
-                string[] parts = chunk.Split(' ', 2);
-
-                string attributePart = parts[0];
-                XPathAttrBase attrBase = XPathAttrBase.Parser(attributePart);
-
-                if (parts.Length == 1)
-                {
-                    yield return (attrBase, null);
+                    yield return (new XPathAttrIndex(false), new FilterComparerInt(FilterComparer.Equal, num));
                     continue;
                 }
 
-                yield return (attrBase, FilterComparerBase.Parser(parts[1].Trim()));
+                (XPathAttrBase attrBase, string left) = XPathAttrBase.Parser(chunk);
+                yield return (attrBase, FilterComparerBase.Parser(left));
             }
         }
     }

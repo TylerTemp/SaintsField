@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SaintsField.SaintsXPathParser.XPathAttribute;
+using UnityEngine;
 
 // ReSharper disable ReplaceSubstringWithRangeIndexer
 
@@ -17,7 +18,13 @@ namespace SaintsField.SaintsXPathParser
             {
                 (string axisNameRaw, string attrRaw, string nodeTestRaw, string predicatesRaw) = SplitStep(stepContent);
                 AxisName axisName = ParseAxisName(axisNameRaw);
-                XPathAttrBase attr = string.IsNullOrEmpty(attrRaw) ? null : XPathAttrBase.Parser(attrRaw);
+                XPathAttrBase attr = null;
+                if(!string.IsNullOrEmpty(attrRaw))
+                {
+                    (XPathAttrBase xPathAttrBase, string leftContent) = XPathAttrBase.Parser(attrRaw);
+                    Debug.Assert(leftContent == "", attrRaw);
+                    attr = xPathAttrBase;
+                }
                 NodeTest nodeTest = ParseNodeTest(nodeTestRaw);
                 IReadOnlyList<XPathPredicate> predicates = string.IsNullOrEmpty(predicatesRaw)
                     ? Array.Empty<XPathPredicate>()

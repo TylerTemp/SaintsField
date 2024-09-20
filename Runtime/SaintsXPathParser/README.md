@@ -51,6 +51,8 @@ step: `axisname::nodetest[predicate]`
 *   `@{activeSelf}`/`@{gameObject.activeSelf}`（其实是读取对应属性）
 *   `@{enabled}`/`@{GetComponent(MyScript).enabled}`/`@{GetComponents(MyScript).enabled}` （其实是读取对应属性）
 *   `@{GetComponents()}`
+*   `@resource-path()`
+*   `@asset-path()`
 *   其它的不支持
 
 **Callback**

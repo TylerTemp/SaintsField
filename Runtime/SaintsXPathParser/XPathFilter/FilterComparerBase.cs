@@ -13,6 +13,11 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
 
         public static FilterComparerBase Parser(string fullPart)
         {
+            if (fullPart == "")
+            {
+                return null;
+            }
+
             if(int.TryParse(fullPart, out int fullNum))
             {
                 return new FilterComparerInt(FilterComparer.Equal, fullNum);

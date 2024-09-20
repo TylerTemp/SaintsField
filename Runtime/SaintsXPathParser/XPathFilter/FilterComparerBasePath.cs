@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.SaintsXPathParser.XPathFilter;
 
-namespace SaintsField.SaintsXPathParser.XPathAttribute
+namespace SaintsField.SaintsXPathParser.XPathFilter
 {
-    public abstract class XPathAttrBasePath: XPathAttrBase
+    public abstract class FilterComparerBasePath: FilterComparerBase
     {
         public struct PathFragment
         {
@@ -23,7 +22,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
 
         public IReadOnlyList<PathFragment> PathFragments;
 
-        protected XPathAttrBasePath(string basePath)
+        protected FilterComparerBasePath(string basePath, FilterComparer filterComparer): base(filterComparer)
         {
             List<PathFragment> pathFragments = new List<PathFragment>();
             bool nextIsDescendant = false;
@@ -116,8 +115,6 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
             {
                 return (null, part);
             }
-
-            string indexComparerStr = split[1].Substring(0, split[1].Length - 1).Trim();
 
             return ((FilterComparerInt)FilterComparerBase.Parser(split[1]), split[0]);
         }
