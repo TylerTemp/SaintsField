@@ -257,5 +257,10 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static string GetUniqueId(SerializedProperty property)
+        {
+            return $"{property.serializedObject.targetObject.GetInstanceID()}.{property.propertyPath}";
+        }
+
     }
 }

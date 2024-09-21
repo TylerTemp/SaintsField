@@ -6,5 +6,10 @@ namespace SaintsField.Samples.Scripts
     {
         public string comment;
         public string GetComment() => comment;
+
+        [SerializeField]
+        private Transform targetTransform;
+
+        private Transform GetTargetTransform() => targetTransform;
     }
 }

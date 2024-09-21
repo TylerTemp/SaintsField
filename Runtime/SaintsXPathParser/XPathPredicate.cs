@@ -7,5 +7,10 @@ namespace SaintsField.SaintsXPathParser
     {
         public XPathAttrBase Attr;
         public FilterComparerBase FilterComparer;
+
+        public override string ToString()
+        {
+            return $"`{Attr} {FilterComparer}`";
+        }
     }
 }

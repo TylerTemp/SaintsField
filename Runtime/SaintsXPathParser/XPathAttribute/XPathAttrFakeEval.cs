@@ -33,53 +33,21 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
             public string ExecuteString;
 
             public IReadOnlyList<FilterComparerBase> ExecuteIndexer;
+
+            public override string ToString()
+            {
+                return $"`{ExecuteType}=>{ExecuteString}[{string.Join(" ", ExecuteIndexer)}]`";
+            }
         }
 
         // public readonly string ComponentName;
         // public XPathAttrIndexComparer IndexComparer;
 
-        public IReadOnlyList<ExecuteFragment> ExecuteFragments;
+        public readonly IReadOnlyList<ExecuteFragment> ExecuteFragments;
 
         public XPathAttrFakeEval(string evalString)
         {
             List<ExecuteFragment> executeFragments = new List<ExecuteFragment>();
-            // string[] endRoundBracketSplit = evalString.Split(')', 2);
-            // ComponentName = endRoundBracketSplit[0].Split('(', 2)[1].Trim();
-            // string indexFilterAndRest = endRoundBracketSplit[1];
-            //
-            // string restQuery;
-            //
-            // if (evalString.StartsWith("GetComponent("))
-            // {
-            //     restQuery = indexFilterAndRest;
-            //     IndexComparer = new XPathAttrIndexComparer(XPathAttrIndexComparer.IndexComparer.Equal, 0);
-            // }
-            // else
-            // {
-            //     if (indexFilterAndRest.StartsWith('['))
-            //     {
-            //         string[] squareBracketSplit = indexFilterAndRest.Split(']', 2);
-            //         string indexFilterStr = squareBracketSplit[0].Substring(1);
-            //         restQuery = squareBracketSplit[1];
-            //
-            //         IndexComparer = XPathAttrIndexComparer.Parse(indexFilterStr).indexComparer;
-            //     }
-            //     else
-            //     {
-            //         restQuery = indexFilterAndRest;
-            //         IndexComparer = null;
-            //     }
-            // }
-            //
-            // if (restQuery == "")
-            // {
-            //     return;
-            // }
-            //
-            // Debug.Assert(restQuery.StartsWith('.'), evalString);
-
-            // ReSharper disable once ReplaceSubstringWithRangeIndexer
-            // string toSplitQuery = restQuery.Substring(1);
 
             Queue<string> evalFragmentQuery = new Queue<string>(evalString.Split('.'));
             while (evalFragmentQuery.Count > 0)
@@ -89,7 +57,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
                 if (isGetComponent || fragmentStr.StartsWith("GetComponents("))
                 {
                     // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                    string getComponentLeftPart = fragmentStr.Substring(fragmentStr.IndexOf('('));
+                    string getComponentLeftPart = fragmentStr.Substring(fragmentStr.IndexOf('(') + 1);
                     (string getComponentTarget, string leftFragmentStr) = ReadUntilEndBracket(getComponentLeftPart, evalFragmentQuery);
 
                     FilterComparerBase[] leftFilter = leftFragmentStr.StartsWith('[')
@@ -203,6 +171,11 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
             }
 
             throw new ArgumentException($"No end bracket found in `{getComponentLeftPart}` and rest parts");
+        }
+
+        public override string ToString()
+        {
+            return $"@{{{string.Join(".", ExecuteFragments)}}}";
         }
     }
 }

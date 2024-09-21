@@ -25,8 +25,7 @@ namespace SaintsField.Editor.FuckDOTween
             // Debug.Log("Popup?");
             if(_doTweenHelperPanel == null)
             {
-                _doTweenHelperPanel = GetWindow<DOTweenHelperPanel>();
-                _doTweenHelperPanel.titleContent = new GUIContent("SaintsField DOTween Helper");
+                _doTweenHelperPanel = GetWindow<DOTweenHelperPanel>(title: "SaintsField DOTween Helper");
             }
             _doTweenHelperPanel.Show();
         }

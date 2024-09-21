@@ -13,8 +13,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             InfoBox("NaughtyAttributes not installed"),
 #endif
         ]
-        // ReSharper disable once NotAccessedField.Local
+
 #pragma warning disable 0262
+        // ReSharper disable once NotAccessedField.Local
         private Canvas naCenterMessageCanvas = default;
 #pragma warning restore 0262
 

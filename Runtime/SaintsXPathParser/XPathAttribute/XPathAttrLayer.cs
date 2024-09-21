@@ -2,7 +2,9 @@
 {
     public class XPathAttrLayer: XPathAttrBase
     {
-        public bool NotEqual;
-        public int Number;
+        public override string ToString()
+        {
+            return "@layer";
+        }
     }
 }

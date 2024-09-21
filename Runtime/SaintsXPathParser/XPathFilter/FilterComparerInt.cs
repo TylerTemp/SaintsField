@@ -7,5 +7,10 @@
         {
             Value = value;
         }
+
+        public override string ToString()
+        {
+            return $"Int{{{FilterComparer} {Value}}}";
+        }
     }
 }

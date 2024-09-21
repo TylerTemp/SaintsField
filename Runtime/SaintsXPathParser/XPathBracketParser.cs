@@ -2,6 +2,7 @@
 using System.Text;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
+using UnityEngine;
 
 namespace SaintsField.SaintsXPathParser
 {
@@ -32,15 +33,24 @@ namespace SaintsField.SaintsXPathParser
 
         public static IEnumerable<(XPathAttrBase attrBase, FilterComparerBase filterComparerBase)> ParseFilter(string value)
         {
+            // Debug.Log($"get filter raw {value}");
             foreach (string chunk in Parse(value, '[', ']'))
             {
-                if(int.TryParse(value, out int num))
+                if(int.TryParse(chunk, out int num))
                 {
+                    // Debug.Log($"yield index attribute {num}");
                     yield return (new XPathAttrIndex(false), new FilterComparerInt(FilterComparer.Equal, num));
                     continue;
                 }
 
+                if (chunk == "last()")
+                {
+                    yield return (new XPathAttrIndex(true), new FilterComparerInt(FilterComparer.Equal, -1));
+                    continue;
+                }
+
                 (XPathAttrBase attrBase, string left) = XPathAttrBase.Parser(chunk);
+                // Debug.Log($"yield {attrBase} {left}");
                 yield return (attrBase, FilterComparerBase.Parser(left));
             }
         }

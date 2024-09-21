@@ -70,6 +70,14 @@ namespace SaintsField.SaintsXPathParser
                     return NodeTest.ParentOrSelf;
                 case "::parent-or-self-inside-prefab":
                     return NodeTest.ParentOrSelfInsidePrefab;
+                case "::scene-root":
+                    return NodeTest.SceneRoot;
+                case "::prefab-root":
+                    return NodeTest.PrefabRoot;
+                case "::Resources":
+                    return NodeTest.Resources;
+                case "::Asset":
+                    return NodeTest.Asset;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(nodeTestRaw), nodeTestRaw, null);
             }
@@ -95,7 +103,7 @@ namespace SaintsField.SaintsXPathParser
                     if (hasContent)  // `content/`
                     {
                         yield return (sepCount, stepBuilder.ToString());
-                        sepCount = 0;
+                        sepCount = 1;
                         hasContent = false;
                         stepBuilder.Clear();
                         quoteBuilder = null;
@@ -158,10 +166,16 @@ namespace SaintsField.SaintsXPathParser
         {
             int nodeTestSepIndex = step.IndexOf("::", StringComparison.Ordinal);
             int attrSepIndex = step.IndexOf('@');
-
-            if (nodeTestSepIndex == -1 && attrSepIndex == -1)
+            int bracketSepIndex = step.IndexOf('[');
+            if (bracketSepIndex != -1 && bracketSepIndex < attrSepIndex)
             {
-                return (step, "", "", "");
+                attrSepIndex = -1;
+            }
+
+            if (nodeTestSepIndex == -1 && attrSepIndex == -1)  // name[filter]
+            {
+                (string axisName, string predicates) = SplitPredicates(step);
+                return (axisName, "", "", predicates);
             }
 
             if (nodeTestSepIndex != -1 && attrSepIndex != -1)
@@ -176,18 +190,18 @@ namespace SaintsField.SaintsXPathParser
                 }
             }
 
-            if (nodeTestSepIndex != -1)
+            if (nodeTestSepIndex != -1)  // name[filter]::nodeTest
             {
-                string axisName = step.Substring(0, nodeTestSepIndex);
-                string nodeTestAndPredicates = step.Substring(nodeTestSepIndex);
-                (string nodeTest, string predicates) = SplitPredicates(nodeTestAndPredicates);
+                string axisNameAndPredicates = step.Substring(0, nodeTestSepIndex);
+                string nodeTest = step.Substring(nodeTestSepIndex);
+                (string axisName, string predicates) = SplitPredicates(axisNameAndPredicates);
                 return (axisName, "", nodeTest, predicates);
             }
-            else
+            else  // name[filter]@attr
             {
-                string axisName = step.Substring(0, attrSepIndex);
-                string attrAndPredicates = step.Substring(attrSepIndex);
-                (string attr, string predicates) = SplitPredicates(attrAndPredicates);
+                string axisNameAndPredicates = step.Substring(0, attrSepIndex);
+                string attr = step.Substring(attrSepIndex);
+                (string axisName, string predicates) = SplitPredicates(axisNameAndPredicates);
                 return (axisName, attr, "", predicates);
             }
         }
@@ -208,13 +222,18 @@ namespace SaintsField.SaintsXPathParser
 
         private static AxisName ParseAxisName(string axisNameRaw)
         {
-            // ReSharper disable once MergeIntoLogicalPattern
-            if (axisNameRaw == "" || axisNameRaw == "*")
+            switch (axisNameRaw)
             {
-                return new AxisName
-                {
-                    NameAny = true,
-                };
+                case "":
+                    return new AxisName
+                    {
+                        NameEmpty = true,
+                    };
+                case "*":
+                    return new AxisName
+                    {
+                        NameAny = true,
+                    };
             }
 
             List<string> rawFragments = axisNameRaw.Split('*').ToList();

@@ -18,6 +18,19 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
 
             // indexer, e.g [-1], [index() > 1], [last()]
             public FilterComparerInt IndexComparer;
+
+            public override string ToString()
+            {
+                return "PF{" +
+                       (NameAny ? "NameAny" : "") +
+                       (ExactMatch != null ? $"ExactMatch: {ExactMatch}" : "") +
+                       (StartsWith != null ? $"StartsWith: {StartsWith}" : "") +
+                       (EndsWith != null ? $"EndsWith: {EndsWith}" : "") +
+                       (Contains != null ? $"Contains: {string.Join(", ", Contains)}" : "") +
+                       (Descendant ? "Descendant" : "") +
+                       (IndexComparer != null ? $"IndexComparer: {IndexComparer}" : "") +
+                       "}";
+            }
         }
 
         public IReadOnlyList<PathFragment> PathFragments;
@@ -117,6 +130,13 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
             }
 
             return ((FilterComparerInt)FilterComparerBase.Parser(split[1]), split[0]);
+        }
+
+        public override string ToString()
+        {
+            return "Path{" +
+                   string.Join(", ", PathFragments.Select(f => f.ToString())) +
+                   "}";
         }
     }
 }

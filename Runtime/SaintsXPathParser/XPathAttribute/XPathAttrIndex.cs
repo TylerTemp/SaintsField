@@ -8,5 +8,10 @@
         {
             Last = last;
         }
+
+        public override string ToString()
+        {
+            return $"@index{(Last ? "{last()}" : "")}";
+        }
     }
 }

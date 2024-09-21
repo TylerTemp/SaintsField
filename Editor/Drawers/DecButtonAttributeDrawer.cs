@@ -15,18 +15,53 @@ namespace SaintsField.Editor.Drawers
 {
     public abstract class DecButtonAttributeDrawer: SaintsPropertyDrawer
     {
-        protected string error = "";
-        private string _execError = "";
+        protected class ErrorInfo
+        {
+            public string Error = "";
+            public string _execError = "";
+        }
 
-        protected string DisplayError {
-            get
+        private static Dictionary<string, ErrorInfo> _imGuiSharedErrorInfo = new Dictionary<string, ErrorInfo>();
+
+#if UNITY_2019_2_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+#endif
+        [InitializeOnLoadMethod]
+        private static void ImGuiClearSharedData() => _imGuiSharedErrorInfo.Clear();
+
+
+        protected string GetDisplayError(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (!_imGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
             {
-                if (error != "" && _execError != "")
-                {
-                    return $"{error}\n\n{_execError}";
-                }
-                return $"{error}{_execError}";
+                return "";
             }
+
+            string Error = errorInfo.Error;
+            string _execError = errorInfo._execError;
+
+            if (Error != "" && _execError != "")
+            {
+                return $"{Error}\n\n{_execError}";
+            }
+            return $"{Error}{_execError}";
+        }
+
+        protected ErrorInfo GetOrCreateErrorInfo(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (!_imGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
+            {
+                errorInfo = new ErrorInfo
+                {
+                    Error = "",
+                    _execError = "",
+                };
+                _imGuiSharedErrorInfo[key] = errorInfo;
+            }
+
+            return errorInfo;
         }
 
         // ReSharper disable once InconsistentNaming
@@ -47,11 +82,15 @@ namespace SaintsField.Editor.Drawers
 
             // object target = GetParentTarget(property);
             (string xmlError, string buttonLabelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, target);
-            error = xmlError;
+            // Error = xmlError;
+            if (xmlError != "")
+            {
+                GetOrCreateErrorInfo(property).Error = xmlError;
+            }
 
             if (GUI.Button(buttonRect, string.Empty))
             {
-                _execError = CallButtonFunc(property, decButtonAttribute, info, target);
+                GetOrCreateErrorInfo(property)._execError = CallButtonFunc(property, decButtonAttribute, info, target);
             }
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;

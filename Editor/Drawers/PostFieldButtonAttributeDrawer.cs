@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers
 
             object target = property.serializedObject.targetObject;
             (string xmlError, string labelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, target);
-            error = xmlError;
+            GetOrCreateErrorInfo(property).Error = xmlError;
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -65,20 +65,25 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info,
             object parent)
         {
-            return DisplayError != "";
+            return GetDisplayError(property) != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            return DisplayError == "" ? 0 : ImGuiHelpBox.GetHeight(DisplayError, width, MessageType.Error);
+            string displayError = GetDisplayError(property);
+            return displayError == "" ? 0 : ImGuiHelpBox.GetHeight(displayError, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) =>
-            DisplayError == ""
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        {
+            string displayError = GetDisplayError(property);
+            return displayError == ""
                 ? position
-                : ImGuiHelpBox.Draw(position, DisplayError, MessageType.Error);
+                : ImGuiHelpBox.Draw(position, displayError, MessageType.Error);
+        }
+
         #endregion
 
 #if UNITY_2021_3_OR_NEWER

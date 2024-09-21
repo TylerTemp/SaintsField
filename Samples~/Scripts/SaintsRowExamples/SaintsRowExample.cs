@@ -34,6 +34,6 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
         }
 
         [SaintsRow] public MyStruct myStruct;
-        // [SaintsRow(inline: true)] public MyStruct myStructInline;
+        [SaintsRow(inline: true)] public MyStruct myStructInline;
     }
 }

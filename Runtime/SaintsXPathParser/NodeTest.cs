@@ -7,6 +7,10 @@
     // *   `::parent`
     // *   `::parent-or-self`
     // *   `::parent-or-self-inside-prefab`
+    // *   `::scene-root`
+    // *   `::prefab-root`
+    // *   `::resources`
+    // *   `::asset`
     public enum NodeTest
     {
         None,
@@ -17,5 +21,9 @@
         Parent,
         ParentOrSelf,
         ParentOrSelfInsidePrefab,
+        SceneRoot,
+        PrefabRoot,
+        Resources,
+        Asset,
     }
 }

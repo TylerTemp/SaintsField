@@ -8,5 +8,10 @@
         {
             Value = value;
         }
+
+        public override string ToString()
+        {
+            return $"Str{{{FilterComparer} {Value}}}";
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
         {
             if (fullPart == "")
             {
-                return null;
+                return new FilterComparerTruly();
             }
 
             if(int.TryParse(fullPart, out int fullNum))
