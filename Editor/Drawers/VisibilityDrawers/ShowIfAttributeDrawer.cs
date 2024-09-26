@@ -12,9 +12,9 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
         protected override (string error, bool shown) IsShown(SerializedProperty property, FieldInfo info, object target)
         {
             List<bool> allResults = new List<bool>();
-           
+
             ShowIfAttribute[] targetAttributes = SerializedUtils.GetAttributesAndDirectParent<ShowIfAttribute>(property).attributes;
-            foreach (var targetAttribute in targetAttributes)
+            foreach (ShowIfAttribute targetAttribute in targetAttributes)
             {
                 (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);
 
@@ -22,16 +22,16 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
                 {
                     return (string.Join("\n\n", errors), true);
                 }
-                
+
                 bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
-                // And Mode
-                bool boolResultsOk = boolResults.All(each => each);
-                allResults.Add(editorModeOk && boolResultsOk);
+                // And Mode; empty=true, but we won't get empty here
+                bool boolResultsOk = boolResults.Append(editorModeOk).All(each => each);
+                allResults.Add(boolResultsOk);
             }
-            
+
             // Or Mode
             bool truly = allResults.Any(each => each);
-            
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
             UnityEngine.Debug.Log($"{property.name} final={truly}/ars={string.Join(",", allResults)}");
 #endif

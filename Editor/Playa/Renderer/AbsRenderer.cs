@@ -136,12 +136,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
             // no show attribute: show
             // any show attribute is true: show; otherwise: not-show
-            bool hasShow = false;
-            bool show = true;
+            // bool hasShow = false;
+            // bool show = true;
             // no hide attribute: show
             // any hide attribute is true: hide; otherwise: not-hide
-            bool hasHide = false;
-            bool hide = false;
+            // bool hasHide = false;
+            List<bool> showResults = new List<bool>();
+            // bool hide = false;
             // no disable attribute: not-disable
             // any disable attribute is true: disable; otherwise: not-disable
             bool disable = false;
@@ -158,23 +159,28 @@ namespace SaintsField.Editor.Playa.Renderer
                         Debug.Log(
                             $"show, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
 #endif
-                        hasShow = true;
-                        if (!preCheckInternalInfo.boolResults.All(each => each))
-                        {
-                            show = false;
-                        }
+                        // hasShow = true;
+                        bool willShow = preCheckInternalInfo.boolResults.All(each => each);
+                        showResults.Add(willShow);
+                        // if (!preCheckInternalInfo.boolResults.All(each => each))
+                        // {
+                        //     show = false;
+                        // }
                         break;
                     case PreCheckInternalType.Hide:
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
                         Debug.Log(
                             $"hide, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
 #endif
-                        hasHide = true;
-                        if (preCheckInternalInfo.boolResults.Count == 0 ||
-                            preCheckInternalInfo.boolResults.Any(each => each))
-                        {
-                            hide = true;
-                        }
+                        bool willHide = preCheckInternalInfo.boolResults.Count == 0 ||
+                                        preCheckInternalInfo.boolResults.Any(each => each);
+                        // hasHide = true;
+                        // if (preCheckInternalInfo.boolResults.Count == 0 ||
+                        //     preCheckInternalInfo.boolResults.Any(each => each))
+                        // {
+                        //     hide = true;
+                        // }
+                        showResults.Add(!willHide);
                         break;
                     case PreCheckInternalType.Disable:
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
@@ -200,17 +206,18 @@ namespace SaintsField.Editor.Playa.Renderer
                         throw new ArgumentOutOfRangeException(nameof(preCheckInternalInfo.Type), preCheckInternalInfo.Type, null);
                 }
             }
-            bool showIfResult = true;
-            if (hasShow)
-            {
-                showIfResult = show;
-            }
-
-            if (hasHide)
-            {
-                // ReSharper disable once SimplifyConditionalTernaryExpression
-                showIfResult = (hasShow? show: true) && !hide;
-            }
+            // bool showIfResult = true;
+            // if (hasShow)
+            // {
+            //     showIfResult = show;
+            // }
+            //
+            // if (hasHide)
+            // {
+            //     // ReSharper disable once SimplifyConditionalTernaryExpression
+            //     showIfResult = (hasShow? show: true) && !hide;
+            // }
+            bool showIfResult = showResults.Count == 0 || showResults.Any(each => each);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
             Debug.Log(
@@ -291,12 +298,12 @@ namespace SaintsField.Editor.Playa.Renderer
         private static void FillResult(PreCheckInternalInfo preCheckInternalInfo)
         {
             bool editorModeIsTrue = Util.ConditionEditModeChecker(preCheckInternalInfo.EditorMode);
-            if (!editorModeIsTrue)
-            {
-                preCheckInternalInfo.errors = Array.Empty<string>();
-                preCheckInternalInfo.boolResults = new[]{false};
-                return;
-            }
+            // if (!editorModeIsTrue)
+            // {
+            //     preCheckInternalInfo.errors = Array.Empty<string>();
+            //     preCheckInternalInfo.boolResults = new[]{false};
+            //     return;
+            // }
 
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(preCheckInternalInfo.ConditionInfos, null, null, preCheckInternalInfo.Target);
 
@@ -308,7 +315,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             preCheckInternalInfo.errors = Array.Empty<string>();
-            preCheckInternalInfo.boolResults = boolResults;
+            preCheckInternalInfo.boolResults = boolResults.Prepend(editorModeIsTrue).ToArray();
         }
 
         private static (string error, object rawResult) GetCallback(SaintsFieldWithInfo fieldWithInfo, string by)

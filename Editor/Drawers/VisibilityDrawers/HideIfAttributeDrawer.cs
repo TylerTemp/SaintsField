@@ -8,8 +8,9 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
     {
         protected override (string error, bool shown) IsShown(SerializedProperty property,  FieldInfo info, object target)
         {
-            // reverse, get shown
-            return ("", !base.IsShown(property, info, target).shown);
+            // reverse shown
+            (string error, bool showResult) = base.IsShown(property, info, target);
+            return (error, error != "" || !showResult);
         }
     }
 }
