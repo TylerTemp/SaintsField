@@ -1055,7 +1055,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         x = rt.x + EditorGUIUtility.labelWidth,
                         width = rt.width - EditorGUIUtility.labelWidth,
-                    }, Color.yellow * new Color(1, 1,1, 0.2f));
+                    }, EColor.CharcoalGray.GetColor() * new Color(1, 1,1, 0.2f));
                     EditorGUI.LabelField(rt, label, "null", EditorStyles.label);
                     return null;
                 }
@@ -1367,7 +1367,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         x = rt.x + EditorGUIUtility.labelWidth,
                         width = rt.width - EditorGUIUtility.labelWidth,
-                    }, Color.yellow * new Color(1, 1,1, 0.2f));
+                    }, EColor.CharcoalGray.GetColor() * new Color(1, 1,1, 0.2f));
                     EditorGUI.LabelField(rt, label, "null", EditorStyles.label);
                     return null;
                 }
@@ -1631,10 +1631,6 @@ namespace SaintsField.Editor.Playa.Renderer
                 TextField textField = new TextField(label)
                 {
                     value = "null",
-                    // style =
-                    // {
-                    //     backgroundColor = Color.yellow * new Color(1, 1, 1, 0.2f),
-                    // },
                     pickingMode = PickingMode.Ignore,
                 };
 

@@ -51,5 +51,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             // Debug.Log(_testEnum);
             _testEnum = _testEnum ==  TestEnum.First? TestEnum.Second : TestEnum.First;
         }
+
+        [ShowInInspector] private SaintsEditorOrdered nullValue;
     }
 }
