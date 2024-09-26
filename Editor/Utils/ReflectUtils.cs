@@ -329,5 +329,19 @@ namespace SaintsField.Editor.Utils
                 lastType = baseType;
             }
         }
+
+        public static Type GetDictionaryType(Type type)
+        {
+            // IDictionary
+            return type
+                .GetInterfaces()
+                .FirstOrDefault(interfaceType =>
+                    interfaceType.IsGenericType
+                    && (
+                        interfaceType.GetGenericTypeDefinition() == typeof(IDictionary<,>)
+                        || interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>)
+                    )
+                );
+        }
     }
 }

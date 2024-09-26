@@ -1,4 +1,5 @@
-﻿namespace SaintsField.SaintsXPathParser
+﻿#if UNITY_EDITOR
+namespace SaintsField.SaintsXPathParser
 {
     // *   `::ancestor`
     // *   `::ancestor-inside-prefab`
@@ -27,3 +28,4 @@
         Asset,
     }
 }
+#endif

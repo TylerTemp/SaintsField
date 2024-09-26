@@ -1717,30 +1717,31 @@ namespace SaintsField.Editor.Core
             {
                 // this is no longer needed for no good reason. Need more investigation and testing
                 // this code is used to prevent the decorator to be drawn everytime a fallback happens
-// #if UNITY_2022_1_OR_NEWER
-//                 Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
-//                     .Select(propertyAttribute =>
-//                     {
-//                         // Debug.Log(propertyAttribute.GetType());
-//                         Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-//                             out IReadOnlyList<Type> eachDrawers)
-//                             ? eachDrawers[0]
-//                             : null;
-//
-//                         // Debug.Log($"Found {results}");
-//
-//                         return results;
-//                     })
-//                     .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
-//
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-//                 Debug.Log($"get dec {dec} for {property.propertyPath}");
-// #endif
-//                 if (dec != null && ImGuiRemoveDecDraw(position, property, label))
-//                 {
-//                     return;
-//                 }
-// #endif
+                // the marco is not added by default
+#if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
+                Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
+                    .Select(propertyAttribute =>
+                    {
+                        // Debug.Log(propertyAttribute.GetType());
+                        Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
+                            out IReadOnlyList<Type> eachDrawers)
+                            ? eachDrawers[0]
+                            : null;
+
+                        // Debug.Log($"Found {results}");
+
+                        return results;
+                    })
+                    .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                Debug.Log($"get dec {dec} for {property.propertyPath}");
+#endif
+                if (dec != null && ImGuiRemoveDecDraw(position, property, label))
+                {
+                    return;
+                }
+#endif
 
                 EditorGUI.PropertyField(position, property, label, true);
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");

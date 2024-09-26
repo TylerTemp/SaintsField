@@ -60,7 +60,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue46
             [Layout("ream counter", ELayout.Horizontal)]
             [Required]
             public MCTeam team;
+#if UNITY_EDITOR
             [ProgressBar(-20, 20, step: 1f, colorCallback: nameof(FillColor))]
+#endif
             public float affinity;
             public ALLIANCETYPE alliance
             {

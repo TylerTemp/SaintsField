@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,10 +26,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            object[] results = GetXPathValue(((SaintsPathAttribute)saintsAttribute).XPathSteps, property, info, parent).ToArray();
-            Debug.Log(results[0]);
-            property.objectReferenceValue = Util.GetTypeFromObj((UnityEngine.Object)results[0], info.FieldType);
-            property.serializedObject.ApplyModifiedProperties();
+            // object[] results = GetXPathValue(((SaintsPathAttribute)saintsAttribute).XPathSteps, property, info, parent).ToArray();
+            // Debug.Log(results[0]);
+            // property.objectReferenceValue = Util.GetTypeFromObj((UnityEngine.Object)results[0], info.FieldType);
+            // property.serializedObject.ApplyModifiedProperties();
+            // return null;
             return null;
         }
         #endregion
@@ -403,99 +405,174 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         {
             foreach (ResourceInfo axisResource in axisResources)
             {
-                object target = axisResource.Resource;
-                object result = target;
-
-                foreach (XPathAttrFakeEval.ExecuteFragment executeFragment in fakeEval.ExecuteFragments)
+                ResourceInfo r = GetValueFromFakeEval(fakeEval, axisResource);
+                if (r != null)
                 {
-                    switch (executeFragment.ExecuteType)
-                    {
-                        case XPathAttrFakeEval.ExecuteType.GetComponents:
-                        {
-                            Component[] components;
-                            if (result is GameObject go)
-                            {
-                                components = go.GetComponents<Component>();
-                            }
-                            else if (result is Component comp)
-                            {
-                                components = comp.GetComponents<Component>();
-                            }
-                            else
-                            {
-                                continue;
-                            }
-
-                            IReadOnlyList<Component> matchTypeComponent =
-                                string.IsNullOrEmpty(executeFragment.ExecuteString)
-                                    ? components
-                                    : FilterComponentsByTypeName(components, executeFragment.ExecuteString).ToArray();
-                            if (matchTypeComponent.Count == 0)
-                            {
-                                continue;
-                            }
-
-                            result = FilterByIndexer(matchTypeComponent, executeFragment.ExecuteIndexer);
-                        }
-                            break;
-
-                        case XPathAttrFakeEval.ExecuteType.Method:
-                        {
-                            MethodInfo methodInfo = result.GetType().GetMethod(executeFragment.ExecuteString);
-                            if (methodInfo == null)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                result = methodInfo.Invoke(result, null);
-                            }
-                        }
-                            break;
-
-                        case XPathAttrFakeEval.ExecuteType.FieldOrProperty:
-                        {
-                            FieldInfo fieldInfo = result.GetType().GetField(executeFragment.ExecuteString);
-                            if (fieldInfo == null)
-                            {
-                                PropertyInfo propertyInfo = result.GetType().GetProperty(executeFragment.ExecuteString);
-                                if (propertyInfo == null)
-                                {
-                                    result = null;
-                                }
-                                else
-                                {
-                                    result = propertyInfo.GetValue(result);
-                                }
-                            }
-                            else
-                            {
-                                result = fieldInfo.GetValue(result);
-                            }
-                        }
-                            break;
-                    }
-
-                    if (result == null)
-                    {
-                        break;
-                    }
-                }
-
-                if(result != null)
-                {
-                    yield return new ResourceInfo
-                    {
-                        Resource = result,
-                        ResourceType = ResourceType.Object,
-                    };
+                    yield return r;
                 }
             }
         }
 
-        private static Component FilterByIndexer(IReadOnlyList<Component> matchTypeComponent, IReadOnlyList<FilterComparerBase> executeFragmentExecuteIndexer)
+        private static ResourceInfo GetValueFromFakeEval(XPathAttrFakeEval fakeEval, ResourceInfo axisResource)
         {
-            throw new NotImplementedException();
+            object target = axisResource.Resource;
+            object result = target;
+
+            foreach (XPathAttrFakeEval.ExecuteFragment executeFragment in fakeEval.ExecuteFragments)
+            {
+                switch (executeFragment.ExecuteType)
+                {
+                    case XPathAttrFakeEval.ExecuteType.GetComponents:
+                    {
+                        Component[] components;
+                        if (result is GameObject go)
+                        {
+                            components = go.GetComponents<Component>();
+                        }
+                        else if (result is Component comp)
+                        {
+                            components = comp.GetComponents<Component>();
+                        }
+                        else
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"{result} is not GameObject or Component");
+#endif
+                            return null;
+                        }
+
+                        IReadOnlyList<Component> matchTypeComponent =
+                            string.IsNullOrEmpty(executeFragment.ExecuteString)
+                                ? components
+                                : FilterComponentsByTypeName(components, executeFragment.ExecuteString).ToArray();
+                        if (matchTypeComponent.Count == 0)
+                        {
+                            return null;
+                        }
+
+                        result = FilterByIndexer(matchTypeComponent, executeFragment.ExecuteIndexer);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                        Debug.Log($"get {result} from [{string.Join("][", executeFragment.ExecuteIndexer)}]");
+#endif
+
+                    }
+                        break;
+
+                    case XPathAttrFakeEval.ExecuteType.Method:
+                    case XPathAttrFakeEval.ExecuteType.FieldOrProperty:
+                    {
+                        (string error, object value) = Util.GetOfNoParams<object>(result, executeFragment.ExecuteString, null);
+                        if (error != "")
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"{result}.{executeFragment.ExecuteString}: {error}");
+#endif
+                            return null;
+                        }
+
+                        result = value;
+                    }
+                        break;
+                }
+
+                if (result == null)
+                {
+                    return null;
+                }
+            }
+
+            return result == null
+                ? null
+                : new ResourceInfo
+                {
+                    Resource = result,
+                    ResourceType = ResourceType.Object,
+                };
+        }
+
+        private static object FilterByIndexer(object target, IReadOnlyList<FilterComparerBase> executeFragmentExecuteIndexer)
+        {
+            object result = target;
+            foreach (FilterComparerBase filterComparerBase in executeFragmentExecuteIndexer)
+            {
+                switch (filterComparerBase)
+                {
+                    case FilterComparerInt filterComparerInt:
+                    {
+                        if (result is Array array)
+                        {
+                            result = array.GetValue(filterComparerInt.Value);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"array index {filterComparerInt.Value} -> {result}");
+#endif
+                        }
+                        else if (result is IList<object> list)
+                        {
+                            result = list[filterComparerInt.Value];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"list index {filterComparerInt.Value} -> {result}");
+#endif
+                        }
+                        else
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"can not index {filterComparerInt.Value} of {result}");
+#endif
+                            return null;
+                        }
+                    }
+                        break;
+
+                    case FilterComparerString filterComparerString:
+                    {
+                        Type dictionaryType = ReflectUtils.GetDictionaryType(result.GetType());
+                        if (dictionaryType is null)
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"can not string index {filterComparerString.Value} of {result}: not a dictionary");
+#endif
+                            return null;
+                        }
+
+                        Type keyType = dictionaryType.GetGenericArguments()[0];
+                        Type stringType = typeof(string);
+                        if (keyType != stringType && !keyType.IsSubclassOf(stringType))
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"can not string index {filterComparerString.Value} of {result}: key is not string");
+#endif
+                            return null;
+                        }
+
+                        try
+                        {
+                            result = ((IDictionary)result)[filterComparerString.Value];
+                        }
+                        catch (KeyNotFoundException)
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"can not find {filterComparerString.Value} in dictionary {result}");
+#endif
+                            return null;
+                        }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                        Debug.Log($"dictionary index {filterComparerString.Value} -> {result}");
+#endif
+                    }
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(filterComparerBase), filterComparerBase, null);
+                }
+
+                if (result == null)
+                {
+                    return null;
+                }
+            }
+
+            return result;
         }
 
         private static IEnumerable<Component> FilterComponentsByTypeName(Component[] components, string executeFragmentExecuteString)

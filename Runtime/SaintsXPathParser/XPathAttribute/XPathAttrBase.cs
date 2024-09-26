@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using UnityEngine;
 
 namespace SaintsField.SaintsXPathParser.XPathAttribute
@@ -49,3 +50,4 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
 
     }
 }
+#endif

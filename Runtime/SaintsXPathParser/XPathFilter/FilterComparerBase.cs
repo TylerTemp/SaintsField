@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 
 namespace SaintsField.SaintsXPathParser.XPathFilter
 {
@@ -79,3 +80,4 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
         }
     }
 }
+#endif

@@ -3835,11 +3835,14 @@ Go to `Window` - `Saints` to enable/disable functions you want
     #"Disable UI Toolkit"
     -define:SAINTSFIELD_UI_TOOLKIT_DISABLE
 
-    #"Apply SaintsEditor project wide"
+    #"Enable SaintsEditor project wide"
     -define:SAINTSFIELD_SAINTS_EDITOR_APPLY
 
     #"Disable SaintsEditor IMGUI constant repaint"
     -define:SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
+    
+    #"Enable IMGUI duplicated decorators drawing fix"
+    -define:SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
     ```
 
 Note: `csc.rsp` can override settings by Saints Menu.

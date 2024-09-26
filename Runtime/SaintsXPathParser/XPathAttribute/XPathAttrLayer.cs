@@ -1,4 +1,5 @@
-﻿namespace SaintsField.SaintsXPathParser.XPathAttribute
+﻿#if UNITY_EDITOR
+namespace SaintsField.SaintsXPathParser.XPathAttribute
 {
     public class XPathAttrLayer: XPathAttrBase
     {
@@ -8,3 +9,4 @@
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿namespace SaintsField.SaintsXPathParser.XPathFilter
+﻿#if UNITY_EDITOR
+namespace SaintsField.SaintsXPathParser.XPathFilter
 {
     public enum FilterComparer
     {
@@ -11,3 +12,4 @@
         NotEqual,
     }
 }
+#endif

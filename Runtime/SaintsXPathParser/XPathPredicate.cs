@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
 
@@ -14,3 +15,4 @@ namespace SaintsField.SaintsXPathParser
         }
     }
 }
+#endif

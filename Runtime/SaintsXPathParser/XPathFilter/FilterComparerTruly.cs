@@ -1,4 +1,5 @@
-﻿namespace SaintsField.SaintsXPathParser.XPathFilter
+﻿#if UNITY_EDITOR
+namespace SaintsField.SaintsXPathParser.XPathFilter
 {
     public class FilterComparerTruly: FilterComparerBase
     {
@@ -12,3 +13,4 @@
         }
     }
 }
+#endif

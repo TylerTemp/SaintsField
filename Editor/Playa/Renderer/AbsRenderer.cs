@@ -1152,7 +1152,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     return EditorGUILayout.TextField(label, value.ToString());
                 }
-                if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+                if (ReflectUtils.GetDictionaryType(valueType) != null)
                 {
                     GUIStyle style = new GUIStyle(GUI.skin.label)
                     {
