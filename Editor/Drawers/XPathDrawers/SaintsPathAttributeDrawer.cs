@@ -599,7 +599,158 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         // TODO
         private static IEnumerable<ResourceInfo> GetValuesFromNodeTest(NodeTest nodeTest, IEnumerable<ResourceInfo> attrResources)
         {
-            return attrResources;
+            // return attrResources;
+            switch (nodeTest)
+            {
+                case NodeTest.None:
+                {
+                    foreach (ResourceInfo resourceInfo in attrResources)
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    break;
+                case NodeTest.Ancestor:
+                {
+                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, false, false)))
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    break;
+                case NodeTest.AncestorInsidePrefab:
+                {
+                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, false, true)))
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    break;
+                case NodeTest.AncestorOrSelf:
+                {
+                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, true, false)))
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    break;
+                case NodeTest.AncestorOrSelfInsidePrefab:
+                {
+                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, true, true)))
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    break;
+                case NodeTest.Parent:
+                {
+                    foreach (Transform parentTransform in attrResources.Select(GetParentFromResourceInfos).Where(each => !(each is null)))
+                    {
+                        yield return new ResourceInfo{
+                            ResourceType = ResourceType.Object,
+                            Resource = parentTransform.gameObject,
+                        };
+                    }
+                }
+                    break;
+                case NodeTest.ParentOrSelf:
+                {
+                    foreach (ResourceInfo attrResource in attrResources)
+                    {
+
+                        switch (attrResource.Resource)
+                        {
+                            case GameObject:
+                            case Component:
+                                yield return attrResource;
+                                break;
+                            default:
+                                yield break;
+                        }
+
+                        Transform parent = GetParentFromResourceInfos(attrResource);
+                        if (!(parent is null))
+                        {
+
+                            yield return new ResourceInfo
+                            {
+                                ResourceType = ResourceType.Object,
+                                Resource = parent.gameObject,
+                            };
+                        }
+                    }
+                }
+                    break;
+            }
+        }
+
+        private static IEnumerable<ResourceInfo> GetGameObjectsAncestor(ResourceInfo resourceInfo, bool withSelf, bool insidePrefab)
+        {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (resourceInfo.Resource)
+            {
+                case GameObject go:
+                    return GetGameObjectsAncestorFromGameObject(go, withSelf, insidePrefab);
+                case Component comp:
+                    return GetGameObjectsAncestorFromGameObject(comp.gameObject, withSelf, insidePrefab);
+                default:
+                    return Array.Empty<ResourceInfo>();
+            }
+        }
+
+        private static IEnumerable<ResourceInfo> GetGameObjectsAncestorFromGameObject(GameObject go, bool withSelf, bool insidePrefab)
+        {
+            if (withSelf)
+            {
+                if (!insidePrefab || PrefabUtility.GetPrefabInstanceHandle(go) != null)
+                {
+                    yield return new ResourceInfo
+                    {
+                        ResourceType = ResourceType.Object,
+                        Resource = go,
+                    };
+                }
+            }
+
+            foreach (GameObject gameObject in GetRecursivelyParentGameObject(go))
+            {
+                if (insidePrefab)
+                {
+                    bool isInsidePrefab = PrefabUtility.GetPrefabInstanceHandle(go) != null;
+                    if (!isInsidePrefab)
+                    {
+                        yield break;
+                    }
+                }
+                yield return new ResourceInfo
+                {
+                    ResourceType = ResourceType.Object,
+                    Resource = gameObject,
+                };
+            }
+        }
+
+        private static IEnumerable<GameObject> GetRecursivelyParentGameObject(GameObject go)
+        {
+            Transform cur = go.transform.parent;
+            while (cur != null)
+            {
+                yield return cur.gameObject;
+                cur = cur.parent;
+            }
+        }
+
+        private static Transform GetParentFromResourceInfos(ResourceInfo resourceInfo)
+        {
+            switch (resourceInfo.Resource)
+            {
+                case GameObject go:
+                    return go.transform.parent;
+                case Component comp:
+                    return comp.transform.parent;
+                default:
+                    return null;
+            }
         }
 
         // TODO
