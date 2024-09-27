@@ -448,7 +448,7 @@ namespace SaintsField.Editor
 
                         ISaintsRendererGroup group =
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-                            rendererGroupInfo.Config.isDOTween
+                            rendererGroupInfo.Config.IsDoTween
                                 ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
                                 : new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config)
 #else
@@ -629,19 +629,19 @@ namespace SaintsField.Editor
 
                                 SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
                                 {
-                                    eLayout = saintsGroup.Layout,
-                                    isDOTween = saintsGroup is DOTweenPlayAttribute,
-                                    marginTop = saintsGroup.MarginTop,
-                                    marginBottom = saintsGroup.MarginBottom,
+                                    ELayout = saintsGroup.Layout,
+                                    IsDoTween = saintsGroup is DOTweenPlayAttribute,
+                                    MarginTop = saintsGroup.MarginTop,
+                                    MarginBottom = saintsGroup.MarginBottom,
                                 };
                                 SaintsRendererGroup.Config oldConfig = targetGroup.Config;
 
                                 targetGroup.Config = new SaintsRendererGroup.Config
                                 {
-                                    eLayout = newConfig.eLayout == 0? oldConfig.eLayout: newConfig.eLayout,
-                                    isDOTween = oldConfig.isDOTween || newConfig.isDOTween,
-                                    marginTop = newConfig.marginTop >= 0? newConfig.marginTop: oldConfig.marginTop,
-                                    marginBottom = newConfig.marginBottom >= 0? newConfig.marginBottom: oldConfig.marginBottom,
+                                    ELayout = newConfig.ELayout == 0? oldConfig.ELayout: newConfig.ELayout,
+                                    IsDoTween = oldConfig.IsDoTween || newConfig.IsDoTween,
+                                    MarginTop = newConfig.MarginTop >= 0? newConfig.MarginTop: oldConfig.MarginTop,
+                                    MarginBottom = newConfig.MarginBottom >= 0? newConfig.MarginBottom: oldConfig.MarginBottom,
                                     KeepGrouping = saintsGroup.KeepGrouping,
                                 };
 

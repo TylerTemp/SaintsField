@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -19,10 +20,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
             public bool KeepGrouping;
 
-            public ELayout eLayout;
-            public bool isDOTween;
-            public float marginTop;
-            public float marginBottom;
+            public ELayout ELayout;
+            public bool IsDoTween;
+            public float MarginTop;
+            public float MarginBottom;
         }
 
         private int _curSelected;
@@ -47,8 +48,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
             _groupPath = groupPath;
             _config = config;
-            _eLayout = config.eLayout;
-            _foldout = !config.eLayout.HasFlag(ELayout.Collapse);
+            _eLayout = config.ELayout;
+            _foldout = !config.ELayout.HasFlag(ELayout.Collapse);
         }
 
         public void Add(string groupPath, ISaintsRenderer renderer)
@@ -144,7 +145,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
-            float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
+            float marginTop = _config.MarginTop >= 0 ? _config.MarginTop : 2;
             EditorGUILayout.GetControlRect(false, marginTop);
 
             GUIStyle fullBoxStyle = (_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
@@ -304,7 +305,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
             }
 
-            float marginBottom = _config.marginBottom >= 0 ? _config.marginBottom : 2;
+            float marginBottom = _config.MarginBottom >= 0 ? _config.MarginBottom : 2;
             EditorGUILayout.GetControlRect(false, marginBottom);
         }
 
@@ -395,16 +396,16 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
             }
 
-            float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
-            float marginBottom = _config.marginBottom >= 0 ? _config.marginBottom : 2;
+            float marginTop = _config.MarginTop >= 0 ? _config.MarginTop : 2;
+            float marginBottom = _config.MarginBottom >= 0 ? _config.MarginBottom : 2;
 
             return titleHeight + contentHeight + marginTop + marginBottom + 4;
         }
 
         public void RenderPosition(Rect position)
         {
-            float marginTop = _config.marginTop >= 0 ? _config.marginTop : 2;
-            float marginBottom = _config.marginBottom >= 0 ? _config.marginBottom : 2;
+            float marginTop = _config.MarginTop >= 0 ? _config.MarginTop : 2;
+            float marginBottom = _config.MarginBottom >= 0 ? _config.MarginBottom : 2;
 
             Rect marginedRect = new Rect(position)
             {
@@ -661,6 +662,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
         #region UIToolkit
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+
+        // private StyleSheet _layoutBoxToggleNoLeftMarginUss;
+
 
         public VisualElement CreateVisualElement()
         {
@@ -1039,7 +1043,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 body.Add(fieldElement);
             }
 
-            if(_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
+            bool fancyBox = _eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab);
+            if(fancyBox)
             {
                 root.style.backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f);
                 root.style.borderTopWidth = 1;
@@ -1068,9 +1073,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 root.RegisterCallback(switchOnAttack);
             }
 
-            float marginTop = _config.marginTop > 0 ? _config.marginTop : 2;
+            float marginTop = _config.MarginTop > 0 ? _config.MarginTop : 2;
 
-            float marginBottom = _config.marginBottom > 0 ? _config.marginBottom : 0;
+            float marginBottom = _config.MarginBottom > 0 ? _config.MarginBottom : 0;
 
             root.style.marginTop = marginTop;
             root.style.marginBottom = marginBottom;
@@ -1087,7 +1092,72 @@ namespace SaintsField.Editor.Playa.RendererGroup
             //     UnityEngine.Object.DestroyImmediate(dropdownRightIcon);
             // });
 
+            if(fancyBox)
+            {
+                root.RegisterCallback<AttachToPanelEvent>(_ => StartToCheckOutOfScoopFoldout(root));
+            }
+
             return root;
+        }
+
+        private readonly HashSet<Toggle> _processedToggles = new HashSet<Toggle>();
+
+        private void StartToCheckOutOfScoopFoldout(VisualElement root)
+        {
+            root.schedule
+                .Execute(() => LoopCheckOutOfScoopFoldout(root, 0))
+                .StartingIn(200);
+        }
+
+        private void LoopCheckOutOfScoopFoldout(VisualElement root, int timeout)
+        {
+            if (timeout >= 3000)
+            {
+                return;
+            }
+
+            foreach (VisualElement actualFieldContainer in root.Query<VisualElement>(className: AbsRenderer.ClassSaintsFieldPlayaContainer).ToList())
+            {
+                // Debug.Log(actualFieldContainer);
+                List<Foldout> foldouts = actualFieldContainer.Query<Foldout>().ToList();
+                if (foldouts.Count == 0)
+                {
+                    continue;
+                }
+
+                // Debug.Log(root.worldBound.x);
+
+                foreach (Foldout foldout in foldouts)
+                {
+                    Toggle toggle = actualFieldContainer.Q<Toggle>(className: "unity-foldout__toggle--inspector");
+                    if (toggle == null)
+                    {
+                        continue;
+                    }
+
+                    if (double.IsNaN(toggle.resolvedStyle.width))
+                    {
+                        continue;
+                    }
+
+                    if (_processedToggles.Add(toggle))
+                    {
+                        continue;
+                    }
+
+                    float distance = toggle.worldBound.x - root.worldBound.x;
+                    if(distance < 0)
+                    {
+                        // Debug.Log($"process {toggle.worldBound.x} - {root.worldBound.x}: {distance}");
+                        foldout.style.marginLeft = -distance + 4;
+                    }
+                }
+            }
+
+            root.schedule.Execute(() =>
+            {
+                LoopCheckOutOfScoopFoldout(root, timeout + 300);
+            }).StartingIn(300);
         }
 
 #endif

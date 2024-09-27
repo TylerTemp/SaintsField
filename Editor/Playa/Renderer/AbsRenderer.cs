@@ -401,6 +401,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private const string ClassSaintsFieldPlaya = "saints-field-playa";
+        public const string ClassSaintsFieldPlayaContainer = ClassSaintsFieldPlaya + "-container";
 
         private VisualElement _rootElement;
 
@@ -417,7 +418,17 @@ namespace SaintsField.Editor.Playa.Renderer
             (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit();
             if (target != null)
             {
-                root.Add(target);
+                VisualElement targetContainer = new VisualElement
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 0,
+                    },
+                };
+                targetContainer.AddToClassList(ClassSaintsFieldPlayaContainer);
+                targetContainer.Add(target);
+                root.Add(targetContainer);
             }
             (VisualElement belowTarget, bool belowNeedUpdate) = CreateBelowUIToolkit();
             if (belowTarget != null)
@@ -440,7 +451,7 @@ namespace SaintsField.Editor.Playa.Renderer
         protected virtual (VisualElement target, bool needUpdate) CreateAboveUIToolkit()
         {
             VisualElement visualElement = new VisualElement();
-            visualElement.AddToClassList($"${ClassSaintsFieldPlaya}-above");
+            visualElement.AddToClassList($"{ClassSaintsFieldPlaya}-above");
 
             Dictionary<string, VisualElement> groupElements = new Dictionary<string, VisualElement>();
 
