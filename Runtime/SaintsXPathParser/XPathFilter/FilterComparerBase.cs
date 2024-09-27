@@ -37,21 +37,21 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
             }
 
 
-            string[] split = fullPart.Split(' ', 2);
+            string[] split = fullPart.Split(new[]{' '}, 2);
             string comparerPart = split[0];
             string numPart = split[1];
 
             if (comparerPart.StartsWith("!="))
             {
                 return int.TryParse(numPart, out int num)
-                    ? new FilterComparerInt(FilterComparer.NotEqual, num)
+                    ? (FilterComparerBase)new FilterComparerInt(FilterComparer.NotEqual, num)
                     : new FilterComparerString(FilterComparer.NotEqual, numPart);
             }
 
             if (comparerPart.StartsWith("="))
             {
                 return int.TryParse(numPart, out int num)
-                    ? new FilterComparerInt(FilterComparer.Equal, num)
+                    ? (FilterComparerBase)new FilterComparerInt(FilterComparer.Equal, num)
                     : new FilterComparerString(FilterComparer.Equal, numPart);
             }
 

@@ -61,7 +61,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
                     string getComponentLeftPart = fragmentStr.Substring(fragmentStr.IndexOf('(') + 1);
                     (string getComponentTarget, string leftFragmentStr) = ReadUntilEndBracket(getComponentLeftPart, evalFragmentQuery);
 
-                    FilterComparerBase[] leftFilter = leftFragmentStr.StartsWith('[')
+                    FilterComparerBase[] leftFilter = leftFragmentStr.StartsWith("[")
                         ? XPathBracketParser.ParseFilter(leftFragmentStr)
                             .Select(each => each.filterComparerBase)
                             .ToArray()

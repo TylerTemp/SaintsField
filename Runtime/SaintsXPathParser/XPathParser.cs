@@ -209,7 +209,7 @@ namespace SaintsField.SaintsXPathParser
 
         private static (string preText, string predicates) SplitPredicates(string text)
         {
-            int squareQuoteStart = text.IndexOf('[', StringComparison.Ordinal);
+            int squareQuoteStart = text.IndexOf("[", StringComparison.Ordinal);
             if (squareQuoteStart == -1)
             {
                 return (text, "");

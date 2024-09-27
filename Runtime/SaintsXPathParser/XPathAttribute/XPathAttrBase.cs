@@ -18,7 +18,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
                 return (new XPathAttrIndex(false), attrString.Substring(7).Trim());
             }
 
-            Debug.Assert(attrString.StartsWith('@'), attrString);
+            Debug.Assert(attrString.StartsWith("@"), attrString);
             // ReSharper disable once ReplaceSubstringWithRangeIndexer
             string attrTrim = attrString.Substring(1);
 
@@ -36,7 +36,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
                 return (new XPathAttrAssetPath(), attrTrim.Substring(12).Trim());
             }
 
-            if(attrTrim.StartsWith('{'))
+            if(attrTrim.StartsWith("{"))
             {
                 int endBracketIndex = attrTrim.IndexOf('}');
                 string evalString = attrTrim.Substring(1, endBracketIndex - 1);

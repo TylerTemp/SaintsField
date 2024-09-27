@@ -124,7 +124,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
 
         private (FilterComparerInt indexComparer, string leftValue) ParseIndexFilter(string part)
         {
-            string[] split = part.Split('[', 2);
+            string[] split = part.Split(new[]{'['}, 2);
             if (split.Length == 1 || !split[1].EndsWith("]"))
             {
                 return (null, part);
