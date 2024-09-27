@@ -2,7 +2,7 @@
 ## 3.3.4 ##
 
 1.  Fix `PlayaShowIf`/`PlayaHideIf` could not be used more than once on the same target.
-2.  IMGUI: Fix missing decorators  If you see duplicated decorators in your project, go: `Window` - `Saints` - `Enable IMGUI duplicated decorator fix`.
+2.  IMGUI: Fix missing decorators. If you see duplicated decorators in your project, go: `Window` - `Saints` - `Enable IMGUI duplicated decorator fix`.
 3.  IMGUI: Fix inconsistent height update for `InfoBox` and `ResiziableTextArea` in Unity 2022.3.46, [#85](https://github.com/TylerTemp/SaintsField/issues/85).
 4.  IMGUI: Fix `PostFieldButton`, `AboveButton`, `BelowButton` use shared error message when in a list/array.
 5.  Change `null` value color for `ShowInInspector`.
