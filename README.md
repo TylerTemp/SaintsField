@@ -70,7 +70,7 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.3.3**
+**3.3.4**
 
 1.  Fix `PlayaShowIf`/`PlayaHideIf` could not be used more than once on the same target.
 2.  IMGUI: Fix missing decorators  If you see duplicated decorators in your project, go: `Window` - `Saints` - `Enable IMGUI duplicated decorator fix`.
