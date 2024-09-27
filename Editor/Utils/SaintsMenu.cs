@@ -18,6 +18,17 @@ namespace SaintsField.Editor.Utils
         public static void UIToolkit() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
 #endif
 
+        #region IMGUI decorators
+
+#if SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
+        [MenuItem("Window/Saints/Disable IMGUI duplicated decorator fix")]
+        public static void ImGuiDuplicateDecoratorFix() => RemoveCompileDefine("SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX");
+#else
+        [MenuItem("Window/Saints/Enable IMGUI duplicated decorator fix")]
+        public static void ImGuiDuplicateDecoratorFix() => AddCompileDefine("SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX");
+#endif
+
+        #endregion
 //         #region Label Fix (UI Toolkit)
 // #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 // #if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE

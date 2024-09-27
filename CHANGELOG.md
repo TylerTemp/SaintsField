@@ -1,5 +1,13 @@
 # Changelog
+## 3.3.4 ##
 
+1.  Fix `PlayaShowIf`/`PlayaHideIf` could not be used more than once on the same target.
+2.  IMGUI: Fix missing decorators  If you see duplicated decorators in your project, go: `Window` - `Saints` - `Enable IMGUI duplicated decorator fix`.
+3.  IMGUI: Fix inconsistent height update for `InfoBox` and `ResiziableTextArea` in Unity 2022.3.46, [#85](https://github.com/TylerTemp/SaintsField/issues/85).
+4.  IMGUI: Fix `PostFieldButton`, `AboveButton`, `BelowButton` use shared error message when in a list/array.
+5.  Change `null` value color for `ShowInInspector`.
+6.  Fix `ShowInInspector` can not detect a dictionary when the target is `IReadOnlyDictionary<,>`
+ 
 ## 3.3.3 ##
 
 1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (note: `<icon>` in `RichLabel` will not work and will get removed).
