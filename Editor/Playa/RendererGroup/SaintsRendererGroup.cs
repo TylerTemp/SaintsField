@@ -1140,7 +1140,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         continue;
                     }
 
-                    if (_processedToggles.Add(toggle))
+                    if (!_processedToggles.Add(toggle))  // already processed
                     {
                         continue;
                     }
