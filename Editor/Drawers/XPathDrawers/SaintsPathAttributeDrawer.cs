@@ -660,8 +660,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                         switch (attrResource.Resource)
                         {
-                            case GameObject:
-                            case Component:
+                            case GameObject _:
+                            case Component _:
                                 yield return attrResource;
                                 break;
                             default:
