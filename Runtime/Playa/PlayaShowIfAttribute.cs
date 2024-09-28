@@ -8,12 +8,11 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaShowIfAttribute: Attribute, IPlayaAttribute
+    public class PlayaShowIfAttribute: Attribute, IPlayaAttribute, IVisibilityAttribute
     {
-        // ReSharper disable InconsistentNaming
-        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
-        public readonly EMode EditorMode;
-        // ReSharper enable InconsistentNaming
+        public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
+        public EMode EditorMode { get; }
+        public virtual bool IsShow => true;
 
         public PlayaShowIfAttribute(EMode editorMode, params object[] andCallbacks)
         {

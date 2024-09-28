@@ -155,7 +155,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButtonField(property);
-            dropdownButton.buttonLabelElement.text = buttonLabel;
+            dropdownButton.ButtonLabelElement.text = buttonLabel;
             dropdownButton.userData = new ButtonData(valueType)
             {
                 selectedIndex = areaIndex,
@@ -174,7 +174,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             ButtonData buttonData = (ButtonData) button.userData;
             // NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute) saintsAttribute;
 
-            button.buttonElement.clicked += () =>
+            button.ButtonElement.clicked += () =>
                 ShowDropdownUIToolkit(property, buttonData, button, onValueChangedCallback);
         }
 
@@ -209,7 +209,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 string buttonLabel = areaIndex == -1
                     ? "-"
                     : FormatAreaName(AiNavigationUtils.GetNavMeshAreas().ElementAt(areaIndex), valueType);
-                button.buttonLabelElement.text = buttonLabel;
+                button.ButtonLabelElement.text = buttonLabel;
             }
         }
 
@@ -245,14 +245,14 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                         onValueChangedCallback(newValue);
                     }
 
-                    button.buttonLabelElement.text = curName;
+                    button.ButtonLabelElement.text = curName;
                 });
             }
 
             genericDropdownMenu.AddSeparator("");
             genericDropdownMenu.AddItem("Open Area Settings...", false, NavMeshEditorHelpers.OpenAreaSettings);
 
-            genericDropdownMenu.DropDown(button.buttonElement.worldBound, button.buttonElement, true);
+            genericDropdownMenu.DropDown(button.ButtonElement.worldBound, button.ButtonElement, true);
         }
 
         #endregion

@@ -13,15 +13,14 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
     public abstract class VisibilityAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI
-        protected override bool GetAndVisibility(SerializedProperty property, FieldInfo info, object parent)
+        protected override bool GetThisDecoratorVisibility(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
         {
-            (string error, bool show) = IsShown(property, info, parent);
-
+            (string error, bool shown) = IsShown(targetAttribute, property, info, target);
             _error = error;
-            return show;
+            return shown;
         }
 
-        protected abstract (string error, bool shown) IsShown(SerializedProperty property, FieldInfo info, object target);
+        protected abstract (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target);
 
         private string _error = "";
 
@@ -119,24 +118,33 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
 
             bool curShow = container.style.display != DisplayStyle.None;
 
-            List<string> errors = new List<string>();
-            bool nowShow = false;
-            // bool isForHidden = ((VisibilityAttribute)saintsAttribute).IsForHide;
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            bool nowShow;
+            (ShowIfAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ShowIfAttribute>(property);
 
-            foreach ((string error, bool show) in visibilityElements.Select(each => IsShown(property, info, parent)))
+            List<bool> showOrResults = new List<bool>();
+            string error = "";
+            foreach (ShowIfAttribute showIfAttribute in attributes)
             {
-                // bool invertedShow = isForHidden? !show: show;
+                (string error, bool shown) showResult = showIfAttribute.IsShow
+                    ? ShowIfAttributeDrawer.HelperIsShown(showIfAttribute.ConditionInfos, showIfAttribute.EditorMode, property, info, parent)
+                    : HideIfAttributeDrawer.HelperIsShown(showIfAttribute.ConditionInfos, showIfAttribute.EditorMode, property, info, parent);
 
-                if (error != "")
+                if (showResult.error != "")
                 {
-                    errors.Add(error);
+                    error = showResult.error;
+                    break;
                 }
+                showOrResults.Add(showResult.shown);
+            }
 
-                if (show)
-                {
-                    nowShow = true;
-                }
+            if (error != "")
+            {
+                nowShow = true;
+            }
+            else
+            {
+                Debug.Assert(showOrResults.Count > 0);
+                nowShow = showOrResults.Any(each => each);
             }
 
             if (curShow != nowShow)
@@ -145,12 +153,11 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             }
 
             HelpBox helpBox = container.Q<HelpBox>(NameVisibilityHelpBox(property, index));
-            string joinedError = string.Join("\n\n", errors);
             // ReSharper disable once InvertIf
-            if (helpBox.text != joinedError)
+            if (helpBox.text != error)
             {
-                helpBox.text = joinedError;
-                helpBox.style.display = joinedError == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
             }
         }
 

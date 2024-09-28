@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Condition;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 
@@ -9,33 +10,23 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
     [CustomPropertyDrawer(typeof(ShowIfAttribute))]
     public class ShowIfAttributeDrawer: VisibilityAttributeDrawer
     {
-        protected override (string error, bool shown) IsShown(SerializedProperty property, FieldInfo info, object target)
+        protected override (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
         {
-            List<bool> allResults = new List<bool>();
+            return HelperIsShown(targetAttribute.ConditionInfos, targetAttribute.EditorMode, property, info, target);
+        }
 
-            ShowIfAttribute[] targetAttributes = SerializedUtils.GetAttributesAndDirectParent<ShowIfAttribute>(property).attributes;
-            foreach (ShowIfAttribute targetAttribute in targetAttributes)
+        public static (string error, bool shown) HelperIsShown(IEnumerable<ConditionInfo> conditionInfos, EMode editorMode, SerializedProperty property, FieldInfo info, object target)
+        {
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(conditionInfos, property, info, target);
+
+            if (errors.Count > 0)
             {
-                (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);
-
-                if (errors.Count > 0)
-                {
-                    return (string.Join("\n\n", errors), true);
-                }
-
-                bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
-                // And Mode; empty=true, but we won't get empty here
-                bool boolResultsOk = boolResults.Append(editorModeOk).All(each => each);
-                allResults.Add(boolResultsOk);
+                return (string.Join("\n\n", errors), true);
             }
 
-            // Or Mode
-            bool truly = allResults.Any(each => each);
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
-            UnityEngine.Debug.Log($"{property.name} final={truly}/ars={string.Join(",", allResults)}");
-#endif
-            return ("", truly);
+            bool editorModeOk = Util.ConditionEditModeChecker(editorMode);
+            // and; empty = true, thus empty=show
+            return ("",  boolResults.Prepend(editorModeOk).All(each => each));
         }
     }
 }

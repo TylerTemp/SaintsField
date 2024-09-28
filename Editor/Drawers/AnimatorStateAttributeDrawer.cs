@@ -566,7 +566,7 @@ namespace SaintsField.Editor.Drawers
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButton.name = NameDropdownButton(property);
             dropdownButton.userData = metaInfo;
-            dropdownButton.buttonLabelElement.text = buttonLabel;
+            dropdownButton.ButtonLabelElement.text = buttonLabel;
 
             root.Add(dropdownButton);
 
@@ -649,7 +649,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
-            dropdownButton.buttonElement.clicked += () => ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
+            dropdownButton.ButtonElement.clicked += () => ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             int curIndex = property.propertyType == SerializedPropertyType.String
@@ -690,7 +690,7 @@ namespace SaintsField.Editor.Drawers
                     property.serializedObject.ApplyModifiedProperties();
                     // Debug.Log($"onChange {curItem}");
                     onChange(property.propertyType == SerializedPropertyType.String? curItem.state.name : curItem);
-                    buttonLabel.buttonLabelElement.text = curName;
+                    buttonLabel.ButtonLabelElement.text = curName;
                     // property.serializedObject.ApplyModifiedProperties();
                 });
             }
@@ -708,7 +708,7 @@ namespace SaintsField.Editor.Drawers
 
             UIToolkitUtils.DropdownButtonField root = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
 
-            genericDropdownMenu.DropDown(root.buttonElement.worldBound, root, true);
+            genericDropdownMenu.DropDown(root.ButtonElement.worldBound, root, true);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

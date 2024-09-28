@@ -1,11 +1,10 @@
-﻿
+﻿#if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using UnityEditor;
 using System;
 using System.Linq;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
 
@@ -132,14 +131,14 @@ namespace SaintsField.Editor.Utils
 
         public class DropdownButtonField : BaseField<string>
         {
-            public readonly Button buttonElement;
-            public readonly Label buttonLabelElement;
+            public readonly Button ButtonElement;
+            public readonly Label ButtonLabelElement;
             // private readonly MethodInfo AlignLabel;
 
             public DropdownButtonField(string label, Button visualInput, Label buttonLabel) : base(label, visualInput)
             {
-                buttonElement = visualInput;
-                buttonLabelElement = buttonLabel;
+                ButtonElement = visualInput;
+                ButtonLabelElement = buttonLabel;
 
                 // AlignLabel = typeof(BaseField<string>).GetMethod("AlignLabel", BindingFlags.NonPublic | BindingFlags.Instance);
             }
@@ -213,6 +212,24 @@ namespace SaintsField.Editor.Utils
             });
 
             return dropdownButtonField;
+        }
+
+        public static IEnumerable<VisualElement> FindParentClass(VisualElement element, string className)
+        {
+            if(element == null)
+            {
+                yield break;
+            }
+
+            if(element.ClassListContains(className))
+            {
+                yield return element;
+            }
+
+            foreach (VisualElement each in FindParentClass(element.parent, className))
+            {
+                yield return each;
+            }
         }
     }
 #endif

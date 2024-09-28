@@ -1092,7 +1092,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             //     UnityEngine.Object.DestroyImmediate(dropdownRightIcon);
             // });
 
-            if(fancyBox)
+            if(fancyBox || _eLayout.HasFlag(ELayout.Foldout) || _eLayout.HasFlag(ELayout.Collapse))
             {
                 root.RegisterCallback<AttachToPanelEvent>(_ => StartToCheckOutOfScoopFoldout(root));
             }
@@ -1106,7 +1106,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
             root.schedule
                 .Execute(() => LoopCheckOutOfScoopFoldout(root, 0))
-                .StartingIn(200);
+                .StartingIn(100);
         }
 
         private void LoopCheckOutOfScoopFoldout(VisualElement root, int timeout)
@@ -1149,7 +1149,19 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     if(distance < 0)
                     {
                         // Debug.Log($"process {toggle.worldBound.x} - {root.worldBound.x}: {distance}");
-                        foldout.style.marginLeft = -distance + 4;
+                        float marginLeft = -distance + 4;
+                        VisualElement saintsParent = UIToolkitUtils.FindParentClass(foldout, SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
+                            .FirstOrDefault();
+                        if(saintsParent == null)
+                        {
+                            foldout.style.marginLeft = marginLeft;
+                        }
+                        else
+                        {
+                            float ml = saintsParent.resolvedStyle.marginLeft;
+                            float useValue = double.IsNaN(ml) ? marginLeft : marginLeft + ml;
+                            saintsParent.style.marginLeft = useValue;
+                        }
                     }
                 }
             }

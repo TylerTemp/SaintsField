@@ -309,10 +309,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3de95c31d15970e41bc8f2aa6f9024e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  e1: 2
+  e1: 0
   e2: 2
-  showOrArray: []
-  showOrElement: 
+  hideAndArray: []
+  hideAndElement: 
+  hideOrArray: []
+  hideOrElement: 
+  showIfElement: 
+  hideIfElement: 
 --- !u!1 &171104905
 GameObject:
   m_ObjectHideFlags: 0
@@ -1091,6 +1095,7 @@ Transform:
   - {fileID: 690734320}
   - {fileID: 2117085779}
   - {fileID: 94141468}
+  - {fileID: 915789747}
   m_Father: {fileID: 0}
   m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1299,6 +1304,63 @@ MonoBehaviour:
   - {fileID: 570233352}
   - {fileID: 174421157}
   - {fileID: 174421158}
+--- !u!1 &915789746
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 915789747}
+  - component: {fileID: 915789748}
+  m_Layer: 0
+  m_Name: LayoutNestFoldout
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &915789747
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 915789746}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 785898368}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &915789748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 915789746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba763499f3bd02e4686d26382434f342, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  plainStrings: []
+  plainStruct:
+    structString: 
+  plainEnum: 0
+  l1Strings: []
+  l1Struct:
+    structString: 
+  l1Enum: 0
+  l2Strings: []
+  l2Struct:
+    structString: 
+  l2Enum: 0
+  l2EnumLabel: 0
 --- !u!1 &943755158
 GameObject:
   m_ObjectHideFlags: 0

@@ -644,9 +644,15 @@ namespace SaintsField.Editor.Utils
         {
             bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
             bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if(editorRequiresEdit && editorRequiresPlay)
             {
                 return true;
+            }
+
+            if(!editorRequiresEdit && !editorRequiresPlay)
+            {
+                return false;
             }
 
             return (
@@ -663,7 +669,15 @@ namespace SaintsField.Editor.Utils
 
             foreach (ConditionInfo conditionInfo in conditionInfos)
             {
-                (string error, object result) = GetOf<object>(conditionInfo.Target, null, property, info, target);
+                if (!(conditionInfo.Target is string conditionStringTarget))
+                {
+                    Debug.Assert(conditionInfo.Compare == LogicCompare.Truly, $"target {conditionInfo.Target} should be truly compared");
+                    bool thisTruly = ReflectUtils.Truly(conditionInfo.Target);
+                    callbackBoolResults.Add(conditionInfo.Reverse ? !thisTruly : thisTruly);
+                    continue;
+                }
+
+                (string error, object result) = GetOf<object>(conditionStringTarget, null, property, info, target);
                 if (error != "")
                 {
                     errors.Add(error);

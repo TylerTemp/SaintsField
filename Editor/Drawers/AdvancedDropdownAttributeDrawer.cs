@@ -1146,7 +1146,7 @@ namespace SaintsField.Editor.Drawers
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButton(property);
             dropdownButton.userData = initMetaInfo.CurValue;
-            dropdownButton.buttonLabelElement.text = GetMetaStackDisplay(initMetaInfo);
+            dropdownButton.ButtonLabelElement.text = GetMetaStackDisplay(initMetaInfo);
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 
@@ -1175,7 +1175,7 @@ namespace SaintsField.Editor.Drawers
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
             VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
-            dropdownButton.buttonElement.clicked += () =>
+            dropdownButton.ButtonElement.clicked += () =>
             {
                 MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
                 // Debug.Log(root.worldBound);
@@ -1202,7 +1202,7 @@ namespace SaintsField.Editor.Drawers
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
 
-                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).buttonLabelElement.text = newDisplay;
+                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).ButtonLabelElement.text = newDisplay;
                         dropdownButton.userData = curItem;
                         onValueChangedCallback(curItem);
                         // dropdownButton.buttonLabelElement.text = newDisplay;

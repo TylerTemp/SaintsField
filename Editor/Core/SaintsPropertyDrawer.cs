@@ -270,7 +270,7 @@ namespace SaintsField.Editor.Core
 
         private float _labelFieldBasicHeight = EditorGUIUtility.singleLineHeight;
 
-        protected virtual bool GetAndVisibility(SerializedProperty property, FieldInfo info, object parent)
+        protected virtual bool GetThisDecoratorVisibility(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
         {
             return true;
         }
@@ -280,10 +280,10 @@ namespace SaintsField.Editor.Core
             List<bool> showAndResults = new List<bool>();
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
-                if (saintsAttributeWithIndex.SaintsAttribute is IImGuiVisibilityAttribute)
+                if (saintsAttributeWithIndex.SaintsAttribute is ShowIfAttribute showIfAttribute)
                 {
                     SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
-                    showAndResults.Add(drawer.GetAndVisibility(property, fieldInfo, parent));
+                    showAndResults.Add(drawer.GetThisDecoratorVisibility(showIfAttribute, property, fieldInfo, parent));
                 }
             }
             // Debug.Log($"visibility={string.Join(", ", showAndResults)}");
@@ -619,6 +619,7 @@ namespace SaintsField.Editor.Core
 
         #region UI
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
+        public static string ClassLabelFieldUIToolkit = "saints-field--label-field";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
         public const string ClassAllowDisable = "saints-field-allow-disable";
@@ -887,6 +888,7 @@ namespace SaintsField.Editor.Core
                 name = NameLabelFieldUIToolkit(property),
                 userData = null,
             };
+            fieldContainer.AddToClassList(ClassLabelFieldUIToolkit);
 
             #region Pre Overlay
 
@@ -1117,7 +1119,7 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"Saints: {property.displayName} found {allSaintsAttributes.Count}");
 
-            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is IImGuiVisibilityAttribute), parent))
+            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is ShowIfAttribute), parent))
             {
                 return;
             }
@@ -1850,24 +1852,6 @@ namespace SaintsField.Editor.Core
         //     return GetFirstAncestorName(element.parent, name);
         // }
 
-        private static IEnumerable<VisualElement> FindParentClass(VisualElement element, string className)
-        {
-            if(element == null)
-            {
-                yield break;
-            }
-
-            if(element.ClassListContains(className))
-            {
-                yield return element;
-            }
-
-            foreach (VisualElement each in FindParentClass(element.parent, className))
-            {
-                yield return each;
-            }
-        }
-
         protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
@@ -1936,7 +1920,7 @@ namespace SaintsField.Editor.Core
             {
                 // containerElement.visible = true;
 
-                List<VisualElement> parentRoots = FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
+                List<VisualElement> parentRoots = UIToolkitUtils.FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
 #endif

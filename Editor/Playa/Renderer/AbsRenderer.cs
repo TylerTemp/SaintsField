@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Condition;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers;
+using SaintsField.Editor.Drawers.VisibilityDrawers;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -75,6 +76,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // TODO: handle errors
             public IReadOnlyList<string> errors;
             public IReadOnlyList<bool> boolResults;
+            public bool EditorModeResult;
         }
 
         protected static PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo)
@@ -85,21 +87,12 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 switch (playaAttribute)
                 {
-                    case PlayaHideIfAttribute hideIfAttribute:
+                    case IVisibilityAttribute visibilityAttribute:
                         preCheckInternalInfos.Add(new PreCheckInternalInfo
                         {
-                            Type = PreCheckInternalType.Hide,
-                            ConditionInfos = hideIfAttribute.ConditionInfos,
-                            EditorMode = hideIfAttribute.EditorMode,
-                            Target = fieldWithInfo.Target,
-                        });
-                        break;
-                    case PlayaShowIfAttribute showIfAttribute:
-                        preCheckInternalInfos.Add(new PreCheckInternalInfo
-                        {
-                            Type = PreCheckInternalType.Show,
-                            ConditionInfos = showIfAttribute.ConditionInfos,
-                            EditorMode = showIfAttribute.EditorMode,
+                            Type = visibilityAttribute.IsShow? PreCheckInternalType.Show: PreCheckInternalType.Hide,
+                            ConditionInfos = visibilityAttribute.ConditionInfos,
+                            EditorMode = visibilityAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
                         break;
@@ -134,13 +127,6 @@ namespace SaintsField.Editor.Playa.Renderer
                 FillResult(preCheckInternalInfo);
             }
 
-            // no show attribute: show
-            // any show attribute is true: show; otherwise: not-show
-            // bool hasShow = false;
-            // bool show = true;
-            // no hide attribute: show
-            // any hide attribute is true: hide; otherwise: not-hide
-            // bool hasHide = false;
             List<bool> showResults = new List<bool>();
             // bool hide = false;
             // no disable attribute: not-disable
@@ -155,32 +141,33 @@ namespace SaintsField.Editor.Playa.Renderer
                 switch (preCheckInternalInfo.Type)
                 {
                     case PreCheckInternalType.Show:
+                    {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
                         Debug.Log(
                             $"show, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
 #endif
-                        // hasShow = true;
-                        bool willShow = preCheckInternalInfo.boolResults.All(each => each);
-                        showResults.Add(willShow);
-                        // if (!preCheckInternalInfo.boolResults.All(each => each))
-                        // {
-                        //     show = false;
-                        // }
+                        showResults.Add(preCheckInternalInfo.boolResults.Prepend(preCheckInternalInfo.EditorModeResult)
+                            .All(each => each));
+                    }
                         break;
                     case PreCheckInternalType.Hide:
+                    {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
                         Debug.Log(
                             $"hide, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
 #endif
-                        bool willHide = preCheckInternalInfo.boolResults.Count == 0 ||
-                                        preCheckInternalInfo.boolResults.Any(each => each);
-                        // hasHide = true;
-                        // if (preCheckInternalInfo.boolResults.Count == 0 ||
-                        //     preCheckInternalInfo.boolResults.Any(each => each))
-                        // {
-                        //     hide = true;
-                        // }
-                        showResults.Add(!willHide);
+
+                        // Any(empty)=false=!hide=show. But because in ShowIf, empty=true=show, so we need to negate it.
+                        if (preCheckInternalInfo.EditorMode == 0 && preCheckInternalInfo.boolResults.Count == 0)
+                        {
+                            showResults.Add(false);  // don't show
+                        }
+                        else
+                        {
+                            bool willHide = preCheckInternalInfo.boolResults.Prepend(preCheckInternalInfo.EditorModeResult).Any(each => each);
+                            showResults.Add(!willHide);
+                        }
+                    }
                         break;
                     case PreCheckInternalType.Disable:
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
@@ -206,24 +193,24 @@ namespace SaintsField.Editor.Playa.Renderer
                         throw new ArgumentOutOfRangeException(nameof(preCheckInternalInfo.Type), preCheckInternalInfo.Type, null);
                 }
             }
-            // bool showIfResult = true;
-            // if (hasShow)
-            // {
-            //     showIfResult = show;
-            // }
-            //
-            // if (hasHide)
-            // {
-            //     // ReSharper disable once SimplifyConditionalTernaryExpression
-            //     showIfResult = (hasShow? show: true) && !hide;
-            // }
-            bool showIfResult = showResults.Count == 0 || showResults.Any(each => each);
+
+            bool showIfResult;
+            bool disableIfResult;
+            if (preCheckInternalInfos.Any(each => each.errors.Count > 0))
+            {
+                showIfResult = true;
+                disableIfResult = false;
+            }
+            else
+            {
+                showIfResult = showResults.Count == 0 || showResults.Any(each => each);
+                disableIfResult = disable || !enable;
+            }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
             Debug.Log(
                 $"showIfResult={showIfResult} (hasShow={hasShow}, show={show}, hide={hide})");
 #endif
-            bool disableIfResult = disable || !enable;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
             Debug.Log(
                 $"disableIfResult={disableIfResult} (disable={disable}, enable={enable})");
@@ -297,13 +284,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private static void FillResult(PreCheckInternalInfo preCheckInternalInfo)
         {
-            bool editorModeIsTrue = Util.ConditionEditModeChecker(preCheckInternalInfo.EditorMode);
-            // if (!editorModeIsTrue)
-            // {
-            //     preCheckInternalInfo.errors = Array.Empty<string>();
-            //     preCheckInternalInfo.boolResults = new[]{false};
-            //     return;
-            // }
+            preCheckInternalInfo.EditorModeResult = Util.ConditionEditModeChecker(preCheckInternalInfo.EditorMode);
 
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(preCheckInternalInfo.ConditionInfos, null, null, preCheckInternalInfo.Target);
 
@@ -313,6 +294,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 preCheckInternalInfo.boolResults = Array.Empty<bool>();
                 return;
             }
+
+            bool editorModeIsTrue = Util.ConditionEditModeChecker(preCheckInternalInfo.EditorMode);
 
             preCheckInternalInfo.errors = Array.Empty<string>();
             preCheckInternalInfo.boolResults = boolResults.Prepend(editorModeIsTrue).ToArray();

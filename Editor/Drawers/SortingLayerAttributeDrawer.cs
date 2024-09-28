@@ -145,9 +145,9 @@ namespace SaintsField.Editor.Drawers
         {
             UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
             (string[] _, int _, string displayName) = GetSelected(property);
-            buttonLabel.buttonLabelElement.text = displayName;
+            buttonLabel.ButtonLabelElement.text = displayName;
 
-            container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).buttonElement.clicked += () =>
+            container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).ButtonElement.clicked += () =>
                 ShowDropdown(property, container, onValueChangedCallback);
         }
 
@@ -188,7 +188,7 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                         onChange.Invoke(curIndex);
                     }
-                    buttonLabel.buttonLabelElement.text = curName;
+                    buttonLabel.ButtonLabelElement.text = curName;
                 });
             }
 
@@ -198,7 +198,7 @@ namespace SaintsField.Editor.Drawers
             }
             genericDropdownMenu.AddItem("Edit Sorting Layers...", false, OpenSortingLayerInspector);
 
-            genericDropdownMenu.DropDown(buttonLabel.buttonElement.worldBound, buttonLabel, true);
+            genericDropdownMenu.DropDown(buttonLabel.ButtonElement.worldBound, buttonLabel, true);
         }
 
         private static (string[] layers, int index, string display) GetSelected(SerializedProperty property)

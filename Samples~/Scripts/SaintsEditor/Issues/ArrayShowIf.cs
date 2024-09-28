@@ -3,7 +3,7 @@ using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 {
-    public class ArrayShowIf : SaintsMonoBehaviour
+    public class ArrayHideIf : SaintsMonoBehaviour
     {
         [Serializable]
         public enum EnumValues
@@ -16,18 +16,22 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
         public EnumValues e1;
         public EnumValues e2;
 
-        [PlayaShowIf(nameof(e1), EnumValues.A)]
-        [PlayaShowIf(nameof(e2), EnumValues.B)]
-        public string[] showOrArray;
+        [PlayaHideIf(EMode.Edit, nameof(e1), EnumValues.A)]
+        [PlayaHideIf(EMode.Edit, nameof(e2), EnumValues.B)]
+        public string[] hideAndArray;
 
-        [ShowIf(nameof(e1), EnumValues.A)]
-        [ShowIf(nameof(e2), EnumValues.B)]
-        public string showOrElement;
+        [HideIf(EMode.Edit, nameof(e1), EnumValues.A)]
+        [HideIf(EMode.Edit, nameof(e2), EnumValues.B)]
+        public string hideAndElement;
 
-        [PlayaShowIf(nameof(e1), EnumValues.A, nameof(e2), EnumValues.B)]
-        public string[] showAndArray;
+        [PlayaHideIf(EMode.Edit, nameof(e1), EnumValues.A, nameof(e2), EnumValues.B)]
+        public string[] hideOrArray;
 
-        [ShowIf(nameof(e1), EnumValues.A, nameof(e2), EnumValues.B)]
-        public string showAndElement;
+        [HideIf(EMode.Edit, nameof(e1), EnumValues.A, nameof(e2), EnumValues.B)]
+        [HideIf(nameof(e1), EnumValues.A, nameof(e2), EnumValues.B)]
+        public string hideOrElement;
+
+        [ShowIf(false)] public string showIfElement;
+        [HideIf(false)] public string hideIfElement;
     }
 }

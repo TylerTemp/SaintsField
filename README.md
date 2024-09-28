@@ -70,14 +70,15 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.3.4**
+**3.3.5**
 
-1.  Fix `PlayaShowIf`/`PlayaHideIf` could not be used more than once on the same target.
-2.  IMGUI: Fix missing decorators. If you see duplicated decorators in your project, go: `Window` - `Saints` - `Enable IMGUI duplicated decorator fix`.
-3.  IMGUI: Fix inconsistent height update for `InfoBox` and `ResiziableTextArea` in Unity 2022.3.46, [#85](https://github.com/TylerTemp/SaintsField/issues/85).
-4.  IMGUI: Fix `PostFieldButton`, `AboveButton`, `BelowButton` use shared error message when in a list/array.
-5.  Change `null` value color for `ShowInInspector`.
-6.  Fix `ShowInInspector` can not detect a dictionary when the target is `IReadOnlyDictionary<,>`
+1.  Fix inconsistent log of `ShowIf` and `HideIf`(also `PlayaShowIf`, `PlayaHideIf`):
+
+    1.  As `[ShowIf]` will show the field, now `[HideIf]` will hide the field.
+    2.  The `Or` logic is not completely correct for `HideIf`, especially with `EMode` config.
+
+2.  Now you can use `[ShowIf(false)]`, `[HideIf(true)]` to directly show or hide the target field.
+3.  UI Toolkit: fix array/list/struct foldout out of space when using `Layout`
 
 (P.S. I'm still working on a big feature so most updates these days will be about bug fixes instead of features)
 

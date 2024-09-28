@@ -26,8 +26,20 @@ namespace SaintsField.Condition
                 Debug.Log($"#Condition# Get {rawConditions[index]}");
 #endif
 
-                string rawCondition = (string)rawConditions[index];
-
+                object rawObjectCondition = rawConditions[index];
+                if (!(rawObjectCondition is string rawCondition))
+                {
+                    yield return new ConditionInfo
+                    {
+                        Target = rawObjectCondition,
+                        Compare = LogicCompare.Truly,
+                        Value = null,
+                        ValueIsCallback = false,
+                        Reverse = false,
+                    };
+                    continue;
+                }
+                // string rawCondition = (string);
 
                 bool reverse = false;
                 object value = null;
@@ -230,12 +242,6 @@ namespace SaintsField.Condition
                     ValueIsCallback = valueIsCallback,
                     Reverse = reverse,
                 };
-
-                if (valueIsCallback)
-                {
-                    skipNext = true;
-                }
-
             }
         }
     }

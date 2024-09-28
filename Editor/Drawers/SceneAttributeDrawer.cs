@@ -184,9 +184,9 @@ namespace SaintsField.Editor.Drawers
         {
             UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
             (int _, string displayName) = GetSelected(property);
-            buttonLabel.buttonLabelElement.text = displayName;
+            buttonLabel.ButtonLabelElement.text = displayName;
 
-            container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).buttonElement.clicked += () =>
+            container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).ButtonElement.clicked += () =>
                 ShowDropdown(property, saintsAttribute, container, parent, onValueChangedCallback);
         }
 
@@ -221,7 +221,7 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                         onChange.Invoke(curIndex);
                     }
-                    buttonDropdown.buttonLabelElement.text = curName;
+                    buttonDropdown.ButtonLabelElement.text = curName;
                 });
             }
 
@@ -231,7 +231,7 @@ namespace SaintsField.Editor.Drawers
             }
             genericDropdownMenu.AddItem("Edit Scenes In Build...", false, OpenBuildSettings);
 
-            genericDropdownMenu.DropDown(buttonDropdown.buttonElement.worldBound, buttonDropdown, true);
+            genericDropdownMenu.DropDown(buttonDropdown.ButtonElement.worldBound, buttonDropdown, true);
         }
 
         private static (int index, string displayName) GetSelected(SerializedProperty property)

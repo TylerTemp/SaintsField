@@ -306,7 +306,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            dropdownField.buttonElement.clicked += () => ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
+            dropdownField.ButtonElement.clicked += () => ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
             // DropdownField dropdownField = container.Q<DropdownField>(NameDropdownField(property));
             // MetaInfo metaInfo = (MetaInfo)dropdownField.userData;
             // // ReSharper disable once InvertIf
@@ -365,7 +365,7 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                         onValueChangedCallback(curItem.nameHash);
                     }
-                    dropdownField.buttonLabelElement.text = curName;
+                    dropdownField.ButtonLabelElement.text = curName;
                 });
             }
 
@@ -378,7 +378,7 @@ namespace SaintsField.Editor.Drawers
                 genericDropdownMenu.AddItem($"Edit {metaInfo.Animator.runtimeAnimatorController.name}...", false, () => OpenAnimator(metaInfo.Animator.runtimeAnimatorController));
             }
 
-            genericDropdownMenu.DropDown(dropdownField.buttonElement.worldBound, dropdownField.buttonElement, true);
+            genericDropdownMenu.DropDown(dropdownField.ButtonElement.worldBound, dropdownField.ButtonElement, true);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -438,9 +438,9 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            if (dropdownField.buttonLabelElement.text != label)
+            if (dropdownField.ButtonLabelElement.text != label)
             {
-                dropdownField.buttonLabelElement.text = label;
+                dropdownField.ButtonLabelElement.text = label;
             }
         }
 
@@ -449,7 +449,7 @@ namespace SaintsField.Editor.Drawers
             IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
         {
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            UIToolkitUtils.SetLabel(dropdownField.buttonLabelElement, richTextChunks, richTextDrawer);
+            UIToolkitUtils.SetLabel(dropdownField.ButtonLabelElement, richTextChunks, richTextDrawer);
         }
 
         private static string GetParameterLabel(AnimatorControllerParameter each) => $"{each.name} [{each.type}]";

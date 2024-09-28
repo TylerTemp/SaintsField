@@ -226,7 +226,7 @@ namespace SaintsField.Editor.Drawers
 
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButton.style.flexGrow = 1;
-            dropdownButton.buttonLabelElement.text = buttonLabel;
+            dropdownButton.ButtonLabelElement.text = buttonLabel;
             dropdownButton.name = NameDropdownButtonField(property);
             dropdownButton.userData = metaInfo.SelectedIndex == -1
                 ? null
@@ -259,7 +259,7 @@ namespace SaintsField.Editor.Drawers
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;
-            container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).buttonElement.clicked += () =>
+            container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).ButtonElement.clicked += () =>
                 ShowDropdown(property, saintsAttribute, container, dropdownAttribute.SlashAsSub, info, parent, onValueChangedCallback);
         }
 
@@ -291,7 +291,7 @@ namespace SaintsField.Editor.Drawers
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, field, parent);
             string display = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
             // Debug.Log($"change label to {display}");
-            Label buttonLabelElement = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).buttonLabelElement;
+            Label buttonLabelElement = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).ButtonLabelElement;
             if(buttonLabelElement.text != display)
             {
                 buttonLabelElement.text = display;
@@ -322,13 +322,13 @@ namespace SaintsField.Editor.Drawers
             if (slashAsSub)
             {
                 string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
-                ShowGenericMenu(metaInfo, curDisplay, dropdownButtonField.buttonElement.worldBound, (newName, item) =>
+                ShowGenericMenu(metaInfo, curDisplay, dropdownButtonField.ButtonElement.worldBound, (newName, item) =>
                 {
                     ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, item);
                     Util.SignPropertyValue(property, info, parent, item);
                     property.serializedObject.ApplyModifiedProperties();
                     onChange(item);
-                    dropdownButtonField.buttonLabelElement.text = newName;
+                    dropdownButtonField.ButtonLabelElement.text = newName;
                     // property.serializedObject.ApplyModifiedProperties();
                 }, false);
             }
@@ -361,13 +361,13 @@ namespace SaintsField.Editor.Drawers
                             Util.SignPropertyValue(property, info, parent, curItem);
                             property.serializedObject.ApplyModifiedProperties();
                             onChange(curItem);
-                            dropdownButtonField.buttonLabelElement.text = curName;
+                            dropdownButtonField.ButtonLabelElement.text = curName;
                             // property.serializedObject.ApplyModifiedProperties();
                         });
                     }
                 }
 
-                genericDropdownMenu.DropDown(dropdownButtonField.buttonElement.worldBound, dropdownButtonField, true);
+                genericDropdownMenu.DropDown(dropdownButtonField.ButtonElement.worldBound, dropdownButtonField, true);
             }
         }
 
