@@ -75,7 +75,7 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 1.  Fix inconsistent logic of `ShowIf` and `HideIf`(also `PlayaShowIf`, `PlayaHideIf`):
 
     1.  As `[ShowIf]` will show the field, now `[HideIf]` will hide the field.
-    2.  The `Or` logic is not completely correct for `HideIf`, especially with `EMode` config.
+    2.  The `Or` logic was not completely correct for `HideIf`, especially with `EMode` config and now is been fixed
 
 2.  Now you can use `[ShowIf(false)]`, `[HideIf(true)]` to directly show or hide the target field.
 3.  UI Toolkit: fix array/list/struct foldout out of space when using `Layout`
