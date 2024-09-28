@@ -72,7 +72,7 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 **3.3.5**
 
-1.  Fix inconsistent log of `ShowIf` and `HideIf`(also `PlayaShowIf`, `PlayaHideIf`):
+1.  Fix inconsistent logic of `ShowIf` and `HideIf`(also `PlayaShowIf`, `PlayaHideIf`):
 
     1.  As `[ShowIf]` will show the field, now `[HideIf]` will hide the field.
     2.  The `Or` logic is not completely correct for `HideIf`, especially with `EMode` config.
