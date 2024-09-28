@@ -1129,7 +1129,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                 foreach (Foldout foldout in foldouts)
                 {
-                    Toggle toggle = actualFieldContainer.Q<Toggle>(className: "unity-foldout__toggle--inspector");
+                    // this class name is not consistent in different UI Toolkit versions. So just remove it...
+                    // Toggle toggle = actualFieldContainer.Q<Toggle>(className: "unity-foldout__toggle--inspector");
+                    Toggle toggle = actualFieldContainer.Q<Toggle>();
                     if (toggle == null)
                     {
                         continue;
