@@ -597,10 +597,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        // TODO
         private static IEnumerable<ResourceInfo> GetValuesFromNodeTest(NodeTest nodeTest, IEnumerable<ResourceInfo> attrResources)
         {
-            // return attrResources;
             switch (nodeTest)
             {
                 case NodeTest.None:
@@ -705,6 +703,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     foreach (ResourceInfo resourceInfo in attrResources)
                     {
                         ResourceInfo top = GetGameObjectsAncestor(resourceInfo, true, false).Last();
+                        // ReSharper disable once UseNegatedPatternInIsExpression
                         if (!(top is null))
                         {
                             yield return top;
@@ -715,7 +714,28 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                 case NodeTest.Resources:
                 {
-                    // TODO
+                    foreach (DirectoryInfo resourceDirectoryInfo in GetResourcesFoldersRecursively(new DirectoryInfo("Assets")))
+                    {
+                        yield return new ResourceInfo
+                        {
+                            FolderPath = resourceDirectoryInfo.FullName,
+                            Resource = resourceDirectoryInfo,
+                            ResourceType = ResourceType.Folder,
+                        };
+                    }
+                }
+                    break;
+                case NodeTest.Asset:
+                {
+                    foreach (DirectoryInfo directoryInfo in GetFoldersRecursively(new DirectoryInfo("Assets")))
+                    {
+                        yield return new ResourceInfo
+                        {
+                            FolderPath = directoryInfo.FullName,
+                            Resource = directoryInfo,
+                            ResourceType = ResourceType.Folder,
+                        };
+                    }
                 }
                     break;
             }
@@ -814,6 +834,39 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     ResourceType = ResourceType.Object,
                     Resource = parent.gameObject,
                 };
+            }
+        }
+
+        private static IEnumerable<DirectoryInfo> GetResourcesFoldersRecursively(DirectoryInfo currentFolder)
+        {
+            DirectoryInfo[] subFolders = currentFolder.GetDirectories();
+            foreach (DirectoryInfo subFolder in subFolders)
+            {
+                string subFolderPath = subFolder.FullName;
+                if (subFolderPath.EndsWith("Resources"))  // resources ends here
+                {
+                    yield return subFolder;
+                }
+                else
+                {
+                    foreach (DirectoryInfo subSubFolder in GetResourcesFoldersRecursively(subFolder))
+                    {
+                        yield return subSubFolder;
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<DirectoryInfo> GetFoldersRecursively(DirectoryInfo currentFolder)
+        {
+            DirectoryInfo[] subFolders = currentFolder.GetDirectories();
+            foreach (DirectoryInfo subFolder in subFolders)
+            {
+                yield return subFolder;
+                foreach (DirectoryInfo subSubFolder in GetResourcesFoldersRecursively(subFolder))
+                {
+                    yield return subSubFolder;
+                }
             }
         }
 
