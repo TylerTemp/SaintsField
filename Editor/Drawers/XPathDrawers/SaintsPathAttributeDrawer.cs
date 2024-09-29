@@ -11,6 +11,7 @@ using SaintsField.SaintsXPathParser;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
@@ -644,7 +645,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     break;
                 case NodeTest.Parent:
                 {
-                    foreach (Transform parentTransform in attrResources.Select(GetParentFromResourceInfos).Where(each => !(each is null)))
+                    foreach (Transform parentTransform in attrResources.Select(GetParentFromResourceInfo).Where(each => !(each is null)))
                     {
                         yield return new ResourceInfo{
                             ResourceType = ResourceType.Object,
@@ -655,30 +656,66 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     break;
                 case NodeTest.ParentOrSelf:
                 {
-                    foreach (ResourceInfo attrResource in attrResources)
+                    foreach (ResourceInfo attrResource in attrResources.SelectMany(GetParentOrSelfFromResourceInfo))
                     {
+                        yield return attrResource;
+                    }
+                }
+                    break;
 
+                case NodeTest.ParentOrSelfInsidePrefab:
+                {
+                    foreach (ResourceInfo attrResource in attrResources.SelectMany(GetParentOrSelfFromResourceInfo))
+                    {
                         switch (attrResource.Resource)
                         {
-                            case GameObject _:
-                            case Component _:
-                                yield return attrResource;
+                            case GameObject go:
+                                if(PrefabUtility.GetPrefabInstanceHandle(go)) {
+                                    yield return attrResource;
+                                }
+
                                 break;
-                            default:
-                                yield break;
-                        }
+                            case Component comp:
+                                if(PrefabUtility.GetPrefabInstanceHandle(comp.gameObject)) {
+                                    yield return attrResource;
+                                }
 
-                        Transform parent = GetParentFromResourceInfos(attrResource);
-                        if (!(parent is null))
-                        {
-
-                            yield return new ResourceInfo
-                            {
-                                ResourceType = ResourceType.Object,
-                                Resource = parent.gameObject,
-                            };
+                                break;
                         }
                     }
+                }
+                    break;
+
+                case NodeTest.SceneRoot:
+                {
+                    Scene scene = SceneManager.GetActiveScene();
+                    foreach (GameObject rootGameObject in scene.GetRootGameObjects())
+                    {
+                        yield return new ResourceInfo
+                        {
+                            ResourceType = ResourceType.Object,
+                            Resource = rootGameObject,
+                        };
+                    }
+                }
+                    break;
+
+                case NodeTest.PrefabRoot:
+                {
+                    foreach (ResourceInfo resourceInfo in attrResources)
+                    {
+                        ResourceInfo top = GetGameObjectsAncestor(resourceInfo, true, false).Last();
+                        if (!(top is null))
+                        {
+                            yield return top;
+                        }
+                    }
+                }
+                    break;
+
+                case NodeTest.Resources:
+                {
+                    // TODO
                 }
                     break;
             }
@@ -740,7 +777,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        private static Transform GetParentFromResourceInfos(ResourceInfo resourceInfo)
+        private static Transform GetParentFromResourceInfo(ResourceInfo resourceInfo)
         {
             switch (resourceInfo.Resource)
             {
@@ -750,6 +787,33 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     return comp.transform.parent;
                 default:
                     return null;
+            }
+        }
+
+        private static IEnumerable<ResourceInfo> GetParentOrSelfFromResourceInfo(ResourceInfo resourceInfo)
+        {
+            switch (resourceInfo.Resource)
+            {
+                // ReSharper disable once RedundantDiscardDesignation
+                case GameObject _:
+                // ReSharper disable once RedundantDiscardDesignation
+                case Component _:
+                    yield return resourceInfo;
+                    break;
+                default:
+                    yield break;
+            }
+
+            Transform parent = GetParentFromResourceInfo(resourceInfo);
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(parent is null))
+            {
+
+                yield return new ResourceInfo
+                {
+                    ResourceType = ResourceType.Object,
+                    Resource = parent.gameObject,
+                };
             }
         }
 
