@@ -152,7 +152,7 @@ namespace SaintsField.Editor.Drawers.Addressable
             dropdownButtonField.name = NameDropdownField(property);
             dropdownButtonField.userData = Array.Empty<string>();
             // ReSharper disable once MergeConditionalExpression
-            dropdownButtonField.buttonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
+            dropdownButtonField.ButtonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
 
             dropdownButtonField.AddToClassList(ClassAllowDisable);
             return dropdownButtonField;
@@ -179,11 +179,11 @@ namespace SaintsField.Editor.Drawers.Addressable
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
+            // HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
 
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
-            dropdownField.buttonElement.clicked += () => ShowDropdown(property, addressableAddressAttribute, dropdownField, onValueChangedCallback);
+            dropdownField.ButtonElement.clicked += () => ShowDropdown(property, addressableAddressAttribute, dropdownField, onValueChangedCallback);
         }
 
         private static void ShowDropdown(SerializedProperty property, AddressableAddressAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField, Action<object> onValueChangedCallback)
@@ -197,7 +197,7 @@ namespace SaintsField.Editor.Drawers.Addressable
                 genericDropdownMenu.AddItem(key, property.stringValue == thisKey, () =>
                 {
                     // dropdownField.buttonLabelElement.text = thisKey;
-                    dropdownField.buttonLabelElement.text = thisKey;
+                    dropdownField.ButtonLabelElement.text = thisKey;
                     property.stringValue = thisKey;
                     property.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(thisKey);
@@ -214,7 +214,7 @@ namespace SaintsField.Editor.Drawers.Addressable
                 EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
             });
 
-            genericDropdownMenu.DropDown(dropdownField.buttonElement.worldBound, dropdownField, true);
+            genericDropdownMenu.DropDown(dropdownField.ButtonElement.worldBound, dropdownField, true);
         }
 
         private static void UpdateHelpBox(HelpBox helpBox, string error)
@@ -239,10 +239,10 @@ namespace SaintsField.Editor.Drawers.Addressable
             }
 
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            if (dropdownField.buttonLabelElement.text != property.stringValue)
+            if (dropdownField.ButtonLabelElement.text != property.stringValue)
             {
                 // ReSharper disable once MergeConditionalExpression
-                dropdownField.buttonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
+                dropdownField.ButtonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
             }
         }
 

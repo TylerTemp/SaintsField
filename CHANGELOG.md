@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.6 ##
+
+Fix broken addressable support due to last version's refactor.
+
 ## 3.3.5 ##
 
 1.  Fix inconsistent log of `ShowIf` and `HideIf`(also `PlayaShowIf`, `PlayaHideIf`):
