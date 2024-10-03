@@ -170,10 +170,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 accValues = predicatesResources.ToArray();
             }
 
-            return accValues.Select(each =>
-                each.ResourceType == ResourceType.File
-                    ? AssetDatabase.LoadAssetAtPath<Object>((string)each.Resource)
-                    : each.Resource);
+            return accValues
+                .Select(each =>
+                {
+                    // ReSharper disable once InvertIf
+                    if (each.ResourceType == ResourceType.File)
+                    {
+                        string assetPath = string.IsNullOrEmpty(each.FolderPath)
+                            ? (string)each.Resource
+                            : $"{each.FolderPath}/{each.Resource}";
+                        return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                    }
+
+                    return each.Resource;
+                })
+                .Where(each => each != null);
         }
 
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)

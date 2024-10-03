@@ -3399,10 +3399,10 @@ MonoBehaviour:
   - xPath: //[@{GetComponent(EPathDebug)}]
     results:
     - //A{NameEmpty}::None``[`@{`GetComponents=>(EPathDebug[Int{Equal 0}]`} Truly`]
-  - xPath: '*'
+  - xPath: ..
     results:
-    - None::Match{NameAny}``[]
-  c: {fileID: 1110953677}
+    - 'None::Match{ExactMatch: ..}``[]'
+  c: {fileID: 1486592967}
 --- !u!1 &665402999
 GameObject:
   m_ObjectHideFlags: 0
