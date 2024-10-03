@@ -25,9 +25,74 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
     {
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
+
+        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_HelpBox";
+        private static string NameResignButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_ResignButton";
+        private static string NameRemoveButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_RemoveButton";
+
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    flexGrow = 0,
+                    flexShrink = 1,
+                },
+            };
+
+            Button refreshButton = new Button
+            {
+                style =
+                {
+                    height = SingleLineHeight,
+                    width = SingleLineHeight,
+                    // display = DisplayStyle.None,
+                    paddingLeft = 0,
+                    paddingRight = 0,
+                    paddingTop = 0,
+                    paddingBottom = 0,
+                    marginLeft = 0,
+                    marginRight = 0,
+                    marginTop = 0,
+                    marginBottom = 0,
+                },
+                name = NameResignButton(property, index),
+            };
+            refreshButton.Add(new Image
+            {
+                image = Util.LoadResource<Texture2D>("refresh.png"),
+            });
+
+            Button removeButton = new Button
+            {
+                style =
+                {
+                    height = SingleLineHeight,
+                    width = SingleLineHeight,
+                    // display = DisplayStyle.None,
+                    paddingLeft = 0,
+                    paddingRight = 0,
+                    paddingTop = 0,
+                    paddingBottom = 0,
+                    marginLeft = 0,
+                    marginRight = 0,
+                    marginTop = 0,
+                    marginBottom = 0,
+                },
+                name = NameRemoveButton(property, index),
+            };
+            removeButton.Add(new Image
+            {
+                image = Util.LoadResource<Texture2D>("close.png"),
+            });
+
+            root.Add(refreshButton);
+            root.Add(removeButton);
+            root.AddToClassList(ClassAllowDisable);
+
             object[] results = GetXPathValue(((GetByXPathAttribute)saintsAttribute).XPathSteps, property, info, parent).ToArray();
             if (results.Length == 0)
             {
@@ -37,7 +102,23 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             Debug.Log(results[0]);
             property.objectReferenceValue = Util.GetTypeFromObj((Object)results[0], info.FieldType);
             property.serializedObject.ApplyModifiedProperties();
-            return null;
+
+            return root;
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+        {
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NameHelpBox(property, index),
+            };
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
         #endregion
 #endif
@@ -97,10 +178,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)
         {
-            if (sepCount == 1 && nodeTest.NameEmpty || (nodeTest.ExactMatch == "."))
+            if (sepCount == 1 && nodeTest.NameEmpty || nodeTest.ExactMatch == "." || nodeTest.ExactMatch == "..")
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
-                Debug.Log("empty name, return original");
+                Debug.Log("empty name or dot name, return original");
 #endif
                 foreach (ResourceInfo resourceInfo in accValues)
                 {
@@ -336,6 +417,73 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
                     Debug.Log($"no resource name, skip {resourceInfo.Resource}");
 #endif
+                    continue;
+                }
+
+                if (nodeTest.ExactMatch == "..")
+                {
+                    switch (resourceInfo.ResourceType)
+                    {
+                        case ResourceType.File:
+                        {
+                            string resFolder = string.Join("/", resourceName.Split("/").SkipLast(1));
+                            yield return new ResourceInfo
+                            {
+                                ResourceType = ResourceType.Folder,
+                                Resource = resFolder,
+                                FolderPath = resourceInfo.FolderPath,
+                            };
+                        }
+                            break;
+                        case ResourceType.Folder:
+                        {
+                            if (resourceName == "" || resourceName == ".")
+                            {
+                                if (!string.IsNullOrEmpty(resourceInfo.FolderPath))
+                                {
+                                    string resFolder = string.Join("/", resourceInfo.FolderPath.Split("/").SkipLast(1));
+                                    if(resFolder.StartsWith("Assets"))
+                                    {
+                                        yield return new ResourceInfo
+                                        {
+                                            ResourceType = ResourceType.Folder,
+                                            Resource = resFolder,
+                                        };
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string resFolder = string.Join("/", resourceName.Split("/").SkipLast(1));
+                                if(resFolder != "" || !string.IsNullOrEmpty(resourceInfo.FolderPath))
+                                {
+                                    yield return new ResourceInfo
+                                    {
+                                        ResourceType = ResourceType.Folder,
+                                        Resource = resFolder,
+                                        FolderPath = resourceInfo.FolderPath,
+                                    };
+                                }
+                            }
+                        }
+                            break;
+                        case ResourceType.Object:
+                        {
+                            Transform parentTransform = GetParentFromResourceInfo(resourceInfo);
+                            if (parentTransform != null)
+                            {
+                                yield return new ResourceInfo
+                                {
+                                    ResourceType = ResourceType.Object,
+                                    Resource = parentTransform.gameObject,
+                                };
+                            }
+                        }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(resourceInfo.ResourceType), resourceInfo.ResourceType, null);
+                    }
+
                     continue;
                 }
 
@@ -935,6 +1083,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 case Component comp:
                     return comp.transform.parent;
                 default:
+                {
+
+                }
                     return null;
             }
         }
