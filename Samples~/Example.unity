@@ -3390,19 +3390,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathAndResults:
-  - xPath: ::scene-root/Issues*[0]//[@{GetComponent(EPathDebug).enabled}][last()]
+  - xPath: scene-root::/Issues*[0]//[@{GetComponent(EPathDebug).enabled}][last()]
     results:
-    - A{NameEmpty}::SceneRoot``[]
-    - '/A{StartsWith: IssuesEndsWith: Contains: }::None``[`@index Int{Equal 0}`]'
-    - //A{NameEmpty}::None``[`@{`GetComponents=>(EPathDebug[Int{Equal 0}]`.`FieldOrProperty=>enabled[]`}
+    - SceneRoot::A{NameEmpty}``[]
+    - '/None::A{StartsWith: IssuesEndsWith: Contains: }``[`@index Int{Equal 0}`]'
+    - //None::A{NameEmpty}``[`@{`GetComponents=>EPathDebug[Int{Equal 0}]`.`FieldOrProperty=>enabled[]`}
       Truly`][`@index{last()} Int{Equal -1}`]
   - xPath: //[@{GetComponent(EPathDebug)}]
     results:
     - //A{NameEmpty}::None``[`@{`GetComponents=>(EPathDebug[Int{Equal 0}]`} Truly`]
-  - xPath: Sub
+  - xPath: '*'
     results:
-    - 'A{ExactMatch: Sub}::None``[]'
-  c: {fileID: 632590879}
+    - None::Match{NameAny}``[]
+  c: {fileID: 1110953677}
 --- !u!1 &665402999
 GameObject:
   m_ObjectHideFlags: 0
@@ -13347,7 +13347,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   comment: 
-  targetTransform: {fileID: 0}
+  targetTransform: {fileID: 1110953677}
 --- !u!1 &1433192484
 GameObject:
   m_ObjectHideFlags: 0

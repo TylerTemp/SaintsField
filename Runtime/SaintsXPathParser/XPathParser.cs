@@ -17,8 +17,10 @@ namespace SaintsField.SaintsXPathParser
         {
             foreach ((int stepSep, string stepContent) in SplitXPath(xPath))
             {
-                (string axisNameRaw, string attrRaw, string nodeTestRaw, string predicatesRaw) = SplitStep(stepContent);
-                AxisName axisName = ParseAxisName(axisNameRaw);
+                (Axis axis, string leftStepPart) = SplitAxisFromStep(stepContent);
+                (string nodeTestRaw, string attrRaw, string predicatesRaw) = SplitStep(leftStepPart);
+
+                NodeTest nodeTest = ParseNodeTest(nodeTestRaw);
                 XPathAttrBase attr = null;
                 if(!string.IsNullOrEmpty(attrRaw))
                 {
@@ -26,61 +28,29 @@ namespace SaintsField.SaintsXPathParser
                     Debug.Assert(leftContent == "", attrRaw);
                     attr = xPathAttrBase;
                 }
-                NodeTest nodeTest = ParseNodeTest(nodeTestRaw);
-                IReadOnlyList<XPathPredicate> predicates = string.IsNullOrEmpty(predicatesRaw)
-                    ? Array.Empty<XPathPredicate>()
+
+                IReadOnlyList<IReadOnlyList<XPathPredicate>> predicates = string.IsNullOrEmpty(predicatesRaw)
+                    ? Array.Empty<IReadOnlyList<XPathPredicate>>()
                     : XPathBracketParser
                         .ParseFilter(predicatesRaw)
-                        .Select(each => new XPathPredicate
-                        {
-                            Attr = each.attrBase,
-                            FilterComparer = each.filterComparerBase,
-                        })
+                        .Select(each => each
+                            .Select(item => new XPathPredicate
+                            {
+                                Attr = item.attrBase,
+                                FilterComparer = item.filterComparerBase,
+                            })
+                            .ToArray()
+                        )
                         .ToArray();
 
                 yield return new XPathStep
                 {
                     SepCount = stepSep,
-                    AxisName = axisName,
                     NodeTest = nodeTest,
+                    Axis = axis,
                     Attr = attr,
                     Predicates = predicates,
                 };
-            }
-        }
-
-        private static NodeTest ParseNodeTest(string nodeTestRaw)
-        {
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (nodeTestRaw)
-            {
-                case null:
-                case "" :
-                    return NodeTest.None;
-                case "::ancestor":
-                    return NodeTest.Ancestor;
-                case "::ancestor-inside-prefab":
-                    return NodeTest.AncestorInsidePrefab;
-                case "::ancestor-or-self":
-                    return NodeTest.AncestorOrSelf;
-                case "::ancestor-or-self-inside-prefab":
-                    return NodeTest.AncestorOrSelfInsidePrefab;
-                case "::parent":
-                    return NodeTest.Parent;
-                case "::parent-or-self":
-                    return NodeTest.ParentOrSelf;
-                case "::parent-or-self-inside-prefab":
-                    return NodeTest.ParentOrSelfInsidePrefab;
-                case "::scene-root":
-                    return NodeTest.SceneRoot;
-                case "::prefab-root":
-                    return NodeTest.PrefabRoot;
-                case "::Resources":
-                    return NodeTest.Resources;
-                case "::Asset":
-                    return NodeTest.Asset;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(nodeTestRaw), nodeTestRaw, null);
             }
         }
 
@@ -163,9 +133,59 @@ namespace SaintsField.SaintsXPathParser
             }
         }
 
-        private static (string axisName, string attr, string nodeTest, string predicates) SplitStep(string step)
+        private static (Axis axis, string leftStepPart) SplitAxisFromStep(string step)
         {
-            int nodeTestSepIndex = step.IndexOf("::", StringComparison.Ordinal);
+            if(step.StartsWith("ancestor::"))
+            {
+                return (Axis.Ancestor, step.Substring("ancestor::".Length));
+            }
+            if(step.StartsWith("ancestor-inside-prefab::"))
+            {
+                return (Axis.AncestorInsidePrefab, step.Substring("ancestor-inside-prefab::".Length));
+            }
+            if(step.StartsWith("ancestor-or-self::"))
+            {
+                return (Axis.AncestorOrSelf, step.Substring("ancestor-or-self::".Length));
+            }
+            if(step.StartsWith("ancestor-or-self-inside-prefab::"))
+            {
+                return (Axis.AncestorOrSelfInsidePrefab, step.Substring("ancestor-or-self-inside-prefab::".Length));
+            }
+            if(step.StartsWith("parent::"))
+            {
+                return (Axis.Parent, step.Substring("parent::".Length));
+            }
+            if(step.StartsWith("parent-or-self::"))
+            {
+                return (Axis.ParentOrSelf, step.Substring("parent-or-self::".Length));
+            }
+            if(step.StartsWith("parent-or-self-inside-prefab::"))
+            {
+                return (Axis.ParentOrSelfInsidePrefab, step.Substring("parent-or-self-inside-prefab::".Length));
+            }
+            if(step.StartsWith("scene-root::"))
+            {
+                return (Axis.SceneRoot, step.Substring("scene-root::".Length));
+            }
+            if(step.StartsWith("prefab-root::"))
+            {
+                return (Axis.PrefabRoot, step.Substring("prefab-root::".Length));
+            }
+            if(step.StartsWith("resources::"))
+            {
+                return (Axis.Resources, step.Substring("resources::".Length));
+            }
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if(step.StartsWith("asset::"))
+            {
+                return (Axis.Asset, step.Substring("asset::".Length));
+            }
+            return (Axis.None, step);
+        }
+
+        // for parent::nodeTest@attr[predicates], this parse `nodeTest@attr[@attr > 1]` part
+        private static (string nodeTest, string attr, string predicates) SplitStep(string step)
+        {
             int attrSepIndex = step.IndexOf('@');
             int bracketSepIndex = step.IndexOf('[');
             if (bracketSepIndex != -1 && bracketSepIndex < attrSepIndex)
@@ -173,38 +193,24 @@ namespace SaintsField.SaintsXPathParser
                 attrSepIndex = -1;
             }
 
-            if (nodeTestSepIndex == -1 && attrSepIndex == -1)  // name[filter]
+            string noPredicatesPart = step;
+            string predicates = "";
+            if (bracketSepIndex != -1)
             {
-                (string axisName, string predicates) = SplitPredicates(step);
-                return (axisName, "", "", predicates);
+                noPredicatesPart = step.Substring(0, bracketSepIndex);
+                predicates = step.Substring(bracketSepIndex);
             }
 
-            if (nodeTestSepIndex != -1 && attrSepIndex != -1)
+            string nodeTest = noPredicatesPart;
+            string attr = "";
+            // ReSharper disable once InvertIf
+            if (attrSepIndex != -1)
             {
-                if (nodeTestSepIndex < attrSepIndex)
-                {
-                    attrSepIndex = -1;
-                }
-                else
-                {
-                    nodeTestSepIndex = -1;
-                }
+                nodeTest = noPredicatesPart.Substring(0, attrSepIndex);
+                attr = noPredicatesPart.Substring(attrSepIndex);
             }
 
-            if (nodeTestSepIndex != -1)  // name[filter]::nodeTest
-            {
-                string axisNameAndPredicates = step.Substring(0, nodeTestSepIndex);
-                string nodeTest = step.Substring(nodeTestSepIndex);
-                (string axisName, string predicates) = SplitPredicates(axisNameAndPredicates);
-                return (axisName, "", nodeTest, predicates);
-            }
-            else  // name[filter]@attr
-            {
-                string axisNameAndPredicates = step.Substring(0, attrSepIndex);
-                string attr = step.Substring(attrSepIndex);
-                (string axisName, string predicates) = SplitPredicates(axisNameAndPredicates);
-                return (axisName, attr, "", predicates);
-            }
+            return (nodeTest, attr, predicates);
         }
 
         private static (string preText, string predicates) SplitPredicates(string text)
@@ -221,17 +227,17 @@ namespace SaintsField.SaintsXPathParser
             return (preText, predicatesText);
         }
 
-        private static AxisName ParseAxisName(string axisNameRaw)
+        private static NodeTest ParseNodeTest(string axisNameRaw)
         {
             switch (axisNameRaw)
             {
                 case "":
-                    return new AxisName
+                    return new NodeTest
                     {
                         NameEmpty = true,
                     };
                 case "*":
-                    return new AxisName
+                    return new NodeTest
                     {
                         NameAny = true,
                     };
@@ -240,7 +246,7 @@ namespace SaintsField.SaintsXPathParser
             List<string> rawFragments = axisNameRaw.Split('*').ToList();
             if (rawFragments.Count == 1)
             {
-                return new AxisName
+                return new NodeTest
                 {
                     ExactMatch = axisNameRaw,
                 };
@@ -257,7 +263,7 @@ namespace SaintsField.SaintsXPathParser
 
             if(rawFragments.Count == 0)
             {
-                return new AxisName
+                return new NodeTest
                 {
                     StartsWith = startsWithStr,
                 };
@@ -268,7 +274,7 @@ namespace SaintsField.SaintsXPathParser
             rawFragments.RemoveAt(lastIndex);
             bool endsWithFragment = !endsLeftValue.EndsWith("*");
 
-            return new AxisName
+            return new NodeTest
             {
                 StartsWith = startsWithStr,
                 EndsWith = endsWithFragment? endsLeftValue: null,

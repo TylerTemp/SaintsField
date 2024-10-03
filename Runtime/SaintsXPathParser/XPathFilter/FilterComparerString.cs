@@ -14,6 +14,19 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
         {
             return $"Str{{{FilterComparer} {Value}}}";
         }
+
+        public bool CompareToString(string source)
+        {
+            switch (FilterComparer)
+            {
+                case FilterComparer.Equal:
+                    return source == Value;
+                case FilterComparer.NotEqual:
+                    return source != Value;
+                default:
+                    return false;
+            }
+        }
     }
 }
 #endif

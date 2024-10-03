@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class SaintsPathAttribute: PropertyAttribute, ISaintsAttribute
+    public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
@@ -21,7 +21,7 @@ namespace SaintsField
         public readonly IReadOnlyList<XPathStep> XPathSteps;
 #endif
 
-        public SaintsPathAttribute(string ePath)
+        public GetByXPathAttribute(string ePath)
         {
 #if UNITY_EDITOR
             XPathSteps = XPathParser.Parse(ePath).ToArray();

@@ -42,7 +42,8 @@ namespace SaintsField.Samples.Scripts.EPathExample
         // [SaintsPath("::scene-root/Issues*[last()]//[@{GetComponent(EPathDebug).enabled}]")]
         // public EPathDebug myself;
 
-        [SaintsPath("Sub@{GetComponent(Dummy).GetTargetTransform()}")]
+        [GetByXPath("Sub@{GetComponent(Dummy).GetTargetTransform()}")]
+        // [GetByXPath("Sub")]
         public Transform c;
 
         [Button("Test")]

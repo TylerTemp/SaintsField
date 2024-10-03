@@ -126,8 +126,8 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             foreach (ShowIfAttribute showIfAttribute in attributes)
             {
                 (string error, bool shown) showResult = showIfAttribute.IsShow
-                    ? ShowIfAttributeDrawer.HelperIsShown(showIfAttribute.ConditionInfos, showIfAttribute.EditorMode, property, info, parent)
-                    : HideIfAttributeDrawer.HelperIsShown(showIfAttribute.ConditionInfos, showIfAttribute.EditorMode, property, info, parent);
+                    ? ShowIfAttributeDrawer.HelperShowIfIsShown(showIfAttribute.ConditionInfos, showIfAttribute.EditorMode, property, info, parent)
+                    : HideIfAttributeDrawer.HelperHideIfIsShown(showIfAttribute.ConditionInfos, showIfAttribute.EditorMode, property, info, parent);
 
                 if (showResult.error != "")
                 {

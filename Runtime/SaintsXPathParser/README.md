@@ -6,9 +6,9 @@
 
 step: `axisname::nodetest[predicate]`
 
-`axisname` 其实可以混合 `@` 来选择属性: `name@attribute`。但是不允许混用`::`，如`name@attr::ancestor`。正确写法为 `name::ancestor/@attr`
+`axisname` 其实可以混合 `@` 来选择属性: `name@attribute`。但是不允许混用`::`，如`ancestor::name@attr`。正确写法为 `ancestor::name/@attr`
 
-`axisname` 本身不带有任何`[0]`, `[last()]` 这些。这些都属于 `predicate` 的范畴
+`nodetest` 本身不带有任何`[0]`, `[last()]` 这些。这些都属于 `predicate` 的范畴
 
 `predicate` 同样 `@` 过滤属性，但是不选择
 
@@ -16,21 +16,21 @@ step: `axisname::nodetest[predicate]`
 
 支持的 XPath 的:
 
-*   `::ancestor`
-*   `::ancestor-inside-prefab`
-*   `::ancestor-or-self`
-*   `::ancestor-or-self-inside-prefab`
-*   `::parent`
-*   `::parent-or-self`
-*   `::parent-or-self-inside-prefab`
+*   `ancestor::`
+*   `ancestor-or-self::`
+*   `parent::`
+*   `parent-or-self::`
+*   `parent-or-self-inside-prefab::`
 *   其它的不支持
 
 基于 Unity 特有的，加上 `::nodetest` 其实有方向指向性，所以用其指向 Unity 特有资源:
 
-*   `::scene-root`: 场景根节点
-*   `::prefab-root`: 预制体根节点
-*   `::resources`: 资源
-*   `::asset`: `AssetDatabase` 资源
+*   `ancestor-inside-prefab::`
+*   `ancestor-or-self-inside-prefab::`
+*   `scene-root::`: 场景根节点
+*   `prefab-root::`: 预制体根节点
+*   `resources::`: 资源
+*   `asset::`: `AssetDatabase` 资源
 
 大部分的函数均不支持，支持的有
 
@@ -63,7 +63,7 @@ step: `axisname::nodetest[predicate]`
 
 *   `[@{GetComponent(MyComponent)}]` 用来测试组件存在。同样，`myNode/@{GetComponent(MyComponent)}` 用来获取组件
 *   `myNode@{GetComponents(MyComponent)[-1].MyFunction().someField['key']}`来调用组件函数。其中：
-    *    `GetComponents` 不支持指定 `NameSpace`，支持指定 `baseClass`，不支持 `generic-class`
+    *    `GetComponents` 支持指定 `NameSpace`，支持指定 `baseClass`，不支持 `generic-class`
     *    函数调用不支持参数，只能是一个括号
     *    `someField` 就是字段/属性获取。公开非公开的都行。`static`不保证
     *    `-1`这类数字是取下标的

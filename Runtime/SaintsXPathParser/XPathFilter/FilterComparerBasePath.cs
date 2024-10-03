@@ -9,11 +9,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
     {
         public struct PathFragment
         {
-            public string StartsWith;
-            public string EndsWith;
-            public IReadOnlyList<string> Contains;
-            public bool NameAny;
-            public string ExactMatch;
+            public NodeTest NodeTest;
 
             public bool Descendant;  // step starts with `//`
 
@@ -23,11 +19,11 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
             public override string ToString()
             {
                 return "PF{" +
-                       (NameAny ? "NameAny" : "") +
-                       (ExactMatch != null ? $"ExactMatch: {ExactMatch}" : "") +
-                       (StartsWith != null ? $"StartsWith: {StartsWith}" : "") +
-                       (EndsWith != null ? $"EndsWith: {EndsWith}" : "") +
-                       (Contains != null ? $"Contains: {string.Join(", ", Contains)}" : "") +
+                       (NodeTest.NameAny ? "NameAny" : "") +
+                       (NodeTest.ExactMatch != null ? $"ExactMatch: {NodeTest.ExactMatch}" : "") +
+                       (NodeTest.StartsWith != null ? $"StartsWith: {NodeTest.StartsWith}" : "") +
+                       (NodeTest.EndsWith != null ? $"EndsWith: {NodeTest.EndsWith}" : "") +
+                       (NodeTest.Contains != null ? $"Contains: {string.Join(", ", NodeTest.Contains)}" : "") +
                        (Descendant ? "Descendant" : "") +
                        (IndexComparer != null ? $"IndexComparer: {IndexComparer}" : "") +
                        "}";
@@ -55,8 +51,11 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
                 {
                     pathFragments.Add(new PathFragment
                     {
-                        Contains = Array.Empty<string>(),
-                        NameAny = true,
+                        NodeTest = new NodeTest
+                        {
+                            Contains = Array.Empty<string>(),
+                            NameAny = true,
+                        },
                         Descendant = thisIsDescendant,
                     });
                     continue;
@@ -68,8 +67,11 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
                     (FilterComparerInt indexComparer, string leftValue) = ParseIndexFilter(eachPath);
                     pathFragments.Add(new PathFragment
                     {
-                        Contains = Array.Empty<string>(),
-                        ExactMatch = leftValue,
+                        NodeTest = new NodeTest
+                        {
+                            Contains = Array.Empty<string>(),
+                            ExactMatch = leftValue,
+                        },
                         Descendant = thisIsDescendant,
 
                         IndexComparer = indexComparer,
@@ -91,8 +93,11 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
                     (FilterComparerInt indexComparer, string leftValue) = ParseIndexFilter(startsWithStr);
                     pathFragments.Add(new PathFragment
                     {
-                        StartsWith = leftValue,
-                        Contains = Array.Empty<string>(),
+                        NodeTest = new NodeTest
+                        {
+                            StartsWith = leftValue,
+                            Contains = Array.Empty<string>(),
+                        },
                         Descendant = thisIsDescendant,
 
                         IndexComparer = indexComparer,
@@ -108,9 +113,12 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
 
                 PathFragment pathFragment = new PathFragment
                 {
-                    StartsWith = startsWithStr,
-                    EndsWith = endsWithFragment? endsLeftValue: null,
-                    Contains = rawFragments,
+                    NodeTest = new NodeTest
+                    {
+                        StartsWith = startsWithStr,
+                        EndsWith = endsWithFragment? endsLeftValue: null,
+                        Contains = rawFragments,
+                    },
                     Descendant = thisIsDescendant,
 
                     IndexComparer = endsIndexComparer,
@@ -130,6 +138,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
                 return (null, part);
             }
 
+            // ReSharper disable once ArrangeStaticMemberQualifier
             return ((FilterComparerInt)FilterComparerBase.Parser(split[1]), split[0]);
         }
 
@@ -138,6 +147,48 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
             return "Path{" +
                    string.Join(", ", PathFragments.Select(f => f.ToString())) +
                    "}";
+        }
+
+        public bool CompareToString(string sourceString)
+        {
+            Queue<string> sourceSplits = new Queue<string>(sourceString.Split("/"));
+
+            foreach (PathFragment pathFragment in PathFragments)
+            {
+                if (sourceSplits.Count == 0)
+                {
+                    return false;
+                }
+
+                if (pathFragment.Descendant)
+                {
+                    bool matched = false;
+                    while (sourceSplits.Count > 0)
+                    {
+                        string checkSource = sourceSplits.Dequeue();
+                        if (NodeTestMatch.NodeMatch(checkSource, pathFragment.NodeTest))
+                        {
+                            matched = true;
+                            break;
+                        }
+                    }
+
+                    if (!matched)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    string checkSource = sourceSplits.Dequeue();
+                    if (!NodeTestMatch.NodeMatch(checkSource, pathFragment.NodeTest))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }

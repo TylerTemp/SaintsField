@@ -44,6 +44,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
             if (comparerPart.StartsWith("!="))
             {
                 return int.TryParse(numPart, out int num)
+                    // ReSharper disable once RedundantCast
                     ? (FilterComparerBase)new FilterComparerInt(FilterComparer.NotEqual, num)
                     : new FilterComparerString(FilterComparer.NotEqual, numPart);
             }
@@ -51,6 +52,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
             if (comparerPart.StartsWith("="))
             {
                 return int.TryParse(numPart, out int num)
+                    // ReSharper disable once RedundantCast
                     ? (FilterComparerBase)new FilterComparerInt(FilterComparer.Equal, num)
                     : new FilterComparerString(FilterComparer.Equal, numPart);
             }

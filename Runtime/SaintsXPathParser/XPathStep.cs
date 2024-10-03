@@ -8,14 +8,14 @@ namespace SaintsField.SaintsXPathParser
     public struct XPathStep
     {
         public int SepCount;  // step starts with how many `/`
-        public AxisName AxisName;
-        public XPathAttrBase Attr;
+        public Axis Axis;
         public NodeTest NodeTest;
-        public IReadOnlyList<XPathPredicate> Predicates;
+        public XPathAttrBase Attr;
+        public IReadOnlyList<IReadOnlyList<XPathPredicate>> Predicates;  // and -> or
 
         public override string ToString()
         {
-            return $"{string.Join("", Enumerable.Repeat('/', SepCount))}{AxisName}::{NodeTest}`{Attr}`[{string.Join("][", Predicates)}]";
+            return $"{string.Join("", Enumerable.Repeat('/', SepCount))}{Axis}::{NodeTest}`{Attr}`[{string.Join("][", Predicates)}]";
         }
     }
 }

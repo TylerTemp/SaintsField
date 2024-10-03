@@ -63,7 +63,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
 
                     FilterComparerBase[] leftFilter = leftFragmentStr.StartsWith("[")
                         ? XPathBracketParser.ParseFilter(leftFragmentStr)
-                            .Select(each => each.filterComparerBase)
+                            .Select(each => each[0].filterComparerBase)
                             .ToArray()
                         : Array.Empty<FilterComparerBase>();
 
@@ -106,7 +106,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
                     FilterComparerBase[] leftFilter = filterFragment ==  null
                         ? Array.Empty<FilterComparerBase>()
                         : XPathBracketParser.ParseFilter(filterFragment)
-                            .Select(each => each.filterComparerBase)
+                            .Select(each => each[0].filterComparerBase)
                             .ToArray();
 
                     if(nameFragment == "rectComponent")

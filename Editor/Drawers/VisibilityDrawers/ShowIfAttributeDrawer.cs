@@ -12,10 +12,10 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
     {
         protected override (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
         {
-            return HelperIsShown(targetAttribute.ConditionInfos, targetAttribute.EditorMode, property, info, target);
+            return HelperShowIfIsShown(targetAttribute.ConditionInfos, targetAttribute.EditorMode, property, info, target);
         }
 
-        public static (string error, bool shown) HelperIsShown(IEnumerable<ConditionInfo> conditionInfos, EMode editorMode, SerializedProperty property, FieldInfo info, object target)
+        public static (string error, bool shown) HelperShowIfIsShown(IEnumerable<ConditionInfo> conditionInfos, EMode editorMode, SerializedProperty property, FieldInfo info, object target)
         {
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(conditionInfos, property, info, target);
 
