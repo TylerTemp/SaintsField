@@ -8,8 +8,8 @@ namespace SaintsField.SaintsXPathParser
     // *   `::parent`
     // *   `::parent-or-self`
     // *   `::parent-or-self-inside-prefab`
-    // *   `::scene-root`
-    // *   `::prefab-root`
+    // *   `::scene`
+    // *   `::prefab`
     // *   `::resources`
     // *   `::asset`
     public enum Axis
@@ -22,8 +22,8 @@ namespace SaintsField.SaintsXPathParser
         Parent,
         ParentOrSelf,
         ParentOrSelfInsidePrefab,
-        SceneRoot,
-        PrefabRoot,
+        Scene,
+        Prefab,
         Resources,
         Asset,
     }

@@ -9,5 +9,10 @@ namespace SaintsField.Samples.Scripts
         [GetComponentInScene(compType: typeof(Dummy))] public Transform myDummyTrans;
         // and GameObject type works too
         [GetComponentInScene(compType: typeof(Dummy))] public GameObject myDummyGo;
+
+        [Separator("XPath")]
+        [GetByXPath("scene:://*")] public Dummy myDummyXPath;
+        [GetByXPath("scene:://*[@{GetComponent(Dummy)}]")] public Transform myDummyTransXPath;
+        [GetByXPath("scene:://*[@{GetComponent(Dummy)}]")] public GameObject myDummyGoXPath;
     }
 }

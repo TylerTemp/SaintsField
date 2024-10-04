@@ -15,18 +15,22 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        public readonly bool IsCallback;
-        public readonly string Callback;
-
         public readonly bool AutoResign;
         public readonly bool UseResignButton;
         public readonly bool UseErrorMessage;
 
+        public struct XPathInfo
+        {
+            public bool IsCallback;
+            public string Callback;
 #if UNITY_EDITOR
-        public readonly IReadOnlyList<XPathStep> XPathSteps;
+            public IReadOnlyList<XPathStep> XPathSteps;
 #endif
+        }
 
-        public GetByXPathAttribute(EGetComp config, string ePath, bool isCallback)
+        public readonly IReadOnlyList<XPathInfo> XPathInfoList;
+
+        public GetByXPathAttribute(EGetComp config, params string[] ePaths)
         {
             AutoResign = !config.HasFlag(EGetComp.NoAutoResign);
             if (AutoResign)
@@ -47,24 +51,36 @@ namespace SaintsField
                 UseErrorMessage = !UseResignButton;
             }
 
-            (string callback, bool actualIsCallback) = RuntimeUtil.ParseCallback(ePath, isCallback);
-
-            Callback = callback;
-            IsCallback = actualIsCallback;
-
+            XPathInfoList = ePaths.Length == 0
+                ? new[]
+                {
+                    new XPathInfo
+                    {
+                        IsCallback = false,
+                        Callback = "",
 #if UNITY_EDITOR
-            if(!IsCallback)
-            {
-                XPathSteps = XPathParser.Parse(ePath).ToArray();
-            }
+                        XPathSteps = XPathParser.Parse(".").ToArray(),
 #endif
+                    },
+                }
+                : ePaths
+                    .Select(ePath =>
+                    {
+                        (string callback, bool actualIsCallback) = RuntimeUtil.ParseCallback(ePath, false);
+
+                        return new XPathInfo
+                        {
+                            IsCallback = actualIsCallback,
+                            Callback = callback,
+    #if UNITY_EDITOR
+                            XPathSteps = XPathParser.Parse(ePath).ToArray(),
+    #endif
+                        };
+                    })
+                    .ToArray();
         }
 
-        public GetByXPathAttribute(string ePath) : this(EGetComp.None, ePath, false)
-        {
-        }
-
-        public GetByXPathAttribute(string ePath, bool isCallback) : this(EGetComp.None, ePath, isCallback)
+        public GetByXPathAttribute(params string[] ePaths) : this(EGetComp.None, ePaths)
         {
         }
     }

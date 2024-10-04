@@ -270,6 +270,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+
             // Debug.Log(indexInArray);
             Object result = indexInArray == -1
                 // ReSharper disable once ArrangeRedundantParentheses
@@ -349,7 +350,7 @@ namespace SaintsField.Editor.Drawers
 
             if (error != "")
             {
-                return (error, targetProperty, null);
+                return (error, targetProperty, Array.Empty<Object>());
             }
 
             Transform transform;
@@ -370,7 +371,7 @@ namespace SaintsField.Editor.Drawers
                         property.serializedObject.ApplyModifiedProperties();
                     }
                 }
-                    return ("GetComponentByPath can only be used on Component or GameObject", targetProperty, null);
+                    return ("GetComponentByPath can only be used on Component or GameObject", targetProperty, Array.Empty<Object>());
             }
 
             IReadOnlyList<IReadOnlyList<GetComponentByPathAttribute.Token>> tokensPaths = getComponentByPathAttribute.Paths;
@@ -391,7 +392,7 @@ namespace SaintsField.Editor.Drawers
                 string pathList = getComponentByPathAttribute.RawPaths.Count <= 1
                     ? getComponentByPathAttribute.RawPaths[0]
                     : string.Join("", getComponentByPathAttribute.RawPaths.Select(each => "\n* " + each));
-                return ($"No component found in path: {pathList}", targetProperty, null);
+                return ($"No component found in path: {pathList}", targetProperty, Array.Empty<Object>());
             }
 
             int indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);

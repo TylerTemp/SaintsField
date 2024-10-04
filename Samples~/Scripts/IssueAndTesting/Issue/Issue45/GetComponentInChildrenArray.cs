@@ -6,8 +6,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
     public class GetComponentInChildrenArray : MonoBehaviour
     {
-        // [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy getComponentInChildren;
-        // [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInChildrenArray;
+        [GetComponentInChildren, PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy getComponentInChildren;
+        [GetComponentInChildren, PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy[] getComponentInChildrenArray;
+        [GetByXPath("@{GetComponents(Dummy)}", ".//*@{GetComponents(Dummy)}"), PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy[] getComponentInChildrenArrayXPath;
         // [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInChildrenList;
 
         private string DummyNumber(Dummy dummy)
@@ -21,7 +22,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
         // [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
         // public GeneralInterface[] getComponentIArray;
 
-        [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        [GetComponentInChildren, PostFieldRichLabel("$" + nameof(DummyNumberG))]
         public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
 
         private string DummyNumberI(GeneralInterface dummyInter)

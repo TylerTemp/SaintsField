@@ -163,13 +163,13 @@ namespace SaintsField.SaintsXPathParser
             {
                 return (Axis.ParentOrSelfInsidePrefab, step.Substring("parent-or-self-inside-prefab::".Length));
             }
-            if(step.StartsWith("scene-root::"))
+            if(step.StartsWith("scene::"))
             {
-                return (Axis.SceneRoot, step.Substring("scene-root::".Length));
+                return (Axis.Scene, step.Substring("scene::".Length));
             }
-            if(step.StartsWith("prefab-root::"))
+            if(step.StartsWith("prefab::"))
             {
-                return (Axis.PrefabRoot, step.Substring("prefab-root::".Length));
+                return (Axis.Prefab, step.Substring("prefab::".Length));
             }
             if(step.StartsWith("resources::"))
             {

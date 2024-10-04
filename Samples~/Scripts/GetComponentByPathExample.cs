@@ -26,5 +26,17 @@ namespace SaintsField.Samples.Scripts
 
         [ReadOnly]
         [GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMultiDisabled;
+
+        [Separator("GetByXPath")]
+        [GetByXPath("scene:://Dummy")] public GameObject dummyXPath;
+        [GetByXPath("./*[1]")] public GameObject direct1XPath;
+        [GetByXPath("./*[index() > 1]")] public GameObject directPosTg1XPath;
+        [GetByXPath("./*[last()]")] public GameObject directLastXPath;
+        [GetByXPath("/no", "./DirectSub1")] public GameObject directSubMultiXPath;
+        [Required]
+        [GetByXPath("/no", "scene:://sth/else/../what/.//ever[last()]/goes/here")] public GameObject notExistsXPath;
+
+        [GetByXPath("scene::/Sth")] public GameObject slashSthXPath;
+        [GetByXPath("scene:://Sth")] public GameObject slash2SthXPath;
     }
 }

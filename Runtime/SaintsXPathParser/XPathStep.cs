@@ -15,7 +15,7 @@ namespace SaintsField.SaintsXPathParser
 
         public override string ToString()
         {
-            return $"{string.Join("", Enumerable.Repeat('/', SepCount))}{Axis}::{NodeTest}`{Attr}`[{string.Join("][", Predicates)}]";
+            return $"{string.Join("", Enumerable.Repeat('/', SepCount))}{Axis}::{NodeTest}`{Attr}`[{string.Join("][", Predicates.Select(each => string.Join(" OR ", each)))}]";
         }
     }
 }

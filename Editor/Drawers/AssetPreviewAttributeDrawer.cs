@@ -382,7 +382,7 @@ namespace SaintsField.Editor.Drawers
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             if (parent == null)
             {
-                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectly");
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly");
                 return;
             }
 
