@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Utils
             return fieldOrProp.IsField ? fieldOrProp.FieldInfo.GetValue(wrapProp) : fieldOrProp.PropertyInfo.GetValue(wrapProp);
         }
 
-        public static void SignPropertyValue(SerializedProperty property, FieldInfo fieldInfo, object parent, object newValue)
+        public static void SignPropertyValue(SerializedProperty property, MemberInfo fieldInfo, object parent, object newValue)
         {
             switch (property.propertyType)
             {
@@ -902,10 +902,23 @@ namespace SaintsField.Editor.Utils
 #endif
         }
 
-        public static (string error, int index, object value) GetValue(SerializedProperty property, FieldInfo fieldInfo, object parent)
+        public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            object rawValue = fieldInfo.GetValue(parent);
+
+            object rawValue;
+            if (fieldInfo.MemberType == MemberTypes.Field)
+            {
+                rawValue = ((FieldInfo)fieldInfo).GetValue(parent);
+            }
+            else if (fieldInfo.MemberType == MemberTypes.Property)
+            {
+                rawValue = ((PropertyInfo)fieldInfo).GetValue(parent);
+            }
+            else
+            {
+                return ($"Unable to get value from {fieldInfo} ({fieldInfo.MemberType})", -1, null);
+            }
 
             if (arrayIndex == -1)
             {
@@ -919,6 +932,44 @@ namespace SaintsField.Editor.Utils
             }
 
             return ("", arrayIndex, indexResult);
+        }
+
+        public static (SerializedProperty arrayProperty, int index, string error) GetArrayProperty(SerializedProperty property, FieldInfo info, object parent)
+        {
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+
+            if (arrayIndex != -1)
+            {
+                (string error, SerializedProperty arrProp) = SerializedUtils.GetArrayProperty(property);
+                return (arrProp, arrayIndex, error);
+            }
+
+            (string propError, int index, object propertyValue) = GetValue(property, info, parent);
+            if (propError != "")
+            {
+                return (null, index, propError);
+            }
+
+            if (propertyValue is IWrapProp wrapProp)
+            {
+                string targetPropName = wrapProp.EditorPropertyName;
+                SerializedProperty arrProp = property.FindPropertyRelative(targetPropName) ??
+                          SerializedUtils.FindPropertyByAutoPropertyName(property, targetPropName);
+                if (arrProp == null)
+                {
+                    return (null, arrayIndex, $"{targetPropName} not found in {property.propertyPath}");
+                }
+
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                if(!arrProp.isArray)
+                {
+                    return (arrProp, arrayIndex, $"{targetPropName} is not an array in {property.propertyPath}");
+                }
+
+                return (arrProp, arrayIndex, "");
+            }
+
+            return (null, arrayIndex, $"{property.propertyPath} is not an array");
         }
 
 

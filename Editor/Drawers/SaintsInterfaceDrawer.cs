@@ -81,32 +81,6 @@ namespace SaintsField.Editor.Drawers
                 {
                     return true;
                 }
-
-                // bool fieldTypeIsComponent = typeof(Component).IsAssignableFrom(_fieldType);
-                // IEnumerable<Type> checkTypes = fieldTypeIsComponent
-                //     ? new[]{_fieldType, _interfaceType}
-                //     : new[]{_interfaceType};
-                // switch (itemInfo.Object)
-                // {
-                //     case GameObject go:
-                //         // Debug.Log($"go={go}, fieldType={_fieldType}, interfaceType={_interfaceType}");
-                //         if (fieldTypeIsComponent)
-                //         {
-                //             return go.GetComponents(_fieldType)
-                //                 .FirstOrDefault(each => _interfaceType.IsInstanceOfType(each)) != null;
-                //         }
-                //
-                //         return _fieldType.IsInstanceOfType(go) && go.GetComponents(typeof(Component)).FirstOrDefault(each => _interfaceType.IsInstanceOfType(each)) != null;
-                //     case ScriptableObject so:
-                //         return (_fieldType == typeof(ScriptableObject) || _fieldType.IsSubclassOf(typeof(ScriptableObject)))
-                //                && _interfaceType.IsInstanceOfType(so);
-                //     default:
-                //     {
-                //         return checkTypes.All(requiredType => requiredType.IsInstanceOfType(itemInfo.Object));
-                //         // Type itemType = itemInfo.Object.GetType();
-                //         // return checkTypes.All(requiredType => itemType.IsInstanceOfType(requiredType));
-                //     }
-                // }
                 return GetSerializedObject(itemInfo.Object, _fieldType, _interfaceType).isMatch;
             }
         }

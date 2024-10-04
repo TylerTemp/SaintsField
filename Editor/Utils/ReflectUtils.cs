@@ -237,27 +237,58 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static void SetValue(string propertyPath, UnityEngine.Object targetObject, FieldInfo info, object parent, object value)
+        public static void SetValue(string propertyPath, UnityEngine.Object targetObject, MemberInfo info, object parent, object value)
         {
             Undo.RecordObject(targetObject, "SetValue");
             int index = SerializedUtils.PropertyPathIndex(propertyPath);
             if (index == -1)
             {
-                // Debug.Log($"direct set value {value} to {info} on {parent}");
-                // info.SetValue(parent, value);
+                object infoValue;
+                if (info.MemberType == MemberTypes.Field)
+                {
+                    infoValue = ((FieldInfo)info).GetValue(parent);
+                }
+                else if (info.MemberType == MemberTypes.Property)
+                {
+                    infoValue = ((PropertyInfo)info).GetValue(parent);
+                }
+                else
+                {
+                    return;
+                }
 
-                if (info.GetValue(parent) is IWrapProp wrapProp)
+                if (infoValue is IWrapProp wrapProp)
                 {
                     SetIWrapPropValue(wrapProp, value);
                 }
                 else
                 {
-                    info.SetValue(parent, value);
+                    if (info.MemberType == MemberTypes.Field)
+                    {
+                        ((FieldInfo)info).SetValue(parent, value);
+                    }
+                    else if (info.MemberType == MemberTypes.Property)
+                    {
+                        ((PropertyInfo)info).SetValue(parent, value);
+                    }
                 }
             }
             else
             {
-                object fieldValue = info.GetValue(parent);
+                object fieldValue;
+                if (info.MemberType == MemberTypes.Field)
+                {
+                    fieldValue = ((FieldInfo)info).GetValue(parent);
+                }
+                else if (info.MemberType == MemberTypes.Property)
+                {
+                    fieldValue = ((PropertyInfo)info).GetValue(parent);
+                }
+                else
+                {
+                    return;
+                }
+
                 // Debug.Log($"try set value {value} at {index} to {info} on {parent}");
                 if (fieldValue is Array array)
                 {
@@ -284,7 +315,15 @@ namespace SaintsField.Editor.Utils
                 else
                 {
                     // Debug.Log($"direct set value {value} to {info} on {parent}");
-                    info.SetValue(parent, value);
+                    // info.SetValue(parent, value);
+                    if (info.MemberType == MemberTypes.Field)
+                    {
+                        ((FieldInfo)info).SetValue(parent, value);
+                    }
+                    else if (info.MemberType == MemberTypes.Property)
+                    {
+                        ((PropertyInfo)info).SetValue(parent, value);
+                    }
                 }
             }
 
@@ -342,6 +381,17 @@ namespace SaintsField.Editor.Utils
                         || interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>)
                     )
                 );
+        }
+
+        public static bool IsSubclassOfRawGeneric(Type generic, Type toCheck) {
+            while (toCheck != null && toCheck != typeof(object)) {
+                Type cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                if (generic == cur) {
+                    return true;
+                }
+                toCheck = toCheck.BaseType;
+            }
+            return false;
         }
     }
 }

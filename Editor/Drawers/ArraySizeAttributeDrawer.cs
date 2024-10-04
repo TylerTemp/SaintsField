@@ -119,8 +119,6 @@ namespace SaintsField.Editor.Drawers
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             // SerializedProperty targetProperty = property;
-            string error = "";
-            SerializedProperty arrProp = null;
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             if (parent == null)
             {
@@ -128,36 +126,7 @@ namespace SaintsField.Editor.Drawers
                 return;
             }
 
-            (string propError, int _, object propertyValue) = Util.GetValue(property, info, parent);
-            if (propError != "")
-            {
-                error = propError;
-            }
-            else
-            {
-                if (propertyValue is IWrapProp wrapProp)
-                {
-                    string targetPropName = wrapProp.EditorPropertyName;
-                    arrProp = property.FindPropertyRelative(targetPropName) ??
-                              SerializedUtils.FindPropertyByAutoPropertyName(property, targetPropName);
-                    if (arrProp == null)
-                    {
-                        SetHelpBox($"{targetPropName} not found in {property.propertyPath}", property, container);
-                        // error = $"{targetPropName} not found in {property.propertyPath}";
-                        return;
-                    }
-                }
-                else
-                {
-                    (error, arrProp) = SerializedUtils.GetArrayProperty(property);
-                }
-            }
-
-            // ReSharper disable once MergeIntoNegatedPattern
-            if (error != "" && (arrProp == null || !arrProp.isArray))
-            {
-                error = $"{arrProp?.propertyPath} is not an array/list";
-            }
+            (SerializedProperty arrProp, int _, string error) = Util.GetArrayProperty(property, info, parent);
 
             SetHelpBox(error, property, container);
 
@@ -165,7 +134,7 @@ namespace SaintsField.Editor.Drawers
 
             // ReSharper disable once InvertIf
             // ReSharper disable once MergeIntoPattern
-            if (error == "" && arrProp != null && arrProp.isArray && arrProp.arraySize != size)
+            if (error == "" && arrProp.arraySize != size)
             {
                 arrProp.arraySize = size;
                 arrProp.serializedObject.ApplyModifiedProperties();

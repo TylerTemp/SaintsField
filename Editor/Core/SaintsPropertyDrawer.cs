@@ -559,7 +559,7 @@ namespace SaintsField.Editor.Core
                         matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType);
                         if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
                         {
-                            matched = IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldType);
+                            matched = ReflectUtils.IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldType);
                         }
                     }
 
@@ -582,17 +582,6 @@ namespace SaintsField.Editor.Core
 
             }
             return null;
-        }
-
-        private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck) {
-            while (toCheck != null && toCheck != typeof(object)) {
-                Type cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
-                if (generic == cur) {
-                    return true;
-                }
-                toCheck = toCheck.BaseType;
-            }
-            return false;
         }
 
         private static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo)
