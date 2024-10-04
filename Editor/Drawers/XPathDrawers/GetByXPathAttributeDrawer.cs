@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     height = SingleLineHeight,
                     width = SingleLineHeight,
-                    // display = DisplayStyle.None,
+                    display = DisplayStyle.None,
                     paddingLeft = 0,
                     paddingRight = 0,
                     paddingTop = 0,
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     height = SingleLineHeight,
                     width = SingleLineHeight,
-                    // display = DisplayStyle.None,
+                    display = DisplayStyle.None,
                     paddingLeft = 0,
                     paddingRight = 0,
                     paddingTop = 0,
@@ -118,14 +118,16 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return null;
             }
 
-            IEnumerable<object> results = GetXPathValue(getByXPathAttribute.XPathSteps, property, info, parent)
+            (string xPathError, IEnumerable<object> xPathResults) = GetXPathValue(getByXPathAttribute, property, info, parent);
+
+            IEnumerable<object> results = xPathResults
                 .Select(each => ValidateXPathResult(each, expectType, expectInterface))
                 .Where(each => each.valid)
                 .Select(each => each.value);
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             object targetValue = null;
-            if (propertyIndex == 1)
+            if (propertyIndex == 1 && xPathError == "")
             {
                 // handle array size if this is the first element
                 object[] resultsArray = results.ToArray();
@@ -134,7 +136,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     targetValue = resultsArray[0];
                 }
 
-                if (getByXPathAttribute.ForceResign)
+                if (getByXPathAttribute.AutoResign)
                 {
                     (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
                     if (error != "")
@@ -166,14 +168,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             CheckFieldResult checkResult = CheckField(property, info, parent, targetValue);
             root.userData = new InitUserData
             {
-                Error = "",
+                Error = xPathError,
                 TargetProperty = targetProperty,
                 MemberInfo = memberInfo,
                 ExpectType = expectType,
                 ExpectInterface = expectInterface,
                 CheckFieldResult = checkResult,
             };
-            UpdateButtons(checkResult, refreshButton, removeButton);
+            if(getByXPathAttribute.UseResignButton)
+            {
+                UpdateButtons(checkResult, refreshButton, removeButton);
+            }
 
             return root;
         }
@@ -271,27 +276,55 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         {
             if (result.Error != "")
             {
-                refreshButton.style.display = DisplayStyle.None;
-                removeButton.style.display = DisplayStyle.Flex;
+                if (refreshButton.style.display != DisplayStyle.None)
+                {
+                    refreshButton.style.display = DisplayStyle.None;
+                }
+
+                if (removeButton.style.display != DisplayStyle.Flex)
+                {
+                    removeButton.style.display = DisplayStyle.Flex;
+                }
                 return;
             }
 
             if (!result.MisMatch)
             {
-                refreshButton.style.display = DisplayStyle.None;
-                removeButton.style.display = DisplayStyle.None;
+                if(refreshButton.style.display != DisplayStyle.None)
+                {
+                    refreshButton.style.display = DisplayStyle.None;
+                }
+
+                if (removeButton.style.display != DisplayStyle.None)
+                {
+                    removeButton.style.display = DisplayStyle.None;
+                }
                 return;
             }
 
             if (result.TargetValue == null)
             {
-                refreshButton.style.display = DisplayStyle.None;
-                removeButton.style.display = DisplayStyle.Flex;
+                if (refreshButton.style.display != DisplayStyle.None)
+                {
+                    refreshButton.style.display = DisplayStyle.None;
+                }
+
+                if (removeButton.style.display != DisplayStyle.Flex)
+                {
+                    removeButton.style.display = DisplayStyle.Flex;
+                }
             }
             else
             {
-                refreshButton.style.display = DisplayStyle.Flex;
-                removeButton.style.display = DisplayStyle.None;
+                if (refreshButton.style.display != DisplayStyle.Flex)
+                {
+                    refreshButton.style.display = DisplayStyle.Flex;
+                }
+
+                if (removeButton.style.display != DisplayStyle.None)
+                {
+                    removeButton.style.display = DisplayStyle.None;
+                }
             }
         }
 
@@ -305,12 +338,39 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
 
             InitUserData userData = (InitUserData) root.userData;
+            GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
+
             if (userData.Error != "")
             {
-                HelpBox helpBox = root.Q<HelpBox>(NameHelpBox(property, index));
-                helpBox.style.display = DisplayStyle.Flex;
-                helpBox.text = userData.Error;
+                UpdateErrorMessage(getByXPathAttribute, container, userData.CheckFieldResult, property, index);
                 return;
+            }
+
+            // init check
+            // ReSharper disable once MergeIntoPattern
+            if (userData.CheckFieldResult.Error == "" && userData.CheckFieldResult.MisMatch && (userData.CheckFieldResult.OriginalValue == null || getByXPathAttribute.AutoResign))
+            {
+                CheckFieldResult checkResult = new CheckFieldResult
+                {
+                    Error = "",
+                    MisMatch = false,
+                    OriginalValue = userData.CheckFieldResult.TargetValue,
+                    TargetValue = userData.CheckFieldResult.TargetValue,
+                    Index = userData.CheckFieldResult.Index,
+                };
+
+                root.userData = new InitUserData
+                {
+                    Error = "",
+                    TargetProperty = userData.TargetProperty,
+                    MemberInfo = userData.MemberInfo,
+                    ExpectType = userData.ExpectType,
+                    ExpectInterface = userData.ExpectInterface,
+                    CheckFieldResult = checkResult,
+                };
+
+                SetValue(userData.TargetProperty, userData.MemberInfo, parent, userData.CheckFieldResult.TargetValue);
+                onValueChangedCallback.Invoke(userData.CheckFieldResult.TargetValue);
             }
 
             Button refreshButton = root.Q<Button>(NameResignButton(property, index));
@@ -320,7 +380,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 InitUserData initUserData = (InitUserData)root.userData;
                 object expectedData = initUserData.CheckFieldResult.TargetValue;
-                // Debug.Log($"{expectedData}///{expectedData.GetType()}");
                 SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, expectedData);
                 onValueChangedCallback.Invoke(expectedData);
             };
@@ -354,17 +413,28 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
             GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
+            (string xPathError, IEnumerable<object> xPathResults) = GetXPathValue(getByXPathAttribute, property, info, parent);
 
-            IEnumerable<object> results = GetXPathValue(getByXPathAttribute.XPathSteps, property, info, parent)
+            IEnumerable<object> results = xPathResults
                 .Select(each => ValidateXPathResult(each, userData.ExpectType, userData.ExpectInterface))
                 .Where(each => each.valid)
                 .Select(each => each.value);
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             object targetValue = results.ElementAtOrDefault(propertyIndex == -1? 0: propertyIndex);
-            CheckFieldResult checkResult = CheckField(property, info, parent, targetValue);
+            CheckFieldResult checkResult = xPathError == ""
+                ? CheckField(property, info, parent, targetValue)
+                : new CheckFieldResult
+                {
+                    Error = xPathError,
+                    MisMatch = userData.CheckFieldResult.MisMatch,
+                    OriginalValue = userData.CheckFieldResult.OriginalValue,
+                    TargetValue = userData.CheckFieldResult.TargetValue,
+                    Index = userData.CheckFieldResult.Index,
+                };
 
-            if (checkResult.Error == "" && checkResult.MisMatch && getByXPathAttribute.ForceResign)
+            // ReSharper disable once MergeIntoPattern
+            if (checkResult.Error == "" && checkResult.MisMatch && getByXPathAttribute.AutoResign)
             {
                 SetValue(userData.TargetProperty, userData.MemberInfo, parent, checkResult.TargetValue);
                 onValueChanged.Invoke(checkResult.TargetValue);
@@ -380,7 +450,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             // Debug.Log($"{checkResult.TargetValue}///{checkResult.TargetValue.GetType()}");
 
-            root.userData = new InitUserData
+            InitUserData newUserData;
+            root.userData = newUserData = new InitUserData
             {
                 Error = "",
                 TargetProperty = userData.TargetProperty,
@@ -390,7 +461,30 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 CheckFieldResult = checkResult,
             };
 
-            UpdateButtons(checkResult, refreshButton, removeButton);
+            if(getByXPathAttribute.UseResignButton)
+            {
+                UpdateButtons(checkResult, refreshButton, removeButton);
+            }
+
+            UpdateErrorMessage(getByXPathAttribute, container, newUserData.CheckFieldResult, property, index);
+        }
+
+        private void UpdateErrorMessage(GetByXPathAttribute getByXPathAttribute, VisualElement root, CheckFieldResult checkFieldResult, SerializedProperty property, int index)
+        {
+            string error = checkFieldResult.Error;
+            if(checkFieldResult.Error == "" && checkFieldResult.MisMatch && getByXPathAttribute.UseErrorMessage)
+            {
+                error = $"Expected {checkFieldResult.TargetValue}, but got {checkFieldResult.OriginalValue}";
+            }
+
+            HelpBox helpBox = root.Q<HelpBox>(NameHelpBox(property, index));
+            if (helpBox.text == error)
+            {
+                return;
+            }
+
+            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            helpBox.text = error;
         }
 
         #endregion
@@ -475,8 +569,25 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             public string FolderPath;
         }
 
-        private static IEnumerable<object> GetXPathValue(IReadOnlyList<XPathStep> xPathSteps, SerializedProperty property, FieldInfo info, object parent)
+        private static (string error, IEnumerable<object>) GetXPathValue(GetByXPathAttribute getByXPathAttribute, SerializedProperty property, FieldInfo info, object parent)
         {
+            IEnumerable<XPathStep> xPathSteps;
+            if (getByXPathAttribute.IsCallback)
+            {
+                (string error, string xPathString) = Util.GetOf(getByXPathAttribute.Callback, "", property, info, parent);
+
+                if (error != "")
+                {
+                    return (error, Array.Empty<object>());
+                }
+
+                xPathSteps = XPathParser.Parse(xPathString);
+            }
+            else
+            {
+                xPathSteps = getByXPathAttribute.XPathSteps;
+            }
+
             IReadOnlyList<ResourceInfo> accValues = new []
             {
                 new ResourceInfo
@@ -508,7 +619,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 accValues = predicatesResources.ToArray();
             }
 
-            return accValues
+            IEnumerable<object> result = accValues
                 .Select(each =>
                 {
                     // ReSharper disable once InvertIf
@@ -523,6 +634,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     return each.Resource;
                 })
                 .Where(each => each != null);
+
+            return ("", result);
         }
 
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)
