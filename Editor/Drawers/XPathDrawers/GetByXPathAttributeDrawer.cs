@@ -397,7 +397,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             };
         }
 
-#if SAINTSFIELD_DEBUG && !SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE
+#if !SAINTSFIELD_DEBUG || !SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
@@ -422,13 +422,25 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
             (string xPathError, IReadOnlyList<object> xPathResults) = GetXPathValues(getByXPathAttribute,  initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
 
-            IEnumerable<object> results = xPathResults
-                .Select(each => ValidateXPathResult(each, initUserData.ExpectType, initUserData.ExpectInterface))
-                .Where(each => each.valid)
-                .Select(each => each.value);
-
+            int arraySize = int.MaxValue;
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            object targetValue = results.ElementAtOrDefault(propertyIndex == -1? 0: propertyIndex);
+
+            if (xPathError == "" && getByXPathAttribute.AutoResign && initUserData.ArrayProperty != null &&
+                initUserData.ArrayProperty.arraySize != xPathResults.Count)
+            {
+                arraySize = xPathResults.Count;
+                initUserData.ArrayProperty.arraySize = arraySize;
+                initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
+            }
+
+            if(propertyIndex >= arraySize)
+            {
+                return;
+            }
+
+            int useIndex = propertyIndex == -1? 0: propertyIndex;
+            object targetValue = xPathResults.Count > propertyIndex ? xPathResults[useIndex] : null;
+
             CheckFieldResult checkResult = xPathError == ""
                 ? CheckField(property, info, parent, targetValue)
                 : new CheckFieldResult
