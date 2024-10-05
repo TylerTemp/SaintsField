@@ -15,6 +15,7 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
+        public readonly bool InitSign;
         public readonly bool AutoResign;
         public readonly bool UseResignButton;
         public readonly bool UseErrorMessage;
@@ -30,19 +31,20 @@ namespace SaintsField
 
         public readonly IReadOnlyList<XPathInfo> XPathInfoList;
 
-        public GetByXPathAttribute(EGetComp config, params string[] ePaths)
+        public GetByXPathAttribute(EXP config, params string[] ePaths)
         {
-            AutoResign = !config.HasFlag(EGetComp.NoAutoResign);
+            InitSign = !config.HasFlag(EXP.NoInitSign);
+            AutoResign = !config.HasFlag(EXP.NoAutoResign);
             if (AutoResign)
             {
                 UseResignButton = false;
             }
             else
             {
-                UseResignButton = !config.HasFlag(EGetComp.NoResignButton);
+                UseResignButton = !config.HasFlag(EXP.NoResignButton);
             }
 
-            if (config.HasFlag(EGetComp.NoMessage))
+            if (config.HasFlag(EXP.NoMessage))
             {
                 UseErrorMessage = false;
             }
@@ -80,7 +82,7 @@ namespace SaintsField
                     .ToArray();
         }
 
-        public GetByXPathAttribute(params string[] ePaths) : this(EGetComp.None, ePaths)
+        public GetByXPathAttribute(params string[] ePaths) : this(EXP.None, ePaths)
         {
         }
     }

@@ -14826,6 +14826,7 @@ MonoBehaviour:
   - {fileID: 5246858966939522138, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
   - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
   - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  pickMat: {fileID: 0}
 --- !u!1 &1540778734
 GameObject:
   m_ObjectHideFlags: 0

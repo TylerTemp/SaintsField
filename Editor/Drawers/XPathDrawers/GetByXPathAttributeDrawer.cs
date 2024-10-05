@@ -23,6 +23,81 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
     [CustomPropertyDrawer(typeof(GetByXPathAttribute))]
     public class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
+        private class GetByPickerWindow : ObjectSelectWindow
+        {
+            private Action<Object> _onSelected;
+            private EPick _editorPick;
+
+            private IReadOnlyList<Object> _assetObjects;
+            private IReadOnlyList<Object> _sceneObjects;
+
+            public static void Open(Object curValue, EPick editorPick, IReadOnlyList<Object> assetObjects, IReadOnlyList<Object> sceneObjects, Action<Object> onSelected)
+            {
+                GetByPickerWindow thisWindow = CreateInstance<GetByPickerWindow>();
+                thisWindow.titleContent = new GUIContent("Select");
+                // thisWindow._expectedTypes = expectedTypes;
+                thisWindow._assetObjects = assetObjects;
+                thisWindow._sceneObjects = sceneObjects;
+                thisWindow._onSelected = onSelected;
+                thisWindow._editorPick = editorPick;
+                thisWindow.SetDefaultActive(curValue);
+                // Debug.Log($"call show selector window");
+                thisWindow.ShowAuxWindow();
+            }
+
+            protected override bool AllowScene =>
+                // Debug.Log(_editorPick);
+                _editorPick.HasFlag(EPick.Scene);
+
+            protected override bool AllowAssets =>
+                // Debug.Log(_editorPick);
+                _editorPick.HasFlag(EPick.Assets);
+
+            protected override IEnumerable<ItemInfo> FetchAllAssets()
+            {
+                // HierarchyProperty property = new HierarchyProperty(HierarchyType.Assets, false);
+                return _assetObjects.Select(each => new ItemInfo
+                {
+                    Object = each,
+                    Label = each.name,
+                    // Icon = property.icon,
+                    InstanceID = each.GetInstanceID(),
+                    GuiLabel = new GUIContent(each.name),
+                });
+            }
+
+            protected override IEnumerable<ItemInfo> FetchAllSceneObject()
+            {
+                // HierarchyProperty property = new HierarchyProperty(HierarchyType.GameObjects, false);
+                return _sceneObjects.Select(each => new ItemInfo
+                {
+                    Object = each,
+                    Label = each.name,
+                    // Icon = property.icon,
+                    InstanceID = each.GetInstanceID(),
+                    GuiLabel = new GUIContent(each.name),
+                });
+            }
+
+            protected override string Error => "";
+
+            protected override bool IsEqual(ItemInfo itemInfo, Object target)
+            {
+                return ReferenceEquals(itemInfo.Object, target);
+            }
+
+            protected override void OnSelect(ItemInfo itemInfo)
+            {
+                _onSelected(itemInfo.Object);
+            }
+
+            protected override bool FetchAllSceneObjectFilter(ItemInfo itemInfo) => true;
+
+            protected override bool FetchAllAssetsFilter(ItemInfo itemInfo) => true;
+        }
+
+
+
 #if UNITY_2021_3_OR_NEWER
         #region UIToolkit
 
@@ -31,6 +106,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_HelpBox";
         private static string NameResignButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_ResignButton";
         private static string NameRemoveButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_RemoveButton";
+        private static string NameSelectorButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_SelectorButton";
 
         private const string ClassGetByXPath = "saints-field-get-by-xpath-attribute-drawer";
 
@@ -115,8 +191,25 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 image = Util.LoadResource<Texture2D>("close.png"),
             });
 
+            StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
+            container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).styleSheets.Add(hideStyle);
+            Button selectorButton = new Button
+            {
+                text = "●",
+                style =
+                {
+                    // position = Position.Absolute,
+                    // right = 0,
+                    width = SingleLineHeight,
+                    marginLeft = 0,
+                    marginRight = 0,
+                },
+                name = NameSelectorButton(property, index),
+            };
+
             root.Add(refreshButton);
             root.Add(removeButton);
+            root.Add(selectorButton);
             root.AddToClassList(ClassAllowDisable);
 
             (string error, SerializedProperty targetProperty, MemberInfo memberInfo, Type expectType, Type expectInterface) = GetExpectedType(property, info, parent);
@@ -338,7 +431,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 bool originIsNull = Util.IsNull(initUserData.CheckFieldResult.OriginalValue);
 
                 bool noMore = false;
-                if (initUserData.ArrayProperty != null && originIsNull && initUserData.ArrayProperty.arraySize == 1)
+                if (getByXPathAttribute.InitSign && initUserData.ArrayProperty != null && originIsNull && initUserData.ArrayProperty.arraySize == 1)
                 {
                     if (initUserData.ArrayValues.Count != initUserData.ArrayProperty.arraySize)
                     {
@@ -352,7 +445,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     }
                 }
 
-                if(!noMore && originIsNull && initUserData.CheckFieldResult.MisMatch)
+                if(getByXPathAttribute.InitSign && !noMore && originIsNull && initUserData.CheckFieldResult.MisMatch)
                 {
                     CheckFieldResult checkResult = new CheckFieldResult
                     {
@@ -373,6 +466,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             Button refreshButton = root.Q<Button>(NameResignButton(property, index));
             Button removeButton = root.Q<Button>(NameRemoveButton(property, index));
+            Button selectorButton = root.Q<Button>(NameSelectorButton(property, index));
 
             refreshButton.clicked += () =>
             {
@@ -394,6 +488,61 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                 }
                 onValueChangedCallback.Invoke(null);
+            };
+
+            selectorButton.clicked += () =>
+            {
+                object updatedParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if (updatedParent == null)
+                {
+                    Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly");
+                    return;
+                }
+
+                (string getValueError, int _, object curValue) = Util.GetValue(property, info, parent);
+
+                if (!(curValue is Object) && curValue != null)
+                {
+                    Debug.LogError($"targetValue is not Object: {curValue}");
+                    return;
+                }
+
+                Object curValueObj = (Object)curValue;
+
+                if (getValueError != "")
+                {
+                    Debug.LogError(getValueError);
+                    return;
+                }
+
+                (string error, IReadOnlyList<object> results) = GetXPathValues(getByXPathAttribute,
+                    initUserData.ExpectType, initUserData.ExpectInterface, property, info, updatedParent);
+                if (error != "")
+                {
+                    Debug.LogError(error);
+                    return;
+                }
+
+                Object[] objResults = results.OfType<Object>().ToArray();
+                List<Object> assetObj = new List<Object>();
+                List<Object> sceneObj = new List<Object>();
+                foreach (Object objResult in objResults)
+                {
+                    if (AssetDatabase.GetAssetPath(objResult) != "")
+                    {
+                        assetObj.Add(objResult);
+                    }
+                    else
+                    {
+                        sceneObj.Add(objResult);
+                    }
+                }
+
+                GetByPickerWindow.Open(curValueObj, EPick.Assets | EPick.Scene, assetObj, sceneObj, obj =>
+                {
+                    SetValue(initUserData.TargetProperty, initUserData.MemberInfo, updatedParent, obj);
+                    onValueChangedCallback.Invoke(obj);
+                });
             };
         }
 
@@ -1652,7 +1801,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                         (string resourceFolder, string subFolder) = SplitResources(resourceDirectoryInfo);
 
-                        var info = new ResourceInfo
+                        ResourceInfo info = new ResourceInfo
                         {
                             FolderPath = resourceFolder,
                             Resource = subFolder,
@@ -1840,22 +1989,22 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        private static IEnumerable<string> GetFoldersRecursively(string currentFolder)
-        {
-            IEnumerable<string> subFolders = GetDirectoriesWithRelative(currentFolder);
-            foreach (string subFolder in subFolders)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
-                Debug.Log($"Folder get {subFolder} from {currentFolder}");
-#endif
-                // string subPath = $"{currentFolder}/{subFolder}";
-                yield return subFolder;
-                foreach (string subSubFolder in GetFoldersRecursively(subFolder))
-                {
-                    yield return subSubFolder;
-                }
-            }
-        }
+//         private static IEnumerable<string> GetFoldersRecursively(string currentFolder)
+//         {
+//             IEnumerable<string> subFolders = GetDirectoriesWithRelative(currentFolder);
+//             foreach (string subFolder in subFolders)
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+//                 Debug.Log($"Folder get {subFolder} from {currentFolder}");
+// #endif
+//                 // string subPath = $"{currentFolder}/{subFolder}";
+//                 yield return subFolder;
+//                 foreach (string subSubFolder in GetFoldersRecursively(subFolder))
+//                 {
+//                     yield return subSubFolder;
+//                 }
+//             }
+//         }
 
         private static IEnumerable<ResourceInfo> GetValuesFromPredicates(IReadOnlyList<IReadOnlyList<XPathPredicate>> andPredicates, IEnumerable<ResourceInfo> nodeTestResources)
         {

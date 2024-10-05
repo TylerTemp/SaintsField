@@ -928,6 +928,8 @@ namespace SaintsField.Editor.Core
                 fieldContainer.userData = fieldAttributeWithIndex;
             }
 
+            containerElement.Add(fieldContainer);
+
             #endregion
 
             #region post field
@@ -943,8 +945,6 @@ namespace SaintsField.Editor.Core
             }
 
             #endregion
-
-            containerElement.Add(fieldContainer);
 
             #region Post Overlay
 

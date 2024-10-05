@@ -10,7 +10,10 @@ namespace SaintsField.Samples.Scripts.GetByXPathExamples
         [GetByXPath("asset:://RawResources/*.png")]
         public Sprite[] searchPngs;
 
-        [GetByXPath("resources:://")]
+        [GetByXPath("resources:://*")]
         public GameObject[] resourcePrefabs;
+
+        [GetByXPath(EXP.Picker,  "asset:://*.mat"), Required]
+        public Material pickMat;
     }
 }

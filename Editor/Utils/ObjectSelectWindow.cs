@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Utils
 
         private static readonly Vector2 WidthScale = new Vector2(30f, 100f);
 
-        public class ItemInfo
+        protected class ItemInfo
         {
             // ReSharper disable InconsistentNaming
             public Object Object;
@@ -561,6 +561,11 @@ namespace SaintsField.Editor.Utils
             return _assetItems;
         }
 
+        protected virtual IEnumerable<ItemInfo> FetchAllAssets()
+        {
+            return HelperFetchAllAssets();
+        }
+
         private IReadOnlyList<ItemInfo> EnsureSceneItems()
         {
             if (_sceneItems == null)
@@ -569,6 +574,11 @@ namespace SaintsField.Editor.Utils
             }
 
             return _sceneItems;
+        }
+
+        protected virtual IEnumerable<ItemInfo> FetchAllSceneObject()
+        {
+            return HelperFetchAllSceneObject();
         }
 
         protected abstract void OnSelect(ItemInfo itemInfo);
@@ -630,7 +640,7 @@ namespace SaintsField.Editor.Utils
                 .Select(x => x.Select(v => v.Value).ToList());
         }
 
-        private static IEnumerable<ItemInfo> FetchAllSceneObject()
+        private static IEnumerable<ItemInfo> HelperFetchAllSceneObject()
         {
             HierarchyProperty property = new HierarchyProperty(HierarchyType.GameObjects, false);
 
@@ -645,7 +655,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static IEnumerable<ItemInfo> FetchAllAssets()
+        private static IEnumerable<ItemInfo> HelperFetchAllAssets()
         {
             HierarchyProperty property = new HierarchyProperty(HierarchyType.Assets, false);
 
