@@ -2165,5 +2165,85 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         }
 
         #endregion
+
+        public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info)
+        {
+            (GetByXPathAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(arrayProperty);
+
+            (string error, SerializedProperty targetProperty, MemberInfo memberInfo, Type expectType, Type expectInterface) = GetExpectedType(arrayProperty, info, parent);
+            if (error != "")
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PLAYA_GET_BY_XPATH
+                Debug.LogError(error);
+#endif
+                return true;
+            }
+
+            GetByXPathAttribute firstAttribute = attributes[0];
+            if (!firstAttribute.InitSign && !firstAttribute.AutoResign)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PLAYA_GET_BY_XPATH
+                Debug.Log($"{arrayProperty.propertyPath} not init sign");
+#endif
+                return false;
+            }
+
+            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(attributes.Select(each => each.XPathInfoList).ToArray(), expectType, expectInterface, arrayProperty, info, parent);
+            if (xPathError != "")
+            {
+                return true;
+            }
+
+            bool needApply = false;
+            // int resultSize = -1;
+            bool needInitSign = firstAttribute.InitSign && targetProperty.arraySize == 0;
+
+            if (needInitSign && results.Count > 0)
+            {
+                targetProperty.arraySize = results.Count;
+                needApply = true;
+            }
+            if(firstAttribute.AutoResign && targetProperty.arraySize != results.Count)
+            {
+                targetProperty.arraySize = results.Count;
+                needApply = true;
+            }
+
+            foreach ((object targetValue, int index) in results.WithIndex())
+            {
+                if (needApply)
+                {
+                    targetProperty.serializedObject.ApplyModifiedProperties();
+                    targetProperty.serializedObject.Update();
+                    needApply = false;
+                }
+
+                if(index >= targetProperty.arraySize)
+                {
+                    break;
+                }
+
+                SerializedProperty elementProperty = targetProperty.GetArrayElementAtIndex(index);
+
+                (string getValueError, int _, object originValue) = Util.GetValue(elementProperty, memberInfo, parent);
+                if (getValueError != "")
+                {
+                    continue;
+                }
+
+                if ((needInitSign || firstAttribute.AutoResign) && !Util.GetIsEqual(originValue, targetValue))
+                {
+                    SetValue(elementProperty, memberInfo, parent, targetValue);
+                }
+            }
+
+            if (needApply)
+            {
+                targetProperty.serializedObject.ApplyModifiedProperties();
+                arrayProperty.serializedObject.ApplyModifiedProperties();
+            }
+            return firstAttribute.AutoResign;
+
+        }
     }
 }

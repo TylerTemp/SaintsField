@@ -924,7 +924,15 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            int arrayIndex;
+            try
+            {
+                arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            }
+            catch (NullReferenceException e)
+            {
+                return (e.Message, -1, null);
+            }
 
             object rawValue;
             if (fieldInfo.MemberType == MemberTypes.Field)

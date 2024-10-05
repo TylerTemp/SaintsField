@@ -1,8 +1,9 @@
+using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.GetByXPathExamples
 {
-    public class GetByXPathAssetExample : MonoBehaviour
+    public class GetByXPathAssetExample : SaintsMonoBehaviour
     {
         [GetByXPath("asset::/SaintsField/Samples/RawResources/Toggle.mat")]
         public Material toggleMat;
@@ -17,7 +18,7 @@ namespace SaintsField.Samples.Scripts.GetByXPathExamples
         public Material pickMat;
 
         [GetByXPath(EXP.Silent, "scene:://noSuchObject", "asset:://*.prefab")]
-        [GetByXPath(EXP.Silent, "scene:://Rate", "asset:://NoSuchItemInAsset")]
-        public GameObject multiGetXPath;
+        [GetByXPath("scene:://Rate", "asset:://NoSuchItemInAsset")]
+        public GameObject[] multiGetXPaths;
     }
 }

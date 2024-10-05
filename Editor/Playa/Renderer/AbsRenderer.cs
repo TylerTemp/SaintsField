@@ -7,6 +7,7 @@ using SaintsField.Condition;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Drawers.VisibilityDrawers;
+using SaintsField.Editor.Drawers.XPathDrawers;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -79,7 +80,7 @@ namespace SaintsField.Editor.Playa.Renderer
             public bool EditorModeResult;
         }
 
-        protected static PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo)
+        protected PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo)
         {
             List<PreCheckInternalInfo> preCheckInternalInfos = new List<PreCheckInternalInfo>();
             int arraySize = -1;
@@ -253,7 +254,9 @@ namespace SaintsField.Editor.Playa.Renderer
             };
         }
 
-        private static int GetArraySize(IPlayaArraySizeAttribute genArraySizeAttribute, SerializedProperty property, FieldInfo info, object parent)
+        private bool _getByXPathKeepUpdate = true;
+
+        private int GetArraySize(IPlayaArraySizeAttribute genArraySizeAttribute, SerializedProperty property, FieldInfo info, object parent)
         {
             switch (genArraySizeAttribute)
             {
@@ -277,6 +280,15 @@ namespace SaintsField.Editor.Playa.Renderer
                     return GetPrefabWithComponentAttributeDrawer.HelperGetArraySize(getPrefabWithComponentAttribute, info);
                 case GetScriptableObjectAttribute getScriptableObjectAttribute:
                     return GetScriptableObjectAttributeDrawer.HelperGetArraySize(getScriptableObjectAttribute, info);
+                case GetByXPathAttribute _:
+                {
+                    if (!_getByXPathKeepUpdate)
+                    {
+                        return -1;
+                    }
+                    _getByXPathKeepUpdate = GetByXPathAttributeDrawer.HelperGetArraySize(property, info);
+                }
+                    return -1;
                 default:
                     return -1;
             }
@@ -684,7 +696,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return UpdatePreCheckUIToolkit(FieldWithInfo, _rootElement);
         }
 
-        protected static PreCheckResult UpdatePreCheckUIToolkit(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
+        protected PreCheckResult UpdatePreCheckUIToolkit(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo);
             if(result.enabledSelf != !preCheckResult.IsDisabled)
@@ -1964,7 +1976,8 @@ namespace SaintsField.Editor.Playa.Renderer
         private static VisualElement WrapVisualElement(VisualElement visualElement)
         {
             visualElement.SetEnabled(false);
-            visualElement.AddToClassList("unity-base-field__aligned");
+            // visualElement.AddToClassList("unity-base-field__aligned");
+            visualElement.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
             return visualElement;
         }
 #endif

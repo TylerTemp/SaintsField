@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.Playa;
 using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
@@ -11,7 +12,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
-    public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute
+    public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
