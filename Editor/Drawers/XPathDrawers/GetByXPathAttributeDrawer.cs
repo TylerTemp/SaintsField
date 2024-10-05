@@ -140,10 +140,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     if (arrayError != "")
                     {
                         initUserData.Error = error;
-
                     }
-
-                    initUserData.ArrayProperty = arrayProperty;
+                    else
+                    {
+                        initUserData.ArrayProperty = arrayProperty;
+                    }
                 }
             }
             else
@@ -158,6 +159,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             initUserData.ExpectType = expectType;
             initUserData.ExpectInterface = expectInterface;
             initUserData.CheckFieldResult = checkResult;
+
             if(getByXPathAttribute.UseResignButton)
             {
                 UpdateButtons(checkResult, refreshButton, removeButton);
@@ -333,21 +335,24 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             // ReSharper disable once MergeIntoPattern
             if (initUserData.CheckFieldResult.Error == "")
             {
+                bool originIsNull = Util.IsNull(initUserData.CheckFieldResult.OriginalValue);
+
                 bool noMore = false;
-                if (initUserData.ArrayProperty != null && initUserData.CheckFieldResult.OriginalValue == null && initUserData.ArrayProperty.arraySize == 1)
+                if (initUserData.ArrayProperty != null && originIsNull && initUserData.ArrayProperty.arraySize == 1)
                 {
                     if (initUserData.ArrayValues.Count != initUserData.ArrayProperty.arraySize)
                     {
+                        int newSize = initUserData.ArrayValues.Count;
                         container.schedule.Execute(() =>
                         {
-                            initUserData.ArrayProperty.arraySize = initUserData.ArrayValues.Count;
+                            initUserData.ArrayProperty.arraySize = newSize;
                             initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
                         });
-                        noMore = initUserData.ArrayValues.Count == 0;
+                        noMore = newSize == 0;
                     }
                 }
 
-                if(!noMore && initUserData.CheckFieldResult.MisMatch && (initUserData.CheckFieldResult.OriginalValue == null || getByXPathAttribute.AutoResign))
+                if(!noMore && originIsNull && initUserData.CheckFieldResult.MisMatch)
                 {
                     CheckFieldResult checkResult = new CheckFieldResult
                     {
@@ -392,7 +397,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             };
         }
 
-#if SAINTSFIELD_DEBUG && !SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE || true
+#if SAINTSFIELD_DEBUG && !SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
@@ -564,6 +569,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             File,
             Object,
             SceneRoot,
+            AssetsRoot,
         }
 
         private class ResourceInfo
@@ -602,15 +608,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     new ResourceInfo
                     {
                         ResourceType = ResourceType.Object,
-                        Resource = parent,
+                        Resource = property.serializedObject.targetObject,
                     },
                 };
 
                 foreach (XPathStep xPathStep in xPathSteps)
                 {
-    #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
                     Debug.Log($"processing xpath {xPathStep}");
-    #endif
+#endif
 
                     IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.NodeTest, accValues);
 
@@ -630,6 +636,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     IEnumerable<ResourceInfo> attrResources = GetValuesFromAttr(xPathStep.Attr, nodeTestResources);
                     IEnumerable<ResourceInfo> predicatesResources = GetValuesFromPredicates(xPathStep.Predicates, attrResources);
                     accValues = predicatesResources.ToArray();
+                    if (accValues.Count == 0)
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                        Debug.Log($"Found 0 in {xPathStep}");
+#endif
+                        break;
+                    }
                 }
 
                 object[] results = accValues
@@ -646,7 +659,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                         return each.Resource;
                     })
-                    .Where(each => each != null)
+                    .Where(each => !Util.IsNull(each))
                     .Select(each => ValidateXPathResult(each, expectedType, expectedInterface))
                     .Where(each => each.valid)
                     .Select(each => each.value)
@@ -770,6 +783,22 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                             }
                         }
                             break;
+
+                        case ResourceType.AssetsRoot:
+                        {
+                            foreach (string directoryInfo in GetDirectoriesWithRelative("Assets"))
+                            {
+        #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                                Debug.Log($"Axis return assets root child {directoryInfo}");
+        #endif
+                                yield return new ResourceInfo
+                                {
+                                    Resource = directoryInfo,
+                                    ResourceType = ResourceType.Folder,
+                                };
+                            }
+                        }
+                            break;
                     }
                 }
             }
@@ -859,47 +888,76 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     }
                 }
                     break;
+
+                case ResourceType.AssetsRoot:
+                {
+                    foreach (string directoryInfo in GetDirectoriesWithRelative("Assets"))
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                        Debug.Log($"Axis return assets all child {directoryInfo}");
+#endif
+                        ResourceInfo subInfo = new ResourceInfo
+                        {
+                            Resource = directoryInfo,
+                            ResourceType = ResourceType.Folder,
+                        };
+                        yield return subInfo;
+
+                        foreach (ResourceInfo child in GetChildInFolderRecursion(subInfo))
+                        {
+                            yield return child;
+                        }
+                    }
+                }
+                    break;
+            }
+        }
+
+        private static IEnumerable<string> GetDirectoriesWithRelative(string directory)
+        {
+            foreach (string subFolder in Directory.GetDirectories(directory))
+            {
+                string subFolderName = subFolder.Substring(directory.Length);
+                if(subFolderName.StartsWith("/"))
+                {
+                    subFolderName = subFolderName.Substring(1);
+                }
+
+                if (!subFolderName.StartsWith(".") && !subFolderName.EndsWith("~"))
+                {
+                    yield return subFolder.Replace("\\", "/");
+                }
             }
         }
 
         private static IEnumerable<ResourceInfo> GetChildInFolder(ResourceInfo resourceInfo)
         {
-            string directoryInfo = (string) resourceInfo.Resource;
-            foreach (string name in Directory.GetDirectories(directoryInfo))
+            string directoryInfo = string.IsNullOrEmpty(resourceInfo.FolderPath)? (string) resourceInfo.Resource: $"{resourceInfo.FolderPath}/{resourceInfo.Resource}";
+            foreach (string name in GetDirectoriesWithRelative(directoryInfo))
             {
-                string resourcePath = $"{resourceInfo.FolderPath}/{name}";
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
-                Debug.Log($"go to folder {resourcePath}");
+                Debug.Log($"go to folder {name}");
 #endif
                 yield return new ResourceInfo
                 {
                     ResourceType = ResourceType.Folder,
-                    Resource = resourcePath,
+                    Resource = name,
                 };
             }
 
-            foreach (string fileName in Directory.GetFiles(directoryInfo).Where(each => !each.EndsWith(".meta")))
+            foreach (string assetPath in Directory
+                         .GetFiles(directoryInfo)
+                         .Where(each => !each.StartsWith(".") && !each.EndsWith(".meta"))
+                         .Select(each => each.Replace("\\", "/")))
             {
-                string assetPath = $"{resourceInfo.FolderPath}/{fileName}";
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
-                Debug.Log($"Load file {assetPath}");
+                Debug.Log($"return file {assetPath}");
 #endif
-                Object uObject = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
-                if (uObject == null)
+                yield return new ResourceInfo
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
-                    Debug.LogWarning($"Failed to load file {resourceInfo.Resource}");
-#endif
-                }
-                else
-                {
-                    yield return new ResourceInfo
-                    {
-                        ResourceType = ResourceType.Object,
-                        Resource = uObject,
-                        FolderPath = resourceInfo.FolderPath,
-                    };
-                }
+                    ResourceType = ResourceType.File,
+                    Resource = assetPath,
+                };
             }
         }
 
@@ -939,7 +997,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     case ResourceType.Folder:
                     case ResourceType.File:
-                        resourceName = (string)resourceInfo.Resource;
+                        resourceName = ((string)resourceInfo.Resource).Split("/").Last();
                         break;
                     case ResourceType.Object:
                         if(resourceInfo.Resource is Object uObject)
@@ -958,6 +1016,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 #endif
                     continue;
                 }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                Debug.Log($"NodeTest resourceName={resourceName}; type={resourceInfo.ResourceType}");
+#endif
 
                 if (nodeTest.ExactMatch == "..")
                 {
@@ -1570,30 +1632,76 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                 case Axis.Resources:
                 {
-                    foreach (string resourceDirectoryInfo in GetResourcesFoldersRecursively("Assets"))
+                    foreach (string resourceDirectoryInfo in GetResourcesRootFolders("Assets"))
                     {
-                        yield return new ResourceInfo
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                        Debug.Log($"Axis Resources return {resourceDirectoryInfo}");
+#endif
+
+                        (string resourceFolder, string subFolder) = SplitResources(resourceDirectoryInfo);
+
+                        var info = new ResourceInfo
                         {
-                            FolderPath = null,
-                            Resource = resourceDirectoryInfo,
+                            FolderPath = resourceFolder,
+                            Resource = subFolder,
                             ResourceType = ResourceType.Folder,
                         };
+                        yield return info;
+
+                        foreach (ResourceInfo resourceInfo in GetChildInFolder(info))
+                        {
+                            string rawPath = (string)resourceInfo.Resource;
+                            string resourcePath = rawPath.Substring(resourceFolder.Length,
+                                rawPath.Length - resourceFolder.Length);
+                            resourceInfo.Resource = resourcePath;
+                            resourceInfo.FolderPath = resourceFolder;
+                            yield return resourceInfo;
+                        }
                     }
                 }
                     break;
                 case Axis.Asset:
                 {
-                    foreach (string directoryInfo in GetFoldersRecursively("Assets"))
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                    Debug.Log("Axis return assets root");
+#endif
+                    yield return new ResourceInfo
                     {
-                        yield return new ResourceInfo
-                        {
-                            Resource = directoryInfo,
-                            ResourceType = ResourceType.Folder,
-                        };
-                    }
+                        Resource = "Assets",
+                        ResourceType = ResourceType.AssetsRoot,
+                    };
                 }
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
+        }
+
+        private static (string resourceFolder, string subFolder) SplitResources(string resourcePath)
+        {
+            if (resourcePath.ToLower().EndsWith("/resources"))
+            {
+                return (resourcePath, "");
+            }
+            if (resourcePath.ToLower().EndsWith("/resources/"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                return (resourcePath.Substring(0, resourcePath.Length - 1), "");
+            }
+
+            List<string> resourceParts = new List<string>();
+            Queue<string> pathSplits = new Queue<string>(resourcePath.Split("/"));
+            while (pathSplits.Count > 0)
+            {
+                string part = pathSplits.Dequeue();
+                resourceParts.Add(part);
+                if (part.ToLower() == "resources")
+                {
+                    break;
+                }
+            }
+
+            return (string.Join("/", resourceParts), string.Join("/", pathSplits));
         }
 
         private static IEnumerable<ResourceInfo> GetGameObjectsAncestor(ResourceInfo resourceInfo, bool withSelf, bool insidePrefab)
@@ -1701,19 +1809,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        private static IEnumerable<string> GetResourcesFoldersRecursively(string currentFolder)
+        private static IEnumerable<string> GetResourcesRootFolders(string currentFolder)
         {
-            string[] subFolders = Directory.GetDirectories(currentFolder);
-            foreach (string subFolder in subFolders)
+            IEnumerable<string> subFolders = GetDirectoriesWithRelative(currentFolder);
+            foreach (string subFolderPath in subFolders)
             {
-                string subFolderPath = $"{currentFolder}/{subFolder}";
-                if (subFolder.ToLower() == "resources") // resources ends here
+                if (subFolderPath.ToLower().EndsWith("/resources")) // resources ends here
                 {
                     yield return subFolderPath;
                 }
                 else
                 {
-                    foreach (string subSubFolder in GetResourcesFoldersRecursively(subFolder))
+                    foreach (string subSubFolder in GetResourcesRootFolders(subFolderPath))
                     {
                         yield return subSubFolder;
                     }
@@ -1723,11 +1830,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
         private static IEnumerable<string> GetFoldersRecursively(string currentFolder)
         {
-            string[] subFolders = Directory.GetDirectories(currentFolder);
+            IEnumerable<string> subFolders = GetDirectoriesWithRelative(currentFolder);
             foreach (string subFolder in subFolders)
             {
-                yield return $"{currentFolder}/{subFolder}";
-                foreach (string subSubFolder in GetResourcesFoldersRecursively(subFolder))
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                Debug.Log($"Folder get {subFolder} from {currentFolder}");
+#endif
+                // string subPath = $"{currentFolder}/{subFolder}";
+                yield return subFolder;
+                foreach (string subSubFolder in GetFoldersRecursively(subFolder))
                 {
                     yield return subSubFolder;
                 }

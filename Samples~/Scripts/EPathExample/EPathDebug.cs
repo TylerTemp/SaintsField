@@ -43,46 +43,46 @@ namespace SaintsField.Samples.Scripts.EPathExample
         // public EPathDebug myself;
 
         // [GetByXPath("Sub@{GetComponent(Dummy).GetTargetTransform()}")]
-        [GetByXPath("..")]
-        public Transform c;
-
-        [Button("Test")]
-        private void T()
-        {
-            var d = new Dictionary<string, EPathDebug>();
-            // Debug.Log(d["Key"]);
-            // Debug.Log(d["Key"]);
-
-            Type objType = d.GetType();
-            foreach (Type interfaceType in objType.GetInterfaces())
-            {
-                // if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
-                //     interfaceType.GetGenericArguments()[0].IsGenericType &&
-                //     interfaceType.GetGenericArguments()[0].GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
-                // {
-                //     Debug.Log(interfaceType.GetGenericArguments()[0].GetGenericArguments()[0]);
-                //     Debug.Log("Found");
-                // }
-                // if (interfaceType.IsGenericType &&
-                //     (interfaceType.GetGenericTypeDefinition() == typeof(IDictionary<,>) || interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>)))
-                // {
-                //     Debug.Log(interfaceType.GetGenericArguments()[0]);
-                //     Debug.Log("Found");
-                //
-                //     if (d is IDictionary<string, object>)
-                //     {
-                //         Debug.Log("String Obj!");
-                //     }
-                //
-                //     Debug.Log(d is IDictionary);
-                // }
-                Debug.Log(interfaceType == typeof(IDictionary));
-            }
-
-            // foreach (var t in d.GetType().GetInterfaces())
-            // {
-            //     Debug.Log(t);
-            // }
-        }
+        // [GetByXPath("..")]
+        // public Transform c;
+        //
+        // [Button("Test")]
+        // private void T()
+        // {
+        //     var d = new Dictionary<string, EPathDebug>();
+        //     // Debug.Log(d["Key"]);
+        //     // Debug.Log(d["Key"]);
+        //
+        //     Type objType = d.GetType();
+        //     foreach (Type interfaceType in objType.GetInterfaces())
+        //     {
+        //         // if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
+        //         //     interfaceType.GetGenericArguments()[0].IsGenericType &&
+        //         //     interfaceType.GetGenericArguments()[0].GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+        //         // {
+        //         //     Debug.Log(interfaceType.GetGenericArguments()[0].GetGenericArguments()[0]);
+        //         //     Debug.Log("Found");
+        //         // }
+        //         // if (interfaceType.IsGenericType &&
+        //         //     (interfaceType.GetGenericTypeDefinition() == typeof(IDictionary<,>) || interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>)))
+        //         // {
+        //         //     Debug.Log(interfaceType.GetGenericArguments()[0]);
+        //         //     Debug.Log("Found");
+        //         //
+        //         //     if (d is IDictionary<string, object>)
+        //         //     {
+        //         //         Debug.Log("String Obj!");
+        //         //     }
+        //         //
+        //         //     Debug.Log(d is IDictionary);
+        //         // }
+        //         Debug.Log(interfaceType == typeof(IDictionary));
+        //     }
+        //
+        //     // foreach (var t in d.GetType().GetInterfaces())
+        //     // {
+        //     //     Debug.Log(t);
+        //     // }
+        // }
     }
 }

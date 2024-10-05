@@ -624,6 +624,26 @@ namespace SaintsField.Editor.Utils
                 // case AudioClip:
                 //     result = fieldResult;
                 //     break;
+                case Texture2D:
+                {
+                    if (fieldType == typeof(Sprite) || fieldType.IsSubclassOf(typeof(Sprite)))
+                    {
+                        string assetPath = AssetDatabase.GetAssetPath(fieldResult);
+                        if(assetPath != "") {
+                            result = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                        }
+
+                        if (result == null)
+                        {
+                            goto default;
+                        }
+                    }
+                    else
+                    {
+                        goto default;
+                    }
+                }
+                    break;
 
                 default:
                     // Debug.Log($"{fieldType}/{fieldResult}: {fieldType.IsInstanceOfType(fieldResult)}");
@@ -981,19 +1001,27 @@ namespace SaintsField.Editor.Utils
                 throw new Exception($"Not a enumerable {source}");
             }
 
-            int searchIndex = 0;
             // Debug.Log($"start check index in {source}");
-            foreach (object result in enumerable)
+            foreach ((object result, int searchIndex) in enumerable.Cast<object>().WithIndex())
             {
                 // Debug.Log($"check index {searchIndex} in {source}");
                 if(searchIndex == index)
                 {
                     return ("", result);
                 }
-                searchIndex++;
             }
 
             return ($"Not found index {index} in {source}", null);
+        }
+
+        public static bool IsNull(object obj)
+        {
+            if (obj is UnityEngine.Object uObject)
+            {
+                return uObject == null;
+            }
+
+            return obj == null;
         }
     }
 }
