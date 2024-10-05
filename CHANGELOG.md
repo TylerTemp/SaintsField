@@ -7,7 +7,7 @@
 
 **Experimental Feature**
 
-Since this version, a new attribute called `GetByXPath` is added. This attribute is designed to be the super class of `GetComponent*`, `GetPrefab` etc.
+Since this version, a new attribute called `GetByXPath` is added (only support UI Toolkit yet). This attribute is designed to be the super class of `GetComponent*`, `GetPrefab` etc.
 
 I'm still working on it, but most used features are already there. The API is not documented yet. The syntax only has [some notes in Chinese](https://github.com/TylerTemp/SaintsField/blob/master/Runtime/SaintsXPathParser/README.md) if you're interested.
 

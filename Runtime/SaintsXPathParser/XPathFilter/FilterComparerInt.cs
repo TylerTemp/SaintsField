@@ -19,17 +19,25 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
         public bool CompareToComparable(IComparable source)
         {
             int compareResult = source.CompareTo(Value);
-            return FilterComparer switch
+            switch (FilterComparer)
             {
-                FilterComparer.Equal => compareResult == 0,
-                FilterComparer.NotEqual => compareResult != 0,
-                FilterComparer.Greater => compareResult > 0,
-                FilterComparer.GreaterEqual => compareResult >= 0,
-                FilterComparer.Less => compareResult < 0,
-                FilterComparer.LessEqual => compareResult <= 0,
-                FilterComparer.None => true,
-                _ => throw new ArgumentOutOfRangeException(nameof(FilterComparer), FilterComparer, null),
-            };
+                case FilterComparer.Equal:
+                    return compareResult == 0;
+                case FilterComparer.NotEqual:
+                    return compareResult != 0;
+                case FilterComparer.Greater:
+                    return compareResult > 0;
+                case FilterComparer.GreaterEqual:
+                    return compareResult >= 0;
+                case FilterComparer.Less:
+                    return compareResult < 0;
+                case FilterComparer.LessEqual:
+                    return compareResult <= 0;
+                case FilterComparer.None:
+                    return true;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FilterComparer), FilterComparer, null);
+            }
         }
     }
 }

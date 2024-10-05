@@ -151,7 +151,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
 
         public bool CompareToString(string sourceString)
         {
-            Queue<string> sourceSplits = new Queue<string>(sourceString.Split("/"));
+            Queue<string> sourceSplits = new Queue<string>(sourceString.Split('/'));
 
             foreach (PathFragment pathFragment in PathFragments)
             {

@@ -237,80 +237,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             return root;
         }
 
-        private static (bool valid, object value) ValidateXPathResult(object each, Type expectType, Type expectInterface)
-        {
-            object result;
-            if (expectType.IsInstanceOfType(each))
-            {
-                result = each;
-            }
-            else if (each is Object uObject)
-            {
-                Object r = Util.GetTypeFromObj(uObject, expectType);
-                if (r == null)
-                {
-                    return (false, null);
-                }
-
-                result = r;
-            }
-            else
-            {
-                return (false, null);
-            }
-
-            if (expectInterface == null)
-            {
-                return (true, result);
-            }
-
-            bool valid = expectInterface.IsAssignableFrom(each.GetType());
-            return valid ? (true, result) : (false, null);
-        }
-
-        private static (string error, SerializedProperty targetProperty, MemberInfo targetMemberInfo, Type expectType, Type expectInterface) GetExpectedType(SerializedProperty property, FieldInfo info, object parent)
-        {
-            Type rawType = ReflectUtils.GetElementType(info.FieldType);
-            MemberInfo targetMemberInfo = info;
-            if (!typeof(IWrapProp).IsAssignableFrom(rawType))
-            {
-                return ("", property, targetMemberInfo, rawType, null);
-            }
-
-            (string error, int _, object value) = Util.GetValue(property, info, parent);
-            if (error != "")
-            {
-                return (error, property, targetMemberInfo, rawType, null);
-            }
-            IWrapProp wrapProp = (IWrapProp) value;
-            string prop = wrapProp.EditorPropertyName;
-            Type expectedType;
-            PropertyInfo wrapPropertyInfo = value.GetType().GetProperty(prop, BindingFlags.Public | BindingFlags.Instance);
-            if (wrapPropertyInfo == null)
-            {
-                FieldInfo wrapFieldInfo = value.GetType().GetField(prop, BindingFlags.Public | BindingFlags.Instance);
-                Debug.Assert(wrapFieldInfo != null);
-                targetMemberInfo = wrapFieldInfo;
-                expectedType = wrapFieldInfo.FieldType;
-            }
-            else
-            {
-                expectedType = wrapPropertyInfo.PropertyType;
-                targetMemberInfo = wrapPropertyInfo;
-            }
-
-            SerializedProperty targetProperty = property.FindPropertyRelative(prop) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, prop);
-
-            Type expectedInterface = null;
-            Type mostBaseType = ReflectUtils.GetMostBaseType(rawType);
-            if(ReflectUtils.IsSubclassOfRawGeneric(typeof(SaintsInterface<,>), mostBaseType))
-            {
-                expectedInterface = mostBaseType.GetGenericArguments()[1];
-            }
-
-            return ("", targetProperty, targetMemberInfo, expectedType, expectedInterface);
-        }
-
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
@@ -704,6 +630,79 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             Util.SignPropertyValue(targetProperty, memberInfo, parent, expectedData);
         }
 
+        private static (bool valid, object value) ValidateXPathResult(object each, Type expectType, Type expectInterface)
+        {
+            object result;
+            if (expectType.IsInstanceOfType(each))
+            {
+                result = each;
+            }
+            else if (each is Object uObject)
+            {
+                Object r = Util.GetTypeFromObj(uObject, expectType);
+                if (r == null)
+                {
+                    return (false, null);
+                }
+
+                result = r;
+            }
+            else
+            {
+                return (false, null);
+            }
+
+            if (expectInterface == null)
+            {
+                return (true, result);
+            }
+
+            bool valid = expectInterface.IsAssignableFrom(each.GetType());
+            return valid ? (true, result) : (false, null);
+        }
+
+                private static (string error, SerializedProperty targetProperty, MemberInfo targetMemberInfo, Type expectType, Type expectInterface) GetExpectedType(SerializedProperty property, FieldInfo info, object parent)
+        {
+            Type rawType = ReflectUtils.GetElementType(info.FieldType);
+            MemberInfo targetMemberInfo = info;
+            if (!typeof(IWrapProp).IsAssignableFrom(rawType))
+            {
+                return ("", property, targetMemberInfo, rawType, null);
+            }
+
+            (string error, int _, object value) = Util.GetValue(property, info, parent);
+            if (error != "")
+            {
+                return (error, property, targetMemberInfo, rawType, null);
+            }
+            IWrapProp wrapProp = (IWrapProp) value;
+            string prop = wrapProp.EditorPropertyName;
+            Type expectedType;
+            PropertyInfo wrapPropertyInfo = value.GetType().GetProperty(prop, BindingFlags.Public | BindingFlags.Instance);
+            if (wrapPropertyInfo == null)
+            {
+                FieldInfo wrapFieldInfo = value.GetType().GetField(prop, BindingFlags.Public | BindingFlags.Instance);
+                Debug.Assert(wrapFieldInfo != null);
+                targetMemberInfo = wrapFieldInfo;
+                expectedType = wrapFieldInfo.FieldType;
+            }
+            else
+            {
+                expectedType = wrapPropertyInfo.PropertyType;
+                targetMemberInfo = wrapPropertyInfo;
+            }
+
+            SerializedProperty targetProperty = property.FindPropertyRelative(prop) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, prop);
+
+            Type expectedInterface = null;
+            Type mostBaseType = ReflectUtils.GetMostBaseType(rawType);
+            if(ReflectUtils.IsSubclassOfRawGeneric(typeof(SaintsInterface<,>), mostBaseType))
+            {
+                expectedInterface = mostBaseType.GetGenericArguments()[1];
+            }
+
+            return ("", targetProperty, targetMemberInfo, expectedType, expectedInterface);
+        }
         private struct CheckFieldResult
         {
             public string Error;
@@ -1204,7 +1203,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     case ResourceType.Folder:
                     case ResourceType.File:
-                        resourceName = ((string)resourceInfo.Resource).Split("/").Last();
+                        resourceName = ((string)resourceInfo.Resource).Split('/').Last();
                         break;
                     case ResourceType.Object:
                         if(resourceInfo.Resource is Object uObject)
@@ -1234,7 +1233,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     {
                         case ResourceType.File:
                         {
-                            string resFolder = string.Join("/", resourceName.Split("/").SkipLast(1));
+                            string[] split = resourceName.Split('/');
+                            string resFolder = string.Join("/", split.Take(split.Length - 1));
                             yield return new ResourceInfo
                             {
                                 ResourceType = ResourceType.Folder,
@@ -1249,7 +1249,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                             {
                                 if (!string.IsNullOrEmpty(resourceInfo.FolderPath))
                                 {
-                                    string resFolder = string.Join("/", resourceInfo.FolderPath.Split("/").SkipLast(1));
+                                    string[] split = resourceInfo.FolderPath.Split('/');
+                                    string resFolder = string.Join("/", split.Take(split.Length - 1));
                                     if(resFolder.StartsWith("Assets"))
                                     {
                                         yield return new ResourceInfo
@@ -1262,7 +1263,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                             }
                             else
                             {
-                                string resFolder = string.Join("/", resourceName.Split("/").SkipLast(1));
+                                string[] split = resourceName.Split('/');
+                                string resFolder = string.Join("/", split.Take(split.Length - 1));
                                 if(resFolder != "" || !string.IsNullOrEmpty(resourceInfo.FolderPath))
                                 {
                                     yield return new ResourceInfo
@@ -1347,7 +1349,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                                 else
                                 {
                                     string folderPath = (string)resourceInfo.Resource;
-                                    Queue<string> pathSplits = new Queue<string>(folderPath.Split("/"));
+                                    Queue<string> pathSplits = new Queue<string>(folderPath.Split('/'));
                                     List<string> parentFolders = new List<string>();
                                     bool found = false;
                                     while (pathSplits.Count > 0)
@@ -1464,7 +1466,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
         private static ResourceInfo GetResourceInfoFromFilePath(string filePath)
         {
-            Queue<string> pathSplits = new Queue<string>(filePath.Split("/"));
+            Queue<string> pathSplits = new Queue<string>(filePath.Split('/'));
             List<string> parentFolders = new List<string>();
             while (pathSplits.Count > 0 && pathSplits.Peek().ToLower() != "resources")
             {
@@ -1897,7 +1899,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
 
             List<string> resourceParts = new List<string>();
-            Queue<string> pathSplits = new Queue<string>(resourcePath.Split("/"));
+            Queue<string> pathSplits = new Queue<string>(resourcePath.Split('/'));
             while (pathSplits.Count > 0)
             {
                 string part = pathSplits.Dequeue();

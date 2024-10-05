@@ -624,7 +624,7 @@ namespace SaintsField.Editor.Utils
                 // case AudioClip:
                 //     result = fieldResult;
                 //     break;
-                case Texture2D:
+                case Texture2D _:
                 {
                     if (fieldType == typeof(Sprite) || fieldType.IsSubclassOf(typeof(Sprite)))
                     {
