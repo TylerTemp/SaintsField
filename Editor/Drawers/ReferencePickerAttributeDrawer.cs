@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
@@ -98,23 +100,6 @@ namespace SaintsField.Editor.Drawers
                 height = SingleLineHeight,
             }, fullLabel, textStyle);
 
-            // Rect newPos = new Rect(position)
-            // {
-            //     height = SingleLineHeight,
-            //     width = width,
-            //     x = position.x + position.width - width,
-            // };
-
-            // (Rect labelRect, Rect dropdownRect) = Utils.RectUtils.SplitWidthRect(new Rect(position)
-            // {
-            //     height = SingleLineHeight,
-            // }, position.width - 20);
-            //
-            // EditorGUI.DrawRect(labelRect, Color.yellow);
-            // EditorGUI.DrawRect(dropdownRect, Color.blue);
-            //
-            // GUI.Label(labelRect, displayLabel);
-
             Rect dropdownRect = new Rect(position)
             {
                 height = SingleLineHeight,
@@ -123,50 +108,77 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(dropdownRect, new GUIContent(" "), FocusType.Keyboard))
             {
-                GenericMenu genericDropdownMenu = new GenericMenu();
-                genericDropdownMenu.AddItem(new GUIContent("[Null]"), managedReferenceValue == null, () =>
-                {
-                    property.managedReferenceValue = null;
-                    property.serializedObject.ApplyModifiedProperties();
-                    onGUIPayload.SetValue(null);
-                    if(ExpandableIMGUIScoop.IsInScoop)
-                    {
-                        property.serializedObject.ApplyModifiedProperties();
-                    }
-                });
-                genericDropdownMenu.AddSeparator("");
+                // GenericMenu genericDropdownMenu = new GenericMenu();
+                // genericDropdownMenu.AddItem(new GUIContent("[Null]"), managedReferenceValue == null, () =>
+                // {
+                //     property.managedReferenceValue = null;
+                //     property.serializedObject.ApplyModifiedProperties();
+                //     onGUIPayload.SetValue(null);
+                //     if(ExpandableIMGUIScoop.IsInScoop)
+                //     {
+                //         property.serializedObject.ApplyModifiedProperties();
+                //     }
+                // });
+                // genericDropdownMenu.AddSeparator("");
+                //
+                // foreach (Type type in GetTypes(property))
+                // {
+                //     string displayName = $"{type.Name}: {type.Namespace}";
+                //
+                //     genericDropdownMenu.AddItem(new GUIContent(displayName), managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
+                //     {
+                //         object instance = Activator.CreateInstance(type);
+                //         property.managedReferenceValue = instance;
+                //         property.serializedObject.ApplyModifiedProperties();
+                //         // property.serializedObject.SetIsDifferentCacheDirty();
+                //         onGUIPayload.SetValue(instance);
+                //         if(ExpandableIMGUIScoop.IsInScoop)
+                //         {
+                //             property.serializedObject.ApplyModifiedProperties();
+                //         }
+                //     });
+                // }
+                // genericDropdownMenu.DropDown(new Rect(position)
+                // {
+                //     x = 0,
+                //     width = EditorGUIUtility.currentViewWidth,
+                //     height = SingleLineHeight,
+                // });
 
+                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
+                {
+                    {"[Null]", null},
+                    AdvancedDropdownList<Type>.Separator(),
+                };
+
+                int totalCount = 1;
                 foreach (Type type in GetTypes(property))
                 {
-                    // string assemblyName =  type.Assembly.ToString().Split('(', ',')[0];
+                    totalCount += 1;
                     string displayName = $"{type.Name}: {type.Namespace}";
+                    dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+                }
 
-                    genericDropdownMenu.AddItem(new GUIContent(displayName), managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
+                Vector2 size = new Vector2(position.width, totalCount * SingleLineHeight + AdvancedDropdownAttribute.DefaultTitleHeight);
+
+                SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(
+                    dropdownList,
+                    size,
+                    position,
+                    new AdvancedDropdownState(),
+                    curItem =>
                     {
-                        object instance = Activator.CreateInstance(type);
+                        object instance = curItem == null
+                            ? null
+                            : Activator.CreateInstance((Type)curItem);
                         property.managedReferenceValue = instance;
                         property.serializedObject.ApplyModifiedProperties();
-                        // property.serializedObject.SetIsDifferentCacheDirty();
                         onGUIPayload.SetValue(instance);
-                        if(ExpandableIMGUIScoop.IsInScoop)
-                        {
-                            property.serializedObject.ApplyModifiedProperties();
-                        }
-                    });
-                }
-                genericDropdownMenu.DropDown(new Rect(position)
-                {
-                    x = 0,
-                    width = EditorGUIUtility.currentViewWidth,
-                    height = SingleLineHeight,
-                });
+                    },
+                    _ => null);
+                dropdown.Show(position);
+                dropdown.BindWindowPosition();
             }
-
-            // EditorGUI.DrawRect(new Rect(position)
-            // {
-            //     x = 0,
-            //     width = EditorGUIUtility.currentViewWidth,
-            // }, Color.red);
 
             return true;
         }
@@ -190,18 +202,10 @@ namespace SaintsField.Editor.Drawers
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            // VisualElement root = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         width = 40,
-            //     },
-            // };
-
             Button button = new Button
             {
                 name = NameButton(property),
-                text = "▼",
+                // text = "▼",
                 style =
                 {
                     height = SingleLineHeight - 2,
@@ -227,6 +231,18 @@ namespace SaintsField.Editor.Drawers
                     overflow = Overflow.Visible,
                 },
             };
+            button.Add(new Image
+            {
+                image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
+                scaleMode = ScaleMode.ScaleToFit,
+                style =
+                {
+                    maxWidth = 12,
+                    maxHeight = EditorGUIUtility.singleLineHeight,
+                    position = Position.Absolute,
+                    right = 4,
+                },
+            });
 
             object curValue = property.managedReferenceValue;
             string labelName = curValue == null
@@ -271,44 +287,83 @@ namespace SaintsField.Editor.Drawers
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property));
-            // VisualElement propertyContainer = container.Q<VisualElement>(NamePropertyContainer(property));
+            VisualElement root = container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property));
             button.clicked += () =>
             {
-                // string typename = property.managedReferenceFieldTypename;
-                // string[] typeSplitString = typename.Split(' ');
-                // string typeClassName = typeSplitString[1];
-                // string typeAssemblyName = typeSplitString[0];
-                // Type realType = Type.GetType($"{typeClassName}, {typeAssemblyName}");
-                // Debug.Log(realType);
+                // object managedReferenceValue = property.managedReferenceValue;
+                // GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+                // genericDropdownMenu.AddItem("[Null]", managedReferenceValue == null, () =>
+                // {
+                //     PropSetValue(container, property, null);
+                //     onValueChangedCallback(null);
+                // });
+                // genericDropdownMenu.AddSeparator("");
+                //
+                // foreach (Type type in GetTypes(property))
+                // {
+                //     string displayName = $"{type.Name}: {type.Namespace}";
+                //
+                //     genericDropdownMenu.AddItem(displayName, managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
+                //     {
+                //         object instance = CopyObj(managedReferenceValue, Activator.CreateInstance(type));
+                //         PropSetValue(container, property, instance);
+                //
+                //         onValueChangedCallback(instance);
+                //     });
+                // }
+                //
+                // Rect fakePos = container.worldBound;
+                // fakePos.height = SingleLineHeight;
+                //
+                // genericDropdownMenu.DropDown(fakePos, container, true);
 
-                // GenericMenu menu = new GenericMenu();
-                object managedReferenceValue = property.managedReferenceValue;
-                GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-                genericDropdownMenu.AddItem("[Null]", managedReferenceValue == null, () =>
+                Rect worldBound = root.worldBound;
+                float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
+                if (maxHeight < 100)
                 {
-                    PropSetValue(container, property, null);
-                    onValueChangedCallback(null);
-                });
-                genericDropdownMenu.AddSeparator("");
+                    // Debug.LogError($"near out of screen: {maxHeight}");
+                    worldBound.y -= 300 + worldBound.height;
+                    maxHeight = 300;
+                }
+                worldBound.height = SingleLineHeight;
 
+                object managedReferenceValue = property.managedReferenceValue;
+                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
+                {
+                    {"[Null]", null},
+                };
                 foreach (Type type in GetTypes(property))
                 {
-                    // string assemblyName =  type.Assembly.ToString().Split('(', ',')[0];
-                    string displayName = $"{type.Name}: {type.Namespace}";
-
-                    genericDropdownMenu.AddItem(displayName, managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
-                    {
-                        object instance = CopyObj(managedReferenceValue, Activator.CreateInstance(type));
-                        PropSetValue(container, property, instance);
-
-                        onValueChangedCallback(instance);
-                    });
+                    string displayName = $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
+                    dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
                 }
 
-                Rect fakePos = container.worldBound;
-                fakePos.height = SingleLineHeight;
+                AdvancedDropdownAttributeDrawer.MetaInfo metaInfo = new AdvancedDropdownAttributeDrawer.MetaInfo
+                {
+                    Error = "",
+                    CurDisplay = managedReferenceValue == null
+                        ? "-"
+                        : managedReferenceValue.GetType().Name,
+                    CurValue = managedReferenceValue,
+                    DropdownListValue = dropdownList,
+                    SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                };
 
-                genericDropdownMenu.DropDown(fakePos, container, true);
+
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUiToolkit(
+                    metaInfo,
+                    root.worldBound.width,
+                    maxHeight,
+                    (newDisplay, curItem) =>
+                    {
+                        object instance = curItem == null
+                            ? null
+                            : CopyObj(managedReferenceValue, Activator.CreateInstance((Type)curItem));
+
+                        PropSetValue(container, property, instance);
+                        onValueChangedCallback(instance);
+                    }
+                ));
             };
         }
 

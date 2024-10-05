@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.3.7 ##
+
+Use `AdvancedDropdown` for `ReferencePicker`, implement [#87](https://github.com/TylerTemp/SaintsField/issues/87)
+
+**Experimental Feature**
+
+Since this version, a new attribute called `GetByXPath` is added. This attribute is designed to be the super class of `GetComponent*`, `GetPrefab` etc.
+
+I'm still working on it, but most used features are already there. The API is not documented yet. The syntax only has [some notes in Chinese](https://github.com/TylerTemp/SaintsField/blob/master/Runtime/SaintsXPathParser/README.md) if you're interested.
+
+I'm actively working on this feature, hopefully to make it available ASAP. In the meantime, I now start to processing all the pending issues.
+
 ## 3.3.6 ##
 
 Fix broken addressable support due to last version's refactor.

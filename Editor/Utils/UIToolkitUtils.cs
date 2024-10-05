@@ -196,7 +196,8 @@ namespace SaintsField.Editor.Utils
                 },
             };
 
-            dropdownButtonField.AddToClassList("unity-base-field__aligned");
+            // dropdownButtonField.AddToClassList("unity-base-field__aligned");
+            dropdownButtonField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
 
             dropdownButtonField.Add(new Image
             {

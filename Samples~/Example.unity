@@ -14827,20 +14827,20 @@ MonoBehaviour:
   - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
   - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
   pickMat: {fileID: 2100000, guid: 09fa8ef13abd33f42a267980f8846ff5, type: 2}
-  multiGetXPath:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  multiGetXPaths:
+  - {fileID: 7004583026823171687, guid: 9bf4dd99c1a4b7d4fbd3263de3fa7cf3, type: 3}
+  - {fileID: 4963078128532305232, guid: d35b56afdb554c441afac72ab884f36e, type: 3}
+  - {fileID: 4273993126308263894, guid: bfe71e2debe494743bb20374ae988950, type: 3}
+  - {fileID: 4398206394286176314, guid: 55109c2cb42e3634384eb8633eb668cb, type: 3}
+  - {fileID: 1967199806982375841, guid: 58e141e2fd5ae114390243c3b3f7ce88, type: 3}
+  - {fileID: 6901306760381823215, guid: dd4735ce3e3dc9249824cb2fc1c4ca56, type: 3}
+  - {fileID: 2088148949201590720, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+  - {fileID: 4190710479621803394, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+  - {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
+  - {fileID: 5246858966939522138, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
+  - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
+  - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
+  - {fileID: 1881364799}
 --- !u!1 &1540778734
 GameObject:
   m_ObjectHideFlags: 0
@@ -15296,7 +15296,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1638446596}
-  - component: {fileID: 1638446595}
+  - component: {fileID: 1638446597}
   m_Layer: 0
   m_Name: Reference
   m_TagString: Untagged
@@ -15304,31 +15304,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1638446595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1638446594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c441f544051b481cb7b304e48b2db074, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  item:
-    rid: -2
-  structImpl:
-    rid: -2
-  myInterface:
-    rid: -2
-  myInterfaceDisabled:
-    rid: -2
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
 --- !u!4 &1638446596
 Transform:
   m_ObjectHideFlags: 0
@@ -15344,6 +15319,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 53
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1638446597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1638446594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c441f544051b481cb7b304e48b2db074, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item:
+    rid: 7833814859042521250
+  structImpl:
+    rid: 7833814859042521248
+  myInterface:
+    rid: 7833814859042521238
+  myInterfaceDisabled:
+    rid: 7833814859042521193
+  references:
+    version: 2
+    RefIds:
+    - rid: 7833814859042521193
+      type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub2: 
+    - rid: 7833814859042521238
+      type: {class: ReferenceExample/ClassSub1, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 3
+        sub1: 
+    - rid: 7833814859042521248
+      type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub2: 
+    - rid: 7833814859042521250
+      type: {class: ReferenceExample/Apple, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
+        base2: 0
+        apple: 
+        applePrefab: {fileID: 0}
 --- !u!1 &1649546546
 GameObject:
   m_ObjectHideFlags: 0

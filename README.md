@@ -70,11 +70,17 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.3.6**
+**3.3.7**
 
-Fix broken addressable support due to last version's refactor.
+Use `AdvancedDropdown` for `ReferencePicker`, implement [#87](https://github.com/TylerTemp/SaintsField/issues/87)
 
-(P.S. I'm still working on a big feature so most updates these days will be about bug fixes instead of features)
+**Experimental Feature**
+
+Since this version, a new attribute called `GetByXPath` is added. This attribute is designed to be the super class of `GetComponent*`, `GetPrefab` etc.
+
+I'm still working on it, but most used features are already there. The API is not documented yet. The syntax only has [some notes in Chinese](https://github.com/TylerTemp/SaintsField/blob/master/Runtime/SaintsXPathParser/README.md) if you're interested.
+
+I'm actively working on this feature, hopefully to make it available ASAP. In the meantime, I now start to processing all the pending issues.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

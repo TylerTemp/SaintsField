@@ -4,7 +4,7 @@
         <ui:VisualElement style="flex-direction: row; align-items: center;">
             <ui:Image name="item-checked-image" style="width: 15px; visibility: hidden;" />
             <ui:Image name="item-icon-image" style="width: 16px; height: 16px; margin-right: 2px;" />
-            <ui:Label name="item-content" />
+            <ui:Label name="item-content" style="-unity-text-align: middle-left;" />
         </ui:VisualElement>
         <ui:Image name="item-next-image" style="width: 6px; margin-right: 4px;" />
     </ui:Button>

@@ -11,7 +11,7 @@ namespace SaintsField
 
         public readonly string FuncName;
 
-        private const float DefaultTitleHeight = 45f;
+        public const float DefaultTitleHeight = 45f;
         private const float DefaultSepHeight = 4f;
 
         public readonly float TitleHeight;

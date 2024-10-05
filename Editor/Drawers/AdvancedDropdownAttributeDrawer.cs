@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override UnityAdvancedDropdownItem BuildRoot()
         {
-            AdvancedDropdownItem root = MakeUnityAdvancedDropdownItem(_dropdownListValue);
+            UnityAdvancedDropdownItem root = MakeUnityAdvancedDropdownItem(_dropdownListValue);
 
             if(_dropdownListValue.children.Count == 0)
             {
@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
-        private void MakeChildren(AdvancedDropdownItem parent, IEnumerable<IAdvancedDropdownList> children)
+        private void MakeChildren(UnityAdvancedDropdownItem parent, IEnumerable<IAdvancedDropdownList> children)
         {
             foreach (IAdvancedDropdownList childItem in children)
             {
@@ -80,14 +80,14 @@ namespace SaintsField.Editor.Drawers
                 else if (childItem.children.Count == 0)
                 {
                     // Debug.Log($"{parent.name}/{childItem.displayName}");
-                    AdvancedDropdownItem item = MakeUnityAdvancedDropdownItem(childItem);
+                    UnityAdvancedDropdownItem item = MakeUnityAdvancedDropdownItem(childItem);
                     _itemToValue[item] = childItem.value;
                     // Debug.Log($"add {childItem.displayName} => {childItem.value}");
                     parent.AddChild(item);
                 }
                 else
                 {
-                    AdvancedDropdownItem subParent = MakeUnityAdvancedDropdownItem(childItem);
+                    UnityAdvancedDropdownItem subParent = MakeUnityAdvancedDropdownItem(childItem);
                     // Debug.Log($"{parent.name}/{childItem.displayName}[...]");
                     MakeChildren(subParent, childItem.children);
                     parent.AddChild(subParent);
@@ -386,6 +386,8 @@ namespace SaintsField.Editor.Drawers
                     });
                 }
             });
+
+            root.RegisterCallback<AttachToPanelEvent>(_ => root.Q<TextField>().Q("unity-text-input").Focus());
 
             return root;
         }
