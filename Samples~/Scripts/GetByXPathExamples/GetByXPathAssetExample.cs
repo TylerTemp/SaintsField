@@ -15,5 +15,9 @@ namespace SaintsField.Samples.Scripts.GetByXPathExamples
 
         [GetByXPath(EXP.Picker,  "asset:://*.mat"), Required]
         public Material pickMat;
+
+        [GetByXPath(EXP.Silent, "scene:://noSuchObject", "asset:://*.prefab")]
+        [GetByXPath(EXP.Silent, "scene:://Rate", "asset:://NoSuchItemInAsset")]
+        public GameObject multiGetXPath;
     }
 }

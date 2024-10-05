@@ -121,6 +121,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             public SerializedProperty ArrayProperty;
             public IReadOnlyList<object> ArrayValues;
             public GetByXPathAttribute GetByXPathAttribute;
+            public int DecoratorIndex;
 
             public CheckFieldResult CheckFieldResult;
         }
@@ -132,6 +133,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             InitUserData initUserData = new InitUserData
             {
                 GetByXPathAttribute = getByXPathAttribute,
+                DecoratorIndex = index,
             };
             VisualElement root = new VisualElement
             {
@@ -144,6 +146,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 name = NameContainer(property, index),
                 userData = initUserData,
             };
+            root.AddToClassList(ClassGetByXPath);
 
             Button refreshButton = new Button
             {
@@ -198,9 +201,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 text = "●",
                 style =
                 {
-                    // position = Position.Absolute,
-                    // right = 0,
                     width = SingleLineHeight,
+                    display = DisplayStyle.None,
                     marginLeft = 0,
                     marginRight = 0,
                 },
@@ -219,44 +221,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return null;
             }
 
-            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(getByXPathAttribute, expectType, expectInterface, property, info, parent);
-            initUserData.ArrayValues = results;
-
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            object targetValue = null;
-            if (propertyIndex == 0 && xPathError == "")
-            {
-                // handle array size if this is the first element
-                if (getByXPathAttribute.AutoResign)
-                {
-                    (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
-                    if (arrayError != "")
-                    {
-                        initUserData.Error = error;
-                    }
-                    else
-                    {
-                        initUserData.ArrayProperty = arrayProperty;
-                    }
-                }
-            }
-            else
-            {
-                targetValue = results.ElementAtOrDefault(propertyIndex == -1? 0: propertyIndex);
-            }
-
-            CheckFieldResult checkResult = CheckField(property, info, parent, targetValue);
-            initUserData.Error = xPathError;
+            // CheckFieldResult checkResult = CheckField(property, info, parent, targetValue);
+            initUserData.Error = "";
             initUserData.TargetProperty = targetProperty;
             initUserData.MemberInfo = memberInfo;
             initUserData.ExpectType = expectType;
             initUserData.ExpectInterface = expectInterface;
-            initUserData.CheckFieldResult = checkResult;
+            // initUserData.CheckFieldResult = checkResult;
 
-            if(getByXPathAttribute.UseResignButton)
-            {
-                UpdateButtons(checkResult, refreshButton, removeButton);
-            }
+            // if(getByXPathAttribute.UseResignButton)
+            // {
+            //     UpdateButtons(checkResult, refreshButton, removeButton);
+            // }
 
             return root;
         }
@@ -292,7 +268,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             return valid ? (true, result) : (false, null);
         }
 
-        private (string error, SerializedProperty targetProperty, MemberInfo targetMemberInfo, Type expectType, Type expectInterface) GetExpectedType(SerializedProperty property, FieldInfo info, object parent)
+        private static (string error, SerializedProperty targetProperty, MemberInfo targetMemberInfo, Type expectType, Type expectInterface) GetExpectedType(SerializedProperty property, FieldInfo info, object parent)
         {
             Type rawType = ReflectUtils.GetElementType(info.FieldType);
             MemberInfo targetMemberInfo = info;
@@ -424,6 +400,52 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
 
+            InitUserData[] allXPathInitData = container
+                .Query<VisualElement>(className: ClassGetByXPath)
+                .ToList()
+                .Select(each => (InitUserData)each.userData)
+                .ToArray();
+
+            bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
+            if (!imTheFirst)
+            {
+                return;
+            }
+
+            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(allXPathInitData.Select(each => each.GetByXPathAttribute.XPathInfoList).ToArray(), initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
+            initUserData.ArrayValues = results;
+
+            object targetValue = null;
+            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (propertyIndex == 0 && xPathError == "")
+            {
+                // handle array size if this is the first element
+                if (getByXPathAttribute.AutoResign)
+                {
+                    (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
+                    if (arrayError != "")
+                    {
+                        initUserData.Error = arrayError;
+                    }
+                    else
+                    {
+                        initUserData.ArrayProperty = arrayProperty;
+                    }
+                }
+            }
+            else
+            {
+                targetValue = results.ElementAtOrDefault(propertyIndex == -1? 0: propertyIndex);
+            }
+
+            initUserData.CheckFieldResult = CheckField(property, info, parent, targetValue);
+
+            if (initUserData.Error != "")
+            {
+                UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
+                return;
+            }
+
             // init check
             // ReSharper disable once MergeIntoPattern
             if (initUserData.CheckFieldResult.Error == "")
@@ -490,60 +512,64 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 onValueChangedCallback.Invoke(null);
             };
 
-            selectorButton.clicked += () =>
+            if (getByXPathAttribute.UsePickerButton)
             {
-                object updatedParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                if (updatedParent == null)
+                selectorButton.style.display = DisplayStyle.Flex;
+                selectorButton.clicked += () =>
                 {
-                    Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly");
-                    return;
-                }
-
-                (string getValueError, int _, object curValue) = Util.GetValue(property, info, parent);
-
-                if (!(curValue is Object) && curValue != null)
-                {
-                    Debug.LogError($"targetValue is not Object: {curValue}");
-                    return;
-                }
-
-                Object curValueObj = (Object)curValue;
-
-                if (getValueError != "")
-                {
-                    Debug.LogError(getValueError);
-                    return;
-                }
-
-                (string error, IReadOnlyList<object> results) = GetXPathValues(getByXPathAttribute,
-                    initUserData.ExpectType, initUserData.ExpectInterface, property, info, updatedParent);
-                if (error != "")
-                {
-                    Debug.LogError(error);
-                    return;
-                }
-
-                Object[] objResults = results.OfType<Object>().ToArray();
-                List<Object> assetObj = new List<Object>();
-                List<Object> sceneObj = new List<Object>();
-                foreach (Object objResult in objResults)
-                {
-                    if (AssetDatabase.GetAssetPath(objResult) != "")
+                    object updatedParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                    if (updatedParent == null)
                     {
-                        assetObj.Add(objResult);
+                        Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly");
+                        return;
                     }
-                    else
-                    {
-                        sceneObj.Add(objResult);
-                    }
-                }
 
-                GetByPickerWindow.Open(curValueObj, EPick.Assets | EPick.Scene, assetObj, sceneObj, obj =>
-                {
-                    SetValue(initUserData.TargetProperty, initUserData.MemberInfo, updatedParent, obj);
-                    onValueChangedCallback.Invoke(obj);
-                });
-            };
+                    (string getValueError, int _, object curValue) = Util.GetValue(property, info, parent);
+
+                    if (!(curValue is Object) && curValue != null)
+                    {
+                        Debug.LogError($"targetValue is not Object: {curValue}");
+                        return;
+                    }
+
+                    Object curValueObj = (Object)curValue;
+
+                    if (getValueError != "")
+                    {
+                        Debug.LogError(getValueError);
+                        return;
+                    }
+
+                    (string error, IReadOnlyList<object> getXPathResults) = GetXPathValues(allXPathInitData.Select(each => each.GetByXPathAttribute.XPathInfoList).ToArray(),
+                        initUserData.ExpectType, initUserData.ExpectInterface, property, info, updatedParent);
+                    if (error != "")
+                    {
+                        Debug.LogError(error);
+                        return;
+                    }
+
+                    Object[] objResults = getXPathResults.OfType<Object>().ToArray();
+                    List<Object> assetObj = new List<Object>();
+                    List<Object> sceneObj = new List<Object>();
+                    foreach (Object objResult in objResults)
+                    {
+                        if (AssetDatabase.GetAssetPath(objResult) != "")
+                        {
+                            assetObj.Add(objResult);
+                        }
+                        else
+                        {
+                            sceneObj.Add(objResult);
+                        }
+                    }
+
+                    GetByPickerWindow.Open(curValueObj, EPick.Assets | EPick.Scene, assetObj, sceneObj, obj =>
+                    {
+                        SetValue(initUserData.TargetProperty, initUserData.MemberInfo, updatedParent, obj);
+                        onValueChangedCallback.Invoke(obj);
+                    });
+                };
+            }
         }
 
 #if !SAINTSFIELD_DEBUG || !SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE
@@ -563,13 +589,26 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
 
+            InitUserData[] allXPathInitData = container
+                .Query<VisualElement>(className: ClassGetByXPath)
+                .ToList()
+                .Select(each => (InitUserData)each.userData)
+                .ToArray();
+
+            bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
+            if (!imTheFirst)
+            {
+                return;
+            }
+
             Button refreshButton = root.Q<Button>(NameResignButton(property, index));
             Button removeButton = root.Q<Button>(NameRemoveButton(property, index));
 
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
             GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
-            (string xPathError, IReadOnlyList<object> xPathResults) = GetXPathValues(getByXPathAttribute,  initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
+
+            (string xPathError, IReadOnlyList<object> xPathResults) = GetXPathValues(allXPathInitData.Select(each => each.GetByXPathAttribute.XPathInfoList).ToArray(),  initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
 
             int arraySize = int.MaxValue;
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -665,7 +704,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             Util.SignPropertyValue(targetProperty, memberInfo, parent, expectedData);
         }
 
-
         private struct CheckFieldResult
         {
             public string Error;
@@ -740,99 +778,107 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             public string FolderPath;
         }
 
-        private static (string error, IReadOnlyList<object>) GetXPathValues(GetByXPathAttribute getByXPathAttribute, Type expectedType, Type expectedInterface, SerializedProperty property, FieldInfo info, object parent)
+        private static (string error, IReadOnlyList<object>) GetXPathValues(IReadOnlyList<IReadOnlyList<GetByXPathAttribute.XPathInfo>> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, FieldInfo info, object parent)
         {
             List<string> errors = new List<string>();
+            List<object> finalResults = new List<object>();
 
-            foreach (GetByXPathAttribute.XPathInfo xPathInfo in getByXPathAttribute.XPathInfoList)
+            foreach (IReadOnlyList<GetByXPathAttribute.XPathInfo> orXPathInfoList in andXPathInfoList)
             {
-                IEnumerable<XPathStep> xPathSteps;
-                if (xPathInfo.IsCallback)
+                foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList)
                 {
-                    (string error, string xPathString) = Util.GetOf(xPathInfo.Callback, "", property, info, parent);
-
-                    if (error != "")
+                    IEnumerable<XPathStep> xPathSteps;
+                    if (xPathInfo.IsCallback)
                     {
-                        errors.Add(error);
-                        continue;
-                    }
+                        (string error, string xPathString) = Util.GetOf(xPathInfo.Callback, "", property, info, parent);
 
-                    xPathSteps = XPathParser.Parse(xPathString);
-                }
-                else
-                {
-                    xPathSteps = xPathInfo.XPathSteps;
-                }
-
-                IReadOnlyList<ResourceInfo> accValues = new []
-                {
-                    new ResourceInfo
-                    {
-                        ResourceType = ResourceType.Object,
-                        Resource = property.serializedObject.targetObject,
-                    },
-                };
-
-                foreach (XPathStep xPathStep in xPathSteps)
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
-                    Debug.Log($"processing xpath {xPathStep}");
-#endif
-
-                    IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.NodeTest, accValues);
-
-                    // foreach (ResourceInfo resourceInfo in sepResources)
-                    // {
-                    //     Debug.Log(resourceInfo.Resource);
-                    // }
-                    IEnumerable<ResourceInfo> axisResources = GetValuesFromAxis(xPathStep.Axis, sepResources);
-
-                    IEnumerable<ResourceInfo> nodeTestResources = GetValuesFromNodeTest(xPathStep.NodeTest, axisResources);
-
-                    // foreach (ResourceInfo resourceInfo in axisResources)
-                    // {
-                    //     Debug.Log(resourceInfo.Resource);
-                    // }
-
-                    IEnumerable<ResourceInfo> attrResources = GetValuesFromAttr(xPathStep.Attr, nodeTestResources);
-                    IEnumerable<ResourceInfo> predicatesResources = GetValuesFromPredicates(xPathStep.Predicates, attrResources);
-                    accValues = predicatesResources.ToArray();
-                    if (accValues.Count == 0)
-                    {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
-                        Debug.Log($"Found 0 in {xPathStep}");
-#endif
-                        break;
-                    }
-                }
-
-                object[] results = accValues
-                    .Select(each =>
-                    {
-                        // ReSharper disable once InvertIf
-                        if (each.ResourceType == ResourceType.File)
+                        if (error != "")
                         {
-                            string assetPath = string.IsNullOrEmpty(each.FolderPath)
-                                ? (string)each.Resource
-                                : $"{each.FolderPath}/{each.Resource}";
-                            return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                            errors.Add(error);
+                            continue;
                         }
 
-                        return each.Resource;
-                    })
-                    .Where(each => !Util.IsNull(each))
-                    .Select(each => ValidateXPathResult(each, expectedType, expectedInterface))
-                    .Where(each => each.valid)
-                    .Select(each => each.value)
-                    .ToArray();
+                        xPathSteps = XPathParser.Parse(xPathString);
+                    }
+                    else
+                    {
+                        xPathSteps = xPathInfo.XPathSteps;
+                    }
 
-                if (results.Length != 0)
-                {
-                    return ("", results);
+                    IReadOnlyList<ResourceInfo> accValues = new []
+                    {
+                        new ResourceInfo
+                        {
+                            ResourceType = ResourceType.Object,
+                            Resource = property.serializedObject.targetObject,
+                        },
+                    };
+
+                    foreach (XPathStep xPathStep in xPathSteps)
+                    {
+    #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                        Debug.Log($"processing xpath {xPathStep}");
+    #endif
+
+                        IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.NodeTest, accValues);
+
+                        // foreach (ResourceInfo resourceInfo in sepResources)
+                        // {
+                        //     Debug.Log(resourceInfo.Resource);
+                        // }
+                        IEnumerable<ResourceInfo> axisResources = GetValuesFromAxis(xPathStep.Axis, sepResources);
+
+                        IEnumerable<ResourceInfo> nodeTestResources = GetValuesFromNodeTest(xPathStep.NodeTest, axisResources);
+
+                        // foreach (ResourceInfo resourceInfo in axisResources)
+                        // {
+                        //     Debug.Log(resourceInfo.Resource);
+                        // }
+
+                        IEnumerable<ResourceInfo> attrResources = GetValuesFromAttr(xPathStep.Attr, nodeTestResources);
+                        IEnumerable<ResourceInfo> predicatesResources = GetValuesFromPredicates(xPathStep.Predicates, attrResources);
+                        accValues = predicatesResources.ToArray();
+                        if (accValues.Count == 0)
+                        {
+    #if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+                            Debug.Log($"Found 0 in {xPathStep}");
+    #endif
+                            break;
+                        }
+                    }
+
+                    object[] results = accValues
+                        .Select(each =>
+                        {
+                            // ReSharper disable once InvertIf
+                            if (each.ResourceType == ResourceType.File)
+                            {
+                                string assetPath = string.IsNullOrEmpty(each.FolderPath)
+                                    ? (string)each.Resource
+                                    : $"{each.FolderPath}/{each.Resource}";
+                                return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                            }
+
+                            return each.Resource;
+                        })
+                        .Where(each => !Util.IsNull(each))
+                        .Select(each => ValidateXPathResult(each, expectedType, expectedInterface))
+                        .Where(each => each.valid)
+                        .Select(each => each.value)
+                        .ToArray();
+
+                    if (results.Length != 0)
+                    {
+                        finalResults.AddRange(results);
+                    }
                 }
             }
 
-            return (string.Join("\n", errors), Array.Empty<object>());
+            // return (string.Join("\n", errors), Array.Empty<object>());
+
+            return finalResults.Count > 0
+                ? ("", finalResults)
+                : (string.Join("\n", errors), finalResults);
         }
 
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)

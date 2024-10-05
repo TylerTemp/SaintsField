@@ -10,6 +10,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
+    [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
     public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
@@ -18,6 +19,7 @@ namespace SaintsField
         public readonly bool InitSign;
         public readonly bool AutoResign;
         public readonly bool UseResignButton;
+        public readonly bool UsePickerButton;
         public readonly bool UseErrorMessage;
 
         public struct XPathInfo
@@ -34,6 +36,7 @@ namespace SaintsField
         public GetByXPathAttribute(EXP config, params string[] ePaths)
         {
             InitSign = !config.HasFlag(EXP.NoInitSign);
+            UsePickerButton = !config.HasFlag(EXP.NoPicker);
             AutoResign = !config.HasFlag(EXP.NoAutoResign);
             if (AutoResign)
             {

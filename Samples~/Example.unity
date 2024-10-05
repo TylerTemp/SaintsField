@@ -14817,16 +14817,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toggleMat: {fileID: 2100000, guid: 03af6470f53b830469257315faf122ad, type: 2}
-  searchPngs:
-  - {fileID: 21300000, guid: f6dd782be9f6242428748582d3c70a63, type: 3}
-  - {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
-  - {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
-  resourcePrefabs:
-  - {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  - {fileID: 5246858966939522138, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
-  - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
-  - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
-  pickMat: {fileID: 0}
+  searchPngs: []
+  resourcePrefabs: []
+  pickMat: {fileID: 2100000, guid: 09fa8ef13abd33f42a267980f8846ff5, type: 2}
+  multiGetXPath: {fileID: 7004583026823171687, guid: 9bf4dd99c1a4b7d4fbd3263de3fa7cf3, type: 3}
 --- !u!1 &1540778734
 GameObject:
   m_ObjectHideFlags: 0
