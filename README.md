@@ -72,7 +72,8 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 **3.3.7**
 
-Use `AdvancedDropdown` for `ReferencePicker`, implement [#87](https://github.com/TylerTemp/SaintsField/issues/87)
+1.  Use `AdvancedDropdown` for `ReferencePicker`, implement [#87](https://github.com/TylerTemp/SaintsField/issues/87)
+2.  UI Toolkit: Fix `AdvancedDropdown` long text align, fix no auto-focus in search field
 
 **Experimental Feature**
 
