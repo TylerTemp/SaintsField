@@ -194,8 +194,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 image = Util.LoadResource<Texture2D>("close.png"),
             });
 
-            StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
-            container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).styleSheets.Add(hideStyle);
             Button selectorButton = new Button
             {
                 text = "●",
@@ -282,7 +280,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
 
-            if (result.TargetValue == null)
+            if (Util.IsNull(result.TargetValue))
             {
                 if (refreshButton.style.display != DisplayStyle.None)
                 {
@@ -324,6 +322,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
                 return;
+            }
+
+            if(getByXPathAttribute.UsePickerButton)
+            {
+                StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
+                container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).styleSheets.Add(hideStyle);
             }
 
             InitUserData[] allXPathInitData = container
@@ -553,7 +557,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
 
             int useIndex = propertyIndex == -1? 0: propertyIndex;
-            object targetValue = xPathResults.Count > propertyIndex ? xPathResults[useIndex] : null;
+            object targetValue = xPathResults.Count > useIndex ? xPathResults[useIndex] : null;
 
             CheckFieldResult checkResult = xPathError == ""
                 ? CheckField(property, info, parent, targetValue)
@@ -603,11 +607,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 if(checkFieldResult.MisMatch)
                 {
-                    error = $"Expected {checkFieldResult.TargetValue}, but got {checkFieldResult.OriginalValue}";
-                }
-                else if(checkFieldResult.OriginalValue == null && checkFieldResult.TargetValue != null)
-                {
-                    error = "Resource not found";
+                    error = $"Expected {(Util.IsNull(checkFieldResult.TargetValue)? "nothing": checkFieldResult.TargetValue)}, but got {(Util.IsNull(checkFieldResult.OriginalValue)? "Null": checkFieldResult.OriginalValue)}";
                 }
             }
 

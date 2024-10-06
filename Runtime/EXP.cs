@@ -3,6 +3,7 @@
 namespace SaintsField
 {
     [Flags]
+    // ReSharper disable once InconsistentNaming
     public enum EXP
     {
         None = 0,
@@ -13,7 +14,8 @@ namespace SaintsField
         NoMessage = 1 << 4,
         NoPicker = 1 << 5,
 
-        Silent = NoAutoResign | NoResignButton | NoMessage,
-        Picker = NoInitSign | NoAutoResign | NoResignButton | NoMessage,
+        Silent = NoAutoResign | NoMessage,
+        JustPicker = NoInitSign | NoAutoResign | NoResignButton | NoMessage,
+        Message = NoAutoResign | NoResignButton,
     }
 }

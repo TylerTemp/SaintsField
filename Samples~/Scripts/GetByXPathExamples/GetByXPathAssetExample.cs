@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts.GetByXPathExamples
         [GetByXPath("resources:://*")]
         public GameObject[] resourcePrefabs;
 
-        [GetByXPath(EXP.Picker,  "asset:://*.mat"), Required]
+        [GetByXPath(EXP.JustPicker,  "asset:://*.mat"), Required]
         public Material pickMat;
 
         [GetByXPath(EXP.Silent, "scene:://noSuchObject", "asset:://*.prefab")]
