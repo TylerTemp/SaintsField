@@ -265,7 +265,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     return playaArraySizeAttribute.Size;
 #pragma warning restore 0618
                 case ArraySizeAttribute arraySizeAttribute:
-                    return arraySizeAttribute.Size;
+                    return arraySizeAttribute.Min;
                 case GetComponentAttribute getComponentAttribute:
                     return GetComponentAttributeDrawer.HelperGetArraySize(property, getComponentAttribute, info);
                 case GetComponentInChildrenAttribute getComponentInChildrenAttribute:

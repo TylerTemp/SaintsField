@@ -29,7 +29,9 @@ namespace SaintsField.Editor.Drawers
             OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
-            int size = ((ArraySizeAttribute)saintsAttribute).Size;
+            ArraySizeAttribute arraySizeAttribute = (ArraySizeAttribute)saintsAttribute;
+            // int size = ((ArraySizeAttribute)saintsAttribute).Size;
+
             // Debug.Log(property.propertyPath);
             // SerializedProperty arrProp = property.serializedObject.FindProperty("nests.Array.data[0].arr3");
             // Debug.Log(arrProp);
@@ -41,12 +43,16 @@ namespace SaintsField.Editor.Drawers
                 return position;
             }
 
-            if (arrProp.arraySize != size)
+            if (arraySizeAttribute.Min >= 0 && arrProp.arraySize < arraySizeAttribute.Min)
             {
                 // Debug.Log(property.arraySize);
                 // Debug.Log(property.propertyPath);
-                arrProp.arraySize = size;
+                arrProp.arraySize = arraySizeAttribute.Min;
                 // arrProp.serializedObject.ApplyModifiedProperties();
+            }
+            if (arraySizeAttribute.Max >= 0 &&  arrProp.arraySize > arraySizeAttribute.Max)
+            {
+                arrProp.arraySize = arraySizeAttribute.Max;
             }
 
             return position;
@@ -130,14 +136,30 @@ namespace SaintsField.Editor.Drawers
 
             SetHelpBox(error, property, container);
 
-            int size = ((ArraySizeAttribute)saintsAttribute).Size;
+            ArraySizeAttribute arraySizeAttribute = (ArraySizeAttribute)saintsAttribute;
 
             // ReSharper disable once InvertIf
             // ReSharper disable once MergeIntoPattern
-            if (error == "" && arrProp.arraySize != size)
+            if (error == "")
             {
-                arrProp.arraySize = size;
-                arrProp.serializedObject.ApplyModifiedProperties();
+                bool changed = false;
+                int curSize = arrProp.arraySize;
+                if(arraySizeAttribute.Min >= 0 && curSize < arraySizeAttribute.Min)
+                {
+                    // Debug.Log($"change array size {curSize} to min {arraySizeAttribute.Min}");
+                    arrProp.arraySize = arraySizeAttribute.Min;
+                    changed = true;
+                }
+                if(arraySizeAttribute.Max >= 0 && curSize > arraySizeAttribute.Max)
+                {
+                    // Debug.Log($"change array size {curSize} to max {arraySizeAttribute.Max}");
+                    arrProp.arraySize = arraySizeAttribute.Max;
+                    changed = true;
+                }
+                if(changed)
+                {
+                    arrProp.serializedObject.ApplyModifiedProperties();
+                }
             }
         }
 

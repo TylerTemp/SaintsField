@@ -1,5 +1,5 @@
 using System;
-using UnityEngine;
+using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
@@ -22,5 +22,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [SaintsRow]
         public Nest[] nests;
+
+        [ArraySize(min: 1)] public int[] atLeastOne;
+        [ArraySize(1, 3)] public int[] oneToThree;
+
+        [ArraySize(1, 3), ListDrawerSettings] public int[] oneToThreeWithSettings;
     }
 }

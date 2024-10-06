@@ -12,11 +12,25 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
-        public readonly int Size;
+        public readonly int Min;
+        public readonly int Max;
 
-        public ArraySizeAttribute(int size, string groupBy = "")
+        public ArraySizeAttribute(int size=-1, int min=-1, int max=-1, string groupBy = "")
         {
-            Size = size;
+            if (size >= 0 && min == -1 && max == -1)
+            {
+                Min = Max = size;
+            }
+            else if (size >= 0 && min >= 0 && max == -1)
+            {
+                Min = size;
+                Max = min;
+            }
+            else
+            {
+                Min = min;
+                Max = max;
+            }
             GroupBy = groupBy;
         }
     }

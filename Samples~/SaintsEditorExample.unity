@@ -2180,6 +2180,9 @@ MonoBehaviour:
     - 
     - 
   nests: []
+  atLeastOne: 00000000
+  oneToThree: 00000000
+  oneToThreeWithSettings: 000000000000000000000000
 --- !u!1 &1776789730
 GameObject:
   m_ObjectHideFlags: 0

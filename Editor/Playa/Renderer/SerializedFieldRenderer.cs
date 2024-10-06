@@ -46,6 +46,8 @@ namespace SaintsField.Editor.Playa.Renderer
             };
 
             ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
+            ArraySizeAttribute arraySizeAttribute =
+                FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
 
             VisualElement result = listDrawerSettingsAttribute == null
                 ? new PropertyField(FieldWithInfo.SerializedProperty)
@@ -55,7 +57,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         flexGrow = 1,
                     },
                 }
-                : MakeListDrawerSettingsField(listDrawerSettingsAttribute);
+                : MakeListDrawerSettingsField(listDrawerSettingsAttribute, arraySizeAttribute?.Min ?? -1, arraySizeAttribute?.Max ?? -1);
 
             result.userData = userDataPayload;
 
@@ -95,7 +97,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return (_fieldElement = result, needUpdate);
         }
 
-        private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, int minSize, int maxSize)
         {
             SerializedProperty property = FieldWithInfo.SerializedProperty;
 
@@ -136,13 +138,6 @@ namespace SaintsField.Editor.Playa.Renderer
                     flexGrow = 1,
                 },
             };
-
-            // listView.itemsAdded += objects =>
-            // {
-            //     Debug.Log("itemAdded");
-            //     property.arraySize += objects.Count();
-            //     property.serializedObject.ApplyModifiedProperties();
-            // };
 
             VisualElement foldoutContent = listView.Q<VisualElement>(className: "unity-foldout__content");
 
@@ -200,13 +195,32 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 numberOfItemsPerPageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
             }
-            Label numberOfItemsPerPageLabel = new Label($" / {property.arraySize} Items")
+            Label numberOfItemsSep = new Label("/")
             {
                 style =
                 {
                     unityTextAlign = TextAnchor.MiddleCenter,
                 },
             };
+
+            IntegerField numberOfItemsTotalField = new IntegerField
+            {
+                isDelayed = true,
+                style =
+                {
+                    minWidth = 30,
+                },
+                value = property.arraySize,
+            };
+
+            Label numberOfItemsDesc = new Label("Items")
+            {
+                style =
+                {
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                },
+            };
+
 
             Button pagePreButton = new Button
             {
@@ -262,6 +276,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 // text = ">",
             };
 
+            Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
+            Button listViewRemoveButton = listView.Q<Button>("unity-list-view__remove-button");
+
             void UpdatePage(int newPageIndex, int numberOfItemsPerPage)
             {
                 PagingInfo pagingInfo = GetPagingInfo(property, newPageIndex, searchField.value, numberOfItemsPerPage);
@@ -289,6 +306,16 @@ namespace SaintsField.Editor.Playa.Renderer
                 listView.itemsSource = curPageItems;
                 // Debug.Log("rebuild listView");
                 listView.Rebuild();
+                UpdateAddRemoveButtons();
+            }
+
+            void UpdateAddRemoveButtons()
+            {
+                int curSize = property.arraySize;
+                bool canNotAddMore = maxSize >= 0 && curSize >= maxSize;
+                listViewAddButton.SetEnabled(!canNotAddMore);
+                bool canNotRemoveMore = minSize >= 0 && curSize <= minSize;
+                listViewRemoveButton.SetEnabled(!canNotRemoveMore);
             }
 
             searchField.RegisterValueChangedCallback(_ =>
@@ -305,6 +332,12 @@ namespace SaintsField.Editor.Playa.Renderer
                 UpdatePage(curPageIndex + 1, numberOfItemsPerPageField.value);
             };
             pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1, numberOfItemsPerPageField.value));
+            numberOfItemsTotalField.RegisterValueChangedCallback(e =>
+            {
+                property.arraySize = e.newValue;
+                property.serializedObject.ApplyModifiedProperties();
+                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+            });
 
             void UpdateNumberOfItemsPerPage(int newValue)
             {
@@ -317,13 +350,14 @@ namespace SaintsField.Editor.Playa.Renderer
 
             numberOfItemsPerPageField.RegisterValueChangedCallback(evt => UpdateNumberOfItemsPerPage(evt.newValue));
 
-            listView.Q<Button>("unity-list-view__add-button").clickable = new Clickable(() =>
+            listViewAddButton.clickable = new Clickable(() =>
             {
                 property.arraySize += 1;
                 property.serializedObject.ApplyModifiedProperties();
                 int totalVisiblePage = Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPageField.value);
                 UpdatePage(totalVisiblePage - 1, numberOfItemsPerPageField.value);
-                numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
+                // numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
+                numberOfItemsTotalField.SetValueWithoutNotify(property.arraySize);
             });
 
             listView.itemsRemoved += objects =>
@@ -333,14 +367,15 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 foreach (int index in curRemoveObjects.Select(removeIndex => itemIndexToPropertyIndex[removeIndex]).OrderByDescending(each => each))
                 {
-                    Debug.Log(index);
+                    // Debug.Log(index);
                     property.DeleteArrayElementAtIndex(index);
                 }
 
                 // itemIndexToPropertyIndex.RemoveAll(each => curRemoveObjects.Contains(each));
                 property.serializedObject.ApplyModifiedProperties();
                 property.serializedObject.Update();
-                numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
+                // numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
+                numberOfItemsTotalField.SetValueWithoutNotify(property.arraySize);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"removed update page to {curPageIndex}");
@@ -364,7 +399,9 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             pagingContainer.Add(numberOfItemsPerPageField);
-            pagingContainer.Add(numberOfItemsPerPageLabel);
+            pagingContainer.Add(numberOfItemsSep);
+            pagingContainer.Add(numberOfItemsTotalField);
+            pagingContainer.Add(numberOfItemsDesc);
 
             pagingContainer.Add(pagePreButton);
             pagingContainer.Add(pageField);
@@ -388,6 +425,8 @@ namespace SaintsField.Editor.Playa.Renderer
             };
 
             foldoutContent.Insert(0, preContent);
+
+            UpdateAddRemoveButtons();
 
             return listView;
         }
