@@ -38,6 +38,7 @@ namespace SaintsField.SaintsXPathParser
             // Debug.Log($"get filter raw {value}");
             foreach (string chunk in Parse(value, '[', ']'))
             {
+                // Debug.Log($"parsed chunk {value} -> {chunk}");
                 List<(XPathAttrBase attrBase, FilterComparerBase filterComparerBase)> orFilters =
                     new List<(XPathAttrBase attrBase, FilterComparerBase filterComparerBase)>();
 
@@ -64,10 +65,12 @@ namespace SaintsField.SaintsXPathParser
 
         private static IEnumerable<string> SplitOrFilter(string chunk)
         {
-            StringBuilder singleQuote = null;
-            StringBuilder doubleQuote = null;
+            StringBuilder quote = null;
+            char quoteChar = '\0';
 
             StringBuilder orChunk = new StringBuilder();
+
+            // Debug.Log($"get string: {chunk}");
 
             List<char> chars = new List<char>(chunk);
 
@@ -75,72 +78,50 @@ namespace SaintsField.SaintsXPathParser
             while (i < chars.Count)
             {
                 char curChar = chars[i];
-                if (curChar == '\'')
+                // Debug.Log($"get char {i}: {curChar}");
+                if (curChar == '\'' || curChar == '"' && quoteChar == curChar)
                 {
-                    if(doubleQuote == null)
+                    if(quote == null)  // start quoting
                     {
-                        if (singleQuote == null)
-                        {
-                            singleQuote = new StringBuilder();
-                            singleQuote.Append(curChar);
-                        }
-                        else
-                        {
-                            singleQuote.Append(curChar);
-                            orChunk.Append(singleQuote.ToString());
-                            singleQuote = null;
-                        }
+                        quote = new StringBuilder();
+                        quote.Append(curChar);
+                        quoteChar = curChar;
+                        // Debug.Log($"start quote {quoteChar}");
                     }
-                    else
+                    else  // end quoting
                     {
-                        doubleQuote.Append(curChar);
-                    }
-                }
-                else if (curChar == '"')
-                {
-                    if(singleQuote == null)
-                    {
-                        if (doubleQuote == null)
-                        {
-                            doubleQuote = new StringBuilder();
-                            doubleQuote.Append(curChar);
-                        }
-                        else
-                        {
-                            doubleQuote.Append(curChar);
-                            orChunk.Append(doubleQuote.ToString());
-                            doubleQuote = null;
-                        }
-                    }
-                    else
-                    {
-                        singleQuote.Append(curChar);
+                        Debug.Assert(quote != null);
+                        // Debug.Log($"end quote {quoteChar}: {curChar}");
+                        quote.Append(curChar);
+                        orChunk.Append(quote.ToString());
+                        quote = null;
+                        quoteChar = '\0';
                     }
                 }
                 else
                 {
                     bool curIsEmptySpace = curChar == ' ';
                     bool has3MoreChars = i + 3 < chars.Count;
-                    if(curIsEmptySpace && has3MoreChars && chars[i + 1] == 'o' && chars[i + 2] == 'r' && chars[i + 3] == ' ')
+                    if(quote == null && curIsEmptySpace && has3MoreChars && chars[i + 1] == 'o' && chars[i + 2] == 'r' && chars[i + 3] == ' ')
                     {
-                        if (singleQuote != null)
-                        {
-                            orChunk.Append(singleQuote.ToString());
-                            singleQuote = null;
-                        }
-                        else if (doubleQuote != null)
-                        {
-                            orChunk.Append(doubleQuote.ToString());
-                            doubleQuote = null;
-                        }
-
-                        yield return orChunk.ToString().Trim();
+                        string orResult = orChunk.ToString().Trim();
+                        // Debug.Log($"yield or chunk: {orResult}");
+                        yield return orResult;
                         orChunk.Clear();
                         i += 3;
                     }
                     else
                     {
-                        orChunk.Append(curChar);
+                        if (quote == null)
+                        {
+                            // Debug.Log($"append chunk: {curChar}");
+                            orChunk.Append(curChar);
+                        }
+                        else
+                        {
+                            // Debug.Log($"append quote {quoteChar}: {curChar}");
+                            quote.Append(curChar);
+                        }
                     }
                 }
 
@@ -150,6 +131,7 @@ namespace SaintsField.SaintsXPathParser
             string orChunkLeft = orChunk.ToString();
             if (!string.IsNullOrWhiteSpace(orChunkLeft))
             {
+                // Debug.Log($"yield left or chunk: {orChunkLeft}");
                 yield return orChunkLeft;
             }
         }

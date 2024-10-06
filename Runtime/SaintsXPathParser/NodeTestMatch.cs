@@ -10,7 +10,7 @@ namespace SaintsField.SaintsXPathParser
         {
             if (nodeTest.NameAny || nodeTest.NameEmpty)
             {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                 Debug.Log($"name matched any={nodeTest.NameAny} empty={nodeTest.NameEmpty} -> {resourceName}, return true");;
 #endif
                 return true;
@@ -20,12 +20,12 @@ namespace SaintsField.SaintsXPathParser
             {
                 if (resourceName == nodeTest.ExactMatch || nodeTest.ExactMatch == ".")
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                     Debug.Log($"name matched {nodeTest.ExactMatch}, return true");;
 #endif
                     return true;
                 }
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                 Debug.Log($"name matched {nodeTest.ExactMatch} failed with {resourceName}, return false");;
 #endif
                 return false;
@@ -36,7 +36,7 @@ namespace SaintsField.SaintsXPathParser
             {
                 if (!checkingName.StartsWith(nodeTest.StartsWith))
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                     Debug.Log($"name startsWith not match: {resourceName} -> {nodeTest.StartsWith}, false");
 #endif
                     return false;
@@ -49,7 +49,7 @@ namespace SaintsField.SaintsXPathParser
             {
                 if (!checkingName.EndsWith(nodeTest.EndsWith))
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                     Debug.Log($"name endsWith not match: {resourceName} -> {nodeTest.EndsWith}, false");
 #endif
                     return false;
@@ -65,7 +65,7 @@ namespace SaintsField.SaintsXPathParser
                     int containIndex = checkingName.IndexOf(axisNameContain, StringComparison.Ordinal);
                     if (containIndex == -1)
                     {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                         Debug.Log($"name contains not match: {axisNameContain} -> {checkingName}, false");
 #endif
                         return false;
@@ -74,7 +74,7 @@ namespace SaintsField.SaintsXPathParser
                 }
             }
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SAINTS_PATH
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
             Debug.Log($"name matched as passed all conditions: {resourceName} -> {nodeTest}");
 #endif
             return true;

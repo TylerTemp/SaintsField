@@ -272,12 +272,34 @@ namespace SaintsField.Editor.Utils
             Debug.Log($"check equal using both UnityEngine.Object on {itemValue} -> {curValue}");
 #endif
             if (curValue is UnityEngine.Object curValueObj
-                && itemValue is UnityEngine.Object itemValueObj
-                && curValueObj == itemValueObj)
+                && itemValue is UnityEngine.Object itemValueObj)
             {
                 // Debug.Log($"GetSelected Unity Object {curValue}");
-                return true;
+                return curValueObj == itemValueObj;
             }
+
+            if (curValue is UnityEngine.Object curValue2)
+            {
+                // Debug.Log($"compare uObject {curValue2} with native {itemValue}/{itemValue == null}/{curValue2 == (itemValue as UnityEngine.Object)}/{curValue2 == null}");
+                if (itemValue == null)
+                {
+                    return curValue2 == null;
+                }
+#pragma warning disable CS0252, CS0253
+                return curValue2 == itemValue;
+#pragma warning restore CS0252, CS0253
+            }
+            if(itemValue is UnityEngine.Object itemValue2)
+            {
+                if(curValue == null)
+                {
+                    return itemValue2 == null;
+                }
+#pragma warning disable CS0252, CS0253
+                return curValue == itemValue2;
+#pragma warning restore CS0252, CS0253
+            }
+
             if (itemValue == null)
             {
                 // Debug.Log($"GetSelected nothing null");

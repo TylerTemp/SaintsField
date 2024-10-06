@@ -43,8 +43,11 @@ step: `axisname::nodetest[predicate]`
 
 **属性**
 
-*   `@layer`: Unity 的 Layer，可以是 string 或 mask: `[@layer=UI]`, `[@layer!=5]`(不支持负数，不支持大小比较)。默认解析数字为 mask。如果明确为层名则使用单引号或双引号均可
-*   `@{tag}`: Unity 的 Tag，可以比较: `[@tag="Main Camera" or @tag="Particle Camera"]`（其实是读取对应属性）
+所有大括号其实都是获取属性值
+
+*   `@layer`: Unity 的 Layer，必须是 string，不能是 mask: `[@layer = UI]`, `[@layer != 'Ignore Raycast']`。层名使用单引号或双引号均可
+*   `@{layer}`: Unity 的 Layer，这个是int值
+*   `@{tag}`: Unity 的 Tag，可以比较: `[@tag = "Main Camera" or @tag = "Particle Camera"]`（其实是读取对应属性）
 *   `@{gameObject}`: 这个是默认行为，获得 `gameObject`。（其实是读取对应属性）
 *   `@{transform}`: 获得 `transform`。（其实是读取对应属性）
 *   `@{rectTransform}`: 获得 `RectTransform`。（其实是`GetComponents(RectTransform)[0]`的缩写）
@@ -81,6 +84,10 @@ step: `axisname::nodetest[predicate]`
 
 比如，搜索某个资源可以直接: `::resources/Cards/Wizard-*/*`
 
-复杂点的例子：过滤某些资源则可以: `myNode/player*/[@resource-path="Cards/Wizard-*"]`
+复杂点的例子：过滤某些资源则可以: `myNode/player*/[@resource-path = "Cards/Wizard-*"]`
 
 过滤资源必须是 Resources 下的Prefab 的: `myNode/player*/[@resources]`
+
+**predicate**
+
+必须有空格

@@ -17,7 +17,9 @@ namespace SaintsField.SaintsXPathParser
         {
             foreach ((int stepSep, string stepContent) in SplitXPath(xPath))
             {
+                // Debug.Log($"stepContent={stepContent}");
                 (Axis axis, string leftStepPart) = SplitAxisFromStep(stepContent);
+                // Debug.Log($"leftStepPart={leftStepPart}");
                 (string nodeTestRaw, string attrRaw, string predicatesRaw) = SplitStep(leftStepPart);
 
                 NodeTest nodeTest = ParseNodeTest(nodeTestRaw);
@@ -58,8 +60,8 @@ namespace SaintsField.SaintsXPathParser
         {
             StringBuilder stepBuilder = new StringBuilder();
 
-            StringBuilder quoteBuilder = null;
-            char quoteType = '\0';
+            StringBuilder quote = null;
+            char quoteChar = '\0';
 
             Queue<char> chars = new Queue<char>(xPath);
 
@@ -77,8 +79,8 @@ namespace SaintsField.SaintsXPathParser
                         sepCount = 1;
                         hasContent = false;
                         stepBuilder.Clear();
-                        quoteBuilder = null;
-                        quoteType = '\0';
+                        quote = null;
+                        quoteChar = '\0';
                     }
                     else  // continued `/`
                     {
@@ -88,46 +90,46 @@ namespace SaintsField.SaintsXPathParser
                 else
                 {
                     hasContent = true;
-                    bool isSingleQuote = curChar == '\'';
-                    bool isDoubleQuote = curChar == '"';
-                    bool inSingleQuote = quoteType == '\'';
-                    bool inDoubleQuote = quoteType == '"';
-
-                    bool matchedQuote = (isSingleQuote && inSingleQuote) || (isDoubleQuote && inDoubleQuote);
-                    if (isSingleQuote || isDoubleQuote)
+                    if (curChar == '\'' || curChar == '"' && quoteChar == curChar)
                     {
-                        if (quoteBuilder == null)  // new quote
+                        if(quote == null)  // start quoting
                         {
-                            quoteType = curChar;
-                            quoteBuilder = new StringBuilder();
-                            quoteBuilder.Append(curChar);
+                            quote = new StringBuilder();
+                            quote.Append(curChar);
+                            quoteChar = curChar;
+                            // Debug.Log($"start quote {quoteChar}");
                         }
-                        else  // still in quote
+                        else  // end quoting
                         {
-                            if (matchedQuote)  // same quote, now close it
-                            {
-                                quoteBuilder.Append(curChar);
-                                stepBuilder.Append(quoteBuilder.ToString());
-                                quoteBuilder = null;
-                            }
-                            else  // keep quoting
-                            {
-                                quoteBuilder.Append(curChar);
-                            }
+                            quote.Append(curChar);
+                            string quoteResult = quote.ToString();
+                            // Debug.Log($"end quote {quoteChar}: {quoteResult}");
+                            stepBuilder.Append(quoteResult);
+                            quote = null;
+                            quoteChar = '\0';
                         }
                     }
                     else  // not in any quote
                     {
-                        stepBuilder.Append(curChar);
+                        if (quote == null)
+                        {
+                            // Debug.Log($"append chunk: {curChar}");
+                            stepBuilder.Append(curChar);
+                        }
+                        else
+                        {
+                            // Debug.Log($"append quote {quoteChar}: {curChar}");
+                            quote.Append(curChar);
+                        }
                     }
                 }
             }
 
             if (hasContent)
             {
-                if (quoteBuilder != null)
+                if (quote != null)
                 {
-                    stepBuilder.Append(quoteBuilder.ToString());
+                    stepBuilder.Append(quote.ToString());
                 }
                 yield return (sepCount, stepBuilder.ToString());
             }
@@ -201,14 +203,19 @@ namespace SaintsField.SaintsXPathParser
                 predicates = step.Substring(bracketSepIndex);
             }
 
+            // Debug.Log($"bracketSepIndex={bracketSepIndex}, step={step}, predicates={predicates}");
+
             string nodeTest = noPredicatesPart;
             string attr = "";
+
             // ReSharper disable once InvertIf
             if (attrSepIndex != -1)
             {
                 nodeTest = noPredicatesPart.Substring(0, attrSepIndex);
                 attr = noPredicatesPart.Substring(attrSepIndex);
             }
+
+            // Debug.Log($"parse predicates, attrSepIndex={attrSepIndex}: {step} -> {predicates}");
 
             return (nodeTest, attr, predicates);
         }

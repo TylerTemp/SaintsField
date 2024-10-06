@@ -5,7 +5,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
     {
         public override string ToString()
         {
-            return "@resource-path";
+            return "@:resource-path:";
         }
     }
 }

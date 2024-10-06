@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System;
+using UnityEngine;
 
 namespace SaintsField.SaintsXPathParser.XPathFilter
 {
@@ -14,6 +15,7 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
 
         public static FilterComparerBase Parser(string fullPart)
         {
+            // Debug.Log(fullPart);
             if (fullPart == "")
             {
                 return new FilterComparerTruly();
@@ -29,53 +31,57 @@ namespace SaintsField.SaintsXPathParser.XPathFilter
                 return new FilterComparerInt(FilterComparer.Equal, -1);
             }
 
-            bool quoted = (fullPart.StartsWith("\"") && fullPart.EndsWith("\"")) ||
-                          (fullPart.StartsWith("'") && fullPart.EndsWith("'"));
-            if (quoted)
-            {
-                return new FilterComparerString(FilterComparer.Equal, fullPart.Substring(1, fullPart.Length - 2));
-            }
-
-
             string[] split = fullPart.Split(new[]{' '}, 2);
             string comparerPart = split[0];
-            string numPart = split[1];
+            FilterComparer comparer = GetComPart(comparerPart);
+            string numPart = split[1].Trim();
 
+            bool quoted = (numPart.StartsWith("\"") && numPart.EndsWith("\"")) ||
+                          (numPart.StartsWith("'") && numPart.EndsWith("'"));
+
+            if (quoted)
+            {
+                string nonQuoted = numPart.Substring(1, numPart.Length - 2);
+                // Debug.Log($"string {comparer}: {nonQuoted}");
+                return new FilterComparerString(comparer, nonQuoted);
+            }
+
+            return int.TryParse(numPart, out int num)
+                // ReSharper disable once RedundantCast
+                ? (FilterComparerBase)new FilterComparerInt(comparer, num)
+                : new FilterComparerString(comparer, numPart);
+        }
+
+        private static FilterComparer GetComPart(string comparerPart)
+        {
             if (comparerPart.StartsWith("!="))
             {
-                return int.TryParse(numPart, out int num)
-                    // ReSharper disable once RedundantCast
-                    ? (FilterComparerBase)new FilterComparerInt(FilterComparer.NotEqual, num)
-                    : new FilterComparerString(FilterComparer.NotEqual, numPart);
+                return FilterComparer.NotEqual;
             }
 
             if (comparerPart.StartsWith("="))
             {
-                return int.TryParse(numPart, out int num)
-                    // ReSharper disable once RedundantCast
-                    ? (FilterComparerBase)new FilterComparerInt(FilterComparer.Equal, num)
-                    : new FilterComparerString(FilterComparer.Equal, numPart);
+                return FilterComparer.Equal;
             }
 
             if (comparerPart.StartsWith(">="))
             {
-                return new FilterComparerInt(FilterComparer.GreaterEqual, int.Parse(numPart));
+                return FilterComparer.GreaterEqual;
             }
 
             if (comparerPart.StartsWith(">"))
             {
-                return new FilterComparerInt(FilterComparer.Greater, int.Parse(numPart));
+                return FilterComparer.Greater;
             }
 
             if (comparerPart.StartsWith("<="))
             {
-                return new FilterComparerInt(FilterComparer.LessEqual, int.Parse(numPart));
+                return FilterComparer.LessEqual;
             }
 
-            // ReSharper disable once InvertIf
             if (comparerPart.StartsWith("<"))
             {
-                return new FilterComparerInt(FilterComparer.Less, int.Parse(numPart));
+                return FilterComparer.Less;
             }
 
             throw new ArgumentOutOfRangeException(nameof(comparerPart), comparerPart, null);

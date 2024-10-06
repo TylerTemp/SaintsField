@@ -22,18 +22,18 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
             // ReSharper disable once ReplaceSubstringWithRangeIndexer
             string attrTrim = attrString.Substring(1);
 
-            if (attrTrim == "layer")
+            if (attrTrim.StartsWith("layer"))
             {
-                return (new XPathAttrLayer(), "");
+                return (new XPathAttrLayer(), attrTrim.Substring("layer".Length).Trim());
             }
             if(attrTrim.StartsWith("resource-path()"))
             {
-                return (new XPathAttrResourcePath(), attrTrim.Substring(15).Trim());
+                return (new XPathAttrResourcePath(), attrTrim.Substring("resource-path()".Length).Trim());
             }
 
             if (attrTrim.StartsWith("asset-path()"))
             {
-                return (new XPathAttrAssetPath(), attrTrim.Substring(12).Trim());
+                return (new XPathAttrAssetPath(), attrTrim.Substring("asset-path()".Length).Trim());
             }
 
             if(attrTrim.StartsWith("{"))
@@ -43,9 +43,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
                 return (new XPathAttrFakeEval(evalString), attrTrim.Substring(endBracketIndex + 1).Trim());
             }
 
-
-
-            throw new ArgumentOutOfRangeException(nameof(attrString), attrString, null);
+            throw new ArgumentOutOfRangeException(nameof(attrString), attrTrim, $"invalid attr {attrString}");
         }
 
     }

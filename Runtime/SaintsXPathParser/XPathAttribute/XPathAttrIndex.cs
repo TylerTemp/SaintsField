@@ -12,7 +12,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
 
         public override string ToString()
         {
-            return $"@index{(Last ? "{last()}" : "")}";
+            return $"@:index{(Last ? "{last()}" : "")}:";
         }
     }
 }
