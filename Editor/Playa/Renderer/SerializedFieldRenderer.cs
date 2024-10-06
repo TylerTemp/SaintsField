@@ -802,13 +802,16 @@ namespace SaintsField.Editor.Playa.Renderer
             const float buttonWidth = 19;
             // const float pagingLabelWidth = 35;
             const float pagingLabelWidth = 30;
+            const float pagingSepWidth = 8;
 
             const float gap = 5;
 
             (Rect titleRect, Rect controlRect) = RectUtils.SplitHeightRect(rect, EditorGUIUtility.singleLineHeight);
             controlRect.height -= 1;
 
-            if(GUI.Button(titleRect, "", GUIStyle.none))
+            (Rect titleFoldRect, Rect titleButtonRect) = RectUtils.SplitWidthRect(titleRect, 16);
+
+            if(GUI.Button(titleButtonRect, "", GUIStyle.none))
             {
                 _imGuiListInfo.Property.isExpanded = !_imGuiListInfo.Property.isExpanded;
                 return;
@@ -833,11 +836,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 _curXml = preCheckResult.RichLabelXml;
 
-                _richTextDrawer.DrawChunks(titleRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
+                _richTextDrawer.DrawChunks(titleButtonRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
             }
             else
             {
-                EditorGUI.LabelField(titleRect, _imGuiListInfo.Property.displayName);
+                EditorGUI.LabelField(titleButtonRect, _imGuiListInfo.Property.displayName);
             }
 
             if (_imGuiListInfo.Property.isExpanded)
@@ -846,27 +849,19 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     _iconDown = Util.LoadResource<Texture2D>("classic-dropdown.png");
                 }
-                GUI.DrawTexture(new Rect(titleRect)
-                {
-                    x = titleRect.x + titleRect.width - 16,
-                    width = 16,
-                }, _iconDown);
+                GUI.DrawTexture(titleFoldRect, _iconDown);
             }
             else
             {
-                if (!_iconLeft)
+                if (!_iconRight)
                 {
-                    _iconLeft = Util.LoadResource<Texture2D>("classic-dropdown-left.png");
+                    _iconRight = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
                 }
-                GUI.DrawTexture(new Rect(titleRect)
-                {
-                    x = titleRect.x + titleRect.width - 16,
-                    width = 16,
-                }, _iconLeft);
+                GUI.DrawTexture(titleFoldRect, _iconRight);
                 return;
             }
 
-            float searchInputWidth = rect.width - inputWidth * 2 - itemsLabelWidth - buttonWidth * 2 - pagingLabelWidth;
+            float searchInputWidth = rect.width - inputWidth * 2 - itemsLabelWidth - pagingSepWidth - buttonWidth * 2 - pagingLabelWidth;
 
             (Rect searchRect, Rect pagingRect) = RectUtils.SplitWidthRect(controlRect, _imGuiListInfo.HasPaging? searchInputWidth: controlRect.width);
 
@@ -897,17 +892,38 @@ namespace SaintsField.Editor.Playa.Renderer
                 _imGuiListInfo.NumberOfItemsPrePage = EditorGUI.IntField(numberOfItemsPerPageRect, GUIContent.none,
                     _imGuiListInfo.NumberOfItemsPrePage);
 
-                Rect totalItemRect = new Rect(numberOfItemsPerPageRect)
+                Rect numberOfItemsSepRect = new Rect(numberOfItemsPerPageRect)
                 {
                     x = numberOfItemsPerPageRect.x + numberOfItemsPerPageRect.width,
+                    width = pagingSepWidth,
+                };
+                EditorGUI.LabelField(numberOfItemsSepRect, $"/");
+
+                Rect numberOfItemsTotalRect = new Rect(numberOfItemsSepRect)
+                {
+                    x = numberOfItemsSepRect.x + numberOfItemsSepRect.width,
                     width = itemsLabelWidth,
                 };
-                EditorGUI.LabelField(totalItemRect, $"/ {_imGuiListInfo.PagingInfo.IndexesAfterSearch.Count} Items");
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newCount = EditorGUI.DelayedIntField(numberOfItemsTotalRect, GUIContent.none,
+                        _imGuiListInfo.PagingInfo.IndexesAfterSearch.Count);
+                    if (changed.changed)
+                    {
+                        _imGuiListInfo.Property.arraySize = newCount;
+                        _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
+                    }
+                }
                 // EditorGUI.LabelField(totalItemRect, $"/ 8888 Items");
 
-                Rect prePageRect = new Rect(totalItemRect)
+                EditorGUI.LabelField(numberOfItemsTotalRect, "Items", new GUIStyle("label") { alignment = TextAnchor.MiddleRight, normal =
                 {
-                    x = totalItemRect.x + totalItemRect.width,
+                    textColor = Color.gray,
+                }, fontStyle = FontStyle.Italic});
+
+                Rect prePageRect = new Rect(numberOfItemsTotalRect)
+                {
+                    x = numberOfItemsTotalRect.x + numberOfItemsTotalRect.width,
                     width = buttonWidth,
                 };
                 using (new EditorGUI.DisabledScope(_imGuiListInfo.PagingInfo.CurPageIndex <= 0))
