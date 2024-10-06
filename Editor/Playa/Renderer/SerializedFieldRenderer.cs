@@ -796,10 +796,23 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 int arraySize = property.arraySize;
                 bool canNotRemove = arraySizeAttribute.Min >= 0 && arraySize <= arraySizeAttribute.Min;
-                _imGuiReorderableList.displayRemove = !canNotRemove;
+                bool canRemove = !canNotRemove;
+                // Debug.Log($"can remove: {!canNotRemove}");
+                // if(_imGuiReorderableList.displayRemove != canRemove)
+                // {
+                //     _imGuiReorderableList.displayRemove = canRemove;
+                // }
+                // this is broken in 2019.1 I don't know why
+                _imGuiReorderableList.displayRemove = canRemove;
 
                 bool canNotAdd = arraySizeAttribute.Max >= 0 && arraySize >= arraySizeAttribute.Max;
-                _imGuiReorderableList.displayAdd = !canNotAdd;
+                bool canAdd = !canNotAdd;
+                // Debug.Log($"can add: {!canNotAdd}");
+                // if (_imGuiReorderableList.displayAdd != canAdd)
+                // {
+                //     _imGuiReorderableList.displayAdd = canAdd;
+                // }
+                _imGuiReorderableList.displayAdd = canAdd;
             }
 
             // Debug.Log(ReorderableList.defaultBehaviours);
@@ -1038,9 +1051,17 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private float DrawListDrawerItemHeight(int index)
         {
-            return _imGuiListInfo.PagingInfo.IndexesCurPage.Contains(index)
-                ? EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(index), true)
-                : 0;
+            if (_imGuiListInfo.PagingInfo.IndexesCurPage.Contains(index))
+            {
+                if(index >= _imGuiListInfo.Property.arraySize)
+                {
+                    return 0;
+                }
+                SerializedProperty element = FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(index);
+                return EditorGUI.GetPropertyHeight(element, true);
+            }
+
+            return 0;
         }
 
         private void DrawListDrawerItem(Rect rect, int index, bool isActive, bool isFocused)
