@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.3.8 ##
+
+1.  `ArraySize` allow to set range, implements [#77](https://github.com/TylerTemp/SaintsField/issues/77)
+2.  If you have `ListDrawerSettings` enabled, the `Add` and `Remove` button will be disabled (removed) accordingly if you have also have `ArraySize`
+3.  Improve logic and fix some bugs for `ListDrawerSettings` for IMGUI
+4.  **Experimental** `GetByXPath` fix predicates parsing
+
 ## 3.3.7 ##
 
 1.  Use `AdvancedDropdown` for `ReferencePicker`, implement [#87](https://github.com/TylerTemp/SaintsField/issues/87)
