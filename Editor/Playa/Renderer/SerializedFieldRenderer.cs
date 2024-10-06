@@ -790,30 +790,38 @@ namespace SaintsField.Editor.Playa.Renderer
                 _imGuiReorderableList.drawHeaderCallback += DrawListDrawerHeader;
                 _imGuiReorderableList.elementHeightCallback += DrawListDrawerItemHeight;
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
+
+                if(arraySizeAttribute != null)
+                {
+                    if(arraySizeAttribute.Min > 0)
+                    {
+                        // _imGuiReorderableList.displayRemove = true;
+                        // _imGuiReorderableList.onRemoveCallback += r =>
+                        // {
+                        //     Debug.Log(r);
+                        // };
+                        _imGuiReorderableList.onCanRemoveCallback += r =>
+                        {
+                            bool canRemove = r.count > arraySizeAttribute.Min;
+                            // Debug.Log($"canRemove={canRemove}, count={r.count}, min={arraySizeAttribute.Min}");
+                            return canRemove;
+                        };
+                    }
+
+                    if (arraySizeAttribute.Max > 0)
+                    {
+                        _imGuiReorderableList.onCanAddCallback += r =>
+                        {
+                            bool canAdd = r.count < arraySizeAttribute.Max;
+                            // Debug.Log($"canAdd={canAdd}, count={r.count}, max={arraySizeAttribute.Max}");
+                            return canAdd;
+                        };
+                    }
+                    // _imGuiReorderableList.onCanAddCallback += _ => !(arraySizeAttribute.Min >= 0 && property.arraySize <= arraySizeAttribute.Min);
+                }
             }
 
-            if(arraySizeAttribute != null)
-            {
-                int arraySize = property.arraySize;
-                bool canNotRemove = arraySizeAttribute.Min >= 0 && arraySize <= arraySizeAttribute.Min;
-                bool canRemove = !canNotRemove;
-                // Debug.Log($"can remove: {!canNotRemove}");
-                // if(_imGuiReorderableList.displayRemove != canRemove)
-                // {
-                //     _imGuiReorderableList.displayRemove = canRemove;
-                // }
-                // this is broken in 2019.1 I don't know why
-                _imGuiReorderableList.displayRemove = canRemove;
 
-                bool canNotAdd = arraySizeAttribute.Max >= 0 && arraySize >= arraySizeAttribute.Max;
-                bool canAdd = !canNotAdd;
-                // Debug.Log($"can add: {!canNotAdd}");
-                // if (_imGuiReorderableList.displayAdd != canAdd)
-                // {
-                //     _imGuiReorderableList.displayAdd = canAdd;
-                // }
-                _imGuiReorderableList.displayAdd = canAdd;
-            }
 
             // Debug.Log(ReorderableList.defaultBehaviours);
             // Debug.Log(ReorderableList.defaultBehaviours.headerBackground);
