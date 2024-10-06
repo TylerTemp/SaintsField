@@ -548,15 +548,17 @@ namespace SaintsField.Editor.Playa.Renderer
 
             ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
 
-            bool hasSearch = listDrawerSettingsAttribute?.Searchable ?? false;
-            bool hasPaging = listDrawerSettingsAttribute?.NumberOfItemsPerPage > 0;
+            // bool hasSearch = listDrawerSettingsAttribute?.Searchable ?? false;
+            // bool hasPaging = listDrawerSettingsAttribute?.NumberOfItemsPerPage > 0;
 
-            if(hasSearch || hasPaging)
+            // if(hasSearch || hasPaging || arraySizeAttribute != null)
+            if(listDrawerSettingsAttribute != null)
             {
                 Rect rect = EditorGUILayout.GetControlRect(true, 0f);
                 float listDrawerHeight = GetHeightIMGUI(rect.width);
                 Rect position = GUILayoutUtility.GetRect(0, listDrawerHeight);
-                DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position);
+                ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
+                DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
                 return;
             }
 
@@ -616,12 +618,14 @@ namespace SaintsField.Editor.Playa.Renderer
 
             bool hasSearch = listDrawerSettingsAttribute.Searchable;
             bool hasPaging = listDrawerSettingsAttribute.NumberOfItemsPerPage > 0;
-
-            if(!hasSearch && !hasPaging)
-            {
-                _imGuiListInfo = null;
-                return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
-            }
+            // ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
+            //
+            // if(!hasSearch && !hasPaging && arraySizeAttribute == null)
+            // {
+            //     Debug.Log($"No IMGUIListInfo");
+            //     _imGuiListInfo = null;
+            //     return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
+            // }
 
             if (_imGuiListInfo == null)
             {
@@ -639,17 +643,24 @@ namespace SaintsField.Editor.Playa.Renderer
                 };
                 FieldWithInfo.SerializedProperty.isExpanded = true;
             }
+            else
+            {
+                _imGuiListInfo.PagingInfo = GetPagingInfo(FieldWithInfo.SerializedProperty, _imGuiListInfo.PageIndex,
+                    _imGuiListInfo.SearchText, _imGuiListInfo.NumberOfItemsPrePage);
+            }
 
             if (!FieldWithInfo.SerializedProperty.isExpanded)
             {
                 return SaintsPropertyDrawer.SingleLineHeight;
             }
 
+            int extraLineCount = (hasSearch || hasPaging) ? 4 : 3;
+
             float height = _imGuiListInfo.PagingInfo.IndexesCurPage
                                .Select(index => EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(index), true))
                                .Sum()
                            + (_imGuiListInfo.PagingInfo.IndexesCurPage.Count == 0? EditorGUIUtility.singleLineHeight: 0)
-                           + SaintsPropertyDrawer.SingleLineHeight * 4;  // header with controller line, footer (plus, minus)
+                           + SaintsPropertyDrawer.SingleLineHeight * extraLineCount;  // header with controller line, footer (plus, minus)
             return height;
         }
 
@@ -670,7 +681,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 if(_imGuiListInfo != null && listDrawerSettingsAttribute != null)
                 {
                     _imGuiListInfo.PreCheckResult = preCheckResult;
-                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position);
+                    ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
+                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
                     return;
                 }
 
@@ -731,7 +743,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        private void DrawListDrawerSettingsField(SerializedProperty property, Rect position)
+        private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute)
         {
             Rect usePosition = new Rect(position)
             {
@@ -773,11 +785,21 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 _imGuiReorderableList = new ReorderableList(property.serializedObject, property, true, true, true, true)
                     {
-                        headerHeight = SaintsPropertyDrawer.SingleLineHeight * 2,
+                        headerHeight = SaintsPropertyDrawer.SingleLineHeight * ((_imGuiListInfo.HasPaging || _imGuiListInfo.HasSearch)? 2: 1),
                     };
                 _imGuiReorderableList.drawHeaderCallback += DrawListDrawerHeader;
                 _imGuiReorderableList.elementHeightCallback += DrawListDrawerItemHeight;
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
+            }
+
+            if(arraySizeAttribute != null)
+            {
+                int arraySize = property.arraySize;
+                bool canNotRemove = arraySizeAttribute.Min >= 0 && arraySize <= arraySizeAttribute.Min;
+                _imGuiReorderableList.displayRemove = !canNotRemove;
+
+                bool canNotAdd = arraySizeAttribute.Max >= 0 && arraySize >= arraySizeAttribute.Max;
+                _imGuiReorderableList.displayAdd = !canNotAdd;
             }
 
             // Debug.Log(ReorderableList.defaultBehaviours);
@@ -810,6 +832,38 @@ namespace SaintsField.Editor.Playa.Renderer
             controlRect.height -= 1;
 
             (Rect titleFoldRect, Rect titleButtonRect) = RectUtils.SplitWidthRect(titleRect, 16);
+
+            if (!_imGuiListInfo.HasPaging && !_imGuiListInfo.HasSearch)  // draw element count container
+            {
+                (Rect titleButtonNewRect, Rect titleItemTotalRect) =
+                    RectUtils.SplitWidthRect(titleButtonRect, titleButtonRect.width - 50);
+                titleItemTotalRect.y += 1;
+                titleItemTotalRect.height -= 2;
+
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newCount = EditorGUI.DelayedIntField(titleItemTotalRect, GUIContent.none,
+                        _imGuiListInfo.PagingInfo.IndexesAfterSearch.Count);
+                    if (changed.changed)
+                    {
+                        _imGuiListInfo.Property.arraySize = newCount;
+                        _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
+                        _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.Property, _imGuiListInfo.PageIndex,
+                            _imGuiListInfo.SearchText, _imGuiListInfo.NumberOfItemsPrePage);
+                        return;
+                    }
+
+                    // EditorGUI.LabelField(new Rect(titleItemTotalRect)
+                    // {
+                    //     width = titleItemTotalRect.width - 6,
+                    // }, "Items", new GUIStyle("label") { alignment = TextAnchor.MiddleRight, normal =
+                    // {
+                    //     textColor = Color.gray,
+                    // }, fontStyle = FontStyle.Italic});
+                }
+
+                titleButtonRect = titleButtonNewRect;
+            }
 
             if(GUI.Button(titleButtonRect, "", GUIStyle.none))
             {
@@ -912,6 +966,9 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         _imGuiListInfo.Property.arraySize = newCount;
                         _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
+                        _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.Property, _imGuiListInfo.PageIndex,
+                            _imGuiListInfo.SearchText, _imGuiListInfo.NumberOfItemsPrePage);
+                        return;
                     }
                 }
                 // EditorGUI.LabelField(totalItemRect, $"/ 8888 Items");
