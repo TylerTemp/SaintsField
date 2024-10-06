@@ -2441,11 +2441,21 @@ Enable `SaintsEditor` if possible, otherwise:
 1.  When the field is 0 length, it'll not be filled to target size.
 2.  You can always change it to 0 size.
 
+If you have `SaintsEditor` enabled, recommend to use it together with `ListDrawerSettings`, the `+` & `-` will be enabled/disabled accordingly.
+
 Parameters:
 
 *   `int size` the size of the array or list
+*   `int min` min value of the size
+*   `int max` max value of the size
 *   `string groupBy = ""` for error message grouping
 *   AllowMultiple: No
+
+For example:
+
+*   `[ArraySize(3)]` will make the array size fixed to 3
+*   `[ArraySize(1, 5)]` will make the array size range to 1-5 (both included)
+*   `[ArraySize(min: 1)]` will make the array size at least 1 (no max value specific). Useful to require a non-empty array.
 
 ```csharp
 using SaintsField;
