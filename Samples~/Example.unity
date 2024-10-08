@@ -9191,12 +9191,12 @@ MonoBehaviour:
   messageMismatch: {fileID: 798353091}
   messageNotFound: {fileID: 798353091}
   noSuchTarget: {fileID: 0}
-  hasSuchTarget: {fileID: 458927138}
+  hasSuchTargetSoShow: {fileID: 0}
   childActive:
   - {fileID: 458927138}
   - {fileID: 662400908}
-  mainCamera: {fileID: 29054846}
-  ignoreRaycast: {fileID: 257594200}
+  mainCamera: {fileID: 0}
+  ignoreRaycast: {fileID: 0}
 --- !u!1 &822381232
 GameObject:
   m_ObjectHideFlags: 0
@@ -11046,7 +11046,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -14485,6 +14484,7 @@ Transform:
   - {fileID: 1500203753}
   - {fileID: 272545722}
   - {fileID: 630270769}
+  - {fileID: 2095648704}
   m_Father: {fileID: 0}
   m_RootOrder: 36
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -14966,7 +14966,7 @@ MonoBehaviour:
   - {fileID: 5246858966939522138, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
   - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
   - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
-  pickMat: {fileID: 2100000, guid: 09fa8ef13abd33f42a267980f8846ff5, type: 2}
+  pickMat: {fileID: 2100000, guid: 03af6470f53b830469257315faf122ad, type: 2}
   multiGetXPaths:
   - {fileID: 7004583026823171687, guid: 9bf4dd99c1a4b7d4fbd3263de3fa7cf3, type: 3}
   - {fileID: 4963078128532305232, guid: d35b56afdb554c441afac72ab884f36e, type: 3}
@@ -22764,6 +22764,61 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boolValue: 1
   <ColorAutoProperty>k__BackingField: {r: 0.600411, g: 1, b: 0.3339622, a: 1}
+--- !u!1 &2095648703
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2095648704}
+  - component: {fileID: 2095648705}
+  m_Layer: 0
+  m_Name: Issue88
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2095648704
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095648703}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2095648705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095648703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629124413d280054586761776601ba72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nonUnityObject:
+    rid: 7833814932006633491
+  unityObject:
+    <V>k__BackingField: {fileID: 2095648705}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7833814932006633491
+      type: {class: ExampleStructOfInterface, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue88, asm: today.comes.saintsfield.Samples}
+      data:
+        DisplayName: 
 --- !u!1 &2096586615
 GameObject:
   m_ObjectHideFlags: 0

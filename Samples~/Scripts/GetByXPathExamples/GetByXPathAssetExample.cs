@@ -17,6 +17,7 @@ namespace SaintsField.Samples.Scripts.GetByXPathExamples
         [GetByXPath(EXP.JustPicker,  "asset:://*.mat"), Required]
         public Material pickMat;
 
+        // a bold search will have serious performance impact, don't do that!
         [GetByXPath(EXP.Silent, "scene:://noSuchObject", "asset:://*.prefab")]
         [GetByXPath("scene:://Rate", "asset:://NoSuchItemInAsset")]
         public GameObject[] multiGetXPaths;

@@ -184,7 +184,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             return ImGuiButtonWidth;
         }

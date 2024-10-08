@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers
         private float _width = -1;
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             if (_width >= 0)
             {
@@ -73,6 +73,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent)
         {
@@ -80,13 +81,13 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) =>
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) =>
             error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, error, MessageType.Error);

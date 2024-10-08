@@ -87,6 +87,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent)
         {
@@ -94,7 +95,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             Object serObject = GetSerObject(property, info, parent);
             float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
@@ -129,7 +130,7 @@ namespace SaintsField.Editor.Drawers
         // private UnityEditor.Editor _editor;
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             Object scriptableObject = GetSerObject(property, info, parent);;
             // _error = property.propertyType != SerializedPropertyType.ObjectReference

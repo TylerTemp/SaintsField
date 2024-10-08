@@ -181,6 +181,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent)
         {
@@ -188,7 +189,7 @@ namespace SaintsField.Editor.Drawers
         }
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             float errorHeight = _errorMsg == "" ? 0 : ImGuiHelpBox.GetHeight(_errorMsg, width, MessageType.Error);
 
@@ -219,7 +220,7 @@ namespace SaintsField.Editor.Drawers
             return errorHeight + subRowHeight;
         }
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            GUIContent label, ISaintsAttribute saintsAttribute, int index1, FieldInfo info, object parent)
         {
             // Debug.Log(_targetIsString);
             if(property.propertyType == SerializedPropertyType.String || !property.isExpanded)

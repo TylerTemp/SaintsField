@@ -14,8 +14,9 @@ namespace SaintsField.Samples.Scripts.GetByXPathExamples
         [GetByXPath(EXP.Message, ".//No/Such/Child")] public GameObject messageNotFound;
 
         // Show if sign the auto target, hide otherwise
+        // Note: this only works for UI Toolkit. For IMGUI, the ShowIf/HideIf will work first, and completely disable the other attributes
         [GetByXPath("./NoSuchTarget!"), ShowIf(nameof(noSuchTarget)), ReadOnly] public GameObject noSuchTarget;
-        [GetByXPath(".//Must*/Child"), ShowIf(nameof(hasSuchTarget)), ReadOnly] public GameObject hasSuchTarget;
+        [GetByXPath(".//Must*/Child"), ShowIf(nameof(hasSuchTargetSoShow)), ReadOnly] public GameObject hasSuchTargetSoShow;
 
         [GetByXPath(".//Child[@{activeSelf}]")] public GameObject[] childActive;
 

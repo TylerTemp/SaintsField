@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers
         #region IMGUI
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string displayError = GetDisplayError(property);
             return EditorGUIUtility.singleLineHeight +
@@ -24,6 +24,7 @@ namespace SaintsField.Editor.Drawers
 
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent)
         {
@@ -31,7 +32,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             Rect leftRect = Draw(position, property, label, saintsAttribute, info, parent);
 

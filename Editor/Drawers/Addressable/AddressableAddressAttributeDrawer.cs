@@ -77,6 +77,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent)
         {
@@ -88,7 +89,7 @@ namespace SaintsField.Editor.Drawers.Addressable
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
             (string error, IReadOnlyList<string> _) = SetupAssetGroup(addressableAddressAttribute);
@@ -98,7 +99,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            GUIContent label, ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
         private static string ErrorNoSettings => "Addressable has no settings created yet.";
 

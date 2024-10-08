@@ -18,47 +18,46 @@ namespace SaintsField.Editor.Drawers
         protected class ErrorInfo
         {
             public string Error = "";
-            public string _execError = "";
+            public string ExecError = "";
         }
 
-        private static Dictionary<string, ErrorInfo> _imGuiSharedErrorInfo = new Dictionary<string, ErrorInfo>();
+        private static readonly Dictionary<string, ErrorInfo> ImGuiSharedErrorInfo = new Dictionary<string, ErrorInfo>();
 
 #if UNITY_2019_2_OR_NEWER
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 #endif
         [InitializeOnLoadMethod]
-        private static void ImGuiClearSharedData() => _imGuiSharedErrorInfo.Clear();
+        private static void ImGuiClearSharedData() => ImGuiSharedErrorInfo.Clear();
 
-
-        protected string GetDisplayError(SerializedProperty property)
+        protected static string GetDisplayError(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            if (!_imGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
+            if (!ImGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
             {
                 return "";
             }
 
-            string Error = errorInfo.Error;
-            string _execError = errorInfo._execError;
+            string error = errorInfo.Error;
+            string execError = errorInfo.ExecError;
 
-            if (Error != "" && _execError != "")
+            if (error != "" && execError != "")
             {
-                return $"{Error}\n\n{_execError}";
+                return $"{error}\n\n{execError}";
             }
-            return $"{Error}{_execError}";
+            return $"{error}{execError}";
         }
 
-        protected ErrorInfo GetOrCreateErrorInfo(SerializedProperty property)
+        protected static ErrorInfo GetOrCreateErrorInfo(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            if (!_imGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
+            if (!ImGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
             {
                 errorInfo = new ErrorInfo
                 {
                     Error = "",
-                    _execError = "",
+                    ExecError = "",
                 };
-                _imGuiSharedErrorInfo[key] = errorInfo;
+                ImGuiSharedErrorInfo[key] = errorInfo;
             }
 
             return errorInfo;
@@ -90,7 +89,7 @@ namespace SaintsField.Editor.Drawers
 
             if (GUI.Button(buttonRect, string.Empty))
             {
-                GetOrCreateErrorInfo(property)._execError = CallButtonFunc(property, decButtonAttribute, info, target);
+                GetOrCreateErrorInfo(property).ExecError = CallButtonFunc(property, decButtonAttribute, info, target);
             }
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;

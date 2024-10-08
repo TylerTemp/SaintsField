@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Drawers
     {
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string displayError = GetDisplayError(property);
             return EditorGUIUtility.singleLineHeight +

@@ -57,6 +57,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent)
         {
@@ -65,7 +66,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             // EditorGUI.EndDisabledGroup();
 
@@ -81,7 +82,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             // Debug.Log("check extra height!");
             if (_error == "")
@@ -96,7 +97,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
         protected virtual (string error, bool disabled) IsDisabled(SerializedProperty property, FieldInfo info, object target)
         {
             List<bool> allResults = new List<bool>();
-           
+
             ReadOnlyAttribute[] targetAttributes = SerializedUtils.GetAttributesAndDirectParent<ReadOnlyAttribute>(property).attributes;
             foreach (var targetAttribute in targetAttributes)
             {
@@ -106,16 +107,16 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
                 {
                     return (string.Join("\n\n", errors), false);
                 }
-                
+
                 bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
                 // And Mode
                 bool boolResultsOk = boolResults.All(each => each);
                 allResults.Add(editorModeOk && boolResultsOk);
             }
-            
+
             // Or Mode
             bool truly = allResults.Any(each => each);
-            
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
             Debug.Log($"{property.name} final={truly}/ars={string.Join(",", allResults)}");
 #endif

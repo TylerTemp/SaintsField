@@ -17,11 +17,11 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        public readonly bool InitSign;
-        public readonly bool AutoResign;
-        public readonly bool UseResignButton;
-        public readonly bool UsePickerButton;
-        public readonly bool UseErrorMessage;
+        public bool InitSign;
+        public bool AutoResign;
+        public bool UseResignButton;
+        public bool UsePickerButton;
+        public bool UseErrorMessage;
 
         public struct XPathInfo
         {
@@ -32,9 +32,10 @@ namespace SaintsField
 #endif
         }
 
-        public readonly IReadOnlyList<XPathInfo> XPathInfoList;
+        // outer and inner or
+        public readonly IReadOnlyList<IReadOnlyList<XPathInfo>> XPathInfoAndList;
 
-        public GetByXPathAttribute(EXP config, params string[] ePaths)
+        protected void ParseOptions(EXP config)
         {
             InitSign = !config.HasFlag(EXP.NoInitSign);
             UsePickerButton = !config.HasFlag(EXP.NoPicker);
@@ -56,8 +57,13 @@ namespace SaintsField
             {
                 UseErrorMessage = !UseResignButton;
             }
+        }
 
-            XPathInfoList = ePaths.Length == 0
+        public GetByXPathAttribute(EXP config, params string[] ePaths)
+        {
+            ParseOptions(config);
+
+            XPathInfo[] xPathInfoOrList = ePaths.Length == 0
                 ? new[]
                 {
                     new XPathInfo
@@ -84,6 +90,8 @@ namespace SaintsField
                         };
                     })
                     .ToArray();
+
+            XPathInfoAndList = new[] { xPathInfoOrList };
         }
 
         public GetByXPathAttribute(params string[] ePaths) : this(EXP.None, ePaths)

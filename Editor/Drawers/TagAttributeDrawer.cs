@@ -43,16 +43,17 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent) => property.propertyType != SerializedPropertyType.String;
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => property.propertyType != SerializedPropertyType.String
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => property.propertyType != SerializedPropertyType.String
             ? ImGuiHelpBox.GetHeight($"Expect string, get {property.propertyType}", width, MessageType.Error)
             : 0f;
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, $"Expect string, get {property.propertyType}", MessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, $"Expect string, get {property.propertyType}", MessageType.Error);
         #endregion
 
 #if UNITY_2021_3_OR_NEWER

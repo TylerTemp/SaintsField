@@ -420,11 +420,11 @@ namespace SaintsField.Editor.Core
                     : fullWidth / grouped.Count();
 
                 IEnumerable<float> aboveHeights = grouped
-                    .Select(each => each.Value.GetAboveExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute, fieldInfo, parent))
+                    .Select(each => each.Value.GetAboveExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute, each.Key.Index, fieldInfo, parent))
                     .Where(each => each > 0)
                     .DefaultIfEmpty(0);
                 IEnumerable<float> belowHeights = grouped
-                    .Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute, fieldInfo, parent))
+                    .Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute, each.Key.Index, fieldInfo, parent))
                     .Where(each => each > 0)
                     .DefaultIfEmpty(0);
 
@@ -484,14 +484,14 @@ namespace SaintsField.Editor.Core
 
         protected virtual float GetAboveExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return 0;
         }
 
         protected virtual float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return 0;
         }
@@ -1332,7 +1332,7 @@ namespace SaintsField.Editor.Core
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     float curWidth =
                         drawerInstance.GetPostFieldWidth(fieldUseRectWithPost, property, GUIContent.none,
-                            eachAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
+                            eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index, onGUIPayload, fieldInfo, parent);
                     postFieldWidth += curWidth;
                     postFieldInfoList.Add((
                         eachAttributeWithIndex,
@@ -1478,42 +1478,42 @@ namespace SaintsField.Editor.Core
 
                 // Debug.Log($"belowRect={belowRect}");
 
-                Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>> groupedDrawers =
-                    new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
+                Dictionary<string, List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>> groupedDrawers =
+                    new Dictionary<string, List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>>();
                 // Debug.Log($"allSaintsAttributes={allSaintsAttributes.Count}");
                 foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
                 {
                     SaintsPropertyDrawer drawerInstance = GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     // Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
                     // ReSharper disable once InvertIf
-                    if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute, fieldInfo, parent))
+                    if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index, fieldInfo, parent))
                     {
                         if (!groupedDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
-                                out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
+                                out List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)> currentGroup))
                         {
-                            currentGroup = new List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>();
+                            currentGroup = new List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>();
                             groupedDrawers[eachAttributeWithIndex.SaintsAttribute.GroupBy] = currentGroup;
                         }
 
-                        currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
+                        currentGroup.Add((drawerInstance, eachAttributeWithIndex));
                         // _usedDrawerTypes.Add(eachDrawer[0]);
                         // UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
                     }
                 }
 
-                foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>
+                foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>>
                              // ReSharper disable once UseDeconstruction
                              groupedDrawerInfo in groupedDrawers)
                 {
                     string groupBy = groupedDrawerInfo.Key;
-                    List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfo =
+                    List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)> drawerInfo =
                         groupedDrawerInfo.Value;
                     // Debug.Log($"draw below: {groupBy}/{bugFixCopyLabel.text}/{label.text}");
                     if (groupBy == "")
                     {
-                        foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfo)
+                        foreach ((SaintsPropertyDrawer drawerInstance, SaintsWithIndex saintsWithIndex) in drawerInfo)
                         {
-                            belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
+                            belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
                         }
                     }
                     else
@@ -1523,14 +1523,14 @@ namespace SaintsField.Editor.Core
                         float height = 0;
                         for (int index = 0; index < drawerInfo.Count; index++)
                         {
-                            (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfo[index];
+                            (SaintsPropertyDrawer drawerInstance, SaintsWithIndex saintsWithIndex) = drawerInfo[index];
                             Rect eachRect = new Rect(belowRect)
                             {
                                 x = belowRect.x + eachWidth * index,
                                 width = eachWidth,
                             };
                             Rect leftRect =
-                                drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
+                                drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
                             height = Mathf.Max(height, leftRect.y - eachRect.y);
                         }
 
@@ -2171,7 +2171,7 @@ namespace SaintsField.Editor.Core
 
 
         protected virtual float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             return 0;
         }
@@ -2201,6 +2201,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
             FieldInfo info,
             object parent)
         {
@@ -2215,7 +2216,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual Rect DrawBelow(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            GUIContent label, ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return position;
         }
