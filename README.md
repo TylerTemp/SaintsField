@@ -70,12 +70,9 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.3.8**
+**3.3.9**
 
-1.  `ArraySize` allow to set range, implements [#77](https://github.com/TylerTemp/SaintsField/issues/77)
-2.  If you have `ListDrawerSettings` enabled, the `Add` and `Remove` buttons will be disabled/enabled accordingly if you also have `ArraySize`
-3.  Improve logic and fix some bugs for `ListDrawerSettings` for IMGUI
-4.  **Experimental** `GetByXPath` fix predicates parsing
+**Experimental** IMGUI for `GetByXPath`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
