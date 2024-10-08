@@ -534,7 +534,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
             if (!imTheFirst)
             {
-                Debug.Log($"{property.propertyPath} not first");
                 return;
             }
 
