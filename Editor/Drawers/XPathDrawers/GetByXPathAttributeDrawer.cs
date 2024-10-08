@@ -96,6 +96,51 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             protected override bool FetchAllAssetsFilter(ItemInfo itemInfo) => true;
         }
 
+
+        private void OpenPicker(SerializedProperty property, FieldInfo info, IReadOnlyList<GetByXPathAttribute> getByXPathAttributes, Type expectedType, Type interfaceType, Action<object> onValueChanged, object updatedParent)
+        {
+            (string getValueError, int _, object curValue) = Util.GetValue(property, info, updatedParent);
+
+            if (!(curValue is Object) && curValue != null)
+            {
+                Debug.LogError($"targetValue is not Object: {curValue}");
+                return;
+            }
+
+            Object curValueObj = (Object)curValue;
+
+            if (getValueError != "")
+            {
+                Debug.LogError(getValueError);
+                return;
+            }
+
+            (string error, IReadOnlyList<object> getXPathResults) = GetXPathValues(getByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+                expectedType, interfaceType, property, info, updatedParent);
+            if (error != "")
+            {
+                Debug.LogError(error);
+                return;
+            }
+
+            Object[] objResults = getXPathResults.OfType<Object>().ToArray();
+            List<Object> assetObj = new List<Object>();
+            List<Object> sceneObj = new List<Object>();
+            foreach (Object objResult in objResults)
+            {
+                if (AssetDatabase.GetAssetPath(objResult) != "")
+                {
+                    assetObj.Add(objResult);
+                }
+                else
+                {
+                    sceneObj.Add(objResult);
+                }
+            }
+
+            GetByPickerWindow.Open(curValueObj, EPick.Assets | EPick.Scene, assetObj, sceneObj, onValueChanged.Invoke);
+        }
+
         #region IMGUI
         private Texture2D _refreshIcon;
         private Texture2D _removeIcon;
@@ -764,49 +809,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        private void OpenPicker(SerializedProperty property, FieldInfo info, IReadOnlyList<GetByXPathAttribute> getByXPathAttributes, Type expectedType, Type interfaceType, Action<object> onValueChanged, object updatedParent)
-        {
-            (string getValueError, int _, object curValue) = Util.GetValue(property, info, updatedParent);
-
-            if (!(curValue is Object) && curValue != null)
-            {
-                Debug.LogError($"targetValue is not Object: {curValue}");
-                return;
-            }
-
-            Object curValueObj = (Object)curValue;
-
-            if (getValueError != "")
-            {
-                Debug.LogError(getValueError);
-                return;
-            }
-
-            (string error, IReadOnlyList<object> getXPathResults) = GetXPathValues(getByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
-                expectedType, interfaceType, property, info, updatedParent);
-            if (error != "")
-            {
-                Debug.LogError(error);
-                return;
-            }
-
-            Object[] objResults = getXPathResults.OfType<Object>().ToArray();
-            List<Object> assetObj = new List<Object>();
-            List<Object> sceneObj = new List<Object>();
-            foreach (Object objResult in objResults)
-            {
-                if (AssetDatabase.GetAssetPath(objResult) != "")
-                {
-                    assetObj.Add(objResult);
-                }
-                else
-                {
-                    sceneObj.Add(objResult);
-                }
-            }
-
-            GetByPickerWindow.Open(curValueObj, EPick.Assets | EPick.Scene, assetObj, sceneObj, onValueChanged.Invoke);
-        }
 
 #if !(SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE)
 
@@ -1884,11 +1886,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         Component[] components;
                         if (result is GameObject go)
                         {
-                            components = go.GetComponents<Component>();
+                            components = go.GetComponents<Component>().Where(each => each != null).ToArray();
                         }
                         else if (result is Component comp)
                         {
-                            components = comp.GetComponents<Component>();
+                            components = comp.GetComponents<Component>().Where(each => each != null).ToArray();
                         }
                         else
                         {
