@@ -33,7 +33,7 @@ namespace SaintsField
         }
 
         // outer and inner or
-        public readonly IReadOnlyList<IReadOnlyList<XPathInfo>> XPathInfoAndList;
+        public IReadOnlyList<IReadOnlyList<XPathInfo>> XPathInfoAndList;
 
         protected void ParseOptions(EXP config)
         {

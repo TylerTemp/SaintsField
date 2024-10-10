@@ -21,6 +21,7 @@ using UnityEngine.UIElements;
 namespace SaintsField.Editor.Drawers.XPathDrawers
 {
     [CustomPropertyDrawer(typeof(GetByXPathAttribute))]
+    [CustomPropertyDrawer(typeof(GetComponentAttribute))]
     public class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
         private class GetByPickerWindow : ObjectSelectWindow

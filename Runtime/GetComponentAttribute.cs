@@ -1,23 +1,46 @@
 ﻿using System;
 using System.Diagnostics;
-using SaintsField.Playa;
-using UnityEngine;
+using System.Linq;
+#if UNITY_EDITOR
+using SaintsField.SaintsXPathParser;
+#endif
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class GetComponentAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
+    public class GetComponentAttribute: GetByXPathAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy { get; }
 
         // ReSharper disable once InconsistentNaming
-        public readonly Type CompType;
+        // public readonly Type CompType;
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")
         {
-            CompType = compType;
-            GroupBy = groupBy;
+            string toParse;
+            if (compType == null)
+            {
+                toParse = ".";
+            }
+            else
+            {
+                string nameSpace = compType.Namespace;
+                string typeName = compType.Name;
+                toParse = $"[@GetComponent({nameSpace}.{typeName})]";
+            }
+
+            ParseOptions(EXP.None);
+
+            XPathInfoAndList = new[] { new[]
+            {
+                new XPathInfo
+                {
+                    IsCallback = false,
+                    Callback = "",
+#if UNITY_EDITOR
+                    XPathSteps = XPathParser.Parse(toParse).ToArray(),
+#endif
+                },
+            } };
         }
     }
 }
