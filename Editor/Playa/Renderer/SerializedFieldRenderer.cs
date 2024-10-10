@@ -1165,7 +1165,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 case SerializedPropertyType.Rect:
                     return property.rectValue.ToString().Contains(search);
                 case SerializedPropertyType.ArraySize:
-                    return property.arraySize.ToString().Contains(search);
+                    if (property.isArray)
+                    {
+                        return property.arraySize.ToString().Contains(search);
+                    }
+                    goto default;
                 case SerializedPropertyType.Character:
                     return property.intValue.ToString().Contains(search);
                 case SerializedPropertyType.AnimationCurve:
