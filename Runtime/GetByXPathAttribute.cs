@@ -15,7 +15,7 @@ namespace SaintsField
     public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
+        public virtual string GroupBy => "";
 
         public bool InitSign;
         public bool AutoResign;

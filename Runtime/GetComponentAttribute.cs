@@ -10,11 +10,24 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetComponentAttribute: GetByXPathAttribute
     {
-
-        // ReSharper disable once InconsistentNaming
-        // public readonly Type CompType;
+        public override string GroupBy => _groupBy;
+        private string _groupBy;
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")
+        {
+            ParseOptions(EXP.None);
+            ParseXPath(compType);
+            _groupBy = groupBy;
+        }
+
+        public GetComponentAttribute(EXP exp, Type compType = null, string groupBy = "")
+        {
+            ParseOptions(exp);
+            ParseXPath(compType);
+            _groupBy = groupBy;
+        }
+
+        private void ParseXPath(Type compType)
         {
             string toParse;
             if (compType == null)
@@ -27,8 +40,6 @@ namespace SaintsField
                 string typeName = compType.Name;
                 toParse = $"[@GetComponent({nameSpace}.{typeName})]";
             }
-
-            ParseOptions(EXP.None);
 
             XPathInfoAndList = new[] { new[]
             {
