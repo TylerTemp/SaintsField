@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SaintsField.Playa;
@@ -22,6 +23,7 @@ namespace SaintsField
         public bool UseResignButton;
         public bool UsePickerButton;
         public bool UseErrorMessage;
+        public bool KeepOriginalPicker;
 
         public struct XPathInfo
         {
@@ -39,6 +41,7 @@ namespace SaintsField
         {
             InitSign = !config.HasFlag(EXP.NoInitSign);
             UsePickerButton = !config.HasFlag(EXP.NoPicker);
+            KeepOriginalPicker = UsePickerButton && config.HasFlag(EXP.KeepOriginalPicker);
             AutoResign = !config.HasFlag(EXP.NoAutoResign);
             if (AutoResign)
             {
@@ -96,6 +99,18 @@ namespace SaintsField
 
         public GetByXPathAttribute(params string[] ePaths) : this(EXP.None, ePaths)
         {
+        }
+
+        protected static string GetComponentFilter(Type compType)
+        {
+            if (compType == null)
+            {
+                return "";
+            }
+
+            string nameSpace = compType.Namespace;
+            string typeName = compType.Name;
+            return $"[@{{GetComponent({nameSpace}.{typeName})}}]";
         }
     }
 }

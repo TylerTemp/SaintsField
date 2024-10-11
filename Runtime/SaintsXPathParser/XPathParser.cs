@@ -177,6 +177,14 @@ namespace SaintsField.SaintsXPathParser
             {
                 return (Axis.Resources, step.Substring("resources::".Length));
             }
+            if(step.StartsWith("resource::"))
+            {
+                return (Axis.Resources, step.Substring("resource::".Length));
+            }
+            if(step.StartsWith("assets::"))
+            {
+                return (Axis.Asset, step.Substring("assets::".Length));
+            }
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if(step.StartsWith("asset::"))
             {

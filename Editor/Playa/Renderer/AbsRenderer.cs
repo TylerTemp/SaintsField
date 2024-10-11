@@ -266,12 +266,8 @@ namespace SaintsField.Editor.Playa.Renderer
 #pragma warning restore 0618
                 case ArraySizeAttribute arraySizeAttribute:
                     return arraySizeAttribute.Min;
-                case GetComponentAttribute getComponentAttribute:
-                    return GetComponentAttributeDrawer.HelperGetArraySize(property, getComponentAttribute, info);
-                case GetComponentInChildrenAttribute getComponentInChildrenAttribute:
-                    return GetComponentInChildrenAttributeDrawer.HelperGetArraySize(property, getComponentInChildrenAttribute, info);
-                case GetComponentInParentsAttribute getComponentInParentsAttribute:
-                    return GetComponentInParentsAttributeDrawer.HelperGetArraySize(property, getComponentInParentsAttribute, info);
+                // case GetComponentInParentsAttribute getComponentInParentsAttribute:
+                //     return GetComponentInParentsAttributeDrawer.HelperGetArraySize(property, getComponentInParentsAttribute, info);
                 case GetComponentInSceneAttribute getComponentInSceneAttribute:
                     return GetComponentInSceneAttributeDrawer.HelperGetArraySize(getComponentInSceneAttribute, info);
                 case GetComponentByPathAttribute getComponentByPathAttribute:

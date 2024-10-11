@@ -14,7 +14,7 @@ namespace SaintsField
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")
         {
-            ParseOptions(EXP.None);
+            ParseOptions(EXP.NoPicker);
             ParseXPath(compType);
             GroupBy = groupBy;
         }
@@ -28,29 +28,21 @@ namespace SaintsField
 
         private void ParseXPath(Type compType)
         {
-            string toParse;
-            if (compType == null)
-            {
-                toParse = ".";
-            }
-            else
-            {
-                string nameSpace = compType.Namespace;
-                string typeName = compType.Name;
-                toParse = $"[@GetComponent({nameSpace}.{typeName})]";
-            }
+            string toParse = GetComponentFilter(compType);
 
-            XPathInfoAndList = new[] { new[]
-            {
-                new XPathInfo
+            XPathInfoAndList = new[] {
+                new[]
                 {
-                    IsCallback = false,
-                    Callback = "",
+                    new XPathInfo
+                    {
+                        IsCallback = false,
+                        Callback = "",
 #if UNITY_EDITOR
-                    XPathSteps = XPathParser.Parse(toParse).ToArray(),
+                        XPathSteps = XPathParser.Parse(toParse).ToArray(),
 #endif
-                },
-            } };
+                    },
+                }
+            };
         }
     }
 }

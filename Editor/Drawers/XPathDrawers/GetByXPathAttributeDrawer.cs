@@ -22,6 +22,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 {
     [CustomPropertyDrawer(typeof(GetByXPathAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentAttribute))]
+    [CustomPropertyDrawer(typeof(GetComponentInChildrenAttribute))]
+    [CustomPropertyDrawer(typeof(GetComponentInParentAttribute))]
+    [CustomPropertyDrawer(typeof(GetComponentInParentsAttribute))]
     public class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
         private class GetByPickerWindow : ObjectSelectWindow
@@ -98,7 +101,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         }
 
 
-        private void OpenPicker(SerializedProperty property, FieldInfo info, IReadOnlyList<GetByXPathAttribute> getByXPathAttributes, Type expectedType, Type interfaceType, Action<object> onValueChanged, object updatedParent)
+        private static void OpenPicker(SerializedProperty property, FieldInfo info, IReadOnlyList<GetByXPathAttribute> getByXPathAttributes, Type expectedType, Type interfaceType, Action<object> onValueChanged, object updatedParent)
         {
             (string getValueError, int _, object curValue) = Util.GetValue(property, info, updatedParent);
 
@@ -1096,6 +1099,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList)
                 {
+                    IReadOnlyList<ResourceInfo> accValues = new []
+                    {
+                        new ResourceInfo
+                        {
+                            ResourceType = ResourceType.Object,
+                            Resource = property.serializedObject.targetObject,
+                        },
+                    };
+
                     IEnumerable<XPathStep> xPathSteps;
                     if (xPathInfo.IsCallback)
                     {
@@ -1113,15 +1125,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     {
                         xPathSteps = xPathInfo.XPathSteps;
                     }
-
-                    IReadOnlyList<ResourceInfo> accValues = new []
-                    {
-                        new ResourceInfo
-                        {
-                            ResourceType = ResourceType.Object,
-                            Resource = property.serializedObject.targetObject,
-                        },
-                    };
 
                     foreach (XPathStep xPathStep in xPathSteps)
                     {
@@ -1149,6 +1152,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         accValues = predicatesResources.ToArray();
                         if (accValues.Count == 0)
                         {
+                            // Debug.Log($"Found 0 in {xPathStep}, break");
     #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                             Debug.Log($"Found 0 in {xPathStep}");
     #endif
@@ -1179,6 +1183,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     if (results.Length != 0)
                     {
                         finalResults.AddRange(results);
+                        break;
                     }
                 }
             }

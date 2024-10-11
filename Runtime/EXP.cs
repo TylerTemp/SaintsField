@@ -13,6 +13,7 @@ namespace SaintsField
         NoResignButton = 1 << 3,
         NoMessage = 1 << 4,
         NoPicker = 1 << 5,
+        KeepOriginalPicker = 1 << 6,
 
         Silent = NoAutoResign | NoMessage,
         JustPicker = NoInitSign | NoAutoResign | NoResignButton | NoMessage,

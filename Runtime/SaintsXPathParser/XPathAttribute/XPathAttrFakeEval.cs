@@ -48,6 +48,7 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
 
         public XPathAttrFakeEval(string evalString)
         {
+            // Debug.Log($"evalString={evalString}");
             List<ExecuteFragment> executeFragments = new List<ExecuteFragment>();
 
             Queue<string> evalFragmentQuery = new Queue<string>(evalString.Split('.'));
@@ -57,9 +58,17 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
                 bool isGetComponent = fragmentStr.StartsWith("GetComponent(");
                 if (isGetComponent || fragmentStr.StartsWith("GetComponents("))
                 {
+                    // Debug.Log($"fragmentStr={fragmentStr}");
                     // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     string getComponentLeftPart = fragmentStr.Substring(fragmentStr.IndexOf('(') + 1);
+                    while (!getComponentLeftPart.Contains(")"))
+                    {
+                        getComponentLeftPart += "." + evalFragmentQuery.Dequeue();
+                    }
+                    // Debug.Log($"getComponentLeftPart={getComponentLeftPart}");
+
                     (string getComponentTarget, string leftFragmentStr) = ReadUntilEndBracket(getComponentLeftPart, evalFragmentQuery);
+                    // Debug.Log($"leftFragmentStr={leftFragmentStr}");
 
                     FilterComparerBase[] leftFilter = leftFragmentStr.StartsWith("[")
                         ? XPathBracketParser.ParseFilter(leftFragmentStr)
@@ -146,14 +155,18 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
         private static (string getComponentTarget, string leftFragmentStr) ReadUntilEndBracket(string getComponentLeftPart, Queue<string> evalFragmentQuery)
         {
             StringBuilder stringBuilder = new StringBuilder();
+            // Debug.Log($"getComponentLeftPart={getComponentLeftPart}");
             Queue<char> chars = new Queue<char>(getComponentLeftPart);
             while(chars.Count > 0)
             {
                 char c = chars.Dequeue();
                 if (c == ')')
                 {
+                    // Debug.Log($"return full chars as we got {c}");
                     return (stringBuilder.ToString(), new string(chars.ToArray()));
                 }
+
+                // Debug.Log($"append char {c}");
 
                 stringBuilder.Append(c);
             }
