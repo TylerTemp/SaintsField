@@ -10,21 +10,20 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetComponentAttribute: GetByXPathAttribute
     {
-        public override string GroupBy => _groupBy;
-        private string _groupBy;
+        public override string GroupBy { get; }
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")
         {
             ParseOptions(EXP.None);
             ParseXPath(compType);
-            _groupBy = groupBy;
+            GroupBy = groupBy;
         }
 
         public GetComponentAttribute(EXP exp, Type compType = null, string groupBy = "")
         {
             ParseOptions(exp);
             ParseXPath(compType);
-            _groupBy = groupBy;
+            GroupBy = groupBy;
         }
 
         private void ParseXPath(Type compType)
