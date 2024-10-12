@@ -6,7 +6,6 @@ using System.Reflection;
 using SaintsField.Condition;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers;
-using SaintsField.Editor.Drawers.VisibilityDrawers;
 using SaintsField.Editor.Drawers.XPathDrawers;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
@@ -272,8 +271,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     return GetComponentInSceneAttributeDrawer.HelperGetArraySize(getComponentInSceneAttribute, info);
                 case GetComponentByPathAttribute getComponentByPathAttribute:
                     return GetComponentByPathAttributeDrawer.HelperGetArraySize(property, getComponentByPathAttribute, info);
-                case GetPrefabWithComponentAttribute getPrefabWithComponentAttribute:
-                    return GetPrefabWithComponentAttributeDrawer.HelperGetArraySize(getPrefabWithComponentAttribute, info);
+                // case GetPrefabWithComponentAttribute getPrefabWithComponentAttribute:
+                //     return GetPrefabWithComponentAttributeDrawer.HelperGetArraySize(getPrefabWithComponentAttribute, info);
                 case GetScriptableObjectAttribute getScriptableObjectAttribute:
                     return GetScriptableObjectAttributeDrawer.HelperGetArraySize(getScriptableObjectAttribute, info);
                 case GetByXPathAttribute _:
