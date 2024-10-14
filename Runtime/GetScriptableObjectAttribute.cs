@@ -13,7 +13,7 @@ namespace SaintsField
         public override string GroupBy { get; }
         public GetScriptableObjectAttribute(string pathSuffix=null, string groupBy="")
         {
-            ParseOptions(EXP.NoPicker);
+            ParseOptions(EXP.NoPicker | EXP.NoAutoResignToNull);
             ParseXPath(pathSuffix);
             GroupBy = groupBy;
         }

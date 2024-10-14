@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using SaintsField.Samples.Scripts;
 using UnityEngine;
 
-namespace SaintsField.Samples.IssueAndTesting.Issue.Issue45
+namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
     public class GetComponentInSceneArray : MonoBehaviour
     {

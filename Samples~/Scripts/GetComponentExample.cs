@@ -10,6 +10,7 @@ namespace SaintsField.Samples.Scripts
 
         [GetComponent] public GetComponentExample selfScript;  // yeah you can get your script itself
         [GetComponent] public Dummy otherScript;  // other script
+        [GetComponent] public SpriteRenderer noSuch;  // other script
 
         [Separator("GetByXPath2")]
         // alternative

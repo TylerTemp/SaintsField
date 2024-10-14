@@ -14,7 +14,7 @@ namespace SaintsField
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")
         {
-            ParseOptions(EXP.NoPicker);
+            ParseOptions(EXP.NoPicker | EXP.NoAutoResignToNull);
             ParseXPath(compType);
             GroupBy = groupBy;
         }

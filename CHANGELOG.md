@@ -4,7 +4,10 @@
 
 This upgrade contains **Breaking Changes**! Though it will not break your code, but some behavior is adjusted. Please read before upgrade.
 
-**Bug Fix**: UI Toolkit: Fix `FieldType` won't update the value if the value is changed externally.
+**Bug Fix**: 
+
+1.  UI Toolkit: Fix `FieldType` won't update the value if the value is changed externally.
+2.  Fix value sign error if the field is in a list/array in some cases.
 
 **Breaking Changes**:
 
@@ -15,30 +18,24 @@ Since this version, `GetComponent*`, `FindComponent`, `GetPrefabWithComponent`, 
 *   All attributes optionally receives `EXP` as the first argument, which has:
 
     *   `NoInitSign`: do not sign the value if the value is null on firsts rendering.
-    *   `NoAutoResign`: do not sign the value to the correct value on the following renderings.
+    *   `NoAutoResignToValue`: do not sign the value to the correct value on the following renderings.
+    *   `NoAutoResignToNull`: do not sign the value to null value if the target disappears on the following renderings.
     *   `NoResignButton`: when `NoAutoResign` is on, by default there will be a `reload` button when value is mismatched. Turn this on to hide the `reload` button.
     *   `NoMessage`: when `NoAutoResign` and `NOResignButton` is on, by default there will be an error box when value is mismatched. Turn this on to hide the error message.
     *   `NoPicker`: this will remove the custom picker. This is on by default (if you do not pass `EXP` as first argument) to keep the consistency.
     *   `KeepOriginalPicker`: UI Toolkit only. By default, when a custom picker is shown, Unity's default picker will hide. This will keep Unity's picker together.
     *   `Silent` = `NoAutoResign | NoMessage`. Useful if you want to allow you to manually sign a different value with no buttons and error box.
-    *   `JustPicker` = `NoInitSign | NoAutoResign | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
-    *   `Message` = `NoAutoResign | NoResignButton`. Just give an error message if target is mismatched.
+    *   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
+    *   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
 
-A classic code broken will be for this case:
+All these attributes except `GetComponentByPath` uses `EXP.NoPicker | EXP.NoAutoResignToNull` as default.
 
-1.  You want to auto-sign the target
-2.  If nothing is found, you want to manually sign the target
+Upgrading from previous version, you may notice:
 
-On previous version, you can sign it but will still get an error box.
+1.  As these attributes complain less when missing the target, you may want to add a `[Required]` together.
+2.  If you have same component added multiple times on the same target, it might only find the first one of them.
 
-On this version, you can NOT sign it because it'll be signed to `null` automatically.
-
-To workaround, you need to change to:
-
-```csharp
-[GetComponent(EXP.Silent)]
-public MyComponent myField;
-```
+I'll update the document about `GetByXPath` soon.
 
 ## 3.3.9 ##
 

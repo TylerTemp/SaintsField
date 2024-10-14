@@ -13,7 +13,7 @@ namespace SaintsField
         {
         }
 
-        public FindComponentAttribute(string path, params string[] paths): this(EXP.NoPicker, path, paths)
+        public FindComponentAttribute(string path, params string[] paths): this(EXP.NoPicker | EXP.NoAutoResignToNull, path, paths)
         {
         }
     }

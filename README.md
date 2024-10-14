@@ -2135,8 +2135,9 @@ Note:
 1.  Like Unity's `GetComponentInParent`, this **will** check the target object itself.
 2.  `GetComponentInParent` will only check the target & its direct parent. `GetComponentInParents` will search all the way up to the root.
 
-
 Parameters:
+
+*   \[Optional\] `EXP config` config tweak (see `GetByXPath` for more information)
 
 *   (For `GetComponentInParents` only) `bool includeInactive = false`
 
@@ -2157,11 +2158,11 @@ Parameters:
 ```csharp
 using SaintsField;
 
-[GetComponentInParent] public SpriteRenderer directParent;
-[GetComponentInParent(typeof(SpriteRenderer))] public GameObject directParentDifferentType;
+[GetComponentInParent] public SpriteRenderer directParent;  // equals [GetByXPath("//parent::")]
+[GetComponentInParent(typeof(SpriteRenderer))] public GameObject directParentDifferentType;  // equals [GetByXPath("//parent::/[@GetComponent(SpriteRenderer)]")]
 [GetComponentInParent] public BoxCollider directNoSuch;
 
-[GetComponentInParents] public SpriteRenderer searchParent;
+[GetComponentInParents] public SpriteRenderer searchParent;  // equals [GetByXPath("//ancestor::")]
 [GetComponentInParents(compType: typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
 [GetComponentInParents] public BoxCollider searchNoSuch;
 ```
@@ -2260,6 +2261,12 @@ using SaintsField;
 ```
 
 ![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/a0fdca83-0c96-4d57-9c9d-989efbac0f07)
+
+#### `GetByXPath` ####
+
+// TODO...
+
+// Why the heck I write some feature so complex...
 
 #### `GetPrefabWithComponent` ####
 

@@ -14,7 +14,7 @@ namespace SaintsField
 
         public GetComponentInSceneAttribute(bool includeInactive = false, Type compType = null, string groupBy = "")
         {
-            ParseOptions(EXP.NoPicker);
+            ParseOptions(EXP.NoPicker | EXP.NoAutoResignToNull);
             ParseArguments(includeInactive, compType);
             GroupBy = groupBy;
         }

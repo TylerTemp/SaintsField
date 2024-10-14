@@ -14,7 +14,7 @@ namespace SaintsField
 
         public GetPrefabWithComponentAttribute(Type compType = null, string groupBy = "")
         {
-            ParseOptions(EXP.NoPicker);
+            ParseOptions(EXP.NoPicker | EXP.NoAutoResignToNull);
             ParseXPath(compType);
             GroupBy = groupBy;
         }

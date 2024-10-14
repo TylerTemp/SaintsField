@@ -301,7 +301,7 @@ namespace SaintsField.Editor.Utils
                         array.SetValue(value, index);
                     }
                 }
-                else if(fieldValue is IList<object> list)
+                else if(fieldValue is IList list)
                 {
                     if (list[index] is IWrapProp wrapProp)
                     {

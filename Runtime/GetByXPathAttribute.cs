@@ -42,7 +42,7 @@ namespace SaintsField
         {
             InitSign = !config.HasFlag(EXP.NoInitSign);
             UsePickerButton = !config.HasFlag(EXP.NoPicker);
-            KeepOriginalPicker = UsePickerButton && config.HasFlag(EXP.KeepOriginalPicker);
+            KeepOriginalPicker = !UsePickerButton || config.HasFlag(EXP.KeepOriginalPicker);
             AutoResignToValue = !config.HasFlag(EXP.NoAutoResignToValue);
             AutoResignToNull = !config.HasFlag(EXP.NoAutoResignToNull);
             if (AutoResignToValue && AutoResignToNull)
