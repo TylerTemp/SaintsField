@@ -29,7 +29,7 @@ namespace SaintsField
         {
             string pathMatch = string.IsNullOrEmpty(pathSuffix)? "*.asset": $"*{pathSuffix}.asset";
 
-            string ePath = $"assets:://{pathMatch}{GetComponentFilter(typeof(ScriptableObject))}";
+            string ePath = $"assets:://{pathMatch}";
 
             XPathInfoAndList = new[]
             {

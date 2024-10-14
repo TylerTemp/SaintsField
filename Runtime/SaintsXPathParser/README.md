@@ -20,13 +20,14 @@ step: `axisname::nodetest[predicate]`
 *   `ancestor-or-self::`
 *   `parent::`
 *   `parent-or-self::`
-*   `parent-or-self-inside-prefab::`
 *   其它的不支持
 
 基于 Unity 特有的，加上 `::nodetest` 其实有方向指向性，所以用其指向 Unity 特有资源:
 
 *   `ancestor-inside-prefab::`
 *   `ancestor-or-self-inside-prefab::`
+*   `parent-inside-prefab::`
+*   `parent-or-self-inside-prefab::`
 *   `scene-root::`: 场景根节点
 *   `prefab-root::`: 预制体根节点
 *   `resources::`: 资源
@@ -90,4 +91,4 @@ step: `axisname::nodetest[predicate]`
 
 **predicate**
 
-必须有空格
+必须有空格。属性支持的都支持

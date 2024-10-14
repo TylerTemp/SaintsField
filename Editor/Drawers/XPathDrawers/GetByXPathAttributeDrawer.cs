@@ -1915,6 +1915,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         {
                             components = comp.GetComponents<Component>().Where(each => each != null).ToArray();
                         }
+
                         else
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
