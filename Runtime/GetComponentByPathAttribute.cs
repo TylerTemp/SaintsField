@@ -15,7 +15,7 @@ namespace SaintsField
 
         public GetComponentByPathAttribute(string path, params string[] paths)
         {
-            ParseOptions(EXP.NoAutoResign | EXP.NoPicker);
+            ParseOptions(EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker);
             ParseXPaths(paths.Prepend(path).Select(TranslatePath).ToArray());
         }
 
@@ -62,7 +62,8 @@ namespace SaintsField
             }
             else
             {
-                exp |= EXP.NoAutoResign;
+                exp |= EXP.NoAutoResignToValue;
+                exp |= EXP.NoAutoResignToNull;
             }
 
             if (config.HasFlag(EGetComp.NoResignButton))

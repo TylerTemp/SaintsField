@@ -9,14 +9,15 @@ namespace SaintsField
         None = 0,
 
         NoInitSign = 1 << 1,
-        NoAutoResign = 1 << 2,
+        NoAutoResignToValue = 1 << 2,
+        NoAutoResignToNull = 1 << 2,
         NoResignButton = 1 << 3,
         NoMessage = 1 << 4,
         NoPicker = 1 << 5,
         KeepOriginalPicker = 1 << 6,
 
-        Silent = NoAutoResign | NoMessage,
-        JustPicker = NoInitSign | NoAutoResign | NoResignButton | NoMessage,
-        Message = NoAutoResign | NoResignButton,
+        Silent = NoAutoResignToNull | NoMessage,
+        JustPicker = NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage,
+        Message = NoAutoResignToValue | NoAutoResignToNull | NoResignButton,
     }
 }

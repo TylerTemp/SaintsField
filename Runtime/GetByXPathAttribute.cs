@@ -19,7 +19,8 @@ namespace SaintsField
         public virtual string GroupBy => "";
 
         public bool InitSign;
-        public bool AutoResign;
+        public bool AutoResignToValue;
+        public bool AutoResignToNull;
         public bool UseResignButton;
         public bool UsePickerButton;
         public bool UseErrorMessage;
@@ -42,8 +43,9 @@ namespace SaintsField
             InitSign = !config.HasFlag(EXP.NoInitSign);
             UsePickerButton = !config.HasFlag(EXP.NoPicker);
             KeepOriginalPicker = UsePickerButton && config.HasFlag(EXP.KeepOriginalPicker);
-            AutoResign = !config.HasFlag(EXP.NoAutoResign);
-            if (AutoResign)
+            AutoResignToValue = !config.HasFlag(EXP.NoAutoResignToValue);
+            AutoResignToNull = !config.HasFlag(EXP.NoAutoResignToNull);
+            if (AutoResignToValue && AutoResignToNull)
             {
                 UseResignButton = false;
             }
