@@ -2669,7 +2669,16 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 needApply = true;
             }
 
-            var curValues = info.GetValue(parent);
+            object curValues = info.GetValue(parent);
+            if (curValues == null)
+            {
+                if (needApply)
+                {
+                    arrayProperty.serializedObject.ApplyModifiedProperties();
+                }
+                return true;
+            }
+
             bool anyChange = false;
 
             foreach ((object targetValue, int index) in results.WithIndex())

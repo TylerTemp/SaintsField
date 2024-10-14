@@ -18,7 +18,7 @@ namespace SaintsField
 
         NoAutoResign = NoAutoResignToValue | NoAutoResignToNull,
 
-        Silent = NoAutoResignToNull | NoMessage,
+        Silent = NoAutoResign | NoMessage,
         JustPicker = NoInitSign | NoAutoResign | NoResignButton | NoMessage,
         Message = NoAutoResign | NoResignButton,
     }
