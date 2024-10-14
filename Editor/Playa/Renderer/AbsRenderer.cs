@@ -115,9 +115,14 @@ namespace SaintsField.Editor.Playa.Renderer
                         });
                         break;
                     case IPlayaArraySizeAttribute arraySizeAttribute:
-                        arraySize = fieldWithInfo.SerializedProperty.isArray
-                            ? GetArraySize(arraySizeAttribute, fieldWithInfo.SerializedProperty, fieldWithInfo.FieldInfo, fieldWithInfo.Target)
-                            : -1;
+                        if(fieldWithInfo.SerializedProperty != null)
+                        {
+                            // Debug.Log(fieldWithInfo.SerializedProperty);
+                            arraySize = fieldWithInfo.SerializedProperty.isArray
+                                ? GetArraySize(arraySizeAttribute, fieldWithInfo.SerializedProperty,
+                                    fieldWithInfo.FieldInfo, fieldWithInfo.Target)
+                                : -1;
+                        }
                         break;
                 }
             }

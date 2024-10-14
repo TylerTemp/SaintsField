@@ -215,26 +215,26 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             SerializedProperty arrProp = null;
 
-            if (propertyIndex == 0 && xPathError == "")
+            if (propertyIndex != -1 && xPathError == "")
             {
                 // handle array size if this is the first element
-                if (firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull)
+                // if (firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull)
+                // {
+                (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
+                if (arrayError != "")
                 {
-                    (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
-                    if (arrayError != "")
+                    xPathError = arrayError;
+                }
+                else
+                {
+                    arrProp = arrayProperty;
+                    if(arrProp.arraySize != results.Count)
                     {
-                        xPathError = arrayError;
-                    }
-                    else
-                    {
-                        arrProp = arrayProperty;
-                        if(arrProp.arraySize != results.Count)
-                        {
-                            arrProp.arraySize = results.Count;
-                            arrProp.serializedObject.ApplyModifiedProperties();
-                        }
+                        arrProp.arraySize = results.Count;
+                        arrProp.serializedObject.ApplyModifiedProperties();
                     }
                 }
+                // }
             }
 
             InitUserData initUserData = new InitUserData
@@ -266,6 +266,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                                      !Util.IsNull(initUserData.CheckFieldResult.TargetValue);
                 bool doResignNull = firstAttribute.AutoResignToNull &&
                                     Util.IsNull(initUserData.CheckFieldResult.TargetValue);
+                // Debug.Log($"init sign {firstAttribute.AutoResignToValue}/{firstAttribute.AutoResignToNull}/{Util.IsNull(initUserData.CheckFieldResult.TargetValue)}");
                 if(doResignValue || doResignNull)
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent,
@@ -348,8 +349,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                             }
                             else
                             {
-                                initUserData.TargetProperty.DeleteArrayElementAtIndex(arrayIndex);
-                                initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                                initUserData.ArrayProperty.DeleteArrayElementAtIndex(arrayIndex);
+                                initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
                             }
                         }
                     }
@@ -1011,6 +1012,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 return (error, property, targetMemberInfo, rawType, null);
             }
+
             IWrapProp wrapProp = (IWrapProp) value;
             string prop = wrapProp.EditorPropertyName;
             Type expectedType;
@@ -2625,13 +2627,16 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         {
             (GetByXPathAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(arrayProperty);
 
-            (string error, SerializedProperty targetProperty, MemberInfo memberInfo, Type expectType, Type expectInterface) = GetExpectedType(arrayProperty, info, parent);
-            if (error != "")
+            Type arrayElementType = ReflectUtils.GetElementType(info.FieldType);
+            bool arrayElementIsWrapProp = typeof(IWrapProp).IsAssignableFrom(arrayElementType);
+            Type expectType = arrayElementType;
+            // Type expectInterface = null;
+
+            // we can not get what prop is wrapped when array size is 0
+            // so giving up on this type (SaintsInterface, SaintsArray)
+            if (arrayElementIsWrapProp)
             {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PLAYA_GET_BY_XPATH
-                Debug.LogError(error);
-#endif
-                return true;
+                return false;
             }
 
             GetByXPathAttribute firstAttribute = attributes[0];
@@ -2643,7 +2648,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return false;
             }
 
-            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(attributes.SelectMany(each => each.XPathInfoAndList).ToArray(), expectType, expectInterface, arrayProperty, info, parent);
+            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(attributes.SelectMany(each => each.XPathInfoAndList).ToArray(), expectType, null, arrayProperty, info, parent);
             if (xPathError != "")
             {
                 return true;
@@ -2651,36 +2656,37 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             bool needApply = false;
             // int resultSize = -1;
-            bool needInitSign = firstAttribute.InitSign && targetProperty.arraySize == 0;
+            bool needInitSign = firstAttribute.InitSign && arrayProperty.arraySize == 0;
 
             if (needInitSign && results.Count > 0)
             {
-                targetProperty.arraySize = results.Count;
+                arrayProperty.arraySize = results.Count;
                 needApply = true;
             }
-            if((firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull) && targetProperty.arraySize != results.Count)
+            if((firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull) && arrayProperty.arraySize != results.Count)
             {
-                targetProperty.arraySize = results.Count;
+                arrayProperty.arraySize = results.Count;
                 needApply = true;
             }
+
+            var curValues = info.GetValue(parent);
+            bool anyChange = false;
 
             foreach ((object targetValue, int index) in results.WithIndex())
             {
                 if (needApply)
                 {
-                    targetProperty.serializedObject.ApplyModifiedProperties();
-                    targetProperty.serializedObject.Update();
+                    arrayProperty.serializedObject.ApplyModifiedProperties();
+                    arrayProperty.serializedObject.Update();
                     needApply = false;
                 }
 
-                if(index >= targetProperty.arraySize)
+                if(index >= arrayProperty.arraySize)
                 {
                     break;
                 }
 
-                SerializedProperty elementProperty = targetProperty.GetArrayElementAtIndex(index);
-
-                (string getValueError, int _, object originValue) = Util.GetValue(elementProperty, memberInfo, parent);
+                (string getValueError, object originValue) = Util.GetValueAtIndex(curValues, index);
                 if (getValueError != "")
                 {
                     continue;
@@ -2688,9 +2694,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                 if(!Util.GetIsEqual(originValue, targetValue))
                 {
+                    bool changeValue = false;
                     if (needInitSign)
                     {
-                        SetValue(elementProperty, memberInfo, parent, targetValue);
+                        changeValue = true;
                     }
                     else
                     {
@@ -2700,15 +2707,40 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                                             Util.IsNull(targetValue);
                         if (doResignValue || doResignNull)
                         {
-                            SetValue(elementProperty, memberInfo, parent, targetValue);
+                            // SetValue(elementProperty, memberInfo, parent, targetValue);
+                            changeValue = true;
+                        }
+                    }
+
+                    if (changeValue)
+                    {
+                        anyChange = true;
+                        if (curValues is Array arr)
+                        {
+                            arr.SetValue(targetValue, index);
+                        }
+                        else if (curValues is IList list)
+                        {
+                            list[index] = targetValue;
                         }
                     }
                 }
             }
 
+            if (anyChange)
+            {
+                int index = 0;
+                foreach (object eachValue in (IEnumerable)curValues)
+                {
+                    Util.SignPropertyValue(arrayProperty.GetArrayElementAtIndex(index), null, parent, eachValue);
+                    index++;
+                }
+
+                needApply = true;
+            }
+
             if (needApply)
             {
-                targetProperty.serializedObject.ApplyModifiedProperties();
                 arrayProperty.serializedObject.ApplyModifiedProperties();
             }
             return firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull;

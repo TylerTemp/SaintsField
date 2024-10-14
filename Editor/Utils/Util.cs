@@ -956,6 +956,11 @@ namespace SaintsField.Editor.Utils
                 return (e.Message, -1, null);
             }
 
+            if (fieldInfo == null)
+            {
+                return ("No MemberInfo given", arrayIndex, null);
+            }
+
             object rawValue;
             if (fieldInfo.MemberType == MemberTypes.Field)
             {
@@ -1029,6 +1034,35 @@ namespace SaintsField.Editor.Utils
             if (!(source is IEnumerable enumerable))
             {
                 throw new Exception($"Not a enumerable {source}");
+            }
+
+            if (source is Array arr)
+            {
+                object result;
+                try
+                {
+                    result = arr.GetValue(index);
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                    return (e.Message, null);
+                }
+
+                return ("", result);
+            }
+            if (source is IList list)
+            {
+                object result;
+                try
+                {
+                    result = list[index];
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    return (e.Message, null);
+                }
+
+                return ("", result);
             }
 
             // Debug.Log($"start check index in {source}");

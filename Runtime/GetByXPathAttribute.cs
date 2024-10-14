@@ -8,6 +8,7 @@ using SaintsField.Utils;
 using SaintsField.SaintsXPathParser;
 #endif
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace SaintsField
 {
@@ -116,7 +117,7 @@ namespace SaintsField
 
             string nameSpace = compType.Namespace;
             string typeName = compType.Name;
-            return $"[@{{GetComponent({nameSpace}.{typeName})}}]";
+            return $"[@{{GetComponents({nameSpace}.{typeName})}}]";
         }
     }
 }
