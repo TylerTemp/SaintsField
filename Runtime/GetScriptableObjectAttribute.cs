@@ -1,21 +1,51 @@
 ﻿using System.Diagnostics;
-using SaintsField.Playa;
+using System.Linq;
+#if UNITY_EDITOR
+using SaintsField.SaintsXPathParser;
+#endif
 using UnityEngine;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class GetScriptableObjectAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
+    public class GetScriptableObjectAttribute: GetByXPathAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-
-        public string GroupBy => "";
-
-        public readonly string PathSuffix;
-
-        public GetScriptableObjectAttribute(string pathSuffix=null)
+        public override string GroupBy { get; }
+        public GetScriptableObjectAttribute(string pathSuffix=null, string groupBy="")
         {
-            PathSuffix = string.IsNullOrEmpty(pathSuffix)? null: pathSuffix + ".asset";
+            ParseOptions(EXP.NoPicker);
+            ParseXPath(pathSuffix);
+            GroupBy = groupBy;
+        }
+
+        public GetScriptableObjectAttribute(EXP config, string pathSuffix=null, string groupBy="")
+        {
+            ParseOptions(config);
+            ParseXPath(pathSuffix);
+            GroupBy = groupBy;
+        }
+
+        private void ParseXPath(string pathSuffix)
+        {
+            string pathMatch = string.IsNullOrEmpty(pathSuffix)? "*.asset": $"*{pathSuffix}.asset";
+
+            string ePath = $"assets:://{pathMatch}{GetComponentFilter(typeof(ScriptableObject))}";
+
+            XPathInfoAndList = new[]
+            {
+                new[]
+                {
+                    new XPathInfo
+                    {
+                        IsCallback = false,
+                        Callback = "",
+#if UNITY_EDITOR
+                        XPathSteps = XPathParser.Parse(ePath).ToArray(),
+#endif
+                    },
+                },
+            };
+
         }
     }
 }

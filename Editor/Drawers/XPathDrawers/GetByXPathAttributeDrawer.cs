@@ -26,6 +26,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
     [CustomPropertyDrawer(typeof(GetComponentInParentAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentInParentsAttribute))]
     [CustomPropertyDrawer(typeof(GetPrefabWithComponentAttribute))]
+    [CustomPropertyDrawer(typeof(GetScriptableObjectAttribute))]
     public class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
         private class GetByPickerWindow : ObjectSelectWindow
