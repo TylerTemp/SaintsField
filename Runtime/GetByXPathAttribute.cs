@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
@@ -65,7 +65,11 @@ namespace SaintsField
         public GetByXPathAttribute(EXP config, params string[] ePaths)
         {
             ParseOptions(config);
+            ParseXPaths(ePaths);
+        }
 
+        protected void ParseXPaths(params string[] ePaths)
+        {
             XPathInfo[] xPathInfoOrList = ePaths.Length == 0
                 ? new[]
                 {
@@ -87,9 +91,9 @@ namespace SaintsField
                         {
                             IsCallback = actualIsCallback,
                             Callback = callback,
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
                             XPathSteps = XPathParser.Parse(ePath).ToArray(),
-    #endif
+#endif
                         };
                     })
                     .ToArray();

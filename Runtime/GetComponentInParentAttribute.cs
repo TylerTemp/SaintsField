@@ -15,7 +15,7 @@ namespace SaintsField
 
         public GetComponentInParentAttribute(Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
-            ParseOptions(EXP.KeepOriginalPicker);
+            ParseOptions(EXP.NoPicker);
             ParseArguments(compType, excludeSelf);
             GroupBy = groupBy;
         }

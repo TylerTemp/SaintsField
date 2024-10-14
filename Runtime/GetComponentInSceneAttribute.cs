@@ -1,24 +1,49 @@
 ﻿using System;
 using System.Diagnostics;
-using SaintsField.Playa;
-using UnityEngine;
+using System.Linq;
+#if UNITY_EDITOR
+using SaintsField.SaintsXPathParser;
+#endif
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class GetComponentInSceneAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
+    public class GetComponentInSceneAttribute: GetByXPathAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy { get; }
-
-        public readonly Type CompType;
-        public readonly bool IncludeInactive;
+        public override string GroupBy { get; }
 
         public GetComponentInSceneAttribute(bool includeInactive = false, Type compType = null, string groupBy = "")
         {
-            CompType = compType;
-            IncludeInactive = includeInactive;
+            ParseOptions(EXP.NoPicker);
+            ParseArguments(includeInactive, compType);
             GroupBy = groupBy;
+        }
+
+        private void ParseArguments(bool includeInactive, Type compType)
+        {
+            string compFilter = GetComponentFilter(compType);
+            string activeFilter = includeInactive ? "" : "[@{gameObject.activeSelf}]";
+            string allFilter = $"{activeFilter}{compFilter}";
+            // string sepFilter = allFilter == ""? "": $"/{allFilter}";
+
+            string ePath = $"scene:://*{allFilter}";
+            // UnityEngine.Debug.Log(ePath);
+
+
+            XPathInfoAndList = new[]
+            {
+                new[]
+                {
+                    new XPathInfo
+                    {
+                        IsCallback = false,
+                        Callback = "",
+#if UNITY_EDITOR
+                        XPathSteps = XPathParser.Parse(ePath).ToArray(),
+#endif
+                    },
+                },
+            };
         }
     }
 }

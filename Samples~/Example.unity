@@ -9003,9 +9003,9 @@ MonoBehaviour:
   myDummy: {fileID: 1271404094}
   myDummyTrans: {fileID: 1271404091}
   myDummyGo: {fileID: 1271404088}
-  myDummyXPath: {fileID: 0}
-  myDummyTransXPath: {fileID: 0}
-  myDummyGoXPath: {fileID: 0}
+  myDummyXPath: {fileID: 1271404094}
+  myDummyTransXPath: {fileID: 1271404091}
+  myDummyGoXPath: {fileID: 1271404088}
 --- !u!4 &746735700
 Transform:
   m_ObjectHideFlags: 0
@@ -16501,7 +16501,7 @@ MonoBehaviour:
   slash2Sth: {fileID: 1540778734}
   slash3Sth: {fileID: 1540778734}
   directSubMultiDisabled: {fileID: 1957647119}
-  dummyXPath: {fileID: 1631756499}
+  dummyXPath: {fileID: 632590878}
   direct1XPath: {fileID: 1671624918}
   directPosTg1XPath: {fileID: 1957647119}
   directLastXPath: {fileID: 1112995838}
