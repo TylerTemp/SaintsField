@@ -7,16 +7,14 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class FindComponentAttribute: PropertyAttribute, ISaintsAttribute
+    public class FindComponentAttribute: GetByXPathAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
-
-        public readonly string[] Paths;
-
-        public FindComponentAttribute(string path, params string[] paths)
+        public FindComponentAttribute(EXP config, string path, params string[] paths): base(config, paths.Prepend(path).ToArray())
         {
-            Paths = new[]{path}.Concat(paths).ToArray();
+        }
+
+        public FindComponentAttribute(string path, params string[] paths): this(EXP.NoPicker, path, paths)
+        {
         }
     }
 }
