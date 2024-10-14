@@ -277,6 +277,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             bool requiredCompIsGameObject = requiredComp == typeof(GameObject);
             bool fieldTypeIsGameObject = fieldType == typeof(GameObject);
 
+            // Debug.Log($"fieldResult={fieldResult}, fieldType={fieldType}, requiredComp={requiredComp}; requiredCompIsGameObject={requiredCompIsGameObject}; fieldTypeIsGameObject={fieldTypeIsGameObject}");
+
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (requiredCompIsGameObject && fieldTypeIsGameObject)
             {
@@ -291,6 +293,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             if (requiredCompIsGameObject)
             {
                 return ((GameObject)fieldResult)?.GetComponent(fieldType);
+            }
+
+            if (fieldResult is GameObject go)
+            {
+                return go;
             }
             return ((Component)fieldResult)?.gameObject;
         }
@@ -373,6 +380,22 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             return objectField;
         }
 
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
+        {
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NameHelpBox(property),
+            };
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
+        }
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -406,12 +429,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             Button selectorButton = container.Q<Button>(NameSelectorButton(property));
             if (selectorButton != null)
             {
-                // Type[] types = requiredComp  == fieldType
-                //     ? new []{requiredComp}
-                //     : new []{requiredComp, fieldType};
-
-                // Debug.Log(editorPick);
-
                 selectorButton.clicked += () =>
                 {
                     FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
@@ -431,21 +448,42 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             }
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, FieldInfo info, object parent)
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(newValue is Object) && newValue != null)
             {
-                style =
-                {
-                    display = DisplayStyle.None,
-                },
-                name = NameHelpBox(property),
-            };
-            helpBox.AddToClassList(ClassAllowDisable);
-            return helpBox;
+                helpBox.style.display = DisplayStyle.Flex;
+                helpBox.text = $"Value `{newValue}` is not a UnityEngine.Object";
+                return;
+            }
+
+            Object uObjectValue = (Object) newValue;
+            Object result = GetNewValue(uObjectValue, info.FieldType, requiredComp);
+
+            ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
+            if(objectField.value != result)
+            {
+                objectField.SetValueWithoutNotify(result);
+            }
+
+            if (newValue != null && result == null)
+            {
+                helpBox.style.display = DisplayStyle.Flex;
+                helpBox.text = $"{newValue} has no component {fieldType}";
+            }
+            else
+            {
+                helpBox.style.display = DisplayStyle.None;
+            }
         }
+
 
         // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
         //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,

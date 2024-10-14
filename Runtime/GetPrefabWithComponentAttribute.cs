@@ -31,7 +31,7 @@ namespace SaintsField
             string compFilter = GetComponentFilter(compType);
             // string sepFilter = compFilter == ""? "": $"/{compFilter}";
 
-            string ePath = $"assets:://*{compFilter}";
+            string ePath = $"assets:://*.prefab{compFilter}";
 
             XPathInfoAndList = new[]
             {

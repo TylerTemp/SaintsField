@@ -1882,6 +1882,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         private static IEnumerable<ResourceInfo> GetValueFromFakeEval(XPathAttrFakeEval fakeEval, ResourceInfo axisResource)
         {
             object target = axisResource.Resource;
+            if (axisResource.ResourceType == ResourceType.File)
+            {
+                Object uObject = AssetDatabase.LoadAssetAtPath<Object>(string.IsNullOrEmpty(axisResource.FolderPath)
+                    ? (string) axisResource.Resource
+                    : $"{axisResource.FolderPath}/{axisResource.Resource}");
+                if (uObject == null)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                    Debug.Log($"FakeEval failed to load {axisResource.FolderPath}/{axisResource.Resource}, return nothing");
+#endif
+                    yield break;
+                }
+
+                target = uObject;
+            }
             object result = target;
 
             foreach (XPathAttrFakeEval.ExecuteFragment executeFragment in fakeEval.ExecuteFragments)
