@@ -64,9 +64,22 @@ namespace SaintsField.Editor.Core
             }
 
             (string error, string result) = Util.GetOf(richTextXml, "", property, fieldInfo, target);
-            return error != ""
-                ? (error, property.displayName)
-                : ("", result);
+            if (error != "")
+            {
+                string originalName;
+                try
+                {
+                    originalName = property.displayName;
+                }
+                catch(InvalidOperationException e)
+                {
+                    return (e.Message, "");
+                }
+
+                return (error, originalName);
+            }
+
+            return ("", result);
             // List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             // types.Reverse();
             // foreach (Type eachType in types)
