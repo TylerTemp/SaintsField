@@ -70,42 +70,11 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.4.0**
+**3.4.1**
 
-This upgrade contains **Breaking Changes**! Though it will not break your code, but some behavior is adjusted. Please read before upgrade.
-
-**Bug Fix**:
-
-1.  UI Toolkit: Fix `FieldType` won't update the value if the value is changed externally.
-2.  Fix value sign error if the field is in a list/array in some cases.
-
-**Breaking Changes**:
-
-Since this version, `GetComponent*`, `FindComponent`, `GetPrefabWithComponent`, `GetScriptableObject` is inherent under `GetByXPath` (which will be documented separately). The behavior for these attributes is changed as:
-
-*   If target is mis-matched, it'll be auto-resigned to the correct value. (Except `GetComponentByPath`, which will give you a reload button)
-*   If the target is not found, it'll be auto-resigned to null. (Except `GetComponentByPath`, which will give you a remove button)
-*   All attributes optionally receives `EXP` as the first argument, which has:
-
-    *   `NoInitSign`: do not sign the value if the value is null on firsts rendering.
-    *   `NoAutoResignToValue`: do not sign the value to the correct value on the following renderings.
-    *   `NoAutoResignToNull`: do not sign the value to null value if the target disappears on the following renderings.
-    *   `NoResignButton`: when `NoAutoResign` is on, by default there will be a `reload` button when value is mismatched. Turn this on to hide the `reload` button.
-    *   `NoMessage`: when `NoAutoResign` and `NOResignButton` is on, by default there will be an error box when value is mismatched. Turn this on to hide the error message.
-    *   `NoPicker`: this will remove the custom picker. This is on by default (if you do not pass `EXP` as first argument) to keep the consistency.
-    *   `KeepOriginalPicker`: UI Toolkit only. By default, when a custom picker is shown, Unity's default picker will hide. This will keep Unity's picker together.
-    *   `Silent` = `NoAutoResign | NoMessage`. Useful if you want to allow you to manually sign a different value with no buttons and error box.
-    *   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
-    *   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
-
-All these attributes except `GetComponentByPath` uses `EXP.NoPicker | EXP.NoAutoResignToNull` as default.
-
-Upgrading from previous version, you may notice:
-
-1.  As these attributes complain less when missing the target, you may want to add a `[Required]` together.
-2.  If you have same component added multiple times on the same target, it might only find the first one of them.
-
-I'll update the document about `GetByXPath` soon.
+1.  UIToolkit: Fix `ShowInInspector` won't disable the updated value
+2.  Fix `LayoutEnd` will make the following fields visible like `ShowInInspector`
+3.  Add `DOTweenStart` as an alias of `DOTweenGroup`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

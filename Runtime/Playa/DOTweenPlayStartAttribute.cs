@@ -7,10 +7,10 @@ namespace SaintsField.Playa
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
 
     // ReSharper disable once InconsistentNaming
-    public class DOTweenPlayGroupAttribute: DOTweenPlayStartAttribute
+    public class DOTweenPlayStartAttribute: DOTweenPlayAttribute
     {
-        public DOTweenPlayGroupAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind, string groupBy="")
-            : base(label, stopAction, groupBy)
+        public DOTweenPlayStartAttribute(string label = null, ETweenStop stopAction = ETweenStop.Rewind, string groupBy="")
+            : base(label, stopAction, groupBy, true)
         {
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -12,14 +13,21 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class NonSerializedFieldRenderer: AbsRenderer
     {
+        private readonly bool _renderField;
         public NonSerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
         {
+            _renderField = fieldWithInfo.FieldInfo.GetCustomAttribute<ShowInInspectorAttribute>() != null;
         }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private VisualElement _fieldElement;
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
+            if (!_renderField)
+            {
+                return (null, false);
+            }
+
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
 
             VisualElement container = new VisualElement
@@ -36,7 +44,7 @@ namespace SaintsField.Editor.Playa.Renderer
             //     container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
             // );
 
-            return (_fieldElement = container, false);
+            return (_fieldElement = container, true);
         }
 
         protected override PreCheckResult OnUpdateUIToolKit()
@@ -45,6 +53,8 @@ namespace SaintsField.Editor.Playa.Renderer
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
             object userData = _fieldElement.userData;
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
+
+            // Debug.Log($"{userData}/{value}");
 
             bool isEqual = Util.GetIsEqual(userData, value);
 

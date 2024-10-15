@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.1 ##
+
+1.  UIToolkit: Fix `ShowInInspector` won't disable the updated value
+2.  Fix `LayoutEnd` will make the following fields visible like `ShowInInspector`
+3.  Add `DOTweenStart` as an alias of `DOTweenGroup`
+
 ## 3.4.0 ##
 
 This upgrade contains **Breaking Changes**! Though it will not break your code, but some behavior is adjusted. Please read before upgrade.
