@@ -1382,7 +1382,8 @@ namespace SaintsField.Editor.Core
                         property.serializedObject.ApplyModifiedProperties();
 
                         (string error, int _, object value) = Util.GetValue(property, fieldInfo, parent);
-                        if (error != "")
+
+                        if (error == "")
                         {
                             onGUIPayload.SetValue(value);
                         }
