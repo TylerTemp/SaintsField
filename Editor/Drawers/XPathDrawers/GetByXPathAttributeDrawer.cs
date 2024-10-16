@@ -970,6 +970,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         private static (bool valid, object value) ValidateXPathResult(object each, Type expectType, Type expectInterface)
         {
             object result;
+            // Debug.Log($"{each}");
             if (expectType.IsInstanceOfType(each))
             {
                 result = each;
@@ -993,6 +994,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             if (expectInterface == null)
             {
                 return (true, result);
+            }
+
+            if (result is GameObject resultGo)
+            {
+                result = resultGo.transform;
+            }
+            if(result is Component resultComponent)
+            {
+                foreach (Component component in resultComponent.GetComponents<Component>())
+                {
+                    if (expectInterface.IsAssignableFrom(component.GetType()))
+                    {
+                        return (true, component);
+                    }
+                }
             }
 
             bool valid = expectInterface.IsAssignableFrom(result.GetType());
