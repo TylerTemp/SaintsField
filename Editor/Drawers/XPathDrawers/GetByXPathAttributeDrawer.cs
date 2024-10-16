@@ -977,6 +977,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             else if (each is Object uObject)
             {
                 Object r = Util.GetTypeFromObj(uObject, expectType);
+
                 if (r == null)
                 {
                     return (false, null);
@@ -994,7 +995,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return (true, result);
             }
 
-            bool valid = expectInterface.IsAssignableFrom(each.GetType());
+            bool valid = expectInterface.IsAssignableFrom(result.GetType());
             return valid ? (true, result) : (false, null);
         }
 
@@ -1067,6 +1068,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     TargetValue = targetValue,
                     Index = propIndex,
                 };
+            }
+
+            if(propValue is IWrapProp wrapProp)
+            {
+                propValue = Util.GetWrapValue(wrapProp);
             }
 
             if (Util.GetIsEqual(propValue, targetValue))
@@ -2706,6 +2712,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 if (getValueError != "")
                 {
                     continue;
+                }
+
+                if (originValue is IWrapProp wrapProp)
+                {
+                    originValue = Util.GetWrapValue(wrapProp);
                 }
 
                 if(!Util.GetIsEqual(originValue, targetValue))
