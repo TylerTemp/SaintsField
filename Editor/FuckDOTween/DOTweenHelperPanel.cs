@@ -1,7 +1,8 @@
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -60,7 +61,7 @@ namespace SaintsField.Editor.FuckDOTween
 
             if (GUILayout.Button("Disable SaintsField's DOTween utility"))
             {
-                SaintsMenu.AddCompileDefine("SAINTSFIELD_DOTWEEN_DISABLED");
+                AddCompileDefine("SAINTSFIELD_DOTWEEN_DISABLED");
                 Close();
             }
         }
@@ -68,6 +69,39 @@ namespace SaintsField.Editor.FuckDOTween
         private void OnDestroy()
         {
             _doTweenHelperPanel = null;
+        }
+
+        private static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
+        {
+            IEnumerable<BuildTargetGroup> targets = targetGroups ?? Enum.GetValues(typeof(BuildTargetGroup)).Cast<BuildTargetGroup>();
+
+            foreach (BuildTargetGroup grp in targets.Where(each => each != BuildTargetGroup.Unknown))
+            {
+                string defines;
+                try
+                {
+                    defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(grp);
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+                if (!defines.Contains(newDefineCompileConstant))
+                {
+                    if (defines.Length > 0)
+                        defines += ";";
+
+                    defines += newDefineCompileConstant;
+                    try
+                    {
+                        PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, defines);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+            }
         }
     }
 }
