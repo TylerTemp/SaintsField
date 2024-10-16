@@ -70,11 +70,11 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.4.1**
+**3.4.2**
 
-1.  UIToolkit: Fix `ShowInInspector` won't disable the updated value
-2.  Fix `LayoutEnd` will make the following fields visible like `ShowInInspector`
-3.  Add `DOTweenStart` as an alias of `DOTweenGroup`
+1.  Fix `GetComponentInScene` won't search a disabled object
+2.  Fix auto-getter attributes support for `SaintsInterface`
+3.  IMGUI: fix `OnValueChanged` did not work
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

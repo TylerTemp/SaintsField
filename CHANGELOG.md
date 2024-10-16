@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.2 ##
+
+1.  Fix `GetComponentInScene` won't search a disabled object
+2.  Fix auto-getter attributes support for `SaintsInterface`
+3.  IMGUI: fix `OnValueChanged` did not work
+
 ## 3.4.1 ##
 
 1.  UIToolkit: Fix `ShowInInspector` won't disable the updated value
