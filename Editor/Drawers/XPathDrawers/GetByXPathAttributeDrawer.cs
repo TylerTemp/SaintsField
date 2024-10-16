@@ -1386,6 +1386,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 case ResourceType.Object:
                 {
                     Object uObject = (Object) resourceInfo.Resource;
+
                     if (uObject is ScriptableObject)  // no sub. Empty axis already been handled
                     {
                         // do nothing
@@ -1409,7 +1410,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         break;
                     }
 
-                    foreach (Transform childTrans in thisTransform.GetComponentsInChildren<Transform>().Where(each => !ReferenceEquals(each, thisTransform)))
+                    foreach (Transform childTrans in thisTransform.GetComponentsInChildren<Transform>(true).Where(each => !ReferenceEquals(each, thisTransform)))
                     {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                         Debug.Log($"return {childTrans} from children of {thisTransform}");
@@ -1433,10 +1434,16 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                             ResourceType = ResourceType.Object,
                             Resource = rootGameObject,
                         };
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                        Debug.Log($"yield scene root direct child {rootInfo.Resource}");
+#endif
                         yield return rootInfo;
 
                         foreach (ResourceInfo child in GetAllChildrenOfResourceInfo(rootInfo))
                         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                            Debug.Log($"yield child {child.Resource} of {rootInfo.Resource}");
+#endif
                             yield return child;
                         }
                     }
