@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.3 ##
+
+UI Toolkit: Fix `Get*` attributes won't save the value
+
 ## 3.4.2 ##
 
 1.  Fix `GetComponentInScene` won't search a disabled object
@@ -16,7 +20,7 @@
 
 This upgrade contains **Breaking Changes**! Though it will not break your code, but some behavior is adjusted. Please read before upgrade.
 
-**Bug Fix**: 
+**Bug Fix**:
 
 1.  UI Toolkit: Fix `FieldType` won't update the value if the value is changed externally.
 2.  Fix value sign error if the field is in a list/array in some cases.
@@ -95,7 +99,7 @@ Fix broken addressable support due to last version's refactor.
 4.  IMGUI: Fix `PostFieldButton`, `AboveButton`, `BelowButton` use shared error message when in a list/array.
 5.  Change `null` value color for `ShowInInspector`.
 6.  Fix `ShowInInspector` can not detect a dictionary when the target is `IReadOnlyDictionary<,>`
- 
+
 ## 3.3.3 ##
 
 1.  UI Toolkit now can fall back to an IMGUI custom drawer if the target field is specified to be drawn by an IMGUI drawer (note: `<icon>` in `RichLabel` will not work and will get removed).
@@ -143,7 +147,7 @@ This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
 ## 3.2.3 ##
 
 1.  IMGUI: fix disposed access.
-2.  IMGUI: fix `ProgressBar` dragging changes all instance inside array. 
+2.  IMGUI: fix `ProgressBar` dragging changes all instance inside array.
 
 ## 3.2.2 ##
 
@@ -153,7 +157,7 @@ This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
 ## 3.2.1 ##
 
 1.  Rich label now supports `<container.Type />` to display the class/struct name of the container of the field, and `<container.Type.BaseType />`.
-2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support. 
+2.  `Separator` to draw text, separator, spaces for field on above / below with rich text & dynamic text support.
 3.  `Layout`, `LayoutGroup` now supports `marginTop`, `marginBottom`, fixes [#52](https://github.com/TylerTemp/SaintsField/issues/52)
 4.  IMGUI: fixes `Layout` broken inside `SaintsRow`
 

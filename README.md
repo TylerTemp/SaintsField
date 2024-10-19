@@ -60,7 +60,7 @@ If you have DOTween installed
 *   Or disable related functions with `Window` - `Saints` - `Disable DOTween Support`
 *   If you can not find this menu, please read "Add a Macro" section about how to manually disable DOTween support in SaintsField.
 
-[**Optional**] To use the full functions of this project, please also do: `Window` - `Saints` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`. 
+[**Optional**] To use the full functions of this project, please also do: `Window` - `Saints` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
 If you're using `unitypackage` or git submodule, but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
 
@@ -70,11 +70,9 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.4.2**
+**3.4.3**
 
-1.  Fix `GetComponentInScene` won't search a disabled object
-2.  Fix auto-getter attributes support for `SaintsInterface`
-3.  IMGUI: fix `OnValueChanged` did not work
+UI Toolkit: Fix `Get*` attributes won't save the value
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -316,7 +314,7 @@ Draw an info box above/below the field.
 *   ~~`bool above=false`~~
 
     ~~Draw the info box above the field instead of below~~
-    
+
     Renamed to `below` since version `3.3.0`
 
 *   `bool below=false`
@@ -2089,7 +2087,7 @@ NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target obj
     The component type to sign. If null, it'll use the field type.
 
 *   `bool excludeSelf = false`
-    
+
     When `true`, skip checking the target itself.
 
 *   `string groupBy = ""`
@@ -3265,7 +3263,7 @@ public string root2;
 public string sub1;
 public string sub2;
 [LayoutEnd(".")]
-    
+
 [LayoutStart("./Another", ELayout.FoldoutBox)]  // equals "Root/Another"
 public string another1;
 public string another2;
@@ -3282,11 +3280,11 @@ public string outOfAll;
 public string tab1Item1;
 public int tab1Item2;
 [LayoutEnd(".")]
-    
+
 [LayoutStart("./Tab2")]
 public string tab2Item1;
 public int tab2Item2;
-``` 
+```
 
 ![image](https://github.com/user-attachments/assets/ebd29cbe-cd84-4f76-8834-91d1ae44fd59)
 
@@ -3605,7 +3603,7 @@ This is a method decorator, which will bind this method to the target `UnityEven
 
 Parameters:
 
-*   `string eventTarget` the target `UnityEvent`. If you have dot in it, it will first find the field (or property/function), then find the target event on the found field using the name after the dot(s) recursively. 
+*   `string eventTarget` the target `UnityEvent`. If you have dot in it, it will first find the field (or property/function), then find the target event on the found field using the name after the dot(s) recursively.
 *   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
 *   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
 
@@ -3614,7 +3612,7 @@ Note:
 1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
 2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
 
-Example: 
+Example:
 
 ```csharp
 public UnityEvent<int, int> intIntEvent;
@@ -3647,7 +3645,7 @@ public class CustomEventExample : SaintsMonoBehaviour
     public CustomEventChild _child;
 
     // it will find the `_intEvent` on the `_child` field
-    [OnEvent(nameof(_child) + "._intEvent")]  
+    [OnEvent(nameof(_child) + "._intEvent")]
     public void OnChildInt(int int1)
     {
     }
@@ -3856,7 +3854,7 @@ Go to `Window` - `Saints` to enable/disable functions you want
 
     #"Disable SaintsEditor IMGUI constant repaint"
     -define:SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
-    
+
     #"Enable IMGUI duplicated decorators drawing fix"
     -define:SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
     ```
