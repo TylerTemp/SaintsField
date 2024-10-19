@@ -776,6 +776,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent,
                         initUserData.CheckFieldResult.TargetValue);
+                    initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(initUserData.CheckFieldResult.TargetValue);
                 }
             }
@@ -789,6 +790,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 object expectedData = initUserData.CheckFieldResult.TargetValue;
                 // Debug.Log($"expectedData={expectedData}, targetProp={initUserData.TargetProperty.propertyPath} memberInfo={initUserData.MemberInfo.Name}");
                 SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, expectedData);
+                initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(expectedData);
             };
 
@@ -798,6 +800,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 if(arrayIndex == -1)
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
+                    initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(null);
                 }
                 else
@@ -823,6 +826,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         newValue =>
                         {
                             SetValue(initUserData.TargetProperty, initUserData.MemberInfo, updatedParent, newValue);
+                            initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                             onValueChangedCallback.Invoke(newValue);
                         }, updatedParent);
                 };
@@ -911,6 +915,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 if (doResignNull || doResignValue)
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, checkResult.TargetValue);
+                    initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                     onValueChanged.Invoke(checkResult.TargetValue);
                     checkResult = new CheckFieldResult
                     {
