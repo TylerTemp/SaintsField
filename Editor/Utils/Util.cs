@@ -500,14 +500,21 @@ namespace SaintsField.Editor.Utils
                     // Debug.Log($"{genResult}/{genResult.GetType()} -> {typeof(T)}");
                     // Debug.LogException(e);
                     // return (e.Message, defaultValue);
-                    try
+                    if (typeof(T) == typeof(string))
                     {
-                        finalResult = (T)genResult;
+                        finalResult = (T)Convert.ChangeType(genResult == null? "": genResult.ToString(), typeof(T));
                     }
-                    catch (InvalidCastException e)
+                    else
                     {
-                        Debug.LogException(e);
-                        return (e.Message, defaultValue);
+                        try
+                        {
+                            finalResult = (T)genResult;
+                        }
+                        catch (InvalidCastException e)
+                        {
+                            Debug.LogException(e);
+                            return (e.Message, defaultValue);
+                        }
                     }
                 }
 

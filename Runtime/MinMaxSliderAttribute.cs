@@ -20,11 +20,13 @@ namespace SaintsField
 
         public readonly float MinWidth;
         public readonly float MaxWidth;
+
+        public readonly bool FreeInput;
         // ReSharper enable InconsistentNaming
 
         private const float DefaultWidth = 50f;
 
-        public MinMaxSliderAttribute(float min, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)
+        public MinMaxSliderAttribute(float min, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth, bool free=false)
         {
             Min = min;
             Max = max;
@@ -34,9 +36,10 @@ namespace SaintsField
 
             MinWidth = minWidth;
             MaxWidth = maxWidth;
+            FreeInput = free;
         }
 
-        public MinMaxSliderAttribute(int min, int max, int step=1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)
+        public MinMaxSliderAttribute(int min, int max, int step=1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth, bool free=false)
         {
             Min = min;
             Max = max;
@@ -46,9 +49,10 @@ namespace SaintsField
 
             MinWidth = minWidth;
             MaxWidth = maxWidth;
+            FreeInput = free;
         }
 
-        public MinMaxSliderAttribute(string minCallback, string maxCallback, int step=-1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)
+        public MinMaxSliderAttribute(string minCallback, string maxCallback, int step=-1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth, bool free=false)
         {
             Min = -1;
             Max = -1;
@@ -58,9 +62,10 @@ namespace SaintsField
 
             MinWidth = minWidth;
             MaxWidth = maxWidth;
+            FreeInput = free;
         }
 
-        public MinMaxSliderAttribute(float min, string maxCallback, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)
+        public MinMaxSliderAttribute(float min, string maxCallback, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth, bool free=false)
         {
             Min = min;
             Max = -1;
@@ -70,9 +75,10 @@ namespace SaintsField
 
             MinWidth = minWidth;
             MaxWidth = maxWidth;
+            FreeInput = free;
         }
 
-        public MinMaxSliderAttribute(string minCallback, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth)
+        public MinMaxSliderAttribute(string minCallback, float max, float step=-1f, float minWidth=DefaultWidth, float maxWidth=DefaultWidth, bool free=false)
         {
             Min = -1;
             Max = max;
@@ -82,6 +88,7 @@ namespace SaintsField
 
             MinWidth = minWidth;
             MaxWidth = maxWidth;
+            FreeInput = free;
         }
     }
 }

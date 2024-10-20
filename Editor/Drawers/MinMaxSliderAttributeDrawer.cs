@@ -66,29 +66,57 @@ namespace SaintsField.Editor.Drawers
             }, rightFieldWidth);
 
             // Draw the slider
-            EditorGUI.BeginChangeCheck();
-
             if (property.propertyType == SerializedPropertyType.Vector2)
             {
                 Vector2 sliderValue = property.vector2Value;
-                EditorGUI.MinMaxSlider(sliderRect, ref sliderValue.x, ref sliderValue.y, minValue, maxValue);
 
-                // GUI.SetNextControlName(FieldControlName);
-                sliderValue.x = EditorGUI.FloatField(labelWithMinFieldRect, label, sliderValue.x);
-                sliderValue.x = Mathf.Clamp(sliderValue.x, minValue, Mathf.Min(maxValue, sliderValue.y));
-
-                sliderValue.y = EditorGUI.FloatField(maxFloatFieldRect, sliderValue.y);
-                sliderValue.y = Mathf.Clamp(sliderValue.y, Mathf.Max(minValue, sliderValue.x), maxValue);
-
-                if (EditorGUI.EndChangeCheck())
+                if (minMaxSliderAttribute.FreeInput)
                 {
-                    property.vector2Value = minMaxSliderAttribute.Step < 0
+                    minValue = Mathf.Min(minValue, sliderValue.x);
+                    maxValue = Mathf.Max(maxValue, sliderValue.y);
+                }
+
+                bool hasChange = false;
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    EditorGUI.MinMaxSlider(sliderRect, ref sliderValue.x, ref sliderValue.y, minValue, maxValue);
+                    if(changed.changed)
+                    {
+                        hasChange = true;
+                    }
+                }
+
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    float sliderX = EditorGUI.FloatField(labelWithMinFieldRect, label, sliderValue.x);
+                    if(changed.changed)
+                    {
+                        sliderValue.x = minMaxSliderAttribute.FreeInput? sliderX: Mathf.Clamp(sliderX, minValue, Mathf.Min(maxValue, sliderValue.y));
+                        hasChange = true;
+                    }
+                }
+
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    float sliderY = EditorGUI.FloatField(maxFloatFieldRect, sliderValue.y);
+                    if(changed.changed)
+                    {
+                        sliderValue.y = minMaxSliderAttribute.FreeInput? sliderY: Mathf.Clamp(sliderY, Mathf.Max(minValue, sliderValue.x), maxValue);
+                        hasChange = true;
+                    }
+                }
+
+                if (hasChange)
+                {
+                    property.vector2Value = minMaxSliderAttribute.Step < 0 || minMaxSliderAttribute.FreeInput
                         ? sliderValue
                         : BoundV2Step(sliderValue, minValue, maxValue, minMaxSliderAttribute.Step);
                 }
             }
             else if (property.propertyType == SerializedPropertyType.Vector2Int)
             {
+                EditorGUI.BeginChangeCheck();
+
                 Vector2Int sliderValue = property.vector2IntValue;
                 float xValue = sliderValue.x;
                 float yValue = sliderValue.y;
@@ -238,6 +266,22 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
+            if (minMaxSliderAttribute.FreeInput)
+            {
+                if(property.propertyType == SerializedPropertyType.Vector2)
+                {
+                    Vector2 curValue = property.vector2Value;
+                    minValue = Mathf.Min(minValue, curValue.x);
+                    maxValue = Mathf.Max(maxValue, curValue.y);
+                }
+                else
+                {
+                    Vector2Int curValue = property.vector2IntValue;
+                    minValue = Mathf.Min(minValue, curValue.x);
+                    maxValue = Mathf.Max(maxValue, curValue.y);
+                }
+            }
+
             return new MetaInfo
             {
                 Error = "",
@@ -365,7 +409,7 @@ namespace SaintsField.Editor.Drawers
 
             MinMaxSliderField minMaxSliderField = new MinMaxSliderField(property.displayName, root);
             minMaxSliderField.labelElement.style.overflow = Overflow.Hidden;
-            minMaxSliderField.AddToClassList("unity-base-field__aligned");
+            minMaxSliderField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
 
             minMaxSliderField.AddToClassList(ClassAllowDisable);
 
@@ -413,7 +457,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     MetaInfo metaInfo = (MetaInfo)minMaxSlider.userData;
                     ApplyIntValue(property, minMaxSliderAttribute.Step, changed.newValue, (int)metaInfo.MinValue,
-                        (int)metaInfo.MaxValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback);
+                        (int)metaInfo.MaxValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
                 // minIntField.RegisterCallback<BlurEvent>(evt =>
                 // {
@@ -421,18 +465,18 @@ namespace SaintsField.Editor.Drawers
                 // });
                 minIntField.RegisterValueChangedCallback(changed =>
                 {
-                    // Debug.Log(minIntField.isDelayed);
+                    Debug.Log(changed.newValue);
                     MetaInfo metaInfo = (MetaInfo)minMaxSlider.userData;
                     ApplyIntValue(property, minMaxSliderAttribute.Step,
                         ToVector2IntRange(changed.newValue, maxIntField.value), (int)metaInfo.MinValue,
-                        (int)metaInfo.MaxValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback);
+                        (int)metaInfo.MaxValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
                 maxIntField.RegisterValueChangedCallback(changed =>
                 {
                     MetaInfo metaInfo = (MetaInfo)minMaxSlider.userData;
                     ApplyIntValue(property, minMaxSliderAttribute.Step,
                         ToVector2IntRange(minIntField.value, changed.newValue), (int)metaInfo.MinValue,
-                        (int)metaInfo.MaxValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback);
+                        (int)metaInfo.MaxValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
             }
             else
@@ -444,7 +488,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     MetaInfo metaInfo = (MetaInfo)minMaxSlider.userData;
                     ApplyFloatValue(property, minMaxSliderAttribute.Step, changed.newValue, metaInfo.MinValue,
-                        metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback);
+                        metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
                 minFloatField.RegisterValueChangedCallback(changed =>
                 {
@@ -454,7 +498,7 @@ namespace SaintsField.Editor.Drawers
 #endif
                     ApplyFloatValue(property, minMaxSliderAttribute.Step,
                         ToVector2Range(changed.newValue, maxFloatField.value), metaInfo.MinValue,
-                        metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback);
+                        metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
                 maxFloatField.RegisterValueChangedCallback(changed =>
                 {
@@ -464,7 +508,7 @@ namespace SaintsField.Editor.Drawers
 #endif
                     ApplyFloatValue(property, minMaxSliderAttribute.Step,
                         ToVector2Range(minFloatField.value, changed.newValue), metaInfo.MinValue,
-                        metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback);
+                        metaInfo.MaxValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
             }
         }
@@ -527,32 +571,50 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static void ApplyIntValue(SerializedProperty property, float step, Vector2 sliderValue, int minValue, int maxValue, MinMaxSlider slider, IntegerField minField, IntegerField maxField, Action<object> onValueChangedCallback)
+        private static void ApplyIntValue(SerializedProperty property, float step, Vector2 sliderValue, int minValue, int maxValue, MinMaxSlider slider, IntegerField minField, IntegerField maxField, Action<object> onValueChangedCallback, bool freeInput)
         {
             int actualStep = Mathf.Max(1, Mathf.RoundToInt(step));
-            Vector2Int vector2IntValue = new Vector2Int(
-                Util.BoundIntStep(sliderValue.x, minValue, maxValue, actualStep),
-                Util.BoundIntStep(sliderValue.y, minValue, maxValue, actualStep)
-            );
+            Vector2Int vector2IntValue = freeInput
+                ? new Vector2Int((int) sliderValue.x, (int) sliderValue.y)
+                : new Vector2Int(
+                    Util.BoundIntStep(sliderValue.x, minValue, maxValue, actualStep),
+                    Util.BoundIntStep(sliderValue.y, minValue, maxValue, actualStep)
+                );
 
             property.vector2IntValue = vector2IntValue;
             property.serializedObject.ApplyModifiedProperties();
             // Debug.Log($"update value to {vector2IntValue}");
             onValueChangedCallback.Invoke(vector2IntValue);
 
+            if (freeInput)
+            {
+                if(slider.lowLimit > vector2IntValue.x)
+                {
+                    slider.lowLimit = vector2IntValue.x;
+                }
+                if(slider.highLimit < vector2IntValue.y)
+                {
+                    slider.highLimit = vector2IntValue.y;
+                }
+            }
+
             slider.SetValueWithoutNotify(vector2IntValue);
             minField.SetValueWithoutNotify(vector2IntValue.x);
             maxField.SetValueWithoutNotify(vector2IntValue.y);
         }
 
-        private static void ApplyFloatValue(SerializedProperty property, float step, Vector2 sliderValue, float minValue, float maxValue, MinMaxSlider slider, FloatField minField, FloatField maxField, Action<object> onValueChangedCallback)
+        private static void ApplyFloatValue(SerializedProperty property, float step, Vector2 sliderValue, float minValue, float maxValue, MinMaxSlider slider, FloatField minField, FloatField maxField, Action<object> onValueChangedCallback, bool freeInput)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
             Debug.Log($"try apply float {minValue}~{maxValue}<={sliderValue}");
 #endif
+
+            float useMin = freeInput ? float.MinValue : minValue;
+            float useMax = freeInput ? float.MaxValue : maxValue;
+
             Vector2 vector2Value = step <= 0f
-                ? new Vector2(Mathf.Max(sliderValue.x, minValue), Mathf.Min(sliderValue.y, maxValue))
-                : BoundV2Step(sliderValue, minValue, maxValue, step);
+                ? new Vector2(Mathf.Max(sliderValue.x, useMin), Mathf.Min(sliderValue.y, useMax))
+                : BoundV2Step(sliderValue, useMin, useMax, step);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
             Debug.Log($"apply step={step}: {sliderValue} => {vector2Value}");
@@ -561,6 +623,18 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log($"apply float {vector2Value}");
             property.serializedObject.ApplyModifiedProperties();
             onValueChangedCallback.Invoke(vector2Value);
+
+            if (freeInput)
+            {
+                if(slider.minValue > vector2Value.x)
+                {
+                    slider.minValue = vector2Value.x;
+                }
+                if(slider.maxValue < vector2Value.y)
+                {
+                    slider.maxValue = vector2Value.y;
+                }
+            }
 
             slider.SetValueWithoutNotify(vector2Value);
             minField.SetValueWithoutNotify(vector2Value.x);
