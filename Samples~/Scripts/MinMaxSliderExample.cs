@@ -49,5 +49,7 @@ namespace SaintsField.Samples.Scripts
 
         [MinMaxSlider(-5, 5, free: true)] public Vector2Int freeInt;
         [MinMaxSlider(-5, 5, free: true)] public Vector2 freeFloat;
+
+        [MinMaxSlider(-5, 5, step: 2, free: true)] public Vector2Int stepInt;
     }
 }
