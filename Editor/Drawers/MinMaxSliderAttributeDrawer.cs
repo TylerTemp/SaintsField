@@ -468,16 +468,16 @@ namespace SaintsField.Editor.Drawers
                 minMaxSlider.RegisterValueChangedCallback(changed =>
                 {
                     UserData userData = (UserData)minMaxSlider.userData;
-                    ApplyIntValue(property, minMaxSliderAttribute.Step, changed.newValue, (int)userData.MetaInfo.MinValue,
-                        (int)userData.MetaInfo.MaxValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    int min = (int)userData.FreeMin;
+                    int max = (int)userData.FreeMax;
+                    ApplyIntValue(property, minMaxSliderAttribute.Step, AdjustIntSliderInput(changed.newValue, minMaxSliderAttribute.Step, min, max), min,
+                        max, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
                 minIntField.RegisterValueChangedCallback(changed =>
                 {
                     UserData userData = (UserData)minMaxSlider.userData;
                     int newValue = changed.newValue;
-                    Vector2Int inputValue = minMaxSliderAttribute.FreeInput
-                        ? AdjustFreeInput(newValue, maxIntField.value, minMaxSliderAttribute.Step)
-                        : ToVector2IntRange(newValue, maxIntField.value);
+                    Vector2Int inputValue = AdjustFreeInput(newValue, maxIntField.value, minMaxSliderAttribute.Step);
                     ApplyIntValue(property, minMaxSliderAttribute.Step,
                         inputValue, (int)userData.FreeMin,
                         (int)userData.FreeMax, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
@@ -486,9 +486,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     UserData userData = (UserData)minMaxSlider.userData;
                     int newValue = changed.newValue;
-                    Vector2Int inputValue = minMaxSliderAttribute.FreeInput
-                        ? AdjustFreeInput(newValue, minIntField.value, minMaxSliderAttribute.Step)
-                        : ToVector2IntRange(newValue, minIntField.value);
+                    Vector2Int inputValue = AdjustFreeInput(newValue, minIntField.value, minMaxSliderAttribute.Step);
                     ApplyIntValue(property, minMaxSliderAttribute.Step,
                         inputValue, (int)userData.FreeMin,
                         (int)userData.FreeMax, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
@@ -544,6 +542,26 @@ namespace SaintsField.Editor.Drawers
                 int useValue = Mathf.RoundToInt(newValue - stepCount * step);
                 return new Vector2Int(useValue, newValue);
             }
+        }
+
+        private static Vector2Int AdjustIntSliderInput(Vector2 changedNewValue, float step, int min, int max)
+        {
+            if (step <= 0f)
+            {
+                return new Vector2Int(Mathf.RoundToInt(changedNewValue.x), Mathf.RoundToInt(changedNewValue.y));
+            }
+
+            float left = changedNewValue.x;
+            float right = changedNewValue.y;
+            int stepCount = Mathf.RoundToInt(left / step);
+            float newRight = left + stepCount * step;
+            if (newRight <= max)
+            {
+                return new Vector2Int(Mathf.RoundToInt(left), Mathf.RoundToInt(newRight));
+            }
+
+            float newLeft = right - stepCount * step;
+            return new Vector2Int(Mathf.RoundToInt(newLeft), Mathf.RoundToInt(right));
         }
 
         private static Vector2 ToVector2Range(float oneValue, float anotherValue) =>  oneValue > anotherValue
@@ -635,13 +653,10 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static void ApplyIntValue(SerializedProperty property, float step, Vector2 sliderValue, int minValue, int maxValue, MinMaxSlider slider, IntegerField minField, IntegerField maxField, Action<object> onValueChangedCallback, bool freeInput)
+        private static void ApplyIntValue(SerializedProperty property, float step, Vector2Int sliderValue, int minValue, int maxValue, MinMaxSlider slider, IntegerField minField, IntegerField maxField, Action<object> onValueChangedCallback, bool freeInput)
         {
-            int actualStep = Mathf.Max(1, Mathf.RoundToInt(step));
-            Vector2Int vector2IntValue = new Vector2Int(
-                    Util.BoundIntStep(sliderValue.x, minValue, maxValue, actualStep),
-                    Util.BoundIntStep(sliderValue.y, minValue, maxValue, actualStep)
-                );
+            // int actualStep = Mathf.Max(1, Mathf.RoundToInt(step));
+            Vector2Int vector2IntValue = sliderValue;
 
             property.vector2IntValue = vector2IntValue;
             property.serializedObject.ApplyModifiedProperties();
