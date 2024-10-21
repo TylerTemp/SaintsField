@@ -177,6 +177,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return 0;
+            }
             // IReadOnlyList<GetByXPathAttribute> allGetByXPathAttributes = AttributesIfImTheFirst(property, (GetByXPathAttribute)saintsAttribute);
             bool configExists = ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData);
             if(configExists && existedInitUserData.DecoratorIndex != index)
@@ -311,6 +315,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             int index,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return false;
+            }
             if(!ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData) || existedInitUserData.DecoratorIndex != index)
             {
                 return false;
@@ -403,6 +411,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             int index,
             FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return 0;
+            }
             string errorMessage = GetErrorMessage(property, (GetByXPathAttribute)saintsAttribute, index);
             return errorMessage == ""
                 ? 0
@@ -414,6 +426,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             FieldInfo info,
             object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return false;
+            }
             return GetErrorMessage(property, (GetByXPathAttribute)saintsAttribute, index) != "";
         }
 
@@ -422,6 +438,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             int index,
             FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return position;
+            }
             string errorMessage = GetErrorMessage(property, (GetByXPathAttribute)saintsAttribute, index);
             return errorMessage == ""
                 ? position
@@ -677,6 +697,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return;
+            }
             VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
             if (root == null)
             {
@@ -839,6 +863,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return;
+            }
+
             VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
             if (root == null)
             {
@@ -2659,6 +2688,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
         public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info)
         {
+            if (EditorApplication.isPlaying)
+            {
+                return false;
+            }
             (GetByXPathAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(arrayProperty);
 
             Type arrayElementType = ReflectUtils.GetElementType(info.FieldType);

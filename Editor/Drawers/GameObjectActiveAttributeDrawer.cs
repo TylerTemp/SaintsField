@@ -248,7 +248,7 @@ namespace SaintsField.Editor.Drawers
             (string goError, GameObject go) = GetGo(property, info, parent);
             if (goError != "")
             {
-                Debug.LogError(goError);
+                // Debug.LogError(goError);
                 return;
             }
 
