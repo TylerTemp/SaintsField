@@ -39,7 +39,7 @@ namespace SaintsField
             FreeInput = free;
         }
 
-        public MinMaxSliderAttribute(int min, int max, int step=1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth, bool free=false)
+        public MinMaxSliderAttribute(int min, int max, int step=-1, float minWidth=DefaultWidth, float maxWidth=DefaultWidth, bool free=false)
         {
             Min = min;
             Max = max;

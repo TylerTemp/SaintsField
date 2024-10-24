@@ -312,7 +312,6 @@ namespace SaintsField.Editor.Drawers
 
         private record UserData
         {
-            public MetaInfo MetaInfo;
             public float FreeMin;
             public float FreeMax;
         }
@@ -338,7 +337,7 @@ namespace SaintsField.Editor.Drawers
 
             Vector2 sliderValue = isInt ? property.vector2IntValue : property.vector2Value;
 
-            MinMaxSlider minMaxSlider = new MinMaxSlider(sliderValue.x, sliderValue.y, sliderValue.x, sliderValue.y)
+            MinMaxSlider minMaxSlider = new MinMaxSlider(sliderValue.x, sliderValue.y, Mathf.Min(sliderValue.x, sliderValue.y), Mathf.Max(sliderValue.x, sliderValue.y))
             {
                 name = NameSlider(property),
                 style =
@@ -350,12 +349,6 @@ namespace SaintsField.Editor.Drawers
                 },
                 userData = new UserData
                 {
-                     MetaInfo = new MetaInfo
-                    {
-                        Error = "",
-                        MinValue = sliderValue.x,
-                        MaxValue = sliderValue.y,
-                    },
                     FreeMin = sliderValue.x,
                     FreeMax = sliderValue.y,
                 },
@@ -450,16 +443,32 @@ namespace SaintsField.Editor.Drawers
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            // if (property.propertyType != SerializedPropertyType.Vector2 &&
-            //     property.propertyType != SerializedPropertyType.Vector2Int)
-            // {
-            //     return;
-            // }
-
             bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
 
             MinMaxSlider minMaxSlider = container.Q<MinMaxSlider>(NameSlider(property));
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
+            UserData userData = (UserData)minMaxSlider.userData;
+
+            // That's the KEY!!!!!!!!!!!!!
+            minMaxSlider.TrackPropertyValue(property, p =>
+            {
+                Vector2 newValue = property.propertyType == SerializedPropertyType.Vector2Int ? p.vector2IntValue : p.vector2Value;
+
+                if (newValue.y < newValue.x)
+                {
+                    newValue.y = newValue.x;
+                }
+
+                minMaxSlider.SetValueWithoutNotify(newValue);
+            });
+
+            MetaInfo metaInfo = GetMetaInfo(property, minMaxSliderAttribute, info, parent);
+            userData.FreeMin = metaInfo.MinValue;
+            userData.FreeMax = metaInfo.MaxValue;
+            minMaxSlider.lowLimit = metaInfo.MinValue;
+            minMaxSlider.highLimit = metaInfo.MaxValue;
+
+            AdjustFreeRangeHighAndLow(property, minMaxSliderAttribute, container);
 
             if (isInt)
             {
@@ -467,29 +476,37 @@ namespace SaintsField.Editor.Drawers
                 IntegerField maxIntField = container.Q<IntegerField>(NameMaxInteger(property));
                 minMaxSlider.RegisterValueChangedCallback(changed =>
                 {
-                    UserData userData = (UserData)minMaxSlider.userData;
-                    int min = (int)userData.FreeMin;
-                    int max = (int)userData.FreeMax;
-                    ApplyIntValue(property, minMaxSliderAttribute.Step, AdjustIntSliderInput(changed.newValue, minMaxSliderAttribute.Step, min, max), min,
-                        max, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    float min = userData.FreeMin;
+                    float max = userData.FreeMax;
+                    Vector2Int inputValue = AdjustIntSliderInput(changed.newValue, minMaxSliderAttribute.Step, min, max);
+                    ApplyIntValue(property, inputValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
                 minIntField.RegisterValueChangedCallback(changed =>
                 {
-                    UserData userData = (UserData)minMaxSlider.userData;
                     int newValue = changed.newValue;
-                    Vector2Int inputValue = AdjustFreeInput(newValue, maxIntField.value, minMaxSliderAttribute.Step);
-                    ApplyIntValue(property, minMaxSliderAttribute.Step,
-                        inputValue, (int)userData.FreeMin,
-                        (int)userData.FreeMax, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    Vector2Int inputValue = AdjustIntInput(newValue, maxIntField.value, minMaxSliderAttribute.Step, (int)userData.FreeMin, (int)userData.FreeMax, minMaxSliderAttribute.FreeInput);
+                    ApplyIntValue(property,
+                        inputValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    if (minMaxSliderAttribute.FreeInput)
+                    {
+                        userData.FreeMin = Mathf.Min(userData.FreeMin, inputValue.x);
+                        userData.FreeMax = Mathf.Max(userData.FreeMax, inputValue.y);
+                        // Debug.Log($"update min max {userData.FreeMin}~{userData.FreeMax}");
+                    }
                 });
                 maxIntField.RegisterValueChangedCallback(changed =>
                 {
-                    UserData userData = (UserData)minMaxSlider.userData;
+
                     int newValue = changed.newValue;
-                    Vector2Int inputValue = AdjustFreeInput(newValue, minIntField.value, minMaxSliderAttribute.Step);
-                    ApplyIntValue(property, minMaxSliderAttribute.Step,
-                        inputValue, (int)userData.FreeMin,
-                        (int)userData.FreeMax, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    Vector2Int inputValue = AdjustIntInput(newValue, minIntField.value, minMaxSliderAttribute.Step, (int)userData.FreeMin, (int)userData.FreeMax, minMaxSliderAttribute.FreeInput);
+                    ApplyIntValue(property,
+                        inputValue, minMaxSlider, minIntField, maxIntField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    if (minMaxSliderAttribute.FreeInput)
+                    {
+                        userData.FreeMin = Mathf.Min(userData.FreeMin, inputValue.x);
+                        userData.FreeMax = Mathf.Max(userData.FreeMax, inputValue.y);
+                        // Debug.Log($"update min max {userData.FreeMin}~{userData.FreeMax}");
+                    }
                 });
             }
             else
@@ -499,178 +516,302 @@ namespace SaintsField.Editor.Drawers
 
                 minMaxSlider.RegisterValueChangedCallback(changed =>
                 {
-                    UserData userData = (UserData)minMaxSlider.userData;
-                    ApplyFloatValue(property, minMaxSliderAttribute.Step, changed.newValue, userData.FreeMin,
-                        userData.FreeMax, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    float min = userData.FreeMin;
+                    float max = userData.FreeMax;
+                    Vector2 inputValue = AdjustFloatSliderInput(changed.newValue, minMaxSliderAttribute.Step, min, max);
+                    ApplyFloatValue(property, inputValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
                 });
                 minFloatField.RegisterValueChangedCallback(changed =>
                 {
-                    UserData userData = (UserData)minMaxSlider.userData;
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
                     Debug.Log($"changed={changed.newValue}, maxValue={maxFloatField.value}");
 #endif
-                    ApplyFloatValue(property, minMaxSliderAttribute.Step,
-                        ToVector2Range(changed.newValue, maxFloatField.value), userData.FreeMin,
-                        userData.FreeMax, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    float newValue = changed.newValue;
+                    Vector2 inputValue = AdjustFloatInput(newValue, maxFloatField.value, minMaxSliderAttribute.Step, userData.FreeMin, userData.FreeMax, minMaxSliderAttribute.FreeInput);
+                    ApplyFloatValue(property,
+                        inputValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    if (minMaxSliderAttribute.FreeInput)
+                    {
+                        userData.FreeMin = Mathf.Min(userData.FreeMin, inputValue.x);
+                        userData.FreeMax = Mathf.Max(userData.FreeMax, inputValue.y);
+                    }
                 });
                 maxFloatField.RegisterValueChangedCallback(changed =>
                 {
-                    UserData userData = (UserData)minMaxSlider.userData;
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
                     Debug.Log($"changed={changed.newValue}, minValue={minFloatField.value}");
 #endif
-                    ApplyFloatValue(property, minMaxSliderAttribute.Step,
-                        ToVector2Range(minFloatField.value, changed.newValue), userData.FreeMin,
-                        userData.FreeMax, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    float newValue = changed.newValue;
+                    Vector2 inputValue = AdjustFloatInput(newValue, minFloatField.value, minMaxSliderAttribute.Step, userData.FreeMin, userData.FreeMax, minMaxSliderAttribute.FreeInput);
+                    ApplyFloatValue(property,
+                        inputValue, minMaxSlider, minFloatField, maxFloatField, onValueChangedCallback, minMaxSliderAttribute.FreeInput);
+                    if (minMaxSliderAttribute.FreeInput)
+                    {
+                        userData.FreeMin = Mathf.Min(userData.FreeMin, inputValue.x);
+                        userData.FreeMax = Mathf.Max(userData.FreeMax, inputValue.y);
+                    }
                 });
             }
         }
 
-        private static Vector2Int AdjustFreeInput(int newValue, int value, float step)
+        private static Vector2Int AdjustIntInput(int newValue, int value, float step, int minValue, int maxValue, bool free)
         {
-            if (newValue < value)
+            int startValue = Mathf.Min(newValue, value);
+            int endValue = Mathf.Max(newValue, value);
+            if (step < 0)
             {
-                int diff = value - newValue;
-                int stepCount = Mathf.RoundToInt(diff / step);
-                int useValue = Mathf.RoundToInt(newValue + stepCount * step);
-                return new Vector2Int(newValue, useValue);
+                return free
+                    ? new Vector2Int(startValue, endValue)
+                    : new Vector2Int(Mathf.Min(startValue, minValue), Mathf.Max(endValue, maxValue));
             }
-            else
+
+            int startSteppedValue = minValue + Mathf.RoundToInt(Mathf.RoundToInt((startValue - minValue) / step) * step);
+            if (!free && startSteppedValue < minValue)
             {
-                int diff = newValue - value;
-                int stepCount = Mathf.RoundToInt(diff / step);
-                int useValue = Mathf.RoundToInt(newValue - stepCount * step);
-                return new Vector2Int(useValue, newValue);
+                startSteppedValue = minValue;
             }
+            int endSteppedValue = startSteppedValue + Mathf.RoundToInt(Mathf.RoundToInt((endValue - startValue) / step) * step);
+            if (!free && endSteppedValue > maxValue)
+            {
+                endSteppedValue = startSteppedValue + Mathf.FloorToInt(Mathf.FloorToInt((maxValue - startSteppedValue) / step) * step);
+            }
+
+            return new Vector2Int(startSteppedValue, endSteppedValue);
         }
 
-        private static Vector2Int AdjustIntSliderInput(Vector2 changedNewValue, float step, int min, int max)
+        private static Vector2 AdjustFloatInput(float newValue, float value, float step, float minValue, float maxValue, bool free)
+        {
+            float startValue = Mathf.Min(newValue, value);
+            float endValue = Mathf.Max(newValue, value);
+            if (step < 0)
+            {
+                return free
+                    ? new Vector2(startValue, endValue)
+                    : new Vector2(Mathf.Min(startValue, minValue), Mathf.Max(endValue, maxValue));
+            }
+
+            float startSteppedValue = minValue + Mathf.RoundToInt((startValue - minValue) / step) * step;
+            if (!free && startSteppedValue < minValue)
+            {
+                startSteppedValue = minValue;
+            }
+            float endSteppedValue = startSteppedValue + (Mathf.RoundToInt((endValue - startValue) / step) * step);
+            if (!free && endSteppedValue > maxValue)
+            {
+                endSteppedValue = startSteppedValue + (Mathf.FloorToInt((maxValue - startSteppedValue) / step) * step);
+            }
+
+            return new Vector2(startSteppedValue, endSteppedValue);
+        }
+
+        private static Vector2Int AdjustIntSliderInput(Vector2 changedNewValue, float step, float min, float max)
         {
             if (step <= 0f)
             {
                 return new Vector2Int(Mathf.RoundToInt(changedNewValue.x), Mathf.RoundToInt(changedNewValue.y));
             }
 
-            float left = changedNewValue.x;
-            float right = changedNewValue.y;
-            int stepCount = Mathf.RoundToInt(left / step);
-            float newRight = left + stepCount * step;
-            if (newRight <= max)
+            int startStep = Mathf.RoundToInt((changedNewValue.x - min) / step);
+            int startValue = Mathf.RoundToInt(min + startStep * Mathf.RoundToInt(step));
+
+            float distance = changedNewValue.y - changedNewValue.x;
+
+            int endValue = Mathf.RoundToInt(startValue + Mathf.RoundToInt(distance / step) * step);
+            if (endValue > max)
             {
-                return new Vector2Int(Mathf.RoundToInt(left), Mathf.RoundToInt(newRight));
+                endValue = Mathf.RoundToInt(endValue - step);
             }
 
-            float newLeft = right - stepCount * step;
-            return new Vector2Int(Mathf.RoundToInt(newLeft), Mathf.RoundToInt(right));
+            return new Vector2Int(startValue, endValue);
+        }
+
+        private static Vector2 AdjustFloatSliderInput(Vector2 changedNewValue, float step, float min, float max)
+        {
+            if (step <= 0f)
+            {
+                return changedNewValue;
+            }
+
+            float startValue = min + Mathf.RoundToInt((changedNewValue.x - min) / step) * step;
+
+            float distance = changedNewValue.y - changedNewValue.x;
+
+            float endValue = startValue + Mathf.RoundToInt(distance / step) * step;
+            if (endValue > max)
+            {
+                endValue -= step;
+            }
+
+            return new Vector2(startValue, endValue);
         }
 
         private static Vector2 ToVector2Range(float oneValue, float anotherValue) =>  oneValue > anotherValue
             ? new Vector2(anotherValue, oneValue)
             : new Vector2(oneValue, anotherValue);
-        private static Vector2Int ToVector2IntRange(int oneValue, int anotherValue) =>  oneValue > anotherValue
-            ? new Vector2Int(anotherValue, oneValue)
-            : new Vector2Int(oneValue, anotherValue);
 
+        // TODO: TrackPropertyValue is better than this
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
-            // bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
+            bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
+            MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
 
-            MinMaxSlider minMaxSlider = container.Q<MinMaxSlider>(NameSlider(property));
-            // MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
-            UserData userData = (UserData)minMaxSlider.userData;
-            MetaInfo oldMetaInfo = userData.MetaInfo;
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+            AdjustFreeRangeHighAndLow(property, minMaxSliderAttribute, container);
 
-            bool changed = false;
-
-            float useHighLimit = metaInfo.MaxValue;
-            float useLowLimit = metaInfo.MinValue;
-            if (((MinMaxSliderAttribute)saintsAttribute).FreeInput)
+            if (isInt)
             {
-                if (property.propertyType == SerializedPropertyType.Vector2)
+                Vector2Int value = property.vector2IntValue;
+                IntegerField minIntField = container.Q<IntegerField>(NameMinInteger(property));
+                IntegerField maxIntField = container.Q<IntegerField>(NameMaxInteger(property));
+                if (minIntField.value != value.x)
                 {
-                    if (useLowLimit > property.vector2Value.x)
-                    {
-                        useLowLimit = property.vector2Value.x;
-                    }
-
-                    if (useHighLimit < property.vector2Value.y)
-                    {
-                        useHighLimit = property.vector2Value.y;
-                    }
+                    minIntField.SetValueWithoutNotify(value.x);
                 }
-                else if (property.propertyType == SerializedPropertyType.Vector2Int)
+
+                if (maxIntField.value != value.y)
                 {
-                    if (useLowLimit > property.vector2IntValue.x)
-                    {
-                        useLowLimit = property.vector2IntValue.x;
-                    }
-                    if(useHighLimit < property.vector2IntValue.y)
-                    {
-                        useHighLimit = property.vector2IntValue.y;
-                    }
+                    maxIntField.SetValueWithoutNotify(value.y);
                 }
             }
-
-            // Debug.Log($"old={oldMetaInfo}, new={metaInfo}");
-
-            if (metaInfo.Error == "" && (!Mathf.Approximately(minMaxSlider.highLimit, useHighLimit)
-                                         || !Mathf.Approximately(minMaxSlider.lowLimit, useLowLimit)))
+            else
             {
-                changed = true;
-                // WTF Unity? Fix your shit!
-                if (useLowLimit >= minMaxSlider.highLimit)
+                Vector2 value = property.vector2Value;
+                FloatField minFloatField = container.Q<FloatField>(NameMinFloat(property));
+                FloatField maxFloatField = container.Q<FloatField>(NameMaxFloat(property));
+                if (!Mathf.Approximately(minFloatField.value, value.x))
                 {
-                    minMaxSlider.highLimit = useHighLimit;
-                    minMaxSlider.lowLimit = useLowLimit;
-                }
-                else
-                {
-                    minMaxSlider.lowLimit = useLowLimit;
-                    minMaxSlider.highLimit = useHighLimit;
+                    minFloatField.SetValueWithoutNotify(value.x);
                 }
 
-                userData.FreeMin = useLowLimit;
-                userData.FreeMax = useHighLimit;
-            }
-
-            if (metaInfo.Error != oldMetaInfo.Error)
-            {
-                changed = true;
-                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-                helpBox.text = metaInfo.Error;
-                helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-
-                minMaxSlider.SetEnabled(metaInfo.Error == "");
-            }
-
-            if (changed)
-            {
-                userData.MetaInfo = metaInfo;
+                if (!Mathf.Approximately(maxFloatField.value, value.y))
+                {
+                    maxFloatField.SetValueWithoutNotify(value.y);
+                }
             }
         }
 
-        private static void ApplyIntValue(SerializedProperty property, float step, Vector2Int sliderValue, int minValue, int maxValue, MinMaxSlider slider, IntegerField minField, IntegerField maxField, Action<object> onValueChangedCallback, bool freeInput)
+        private static void AdjustFreeRangeHighAndLow(SerializedProperty property, MinMaxSliderAttribute minMaxSliderAttribute,
+            VisualElement container)
         {
-            // int actualStep = Mathf.Max(1, Mathf.RoundToInt(step));
+            bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
+            MinMaxSlider minMaxSlider = container.Q<MinMaxSlider>(NameSlider(property));
+            UserData userData = (UserData)minMaxSlider.userData;
+
+            if (isInt)
+            {
+                Vector2Int value = property.vector2IntValue;
+                Vector2Int sliderValue = value.y < value.x
+                    ? new Vector2Int(value.x, value.x)
+                    : value;
+
+                // if the new value is out of range, let's expand the low/high limit. But we need to stick to the `step`
+                // this is not fun, at all
+                float step = minMaxSliderAttribute.Step;
+                if (minMaxSliderAttribute.FreeInput)
+                {
+                    int leftValue = sliderValue.x;
+                    int originMin = Mathf.RoundToInt(userData.FreeMin);
+
+                    if (leftValue < originMin)
+                    {
+                        if(step > 0)
+                        {
+                            int newMin = originMin +
+                                         Mathf.FloorToInt(Mathf.FloorToInt((leftValue - originMin) / step) * step);
+                            minMaxSlider.lowLimit = userData.FreeMin = newMin;
+                        }
+                        else
+                        {
+                            minMaxSlider.lowLimit = userData.FreeMin = leftValue;
+                        }
+                    }
+
+                    int rightValue = sliderValue.y;
+                    int originMax = Mathf.RoundToInt(userData.FreeMax);
+                    if (rightValue > originMax)
+                    {
+                        if(step > 0)
+                        {
+                            int newMax = originMax +
+                                         Mathf.CeilToInt(Mathf.CeilToInt((rightValue - originMax) / step) * step);
+                            minMaxSlider.highLimit = userData.FreeMax = newMax;
+                        }
+                        else
+                        {
+                            minMaxSlider.highLimit = userData.FreeMax = rightValue;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Vector2 value = property.vector2Value;
+
+                Vector2 sliderValue = value.y < value.x
+                    ? new Vector2(value.x, value.x)
+                    : value;
+
+                // if the new value is out of range, let's expand the low/high limit. But we need to stick to the `step`
+                // this is not fun, at all
+                float step = minMaxSliderAttribute.Step;
+                if (minMaxSliderAttribute.FreeInput)
+                {
+                    float leftValue = sliderValue.x;
+                    float originMin = userData.FreeMin;
+
+                    if (leftValue < originMin)
+                    {
+                        if(step > 0)
+                        {
+                            float newMin = originMin + Mathf.FloorToInt((leftValue - originMin) / step) * step;
+                            minMaxSlider.lowLimit = userData.FreeMin = newMin;
+                        }
+                        else
+                        {
+                            minMaxSlider.lowLimit = userData.FreeMin = leftValue;
+                        }
+                    }
+
+                    float rightValue = sliderValue.y;
+                    float originMax = userData.FreeMax;
+                    if (rightValue > originMax)
+                    {
+                        if(step > 0)
+                        {
+                            float newMax = originMax +
+                                           Mathf.CeilToInt((rightValue - originMax) / step) * step;
+                            minMaxSlider.highLimit = userData.FreeMax = newMax;
+                        }
+                        else
+                        {
+                            minMaxSlider.highLimit = userData.FreeMax = rightValue;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void ApplyIntValue(SerializedProperty property, Vector2Int sliderValue, MinMaxSlider slider, IntegerField minField, IntegerField maxField, Action<object> onValueChangedCallback, bool freeInput)
+        {
             Vector2Int vector2IntValue = sliderValue;
 
             property.vector2IntValue = vector2IntValue;
             property.serializedObject.ApplyModifiedProperties();
-            // Debug.Log($"update value to {vector2IntValue}");
             onValueChangedCallback.Invoke(vector2IntValue);
 
             if (freeInput)
             {
                 if(slider.lowLimit > vector2IntValue.x)
                 {
+                    // Debug.Log($"free adjust low {slider.lowLimit} -> {vector2IntValue.x}");
                     slider.lowLimit = vector2IntValue.x;
                 }
                 if(slider.highLimit < vector2IntValue.y)
                 {
+                    // Debug.Log($"free adjust high {slider.highLimit} -> {vector2IntValue.y}");
                     slider.highLimit = vector2IntValue.y;
                 }
             }
@@ -680,18 +821,13 @@ namespace SaintsField.Editor.Drawers
             maxField.SetValueWithoutNotify(vector2IntValue.y);
         }
 
-        private static void ApplyFloatValue(SerializedProperty property, float step, Vector2 sliderValue, float minValue, float maxValue, MinMaxSlider slider, FloatField minField, FloatField maxField, Action<object> onValueChangedCallback, bool freeInput)
+        private static void ApplyFloatValue(SerializedProperty property, Vector2 sliderValue, MinMaxSlider slider, FloatField minField, FloatField maxField, Action<object> onValueChangedCallback, bool freeInput)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
             Debug.Log($"try apply float {minValue}~{maxValue}<={sliderValue}");
 #endif
 
-            // float useMin = freeInput ? float.MinValue : minValue;
-            // float useMax = freeInput ? float.MaxValue : maxValue;
-
-            Vector2 vector2Value = step <= 0f
-                ? new Vector2(Mathf.Max(sliderValue.x, minValue), Mathf.Min(sliderValue.y, maxValue))
-                : BoundV2Step(sliderValue, minValue, maxValue, step);
+            Vector2 vector2Value = sliderValue;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
             Debug.Log($"apply step={step}: {sliderValue} => {vector2Value}");

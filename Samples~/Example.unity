@@ -12961,22 +12961,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vector2Step03: {x: -0.099999964, y: 1.7}
+  vector2Step03: {x: -0.099999964, y: 0.50000006}
   vector2IntStep3: {x: 6, y: 12}
-  vector2Free: {x: -0.18066192, y: 1.8193381}
-  vector2IntFree: {x: 0, y: 5}
-  _autoWidth: {x: 11, y: 79}
-  _autoWidthFloat: {x: -56.03448, y: -11.206894}
+  vector2Free: {x: -0.18066192, y: 0.5856931}
+  vector2IntFree: {x: 2, y: 4}
+  _autoWidth: {x: 30, y: 77}
+  _autoWidthFloat: {x: -48.07444, y: -11.206894}
   <OuterRange>k__BackingField: {x: -26.724133, y: 73.27586}
-  _innerRange: {x: 15, y: 47}
+  _innerRange: {x: 23, y: 47}
   <DynamicMin>k__BackingField: -1
   <DynamicMax>k__BackingField: 10
   _propRange: {x: 5, y: 5}
   _propLeftRange: {x: 0, y: 0}
   _propRightRange: {x: 0, y: 0}
   vector2Step03Disabled: {x: 0, y: 0}
-  freeInt: {x: -2, y: 0}
-  freeFloat: {x: 0, y: 0}
+  freeInt: {x: -20, y: -7}
+  freeFloat: {x: -2.0560749, y: 2.1214955}
+  stepInt: {x: -5, y: 5}
 --- !u!1 &1271404088
 GameObject:
   m_ObjectHideFlags: 0

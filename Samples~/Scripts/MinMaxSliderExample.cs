@@ -48,8 +48,13 @@ namespace SaintsField.Samples.Scripts
         [Separator("Free")]
 
         [MinMaxSlider(-5, 5, free: true)] public Vector2Int freeInt;
-        [MinMaxSlider(-5, 5, free: true)] public Vector2 freeFloat;
+        [MinMaxSlider(-5, 5, free: true), BelowRichLabel("$" + nameof(freeFloat))] public Vector2 freeFloat;
 
-        [MinMaxSlider(-5, 5, step: 2, free: true)] public Vector2Int stepInt;
+        [MinMaxSlider(-5, 6, step: 2, free: true), BelowButton(nameof(C))] public Vector2Int stepInt;
+
+        private void C()
+        {
+            stepInt = new Vector2Int(-100, 100);
+        }
     }
 }
