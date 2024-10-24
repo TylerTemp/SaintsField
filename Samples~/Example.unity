@@ -11067,7 +11067,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -12975,7 +12974,7 @@ MonoBehaviour:
   _propLeftRange: {x: 0, y: 0}
   _propRightRange: {x: 0, y: 0}
   vector2Step03Disabled: {x: 0, y: 0}
-  freeInt: {x: -20, y: -7}
+  freeInt: {x: -43, y: -7}
   freeFloat: {x: -2.0560749, y: 2.1214955}
   stepInt: {x: -5, y: 5}
 --- !u!1 &1271404088
