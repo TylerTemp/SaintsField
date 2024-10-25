@@ -372,6 +372,99 @@ namespace SaintsField.Editor.Drawers
             };
         }
 
+
+        private static Vector2Int AdjustIntSliderInput(Vector2 changedNewValue, float step, float min, float max)
+        {
+            if (step <= 0f)
+            {
+                return new Vector2Int(Mathf.RoundToInt(changedNewValue.x), Mathf.RoundToInt(changedNewValue.y));
+            }
+
+            int startStep = Mathf.RoundToInt((changedNewValue.x - min) / step);
+            int startValue = Mathf.RoundToInt(min + startStep * Mathf.RoundToInt(step));
+
+            float distance = changedNewValue.y - changedNewValue.x;
+
+            int endValue = Mathf.RoundToInt(startValue + Mathf.RoundToInt(distance / step) * step);
+            if (endValue > max)
+            {
+                endValue = Mathf.RoundToInt(endValue - step);
+            }
+
+            return new Vector2Int(startValue, endValue);
+        }
+
+        private static Vector2 AdjustFloatSliderInput(Vector2 changedNewValue, float step, float min, float max)
+        {
+            if (step <= 0f)
+            {
+                return changedNewValue;
+            }
+
+            float startValue = min + Mathf.RoundToInt((changedNewValue.x - min) / step) * step;
+
+            float distance = changedNewValue.y - changedNewValue.x;
+
+            float endValue = startValue + Mathf.RoundToInt(distance / step) * step;
+            if (endValue > max)
+            {
+                endValue -= step;
+            }
+
+            return new Vector2(startValue, endValue);
+        }
+
+        private static Vector2Int AdjustIntInput(int newValue, int value, float step, float minValue, float maxValue, bool free)
+        {
+            int startValue = Mathf.Min(newValue, value);
+            int endValue = Mathf.Max(newValue, value);
+            if (step < 0)
+            {
+                return free
+                    ? new Vector2Int(startValue, endValue)
+                    : new Vector2Int(Mathf.RoundToInt(Mathf.Min(startValue, minValue)), Mathf.RoundToInt(Mathf.Max(endValue, maxValue)));
+            }
+
+            int startSteppedValue =
+                Mathf.RoundToInt(minValue + Mathf.RoundToInt(Mathf.RoundToInt((startValue - minValue) / step) * step));
+            if (!free && startSteppedValue < minValue)
+            {
+                startSteppedValue = Mathf.RoundToInt(minValue);
+            }
+            int endSteppedValue = startSteppedValue + Mathf.RoundToInt(Mathf.RoundToInt((endValue - startValue) / step) * step);
+            if (!free && endSteppedValue > maxValue)
+            {
+                endSteppedValue = startSteppedValue + Mathf.FloorToInt(Mathf.FloorToInt((maxValue - startSteppedValue) / step) * step);
+            }
+
+            return new Vector2Int(startSteppedValue, endSteppedValue);
+        }
+
+        private static Vector2 AdjustFloatInput(float newValue, float value, float step, float minValue, float maxValue, bool free)
+        {
+            float startValue = Mathf.Min(newValue, value);
+            float endValue = Mathf.Max(newValue, value);
+            if (step < 0)
+            {
+                return free
+                    ? new Vector2(startValue, endValue)
+                    : new Vector2(Mathf.Min(startValue, minValue), Mathf.Max(endValue, maxValue));
+            }
+
+            float startSteppedValue = minValue + Mathf.RoundToInt((startValue - minValue) / step) * step;
+            if (!free && startSteppedValue < minValue)
+            {
+                startSteppedValue = minValue;
+            }
+            float endSteppedValue = startSteppedValue + (Mathf.RoundToInt((endValue - startValue) / step) * step);
+            if (!free && endSteppedValue > maxValue)
+            {
+                endSteppedValue = startSteppedValue + (Mathf.FloorToInt((maxValue - startSteppedValue) / step) * step);
+            }
+
+            return new Vector2(startSteppedValue, endSteppedValue);
+        }
+
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
@@ -646,98 +739,6 @@ namespace SaintsField.Editor.Drawers
                     }
                 });
             }
-        }
-
-        private static Vector2Int AdjustIntInput(int newValue, int value, float step, float minValue, float maxValue, bool free)
-        {
-            int startValue = Mathf.Min(newValue, value);
-            int endValue = Mathf.Max(newValue, value);
-            if (step < 0)
-            {
-                return free
-                    ? new Vector2Int(startValue, endValue)
-                    : new Vector2Int(Mathf.RoundToInt(Mathf.Min(startValue, minValue)), Mathf.RoundToInt(Mathf.Max(endValue, maxValue)));
-            }
-
-            int startSteppedValue =
-                Mathf.RoundToInt(minValue + Mathf.RoundToInt(Mathf.RoundToInt((startValue - minValue) / step) * step));
-            if (!free && startSteppedValue < minValue)
-            {
-                startSteppedValue = Mathf.RoundToInt(minValue);
-            }
-            int endSteppedValue = startSteppedValue + Mathf.RoundToInt(Mathf.RoundToInt((endValue - startValue) / step) * step);
-            if (!free && endSteppedValue > maxValue)
-            {
-                endSteppedValue = startSteppedValue + Mathf.FloorToInt(Mathf.FloorToInt((maxValue - startSteppedValue) / step) * step);
-            }
-
-            return new Vector2Int(startSteppedValue, endSteppedValue);
-        }
-
-        private static Vector2 AdjustFloatInput(float newValue, float value, float step, float minValue, float maxValue, bool free)
-        {
-            float startValue = Mathf.Min(newValue, value);
-            float endValue = Mathf.Max(newValue, value);
-            if (step < 0)
-            {
-                return free
-                    ? new Vector2(startValue, endValue)
-                    : new Vector2(Mathf.Min(startValue, minValue), Mathf.Max(endValue, maxValue));
-            }
-
-            float startSteppedValue = minValue + Mathf.RoundToInt((startValue - minValue) / step) * step;
-            if (!free && startSteppedValue < minValue)
-            {
-                startSteppedValue = minValue;
-            }
-            float endSteppedValue = startSteppedValue + (Mathf.RoundToInt((endValue - startValue) / step) * step);
-            if (!free && endSteppedValue > maxValue)
-            {
-                endSteppedValue = startSteppedValue + (Mathf.FloorToInt((maxValue - startSteppedValue) / step) * step);
-            }
-
-            return new Vector2(startSteppedValue, endSteppedValue);
-        }
-
-        private static Vector2Int AdjustIntSliderInput(Vector2 changedNewValue, float step, float min, float max)
-        {
-            if (step <= 0f)
-            {
-                return new Vector2Int(Mathf.RoundToInt(changedNewValue.x), Mathf.RoundToInt(changedNewValue.y));
-            }
-
-            int startStep = Mathf.RoundToInt((changedNewValue.x - min) / step);
-            int startValue = Mathf.RoundToInt(min + startStep * Mathf.RoundToInt(step));
-
-            float distance = changedNewValue.y - changedNewValue.x;
-
-            int endValue = Mathf.RoundToInt(startValue + Mathf.RoundToInt(distance / step) * step);
-            if (endValue > max)
-            {
-                endValue = Mathf.RoundToInt(endValue - step);
-            }
-
-            return new Vector2Int(startValue, endValue);
-        }
-
-        private static Vector2 AdjustFloatSliderInput(Vector2 changedNewValue, float step, float min, float max)
-        {
-            if (step <= 0f)
-            {
-                return changedNewValue;
-            }
-
-            float startValue = min + Mathf.RoundToInt((changedNewValue.x - min) / step) * step;
-
-            float distance = changedNewValue.y - changedNewValue.x;
-
-            float endValue = startValue + Mathf.RoundToInt(distance / step) * step;
-            if (endValue > max)
-            {
-                endValue -= step;
-            }
-
-            return new Vector2(startValue, endValue);
         }
 
         // TODO: TrackPropertyValue is better than this
