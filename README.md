@@ -70,9 +70,10 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.4.3**
+**3.4.4**
 
-UI Toolkit: Fix `Get*` attributes won't save the value
+Allow free input value in `MinMaxSlider` if you manually input int the field, [#48](https://github.com/TylerTemp/SaintsField/issues/48)
+
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

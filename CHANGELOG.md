@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.4 ##
+
+Allow free input value in `MinMaxSlider` if you manually input int the field, [#48](https://github.com/TylerTemp/SaintsField/issues/48)
+
 ## 3.4.3 ##
 
 UI Toolkit: Fix `Get*` attributes won't save the value
