@@ -11067,6 +11067,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -12960,24 +12961,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vector2Step03: {x: -0.7, y: -0.099999964}
-  vector2IntStep3: {x: 12, y: 18}
-  vector2Free: {x: 0.7853488, y: 1.5517036}
-  vector2IntFree: {x: 2, y: 4}
-  _autoWidth: {x: 30, y: 77}
-  _autoWidthFloat: {x: -48.07444, y: -11.206894}
-  <OuterRange>k__BackingField: {x: -26.724133, y: 73.27586}
-  _innerRange: {x: -1, y: 73}
-  <DynamicMin>k__BackingField: -1
-  <DynamicMax>k__BackingField: 10
-  _propRange: {x: 5, y: 5}
-  _propLeftRange: {x: 0, y: 0}
-  _propRightRange: {x: 0, y: 0}
+  vector2Step03: {x: -1, y: 1.1000001}
+  vector2IntStep3: {x: 9, y: 12}
+  vector2Free: {x: 1.4299066, y: 2.4299066}
+  vector2IntFree: {x: 7, y: 12}
+  _autoWidth: {x: 0, y: 0}
+  _autoWidthFloat: {x: 0, y: 0}
+  <OuterRange>k__BackingField: {x: -48.598137, y: 39.252335}
+  _innerRange: {x: -45, y: -1}
+  <DynamicMin>k__BackingField: 0
+  <DynamicMax>k__BackingField: 4.26
+  _propRange: {x: 2.3685985, y: 4.091215}
+  _propLeftRange: {x: 9.345795, y: 23.364487}
+  _propRightRange: {x: -51.49785, y: 4.26}
   vector2Step03Disabled: {x: 0, y: 0}
-  freeInt: {x: -43, y: -7}
-  freeFloat: {x: -2.0560749, y: 2.1214955}
-  stepInt: {x: -5, y: 5}
-  stepFloat: {x: -69.5, y: -19}
+  freeInt: {x: -20, y: 20}
+  freeFloat: {x: 0, y: 0}
+  stepInt: {x: 0, y: 0}
+  stepFloat: {x: 0, y: 0}
+  freeMin: 5.5
+  freeMax: 13.81
+  freeMinMax: {x: 4, y: 12}
+  nonFreeMinMax: {x: 9.9, y: 11.5}
 --- !u!1 &1271404088
 GameObject:
   m_ObjectHideFlags: 0

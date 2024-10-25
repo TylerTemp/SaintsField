@@ -57,5 +57,12 @@ namespace SaintsField.Samples.Scripts
         {
             stepInt = new Vector2Int(-100, 100);
         }
+
+        public float freeMin;
+        public float freeMax;
+
+        [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f, free: true)] public Vector2 freeMinMax;
+        [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f)] public Vector2 nonFreeMinMax;
+
     }
 }
