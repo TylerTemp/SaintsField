@@ -74,6 +74,9 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 Allow free input value in `MinMaxSlider` if you manually input int the field, [#48](https://github.com/TylerTemp/SaintsField/issues/48)
 
+**3.4.5**
+
+UI Toolkit: fix `MinMaxSlider` with `free` can display wrong slider when manually input.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

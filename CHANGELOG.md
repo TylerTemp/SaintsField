@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.5 ##
+
+UI Toolkit: fix `MinMaxSlider` with `free` can display wrong slider when manually input.
+
 ## 3.4.4 ##
 
 Allow free input value in `MinMaxSlider` if you manually input int the field, [#48](https://github.com/TylerTemp/SaintsField/issues/48)

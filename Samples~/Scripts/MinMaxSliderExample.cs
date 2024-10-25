@@ -51,7 +51,7 @@ namespace SaintsField.Samples.Scripts
         [MinMaxSlider(-5, 5, free: true), BelowRichLabel("$" + nameof(freeFloat))] public Vector2 freeFloat;
 
         [MinMaxSlider(-5, 6, step: 2, free: true), BelowButton(nameof(C))] public Vector2Int stepInt;
-        [MinMaxSlider(-5, 6, step: 0.5f, free: true), BelowButton(nameof(C))] public Vector2 stepFloat;
+        [MinMaxSlider(-5, 6, step: 0.5f, free: true)] public Vector2 stepFloat;
 
         private void C()
         {
@@ -64,5 +64,6 @@ namespace SaintsField.Samples.Scripts
         [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f, free: true)] public Vector2 freeMinMax;
         [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f)] public Vector2 nonFreeMinMax;
 
+        [MinMaxSlider(0, 10, free: true), BelowRichLabel("$" + nameof(freeInput))] public Vector2 freeInput;
     }
 }
