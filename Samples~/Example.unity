@@ -12982,7 +12982,7 @@ MonoBehaviour:
   freeMax: 2.71
   freeMinMax: {x: 1, y: 4.4}
   nonFreeMinMax: {x: 1.2, y: 2.6000001}
-  freeInput: {x: -28.155342, y: 10}
+  freeInput: {x: 0, y: 0}
 --- !u!1 &1271404088
 GameObject:
   m_ObjectHideFlags: 0

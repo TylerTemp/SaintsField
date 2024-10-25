@@ -1103,6 +1103,7 @@ For each argument:
 *   `int|float step=1|-1f`: the step of the slider, `<= 0` means no limit. By default, int type use `1` and float type use `-1f`
 *   `float minWidth=50f`: (IMGUI Only) the minimum width of the value label. `< 0` for auto size (not recommended)
 *   `float maxWidth=50f`: (IMGUI Only) the maximum width of the value label. `< 0` for auto size (not recommended)
+*   `bool free=false`: `true` to allow you manually input the value without getting limited by the slider (and the min/max value).
 
 *   AllowMultiple: No
 
@@ -1147,6 +1148,14 @@ public float DynamicMax { get; private set; }
 ```
 
 [![minmaxslider](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
+
+Example of free input mode:
+
+```csharp
+[MinMaxSlider(0, 10, free: true)] public Vector2 freeInput;
+```
+
+[![min-max-free-input](https://github.com/user-attachments/assets/6843ae58-0742-402b-a96a-5ae6ce531271)](https://github.com/user-attachments/assets/00ef50ba-98bd-4812-8664-8066b31c769a)
 
 #### `EnumFlags` ####
 
