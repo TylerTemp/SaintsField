@@ -138,8 +138,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
             // UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), fieldWithInfo.Target, fieldWithInfo.MethodInfo);
 
+            Undo.RecordObject(unityEventContainerObject, "AddEventListener");
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-            Debug.Log($"add `{fieldWithInfo.MethodInfo.Name}` to `{unityEventBase}`.onClick");
+            Debug.Log($"add `{fieldWithInfo.MethodInfo.Name}` to `{unityEventBase}`.onClick on target {unityEventContainerObject}");
 #endif
 
             // Undo.RecordObject(unityEventBase, "AddOnClick");
@@ -163,8 +165,6 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 value = foundValue;
             }
-
-            Undo.RecordObject(unityEventContainerObject, "AddEventListener");
             Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Target, value);
         }
 
