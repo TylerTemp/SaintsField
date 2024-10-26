@@ -37,6 +37,7 @@ namespace SaintsField.Editor.Playa.Renderer
             object value = playaMethodBindAttribute.Value;
 
             UnityEventBase unityEventBase = null;
+            UnityEngine.Object unityEventContainerObject = null;
             List<Type> invokeRequiredTypes = new List<Type>();
             if (methodBind == MethodBind.ButtonOnClick)
             {
@@ -53,6 +54,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     return;
                 }
 
+                unityEventContainerObject = uiButton;
                 unityEventBase = uiButton.onClick;
             }
             else  // custom event at the moment
@@ -68,6 +70,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
 
                 object target = fieldWithInfo.Target;
+                unityEventContainerObject = fieldWithInfo.SerializedProperty.serializedObject.targetObject;
                 while (attrNames.Count > 0)
                 {
                     string searchAttr = attrNames[0];
@@ -100,6 +103,10 @@ namespace SaintsField.Editor.Playa.Renderer
                         }
 
                         target = foundValue;
+                        if(foundValue is UnityEngine.Object foundUObject)
+                        {
+                            unityEventContainerObject = foundUObject;
+                        }
                     }
                 }
 
@@ -157,6 +164,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 value = foundValue;
             }
 
+            Undo.RecordObject(unityEventContainerObject, "AddEventListener");
             Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Target, value);
         }
 
