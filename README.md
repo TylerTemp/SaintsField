@@ -2864,7 +2864,7 @@ For more information, see [the comment of the answer in this stackoverflow](http
 
 ## SaintsEditor ##
 
-`SaintsField` is a `UnityEditor.Editor` level component.
+`SaintsEditor` is a `UnityEditor.Editor` level component.
 
 Namespace: `SaintsField.Playa`
 
