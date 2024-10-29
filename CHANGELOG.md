@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.6 ##
+
+1.  Fix `OnEvent` and `OnButtonClick` wouldn't save the result.
+2.  Fix `Dropdown` and `AdvancedDropdown` gave error when working with `long` type, [#92](https://github.com/TylerTemp/SaintsField/issues/92)
+
 ## 3.4.5 ##
 
 UI Toolkit: fix `MinMaxSlider` with `free` can display wrong slider when manually input.
