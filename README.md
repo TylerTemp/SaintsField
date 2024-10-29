@@ -3834,6 +3834,50 @@ public EnumF enumF;
 [EnableIf(nameof(enumF), EnumF.A | EnumF.B), RichLabel("hasFlag(A | B)")] public string enumFEnableAB;
 ```
 
+## XPath-like Syntax ##
+
+**XPath**
+
+This part is how a target is found, a simplified [XML Path Language](https://developer.mozilla.org/en-US/docs/Web/XPath).
+
+**`nodetest`**
+
+`nodetest` is like a path, use `/` to separate, `//` means any descendant
+
+`.` means current object, `..` means parent, `*` means any node.
+
+`nodetest` always starts from the current object.
+
+```csharp
+// `DirectChild` object under this object
+[GetByXPath("/DirectChild")] public GameObject directChild;
+// Search all children that starts with `StartsWith`,
+// under which, search all children ends with `Child`
+// and get all the direct children of that.
+[GetByXPath("//StartsWith*//*Child/*")] public Transform[] searchChildren;
+```
+
+**`axis`**
+
+`axis` redirect the target point
+
+*   `ancestor::`: all parents
+*   `ancestor-or-self::`: the object itself, and all it's parents.
+*   `ancestor-inside-prefab::`: all parents inside this prefab
+*   `ancestor-or-self-inside-prefab::`: the object itself, and all it's parents inside this prefab
+*   `parent::`: parent of the object
+*   `parent-or-self::`: the object itself, and it's parent
+*   `parent-inside-prefab::`: parent inside this prefab
+*   `parent-or-self-inside-prefab::`: this object itself, and it's parent inside this prefab
+*   `scene::`: root of the active scene
+*   `prefab::`: root of the current prefab
+*   `resources::`: `Resources`
+*   `assets::`: root folder `Assets`
+
+```csharp
+
+```
+
 ## Add a Macro ##
 
 Pick a way that is most convenient for you:

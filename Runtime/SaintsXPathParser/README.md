@@ -28,8 +28,8 @@ step: `axisname::nodetest[predicate]`
 *   `ancestor-or-self-inside-prefab::`
 *   `parent-inside-prefab::`
 *   `parent-or-self-inside-prefab::`
-*   `scene-root::`: 场景根节点
-*   `prefab-root::`: 预制体根节点
+*   `scene::`: 场景根节点
+*   `prefab::`: 预制体根节点
 *   `resources::`: 资源
 *   `asset::`: `AssetDatabase` 资源
 
