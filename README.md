@@ -74,6 +74,7 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 1.  Fix `OnEvent` and `OnButtonClick` wouldn't save the result.
 2.  Fix `Dropdown` and `AdvancedDropdown` gave error when working with `long` type, [#92](https://github.com/TylerTemp/SaintsField/issues/92)
+3.  Re-paint icons used in this project
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

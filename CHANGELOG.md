@@ -4,6 +4,7 @@
 
 1.  Fix `OnEvent` and `OnButtonClick` wouldn't save the result.
 2.  Fix `Dropdown` and `AdvancedDropdown` gave error when working with `long` type, [#92](https://github.com/TylerTemp/SaintsField/issues/92)
+3.  Re-paint icons used in this project
 
 ## 3.4.5 ##
 
