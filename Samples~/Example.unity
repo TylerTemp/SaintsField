@@ -455,6 +455,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   longValue: 9223372036854775807
+  intValue: 2
+  enumValue: 1
 --- !u!1 &69899265
 GameObject:
   m_ObjectHideFlags: 0
@@ -16350,7 +16352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   directChild: {fileID: 393988620}
-  searchChild: {fileID: 0}
+  searchChildren: []
 --- !u!1 &1730412120
 GameObject:
   m_ObjectHideFlags: 0

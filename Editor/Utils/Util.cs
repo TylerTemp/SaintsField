@@ -153,10 +153,29 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.LayerMask:
                 case SerializedPropertyType.Integer:
                 case SerializedPropertyType.Enum:
-                    property.intValue = (int) newValue;
+                {
+                    switch (newValue)
+                    {
+                        case long newValueLong:
+                            property.longValue = newValueLong;
+                            break;
+                        case ulong newValueUlong:
+                            property.longValue = (long)newValueUlong;
+                            break;
+                        case int newValueInt:
+                            property.intValue = newValueInt;
+                            break;
+                        case uint newValueUInt:
+                            property.intValue = (int)newValueUInt;
+                            break;
+                        default:
+                            property.intValue = (int)newValue;
+                            break;
+                    }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
                     Debug.Log($"{property.propertyType}: set={property.intValue}");
 #endif
+                }
                     break;
                 case SerializedPropertyType.Boolean:
                     property.boolValue = (bool) newValue;
