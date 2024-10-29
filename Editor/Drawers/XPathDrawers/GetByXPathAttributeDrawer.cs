@@ -1214,19 +1214,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
     #endif
 
                         IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.NodeTest, accValues);
-
-                        // foreach (ResourceInfo resourceInfo in sepResources)
-                        // {
-                        //     Debug.Log(resourceInfo.Resource);
-                        // }
                         IEnumerable<ResourceInfo> axisResources = GetValuesFromAxis(xPathStep.Axis, sepResources);
 
                         IEnumerable<ResourceInfo> nodeTestResources = GetValuesFromNodeTest(xPathStep.NodeTest, axisResources);
-
-                        // foreach (ResourceInfo resourceInfo in axisResources)
-                        // {
-                        //     Debug.Log(resourceInfo.Resource);
-                        // }
 
                         IEnumerable<ResourceInfo> attrResources = GetValuesFromAttr(xPathStep.Attr, nodeTestResources);
                         IEnumerable<ResourceInfo> predicatesResources = GetValuesFromPredicates(xPathStep.Predicates, attrResources);
@@ -1279,7 +1269,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)
         {
             // Debug.LogWarning($"sepCount={sepCount}");
-            if (nodeTest.NameEmpty || nodeTest.ExactMatch == "." || nodeTest.ExactMatch == "..")
+            if (sepCount == 0 || nodeTest.NameEmpty || nodeTest.ExactMatch == "." || nodeTest.ExactMatch == "..")
             {
                 if(sepCount <= 1)
                 {

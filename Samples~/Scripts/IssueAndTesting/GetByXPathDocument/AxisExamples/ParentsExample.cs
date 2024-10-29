@@ -7,9 +7,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.GetByXPathDocument.AxisExa
     {
         // search all parents that starts with `Sub`
         [GetByXPath("ancestor:://Sub*")] public Transform ancestorStartsWithSub;
-        // search current scene that ends with `Camera`
-        [GetByXPath("scene:://*Camera")] public Camera[] sceneCameras;
-        // get the first folder with name `Anim`, and get all the animations
-        [GetByXPath("assets:://Anim/*.anim")] public Animation[] animations;
+
+        // search object itself, and all it's parents, with letter `This`
+        [GetByXPath("ancestor-or-self::*This*")] public Transform[] parentsSelfWithLetter1;
     }
 }

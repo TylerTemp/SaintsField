@@ -2062,6 +2062,8 @@ public int upLimit;
 
 Automatically sign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
 
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
 *   `Type compType = null`
 
     The component type to sign. If null, it'll use the field type.
@@ -2090,6 +2092,8 @@ using SaintsField;
 Automatically sign a component to a field, if the field value is null and the component is already attached to itself or its child GameObjects. (First one found will be used)
 
 NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target object itself.
+
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
 *   `bool includeInactive = false`
 
@@ -2123,8 +2127,11 @@ using SaintsField;
 
 #### `FindComponent` ####
 
+**Deprecated**: use `GetByXPath` instead.
+
 Automatically find a component under the current target. This is very similar to Unity's [`transform.Find`](https://docs.unity3d.com/ScriptReference/Transform.Find.html), except it accepts many paths, and it's returning value is not limited to `transform`
 
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 *   `string path` a path to search
 *   `params string[] paths` more paths to search
 *   AllowMultiple: Yes but not necessary
@@ -2150,7 +2157,7 @@ Note:
 
 Parameters:
 
-*   \[Optional\] `EXP config` config tweak (see `GetByXPath` for more information)
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
 *   (For `GetComponentInParents` only) `bool includeInactive = false`
 
@@ -2186,6 +2193,8 @@ using SaintsField;
 
 Automatically sign a component to a field, if the field value is null and the component is in the currently opened scene. (First one found will be used)
 
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
 *   `bool includeInactive = false`
 
     Should inactive GameObject be included? `true` to include inactive GameObject.
@@ -2213,6 +2222,8 @@ using SaintsField;
 ![get_component_in_scene](https://github.com/TylerTemp/SaintsField/assets/6391063/95a008a2-c7f8-4bc9-90f6-57c58724ebaf)
 
 #### `GetComponentByPath` ####
+
+**Deprecated**: use `GetByXPath` instead.
 
 Automatically sign a component to a field by a given path.
 
@@ -2275,11 +2286,6 @@ using SaintsField;
 
 ![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/a0fdca83-0c96-4d57-9c9d-989efbac0f07)
 
-#### `GetByXPath` ####
-
-// TODO...
-
-// Why the heck I write some feature so complex...
 
 #### `GetPrefabWithComponent` ####
 
@@ -2287,6 +2293,7 @@ Automatically sign a prefab to a field, if the field value is null and the prefa
 
 Recommended to use it with `FieldType`!
 
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 *   `Type compType = null`
 
     The component type to sign. If null, it'll use the field type.
@@ -2315,6 +2322,7 @@ Automatically sign a `ScriptableObject` file to this field. (First one found wil
 
 Recommended to use it with `Expandable`!
 
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 *   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only sign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
 *   AllowMultiple: No
 
@@ -2326,6 +2334,33 @@ using SaintsField;
 ```
 
 ![GetScriptableObject](https://github.com/TylerTemp/SaintsField/assets/6391063/191c3b4b-a58a-4475-80cd-3dbc809a9511)
+
+#### `GetByXPath` ####
+
+Please read `Saints XPath-like Syntax` section for more information.
+
+**Parameters**
+
+*   (Optional) `EXP config`: config tweak
+*   `string path...`: resource searching paths. use `.` if nothing is provided. First path with results will be used.
+
+*    Allow multiple: Yes. With multiple decorators, all results from each decorator will be used.
+
+Showcase:
+
+```csharp
+// get the main camera from scene
+[GetByXPath("scene:://[@Tag = MainCamera][]")] public Camera mainCamera;
+
+// only allow the user to pick from the target folder, which the `Hero` script returns `isAvaliable` as true
+[GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab[@{GetComponent(Hero).isAvaliable}]")]
+public GameObject[] heroPrefabs;
+
+// get all prefabs under `Art/Heros` AND `Art/Monsters`
+[GetByXPath("assets::/Art/Heros/*.prefab")]
+[GetByXPath("assets::/Art/Monsters/*.prefab")]
+public GameObject[] entityPrefabs;
+```
 
 #### `AddComponent` ####
 
@@ -3834,11 +3869,17 @@ public EnumF enumF;
 [EnableIf(nameof(enumF), EnumF.A | EnumF.B), RichLabel("hasFlag(A | B)")] public string enumFEnableAB;
 ```
 
-## XPath-like Syntax ##
+## Saints XPath-like Syntax ##
 
-**XPath**
+### XPath ###
 
 This part is how a target is found, a simplified [XML Path Language](https://developer.mozilla.org/en-US/docs/Web/XPath).
+
+basic syntax: `step/step/step...`
+
+for each step: `axis::nodetest[predicate][predicate OR predicate]/othersteps...`
+
+Please note: powerful as the seems, there are many edge cases I have not covered yet. Report an issue if you face any.
 
 **`nodetest`**
 
@@ -3875,8 +3916,103 @@ This part is how a target is found, a simplified [XML Path Language](https://dev
 *   `assets::`: root folder `Assets`
 
 ```csharp
+// search all parents that starts with `Sub`
+[GetByXPath("ancestor:://Sub*")] public Transform ancestorStartsWithSub;
 
+// search object itself, and all it's parents, which contains `This`
+[GetByXPath("ancestor-or-self::*This*")] public Transform[] parentsSelfWithThis;
+
+// search current scene that ends with `Camera`
+[GetByXPath("scene:://*Camera")] public Camera[] sceneCameras;
+
+// get the first folder starts with `Issue`, and get all the prefabs
+[GetByXPath("assets:://Issue*/*.prefab")] public GameObject[] prefabs;
 ```
+
+**`attribute`**
+
+`attribute` allows you to extract an attribute from a target, starting with a `@` letter. Normally, `{}` means it
+can be directly executed on the target.
+
+*   `@layer`: Get the layer string name
+*   `@{layer}`: Get the layer mask (int)
+*   `@{tag}`: Get the tag value
+*   `@{gameObject}`: Get the `gameObject` (this is the default behavior)
+*   `@{transform}`: Get the `transform`
+*   `@{rectTransform}`: Get the `RectTransform`. This is just a shortcut of`GetComponent(RectTransform)`
+*   `@{activeSelf}`/`@{gameObject.activeSelf}`
+*   `@{GetComponent(MyScript)}`/`@{GetComponents(MyScript)[2]}` Get a component from the target.
+    You can continuously chaining the calling like: `@{GetComponents(MyComponent)[-1].MyFunction().someField['key']}`.
+
+    Please note: this is not an actual code executing, and with these limits:
+
+    1.  Parameters are not supported
+    2.  indexing for array/list is allowed
+    3.  indexing for dictionary only supports `string` key type, and single quote / double quote are the same
+
+    `GetComponent` & `GetComponents` are a special function. You can pass type name. If you have multiple type with the same name,
+    prefix it with some `namespace` is allowed: `GetComponent(MyNameSpace.MyScript)`.
+
+    Base class is allow allowed, but generic class is not supported.
+
+*   `@{GetComponents()}`: Get all components of the target
+*   ~~`@resource-path()`~~
+*   ~~`@asset-path()`~~
+
+```csharp
+// 1.  search all the children which has `FunctionProvider` script, grab the first result
+// 2.  call `GetTransforms()` as the results
+// 3.  from the results, get first direct children named "ok"
+[GetByXPath("//*@{GetComponent(FunctionProvider).GetTransforms()}/ok")] public GameObject[] getObjs;
+
+// FunctionProvider.cs
+public class FunctionProvider : MonoBehaviour
+{
+    // Example of returning some target
+    public Transform[] GetTransforms() => transform.Cast<Transform>().ToArray();
+}
+```
+
+**`filter`**
+
+`filter` check if the results match the expected condition. There are two types of filter:
+
+*   index filter:
+
+    either just use the index: `child*[1]` (second one), `child*[last()]`/`child*[-1]` (last one)
+
+    or compared value: `child*[index() > 3]`
+
+*   value filter: use any `attribute` mentioned above, with `>`, `!=` etc. for comparison. e.g. `[@{gameObject.activeSelf}][@layer = "UI"]`
+
+using multiple filters means all conditions must be met. Otherwise, use the keyword `OR`: `[@{GetComponent(Collider)} OR @{GetComponent(MyScript)}]`
+
+```csharp
+// find the first main camera in the scene
+[GetByXPath("scene:://[@Tag = MainCamera]")] public Camera mainCamera;
+
+// find the prefabs with component "Hero"
+[GetByXPath("assets:://Heros/*.prefab[@GetComponent(Hero)]")] public Camera mainCamera;
+```
+
+### `EXP` ###
+
+`EXP` is how all the auto getters works, behaviors in the inspector. The values are:
+
+*   `NoInitSign`: do not sign the value if the value is null on firsts rendering.
+*   `NoAutoResignToValue`: do not sign the value to the correct value on the following renderings.
+*   `NoAutoResignToNull`: do not sign the value to null value if the target disappears on the following renderings.
+*   `NoResignButton`: when `NoAutoResign` is on, by default there will be a `reload` button when value is mismatched. Turn this on to hide the `reload` button.
+*   `NoMessage`: when `NoAutoResign` and `NOResignButton` is on, by default there will be an error box when value is mismatched. Turn this on to hide the error message.
+*   `NoPicker`: this will remove the custom picker. This is on by default (if you do not pass `EXP` as first argument) to keep the consistency.
+*   `KeepOriginalPicker`: UI Toolkit only. By default, when a custom picker is shown, Unity's default picker will hide. This will keep Unity's picker together.
+
+And some shortcut:
+
+*   `NoAutoResign` = `NoAutoResignToValue | NoAutoResignToNull`
+*   `Silent` = `NoAutoResign | NoMessage`. Useful if you want to allow you to manually sign a different value with no buttons and error box.
+*   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
+*   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
 
 ## Add a Macro ##
 
