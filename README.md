@@ -70,11 +70,10 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.4.6**
+**3.4.7**
 
-1.  Fix `OnEvent` and `OnButtonClick` wouldn't save the result.
-2.  Fix `Dropdown` and `AdvancedDropdown` gave error when working with `long` type, [#92](https://github.com/TylerTemp/SaintsField/issues/92)
-3.  Re-paint icons used in this project
+1.  Fix `OnEvent` and `OnButtonClick` saving target incorrect and gives error.
+2.  Fix `GetByXPath` failed to find the correct target.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3987,7 +3986,7 @@ using multiple filters means all conditions must be met. Otherwise, use the keyw
 
 ```csharp
 // find the first main camera in the scene
-[GetByXPath("scene:://[@Tag = MainCamera]")] public Camera mainCamera;
+[GetByXPath("scene:://[@{tag} = MainCamera]")] public Camera mainCamera;
 
 // find the prefabs with component "Hero"
 [GetByXPath("assets:://Heros/*.prefab[@GetComponent(Hero)]")] public Camera mainCamera;

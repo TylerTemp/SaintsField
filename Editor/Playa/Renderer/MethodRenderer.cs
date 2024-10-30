@@ -19,11 +19,14 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class MethodRenderer: AbsRenderer
     {
+        private readonly SerializedObject _serializedObject;
+
         public MethodRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
         {
+            _serializedObject = serializedObject;
         }
 
-        private static void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
+        private void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
         {
             if (EditorApplication.isPlaying)
             {
@@ -70,7 +73,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
 
                 object target = fieldWithInfo.Target;
-                unityEventContainerObject = fieldWithInfo.SerializedProperty.serializedObject.targetObject;
+
+                unityEventContainerObject = _serializedObject.targetObject;
+
                 while (attrNames.Count > 0)
                 {
                     string searchAttr = attrNames[0];

@@ -1213,10 +1213,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         Debug.Log($"processing xpath {xPathStep}");
     #endif
 
-                        IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.NodeTest, accValues);
-                        IEnumerable<ResourceInfo> axisResources = GetValuesFromAxis(xPathStep.Axis, sepResources);
+                        IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.Axis, xPathStep.NodeTest, accValues);
+                        // IEnumerable<ResourceInfo> axisResources = GetValuesFromAxis(xPathStep.Axis, sepResources);
 
-                        IEnumerable<ResourceInfo> nodeTestResources = GetValuesFromNodeTest(xPathStep.NodeTest, axisResources);
+                        IEnumerable<ResourceInfo> nodeTestResources = GetValuesFromNodeTest(xPathStep.NodeTest, sepResources);
 
                         IEnumerable<ResourceInfo> attrResources = GetValuesFromAttr(xPathStep.Attr, nodeTestResources);
                         IEnumerable<ResourceInfo> predicatesResources = GetValuesFromPredicates(xPathStep.Predicates, attrResources);
@@ -1266,10 +1266,170 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 : (string.Join("\n", errors), finalResults);
         }
 
-        private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)
+        private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, Axis axis, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)
         {
+            switch (axis)
+            {
+                case Axis.None:
+                    break;
+                case Axis.Ancestor:
+                {
+                    foreach (ResourceInfo resourceInfo in accValues.SelectMany(each => GetGameObjectsAncestor(each, false, false)))
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    yield break;
+                case Axis.AncestorInsidePrefab:
+                {
+                    foreach (ResourceInfo resourceInfo in accValues.SelectMany(each => GetGameObjectsAncestor(each, false, true)))
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    yield break;
+                case Axis.AncestorOrSelf:
+                {
+                    foreach (ResourceInfo resourceInfo in accValues.SelectMany(each => GetGameObjectsAncestor(each, true, false)))
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                        Debug.Log($"Axis AncestorOrSelf return [{resourceInfo.ResourceType}]{resourceInfo.Resource}");
+#endif
+                        yield return resourceInfo;
+                    }
+                }
+                    yield break;
+                case Axis.AncestorOrSelfInsidePrefab:
+                {
+                    foreach (ResourceInfo resourceInfo in accValues.SelectMany(each => GetGameObjectsAncestor(each, true, true)))
+                    {
+                        yield return resourceInfo;
+                    }
+                }
+                    yield break;
+                case Axis.Parent:
+                {
+                    foreach (Transform parentTransform in accValues.Select(GetParentFromResourceInfo).Where(each => !(each is null)))
+                    {
+                        yield return new ResourceInfo{
+                            ResourceType = ResourceType.Object,
+                            Resource = parentTransform.gameObject,
+                        };
+                    }
+                }
+                    yield break;
+                case Axis.ParentOrSelf:
+                {
+                    foreach (ResourceInfo attrResource in accValues.SelectMany(GetParentOrSelfFromResourceInfo))
+                    {
+                        yield return attrResource;
+                    }
+                }
+                    yield break;
+
+                case Axis.ParentOrSelfInsidePrefab:
+                {
+                    foreach (ResourceInfo attrResource in accValues.SelectMany(GetParentOrSelfFromResourceInfo))
+                    {
+                        switch (attrResource.Resource)
+                        {
+                            case GameObject go:
+                                if(PrefabUtility.GetPrefabInstanceHandle(go)) {
+                                    yield return attrResource;
+                                }
+
+                                break;
+                            case Component comp:
+                                if(PrefabUtility.GetPrefabInstanceHandle(comp.gameObject)) {
+                                    yield return attrResource;
+                                }
+
+                                break;
+                        }
+                    }
+                }
+                    yield break;
+
+                case Axis.Scene:
+                {
+                    Scene scene = SceneManager.GetActiveScene();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                    Debug.Log($"Axis return scene {scene}");
+#endif
+                    yield return new ResourceInfo
+                    {
+                        ResourceType = ResourceType.SceneRoot,
+                        Resource = scene,
+                    };
+                    // foreach (GameObject rootGameObject in scene.GetRootGameObjects())
+                    // {
+                    //
+                    // }
+                }
+                    yield break;
+
+                case Axis.Prefab:
+                {
+                    foreach (ResourceInfo resourceInfo in accValues)
+                    {
+                        ResourceInfo top = GetGameObjectsAncestor(resourceInfo, true, false).Last();
+                        // ReSharper disable once UseNegatedPatternInIsExpression
+                        if (!(top is null))
+                        {
+                            yield return top;
+                        }
+                    }
+                }
+                    yield break;
+
+                case Axis.Resources:
+                {
+                    foreach (string resourceDirectoryInfo in GetResourcesRootFolders("Assets"))
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                        Debug.Log($"Axis Resources return {resourceDirectoryInfo}");
+#endif
+
+                        (string resourceFolder, string subFolder) = SplitResources(resourceDirectoryInfo);
+
+                        ResourceInfo info = new ResourceInfo
+                        {
+                            FolderPath = resourceFolder,
+                            Resource = subFolder,
+                            ResourceType = ResourceType.Folder,
+                        };
+                        yield return info;
+
+                        foreach (ResourceInfo resourceInfo in GetChildInFolder(info))
+                        {
+                            string rawPath = (string)resourceInfo.Resource;
+                            string resourcePath = rawPath.Substring(resourceFolder.Length,
+                                rawPath.Length - resourceFolder.Length);
+                            resourceInfo.Resource = resourcePath;
+                            resourceInfo.FolderPath = resourceFolder;
+                            yield return resourceInfo;
+                        }
+                    }
+                }
+                    yield break;
+                case Axis.Asset:
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                    Debug.Log("Axis return assets root");
+#endif
+                    yield return new ResourceInfo
+                    {
+                        Resource = "Assets",
+                        ResourceType = ResourceType.AssetsRoot,
+                    };
+                }
+                    yield break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
+
             // Debug.LogWarning($"sepCount={sepCount}");
-            if (sepCount == 0 || nodeTest.NameEmpty || nodeTest.ExactMatch == "." || nodeTest.ExactMatch == "..")
+            if (nodeTest.NameEmpty || nodeTest.ExactMatch == "." || nodeTest.ExactMatch == "..")
             {
                 if(sepCount <= 1)
                 {
@@ -2196,178 +2356,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 #endif
                     yield return eachComp;
                 }
-            }
-        }
-
-        private static IEnumerable<ResourceInfo> GetValuesFromAxis(Axis axis, IEnumerable<ResourceInfo> attrResources)
-        {
-            switch (axis)
-            {
-                case Axis.None:
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                    Debug.Log("No axis given, return origins");
-#endif
-                    foreach (ResourceInfo resourceInfo in attrResources)
-                    {
-                        yield return resourceInfo;
-                    }
-                }
-                    break;
-                case Axis.Ancestor:
-                {
-                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, false, false)))
-                    {
-                        yield return resourceInfo;
-                    }
-                }
-                    break;
-                case Axis.AncestorInsidePrefab:
-                {
-                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, false, true)))
-                    {
-                        yield return resourceInfo;
-                    }
-                }
-                    break;
-                case Axis.AncestorOrSelf:
-                {
-                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, true, false)))
-                    {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                        Debug.Log($"Axis AncestorOrSelf return [{resourceInfo.ResourceType}]{resourceInfo.Resource}");
-#endif
-                        yield return resourceInfo;
-                    }
-                }
-                    break;
-                case Axis.AncestorOrSelfInsidePrefab:
-                {
-                    foreach (ResourceInfo resourceInfo in attrResources.SelectMany(each => GetGameObjectsAncestor(each, true, true)))
-                    {
-                        yield return resourceInfo;
-                    }
-                }
-                    break;
-                case Axis.Parent:
-                {
-                    foreach (Transform parentTransform in attrResources.Select(GetParentFromResourceInfo).Where(each => !(each is null)))
-                    {
-                        yield return new ResourceInfo{
-                            ResourceType = ResourceType.Object,
-                            Resource = parentTransform.gameObject,
-                        };
-                    }
-                }
-                    break;
-                case Axis.ParentOrSelf:
-                {
-                    foreach (ResourceInfo attrResource in attrResources.SelectMany(GetParentOrSelfFromResourceInfo))
-                    {
-                        yield return attrResource;
-                    }
-                }
-                    break;
-
-                case Axis.ParentOrSelfInsidePrefab:
-                {
-                    foreach (ResourceInfo attrResource in attrResources.SelectMany(GetParentOrSelfFromResourceInfo))
-                    {
-                        switch (attrResource.Resource)
-                        {
-                            case GameObject go:
-                                if(PrefabUtility.GetPrefabInstanceHandle(go)) {
-                                    yield return attrResource;
-                                }
-
-                                break;
-                            case Component comp:
-                                if(PrefabUtility.GetPrefabInstanceHandle(comp.gameObject)) {
-                                    yield return attrResource;
-                                }
-
-                                break;
-                        }
-                    }
-                }
-                    break;
-
-                case Axis.Scene:
-                {
-                    Scene scene = SceneManager.GetActiveScene();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                    Debug.Log($"Axis return scene {scene}");
-#endif
-                    yield return new ResourceInfo
-                    {
-                        ResourceType = ResourceType.SceneRoot,
-                        Resource = scene,
-                    };
-                    // foreach (GameObject rootGameObject in scene.GetRootGameObjects())
-                    // {
-                    //
-                    // }
-                }
-                    break;
-
-                case Axis.Prefab:
-                {
-                    foreach (ResourceInfo resourceInfo in attrResources)
-                    {
-                        ResourceInfo top = GetGameObjectsAncestor(resourceInfo, true, false).Last();
-                        // ReSharper disable once UseNegatedPatternInIsExpression
-                        if (!(top is null))
-                        {
-                            yield return top;
-                        }
-                    }
-                }
-                    break;
-
-                case Axis.Resources:
-                {
-                    foreach (string resourceDirectoryInfo in GetResourcesRootFolders("Assets"))
-                    {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                        Debug.Log($"Axis Resources return {resourceDirectoryInfo}");
-#endif
-
-                        (string resourceFolder, string subFolder) = SplitResources(resourceDirectoryInfo);
-
-                        ResourceInfo info = new ResourceInfo
-                        {
-                            FolderPath = resourceFolder,
-                            Resource = subFolder,
-                            ResourceType = ResourceType.Folder,
-                        };
-                        yield return info;
-
-                        foreach (ResourceInfo resourceInfo in GetChildInFolder(info))
-                        {
-                            string rawPath = (string)resourceInfo.Resource;
-                            string resourcePath = rawPath.Substring(resourceFolder.Length,
-                                rawPath.Length - resourceFolder.Length);
-                            resourceInfo.Resource = resourcePath;
-                            resourceInfo.FolderPath = resourceFolder;
-                            yield return resourceInfo;
-                        }
-                    }
-                }
-                    break;
-                case Axis.Asset:
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                    Debug.Log("Axis return assets root");
-#endif
-                    yield return new ResourceInfo
-                    {
-                        Resource = "Assets",
-                        ResourceType = ResourceType.AssetsRoot,
-                    };
-                }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
             }
         }
 

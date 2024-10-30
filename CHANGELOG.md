@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.7 ##
+
+1.  Fix `OnEvent` and `OnButtonClick` saving target incorrect and gives error.
+2.  Fix `GetByXPath` failed to find the correct target.
+
 ## 3.4.6 ##
 
 1.  Fix `OnEvent` and `OnButtonClick` wouldn't save the result.
