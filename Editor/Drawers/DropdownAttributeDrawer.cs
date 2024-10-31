@@ -144,6 +144,17 @@ namespace SaintsField.Editor.Drawers
                 $"MetaInfo(index={SelectedIndex}, items={string.Join(",", DropdownListValue.Select(each => each.Item1))}";
         }
 
+        private static string GetRichLabel(Type enumType, string enumFiledName)
+        {
+            FieldInfo fieldInfo = enumType.GetField(enumFiledName);
+            RichLabelAttribute attribute = (RichLabelAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(RichLabelAttribute));
+            if (attribute != null)
+            {
+                return attribute.RichTextXml;
+            }
+            return enumFiledName;
+        }
+
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo field,
             object parentObj)
@@ -151,8 +162,36 @@ namespace SaintsField.Editor.Drawers
             Debug.Assert(field != null);
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
 
-            (string error, IDropdownList dropdownListValue) =
-                Util.GetOf<IDropdownList>(dropdownAttribute.FuncName, null, property, field, parentObj);
+
+            string error;
+            IDropdownList dropdownListValue = null;
+            if (dropdownAttribute.FuncName == null)
+            {
+                Type enumType = ReflectUtils.GetElementType(field.FieldType);
+                if(enumType.IsEnum)
+                {
+                    Array enumValues = Enum.GetValues(enumType);
+                    DropdownList<object> enumDropdown = new DropdownList<object>();
+                    foreach (object enumValue in enumValues)
+                    {
+                        enumDropdown.Add(GetRichLabel(enumType, enumValue.ToString()), enumValue);
+                    }
+
+                    error = "";
+                    dropdownListValue = enumDropdown;
+                }
+                else
+                {
+                    error = $"{property.displayName}({enumType}) is not a enum";
+                }
+            }
+            else
+            {
+                (string getOfError, IDropdownList getOfDropdownListValue) =
+                    Util.GetOf<IDropdownList>(dropdownAttribute.FuncName, null, property, field, parentObj);
+                error = getOfError;
+                dropdownListValue = getOfDropdownListValue;
+            }
             if(dropdownListValue == null || error != "")
             {
                 return new MetaInfo

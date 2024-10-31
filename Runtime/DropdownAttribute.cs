@@ -12,7 +12,7 @@ namespace SaintsField
         public readonly string FuncName;
         public readonly bool SlashAsSub;
 
-        public DropdownAttribute(string funcName, bool slashAsSub=true)
+        public DropdownAttribute(string funcName = null, bool slashAsSub=true)
         {
             FuncName = funcName;
             SlashAsSub = slashAsSub;
