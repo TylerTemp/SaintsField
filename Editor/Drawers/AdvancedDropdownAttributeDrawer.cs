@@ -791,17 +791,6 @@ namespace SaintsField.Editor.Drawers
             // ReSharper enable InconsistentNaming
         }
 
-        private static string GetRichLabel(Type enumType, string enumFiledName)
-        {
-            FieldInfo fieldInfo = enumType.GetField(enumFiledName);
-            RichLabelAttribute attribute = (RichLabelAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(RichLabelAttribute));
-            if (attribute != null)
-            {
-                return attribute.RichTextXml;
-            }
-            return enumFiledName;
-        }
-
         private static MetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj)
         {
             string funcName = advancedDropdownAttribute.FuncName;
@@ -817,7 +806,7 @@ namespace SaintsField.Editor.Drawers
                     AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>();
                     foreach (object enumValue in enumValues)
                     {
-                        enumDropdown.Add(GetRichLabel(enumType, enumValue.ToString()), enumValue);
+                        enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(enumType, enumValue).value, enumValue);
                     }
 
                     error = "";

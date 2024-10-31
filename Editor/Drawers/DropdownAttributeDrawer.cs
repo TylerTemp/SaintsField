@@ -144,17 +144,6 @@ namespace SaintsField.Editor.Drawers
                 $"MetaInfo(index={SelectedIndex}, items={string.Join(",", DropdownListValue.Select(each => each.Item1))}";
         }
 
-        private static string GetRichLabel(Type enumType, string enumFiledName)
-        {
-            FieldInfo fieldInfo = enumType.GetField(enumFiledName);
-            RichLabelAttribute attribute = (RichLabelAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(RichLabelAttribute));
-            if (attribute != null)
-            {
-                return attribute.RichTextXml;
-            }
-            return enumFiledName;
-        }
-
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo field,
             object parentObj)
@@ -174,7 +163,7 @@ namespace SaintsField.Editor.Drawers
                     DropdownList<object> enumDropdown = new DropdownList<object>();
                     foreach (object enumValue in enumValues)
                     {
-                        enumDropdown.Add(GetRichLabel(enumType, enumValue.ToString()), enumValue);
+                        enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(enumType, enumValue).value, enumValue);
                     }
 
                     error = "";

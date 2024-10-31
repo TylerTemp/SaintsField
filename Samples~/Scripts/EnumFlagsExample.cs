@@ -9,15 +9,19 @@ namespace SaintsField.Samples.Scripts
         public enum BitMask
         {
             None = 0,  // this will be replaced for all/none button
+            [RichLabel("M<color=red>1</color>")]
             Mask1 = 1,
+            [RichLabel("M<color=green>2</color>")]
             Mask2 = 1 << 1,
+            [RichLabel("M<color=blue>3</color>")]
             Mask3 = 1 << 2,
+            [RichLabel("M4")]
             Mask4 = 1 << 3,
             Mask5 = 1 << 4,
-            // Mask6 = 1 << 5,
         }
 
-        [EnumFlags] [RichLabel("<icon=star.png /><label />")]
+        [RichLabel("<icon=star.png /><label />")]
+        [EnumFlags]
         public BitMask myMask;
         [EnumFlags, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
 

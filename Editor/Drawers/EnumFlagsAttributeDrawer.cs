@@ -31,12 +31,14 @@ namespace SaintsField.Editor.Drawers
 
             // Debug.Log(SerializedUtils.GetType(property));
 
+            Type enumType = ReflectUtils.GetElementType(info.FieldType);
+
             Dictionary<int, string> allIntToName = Enum
-                .GetValues(info.FieldType)
+                .GetValues(enumType)
                 .Cast<object>()
                 .ToDictionary(
                     each => (int) each,
-                    each => each.ToString()
+                    each => ReflectUtils.GetRichLabelFromEnum(enumType, each).value
                 );
 
             int allCheckedInt = allIntToName.Keys.Aggregate(0, (acc, value) => acc | value);

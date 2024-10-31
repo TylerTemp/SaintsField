@@ -848,7 +848,8 @@ A dropdown selector. Supports reference type, sub-menu, separator, and disabled 
 
 If you want a searchable dropdown, see `AdvancedDropdown`.
 
-*   `string funcName` callback function. Must return a `DropdownList<T>`.
+*   `string funcName=null` callback function. Must return a `DropdownList<T>`.
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
 *   `bool slashAsSub=true` treat `/` as a sub item.
 
     Note: In `IMGUI`, this just replace `/` to unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
@@ -927,6 +928,31 @@ The look in the UI Toolkit with `slashAsSub: false`:
 
 ![dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/e6788204-ff04-4096-a37a-26d68e852737)
 
+Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
+
+If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+
+```csharp
+[Serializable]
+public enum MyEnum
+{
+    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
+    First,
+    [RichLabel("2")]
+    Second,
+    [RichLabel("3")]
+    Third,
+    [RichLabel("4/0")]
+    ForthZero,
+    [RichLabel("4/1")]
+    ForthOne,
+}
+
+[Dropdown] public MyEnum myEnumDropdown;
+```
+
+![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)
+
 #### `AdvancedDropdown` ####
 
 A dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
@@ -948,7 +974,8 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 
 **Arguments**
 
-*   `string funcName` callback function. Must return a `AdvancedDropdownList<T>`.
+*   `string funcName=null` callback function. Must return a `AdvancedDropdownList<T>`.
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
 *   (IMGUI) `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will not change the actual height of item, but to decide the dropdown height.
 *   (IMGUI) `float titleHeight=Default` height of the title. This will not change the actual height of title, but to decide the dropdown height.
 *   (IMGUI) `float sepHeight=Default` height of separator. This will not change the actual height of title, but to decide the dropdown height.
@@ -1063,6 +1090,31 @@ public AdvancedDropdownList<int> AdvDropdownNoNest()
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1e0ad6f4-e65d-4953-9f2a-fa9e22e706af)
+
+Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
+
+If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+
+```csharp
+[Serializable]
+public enum MyEnum
+{
+    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control 
+    First,
+    [RichLabel("2")]
+    Second,
+    [RichLabel("3")]
+    Third,
+    [RichLabel("4/0")]
+    ForthZero,
+    [RichLabel("4/1")]
+    ForthOne,
+}
+
+[AdvancedDropdown] public MyEnum myEnumAdvancedDropdown;
+```
+
+![image](https://github.com/user-attachments/assets/ebc2e2f7-3534-4ff7-8710-29a990f5dea4)
 
 #### `PropRange` ####
 
@@ -1187,6 +1239,30 @@ public enum BitMask
 ```
 
 [![enum_flags](https://github.com/TylerTemp/SaintsField/assets/6391063/710d3efc-5cba-471b-a0f1-a4319ded86fd)](https://github.com/TylerTemp/SaintsField/assets/6391063/48f4c25b-a4cd-40c6-bb42-913a0dc18daa)
+
+You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
+
+```csharp
+[Serializable, Flags]
+public enum BitMask
+{
+    None = 0,
+    [RichLabel("M<color=red>1</color>")]
+    Mask1 = 1,
+    [RichLabel("M<color=green>2</color>")]
+    Mask2 = 1 << 1,
+    [RichLabel("M<color=blue>3</color>")]
+    Mask3 = 1 << 2,
+    [RichLabel("M4")]
+    Mask4 = 1 << 3,
+    Mask5 = 1 << 4,
+}
+
+[EnumFlags]
+public BitMask myMask;
+```
+
+![image](https://github.com/user-attachments/assets/556ff203-aa55-44c9-9cc1-6ca2675b995f)
 
 #### `ResizableTextArea` ####
 

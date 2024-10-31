@@ -393,5 +393,17 @@ namespace SaintsField.Editor.Utils
             }
             return false;
         }
+
+        public static (bool found, string value) GetRichLabelFromEnum(Type enumType, object enumValue)
+        {
+            string enumFieldName = Enum.GetName(enumType, enumValue);
+            FieldInfo fieldInfo = enumType.GetField(enumFieldName);
+            RichLabelAttribute attribute = (RichLabelAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(RichLabelAttribute));
+            if (attribute != null)
+            {
+                return (true, attribute.RichTextXml);
+            }
+            return (false, enumFieldName);
+        }
     }
 }
