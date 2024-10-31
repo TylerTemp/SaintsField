@@ -1853,7 +1853,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &393988620
 GameObject:
   m_ObjectHideFlags: 0
@@ -2633,7 +2632,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d97914ff5cb73574e914780c64d2fd46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myEnum: 4
+  myEnumDropdown: 4
+  myEnumAdvancedDropdown: 3
 --- !u!4 &508450319
 Transform:
   m_ObjectHideFlags: 0
@@ -10733,7 +10733,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &972998063
 GameObject:
   m_ObjectHideFlags: 0
@@ -10816,7 +10815,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &985301982
 GameObject:
   m_ObjectHideFlags: 0
@@ -16099,7 +16097,6 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0

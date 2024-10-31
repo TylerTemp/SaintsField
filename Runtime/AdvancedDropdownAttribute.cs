@@ -25,7 +25,7 @@ namespace SaintsField
         //     FuncName = funcName;
         // }
 
-        public AdvancedDropdownAttribute(string funcName, float itemHeight=-1f, float titleHeight=DefaultTitleHeight, float sepHeight=DefaultSepHeight, bool useTotalItemCount=false, float minHeight=-1f)
+        public AdvancedDropdownAttribute(string funcName=null, float itemHeight=-1f, float titleHeight=DefaultTitleHeight, float sepHeight=DefaultSepHeight, bool useTotalItemCount=false, float minHeight=-1f)
         {
             FuncName = funcName;
             ItemHeight = itemHeight;

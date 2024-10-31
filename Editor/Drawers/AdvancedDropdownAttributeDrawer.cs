@@ -791,12 +791,50 @@ namespace SaintsField.Editor.Drawers
             // ReSharper enable InconsistentNaming
         }
 
+        private static string GetRichLabel(Type enumType, string enumFiledName)
+        {
+            FieldInfo fieldInfo = enumType.GetField(enumFiledName);
+            RichLabelAttribute attribute = (RichLabelAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(RichLabelAttribute));
+            if (attribute != null)
+            {
+                return attribute.RichTextXml;
+            }
+            return enumFiledName;
+        }
+
         private static MetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
-            (string error, IAdvancedDropdownList dropdownListValue) =
-                Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
+            string error;
+            IAdvancedDropdownList dropdownListValue = null;
+            if (funcName is null)
+            {
+                Type enumType = ReflectUtils.GetElementType(field.FieldType);
+                if(enumType.IsEnum)
+                {
+                    Array enumValues = Enum.GetValues(enumType);
+                    AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>();
+                    foreach (object enumValue in enumValues)
+                    {
+                        enumDropdown.Add(GetRichLabel(enumType, enumValue.ToString()), enumValue);
+                    }
+
+                    error = "";
+                    dropdownListValue = enumDropdown;
+                }
+                else
+                {
+                    error = $"{property.displayName}({enumType}) is not a enum";
+                }
+            }
+            else
+            {
+                (string getOfError, IAdvancedDropdownList getOfDropdownListValue) =
+                    Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
+                error = getOfError;
+                dropdownListValue = getOfDropdownListValue;
+            }
             if(dropdownListValue == null || error != "")
             {
                 return new MetaInfo
