@@ -70,10 +70,13 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.4.7**
+**3.4.8**
 
-1.  Fix `OnEvent` and `OnButtonClick` saving target incorrect and gives error.
-2.  Fix `GetByXPath` failed to find the correct target.
+1.  Using `Dropdown`/`AdvancedDropdown` directly on an enum field (without specifying the callback) will allow you to pick
+    up one enum, despise whether the enum is `[Flags]` or not. This is useful when you want to pick up one enum value.  [#81](https://github.com/TylerTemp/SaintsField/issues/81)
+2.  Using `RichLabel` on an enum will allow `Dropdown`/`AdvancedDropdown` to change the name displayed for each enum item.
+    The `EnumFlags` will also change the button's name accordingly. Please note: only standard Unity's RichText label is supported yet.
+    Extended tag like `<icon>`, `<label>` and extended color name will not be supported at the point.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
