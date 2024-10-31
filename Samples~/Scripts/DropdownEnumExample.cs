@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts
             ForthOne,
         }
 
-        // [Dropdown] public MyEnum myEnumDropdown;
+        [Dropdown] public MyEnum myEnumDropdown;
         [AdvancedDropdown] public MyEnum myEnumAdvancedDropdown;
     }
 }
