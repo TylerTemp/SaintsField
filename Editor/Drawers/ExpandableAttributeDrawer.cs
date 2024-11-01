@@ -36,7 +36,102 @@ namespace SaintsField.Editor.Drawers
     {
         #region IMGUI
 
-        private string _error = "";
+        private class ExpandableInfo
+        {
+            public string Error;
+            public SerializedObject SerializedObject;
+        }
+
+        private static readonly Dictionary<string, ExpandableInfo> IdToInfo = new Dictionary<string, ExpandableInfo>();
+        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+#if UNITY_2019_2_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+#endif
+#if UNITY_2019_3_OR_NEWER
+        [InitializeOnEnterPlayMode]
+#endif
+        private static void ImGuiClearSharedData()
+        {
+            foreach (ExpandableInfo expandableInfo in IdToInfo.Values)
+            {
+                DisposeExpandableInfo(expandableInfo);
+            }
+            IdToInfo.Clear();
+        }
+
+        private string _cacheKey = "";
+
+        protected override void ImGuiOnDispose()
+        {
+            base.ImGuiOnDispose();
+            if (IdToInfo.TryGetValue(_cacheKey, out ExpandableInfo expandableInfo))
+            {
+                DisposeExpandableInfo(expandableInfo);
+                IdToInfo.Remove(_cacheKey);
+            }
+        }
+
+        private static void DisposeExpandableInfo(ExpandableInfo expandableInfo)
+        {
+            // ReSharper disable once MergeIntoPattern
+            // ReSharper disable once MergeSequentialChecks
+            if (expandableInfo == null || expandableInfo.SerializedObject == null)
+            {
+                return;
+            }
+
+            try
+            {
+                expandableInfo.SerializedObject.Dispose();
+            }
+            catch (Exception)
+            {
+                // do nothing
+            }
+        }
+
+        private ExpandableInfo GetSerializedObject(SerializedProperty property, FieldInfo info, object parent)
+        {
+            ImGuiEnsureDispose(property.serializedObject.targetObject);
+            _cacheKey = GetKey(property);
+            if(IdToInfo.TryGetValue(_cacheKey, out ExpandableInfo expandableInfo) && expandableInfo.SerializedObject != null)
+            {
+                return expandableInfo;
+            }
+            Object serObject = GetSerObject(property, info, parent);
+            if (serObject == null)
+            {
+                if(IdToInfo.TryGetValue(_cacheKey, out ExpandableInfo expandableNullInfo))
+                {
+                    DisposeExpandableInfo(expandableNullInfo);
+                }
+                return IdToInfo[_cacheKey] = new ExpandableInfo
+                {
+                    Error = "",
+                    SerializedObject = null,
+                };
+            }
+
+            SerializedObject serializedObject = null;
+            try
+            {
+                serializedObject = new SerializedObject(serObject);
+            }
+            catch (Exception e)
+            {
+                return IdToInfo[_cacheKey] = new ExpandableInfo
+                {
+                    Error = $"Failed to create a SerializedObject: {e.Message}",
+                    SerializedObject = null,
+                };
+            }
+            return IdToInfo[_cacheKey] = new ExpandableInfo
+            {
+                Error = "",
+                SerializedObject = serializedObject,
+            };
+        }
+        // private string _error = "";
 
         // list/array shares the same drawer in Unity
         // for convenience, we use the propertyPath as key as it already contains the index
@@ -45,24 +140,11 @@ namespace SaintsField.Editor.Drawers
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            Object serObject = GetSerObject(property, info, parent);
-            if (serObject == null)
+            ExpandableInfo serInfo = GetSerializedObject(property, info, parent);
+            if (serInfo.Error != "")
             {
                 return -1;
             }
-            // if(property.objectReferenceValue == null)
-            // {
-            //     return -1;
-            // }
-
-            // EditorGUI.DrawRect(position, Color.yellow);
-
-            // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
-
-            // Rect drawPos = new Rect(position)
-            // {
-            //     x = position.x - 13,
-            // };
 
             bool curExpanded = property.isExpanded;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_EXPANDABLE
@@ -77,7 +159,6 @@ namespace SaintsField.Editor.Drawers
                         new GUIContent(new string(' ', property.displayName.Length)), true);
                     if (changed.changed)
                     {
-                        // SetExpand(property, newExpanded);
                         property.isExpanded = newExpanded;
                     }
                 }
@@ -97,64 +178,41 @@ namespace SaintsField.Editor.Drawers
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            Object serObject = GetSerObject(property, info, parent);
-            float basicHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+            ExpandableInfo serInfo = GetSerializedObject(property, info, parent);
+            float basicHeight = serInfo.Error == "" ? 0 : ImGuiHelpBox.GetHeight(serInfo.Error, width, MessageType.Error);
 
-            if (!property.isExpanded || serObject == null)
+            if (!property.isExpanded || serInfo.SerializedObject == null)
             {
                 return basicHeight;
             }
 
-            // ScriptableObject scriptableObject = property.objectReferenceValue as ScriptableObject;
-            SerializedObject serializedObject = new SerializedObject(serObject);
-
-            // foreach (SerializedProperty serializedProperty in GetAllField(serializedObject))
-            // {
-            //     Debug.Log(serializedProperty);
-            // }
-
-            // SerializedProperty childProperty = GetAllField(serializedObject).First();
-            // Debug.Log(childProperty);
-            // Debug.Log(childProperty.displayName);
-            // Debug.Log(EditorGUI.GetPropertyHeight(childProperty, true));
-            //
-            // return basicHeight;
-
-            float expandedHeight = GetAllField(serializedObject).Select(childProperty =>
-                EditorGUI.GetPropertyHeight(childProperty, true)).Sum();
-            // float expandedHeight = 0;
-
+            serInfo.SerializedObject.UpdateIfRequiredOrScript();
+            float expandedHeight = GetAllField(serInfo.SerializedObject)
+                .Select(childProperty => EditorGUI.GetPropertyHeight(childProperty, true) + 2)
+                .Sum();
             return basicHeight + expandedHeight;
         }
-
-        // private UnityEditor.Editor _editor;
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            Object scriptableObject = GetSerObject(property, info, parent);;
-            // _error = property.propertyType != SerializedPropertyType.ObjectReference
-            //     ? $"Expected ScriptableObject type, get {property.propertyType}"
-            //     : "";
+            ExpandableInfo serInfo = GetSerializedObject(property, info, parent);
 
             Rect leftRect = position;
 
-            if (_error != "")
+            if (serInfo.Error != "")
             {
-                leftRect = ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+                leftRect = ImGuiHelpBox.Draw(position, serInfo.Error, MessageType.Error);
             }
 
             bool isExpand = property.isExpanded;
             // Debug.Log($"below expand = {isExpand}");
-            if (!isExpand || scriptableObject == null)
+            if (!isExpand || serInfo.SerializedObject == null)
             {
                 return leftRect;
             }
 
-            SerializedObject serializedObject = new SerializedObject(scriptableObject);
-            serializedObject.Update();
-
-            float usedHeight = 0f;
+            // serializedObject.Update();
 
             Rect indentedRect;
             using (new EditorGUI.IndentLevelScope(1))
@@ -162,78 +220,57 @@ namespace SaintsField.Editor.Drawers
                 indentedRect = EditorGUI.IndentedRect(leftRect);
             }
 
-            // _editor ??= UnityEditor.Editor.CreateEditor(scriptableObject);
-            // _editor.OnInspectorGUI();
+            float indentWidth = indentedRect.x - leftRect.x;
 
-            List<(Rect, SerializedProperty)> propertyRects = new List<(Rect, SerializedProperty)>();
+            float usedHeight = 0;
 
             using(new EditorGUI.IndentLevelScope(1))
             using(new AdaptLabelWidth())
             using(new ResetIndentScoop())
-            {
-                foreach (SerializedProperty childProperty in GetAllField(serializedObject))
-                {
-                    float childHeight = EditorGUI.GetPropertyHeight(childProperty, true);
-                    Rect childRect = new Rect
-                    {
-                        x = indentedRect.x,
-                        y = indentedRect.y + usedHeight,
-                        width = indentedRect.width,
-                        height = childHeight,
-                    };
-
-                    // EditorGUI.PropertyField(childRect, childProperty, true);
-                    propertyRects.Add((childRect, childProperty));
-
-                    usedHeight += childHeight;
-                }
-            }
-
-            GUI.Box(new Rect(leftRect)
-            {
-                height = usedHeight,
-            }, GUIContent.none);
-
             using(new ExpandableIMGUIScoop())
             {
-                foreach ((Rect childRect, SerializedProperty childProperty) in propertyRects)
+                foreach (SerializedProperty iterator in GetAllField(serInfo.SerializedObject))
                 {
-                    EditorGUI.PropertyField(childRect, childProperty, true);
-                    // EditorGUI.DrawRect(childRect, Color.blue);
-                }
-            }
+                    float childHeight = EditorGUI.GetPropertyHeight(iterator, true) + 2;
+                    (Rect childRect, Rect leftOutRect) = RectUtils.SplitHeightRect(indentedRect, childHeight);
+                    indentedRect = leftOutRect;
+                    usedHeight += childHeight;
 
-            serializedObject.ApplyModifiedProperties();
+                    GUI.Box(new Rect(childRect)
+                    {
+                        x = childRect.x - indentWidth,
+                        width = childRect.width + indentWidth,
+                    }, GUIContent.none);
+                    EditorGUI.PropertyField(new Rect(childRect)
+                    {
+                        y = childRect.y + 1,
+                        height = childRect.height - 2,
+                    }, iterator, true);
+                }
+
+                serInfo.SerializedObject.ApplyModifiedProperties();
+            }
 
             return new Rect(leftRect)
             {
-                y = leftRect.y + usedHeight,
+                y = indentedRect.y + indentedRect.height,
                 height = leftRect.height - usedHeight,
             };
         }
 
         #endregion
 
-        private static IEnumerable<SerializedProperty> GetAllField(SerializedObject serializedScriptableObject)
+        private static IEnumerable<SerializedProperty> GetAllField(SerializedObject obj)
         {
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (SerializedProperty iterator = serializedScriptableObject.GetIterator())
+            obj.UpdateIfRequiredOrScript();
+            SerializedProperty iterator = obj.GetIterator();
+            for (bool enterChildren = true; iterator.NextVisible(enterChildren); enterChildren = false)
             {
-                if (!iterator.NextVisible(true))
+                // using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath))
+                if("m_Script" != iterator.propertyPath)
                 {
-                    yield break;
+                    yield return iterator;
                 }
-
-                do
-                {
-                    SerializedProperty childProperty = serializedScriptableObject.FindProperty(iterator.name);
-                    if (childProperty.name.Equals("m_Script", System.StringComparison.Ordinal))
-                    {
-                        continue;
-                    }
-
-                    yield return childProperty;
-                } while (iterator.NextVisible(false));
             }
         }
 
