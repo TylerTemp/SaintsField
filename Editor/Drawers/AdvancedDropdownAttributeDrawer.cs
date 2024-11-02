@@ -10,6 +10,9 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
+using Button = UnityEngine.UIElements.Button;
+using Image = UnityEngine.UIElements.Image;
 using UnityAdvancedDropdown = UnityEditor.IMGUI.Controls.AdvancedDropdown;
 using UnityAdvancedDropdownItem = UnityEditor.IMGUI.Controls.AdvancedDropdownItem;
 #if UNITY_2021_3_OR_NEWER
@@ -858,8 +861,23 @@ namespace SaintsField.Editor.Drawers
                 curValue = Util.GetWrapValue(wrapProp);
             }
 
+            // process the unique options
+            (string uniqueError, IAdvancedDropdownList dropdownListValueUnique) = GetUniqueList(dropdownListValue, advancedDropdownAttribute.EUnique, curValue, property, field, parentObj);
+
+            if (uniqueError != "")
+            {
+                return new MetaInfo
+                {
+                    Error = curError,
+                    CurDisplay = "[Error]",
+                    CurValue = null,
+                    DropdownListValue = null,
+                    SelectStacks = Array.Empty<SelectStack>(),
+                };
+            }
+
             // string curDisplay = "";
-            (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValue);
+            (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValueUnique);
             #endregion
 
             return new MetaInfo
@@ -868,9 +886,128 @@ namespace SaintsField.Editor.Drawers
                 // FieldInfo = field,
                 CurDisplay = display,
                 CurValue = curValue,
-                DropdownListValue = dropdownListValue,
+                DropdownListValue = dropdownListValueUnique,
                 SelectStacks = curSelected,
             };
+        }
+
+        private static (string error, IAdvancedDropdownList dropdownList) GetUniqueList(IAdvancedDropdownList dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, FieldInfo info, object parent)
+        {
+            if(eUnique == EUnique.None)
+            {
+                return ("", dropdownListValue);
+            }
+
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (arrayIndex == -1)
+            {
+                return ("", dropdownListValue);
+            }
+
+            (SerializedProperty arrProp, int _, string error) = Util.GetArrayProperty(property, info, parent);
+            if (error != "")
+            {
+                return (error, null);
+            }
+
+            List<object> existsValues = new List<object>();
+
+            foreach (SerializedProperty element in Enumerable.Range(0, arrProp.arraySize).Where(index => index != arrayIndex).Select(arrProp.GetArrayElementAtIndex))
+            {
+                (string otherError, int _, object otherValue) = Util.GetValue(element, info, parent);
+                if (otherError != "")
+                {
+                    return (otherError, null);
+                }
+
+                if (otherValue is IWrapProp wrapProp)
+                {
+                    otherValue = Util.GetWrapValue(wrapProp);
+                }
+
+                existsValues.Add(otherValue);
+            }
+
+            // if (eUnique == EUnique.Remove)
+            // {
+            //     existsValues.Remove(curValue);
+            // }
+
+            return ("", ReWrapUniqueList(dropdownListValue, eUnique, existsValues, curValue));
+        }
+
+        private static AdvancedDropdownList<object> ReWrapUniqueList(IAdvancedDropdownList dropdownListValue, EUnique eUnique, List<object> existsValues, object curValue)
+        {
+            AdvancedDropdownList<object> dropdownList = new AdvancedDropdownList<object>(dropdownListValue.displayName, dropdownListValue.disabled, dropdownListValue.icon);
+            IReadOnlyList<AdvancedDropdownList<object>> children = ReWrapUniqueChildren(dropdownListValue.children, eUnique, existsValues, curValue);
+            dropdownList.SetChildren(children.ToList());
+            return dropdownList;
+        }
+
+        private static IReadOnlyList<AdvancedDropdownList<object>> ReWrapUniqueChildren(IReadOnlyList<IAdvancedDropdownList> children, EUnique eUnique, IReadOnlyList<object> existsValues, object curValue)
+        {
+            List<AdvancedDropdownList<object>> newChildren = new List<AdvancedDropdownList<object>>();
+            foreach (IAdvancedDropdownList originChild in children)
+            {
+                if (originChild.isSeparator)
+                {
+                    newChildren.Add(AdvancedDropdownList<object>.Separator());
+                }
+                else if (originChild.ChildCount() > 0)  // has sub child
+                {
+                    IReadOnlyList<AdvancedDropdownList<object>> subChildren = ReWrapUniqueChildren(originChild.children, eUnique, existsValues, curValue);
+                    if (subChildren.Any(each => !each.isSeparator))
+                    {
+                        bool isDisabled = originChild.disabled ||
+                                          subChildren.All(each => each.isSeparator || each.disabled);
+                        AdvancedDropdownList<object> newChild = new AdvancedDropdownList<object>(originChild.displayName, isDisabled, originChild.icon);
+                        newChild.SetChildren(subChildren.ToList());
+                        newChildren.Add(newChild);
+                    }
+                }
+                else
+                {
+                    object childValue = originChild.value;
+                    bool exists = existsValues.Any(each => Util.GetIsEqual(each, childValue));
+                    if (!exists)
+                    {
+                        newChildren.Add(new AdvancedDropdownList<object>(
+                            originChild.displayName,
+                            originChild.value,
+                            originChild.disabled,
+                            originChild.icon,
+                            originChild.isSeparator));
+                    }
+                    else if (eUnique == EUnique.Disable)
+                    {
+                        newChildren.Add(new AdvancedDropdownList<object>(
+                            originChild.displayName,
+                            originChild.value,
+                            true,
+                            originChild.icon,
+                            originChild.isSeparator));
+                    }
+                    else if (eUnique == EUnique.Remove)
+                    {
+                        if (Util.GetIsEqual(originChild.value, curValue))
+                        {
+                            newChildren.Add(new AdvancedDropdownList<object>(
+                                originChild.displayName,
+                                originChild.value,
+                                true,
+                                originChild.icon,
+                                originChild.isSeparator));
+                        }
+                    }
+                }
+            }
+
+            if (newChildren.All(each => each.isSeparator))
+            {
+                newChildren.Clear();
+            }
+
+            return newChildren;
         }
 
         private static string GetMetaStackDisplay(MetaInfo metaInfo)

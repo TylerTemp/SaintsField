@@ -21,6 +21,10 @@ namespace SaintsField.Samples.Scripts
         }
 
         [Dropdown] public MyEnum myEnumDropdown;
+        [Dropdown(EUnique.Disable)] public MyEnum[] myEnumDropdownDisable;
+        [Dropdown(EUnique.Remove)] public MyEnum[] myEnumDropdownRemove;
         [AdvancedDropdown] public MyEnum myEnumAdvancedDropdown;
+        [AdvancedDropdown(EUnique.Disable)] public MyEnum[] myEnumAdvancedDropdownDisable;
+        [AdvancedDropdown(EUnique.Remove)] public MyEnum[] myEnumAdvancedDropdownRemove;
     }
 }

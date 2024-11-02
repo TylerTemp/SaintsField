@@ -209,11 +209,23 @@ namespace SaintsField.Editor.Drawers
             }
             // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
             // string curDisplay = "";
-
-            int selectedIndex = -1;
             Debug.Assert(dropdownListValue != null);
 
-            IReadOnlyList<(string, object, bool, bool)> dropdownActualList = dropdownListValue.ToArray();
+            (string uniqueError, IDropdownList dropdownListValueUnique) = GetUniqueList(dropdownListValue, dropdownAttribute.EUnique, curValue, property, field, parentObj);
+
+            if (uniqueError != "")
+            {
+                return new MetaInfo
+                {
+                    Error = curError,
+                    SelectedIndex = -1,
+                    DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+                };
+            }
+
+            int selectedIndex = -1;
+
+            IReadOnlyList<(string, object, bool, bool)> dropdownActualList = dropdownListValueUnique.ToArray();
 
             foreach (int dropdownIndex in Enumerable.Range(0, dropdownActualList.Count))
             {
@@ -236,6 +248,68 @@ namespace SaintsField.Editor.Drawers
                 DropdownListValue = dropdownActualList,
                 SelectedIndex = selectedIndex,
             };
+        }
+
+        private static (string uniqueError, IDropdownList dropdownListValueUnique) GetUniqueList(IDropdownList dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, FieldInfo info, object parent)
+        {
+            if(eUnique == EUnique.None)
+            {
+                return ("", dropdownListValue);
+            }
+
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (arrayIndex == -1)
+            {
+                return ("", dropdownListValue);
+            }
+
+            (SerializedProperty arrProp, int _, string error) = Util.GetArrayProperty(property, info, parent);
+            if (error != "")
+            {
+                return (error, null);
+            }
+
+            List<object> existsValues = new List<object>();
+
+            foreach (SerializedProperty element in Enumerable.Range(0, arrProp.arraySize).Where(index => index != arrayIndex).Select(arrProp.GetArrayElementAtIndex))
+            {
+                (string otherError, int _, object otherValue) = Util.GetValue(element, info, parent);
+                if (otherError != "")
+                {
+                    return (otherError, null);
+                }
+
+                if (otherValue is IWrapProp wrapProp)
+                {
+                    otherValue = Util.GetWrapValue(wrapProp);
+                }
+
+                existsValues.Add(otherValue);
+            }
+
+            DropdownList<object> newResult = new DropdownList<object>();
+            foreach ((string name, object value, bool disabled, bool separator) eachValue in dropdownListValue)
+            {
+                bool exists = existsValues.Any(each => Util.GetIsEqual(each, eachValue.value));
+                if (!exists)
+                {
+                    newResult.Add(eachValue);
+                }
+                else if (eUnique == EUnique.Disable)
+                {
+                    newResult.Add((eachValue.name, eachValue.value, true, eachValue.separator));
+                }
+                else if (eUnique == EUnique.Remove)
+                {
+                    // if it's the value from other element, then just disable it rather than remove it
+                    if(Util.GetIsEqual(curValue, eachValue.value))
+                    {
+                        newResult.Add((eachValue.name, eachValue.value, true, eachValue.separator));
+                    }
+                }
+            }
+
+            return ("", newResult);
         }
 
 #if UNITY_2021_3_OR_NEWER

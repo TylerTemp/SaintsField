@@ -2,8 +2,8 @@
 
 [![unity_version](https://github.com/TylerTemp/SaintsField/assets/6391063/c01626a1-9329-4c26-be31-372f8704df1d)](https://unity.com/download)
 [![license_mit](https://github.com/TylerTemp/SaintsField/assets/6391063/a093811a-5dbc-46ad-939e-a9e207ae5bfb)](https://github.com/TylerTemp/SaintsField/blob/master/LICENSE)
-[![openupm](https://img.shields.io/npm/v/today.comes.saintsfield?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/today.comes.saintsfield/)
-[![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Ftoday.comes.saintsfield)](https://openupm.com/packages/today.comes.saintsfield/)
+[![openupm](https://img.shields.io/npm/v/today.comes.saintsfield?label=OpenUPM&registry_uri=https://package.openupm.com)](https://openupm.com/packages/today.comes.saintsfield/)
+[![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Ftoday.comes.saintsfield)](https://openupm.com/packages/today.comes.saintsfield/)
 [![repo-stars](https://img.shields.io/github/stars/TylerTemp/SaintsField)](https://github.com/TylerTemp/SaintsField/)
 
 `SaintsField` is a Unity Inspector extension tool focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
@@ -70,13 +70,11 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 ## Change Log ##
 
-**3.4.8**
+**3.4.9**
 
-1.  Using `Dropdown`/`AdvancedDropdown` directly on an enum field (without specifying the callback) will allow you to pick
-    up one enum, despise whether the enum is `[Flags]` or not. This is useful when you want to pick up one enum value.  [#81](https://github.com/TylerTemp/SaintsField/issues/81)
-2.  Using `RichLabel` on an enum will allow `Dropdown`/`AdvancedDropdown` to change the name displayed for each enum item.
-    The `EnumFlags` will also change the button's name accordingly. Please note: only standard Unity's RichText label is supported yet.
-    Extended tag like `<icon>`, `<label>` and extended color name will not be supported at the point.
+1.  Add `EUnique.Remove`, `EUnique.Disable` for `Dropdown` & `AdvancedDropdown`. When using on a list/array, a duplicated
+    option can be removed or disabled.
+2.  IMGUI: `Expandable` fix repeatedly creating `SerializedObject` and lead to un-editable fields. Possibly related to [#78](https://github.com/TylerTemp/SaintsField/issues/78)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -14,7 +14,7 @@ namespace SaintsField
 
         public object value => _typeValue;
 
-        private readonly List<AdvancedDropdownList<T>> _typeChildren;
+        private List<AdvancedDropdownList<T>> _typeChildren;
 
         public IReadOnlyList<IAdvancedDropdownList> children =>
             _typeChildren.Select(each => (IAdvancedDropdownList)each).ToList();
@@ -22,6 +22,8 @@ namespace SaintsField
         public bool disabled { get; }
         public string icon { get; }
         public bool isSeparator { get; }
+
+        public void SetChildren(List<AdvancedDropdownList<T>> newChildren) => _typeChildren = newChildren;
 
         public AdvancedDropdownList()
         {
