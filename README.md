@@ -855,6 +855,7 @@ If you want a searchable dropdown, see `AdvancedDropdown`.
 
     Note: In `IMGUI`, this just replace `/` to unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
 
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
 **Example**
@@ -977,11 +978,7 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 
 *   `string funcName=null` callback function. Must return a `AdvancedDropdownList<T>`.
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
-*   (IMGUI) `float itemHeight=-1f` height of each item. `< 0` means use Unity's default value. This will not change the actual height of item, but to decide the dropdown height.
-*   (IMGUI) `float titleHeight=Default` height of the title. This will not change the actual height of title, but to decide the dropdown height.
-*   (IMGUI) `float sepHeight=Default` height of separator. This will not change the actual height of title, but to decide the dropdown height.
-*   (IMGUI) `bool useTotalItemCount=false` if true, the dropdown height will be decided using the number of all value item, thus the search result will always fit in the position without scroll. Otherwise, it'll be decided by the max height of every item page.
-*   (IMGUI) `float minHeight=-1f` minimum height of the dropdown. `< 0` means no limit. Otherwise, use this as the dropdown height and ignore all the other auto height config.
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
 **`AdvancedDropdownList<T>`**
@@ -1100,7 +1097,7 @@ If you add `RichLabel` to the `enum`, the item name will be changed to the `Rich
 [Serializable]
 public enum MyEnum
 {
-    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control 
+    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
     First,
     [RichLabel("2")]
     Second,

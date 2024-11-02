@@ -2,10 +2,10 @@
 
 ## 3.4.9 ##
 
-1.  Add `EUnique.Remove`, `EUnique.Disable` for `Dropdown` & `AdvancedDropdown`. When using on a list/array, a duplicated
-    option can be removed or disabled.
-2.  IMGUI: `Expandable` fix repeatedly creating `SerializedObject` and lead to un-editable fields. Possibly related to [#78](https://github.com/TylerTemp/SaintsField/issues/78) 
- 
+1.  Add `EUnique.Remove`, `EUnique.Disable` for `Dropdown` & `AdvancedDropdown`. When using on a list/array, a duplicated option can be removed or disabled.
+2.  IMGUI: `Expandable` fix repeatedly creating `SerializedObject` and lead to un-editable fields. Possibly related to [#78](https://github.com/TylerTemp/SaintsField/issues/78)
+3.  IMGUI: many IMGUI only parameters are removed from `AdvancedDropdown`.
+
 ## 3.4.8 ##
 
 1.  Using `Dropdown`/`AdvancedDropdown` directly on an enum field (without specifying the callback) will allow you to pick
