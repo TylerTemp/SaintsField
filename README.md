@@ -2711,6 +2711,157 @@ private void OnClick()
 
 ![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
 
+## Data Types ##
+
+### `SaintsArray`/`SaintsList` ###
+
+Unity does not allow to serialize two dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
+
+```csharp
+using SaintsField;
+
+// two dimensional array
+public SaintsArray<GameObject>[] gameObjects2;
+public SaintsArray<SaintsArray<GameObject>> gameObjects2Nest;
+// four dimensional array, if you like.
+// it can be used with array, but ensure the `[]` is always at the end.
+public SaintsArray<SaintsArray<SaintsArray<GameObject>>>[] gameObjects4;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/5c6a5d8d-ec56-45d2-9860-1ecdd6badd3f)
+
+`SaintsArray` implements `IReadOnlyList`, `SaintsList` implements `IList`:
+
+```csharp
+using SaintsField;
+
+// SaintsArray
+GameObject firstGameObject = saintsArrayGo[0];
+Debug.Log(saintsArrayGo.value); // the actual array value
+
+// SaintsList
+saintsListGo.Add(new GameObject());
+saintsListGo.RemoveAt(0);
+Debug.Log(saintsListGo.value);  // the actual list value
+```
+
+These two can be easily converted to array/list:
+
+```csharp
+using SaintsField;
+
+// SaintsArray to Array
+GameObject[] arrayGo = saintsArrayGo;
+// Array to SaintsArray
+SaintsArray<GameObject> expSaintsArrayGo = (SaintsArray<GameObject>)arrayGo;
+
+// SaintsList to List
+List<GameObject> ListGo = saintsListGo;
+// List to SaintsList
+SaintsList<GameObject> expSaintsListGo = (SaintsList<GameObject>)ListGo;
+```
+
+Because it's actually a struct, you can also implement your own Array/List, using `[SaintsArray]`. Here is an example of customize your own struct:
+
+```csharp
+using SaintsField;
+
+// example: using IWrapProp so you don't need to specify the type name everytime
+[Serializable]
+public class MyList : IWrapProp
+{
+    [SerializeField] public List<string> myStrings;
+
+#if UNITY_EDITOR
+    public string EditorPropertyName => nameof(myStrings);
+#endif
+}
+
+[SaintsArray]
+public MyList[] myLis;
+
+
+// example: any Serializable which hold a serialized array/list is fine
+[Serializable]
+public struct MyArr
+{
+    [RichLabel(nameof(MyInnerRichLabel), true)]
+    public int[] myArray;
+
+    private string MyInnerRichLabel(object _, int index) => $"<color=pink> Inner [{(char)('A' + index)}]";
+}
+
+[RichLabel(nameof(MyOuterLabel), true), SaintsArray("myArray")]
+public MyArr[] myArr;
+
+private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}";
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ff4bcdef-f3e6-4ece-8204-d4ba8798e164)
+
+alternatively, you can make a custom drawer for your data type to avoid adding `[SaintsArray]` to every field:
+
+```csharp
+// Put it under an Editor folder, or with UNITY_EDITOR
+#if UNITY_EDITOR
+using SaintsField.Editor.Drawers.TypeDrawers;
+
+[CustomPropertyDrawer(typeof(MyList))]
+public class MyArrayDrawer: SaintsArrayDrawer {}
+#endif
+```
+
+### `SaintsInterface<,>` ###
+
+`SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface.
+
+You can access the interface with the `.I` field, and actual object with `.V` field.
+
+It provides a drawer to let you only select the object that implements the interface.
+
+For `SaintsInterface<TObject, TInterface>`:
+
+*   `TObject` a serializable type. Use `Component` (for your `MonoBehavior`), `ScriptableObject` or even `UnityEngine.Object` (for any serializable object) if you only want any limitation. Don't use `GameObject`.
+*   `TInterface` the interface type.
+*   `.I`: the interface value, which is the instance of `TInterface`
+*   `.V`: the actual object value, which is the instance of `TObject`
+
+```csharp
+using SaintsField;
+
+public SaintsInterface<Component, IInterface1> myInter1;
+
+// for old unity
+[Serializable]
+public class Interface1 : SaintsInterface<Component, IInterface1>
+{
+}
+
+public Interface1 myInherentInterface1;
+
+private void Awake()
+{
+    Debug.Log(myInter1.I);  // the actual interface
+    Debug.Log(myInter1.V);  // the actual serialized object
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/e7ea662d-34d2-4d4b-88b9-0c4bbbbdee33)
+
+Special Note:
+
+Though you can inherit `SaintsInterface`, but don't inherit it with 2 steps of generic, for example:
+
+```csharp
+// Don't do this!
+class AnyObjectInterface<T>: SaintsInterface<UnityEngine.Object, T> {}
+class MyInterface: AnyObjectInterface<IInterface1> {}
+```
+
+The drawer will fail for `AnyObjectInterface` and `MyInterface` because in Unity's C# runtime, it can not report correctly generic arguments.
+For more information, see [the comment of the answer in this stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347).
+
+
 ## Addressable ##
 
 These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.unity.addressables@latest). It's there only if you have `Addressable` installed.
@@ -2813,156 +2964,6 @@ public int areaName;
 ```
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
-
-### Data Types ###
-
-#### `SaintsArray`/`SaintsList` ####
-
-Unity does not allow to serialize two dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
-
-```csharp
-using SaintsField;
-
-// two dimensional array
-public SaintsArray<GameObject>[] gameObjects2;
-public SaintsArray<SaintsArray<GameObject>> gameObjects2Nest;
-// four dimensional array, if you like.
-// it can be used with array, but ensure the `[]` is always at the end.
-public SaintsArray<SaintsArray<SaintsArray<GameObject>>>[] gameObjects4;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/5c6a5d8d-ec56-45d2-9860-1ecdd6badd3f)
-
-`SaintsArray` implements `IReadOnlyList`, `SaintsList` implements `IList`:
-
-```csharp
-using SaintsField;
-
-// SaintsArray
-GameObject firstGameObject = saintsArrayGo[0];
-Debug.Log(saintsArrayGo.value); // the actual array value
-
-// SaintsList
-saintsListGo.Add(new GameObject());
-saintsListGo.RemoveAt(0);
-Debug.Log(saintsListGo.value);  // the actual list value
-```
-
-These two can be easily converted to array/list:
-
-```csharp
-using SaintsField;
-
-// SaintsArray to Array
-GameObject[] arrayGo = saintsArrayGo;
-// Array to SaintsArray
-SaintsArray<GameObject> expSaintsArrayGo = (SaintsArray<GameObject>)arrayGo;
-
-// SaintsList to List
-List<GameObject> ListGo = saintsListGo;
-// List to SaintsList
-SaintsList<GameObject> expSaintsListGo = (SaintsList<GameObject>)ListGo;
-```
-
-Because it's actually a struct, you can also implement your own Array/List, using `[SaintsArray]`. Here is an example of customize your own struct:
-
-```csharp
-using SaintsField;
-
-// example: using IWrapProp so you don't need to specify the type name everytime
-[Serializable]
-public class MyList : IWrapProp
-{
-    [SerializeField] public List<string> myStrings;
-
-#if UNITY_EDITOR
-    public string EditorPropertyName => nameof(myStrings);
-#endif
-}
-
-[SaintsArray]
-public MyList[] myLis;
-
-
-// example: any Serializable which hold a serialized array/list is fine
-[Serializable]
-public struct MyArr
-{
-    [RichLabel(nameof(MyInnerRichLabel), true)]
-    public int[] myArray;
-
-    private string MyInnerRichLabel(object _, int index) => $"<color=pink> Inner [{(char)('A' + index)}]";
-}
-
-[RichLabel(nameof(MyOuterLabel), true), SaintsArray("myArray")]
-public MyArr[] myArr;
-
-private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}";
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ff4bcdef-f3e6-4ece-8204-d4ba8798e164)
-
-alternatively, you can make a custom drawer for your data type to avoid adding `[SaintsArray]` to every field:
-
-```csharp
-// Put it under an Editor folder, or with UNITY_EDITOR
-#if UNITY_EDITOR
-using SaintsField.Editor.Drawers.TypeDrawers;
-
-[CustomPropertyDrawer(typeof(MyList))]
-public class MyArrayDrawer: SaintsArrayDrawer {}
-#endif
-```
-
-#### `SaintsInterface<,>` ####
-
-`SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface.
-
-You can access the interface with the `.I` field, and actual object with `.V` field.
-
-It provides a drawer to let you only select the object that implements the interface.
-
-For `SaintsInterface<TObject, TInterface>`:
-
-*   `TObject` a serializable type. Use `Component` (for your `MonoBehavior`), `ScriptableObject` or even `UnityEngine.Object` (for any serializable object) if you only want any limitation. Don't use `GameObject`.
-*   `TInterface` the interface type.
-*   `.I`: the interface value, which is the instance of `TInterface`
-*   `.V`: the actual object value, which is the instance of `TObject`
-
-```csharp
-using SaintsField;
-
-public SaintsInterface<Component, IInterface1> myInter1;
-
-// for old unity
-[Serializable]
-public class Interface1 : SaintsInterface<Component, IInterface1>
-{
-}
-
-public Interface1 myInherentInterface1;
-
-private void Awake()
-{
-    Debug.Log(myInter1.I);  // the actual interface
-    Debug.Log(myInter1.V);  // the actual serialized object
-}
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/e7ea662d-34d2-4d4b-88b9-0c4bbbbdee33)
-
-Special Note:
-
-Though you can inherit `SaintsInterface`, but don't inherit it with 2 steps of generic, for example:
-
-```csharp
-// Don't do this!
-class AnyObjectInterface<T>: SaintsInterface<UnityEngine.Object, T> {}
-class MyInterface: AnyObjectInterface<IInterface1> {}
-```
-
-The drawer will fail for `AnyObjectInterface` and `MyInterface` because in Unity's C# runtime, it can not report correctly generic arguments.
-For more information, see [the comment of the answer in this stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347).
 
 ## SaintsEditor ##
 
