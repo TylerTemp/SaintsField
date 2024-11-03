@@ -82,7 +82,7 @@ namespace: `SaintsField`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
-## Attributes ##
+## General Attributes ##
 
 ### Label & Text ###
 
