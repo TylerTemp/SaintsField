@@ -14,7 +14,9 @@ Unity: 2019.1 or higher
 
 (Yes, the project name comes from, of course, [Saints Row 2](https://saintsrow.fandom.com/wiki/Saints_Row_2))
 
-## Highlights ##
+## Getting Started ##
+
+### Highlights ###
 
 1.  Works on deep nested fields!
 2.  Supports both IMGUI and UI Toolkit! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
@@ -22,7 +24,7 @@ Unity: 2019.1 or higher
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
 
-## Installation ##
+### Installation ###
 
 *   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)
 
@@ -68,7 +70,9 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 *   Copy files from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
     If you're using a file browser instead of Unity's project tab to copy files, you may want to exclude the `.meta` file to avoid GUID conflict.
 
-## Change Log ##
+namespace: `SaintsField`
+
+### Change Log ###
 
 **3.4.9**
 
@@ -78,11 +82,7 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
-## Out-Of-Box Attributes ##
-
-All attributes under this section can be used in your project without any extra setup.
-
-namespace: `SaintsField`
+## Attributes ##
 
 ### Label & Text ###
 
@@ -435,7 +435,9 @@ public string content2;
 
 ![sep_title](https://github.com/TylerTemp/SaintsField/assets/6391063/55e08b48-4463-4be3-8f87-7afd5ce9e451)
 
-### General Buttons ###
+### Button ###
+
+#### `AboveButton`/`BelowButton`/`PostFieldButton` ####
 
 There are 3 general buttons:
 
@@ -520,7 +522,87 @@ private void Toggle() => _errorOut = !_errorOut;
 
 [![button](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
 
-### Field Modifier ###
+### Game Related ###
+
+#### `Layer` ####
+
+A dropdown selector for layer.
+
+*   AllowMultiple: No
+
+Note: want a bitmask layer selector? Unity already has it. Just use `public LayerMask myLayerMask;`
+
+```csharp
+using SaintsField;
+
+[Layer] public string layerString;
+[Layer] public int layerInt;
+
+// Unity supports multiple layer selector
+public LayerMask myLayerMask;
+```
+
+![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/a7ff79a3-f7b8-48ca-8233-5facc975f5eb)
+
+#### `Scene` ####
+
+A dropdown selector for a scene in the build list, plus a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[Scene] public int _sceneInt;
+[Scene] public string _sceneString;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/0da47bd1-0741-4707-b96b-6c08e4c5844c)
+
+#### `SortingLayer` ####
+
+A dropdown selector for sorting layer, plus a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[SortingLayer] public string _sortingLayerString;
+[SortingLayer] public int _sortingLayerInt;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/f6633689-012b-4d55-af32-885aa2a2e3cf)
+
+#### `Tag` ####
+
+A dropdown selector for a tag.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[Tag] public string tag;
+```
+
+![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/1a705bce-60ac-4434-826f-69c34055450c)
+
+#### `InputAxis` ####
+
+A string dropdown selector for an input axis, plus a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[InputAxis] public string inputAxis;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/68dc47d9-7211-48df-bbd1-c11faa536bd1)
+
+### Toggle & Switch ###
 
 #### `GameObjectActive` ####
 
@@ -632,6 +714,34 @@ using SaintsField;
 ```
 
 [![color_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/ce592999-0912-4c94-85dd-a8e428b1c321)](https://github.com/TylerTemp/SaintsField/assets/6391063/236eea74-a902-4f40-b0b9-ab3f2b7c1dbe)
+
+
+
+#### `ParticlePlay` ####
+
+A button to play a particle system of the field value, or the one on the field value.
+
+Unity allows play ParticleSystem in the editor, but only if you selected the target GameObject. It can only play one at a time.
+
+This decorator allows you to play multiple ParticleSystem as long as you have the expected fields.
+
+Parameters:
+
+*   `string groupBy = ""` for error grouping.
+
+*   Allow Multiple: No
+
+Note: because of the limitation from Unity, it can NOT detect if a `ParticleSystem` is finished playing
+
+```csharp
+[ParticlePlay] public ParticleSystem particle;
+// It also works if the field target has a particleSystem component
+[ParticlePlay, FieldType(typeof(ParticleSystem), false)] public GameObject particle2;
+```
+
+[![ParticlePlay](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
+
+### Data Editor ###
 
 #### `Expandable` ####
 
@@ -746,33 +856,101 @@ public IRefInterface myInterface;
 
 ![reference_picker](https://github.com/TylerTemp/SaintsField/assets/6391063/06b1a8f6-806e-49c3-b491-a810bc885595)
 
-#### `ParticlePlay` ####
+#### `SaintsRow` ####
 
-A button to play a particle system of the field value, or the one on the field value.
+`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
 
-Unity allows play ParticleSystem in the editor, but only if you selected the target GameObject. It can only play one at a time.
-
-This decorator allows you to play multiple ParticleSystem as long as you have the expected fields.
+This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
 
 Parameters:
 
-*   `string groupBy = ""` for error grouping.
+*   `bool inline=false`
 
-*   Allow Multiple: No
+    If true, it'll draw the `Serializable` inline like it's directly in the `MonoBehavior`
 
-Note: because of the limitation from Unity, it can NOT detect if a `ParticleSystem` is finished playing
+*   AllowMultiple: No
+
+Special Note:
+
+1.  After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
+2.  IMGUI: `ELayout.Horizontal` does not work here
+3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
 
 ```csharp
-[ParticlePlay] public ParticleSystem particle;
-// It also works if the field target has a particleSystem component
-[ParticlePlay, FieldType(typeof(ParticleSystem), false)] public GameObject particle2;
+using SaintsField;
+using SaintsField.Playa;  // SaintsEditor is not required here
+
+[Serializable]
+public struct Nest
+{
+    public string nest2Str;  // normal field
+    [Button]  // function button
+    private void Nest2Btn() => Debug.Log("Call Nest2Btn");
+    // static field (non serializable)
+    [ShowInInspector] public static Color StaticColor => Color.cyan;
+    // const field (non serializable)
+    [ShowInInspector] public const float Pi = 3.14f;
+    // normal attribute drawer works as expected
+    [BelowImage(maxWidth: 25)] public SpriteRenderer spriteRenderer;
+
+    [DOTweenPlay]  // DOTween helper
+    private Sequence PlayColor()
+    {
+        return DOTween.Sequence()
+            .Append(spriteRenderer.DOColor(Color.red, 1f))
+            .Append(spriteRenderer.DOColor(Color.green, 1f))
+            .Append(spriteRenderer.DOColor(Color.blue, 1f))
+            .SetLoops(-1);
+    }
+    [DOTweenPlay("Position")]
+    private Sequence PlayTween2()
+    {
+        return DOTween.Sequence()
+                .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
+                .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
+            ;
+    }
+}
+
+[SaintsRow]
+public Nest n1;
 ```
 
-[![ParticlePlay](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
+![saints_row](https://github.com/TylerTemp/SaintsField/assets/6391063/d8465de6-0741-4bfb-aa0d-3042422ca56c)
 
-### Field Re-Draw ###
+alternatively, you can make a drawer for your data type to omit `[SaintsRow]` everywhere:
 
-This will change the look & behavior of a field.
+```csharp
+using SaintsField.Editor.Playa;
+
+[CustomPropertyDrawer(typeof(Nest))]
+public class MySaintsRowAttributeDrawer: SaintsRowAttributeDrawer {}
+```
+
+To show a `Serializable` inline like it's directly in the `MonoBehavior`:
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct MyStruct
+{
+    public int structInt;
+    public bool structBool;
+}
+
+[SaintsRow(inline: true)]
+public MyStruct myStructInline;
+
+public string normalStringField;
+```
+
+![saints_row_inline](https://github.com/TylerTemp/SaintsField/assets/6391063/571f4a05-91e0-4860-9ea2-bff6b1fe1d58)
+
+### Numberical ###
 
 #### `Rate` ####
 
@@ -800,320 +978,6 @@ using SaintsField;
 
 [![stars](https://github.com/TylerTemp/SaintsField/assets/6391063/c3a0509e-b211-4a62-92c8-7bc8c3866cf4)](https://github.com/TylerTemp/SaintsField/assets/6391063/a506681f-92f8-42ab-b08d-483b26b2f7c3)
 
-#### `FieldType` ####
-
-Ask the inspector to display another type of field rather than the field's original type.
-
-This is useful when you want to have a `GameObject` prefab, but you want this target prefab to have a specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you force the inspector to sign the required object that has your expected component but still gives you the original typed value to field.
-
-This can also be used when you just want a type reference to a prefab, but Unity does not allow you to pick a prefab because "performance consideration".
-
-Overload:
-
-*   `FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
-*   `FieldTypeAttribute(Type compType, bool customPicker)`
-*   `FieldTypeAttribute(EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
-
-For each argument:
-
-*   `Type compType` the type of the component you want to pick. `null` for using current type
-*   `EPick editorPick` where you want to pick the component. Options are:
-    *   `EPick.Assets` for assets
-    *   `EPick.Scene` for scene objects
-
-    For the default Unity picker: if no `EPick.Scene` is set,  will not show the scene objects. However, omit `Assets` will still show the assets. This limitation is from Unity's API.
-
-    The custom picker does **NOT** have this limitation.
-*   `customPicker` show an extra button to use a custom picker. Disable this if you have serious performance issue.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[SerializeField, FieldType(typeof(SpriteRenderer))]
-private GameObject _go;
-
-[SerializeField, FieldType(typeof(FieldTypeExample))]
-private ParticleSystem _ps;
-
-// this allows you to pick a perfab with field component on, which Unity will only give an empty picker.
-[FieldType(EPick.Assets)] public Dummy dummyPrefab;
-```
-
-![field_type](https://github.com/TylerTemp/SaintsField/assets/6391063/7bcc058f-5cb4-4a4f-9d8e-ec08bcb8da2c)
-
-#### `Dropdown` ####
-
-A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
-
-If you want a searchable dropdown, see `AdvancedDropdown`.
-
-*   `string funcName=null` callback function. Must return a `DropdownList<T>`.
-    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
-*   `bool slashAsSub=true` treat `/` as a sub item.
-
-    Note: In `IMGUI`, this just replace `/` to unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
-
-*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
-*   AllowMultiple: No
-
-**Example**
-
-```csharp
-using SaintsField;
-
-[Dropdown(nameof(GetDropdownItems))] public float _float;
-
-public GameObject _go1;
-public GameObject _go2;
-[Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
-
-private DropdownList<float> GetDropdownItems()
-{
-    return new DropdownList<float>
-    {
-        { "1", 1.0f },
-        { "2", 2.0f },
-        { "3/1", 3.1f },
-        { "3/2", 3.2f },
-    };
-}
-
-private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
-{
-    {_go1.name, _go1},
-    {_go2.name, _go2},
-    {"NULL", null},
-};
-```
-
-![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
-
-To control the separator and disabled item
-
-```csharp
-using SaintsField;
-
-[Dropdown(nameof(GetDropdownItems))]
-public Color color;
-
-private DropdownList<Color> GetDropdownItems()
-{
-    return new DropdownList<Color>
-    {
-        { "Black", Color.black },
-        { "White", Color.white },
-        DropdownList<Color>.Separator(),
-        { "Basic/Red", Color.red, true },  // the third arg means it's disabled
-        { "Basic/Green", Color.green },
-        { "Basic/Blue", Color.blue },
-        DropdownList<Color>.Separator("Basic/"),
-        { "Basic/Magenta", Color.magenta },
-        { "Basic/Cyan", Color.cyan },
-    };
-}
-```
-
-And you can always manually add it:
-
-```csharp
-DropdownList<Color> dropdownList = new DropdownList<Color>();
-dropdownList.Add("Black", Color.black);  // add an item
-dropdownList.Add("White", Color.white, true);  // and a disabled item
-dropdownList.AddSeparator();  // add a separator
-```
-
-![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
-
-The look in the UI Toolkit with `slashAsSub: false`:
-
-![dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/e6788204-ff04-4096-a37a-26d68e852737)
-
-Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
-
-If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
-
-```csharp
-[Serializable]
-public enum MyEnum
-{
-    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
-    First,
-    [RichLabel("2")]
-    Second,
-    [RichLabel("3")]
-    Third,
-    [RichLabel("4/0")]
-    ForthZero,
-    [RichLabel("4/1")]
-    ForthOne,
-}
-
-[Dropdown] public MyEnum myEnumDropdown;
-```
-
-![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)
-
-#### `AdvancedDropdown` ####
-
-A dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
-
-**Known Issue**:
-
-1.  IMGUI: Using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
-    This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup.
-
-    This issue is not fixable unless Unity fixes it.
-
-    This bug only exists in IMGUI
-
-2.  UI Toolkit:
-
-    The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not has the same layout even with same elements+style+boundary size.
-
-    This issue is not fixable unless Unity fixes it. This issue might be different on different Unity (UI Toolkit) version.
-
-**Arguments**
-
-*   `string funcName=null` callback function. Must return a `AdvancedDropdownList<T>`.
-    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
-*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
-*   AllowMultiple: No
-
-**`AdvancedDropdownList<T>`**
-
-*   `string displayName` item name to display
-*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise it's a group of items, which the values are specified by `children`
-*   `bool disabled = false` if item is disabled
-*   `string icon = null` the icon for the item.
-
-    Note: setting an icon for a parent group will result an weird issue on it's sub page's title and block the items. This is not fixable unless Unity decide to fix it.
-
-*   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
-
-```csharp
-using SaintsField;
-
-[AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
-
-public AdvancedDropdownList<int> AdvDropdown()
-{
-    return new AdvancedDropdownList<int>("Days")
-    {
-        // a grouped value
-        new AdvancedDropdownList<int>("First Half")
-        {
-            // with icon
-            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
-            // no icon
-            new AdvancedDropdownList<int>("Tuesday", 2),
-        },
-        new AdvancedDropdownList<int>("Second Half")
-        {
-            new AdvancedDropdownList<int>("Wednesday")
-            {
-                new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
-                new AdvancedDropdownList<int>("Afternoon", 8),
-            },
-            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
-        },
-        // direct value
-        new AdvancedDropdownList<int>("Friday", 5, true),
-        AdvancedDropdownList<int>.Separator(),
-        new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
-        new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
-    };
-}
-```
-
-**IMGUI**
-
-![advanced_dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/d22d56b1-39c2-4ec9-bfbb-5e61dfe1b8a2)
-
-**UI Toolkit**
-
-[![advanced_dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/ad2f556b-7d98-4f49-a1ad-e2a5a52bf8f0)](https://github.com/TylerTemp/SaintsField/assets/6391063/157838e7-1f63-4b44-9503-bbb0004db7e8)
-
-There is also a parser to automatically separate items as sub items using `/`:
-
-```csharp
-using SaintsField;
-
-[AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
-
-public AdvancedDropdownList<int> AdvDropdown()
-{
-    return new AdvancedDropdownList<int>("Days")
-    {
-        {"First Half/Monday", 1, false, "star.png"},  // enabled, with icon
-        {"First Half/Tuesday", 2},
-
-        {"Second Half/Wednesday/Morning", 3, false, "star.png"},
-        {"Second Half/Wednesday/Afternoon", 4},
-        {"Second Half/Thursday", 5, true, "star.png"},  // disabled, with icon
-        "",  // root separator
-        {"Friday", 6, true},  // disabled
-        "",
-        {"Weekend/Saturday", 7, false, "star.png"},
-        "Weekend/",  // separator under `Weekend` group
-        {"Weekend/Sunday", 8, false, "star.png"},
-    };
-}
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1bbad2f3-e1aa-4175-a6b1-fd350c58feb3)
-
-You can use this to make a searchable dropdown:
-
-```csharp
-using SaintsField;
-
-[AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
-
-public AdvancedDropdownList<int> AdvDropdownNoNest()
-{
-    return new AdvancedDropdownList<int>("Days")
-    {
-        {"Monday", 1},
-        {"Tuesday", 2, true},  // disabled
-        {"Wednesday", 3, false, "star.png"},  // enabled with icon
-        {"Thursday", 4, true, "star.png"},  // disabled with icon
-        {"Friday", 5},
-        "",  // separator
-        {"Saturday", 6},
-        {"Sunday", 7},
-    };
-}
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1e0ad6f4-e65d-4953-9f2a-fa9e22e706af)
-
-Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
-
-If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
-
-```csharp
-[Serializable]
-public enum MyEnum
-{
-    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
-    First,
-    [RichLabel("2")]
-    Second,
-    [RichLabel("3")]
-    Third,
-    [RichLabel("4/0")]
-    ForthZero,
-    [RichLabel("4/1")]
-    ForthOne,
-}
-
-[AdvancedDropdown] public MyEnum myEnumAdvancedDropdown;
-```
-
-![image](https://github.com/user-attachments/assets/ebc2e2f7-3534-4ff7-8710-29a990f5dea4)
-
 #### `PropRange` ####
 
 Very like Unity's `Range` but allow you to dynamically change the range, plus allow to set range step.
@@ -1138,6 +1002,7 @@ public int max;
 ```
 
 ![range](https://github.com/TylerTemp/SaintsField/assets/6391063/55f3fc5a-3ee4-4bd8-9b0a-cd016a7a79e7)
+
 
 #### `MinMaxSlider` ####
 
@@ -1204,81 +1069,61 @@ Example of free input mode:
 
 [![min-max-free-input](https://github.com/user-attachments/assets/6843ae58-0742-402b-a96a-5ae6ce531271)](https://github.com/user-attachments/assets/00ef50ba-98bd-4812-8664-8066b31c769a)
 
-#### `EnumFlags` ####
+#### `ProgressBar` ####
 
-A toggle buttons group for enum flags (bit mask). It provides a button to toggle all bits on/off.
+A progress bar for `float` or `int` field. This behaves like a slider but more fancy.
 
-This field has compact mode and expanded mode.
+Note: Unlike NaughtyAttributes (which is read-only), this **is interactable**.
 
-For each argument:
+Parameters:
 
-*   `bool autoExpand=true`: if the view is not enough to show all buttons in a row, automatically expand to a vertical group.
-*   `bool defaultExpanded=false`: if true, the buttons group will be expanded as a vertical group by default.
-*   AllowMultiple: No
+*   (Optional) `float minValue=0` | `string minCallback=null`: minimum value of the slider
+*   `float maxValue=100` | `string maxCallback=null`: maximum value of the slider
+*   `float step=-1`: the growth step of the slider, `<= 0` means no limit.
+*   `EColor color=EColor.OceanicSlate`: filler color
+*   `EColor backgroundColor=EColor.CharcoalGray`: background color
+*   `string colorCallback=null`: a callback or property name for the filler color. The function must return a `EColor`, `Color`, a name of `EColor`/`Color`, or a hex color string (starts with `#`). This will override `color` parameter.
+*   `string backgroundColorCallback=null`: a callback or property name for the background color.
+*   `string titleCallback=null`: a callback for displaying the title. The function signature is:
 
-Known Issue:
+    ```csharp
+    string TitleCallback(float curValue, float min, float max, string label);
+    ```
 
-1.  IMGUI: If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
-2.  UI Toolkit: when `autoExpand=true`, `defaultExpanded` will be ignored
-
-```csharp
-using SaintsField;
-
-[Serializable, Flags]
-public enum BitMask
-{
-    None = 0,  // this will be hide as we will have an all/none button
-    Mask1 = 1,
-    Mask2 = 1 << 1,
-    Mask3 = 1 << 2,
-}
-
-[EnumFlags] public BitMask myMask;
-```
-
-[![enum_flags](https://github.com/TylerTemp/SaintsField/assets/6391063/710d3efc-5cba-471b-a0f1-a4319ded86fd)](https://github.com/TylerTemp/SaintsField/assets/6391063/48f4c25b-a4cd-40c6-bb42-913a0dc18daa)
-
-You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
-
-```csharp
-[Serializable, Flags]
-public enum BitMask
-{
-    None = 0,
-    [RichLabel("M<color=red>1</color>")]
-    Mask1 = 1,
-    [RichLabel("M<color=green>2</color>")]
-    Mask2 = 1 << 1,
-    [RichLabel("M<color=blue>3</color>")]
-    Mask3 = 1 << 2,
-    [RichLabel("M4")]
-    Mask4 = 1 << 3,
-    Mask5 = 1 << 4,
-}
-
-[EnumFlags]
-public BitMask myMask;
-```
-
-![image](https://github.com/user-attachments/assets/556ff203-aa55-44c9-9cc1-6ca2675b995f)
-
-#### `ResizableTextArea` ####
-
-This `TextArea` will always grow its height to fit the content. (minimal height is 3 rows).
-
-Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
-
-*   AllowMultiple: No
+    rich text is not supported here
 
 ```csharp
 using SaintsField;
 
-[SerializeField, ResizableTextArea] private string _short;
-[SerializeField, ResizableTextArea] private string _long;
-[SerializeField, RichLabel(null), ResizableTextArea] private string _noLabel;
+[ProgressBar(10)] public int myHp;
+// control step for float rather than free value
+[ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)] public float myMp;
+
+[Space]
+public int minValue;
+public int maxValue;
+
+[ProgressBar(nameof(minValue)
+        , nameof(maxValue)  // dynamic min/max
+        , step: 0.05f
+        , backgroundColorCallback: nameof(BackgroundColor)  // dynamic background color
+        , colorCallback: nameof(FillColor)  // dynamic fill color
+        , titleCallback: nameof(Title)  // dynamic title, does not support rich label
+    ),
+]
+[RichLabel(null)]  // make this full width
+public float fValue;
+
+private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
+
+private Color FillColor() => Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
+
+private string Title(float curValue, float min, float max, string label) => curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
 ```
 
-[![resizabletextarea](https://github.com/TylerTemp/SaintsField/assets/6391063/202a742a-965c-4e68-a829-4a8aa4c8fe9e)](https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922)
+[![progress_bar](https://github.com/TylerTemp/SaintsField/assets/6391063/74085d85-e447-4b6b-a3ff-1bd2f26c5d73)](https://github.com/TylerTemp/SaintsField/assets/6391063/11ad0700-32ba-4280-ae7b-6b6994c9de83)
+
+### Animation ###
 
 #### `AnimatorParam` ###
 
@@ -1356,99 +1201,6 @@ private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"la
 
 ![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/8ee35de5-c7d5-4f0d-b8b7-8feeac41c31d)
 
-#### `Layer` ####
-
-A dropdown selector for layer.
-
-*   AllowMultiple: No
-
-Note: want a bitmask layer selector? Unity already has it. Just use `public LayerMask myLayerMask;`
-
-```csharp
-using SaintsField;
-
-[Layer] public string layerString;
-[Layer] public int layerInt;
-
-// Unity supports multiple layer selector
-public LayerMask myLayerMask;
-```
-
-![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/a7ff79a3-f7b8-48ca-8233-5facc975f5eb)
-
-#### `Scene` ####
-
-A dropdown selector for a scene in the build list, plus a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[Scene] public int _sceneInt;
-[Scene] public string _sceneString;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/0da47bd1-0741-4707-b96b-6c08e4c5844c)
-
-#### `SortingLayer` ####
-
-A dropdown selector for sorting layer, plus a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[SortingLayer] public string _sortingLayerString;
-[SortingLayer] public int _sortingLayerInt;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/f6633689-012b-4d55-af32-885aa2a2e3cf)
-
-#### `Tag` ####
-
-A dropdown selector for a tag.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[Tag] public string tag;
-```
-
-![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/1a705bce-60ac-4434-826f-69c34055450c)
-
-#### `InputAxis` ####
-
-A string dropdown selector for an input axis, plus a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[InputAxis] public string inputAxis;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/68dc47d9-7211-48df-bbd1-c11faa536bd1)
-
-#### `LeftToggle` ####
-
-A toggle button on the left of the bool field. Only works on boolean field.
-
-IMGUI: To use with `RichLabel`, you need to add 6 spaces ahead as a hack
-
-```csharp
-using SaintsField;
-
-[LeftToggle] public bool myToggle;
-[LeftToggle, RichLabel("      <color=green><label />")] public bool richToggle;
-```
-
-![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
-
 #### `CurveRange` ####
 
 A curve drawer for `AnimationCurve` which allow to set bounds and color
@@ -1482,205 +1234,384 @@ public AnimationCurve curve2;
 
 ![curverange](https://github.com/TylerTemp/SaintsField/assets/6391063/7c10ebb4-ab93-4192-ad05-5e2c3addcfe9)
 
-#### `ProgressBar` ####
 
-A progress bar for `float` or `int` field. This behaves like a slider but more fancy.
+### Auto Getter ###
 
-Note: Unlike NaughtyAttributes (which is read-only), this **is interactable**.
+#### `GetComponent` ####
+
+Automatically sign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
+
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
+*   `Type compType = null`
+
+    The component type to sign. If null, it'll use the field type.
+
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[GetComponent] public BoxCollider otherComponent;
+[GetComponent] public GameObject selfGameObject;  // get the GameObject itself
+[GetComponent] public RectTransform selfRectTransform;  // useful for UI
+
+[GetComponent] public GetComponentExample selfScript;  // yeah you can get your script itself
+[GetComponent] public Dummy otherScript;  // other script
+```
+
+![get_component](https://github.com/TylerTemp/SaintsField/assets/6391063/a5e9ca85-ab23-4b4a-b228-5d19c66c4052)
+
+#### `GetComponentInChildren` ####
+
+Automatically sign a component to a field, if the field value is null and the component is already attached to itself or its child GameObjects. (First one found will be used)
+
+NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target object itself.
+
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
+*   `bool includeInactive = false`
+
+    Should inactive children be included? `true` to include inactive children.
+
+*   `Type compType = null`
+
+    The component type to sign. If null, it'll use the field type.
+
+*   `bool excludeSelf = false`
+
+    When `true`, skip checking the target itself.
+
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[GetComponentInChildren] public BoxCollider childBoxCollider;
+// by setting compType, you can sign it as a different type
+[GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
+// and GameObject field works too
+[GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
+```
+
+![get_component_in_children](https://github.com/TylerTemp/SaintsField/assets/6391063/854aeefc-6456-4df2-a4a7-40a5cd5e2290)
+
+
+#### `GetComponentInParent` / `GetComponentInParents` ####
+
+Automatically sign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
+
+Note:
+
+1.  Like Unity's `GetComponentInParent`, this **will** check the target object itself.
+2.  `GetComponentInParent` will only check the target & its direct parent. `GetComponentInParents` will search all the way up to the root.
 
 Parameters:
 
-*   (Optional) `float minValue=0` | `string minCallback=null`: minimum value of the slider
-*   `float maxValue=100` | `string maxCallback=null`: maximum value of the slider
-*   `float step=-1`: the growth step of the slider, `<= 0` means no limit.
-*   `EColor color=EColor.OceanicSlate`: filler color
-*   `EColor backgroundColor=EColor.CharcoalGray`: background color
-*   `string colorCallback=null`: a callback or property name for the filler color. The function must return a `EColor`, `Color`, a name of `EColor`/`Color`, or a hex color string (starts with `#`). This will override `color` parameter.
-*   `string backgroundColorCallback=null`: a callback or property name for the background color.
-*   `string titleCallback=null`: a callback for displaying the title. The function signature is:
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
-    ```csharp
-    string TitleCallback(float curValue, float min, float max, string label);
-    ```
+*   (For `GetComponentInParents` only) `bool includeInactive = false`
 
-    rich text is not supported here
+    Should inactive GameObject be included? `true` to include inactive GameObject.
 
-```csharp
-using SaintsField;
+    Note: **only `GetComponentInParents` has this parameter!**
 
-[ProgressBar(10)] public int myHp;
-// control step for float rather than free value
-[ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)] public float myMp;
+*   `Type compType = null`
 
-[Space]
-public int minValue;
-public int maxValue;
+    The component type to sign. If null, it'll use the field type.
 
-[ProgressBar(nameof(minValue)
-        , nameof(maxValue)  // dynamic min/max
-        , step: 0.05f
-        , backgroundColorCallback: nameof(BackgroundColor)  // dynamic background color
-        , colorCallback: nameof(FillColor)  // dynamic fill color
-        , titleCallback: nameof(Title)  // dynamic title, does not support rich label
-    ),
-]
-[RichLabel(null)]  // make this full width
-public float fValue;
+*   `string groupBy = ""`
 
-private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
-
-private Color FillColor() => Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
-
-private string Title(float curValue, float min, float max, string label) => curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
-```
-
-[![progress_bar](https://github.com/TylerTemp/SaintsField/assets/6391063/74085d85-e447-4b6b-a3ff-1bd2f26c5d73)](https://github.com/TylerTemp/SaintsField/assets/6391063/11ad0700-32ba-4280-ae7b-6b6994c9de83)
-
-#### `ResourcePath` ####
-
-A tool to pick an resource path (a string) with:
-1.  required types or interfaces
-2.  display a type instead of showing a string
-3.  pick a suitable object using a custom picker
-
-Parameters:
-
-*   `EStr eStr = EStr.Resource`: which kind of string value you expected:
-    *  `Resource`: a resource path
-    *  `AssetDatabase`: an asset path. You should NOT use this unless you know what you are doing.
-    *  `Guid`: the GUID of the target object. You should NOT use this unless you know what you are doing.
-*   `bool freeSign=false`:
-
-    `true` to allow to sign any object, and gives a message if the signed value does not match.
-
-    `false` to only allow to sign matched object, and trying to prevent the change if it's illegal.
-
-*   `bool customPicker=true`: use a custom object pick that only display objects which meet the requirements
-*   `Type compType`: the type of the component. It can be a component, or an object like `GameObject`, `Sprite`. The field will be this type. It can NOT be an interface
-*   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all of the types can be signed.
-*   AllowMultiple: No
-
-**Known Issue**: IMGUI, manually sign a null object by using Unity's default pick will sign an empty string instead of null. Use custom pick to avoid this inconsistency.
-
-```csharp
-using SaintsField;
-
-// resource: display as a MonoScript, requires a BoxCollider
-[ResourcePath(typeof(Dummy), typeof(BoxCollider))]
-[InfoBox(nameof(myResource), true)]
-public string myResource;
-
-// AssetDatabase path
-[Space]
-[ResourcePath(EStr.AssetDatabase, typeof(Dummy), typeof(BoxCollider))]
-[InfoBox(nameof(myAssetPath), true)]
-public string myAssetPath;
-
-// GUID
-[Space]
-[ResourcePath(EStr.Guid, typeof(Dummy), typeof(BoxCollider))]
-[InfoBox(nameof(myGuid), true)]
-public string myGuid;
-
-// prefab resource
-[ResourcePath(typeof(GameObject))]
-[InfoBox(nameof(resourceNoRequire), true)]
-public string resourceNoRequire;
-
-// requires to have a Dummy script attached, and has interface IMyInterface
-[ResourcePath(typeof(Dummy), typeof(IMyInterface))]
-[InfoBox(nameof(myInterface), true)]
-public string myInterface;
-```
-
-![resource_path](https://github.com/TylerTemp/SaintsField/assets/6391063/35d683bf-7d19-4854-bdf6-ee63532fed80)
-
-### Field Utilities ###
-
-#### `AssetPreview` ####
-
-Show an image preview for prefabs, Sprite, Texture2D, etc. (Internally use `AssetPreview.GetAssetPreview`)
-
-Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
-
-*   `int width=-1`
-
-    preview width, -1 for original image size that returned by Unity. If it's greater than current view width, it'll be scaled down to fit the view. Use `int.MaxValue` to always fit the view width.
-
-*   `int height=-1`
-
-    preview height, -1 for auto resize (with the same aspect) using the width
-
-*   `EAlign align=EAlign.End`
-
-    Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
-
-*   `bool above=false`
-
-    if true, render above the field instead of below
-
-*   `string groupBy=""`
-
-    See the `GroupBy` section
+    For error message grouping.
 
 *   AllowMultiple: No
 
 ```csharp
 using SaintsField;
 
-[AssetPreview(20, 100)] public Texture2D _texture2D;
-[AssetPreview(50)] public GameObject _go;
-[AssetPreview(above: true)] public Sprite _sprite;
+[GetComponentInParent] public SpriteRenderer directParent;  // equals [GetByXPath("//parent::")]
+[GetComponentInParent(typeof(SpriteRenderer))] public GameObject directParentDifferentType;  // equals [GetByXPath("//parent::/[@GetComponent(SpriteRenderer)]")]
+[GetComponentInParent] public BoxCollider directNoSuch;
+
+[GetComponentInParents] public SpriteRenderer searchParent;  // equals [GetByXPath("//ancestor::")]
+[GetComponentInParents(compType: typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
+[GetComponentInParents] public BoxCollider searchNoSuch;
 ```
 
-![asset_preview](https://github.com/TylerTemp/SaintsField/assets/6391063/ffed3715-f531-43d0-b4c3-98d20d419b3e)
+![get_component_in_parents](https://github.com/TylerTemp/SaintsField/assets/6391063/02836529-1aff-4bc9-b849-203d7bdaad21)
 
-#### `AboveImage`/`BelowImage` ####
+#### `GetComponentInScene` ####
 
-Show an image above/below the field.
+Automatically sign a component to a field, if the field value is null and the component is in the currently opened scene. (First one found will be used)
 
-*   `string image = null`
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
-    An image to display. This can be a property or a callback, which returns a `Sprite`, `Texture2D`, `SpriteRenderer`, `UI.Image`, `UI.RawImage` or `UI.Button`.
+*   `bool includeInactive = false`
 
-    If it's null, it'll try to get the image from the field itself.
+    Should inactive GameObject be included? `true` to include inactive GameObject.
 
-*   `string maxWidth=-1`
+*   `Type compType = null`
 
-    preview max width, -1 for original image size. If it's greater than current view width, it'll be scaled down to fit the view. . Use `int.MaxValue` to always fit the view width.
+    The component type to sign. If null, it'll use the field type.
 
-*   `int maxHeight=-1`
+*   `string groupBy = ""`
 
-    preview max height, -1 for auto resize (with the same aspect) using the width
-
-*   `EAlign align=EAlign.Start`
-
-    Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
-
-*   `string groupBy=""`
-
-    See the `GroupBy` section
+    For error message grouping.
 
 *   AllowMultiple: No
 
 ```csharp
 using SaintsField;
 
-[AboveImage(nameof(spriteField))]
-// size and group
-[BelowImage(nameof(spriteField), maxWidth: 25, groupBy: "Below1")]
-[BelowImage(nameof(spriteField), maxHeight: 20, align: EAlign.End, groupBy: "Below1")]
-public Sprite spriteField;
-
-// align
-[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.FieldStart)]
-[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Start)]
-[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Center)]
-[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.End)]
-public string alignField;
+[GetComponentInScene] public Dummy dummy;
+// by setting compType, you can sign it as a different type
+[GetComponentInScene(compType: typeof(Dummy))] public RectTransform dummyTrans;
+// and GameObject field works too
+[GetComponentInScene(compType: typeof(Dummy))] public GameObject dummyGo;
 ```
 
-![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
+![get_component_in_scene](https://github.com/TylerTemp/SaintsField/assets/6391063/95a008a2-c7f8-4bc9-90f6-57c58724ebaf)
+
+
+#### `GetPrefabWithComponent` ####
+
+Automatically sign a prefab to a field, if the field value is null and the prefab has the component. (First one found will be used)
+
+Recommended to use it with `FieldType`!
+
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+*   `Type compType = null`
+
+    The component type to sign. If null, it'll use the field type.
+
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[GetPrefabWithComponent] public Dummy dummy;
+// get the prefab itself
+[GetPrefabWithComponent(compType: typeof(Dummy))] public GameObject dummyPrefab;
+// works so good with `FieldType`
+[GetPrefabWithComponent(compType: typeof(Dummy)), FieldType(typeof(Dummy))] public GameObject dummyPrefabFieldType;
+```
+
+![get_prefab_with_component](https://github.com/TylerTemp/SaintsField/assets/6391063/07eae93c-d2fc-4641-b71f-55a98f17b360)
+
+#### `GetScriptableObject` ####
+
+Automatically sign a `ScriptableObject` file to this field. (First one found will be used)
+
+Recommended to use it with `Expandable`!
+
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+*   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only sign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[GetScriptableObject] public Scriptable mySo;
+[GetScriptableObject("RawResources/ScriptableIns")] public Scriptable mySoSuffix;
+```
+
+![GetScriptableObject](https://github.com/TylerTemp/SaintsField/assets/6391063/191c3b4b-a58a-4475-80cd-3dbc809a9511)
+
+#### `GetByXPath` ####
+
+Please read `Saints XPath-like Syntax` section for more information.
+
+**Parameters**
+
+*   (Optional) `EXP config`: config tweak
+*   `string path...`: resource searching paths. use `.` if nothing is provided. First path with results will be used.
+
+*    Allow multiple: Yes. With multiple decorators, all results from each decorator will be used.
+
+Showcase:
+
+```csharp
+// get the main camera from scene
+[GetByXPath("scene:://[@Tag = MainCamera][]")] public Camera mainCamera;
+
+// only allow the user to pick from the target folder, which the `Hero` script returns `isAvaliable` as true
+[GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab[@{GetComponent(Hero).isAvaliable}]")]
+public GameObject[] heroPrefabs;
+
+// get all prefabs under `Art/Heros` AND `Art/Monsters`
+[GetByXPath("assets::/Art/Heros/*.prefab")]
+[GetByXPath("assets::/Art/Monsters/*.prefab")]
+public GameObject[] entityPrefabs;
+```
+
+#### `AddComponent` ####
+
+Automatically add a component to the current target if the target does not have this component. (This will not sign the component added)
+
+Recommended to use it with `GetComponent`!
+
+*   `Type compType = null`
+
+    The component type to add. If null, it'll use the field type.
+
+*   `string groupBy = ""`
+
+    For error message grouping.
+
+*   AllowMultiple: Yes
+
+```csharp
+using SaintsField;
+
+[AddComponent, GetComponent] public Dummy dummy;
+[AddComponent(typeof(BoxCollider)), GetComponent] public GameObject thisObj;
+```
+
+![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
+
+#### `FindComponent` ####
+
+**Deprecated**: use `GetByXPath` instead.
+
+Automatically find a component under the current target. This is very similar to Unity's [`transform.Find`](https://docs.unity3d.com/ScriptReference/Transform.Find.html), except it accepts many paths, and it's returning value is not limited to `transform`
+
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+*   `string path` a path to search
+*   `params string[] paths` more paths to search
+*   AllowMultiple: Yes but not necessary
+
+```csharp
+using SaintsField;
+
+[FindComponent("sub/dummy")] public Dummy subDummy;
+[FindComponent("sub/dummy")] public GameObject subDummyGo;
+[FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
+```
+
+![find_component](https://github.com/TylerTemp/SaintsField/assets/6391063/6620e643-3f8a-4c33-a136-6cbfc889d2ac)
+
+
+#### `GetComponentByPath` ####
+
+**Deprecated**: use `GetByXPath` instead.
+
+Automatically sign a component to a field by a given path.
+
+*   (Optional)`EGetComp config`
+
+    Options are:
+
+    *   `EGetComp.ForceResign`: when the target changed (e.g. you delete/create one), automatically resign the new correct component.
+    *   `EGetComp.NoResignButton`: do not display a resign button when the target mismatches.
+
+*   `string paths...`
+
+    Paths to search.
+
+*   AllowMultiple: Yes. But not necessary.
+
+The `path` is a bit like html's `XPath` but with less functions:
+
+| Path            | Meaning                                                        |
+|-----------------|----------------------------------------------------------------|
+| `/`             | Separator. Using at start means the root of the current scene. |
+| `//`            | Separator. Any descendant children                             |
+| `.`             | Node. Current node                                             |
+| `..`            | Node. Parent node                                              |
+| `*`             | All nodes                                                      |
+| name            | Node. Any nodes with this name                                 |
+| `[last()]`      | Index Filter. Last of results                                  |
+| `[index() > 1]` | Index Filter. Node index that is greater than 1                |
+|  `[0]`          | Index Filter. First node in the results                        |
+
+For example:
+
+*   `./sth` or `sth`: direct child object of current object named `sth`
+*   `.//sth`: any descendant child under current. (descendant::sth)
+*   `..//sth`: first go to parent, then find the direct child named `sth`
+*   `/sth`: top level node in current scene named `sth`
+*   `//sth`: first go to top level, then find the direct child named `sth`
+*   `///sth`: first go to top level, then find any node named `sth`
+*   `./get/sth[1]`: the child named `get` of current node, then the second node named `sth` in the direct children list of `get`
+
+```csharp
+using SaintsField;
+
+// starting from root, search any object with name "Dummy"
+[GetComponentByPath("///Dummy")] public GameObject dummy;
+// first child of current object
+[GetComponentByPath("./*[1]")] public GameObject direct1;
+// child of current object which has index greater than 1
+[GetComponentByPath("./*[index() > 1]")] public GameObject directPosTg1;
+// last child of current object
+[GetComponentByPath("./*[last()]")] public GameObject directLast;
+// re-sign the target if mis-match
+[GetComponentByPath(EGetComp.NoResignButton | EGetComp.ForceResign, "./DirectSub")] public GameObject directSubWatched;
+// without "ForceResign", it'll display a reload button if mis-match
+// with multiple paths, it'll search from left to right
+[GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMulti;
+// if no match, it'll show an error message
+[GetComponentByPath("/no", "///sth/else/../what/.//ever[last()]/goes/here")] public GameObject notExists;
+```
+
+![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/a0fdca83-0c96-4d57-9c9d-989efbac0f07)
+
+### Validate & Restrict ###
+
+#### `FieldType` ####
+
+Ask the inspector to display another type of field rather than the field's original type.
+
+This is useful when you want to have a `GameObject` prefab, but you want this target prefab to have a specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you force the inspector to sign the required object that has your expected component but still gives you the original typed value to field.
+
+This can also be used when you just want a type reference to a prefab, but Unity does not allow you to pick a prefab because "performance consideration".
+
+Overload:
+
+*   `FieldTypeAttribute(Type compType, EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
+*   `FieldTypeAttribute(Type compType, bool customPicker)`
+*   `FieldTypeAttribute(EPick editorPick = EPick.Assets | EPick.Scene, bool customPicker = true)`
+
+For each argument:
+
+*   `Type compType` the type of the component you want to pick. `null` for using current type
+*   `EPick editorPick` where you want to pick the component. Options are:
+    *   `EPick.Assets` for assets
+    *   `EPick.Scene` for scene objects
+
+    For the default Unity picker: if no `EPick.Scene` is set,  will not show the scene objects. However, omit `Assets` will still show the assets. This limitation is from Unity's API.
+
+    The custom picker does **NOT** have this limitation.
+*   `customPicker` show an extra button to use a custom picker. Disable this if you have serious performance issue.
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[SerializeField, FieldType(typeof(SpriteRenderer))]
+private GameObject _go;
+
+[SerializeField, FieldType(typeof(FieldTypeExample))]
+private ParticleSystem _ps;
+
+// this allows you to pick a perfab with field component on, which Unity will only give an empty picker.
+[FieldType(EPick.Assets)] public Dummy dummyPrefab;
+```
+
+![field_type](https://github.com/TylerTemp/SaintsField/assets/6391063/7bcc058f-5cb4-4a4f-9d8e-ec08bcb8da2c)
 
 #### `OnValueChanged` ####
 
@@ -2129,367 +2060,6 @@ public int upLimit;
 
 [![minmax](https://github.com/TylerTemp/SaintsField/assets/6391063/7714fa76-fc5c-4ebc-9aae-be189cef7743)](https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604)
 
-#### `GetComponent` ####
-
-Automatically sign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
-
-*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
-
-*   `Type compType = null`
-
-    The component type to sign. If null, it'll use the field type.
-
-*   `string groupBy = ""`
-
-    For error message grouping.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[GetComponent] public BoxCollider otherComponent;
-[GetComponent] public GameObject selfGameObject;  // get the GameObject itself
-[GetComponent] public RectTransform selfRectTransform;  // useful for UI
-
-[GetComponent] public GetComponentExample selfScript;  // yeah you can get your script itself
-[GetComponent] public Dummy otherScript;  // other script
-```
-
-![get_component](https://github.com/TylerTemp/SaintsField/assets/6391063/a5e9ca85-ab23-4b4a-b228-5d19c66c4052)
-
-#### `GetComponentInChildren` ####
-
-Automatically sign a component to a field, if the field value is null and the component is already attached to itself or its child GameObjects. (First one found will be used)
-
-NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target object itself.
-
-*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
-
-*   `bool includeInactive = false`
-
-    Should inactive children be included? `true` to include inactive children.
-
-*   `Type compType = null`
-
-    The component type to sign. If null, it'll use the field type.
-
-*   `bool excludeSelf = false`
-
-    When `true`, skip checking the target itself.
-
-*   `string groupBy = ""`
-
-    For error message grouping.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[GetComponentInChildren] public BoxCollider childBoxCollider;
-// by setting compType, you can sign it as a different type
-[GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
-// and GameObject field works too
-[GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
-```
-
-![get_component_in_children](https://github.com/TylerTemp/SaintsField/assets/6391063/854aeefc-6456-4df2-a4a7-40a5cd5e2290)
-
-#### `FindComponent` ####
-
-**Deprecated**: use `GetByXPath` instead.
-
-Automatically find a component under the current target. This is very similar to Unity's [`transform.Find`](https://docs.unity3d.com/ScriptReference/Transform.Find.html), except it accepts many paths, and it's returning value is not limited to `transform`
-
-*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
-*   `string path` a path to search
-*   `params string[] paths` more paths to search
-*   AllowMultiple: Yes but not necessary
-
-```csharp
-using SaintsField;
-
-[FindComponent("sub/dummy")] public Dummy subDummy;
-[FindComponent("sub/dummy")] public GameObject subDummyGo;
-[FindComponent("sub/noSuch", "sub/dummy")] public Transform subDummyTrans;
-```
-
-![find_component](https://github.com/TylerTemp/SaintsField/assets/6391063/6620e643-3f8a-4c33-a136-6cbfc889d2ac)
-
-#### `GetComponentInParent` / `GetComponentInParents` ####
-
-Automatically sign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
-
-Note:
-
-1.  Like Unity's `GetComponentInParent`, this **will** check the target object itself.
-2.  `GetComponentInParent` will only check the target & its direct parent. `GetComponentInParents` will search all the way up to the root.
-
-Parameters:
-
-*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
-
-*   (For `GetComponentInParents` only) `bool includeInactive = false`
-
-    Should inactive GameObject be included? `true` to include inactive GameObject.
-
-    Note: **only `GetComponentInParents` has this parameter!**
-
-*   `Type compType = null`
-
-    The component type to sign. If null, it'll use the field type.
-
-*   `string groupBy = ""`
-
-    For error message grouping.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[GetComponentInParent] public SpriteRenderer directParent;  // equals [GetByXPath("//parent::")]
-[GetComponentInParent(typeof(SpriteRenderer))] public GameObject directParentDifferentType;  // equals [GetByXPath("//parent::/[@GetComponent(SpriteRenderer)]")]
-[GetComponentInParent] public BoxCollider directNoSuch;
-
-[GetComponentInParents] public SpriteRenderer searchParent;  // equals [GetByXPath("//ancestor::")]
-[GetComponentInParents(compType: typeof(SpriteRenderer))] public GameObject searchParentDifferentType;
-[GetComponentInParents] public BoxCollider searchNoSuch;
-```
-
-![get_component_in_parents](https://github.com/TylerTemp/SaintsField/assets/6391063/02836529-1aff-4bc9-b849-203d7bdaad21)
-
-#### `GetComponentInScene` ####
-
-Automatically sign a component to a field, if the field value is null and the component is in the currently opened scene. (First one found will be used)
-
-*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
-
-*   `bool includeInactive = false`
-
-    Should inactive GameObject be included? `true` to include inactive GameObject.
-
-*   `Type compType = null`
-
-    The component type to sign. If null, it'll use the field type.
-
-*   `string groupBy = ""`
-
-    For error message grouping.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[GetComponentInScene] public Dummy dummy;
-// by setting compType, you can sign it as a different type
-[GetComponentInScene(compType: typeof(Dummy))] public RectTransform dummyTrans;
-// and GameObject field works too
-[GetComponentInScene(compType: typeof(Dummy))] public GameObject dummyGo;
-```
-
-![get_component_in_scene](https://github.com/TylerTemp/SaintsField/assets/6391063/95a008a2-c7f8-4bc9-90f6-57c58724ebaf)
-
-#### `GetComponentByPath` ####
-
-**Deprecated**: use `GetByXPath` instead.
-
-Automatically sign a component to a field by a given path.
-
-*   (Optional)`EGetComp config`
-
-    Options are:
-
-    *   `EGetComp.ForceResign`: when the target changed (e.g. you delete/create one), automatically resign the new correct component.
-    *   `EGetComp.NoResignButton`: do not display a resign button when the target mismatches.
-
-*   `string paths...`
-
-    Paths to search.
-
-*   AllowMultiple: Yes. But not necessary.
-
-The `path` is a bit like html's `XPath` but with less functions:
-
-| Path            | Meaning                                                        |
-|-----------------|----------------------------------------------------------------|
-| `/`             | Separator. Using at start means the root of the current scene. |
-| `//`            | Separator. Any descendant children                             |
-| `.`             | Node. Current node                                             |
-| `..`            | Node. Parent node                                              |
-| `*`             | All nodes                                                      |
-| name            | Node. Any nodes with this name                                 |
-| `[last()]`      | Index Filter. Last of results                                  |
-| `[index() > 1]` | Index Filter. Node index that is greater than 1                |
-|  `[0]`          | Index Filter. First node in the results                        |
-
-For example:
-
-*   `./sth` or `sth`: direct child object of current object named `sth`
-*   `.//sth`: any descendant child under current. (descendant::sth)
-*   `..//sth`: first go to parent, then find the direct child named `sth`
-*   `/sth`: top level node in current scene named `sth`
-*   `//sth`: first go to top level, then find the direct child named `sth`
-*   `///sth`: first go to top level, then find any node named `sth`
-*   `./get/sth[1]`: the child named `get` of current node, then the second node named `sth` in the direct children list of `get`
-
-```csharp
-using SaintsField;
-
-// starting from root, search any object with name "Dummy"
-[GetComponentByPath("///Dummy")] public GameObject dummy;
-// first child of current object
-[GetComponentByPath("./*[1]")] public GameObject direct1;
-// child of current object which has index greater than 1
-[GetComponentByPath("./*[index() > 1]")] public GameObject directPosTg1;
-// last child of current object
-[GetComponentByPath("./*[last()]")] public GameObject directLast;
-// re-sign the target if mis-match
-[GetComponentByPath(EGetComp.NoResignButton | EGetComp.ForceResign, "./DirectSub")] public GameObject directSubWatched;
-// without "ForceResign", it'll display a reload button if mis-match
-// with multiple paths, it'll search from left to right
-[GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMulti;
-// if no match, it'll show an error message
-[GetComponentByPath("/no", "///sth/else/../what/.//ever[last()]/goes/here")] public GameObject notExists;
-```
-
-![get_component_by_path](https://github.com/TylerTemp/SaintsField/assets/6391063/a0fdca83-0c96-4d57-9c9d-989efbac0f07)
-
-
-#### `GetPrefabWithComponent` ####
-
-Automatically sign a prefab to a field, if the field value is null and the prefab has the component. (First one found will be used)
-
-Recommended to use it with `FieldType`!
-
-*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
-*   `Type compType = null`
-
-    The component type to sign. If null, it'll use the field type.
-
-*   `string groupBy = ""`
-
-    For error message grouping.
-
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[GetPrefabWithComponent] public Dummy dummy;
-// get the prefab itself
-[GetPrefabWithComponent(compType: typeof(Dummy))] public GameObject dummyPrefab;
-// works so good with `FieldType`
-[GetPrefabWithComponent(compType: typeof(Dummy)), FieldType(typeof(Dummy))] public GameObject dummyPrefabFieldType;
-```
-
-![get_prefab_with_component](https://github.com/TylerTemp/SaintsField/assets/6391063/07eae93c-d2fc-4641-b71f-55a98f17b360)
-
-#### `GetScriptableObject` ####
-
-Automatically sign a `ScriptableObject` file to this field. (First one found will be used)
-
-Recommended to use it with `Expandable`!
-
-*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
-*   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only sign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
-*   AllowMultiple: No
-
-```csharp
-using SaintsField;
-
-[GetScriptableObject] public Scriptable mySo;
-[GetScriptableObject("RawResources/ScriptableIns")] public Scriptable mySoSuffix;
-```
-
-![GetScriptableObject](https://github.com/TylerTemp/SaintsField/assets/6391063/191c3b4b-a58a-4475-80cd-3dbc809a9511)
-
-#### `GetByXPath` ####
-
-Please read `Saints XPath-like Syntax` section for more information.
-
-**Parameters**
-
-*   (Optional) `EXP config`: config tweak
-*   `string path...`: resource searching paths. use `.` if nothing is provided. First path with results will be used.
-
-*    Allow multiple: Yes. With multiple decorators, all results from each decorator will be used.
-
-Showcase:
-
-```csharp
-// get the main camera from scene
-[GetByXPath("scene:://[@Tag = MainCamera][]")] public Camera mainCamera;
-
-// only allow the user to pick from the target folder, which the `Hero` script returns `isAvaliable` as true
-[GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab[@{GetComponent(Hero).isAvaliable}]")]
-public GameObject[] heroPrefabs;
-
-// get all prefabs under `Art/Heros` AND `Art/Monsters`
-[GetByXPath("assets::/Art/Heros/*.prefab")]
-[GetByXPath("assets::/Art/Monsters/*.prefab")]
-public GameObject[] entityPrefabs;
-```
-
-#### `AddComponent` ####
-
-Automatically add a component to the current target if the target does not have this component. (This will not sign the component added)
-
-Recommended to use it with `GetComponent`!
-
-*   `Type compType = null`
-
-    The component type to add. If null, it'll use the field type.
-
-*   `string groupBy = ""`
-
-    For error message grouping.
-
-*   AllowMultiple: Yes
-
-```csharp
-using SaintsField;
-
-[AddComponent, GetComponent] public Dummy dummy;
-[AddComponent(typeof(BoxCollider)), GetComponent] public GameObject thisObj;
-```
-
-![add_component](https://github.com/TylerTemp/SaintsField/assets/6391063/84002879-875f-42aa-9aa0-cca8961f6b2c)
-
-#### `ButtonAddOnClick` ####
-
-Add a callback to a button's `onClick` event. Note this at this point does only supports callback with no arguments.
-
-Note: `SaintsEditor` has a more powerful `OnButtonClick`. If you have `SaintsEditor` enabled, it's recommended to use `OnButtonClick` instead.
-
-*   `string funcName` the callback function name
-*   `string buttonComp=null` the button component name.
-
-    If null, it'll try to get the button component by this order:
-
-    1.  the field itself
-    2.  get the `Button` component from the field itself
-    3.  get the `Button` component from the current target
-
-    If it's not null, the search order will be:
-
-    1.  get the field of this name from current target
-    2.  call a function of this name from current target
-
-```csharp
-using SaintsField;
-
-[GetComponent, ButtonAddOnClick(nameof(OnClick))] public Button button;
-
-private void OnClick()
-{
-    Debug.Log("Button clicked!");
-}
-```
-
-![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
 
 #### `RequireType` ####
 
@@ -2589,103 +2159,559 @@ public string[] myArr;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/4a2f3d42-d574-4212-a57a-76328fbf218f)
 
-#### `SaintsRow` ####
 
-`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
 
-This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
 
-Parameters:
+### Miscellaneous ###
 
-*   `bool inline=false`
+#### `Dropdown` ####
 
-    If true, it'll draw the `Serializable` inline like it's directly in the `MonoBehavior`
+A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
+
+If you want a searchable dropdown, see `AdvancedDropdown`.
+
+*   `string funcName=null` callback function. Must return a `DropdownList<T>`.
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
+*   `bool slashAsSub=true` treat `/` as a sub item.
+
+    Note: In `IMGUI`, this just replace `/` to unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
+
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   AllowMultiple: No
+
+**Example**
+
+```csharp
+using SaintsField;
+
+[Dropdown(nameof(GetDropdownItems))] public float _float;
+
+public GameObject _go1;
+public GameObject _go2;
+[Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
+
+private DropdownList<float> GetDropdownItems()
+{
+    return new DropdownList<float>
+    {
+        { "1", 1.0f },
+        { "2", 2.0f },
+        { "3/1", 3.1f },
+        { "3/2", 3.2f },
+    };
+}
+
+private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
+{
+    {_go1.name, _go1},
+    {_go2.name, _go2},
+    {"NULL", null},
+};
+```
+
+![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
+
+To control the separator and disabled item
+
+```csharp
+using SaintsField;
+
+[Dropdown(nameof(GetDropdownItems))]
+public Color color;
+
+private DropdownList<Color> GetDropdownItems()
+{
+    return new DropdownList<Color>
+    {
+        { "Black", Color.black },
+        { "White", Color.white },
+        DropdownList<Color>.Separator(),
+        { "Basic/Red", Color.red, true },  // the third arg means it's disabled
+        { "Basic/Green", Color.green },
+        { "Basic/Blue", Color.blue },
+        DropdownList<Color>.Separator("Basic/"),
+        { "Basic/Magenta", Color.magenta },
+        { "Basic/Cyan", Color.cyan },
+    };
+}
+```
+
+And you can always manually add it:
+
+```csharp
+DropdownList<Color> dropdownList = new DropdownList<Color>();
+dropdownList.Add("Black", Color.black);  // add an item
+dropdownList.Add("White", Color.white, true);  // and a disabled item
+dropdownList.AddSeparator();  // add a separator
+```
+
+![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
+
+The look in the UI Toolkit with `slashAsSub: false`:
+
+![dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/e6788204-ff04-4096-a37a-26d68e852737)
+
+Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
+
+If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+
+```csharp
+[Serializable]
+public enum MyEnum
+{
+    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
+    First,
+    [RichLabel("2")]
+    Second,
+    [RichLabel("3")]
+    Third,
+    [RichLabel("4/0")]
+    ForthZero,
+    [RichLabel("4/1")]
+    ForthOne,
+}
+
+[Dropdown] public MyEnum myEnumDropdown;
+```
+
+![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)
+
+#### `AdvancedDropdown` ####
+
+A dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
+
+**Known Issue**:
+
+1.  IMGUI: Using Unity's [`AdvancedDropdown`](https://docs.unity3d.com/ScriptReference/IMGUI.Controls.AdvancedDropdown.html). Unity's `AdvancedDropdown` allows to click the disabled item and close the popup, thus you can still click the disable item.
+    This is a BUG from Unity. I managed to "hack" it around to show again the popup when you click the disabled item, but you will see the flick of the popup.
+
+    This issue is not fixable unless Unity fixes it.
+
+    This bug only exists in IMGUI
+
+2.  UI Toolkit:
+
+    The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not has the same layout even with same elements+style+boundary size.
+
+    This issue is not fixable unless Unity fixes it. This issue might be different on different Unity (UI Toolkit) version.
+
+**Arguments**
+
+*   `string funcName=null` callback function. Must return a `AdvancedDropdownList<T>`.
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   AllowMultiple: No
+
+**`AdvancedDropdownList<T>`**
+
+*   `string displayName` item name to display
+*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise it's a group of items, which the values are specified by `children`
+*   `bool disabled = false` if item is disabled
+*   `string icon = null` the icon for the item.
+
+    Note: setting an icon for a parent group will result an weird issue on it's sub page's title and block the items. This is not fixable unless Unity decide to fix it.
+
+*   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
+
+```csharp
+using SaintsField;
+
+[AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
+
+public AdvancedDropdownList<int> AdvDropdown()
+{
+    return new AdvancedDropdownList<int>("Days")
+    {
+        // a grouped value
+        new AdvancedDropdownList<int>("First Half")
+        {
+            // with icon
+            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+            // no icon
+            new AdvancedDropdownList<int>("Tuesday", 2),
+        },
+        new AdvancedDropdownList<int>("Second Half")
+        {
+            new AdvancedDropdownList<int>("Wednesday")
+            {
+                new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
+                new AdvancedDropdownList<int>("Afternoon", 8),
+            },
+            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
+        },
+        // direct value
+        new AdvancedDropdownList<int>("Friday", 5, true),
+        AdvancedDropdownList<int>.Separator(),
+        new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
+        new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
+    };
+}
+```
+
+**IMGUI**
+
+![advanced_dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/d22d56b1-39c2-4ec9-bfbb-5e61dfe1b8a2)
+
+**UI Toolkit**
+
+[![advanced_dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/ad2f556b-7d98-4f49-a1ad-e2a5a52bf8f0)](https://github.com/TylerTemp/SaintsField/assets/6391063/157838e7-1f63-4b44-9503-bbb0004db7e8)
+
+There is also a parser to automatically separate items as sub items using `/`:
+
+```csharp
+using SaintsField;
+
+[AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
+
+public AdvancedDropdownList<int> AdvDropdown()
+{
+    return new AdvancedDropdownList<int>("Days")
+    {
+        {"First Half/Monday", 1, false, "star.png"},  // enabled, with icon
+        {"First Half/Tuesday", 2},
+
+        {"Second Half/Wednesday/Morning", 3, false, "star.png"},
+        {"Second Half/Wednesday/Afternoon", 4},
+        {"Second Half/Thursday", 5, true, "star.png"},  // disabled, with icon
+        "",  // root separator
+        {"Friday", 6, true},  // disabled
+        "",
+        {"Weekend/Saturday", 7, false, "star.png"},
+        "Weekend/",  // separator under `Weekend` group
+        {"Weekend/Sunday", 8, false, "star.png"},
+    };
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1bbad2f3-e1aa-4175-a6b1-fd350c58feb3)
+
+You can use this to make a searchable dropdown:
+
+```csharp
+using SaintsField;
+
+[AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
+
+public AdvancedDropdownList<int> AdvDropdownNoNest()
+{
+    return new AdvancedDropdownList<int>("Days")
+    {
+        {"Monday", 1},
+        {"Tuesday", 2, true},  // disabled
+        {"Wednesday", 3, false, "star.png"},  // enabled with icon
+        {"Thursday", 4, true, "star.png"},  // disabled with icon
+        {"Friday", 5},
+        "",  // separator
+        {"Saturday", 6},
+        {"Sunday", 7},
+    };
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1e0ad6f4-e65d-4953-9f2a-fa9e22e706af)
+
+Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
+
+If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+
+```csharp
+[Serializable]
+public enum MyEnum
+{
+    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
+    First,
+    [RichLabel("2")]
+    Second,
+    [RichLabel("3")]
+    Third,
+    [RichLabel("4/0")]
+    ForthZero,
+    [RichLabel("4/1")]
+    ForthOne,
+}
+
+[AdvancedDropdown] public MyEnum myEnumAdvancedDropdown;
+```
+
+![image](https://github.com/user-attachments/assets/ebc2e2f7-3534-4ff7-8710-29a990f5dea4)
+
+
+
+#### `EnumFlags` ####
+
+A toggle buttons group for enum flags (bit mask). It provides a button to toggle all bits on/off.
+
+This field has compact mode and expanded mode.
+
+For each argument:
+
+*   `bool autoExpand=true`: if the view is not enough to show all buttons in a row, automatically expand to a vertical group.
+*   `bool defaultExpanded=false`: if true, the buttons group will be expanded as a vertical group by default.
+*   AllowMultiple: No
+
+Known Issue:
+
+1.  IMGUI: If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
+2.  UI Toolkit: when `autoExpand=true`, `defaultExpanded` will be ignored
+
+```csharp
+using SaintsField;
+
+[Serializable, Flags]
+public enum BitMask
+{
+    None = 0,  // this will be hide as we will have an all/none button
+    Mask1 = 1,
+    Mask2 = 1 << 1,
+    Mask3 = 1 << 2,
+}
+
+[EnumFlags] public BitMask myMask;
+```
+
+[![enum_flags](https://github.com/TylerTemp/SaintsField/assets/6391063/710d3efc-5cba-471b-a0f1-a4319ded86fd)](https://github.com/TylerTemp/SaintsField/assets/6391063/48f4c25b-a4cd-40c6-bb42-913a0dc18daa)
+
+You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
+
+```csharp
+[Serializable, Flags]
+public enum BitMask
+{
+    None = 0,
+    [RichLabel("M<color=red>1</color>")]
+    Mask1 = 1,
+    [RichLabel("M<color=green>2</color>")]
+    Mask2 = 1 << 1,
+    [RichLabel("M<color=blue>3</color>")]
+    Mask3 = 1 << 2,
+    [RichLabel("M4")]
+    Mask4 = 1 << 3,
+    Mask5 = 1 << 4,
+}
+
+[EnumFlags]
+public BitMask myMask;
+```
+
+![image](https://github.com/user-attachments/assets/556ff203-aa55-44c9-9cc1-6ca2675b995f)
+
+#### `ResizableTextArea` ####
+
+This `TextArea` will always grow its height to fit the content. (minimal height is 3 rows).
+
+Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
 
 *   AllowMultiple: No
 
-Special Note:
-
-1.  After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
-2.  IMGUI: `ELayout.Horizontal` does not work here
-3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
-
 ```csharp
 using SaintsField;
-using SaintsField.Playa;  // SaintsEditor is not required here
 
-[Serializable]
-public struct Nest
-{
-    public string nest2Str;  // normal field
-    [Button]  // function button
-    private void Nest2Btn() => Debug.Log("Call Nest2Btn");
-    // static field (non serializable)
-    [ShowInInspector] public static Color StaticColor => Color.cyan;
-    // const field (non serializable)
-    [ShowInInspector] public const float Pi = 3.14f;
-    // normal attribute drawer works as expected
-    [BelowImage(maxWidth: 25)] public SpriteRenderer spriteRenderer;
-
-    [DOTweenPlay]  // DOTween helper
-    private Sequence PlayColor()
-    {
-        return DOTween.Sequence()
-            .Append(spriteRenderer.DOColor(Color.red, 1f))
-            .Append(spriteRenderer.DOColor(Color.green, 1f))
-            .Append(spriteRenderer.DOColor(Color.blue, 1f))
-            .SetLoops(-1);
-    }
-    [DOTweenPlay("Position")]
-    private Sequence PlayTween2()
-    {
-        return DOTween.Sequence()
-                .Append(spriteRenderer.transform.DOMove(Vector3.up, 1f))
-                .Append(spriteRenderer.transform.DOMove(Vector3.right, 1f))
-                .Append(spriteRenderer.transform.DOMove(Vector3.down, 1f))
-                .Append(spriteRenderer.transform.DOMove(Vector3.left, 1f))
-                .Append(spriteRenderer.transform.DOMove(Vector3.zero, 1f))
-            ;
-    }
-}
-
-[SaintsRow]
-public Nest n1;
+[SerializeField, ResizableTextArea] private string _short;
+[SerializeField, ResizableTextArea] private string _long;
+[SerializeField, RichLabel(null), ResizableTextArea] private string _noLabel;
 ```
 
-![saints_row](https://github.com/TylerTemp/SaintsField/assets/6391063/d8465de6-0741-4bfb-aa0d-3042422ca56c)
+[![resizabletextarea](https://github.com/TylerTemp/SaintsField/assets/6391063/202a742a-965c-4e68-a829-4a8aa4c8fe9e)](https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922)
 
-alternatively, you can make a drawer for your data type to omit `[SaintsRow]` everywhere:
 
-```csharp
-using SaintsField.Editor.Playa;
 
-[CustomPropertyDrawer(typeof(Nest))]
-public class MySaintsRowAttributeDrawer: SaintsRowAttributeDrawer {}
-```
+#### `LeftToggle` ####
 
-To show a `Serializable` inline like it's directly in the `MonoBehavior`:
+A toggle button on the left of the bool field. Only works on boolean field.
+
+IMGUI: To use with `RichLabel`, you need to add 6 spaces ahead as a hack
 
 ```csharp
 using SaintsField;
 
-[Serializable]
-public struct MyStruct
-{
-    public int structInt;
-    public bool structBool;
-}
-
-[SaintsRow(inline: true)]
-public MyStruct myStructInline;
-
-public string normalStringField;
+[LeftToggle] public bool myToggle;
+[LeftToggle, RichLabel("      <color=green><label />")] public bool richToggle;
 ```
 
-![saints_row_inline](https://github.com/TylerTemp/SaintsField/assets/6391063/571f4a05-91e0-4860-9ea2-bff6b1fe1d58)
+![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
 
-### Other Tools ###
 
-#### Addressable ####
+#### `ResourcePath` ####
+
+A tool to pick an resource path (a string) with:
+1.  required types or interfaces
+2.  display a type instead of showing a string
+3.  pick a suitable object using a custom picker
+
+Parameters:
+
+*   `EStr eStr = EStr.Resource`: which kind of string value you expected:
+    *  `Resource`: a resource path
+    *  `AssetDatabase`: an asset path. You should NOT use this unless you know what you are doing.
+    *  `Guid`: the GUID of the target object. You should NOT use this unless you know what you are doing.
+*   `bool freeSign=false`:
+
+    `true` to allow to sign any object, and gives a message if the signed value does not match.
+
+    `false` to only allow to sign matched object, and trying to prevent the change if it's illegal.
+
+*   `bool customPicker=true`: use a custom object pick that only display objects which meet the requirements
+*   `Type compType`: the type of the component. It can be a component, or an object like `GameObject`, `Sprite`. The field will be this type. It can NOT be an interface
+*   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all of the types can be signed.
+*   AllowMultiple: No
+
+**Known Issue**: IMGUI, manually sign a null object by using Unity's default pick will sign an empty string instead of null. Use custom pick to avoid this inconsistency.
+
+```csharp
+using SaintsField;
+
+// resource: display as a MonoScript, requires a BoxCollider
+[ResourcePath(typeof(Dummy), typeof(BoxCollider))]
+[InfoBox(nameof(myResource), true)]
+public string myResource;
+
+// AssetDatabase path
+[Space]
+[ResourcePath(EStr.AssetDatabase, typeof(Dummy), typeof(BoxCollider))]
+[InfoBox(nameof(myAssetPath), true)]
+public string myAssetPath;
+
+// GUID
+[Space]
+[ResourcePath(EStr.Guid, typeof(Dummy), typeof(BoxCollider))]
+[InfoBox(nameof(myGuid), true)]
+public string myGuid;
+
+// prefab resource
+[ResourcePath(typeof(GameObject))]
+[InfoBox(nameof(resourceNoRequire), true)]
+public string resourceNoRequire;
+
+// requires to have a Dummy script attached, and has interface IMyInterface
+[ResourcePath(typeof(Dummy), typeof(IMyInterface))]
+[InfoBox(nameof(myInterface), true)]
+public string myInterface;
+```
+
+![resource_path](https://github.com/TylerTemp/SaintsField/assets/6391063/35d683bf-7d19-4854-bdf6-ee63532fed80)
+
+
+
+#### `AssetPreview` ####
+
+Show an image preview for prefabs, Sprite, Texture2D, etc. (Internally use `AssetPreview.GetAssetPreview`)
+
+Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
+
+*   `int width=-1`
+
+    preview width, -1 for original image size that returned by Unity. If it's greater than current view width, it'll be scaled down to fit the view. Use `int.MaxValue` to always fit the view width.
+
+*   `int height=-1`
+
+    preview height, -1 for auto resize (with the same aspect) using the width
+
+*   `EAlign align=EAlign.End`
+
+    Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
+
+*   `bool above=false`
+
+    if true, render above the field instead of below
+
+*   `string groupBy=""`
+
+    See the `GroupBy` section
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[AssetPreview(20, 100)] public Texture2D _texture2D;
+[AssetPreview(50)] public GameObject _go;
+[AssetPreview(above: true)] public Sprite _sprite;
+```
+
+![asset_preview](https://github.com/TylerTemp/SaintsField/assets/6391063/ffed3715-f531-43d0-b4c3-98d20d419b3e)
+
+#### `AboveImage`/`BelowImage` ####
+
+Show an image above/below the field.
+
+*   `string image = null`
+
+    An image to display. This can be a property or a callback, which returns a `Sprite`, `Texture2D`, `SpriteRenderer`, `UI.Image`, `UI.RawImage` or `UI.Button`.
+
+    If it's null, it'll try to get the image from the field itself.
+
+*   `string maxWidth=-1`
+
+    preview max width, -1 for original image size. If it's greater than current view width, it'll be scaled down to fit the view. . Use `int.MaxValue` to always fit the view width.
+
+*   `int maxHeight=-1`
+
+    preview max height, -1 for auto resize (with the same aspect) using the width
+
+*   `EAlign align=EAlign.Start`
+
+    Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
+
+*   `string groupBy=""`
+
+    See the `GroupBy` section
+
+*   AllowMultiple: No
+
+```csharp
+using SaintsField;
+
+[AboveImage(nameof(spriteField))]
+// size and group
+[BelowImage(nameof(spriteField), maxWidth: 25, groupBy: "Below1")]
+[BelowImage(nameof(spriteField), maxHeight: 20, align: EAlign.End, groupBy: "Below1")]
+public Sprite spriteField;
+
+// align
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.FieldStart)]
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Start)]
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.Center)]
+[BelowImage(nameof(spriteField), maxWidth: 20, align: EAlign.End)]
+public string alignField;
+```
+
+![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
+
+
+#### `ButtonAddOnClick` ####
+
+Add a callback to a button's `onClick` event. Note this at this point does only supports callback with no arguments.
+
+Note: `SaintsEditor` has a more powerful `OnButtonClick`. If you have `SaintsEditor` enabled, it's recommended to use `OnButtonClick` instead.
+
+*   `string funcName` the callback function name
+*   `string buttonComp=null` the button component name.
+
+    If null, it'll try to get the button component by this order:
+
+    1.  the field itself
+    2.  get the `Button` component from the field itself
+    3.  get the `Button` component from the current target
+
+    If it's not null, the search order will be:
+
+    1.  get the field of this name from current target
+    2.  call a function of this name from current target
+
+```csharp
+using SaintsField;
+
+[GetComponent, ButtonAddOnClick(nameof(OnClick))] public Button button;
+
+private void OnClick()
+{
+    Debug.Log("Button clicked!");
+}
+```
+
+![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
+
+## Addressable ##
 
 These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.unity.addressables@latest). It's there only if you have `Addressable` installed.
 
@@ -2693,7 +2719,7 @@ Namespace: `SaintsField.Addressable`
 
 If you encounter issue because of version incompatible with your installation, you can add a macro `SAINTSFIELD_ADDRESSABLE_DISABLE` to disable this component (See "Add a Macro" section for more information)
 
-##### `AddressableLabel` #####
+### `AddressableLabel` ###
 
 A picker to select an addressable label.
 
@@ -2708,7 +2734,7 @@ public string addressableLabel;
 
 ![addressable_label](https://github.com/TylerTemp/SaintsField/assets/6391063/c0485d73-0f5f-4748-9684-d16f712e00e9)
 
-##### `AddressableAddress` #####
+### `AddressableAddress` ###
 
 A picker to select an addressable address (key).
 
@@ -2741,7 +2767,7 @@ public string addressLabelAnd;
 
 ![addressable_address](https://github.com/TylerTemp/SaintsField/assets/6391063/5646af00-c167-4131-be06-7e0b8e9b102e)
 
-#### AI Navigation ####
+## AI Navigation ##
 
 These tools are for [Unity AI Navigation](https://docs.unity3d.com/Packages/com.unity.ai.navigation@2.0/manual/) (`NavMesh`). It's there only if you have `AI Navigation` installed.
 
@@ -2749,7 +2775,7 @@ Namespace: `SaintsField.AiNavigation`
 
 Adding marco `SAINTSFIELD_AI_NAVIGATION_DISABLED` to disable this component. (See "Add a Macro" section for more information)
 
-##### `NavMeshAreaMask` #####
+### `NavMeshAreaMask` ###
 
 Select `NavMesh` area bit mask for an integer field. (So the integer value can be used in `SamplePathPosition`)
 
@@ -2764,7 +2790,7 @@ public int areaMask;
 
 ![nav_mesh_area_mask](https://github.com/TylerTemp/SaintsField/assets/6391063/acbd016b-6001-4440-86b6-e3278216bdde)
 
-##### `NavMeshArea` #####
+### `NavMeshArea` ###
 
 Select a `NavMesh` area for a string or an interger field.
 
@@ -2787,6 +2813,8 @@ public int areaName;
 ```
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
+
+### Data Types ###
 
 #### `SaintsArray`/`SaintsList` ####
 
@@ -3018,7 +3046,7 @@ The check of each row means autoplay when you click the start in the global cont
 
 To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
-### `DOTweenPlayGroup` / `DOTweenPlayEnd` ###
+### `DOTweenPlayStart` / `DOTweenPlayEnd` ###
 
 A convenient way to add many method to `DOTweenPlay`.
 
@@ -3026,7 +3054,7 @@ A convenient way to add many method to `DOTweenPlay`.
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
-[DOTweenPlayGroup(groupBy: "Color")]
+[DOTweenPlayStart(groupBy: "Color")]
 private Sequence PlayColor()
 {
     return DOTween.Sequence()
@@ -3801,7 +3829,9 @@ public MyData[] myDataArr;
 
 The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
 
-## About GroupBy ##
+## Misc ##
+
+### About GroupBy ##
 
 group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
 
@@ -3809,7 +3839,7 @@ This only works for decorator draws above or below the field. The above drawer w
 
 `""` means no group.
 
-## Value Comparison for Show/Hide/Enable/Disable-If ##
+### Value Comparison for Show/Hide/Enable/Disable-If ##
 
 
 This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
@@ -3940,9 +3970,9 @@ public EnumF enumF;
 [EnableIf(nameof(enumF), EnumF.A | EnumF.B), RichLabel("hasFlag(A | B)")] public string enumFEnableAB;
 ```
 
-## Saints XPath-like Syntax ##
+### Saints XPath-like Syntax ##
 
-### XPath ###
+#### XPath ####
 
 This part is how a target is found, a simplified [XML Path Language](https://developer.mozilla.org/en-US/docs/Web/XPath).
 
@@ -4066,7 +4096,7 @@ using multiple filters means all conditions must be met. Otherwise, use the keyw
 [GetByXPath("assets:://Heros/*.prefab[@GetComponent(Hero)]")] public Camera mainCamera;
 ```
 
-### `EXP` ###
+#### `EXP` ####
 
 `EXP` is how all the auto getters works, behaviors in the inspector. The values are:
 
@@ -4085,7 +4115,7 @@ And some shortcut:
 *   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
 *   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
 
-## Add a Macro ##
+### Add a Macro ##
 
 Pick a way that is most convenient for you:
 
@@ -4129,9 +4159,9 @@ Note: `csc.rsp` can override settings by Saints Menu.
 
 `Edit` - `Project Settings` - `Player`, find your platform, then go `Other Settings` - `Script Compliation` - `Scripting Define Symbols` to add your marcos. Don't forget to click `Apply` before closing the window.
 
-## Common Pitfalls & Compatibility ##
+### Common Pitfalls & Compatibility ###
 
-### List/Array & Nesting ###
+#### List/Array & Nesting ####
 
 Directly using on list/array will apply to every direct element of the list, this is a limit from Unity.
 
@@ -4156,7 +4186,7 @@ public class ArrayLabelExample : MonoBehaviour
 }
 ```
 
-### Order Matters ###
+#### Order Matters ####
 
 `SaintsField` only uses `PropertyDrawer` to draw the field, and will properly fall back to the rest drawers if there is one.
 This works for both 3rd party drawer, your custom drawer, and Unity's default drawer.
@@ -4188,7 +4218,7 @@ public float nativeRangeHandled;
 public AnimationCurve naCurveHandled;
 ```
 
-### Fallback To Other Drawers ###
+#### Fallback To Other Drawers ####
 
 `SaintsField` is designed to be compatible with other drawers if
 
