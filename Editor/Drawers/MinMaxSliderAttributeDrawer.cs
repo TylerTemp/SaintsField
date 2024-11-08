@@ -423,7 +423,7 @@ namespace SaintsField.Editor.Drawers
             {
                 return free
                     ? new Vector2Int(startValue, endValue)
-                    : new Vector2Int(Mathf.RoundToInt(Mathf.Min(startValue, minValue)), Mathf.RoundToInt(Mathf.Max(endValue, maxValue)));
+                    : new Vector2Int(Mathf.RoundToInt(Mathf.Max(startValue, minValue)), Mathf.RoundToInt(Mathf.Min(endValue, maxValue)));
             }
 
             int startSteppedValue =
@@ -449,7 +449,7 @@ namespace SaintsField.Editor.Drawers
             {
                 return free
                     ? new Vector2(startValue, endValue)
-                    : new Vector2(Mathf.Min(startValue, minValue), Mathf.Max(endValue, maxValue));
+                    : new Vector2(Mathf.Max(startValue, minValue), Mathf.Min(endValue, maxValue));
             }
 
             float startSteppedValue = minValue + Mathf.RoundToInt((startValue - minValue) / step) * step;
@@ -724,19 +724,13 @@ namespace SaintsField.Editor.Drawers
                 });
                 minFloatField.RegisterValueChangedCallback(changed =>
                 {
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
-                    Debug.Log($"minFloat changed={changed.newValue}, maxValue={maxFloatField.value}");
-#endif
                     float newValue = changed.newValue;
                     Vector2 inputValue = AdjustFloatInput(newValue, maxFloatField.value, minMaxSliderAttribute.Step, userData.FreeMin, userData.FreeMax, minMaxSliderAttribute.FreeInput);
                     ApplyFloatValue(property,
                         inputValue, onValueChangedCallback, minMaxSliderAttribute, container, info, parent);
-                    // if (minMaxSliderAttribute.FreeInput)
-                    // {
-                    //     userData.FreeMin = Mathf.Min(userData.FreeMin, inputValue.x);
-                    //     userData.FreeMax = Mathf.Max(userData.FreeMax, inputValue.y);
-                    // }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
+                    Debug.Log($"minFloat onChange changed={newValue}, maxValue={maxFloatField.value}, inputValue={inputValue}, {userData.FreeMin}, {userData.FreeMax}");
+#endif
                 });
                 maxFloatField.RegisterValueChangedCallback(changed =>
                 {

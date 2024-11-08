@@ -1026,6 +1026,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fcdec08c3a904347aa33de87021e3fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  range: {x: 2, y: 10}
 --- !u!1 &215164999
 GameObject:
   m_ObjectHideFlags: 0
@@ -11271,6 +11272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
+  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:

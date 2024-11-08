@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.10 ##
+
+Fix a bug that low/high input in `MinMaxSlider` with `free: false` won't work and get reset to min/max value, [#94](https://github.com/TylerTemp/SaintsField/issues/94)
+
 ## 3.4.9 ##
 
 1.  Add `EUnique.Remove`, `EUnique.Disable` for `Dropdown` & `AdvancedDropdown`. When using on a list/array, a duplicated option can be removed or disabled.

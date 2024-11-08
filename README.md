@@ -74,11 +74,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.4.9**
+**3.4.10**
 
-1.  Add `EUnique.Remove`, `EUnique.Disable` for `Dropdown` & `AdvancedDropdown`. When using on a list/array, a duplicated
-    option can be removed or disabled.
-2.  IMGUI: `Expandable` fix repeatedly creating `SerializedObject` and lead to un-editable fields. Possibly related to [#78](https://github.com/TylerTemp/SaintsField/issues/78)
+Fix a bug that low/high input in `MinMaxSlider` with `free: false` won't work and get reset to min/max value, [#94](https://github.com/TylerTemp/SaintsField/issues/94)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -950,7 +948,7 @@ public string normalStringField;
 
 ![saints_row_inline](https://github.com/TylerTemp/SaintsField/assets/6391063/571f4a05-91e0-4860-9ea2-bff6b1fe1d58)
 
-### Numberical ###
+### Numerical ###
 
 #### `Rate` ####
 
