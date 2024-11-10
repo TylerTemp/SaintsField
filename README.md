@@ -12,6 +12,9 @@ Developed by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github
 
 Unity: 2019.1 or higher
 
+> [!TIP]
+> A better document with TOC & Search: [saintsfield.comes.today](https://saintsfield.comes.today/)
+
 (Yes, the project name comes from, of course, [Saints Row 2](https://saintsrow.fandom.com/wiki/Saints_Row_2))
 
 ## Getting Started ##
