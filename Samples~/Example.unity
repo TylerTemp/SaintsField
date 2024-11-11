@@ -9489,6 +9489,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dummy: {fileID: 822337505}
+  textArea: 
 --- !u!114 &822337505
 MonoBehaviour:
   m_ObjectHideFlags: 0

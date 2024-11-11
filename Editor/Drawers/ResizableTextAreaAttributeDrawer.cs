@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using System;
+using SaintsField.Utils;
 using UnityEngine.UIElements;
 #endif
 
@@ -99,7 +100,7 @@ namespace SaintsField.Editor.Drawers
                 text = "F";
             }
             float areaHeight = style.CalcHeight(new GUIContent(text), width);
-            return Mathf.Max(areaHeight, EditorGUIUtility.singleLineHeight * 3);
+            return Mathf.Max(areaHeight, EditorGUIUtility.singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow());
         }
 
         // private static float GetTextAreaHeight(string text) => (EditorGUIUtility.singleLineHeight - 3.0f) * GetNumberOfLines(text) + 3.0f;
@@ -150,6 +151,9 @@ namespace SaintsField.Editor.Drawers
                 },
                 pickingMode = PickingMode.Ignore,
             });
+
+            const float singleLineHeight = 47 / 3f;
+
             root.Add(new TextField
             {
                 value = property.stringValue,
@@ -158,7 +162,7 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     whiteSpace = WhiteSpace.Normal,
-                    minHeight = 47,
+                    minHeight = singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow(),
                 },
             });
 
