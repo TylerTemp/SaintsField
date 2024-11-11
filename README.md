@@ -779,6 +779,10 @@ Limitation:
 1.  The target must have a public constructor with no required arguments.
 2.  It'll try to copy field values when changing types but not guaranteed. `struct` will not get copied value (it's too tricky to deal a struct)
 
+Parameters:
+
+*   `bool hideLabel=false`: true to hide the label of picked type
+
 *   Allow Multiple: No
 
 ```csharp
@@ -924,6 +928,26 @@ public Nest n1;
 
 ![saints_row](https://github.com/TylerTemp/SaintsField/assets/6391063/d8465de6-0741-4bfb-aa0d-3042422ca56c)
 
+To show a `Serializable` inline like it's directly in the `MonoBehavior`:
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct MyStruct
+{
+    public int structInt;
+    public bool structBool;
+}
+
+[SaintsRow(inline: true)]
+public MyStruct myStructInline;
+
+public string normalStringField;
+```
+
+![saints_row_inline](https://github.com/TylerTemp/SaintsField/assets/6391063/571f4a05-91e0-4860-9ea2-bff6b1fe1d58)
+
 **SerializeReference**
 
 `SaintsRow` can work on `SerializeReference`. If using it together with `ReferencePicker`, ensure `ReferencePicker` is before `SaintsRow`!
@@ -966,26 +990,6 @@ using SaintsField.Editor.Playa;
 [CustomPropertyDrawer(typeof(Nest))]
 public class MySaintsRowAttributeDrawer: SaintsRowAttributeDrawer {}
 ```
-
-To show a `Serializable` inline like it's directly in the `MonoBehavior`:
-
-```csharp
-using SaintsField;
-
-[Serializable]
-public struct MyStruct
-{
-    public int structInt;
-    public bool structBool;
-}
-
-[SaintsRow(inline: true)]
-public MyStruct myStructInline;
-
-public string normalStringField;
-```
-
-![saints_row_inline](https://github.com/TylerTemp/SaintsField/assets/6391063/571f4a05-91e0-4860-9ea2-bff6b1fe1d58)
 
 ### Numerical ###
 
