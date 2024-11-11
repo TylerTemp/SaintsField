@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
 #endif
@@ -15,7 +16,7 @@ namespace SaintsField
 
         public GetComponentInParentsAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
-            ParseOptions(EXP.NoPicker | EXP.NoAutoResignToNull);
+            ParseOptions(SaintsFieldConfigUtil.GetComponentInParentsExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseArguments(includeInactive, compType, excludeSelf);
             GroupBy = groupBy;
         }

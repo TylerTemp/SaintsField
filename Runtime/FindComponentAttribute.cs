@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -13,7 +14,7 @@ namespace SaintsField
         {
         }
 
-        public FindComponentAttribute(string path, params string[] paths): this(EXP.NoPicker | EXP.NoAutoResignToNull, path, paths)
+        public FindComponentAttribute(string path, params string[] paths): this(SaintsFieldConfigUtil.FindComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull), path, paths)
         {
         }
     }

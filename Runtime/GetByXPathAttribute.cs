@@ -104,7 +104,7 @@ namespace SaintsField
             XPathInfoAndList = new[] { xPathInfoOrList };
         }
 
-        public GetByXPathAttribute(params string[] ePaths) : this(EXP.None, ePaths)
+        public GetByXPathAttribute(params string[] ePaths) : this(SaintsFieldConfigUtil.GetByXPathExp(EXP.None), ePaths)
         {
         }
 

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -15,7 +16,7 @@ namespace SaintsField
 
         public GetComponentByPathAttribute(string path, params string[] paths)
         {
-            ParseOptions(EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker);
+            ParseOptions(SaintsFieldConfigUtil.GetComponentByPathExp(EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker));
             ParseXPaths(paths.Prepend(path).Select(TranslatePath).ToArray());
         }
 

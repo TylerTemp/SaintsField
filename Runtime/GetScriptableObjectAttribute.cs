@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq;
+using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
 #endif
@@ -13,7 +14,7 @@ namespace SaintsField
         public override string GroupBy { get; }
         public GetScriptableObjectAttribute(string pathSuffix=null, string groupBy="")
         {
-            ParseOptions(EXP.NoPicker | EXP.NoAutoResignToNull);
+            ParseOptions(SaintsFieldConfigUtil.GetScriptableObjectExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseXPath(pathSuffix);
             GroupBy = groupBy;
         }

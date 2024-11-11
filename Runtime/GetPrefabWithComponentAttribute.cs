@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
 #endif
@@ -14,7 +15,7 @@ namespace SaintsField
 
         public GetPrefabWithComponentAttribute(Type compType = null, string groupBy = "")
         {
-            ParseOptions(EXP.NoPicker | EXP.NoAutoResignToNull);
+            ParseOptions(SaintsFieldConfigUtil.GetPrefabWithComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseXPath(compType);
             GroupBy = groupBy;
         }
