@@ -58,6 +58,11 @@ namespace SaintsField.Editor.Playa
 
         private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(SerializedProperty property)
         {
+            if(property.propertyType == SerializedPropertyType.ManagedReference && property.managedReferenceValue == null)
+            {
+                return Array.Empty<ISaintsRenderer>();
+            }
+
             // string key = $"{property.serializedObject.targetObject.GetInstanceID()}:{property.propertyPath}";
             // if (GlobalCache.TryGetValue(key, out IReadOnlyList<ISaintsRenderer> result))
             // {
@@ -90,6 +95,11 @@ namespace SaintsField.Editor.Playa
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            if(property.propertyType == SerializedPropertyType.ManagedReference && property.managedReferenceValue == null)
+            {
+                return EditorGUIUtility.singleLineHeight;
+            }
+
             float fullWidth = _filedWidthCache <= 0
                 ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
                 : _filedWidthCache;
