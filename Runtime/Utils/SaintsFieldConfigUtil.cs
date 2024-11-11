@@ -1,5 +1,4 @@
 
-using UnityEngine;
 using System;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,6 +17,9 @@ namespace SaintsField.Utils
 #if UNITY_EDITOR
             if (Config == null)
             {
+#if SAINTSFIELD_DEBUG
+                UnityEngine.Debug.Log("Load SaintsFieldConfig because it's null");
+#endif
                 ReloadConfig();
             }
 #endif
@@ -27,7 +29,7 @@ namespace SaintsField.Utils
 
 #if UNITY_EDITOR
 #if UNITY_2019_2_OR_NEWER
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void ReloadConfig()
         {
 #if SAINTSFIELD_DEBUG

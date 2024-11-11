@@ -174,14 +174,28 @@ namespace SaintsField.Editor.Playa
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            (string error, int _, object value)= Util.GetValue(property, fieldInfo, parentValue);
-            if (error != "")
+            object value;
+            if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
-                return new HelpBox(error, HelpBoxMessageType.Error);
+                value = property.managedReferenceValue;
+                if (value == null)
+                {
+                    return new VisualElement();
+                }
             }
+            else
+            {
+                object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                (string error, int _, object getValue) = Util.GetValue(property, fieldInfo, parentValue);
+                if (error != "")
+                {
+                    return new HelpBox(error, HelpBoxMessageType.Error);
+                }
 
-            Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property).ToDictionary(each => each.name, each => each.property);
+                value = getValue;
+            }
+            Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
+                .ToDictionary(each => each.name, each => each.property);
 
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
 

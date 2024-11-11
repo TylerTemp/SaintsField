@@ -77,9 +77,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.4.10**
+**3.4.11**
 
-Fix a bug that low/high input in `MinMaxSlider` with `free: false` won't work and get reset to min/max value, [#94](https://github.com/TylerTemp/SaintsField/issues/94)
+1.  `SaintsRow` now support managed reference type. [#80](https://github.com/TylerTemp/SaintsField/issues/80)
+2.  Add `Window/Saints/Create or Edit SaintsField Config` config tweak so you can change the default behavior of auto getters. [#72](https://github.com/TylerTemp/SaintsField/issues/72#issuecomment-2453595293)
+3.  UI Toolkit: fix auto-indent for foldout in nested layout can incorrectly indent some fields.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2862,6 +2864,12 @@ class MyInterface: AnyObjectInterface<IInterface1> {}
 The drawer will fail for `AnyObjectInterface` and `MyInterface` because in Unity's C# runtime, it can not report correctly generic arguments.
 For more information, see [the comment of the answer in this stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347).
 
+This component is inspired by [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/utilities/serialize-interfaces-187505), you may go there and support him!
+
+Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/utilities/serialize-interfaces-187505), this version has several differences:
+
+*   It supports UI Toolkits too.
+*   Many SaintsField attributes can work together with this one, especially these auto getters, validators etc.
 
 ## Addressable ##
 

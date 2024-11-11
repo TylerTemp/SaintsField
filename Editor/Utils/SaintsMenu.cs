@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,6 +10,38 @@ namespace SaintsField.Editor.Utils
 {
     public static class SaintsMenu
     {
+
+        #region UI Toolkit
+
+        [MenuItem("Window/Saints/Create or Edit SaintsField Config")]
+        public static void CreateOrEditSaintsFieldConfig()
+        {
+            SaintsFieldConfig saintsFieldConfig = SaintsFieldConfigUtil.GetConfig();
+            if (saintsFieldConfig == null)
+            {
+                if (!Directory.Exists("Assets/Editor Default Resources"))
+                {
+                    Debug.Log($"Create folder: Assets/Editor Default Resources");
+                    AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+                }
+
+                if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
+                {
+                    Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
+                    AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
+                }
+
+                saintsFieldConfig = ScriptableObject.CreateInstance<SaintsFieldConfig>();
+                Debug.Log($"Create saintsFieldConfig: Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
+                AssetDatabase.CreateAsset(saintsFieldConfig, $"Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
+                AssetDatabase.SaveAssets();
+            }
+
+            Selection.activeObject = saintsFieldConfig;
+        }
+
+        #endregion
+
 
         #region UI Toolkit
 #if SAINTSFIELD_UI_TOOLKIT_DISABLE

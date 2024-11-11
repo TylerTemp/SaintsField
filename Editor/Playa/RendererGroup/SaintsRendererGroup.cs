@@ -1152,17 +1152,23 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         // Debug.Log($"process {toggle.worldBound.x} - {root.worldBound.x}: {distance}");
                         float marginLeft = -distance + 4;
-                        VisualElement saintsParent = UIToolkitUtils.FindParentClass(foldout, SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
-                            .FirstOrDefault();
-                        if(saintsParent == null)
+                        // VisualElement saintsParent = UIToolkitUtils.FindParentClass(foldout, SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
+                        //     .FirstOrDefault();
+                        // if(saintsParent == null)
+                        // {
+                        //     Debug.Log(foldout);
+                        //     foldout.style.marginLeft = marginLeft;
+                        // }
+                        // else
+                        // {
+                        //     float ml = saintsParent.resolvedStyle.marginLeft;
+                        //     float useValue = double.IsNaN(ml) ? marginLeft : marginLeft + ml;
+                        //     saintsParent.style.marginLeft = useValue;
+                        // }
+                        VisualElement propertyParent = UIToolkitUtils.IterUpWithSelf(foldout).Skip(1).FirstOrDefault(each => each is PropertyField);
+                        if (propertyParent != null)
                         {
-                            foldout.style.marginLeft = marginLeft;
-                        }
-                        else
-                        {
-                            float ml = saintsParent.resolvedStyle.marginLeft;
-                            float useValue = double.IsNaN(ml) ? marginLeft : marginLeft + ml;
-                            saintsParent.style.marginLeft = useValue;
+                            propertyParent.style.marginLeft = marginLeft;
                         }
                     }
                 }

@@ -217,19 +217,21 @@ namespace SaintsField.Editor.Utils
 
         public static IEnumerable<VisualElement> FindParentClass(VisualElement element, string className)
         {
+            return IterUpWithSelf(element).Where(each => each.ClassListContains(className));
+        }
+
+        public static IEnumerable<VisualElement> IterUpWithSelf(VisualElement element)
+        {
             if(element == null)
             {
                 yield break;
             }
 
-            if(element.ClassListContains(className))
-            {
-                yield return element;
-            }
+            yield return element;
 
-            foreach (VisualElement each in FindParentClass(element.parent, className))
+            foreach (VisualElement visualElement in IterUpWithSelf(element.parent))
             {
-                yield return each;
+                yield return visualElement;
             }
         }
     }

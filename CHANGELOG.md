@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.11 ##
+
+1.  `SaintsRow` now support managed reference type. [#80](https://github.com/TylerTemp/SaintsField/issues/80)
+2.  Add `Window/Saints/Create or Edit SaintsField Config` config tweak so you can change the default behavior of auto getters. [#72](https://github.com/TylerTemp/SaintsField/issues/72#issuecomment-2453595293)
+3.  UI Toolkit: fix auto-indent for foldout in nested layout can incorrectly indent some fields.
+
 ## 3.4.10 ##
 
 Fix a bug that low/high input in `MinMaxSlider` with `free: false` won't work and get reset to min/max value, [#94](https://github.com/TylerTemp/SaintsField/issues/94)

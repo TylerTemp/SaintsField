@@ -93,12 +93,15 @@ namespace SaintsField.Editor.Drawers
                 richText = true,
             };
             float width = textStyle.CalcSize(fullLabel).x;
-            GUI.Label(new Rect(position)
+            if(!((ReferencePickerAttribute)saintsAttribute).HideLabel)
             {
-                x = position.x - width,
-                width = width,
-                height = SingleLineHeight,
-            }, fullLabel, textStyle);
+                GUI.Label(new Rect(position)
+                {
+                    x = position.x - width,
+                    width = width,
+                    height = SingleLineHeight,
+                }, fullLabel, textStyle);
+            }
 
             Rect dropdownRect = new Rect(position)
             {
@@ -108,43 +111,6 @@ namespace SaintsField.Editor.Drawers
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(dropdownRect, new GUIContent(" "), FocusType.Keyboard))
             {
-                // GenericMenu genericDropdownMenu = new GenericMenu();
-                // genericDropdownMenu.AddItem(new GUIContent("[Null]"), managedReferenceValue == null, () =>
-                // {
-                //     property.managedReferenceValue = null;
-                //     property.serializedObject.ApplyModifiedProperties();
-                //     onGUIPayload.SetValue(null);
-                //     if(ExpandableIMGUIScoop.IsInScoop)
-                //     {
-                //         property.serializedObject.ApplyModifiedProperties();
-                //     }
-                // });
-                // genericDropdownMenu.AddSeparator("");
-                //
-                // foreach (Type type in GetTypes(property))
-                // {
-                //     string displayName = $"{type.Name}: {type.Namespace}";
-                //
-                //     genericDropdownMenu.AddItem(new GUIContent(displayName), managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
-                //     {
-                //         object instance = Activator.CreateInstance(type);
-                //         property.managedReferenceValue = instance;
-                //         property.serializedObject.ApplyModifiedProperties();
-                //         // property.serializedObject.SetIsDifferentCacheDirty();
-                //         onGUIPayload.SetValue(instance);
-                //         if(ExpandableIMGUIScoop.IsInScoop)
-                //         {
-                //             property.serializedObject.ApplyModifiedProperties();
-                //         }
-                //     });
-                // }
-                // genericDropdownMenu.DropDown(new Rect(position)
-                // {
-                //     x = 0,
-                //     width = EditorGUIUtility.currentViewWidth,
-                //     height = SingleLineHeight,
-                // });
-
                 AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
                 {
                     {"[Null]", null},
@@ -260,6 +226,7 @@ namespace SaintsField.Editor.Drawers
                 {
                     position = Position.Absolute,
                     right = SingleLineHeight,
+                    display = ((ReferencePickerAttribute) saintsAttribute).HideLabel? DisplayStyle.None: DisplayStyle.Flex,
                     // translate = new Translate(Length.Percent(-100), Length.Auto()),
                     // paddingRight = 1,
                 },

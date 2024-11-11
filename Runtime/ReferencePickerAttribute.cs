@@ -11,6 +11,10 @@ namespace SaintsField
         // public string GroupBy => "__LABEL_FIELD__";
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
+
+        public readonly bool HideLabel;
+
+        public ReferencePickerAttribute(bool hideLabel=false) => HideLabel = hideLabel;
     }
 }
 #endif
