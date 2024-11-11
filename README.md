@@ -924,6 +924,40 @@ public Nest n1;
 
 ![saints_row](https://github.com/TylerTemp/SaintsField/assets/6391063/d8465de6-0741-4bfb-aa0d-3042422ca56c)
 
+**SerializeReference**
+
+`SaintsRow` can work on `SerializeReference`. If using it together with `ReferencePicker`, ensure `ReferencePicker` is before `SaintsRow`!
+
+```csharp
+using SaintsField;
+
+public interface IRefInterface
+{
+    public int TheInt { get; }
+}
+
+[Serializable]
+public struct StructImpl : IRefInterface
+{
+    [field: SerializeField]
+    public int TheInt { get; set; }
+    [LayoutStart("Hi", ELayout.FoldoutBox)]
+    public string myStruct;
+
+    public ClassDirect nestedClass;
+}
+
+[SerializeReference, ReferencePicker, SaintsRow]
+public IRefInterface saints;
+
+[SerializeReference, ReferencePicker(hideLabel: true), SaintsRow(inline: true)]
+public IRefInterface inline;
+```
+
+![image](https://github.com/user-attachments/assets/a3735317-68bf-4a43-a97f-5d19c2d0c96c)
+
+**Drawer**
+
 alternatively, you can make a drawer for your data type to omit `[SaintsRow]` everywhere:
 
 ```csharp
@@ -1240,11 +1274,15 @@ public AnimationCurve curve2;
 
 ### Auto Getter ###
 
+Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+
 #### `GetComponent` ####
 
 Automatically sign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
+    Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
 
 *   `Type compType = null`
 
@@ -1277,6 +1315,8 @@ NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target obj
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
+    Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+
 *   `bool includeInactive = false`
 
     Should inactive children be included? `true` to include inactive children.
@@ -1307,7 +1347,6 @@ using SaintsField;
 
 ![get_component_in_children](https://github.com/TylerTemp/SaintsField/assets/6391063/854aeefc-6456-4df2-a4a7-40a5cd5e2290)
 
-
 #### `GetComponentInParent` / `GetComponentInParents` ####
 
 Automatically sign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
@@ -1320,6 +1359,8 @@ Note:
 Parameters:
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
+    Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
 
 *   (For `GetComponentInParents` only) `bool includeInactive = false`
 
@@ -1357,6 +1398,8 @@ Automatically sign a component to a field, if the field value is null and the co
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
+    Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+
 *   `bool includeInactive = false`
 
     Should inactive GameObject be included? `true` to include inactive GameObject.
@@ -1383,7 +1426,6 @@ using SaintsField;
 
 ![get_component_in_scene](https://github.com/TylerTemp/SaintsField/assets/6391063/95a008a2-c7f8-4bc9-90f6-57c58724ebaf)
 
-
 #### `GetPrefabWithComponent` ####
 
 Automatically sign a prefab to a field, if the field value is null and the prefab has the component. (First one found will be used)
@@ -1391,6 +1433,9 @@ Automatically sign a prefab to a field, if the field value is null and the prefa
 Recommended to use it with `FieldType`!
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
+    Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+
 *   `Type compType = null`
 
     The component type to sign. If null, it'll use the field type.
@@ -1420,6 +1465,9 @@ Automatically sign a `ScriptableObject` file to this field. (First one found wil
 Recommended to use it with `Expandable`!
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
+    Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+
 *   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only sign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
 *   AllowMultiple: No
 
@@ -1434,12 +1482,16 @@ using SaintsField;
 
 #### `GetByXPath` ####
 
+Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+
 Please read `Saints XPath-like Syntax` section for more information.
 
 **Parameters**
 
 *   (Optional) `EXP config`: config tweak
-*   `string path...`: resource searching paths. use `.` if nothing is provided. First path with results will be used.
+*   `string path...`: resource searching paths.
+    
+    Using `$` as a start to get a path from a callback/property/field.  
 
 *    Allow multiple: Yes. With multiple decorators, all results from each decorator will be used.
 
@@ -1457,6 +1509,15 @@ public GameObject[] heroPrefabs;
 [GetByXPath("assets::/Art/Heros/*.prefab")]
 [GetByXPath("assets::/Art/Monsters/*.prefab")]
 public GameObject[] entityPrefabs;
+
+// callback: auto find a resource depending on another resource
+public Sprite normalIcon;
+[GetByXPath("$" + nameof(EditorGetFallbackXPath))]
+public Sprite alternativeIcon;
+
+public string EditorGetFallbackXPath() => normalIcon == null
+    ? ""
+    : $"assets::/Alternative/{AssetDatabase.GetAssetPath(normalIcon)["Assets/".Length..]}";
 ```
 
 #### `AddComponent` ####
@@ -1504,7 +1565,6 @@ using SaintsField;
 ```
 
 ![find_component](https://github.com/TylerTemp/SaintsField/assets/6391063/6620e643-3f8a-4c33-a136-6cbfc889d2ac)
-
 
 #### `GetComponentByPath` ####
 
