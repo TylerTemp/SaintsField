@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts
             Debug.Log($"changed={dir}");
         }
 
-        [OnValueChanged(nameof(ChangedParam)), InfoBox(nameof(_belowText), EMessageType.Info, nameof(_belowText), isCallback: true)]
+        [OnValueChanged(nameof(ChangedParam)), InfoBox("$" + nameof(_belowText), EMessageType.Info, nameof(_belowText))]
         public int value;
 
         private string _belowText;
@@ -33,5 +33,13 @@ namespace SaintsField.Samples.Scripts
         {
             Debug.Log($"changed={anyObj}@{index}");
         }
+
+        [OnValueChanged(nameof(NumberChanged))]
+        public int[] numbers;
+
+        public string changedInfo;
+
+        private void NumberChanged(int v, int index) => changedInfo = $"[{index}] changed to {v}";
+
     }
 }
