@@ -30,6 +30,7 @@ namespace SaintsField.Utils
 #if UNITY_EDITOR
 #if UNITY_2019_2_OR_NEWER
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+#endif
         public static void ReloadConfig()
         {
 #if SAINTSFIELD_DEBUG
@@ -47,7 +48,6 @@ namespace SaintsField.Utils
 #endif
             }
         }
-#endif
 #endif
 
         public static EXP GetComponentExp(EXP defaultValue) => GetConfig()?.getComponentExp ?? defaultValue;
