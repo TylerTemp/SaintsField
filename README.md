@@ -77,11 +77,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.4.11**
+**3.4.12**
 
-1.  `SaintsRow` now support managed reference type. [#80](https://github.com/TylerTemp/SaintsField/issues/80)
-2.  Add `Window/Saints/Create or Edit SaintsField Config` config tweak so you can change the default behavior of auto getters. [#72](https://github.com/TylerTemp/SaintsField/issues/72#issuecomment-2453595293)
-3.  UI Toolkit: fix auto-indent for foldout in nested layout can incorrectly indent some fields.
+Fix not work with Unity < 2021.3
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

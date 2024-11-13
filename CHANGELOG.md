@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.12 ##
+
+Fix not work with Unity < 2021.3
+
 ## 3.4.11 ##
 
 1.  `SaintsRow` now support managed reference type. [#80](https://github.com/TylerTemp/SaintsField/issues/80)
