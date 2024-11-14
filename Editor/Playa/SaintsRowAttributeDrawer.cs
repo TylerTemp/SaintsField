@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
@@ -15,7 +16,7 @@ using SaintsField.Editor.Playa.Renderer;
 namespace SaintsField.Editor.Playa
 {
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
-    public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
+    public class SaintsRowAttributeDrawer: SaintsPropertyDrawer, IDOTweenPlayRecorder
     {
         private static (string error, int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
@@ -185,8 +186,57 @@ namespace SaintsField.Editor.Playa
         #endregion
 
         #region UI Toolkit
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+#if UNITY_2021_3_OR_NEWER
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            VisualElement container, FieldInfo info, object parent)
+        {
+            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) saintsAttribute;
+
+            // VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
+            VisualElement bodyElement = new VisualElement();
+            foreach (VisualElement visualElement in FillElements(property))
+            {
+                bodyElement.Add(visualElement);
+            }
+
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+            bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(this));
+            bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(this));
+#endif
+            bodyElement.TrackPropertyValue(property, p =>
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTSROW
+                Debug.Log($"inline changed {p}");
+#endif
+                bodyElement.Clear();
+                foreach (VisualElement visualElement in FillElements(p))
+                {
+                    bodyElement.Add(visualElement);
+                }
+            });
+
+            if (saintsRowAttribute.Inline)
+            {
+                return bodyElement;
+            }
+
+            bodyElement.style.paddingLeft = IndentWidth;
+
+            Foldout toggle = new Foldout
+            {
+                text = property.displayName,
+                value = true,
+            };
+            toggle.Add(bodyElement);
+            // toggle.RegisterValueChangedCallback(evt => bodyElement.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+
+            VisualElement root = new VisualElement();
+            root.Add(toggle);
+            return root;
+        }
+
+        private IEnumerable<VisualElement> FillElements(SerializedProperty property)
         {
             object value;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -194,16 +244,22 @@ namespace SaintsField.Editor.Playa
                 value = property.managedReferenceValue;
                 if (value == null)
                 {
-                    return new VisualElement();
+                    yield break;
                 }
             }
             else
             {
                 object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if(parentValue == null)
+                {
+                    yield return new HelpBox("Failed to get parent, target field might be disposed", HelpBoxMessageType.Error);
+                    yield break;
+                }
                 (string error, int _, object getValue) = Util.GetValue(property, fieldInfo, parentValue);
                 if (error != "")
                 {
-                    return new HelpBox(error, HelpBoxMessageType.Error);
+                    yield return new HelpBox(error, HelpBoxMessageType.Error);
+                    yield break;
                 }
 
                 value = getValue;
@@ -211,40 +267,13 @@ namespace SaintsField.Editor.Playa
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                 .ToDictionary(each => each.name, each => each.property);
 
-            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
-
             IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.GetRenderers(serializedFieldNames, property.serializedObject, value);
 
             // VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
-            VisualElement bodyElement = new VisualElement();
             foreach (ISaintsRenderer saintsRenderer in renderer)
             {
-                bodyElement.Add(saintsRenderer.CreateVisualElement());
+                yield return saintsRenderer.CreateVisualElement();
             }
-
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-            bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(this));
-            bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(this));
-#endif
-
-            if (saintsRowAttribute.Inline)
-            {
-                return bodyElement;
-            }
-
-            bodyElement.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
-
-            Foldout toggle = new Foldout
-            {
-                text = property.displayName,
-                value = true,
-            };
-            toggle.RegisterValueChangedCallback(evt => bodyElement.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-
-            VisualElement root = new VisualElement();
-            root.Add(toggle);
-            root.Add(bodyElement);
-            return root;
         }
 #endif
         #endregion
