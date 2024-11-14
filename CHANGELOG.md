@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP ##
+
+1.  UI Toolkit: Fix an issue with `MinMaxSlider(free: true)` that the high/low is jump back to code value when you input an out-ranged value, then slide back to in-range value 
+
 ## 3.4.12 ##
 
 Fix not work with Unity < 2021.3

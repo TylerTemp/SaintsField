@@ -65,5 +65,6 @@ namespace SaintsField.Samples.Scripts
         [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f)] public Vector2 nonFreeMinMax;
 
         [MinMaxSlider(0, 10, free: true), BelowRichLabel("$" + nameof(freeInput))] public Vector2 freeInput;
+        [MinMaxSlider(0, 10, free: true), BelowRichLabel("$" + nameof(freeInputInt))] public Vector2Int freeInputInt;
     }
 }

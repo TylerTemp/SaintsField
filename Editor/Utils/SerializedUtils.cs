@@ -167,6 +167,10 @@ namespace SaintsField.Editor.Utils
         public static (T[] attributes, object parent) GetAttributesAndDirectParent<T>(SerializedProperty property) where T : class
         {
             (FieldOrProp fieldOrProp, object sourceObj) = GetFieldInfoAndDirectParent(property);
+            if (sourceObj is null)
+            {
+                return (Array.Empty<T>(), null);
+            }
             // Debug.Log(fieldOrProp.IsField);
             // Debug.Log(fieldOrProp.PropertyInfo);
             // Debug.Log(fieldOrProp.PropertyInfo.GetCustomAttributes());

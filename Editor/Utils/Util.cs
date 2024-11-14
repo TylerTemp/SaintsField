@@ -427,6 +427,11 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
         {
+            if (target == null)
+            {
+                return ("Target is null", defaultValue);
+            }
+
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             types.Reverse();
 

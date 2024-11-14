@@ -825,15 +825,15 @@ namespace SaintsField.Editor.Drawers
                     if(metaInfo.Error == "")
                     {
                         int intMetaMinValue = Mathf.RoundToInt(metaInfo.MinValue);
-                        if(intMetaMinValue < leftValue)
+                        if(intMetaMinValue > leftValue)
                         {
                             leftValue = intMetaMinValue;
                             leftMetaAdjust = true;
                         }
-                        else if(intMetaMinValue > originMin && intMetaMinValue < leftValue)
-                        {
-                            leftMetaAdjust = true;
-                        }
+                        // else if(intMetaMinValue > originMin && intMetaMinValue < leftValue)
+                        // {
+                        //     leftMetaAdjust = true;
+                        // }
                     }
 
                     if (leftValueOutOfRange || leftMetaAdjust)
@@ -889,15 +889,21 @@ namespace SaintsField.Editor.Drawers
                     bool leftMetaAdjust = false;
                     if(metaInfo.Error == "")
                     {
-                        if(metaInfo.MinValue < leftValue)
+                        if(metaInfo.MinValue > leftValue)
                         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
+                            Debug.Log($"leftMetaAdjust as metaInfo.MinValue {metaInfo.MinValue} > leftValue {leftValue}");
+#endif
                             leftValue = metaInfo.MinValue;
                             leftMetaAdjust = true;
                         }
-                        else if(metaInfo.MinValue > originMin && metaInfo.MinValue < leftValue)
-                        {
-                            leftMetaAdjust = true;
-                        }
+//                         else if(metaInfo.MinValue > originMin && metaInfo.MinValue < leftValue)
+//                         {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
+//                             Debug.Log($"leftMetaAdjust as metaInfo.MinValue {metaInfo.MinValue} out of {leftValue} ~ {originMin}");
+// #endif
+//                             leftMetaAdjust = true;
+//                         }
                     }
 
                     if (leftValueOutOfRange || leftMetaAdjust)
@@ -913,7 +919,7 @@ namespace SaintsField.Editor.Drawers
                         }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_SLIDER
-                        Debug.Log($"lowLimit changed {minMaxSlider.lowLimit}");
+                        Debug.Log($"lowLimit changed {minMaxSlider.lowLimit}: leftValueOutOfRange={leftValueOutOfRange}, leftMetaAdjust={leftMetaAdjust}");
 #endif
                     }
 
