@@ -56,11 +56,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         // [SerializeReference, ReferencePicker]
         // public IRefInterface plain;
 
-        [SerializeReference, ReferencePicker, SaintsRow]
+        [SerializeReference, OnValueChanged(nameof(ValueChanged)), ReferencePicker, SaintsRow]
         public IRefInterface saints;
 
         [SerializeReference, ReferencePicker(hideLabel: true), SaintsRow(inline: true)]
         public IRefInterface inline;
+
+        private void ValueChanged(object v) => Debug.Log(v);
 
         // [SerializeReference, ReferencePicker]
         // public IRefInterface myInterface;

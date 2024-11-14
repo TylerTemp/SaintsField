@@ -1954,26 +1954,41 @@ namespace SaintsField.Editor.Core
                 topRoot.Add(containerElement);
 
                 // thisPropField.Bind(property.serializedObject);
-                fallbackField.Unbind();
-                fallbackField.BindProperty(property.serializedObject);
-                fallbackField.RegisterValueChangeCallback(evt =>
+                // fallbackField.Unbind();
+                fallbackField.BindProperty(property);
+                fallbackField.TrackPropertyValue(property, prop =>
                 {
-                    SerializedProperty prop = evt.changedProperty;
-                    if(SerializedProperty.EqualContents(prop, property))
+                    object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(prop).parent;
+                    if (noCacheParent == null)
                     {
-                        object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                        if (noCacheParent == null)
-                        {
-                            Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
-                            return;
-                        }
-                        (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
-                        if (error == "")
-                        {
-                            onValueChangedCallback(curValue);
-                        }
+                        Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
+                        return;
+                    }
+                    (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
+                    if (error == "")
+                    {
+                        onValueChangedCallback(curValue);
                     }
                 });
+                // this does not work on some unity version, e.g. 2022.3.14f1
+                // fallbackField.RegisterValueChangeCallback(evt =>
+                // {
+                //     SerializedProperty prop = evt.changedProperty;
+                //     if(SerializedProperty.EqualContents(prop, property))
+                //     {
+                //         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                //         if (noCacheParent == null)
+                //         {
+                //             Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
+                //             return;
+                //         }
+                //         (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
+                //         if (error == "")
+                //         {
+                //             onValueChangedCallback(curValue);
+                //         }
+                //     }
+                // });
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
             }
             else
