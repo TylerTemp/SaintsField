@@ -210,6 +210,7 @@ namespace SaintsField.Editor.Utils
                     position = Position.Absolute,
                     right = 4,
                 },
+                pickingMode = PickingMode.Ignore,
             });
 
             return dropdownButtonField;
