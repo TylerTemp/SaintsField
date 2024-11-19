@@ -7,8 +7,9 @@ using SaintsField.Playa;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Reflection;
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using SaintsField.Editor.Drawers;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
@@ -28,10 +29,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private class UserDataPayload
         {
-            public string xml;
-            public Label label;
-            public string friendlyName;
-            public RichTextDrawer richTextDrawer;
+            public string XML;
+            public Label Label;
+            public string FriendlyName;
+            public RichTextDrawer RichTextDrawer;
         }
 
         private VisualElement _fieldElement;
@@ -42,7 +43,7 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             UserDataPayload userDataPayload = new UserDataPayload
             {
-                friendlyName = FieldWithInfo.SerializedProperty.displayName,
+                FriendlyName = FieldWithInfo.SerializedProperty.displayName,
             };
 
             ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
@@ -58,6 +59,12 @@ namespace SaintsField.Editor.Playa.Renderer
                     },
                 }
                 : MakeListDrawerSettingsField(listDrawerSettingsAttribute, arraySizeAttribute?.Min ?? -1, arraySizeAttribute?.Max ?? -1);
+
+            OnChangedAttribute onChangedAttribute = FieldWithInfo.PlayaAttributes.OfType<OnChangedAttribute>().FirstOrDefault();
+            if (onChangedAttribute != null)
+            {
+                OnChangedUIToolkit(onChangedAttribute.Callback, result, FieldWithInfo.SerializedProperty, (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+            }
 
             result.userData = userDataPayload;
 
@@ -75,26 +82,140 @@ namespace SaintsField.Editor.Playa.Renderer
 #endif
 
             bool needUpdate = ifCondition || _arraySizeCondition || _richLabelCondition;
-            // if ()
-            // {
-            //     result.RegisterCallback<AttachToPanelEvent>(_ =>
-            //         result.schedule
-            //             .Execute(() => UIToolkitCheckUpdate(result, ifCondition, arraySizeCondition, richLabelCondition, FieldWithInfo.FieldInfo, FieldWithInfo.Target))
-            //             .Every(100)
-            //     );
-            // }
-            //
-            // result.RegisterCallback<DetachFromPanelEvent>(_ =>
-            // {
-            //     // ReSharper disable once InvertIf
-            //     if(userDataPayload.richTextDrawer != null)
-            //     {
-            //         userDataPayload.richTextDrawer.Dispose();
-            //         userDataPayload.richTextDrawer = null;
-            //     }
-            // });
 
             return (_fieldElement = result, needUpdate);
+        }
+
+        // this again not work for SerializeReference, not sure why... tried to hack around but failed...
+        private static void OnChangedUIToolkit(string callback, VisualElement result, SerializedProperty property, MemberInfo memberInfo)
+        {
+            SerializedProperty trackProp = property;
+            int propertyPathIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (propertyPathIndex != -1)
+            {
+                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                (SerializedProperty arrProp, int _, string error) = Util.GetArrayProperty(property, memberInfo, parent);
+                if (error != null)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
+                    return;
+                }
+
+                trackProp = arrProp;
+            }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+            Debug.Log($"trackProp: {trackProp.propertyPath}");
+#endif
+
+            result.TrackPropertyValue(trackProp, p => TrackPropertyChangeUIToolkit(callback, p, memberInfo));
+
+// #if UNITY_2021_3_OR_NEWER
+//             if(trackProp.propertyType == SerializedPropertyType.ManagedReference)
+//             {
+//                 VisualElement tracker = new VisualElement();
+//                 result.Add(tracker);
+//
+//                 tracker.userData = trackProp.managedReferenceValue;
+//                 tracker.schedule.Execute(() =>
+//                 {
+//                     object newValue = trackProp.managedReferenceValue;
+//                     Debug.Log($"{tracker.userData}/{newValue}/{tracker.userData == newValue}");
+//                     if (!Util.GetIsEqual(tracker.userData, newValue))
+//                     {
+//                         tracker.userData = newValue;
+//                         object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(trackProp).parent;
+//                         if (newFetchParent == null)
+//                         {
+//                             Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+//                             return;
+//                         }
+//                         string error = InvokeCallback(callback, newValue, newFetchParent);
+// #if SAINTSFIELD_DEBUG
+//                         if (error != "")
+//                         {
+//                             Debug.LogError(error);
+//                         }
+// #endif
+//                     }
+//                     // Debug.Log($"{trackProp.managedReferenceValue}/{trackProp.managedReferenceId}/{trackProp.managedReferenceFieldTypename}/{trackProp.managedReferenceFullTypename}");
+//                 }).Every(1000);
+//             }
+// #endif
+        }
+
+        private static void TrackPropertyChangeUIToolkit(string callback, SerializedProperty p, MemberInfo memberInfo)
+        {
+            object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(p).parent;
+            if (newFetchParent == null)
+            {
+                Debug.LogWarning($"{p.propertyPath} parent disposed unexpectedly.");
+                return;
+            }
+
+
+            (string error, int _, object value) = Util.GetValue(p, memberInfo, newFetchParent);
+            if (error == "")
+            {
+                error = InvokeCallback(callback, value, newFetchParent);
+            }
+#if SAINTSFIELD_DEBUG
+            if (error != "")
+            {
+                Debug.LogError(error);
+            }
+#endif
+        }
+
+        private static string InvokeCallback(string callback, object newValue, object parent)
+        {
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
+            types.Reverse();
+
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+            foreach (Type type in types)
+            {
+                MethodInfo methodInfo = type.GetMethod(callback, bindAttr);
+                if (methodInfo == null)
+                {
+                    continue;
+                }
+
+                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                {
+                    newValue,
+                });
+
+                try
+                {
+                    methodInfo.Invoke(parent, passParams);
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.LogException(e);
+                    Debug.Assert(e.InnerException != null);
+                    return e.InnerException.Message;
+                }
+                catch (InvalidCastException e)
+                {
+                    Debug.LogException(e);
+                    return e.Message;
+                }
+                catch (Exception e)
+                {
+                    // _error = e.Message;
+                    Debug.LogException(e);
+                    return e.Message;
+                }
+
+                return "";
+            }
+
+            return $"No field or method named `{callback}` found on `{parent}`";
         }
 
         private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, int minSize, int maxSize)
@@ -457,14 +578,14 @@ namespace SaintsField.Editor.Playa.Renderer
                 string xml = preCheckResult.RichLabelXml;
                 // Debug.Log(xml);
                 UserDataPayload userDataPayload = (UserDataPayload) _fieldElement.userData;
-                if (xml != userDataPayload.xml)
+                if (xml != userDataPayload.XML)
                 {
                     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-                    if (userDataPayload.richTextDrawer == null)
+                    if (userDataPayload.RichTextDrawer == null)
                     {
-                        userDataPayload.richTextDrawer = new RichTextDrawer();
+                        userDataPayload.RichTextDrawer = new RichTextDrawer();
                     }
-                    if(userDataPayload.label == null)
+                    if(userDataPayload.Label == null)
                     {
                         UIToolkitUtils.WaitUntilThenDo(
                             _fieldElement,
@@ -479,14 +600,14 @@ namespace SaintsField.Editor.Playa.Renderer
                             },
                             label =>
                             {
-                                userDataPayload.label = label;
+                                userDataPayload.Label = label;
                             }
                         );
                     }
                     else
                     {
-                        userDataPayload.xml = xml;
-                        UIToolkitUtils.SetLabel(userDataPayload.label, RichTextDrawer.ParseRichXml(xml, userDataPayload.friendlyName, GetMemberInfo(FieldWithInfo), FieldWithInfo.Target), userDataPayload.richTextDrawer);
+                        userDataPayload.XML = xml;
+                        UIToolkitUtils.SetLabel(userDataPayload.Label, RichTextDrawer.ParseRichXml(xml, userDataPayload.FriendlyName, GetMemberInfo(FieldWithInfo), FieldWithInfo.Target), userDataPayload.RichTextDrawer);
                     }
                 }
             }

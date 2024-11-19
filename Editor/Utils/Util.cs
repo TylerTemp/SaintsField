@@ -992,6 +992,11 @@ namespace SaintsField.Editor.Utils
                 return ("No MemberInfo given", arrayIndex, null);
             }
 
+            if (parent == null)
+            {
+                return ("No parent given", arrayIndex, null);
+            }
+
             object rawValue;
             if (fieldInfo.MemberType == MemberTypes.Field)
             {
@@ -1020,7 +1025,7 @@ namespace SaintsField.Editor.Utils
             return ("", arrayIndex, indexResult);
         }
 
-        public static (SerializedProperty arrayProperty, int index, string error) GetArrayProperty(SerializedProperty property, FieldInfo info, object parent)
+        public static (SerializedProperty arrayProperty, int index, string error) GetArrayProperty(SerializedProperty property, MemberInfo info, object parent)
         {
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 

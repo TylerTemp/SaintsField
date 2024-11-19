@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Playa
             return ("", index, parentValue, value);
         }
 
-        private static IEnumerable<(string name, SerializedProperty property)> GetSerializableFieldInfo(SerializedProperty property)
+        public static IEnumerable<(string name, SerializedProperty property)> GetSerializableFieldInfo(SerializedProperty property)
         {
             HashSet<string> alreadySend = new HashSet<string>();
             SerializedProperty it = property.Copy();

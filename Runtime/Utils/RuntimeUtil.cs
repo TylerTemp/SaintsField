@@ -2,7 +2,7 @@ namespace SaintsField.Utils
 {
     public static class RuntimeUtil
     {
-        public static (string content, bool isCallback) ParseCallback(string content, bool isCallback)
+        public static (string content, bool isCallback) ParseCallback(string content, bool isCallback=false)
         {
             if (isCallback || content is null)
             {

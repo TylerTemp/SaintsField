@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers
 
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-            _error = InvokeCallback(property, saintsAttribute, onGUIPayload.newValue, arrayIndex, info, parent);
+            _error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, onGUIPayload.newValue, arrayIndex, parent);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -56,10 +56,8 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         #endregion
 
-        private static string InvokeCallback(SerializedProperty property, ISaintsAttribute saintsAttribute, object newValue, int index, FieldInfo info, object parent)
+        private static string InvokeCallback(string callback, object newValue, int index, object parent)
         {
-            // Debug.Log(saintsAttribute);
-            string callback = ((OnValueChangedAttribute)saintsAttribute).Callback;
             // no, don't use this. We already have the value
             // (string error, object _) = Util.GetMethodOf<object>(callback, null, property, info, target);
             // return error != "" ? error : "";
@@ -148,7 +146,7 @@ namespace SaintsField.Editor.Drawers
             object newValue)
         {
             // Debug.Log($"OK I got a new value {newValue}; {this}");
-            string error = InvokeCallback(property, saintsAttribute, newValue, SerializedUtils.PropertyPathIndex(property.propertyPath), info, parent);
+            string error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, newValue, SerializedUtils.PropertyPathIndex(property.propertyPath), parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             helpBox.text = error;
             helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
