@@ -77,9 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.4.12**
+**WIP**
 
-Fix not work with Unity < 2021.3
+1.  UI Toolkit: Fix an issue with `MinMaxSlider(free: true)` that the high/low is jump back to code value when you input an out-ranged value, then slide back to in-range value
+2.  Fix `Button` won't work if there are two methods with the same name (but different arguments overload) in the same class, [#104](https://github.com/TylerTemp/SaintsField/issues/104)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1492,8 +1493,8 @@ Please read `Saints XPath-like Syntax` section for more information.
 
 *   (Optional) `EXP config`: config tweak
 *   `string path...`: resource searching paths.
-    
-    Using `$` as a start to get a path from a callback/property/field.  
+
+    Using `$` as a start to get a path from a callback/property/field.
 
 *    Allow multiple: Yes. With multiple decorators, all results from each decorator will be used.
 
