@@ -222,7 +222,7 @@ namespace SaintsField.Editor.Utils
                 type = type.BaseType;
             }
 
-            throw new Exception($"Unable to get type from {source}");
+            throw new Exception($"Unable to get {name} from {source}");
         }
 
         public static int PropertyPathIndex(string propertyPath)
