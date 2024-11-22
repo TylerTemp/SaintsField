@@ -7,11 +7,11 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field)]
-    public class OnChangedAttribute: PropertyAttribute, IPlayaAttribute
+    public class OnArraySizeChangedAttribute: PropertyAttribute, IPlayaAttribute
     {
         public readonly string Callback;
 
-        public OnChangedAttribute(string callback)
+        public OnArraySizeChangedAttribute(string callback)
         {
             Callback = RuntimeUtil.ParseCallback(callback).content;
         }

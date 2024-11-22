@@ -9,6 +9,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using System.Reflection;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System.Collections;
 using SaintsField.Editor.Drawers;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -60,10 +61,10 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
                 : MakeListDrawerSettingsField(listDrawerSettingsAttribute, arraySizeAttribute?.Min ?? -1, arraySizeAttribute?.Max ?? -1);
 
-            OnChangedAttribute onChangedAttribute = FieldWithInfo.PlayaAttributes.OfType<OnChangedAttribute>().FirstOrDefault();
-            if (onChangedAttribute != null)
+            OnArraySizeChangedAttribute onArraySizeChangedAttribute = FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
+            if (onArraySizeChangedAttribute != null)
             {
-                OnChangedUIToolkit(onChangedAttribute.Callback, result, FieldWithInfo.SerializedProperty, (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+                OnArraySizeChangedUIToolkit(onArraySizeChangedAttribute.Callback, result, FieldWithInfo.SerializedProperty, (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
             }
 
             result.userData = userDataPayload;
@@ -86,143 +87,61 @@ namespace SaintsField.Editor.Playa.Renderer
             return (_fieldElement = result, needUpdate);
         }
 
-        private HashSet<string> _trackedSubPropertyNames = new HashSet<string>();
-
-        private void OnChangedUIToolkit(string callback, VisualElement result, SerializedProperty property, MemberInfo memberInfo)
+        private static void OnArraySizeChangedUIToolkit(string callback, VisualElement result, SerializedProperty property, MemberInfo memberInfo)
         {
-            // SerializedProperty trackProp = property;
-            // no need to check array/list as Editor always receives the whole array/list
-//             int propertyPathIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-//             object parent = null;
-//             if (propertyPathIndex != -1)
-//             {
-//                 parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-//                 (SerializedProperty arrProp, int _, string error) = Util.GetArrayProperty(property, memberInfo, parent);
-//                 if (error != null)
-//                 {
-// #if SAINTSFIELD_DEBUG
-//                     Debug.LogError(error);
-// #endif
-//                     return;
-//                 }
-//
-//                 trackProp = arrProp;
-//             }
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
-            Debug.Log($"trackProp: {property.propertyPath}");
-#endif
-
-            result.TrackPropertyValue(property, p => TrackPropertyChangeUIToolkit(callback, p, memberInfo, result));
-
-            WatchSubChangeUIToolkit(callback, property, memberInfo, result);
-        }
-
-        private void WatchSubChangeUIToolkit(string callback, SerializedProperty property, MemberInfo memberInfo, VisualElement result)
-        {
-#if UNITY_2021_3_OR_NEWER
-            if(property.propertyType == SerializedPropertyType.ManagedReference)
+            if (!property.isArray)
             {
-                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                if(parent != null)
-                {
-                    TrackPropertyManagedUIToolkit(callback, property, property, memberInfo, result, parent);
-                }
-            }
-
-            if (property.isArray && property.arrayElementType.StartsWith("managedReference<"))
-            {
-                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                if(parent != null)
-                {
-                    foreach (SerializedProperty elementProp in Enumerable.Range(0, property.arraySize)
-                                 .Select(property.GetArrayElementAtIndex))
-                    {
-                        TrackPropertyManagedUIToolkit(callback, elementProp, property, memberInfo, result, parent);
-                    }
-                }
-            }
-#endif
-        }
-
-        private void TrackPropertyChangeUIToolkit(string callback, SerializedProperty p, MemberInfo memberInfo, VisualElement tracker)
-        {
-            object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(p).parent;
-            if (newFetchParent == null)
-            {
-                Debug.LogWarning($"{p.propertyPath} parent disposed unexpectedly.");
+                Debug.LogWarning($"{property.propertyPath} is no an array/list");
                 return;
             }
 
-            (string error, int _, object value) = Util.GetValue(p, memberInfo, newFetchParent);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
-            Debug.Log($"draw changed: {value}, {p.managedReferenceValue}");
-#endif
-            if (error == "")
+            int arraySize = property.arraySize;
+            // don't use TrackPropertyValue because if you remove anything from list, it gives error
+            // this is Unity's fault
+            // result.TrackPropertyValue(property, p =>
+            result.TrackSerializedObjectValue(property.serializedObject, _ =>
             {
-                error = InvokeCallback(callback, value, newFetchParent);
-            }
-#if SAINTSFIELD_DEBUG
-            if (error != "")
-            {
-                Debug.LogError(error);
-            }
-#endif
-
-            WatchSubChangeUIToolkit(callback, p, memberInfo, tracker);
-            // this change means field changes. add tracker to it
-// #if UNITY_2021_3_OR_NEWER
-//             if(p.propertyType == SerializedPropertyType.ManagedReference)
-//             {
-//                 TrackPropertyManagedUIToolkit(callback, p,  memberInfo, tracker, newFetchParent);
-//             }
-// #endif
-        }
-
-        private void TrackPropertyManagedUIToolkit(string callback, SerializedProperty watchSubProperty, SerializedProperty getValueProperty, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
-        {
-#if UNITY_2021_3_OR_NEWER
-            foreach ((string name, SerializedProperty subProperty) in SaintsRowAttributeDrawer.GetSerializableFieldInfo(watchSubProperty))
-            {
-                if (_trackedSubPropertyNames.Add(name))
+                int newSize;
+                try
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER || true
-                    Debug.Log($"Add sub track: {name}/{_trackedSubPropertyNames.Count}");
-#endif
-                    tracker.TrackPropertyValue(subProperty,
-                        _ =>
-                        {
-                            // object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(p).parent;
-                            (string subError, int _, object subValue) = Util.GetValue(getValueProperty, memberInfo, newFetchParent);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER || true
-                            if (subError != "")
-                            {
-                                Debug.LogError(subError);
-                            }
-#endif
-
-                            // ReSharper disable once NotAccessedVariable
-                            string subInvokeError = "";
-                            if (subError == "")
-                            {
-                                // ReSharper disable once RedundantAssignment
-                                subInvokeError = InvokeCallback(callback, subValue, newFetchParent);
-                            }
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
-                            if (subInvokeError != "")
-                            {
-                                Debug.LogError(subError);
-                            }
-#endif
-
-                        });
+                    newSize = property.arraySize;
                 }
-            }
-#endif
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    return;
+                }
+
+                if (newSize == arraySize)
+                {
+                    return;
+                }
+
+                arraySize = newSize;
+
+                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if (parent == null)
+                {
+                    Debug.LogWarning("Property disposed unexpectedly");
+                    return;
+                }
+
+                (string error, int _, object newValue) = Util.GetValue(property, memberInfo, parent);
+                if (error != "")
+                {
+                    Debug.LogError(error);
+                    return;
+                }
+
+                InvokeCallback(callback, newValue, parent);
+
+            });
         }
 
-        private static string InvokeCallback(string callback, object newValue, object parent)
+        private static void InvokeCallback(string callback, object newValue, object parent)
         {
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
             types.Reverse();
@@ -250,25 +169,30 @@ namespace SaintsField.Editor.Playa.Renderer
                 catch (TargetInvocationException e)
                 {
                     Debug.LogException(e);
-                    Debug.Assert(e.InnerException != null);
-                    return e.InnerException.Message;
+                    // Debug.Assert(e.InnerException != null);
+                    // return e.InnerException?.Message ?? e.Message;
+                    return;
                 }
                 catch (InvalidCastException e)
                 {
                     Debug.LogException(e);
-                    return e.Message;
+                    // return e.Message;
+                    return;
                 }
                 catch (Exception e)
                 {
                     // _error = e.Message;
                     Debug.LogException(e);
-                    return e.Message;
+                    // return e.Message;
+                    return;
                 }
 
-                return "";
+                // return "";
+                return;
             }
 
-            return $"No field or method named `{callback}` found on `{parent}`";
+            string error = $"No field or method named `{callback}` found on `{parent}`";
+            Debug.LogError(error);
         }
 
         private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, int minSize, int maxSize)
