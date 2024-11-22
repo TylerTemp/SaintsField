@@ -1431,7 +1431,8 @@ MonoBehaviour:
     - rid: 7411922739809484817
       type: {class: Issue97/MyClassIn, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        myString: Default String
+        classInt: 213
+        myString: 1
 --- !u!1 &943755158
 GameObject:
   m_ObjectHideFlags: 0

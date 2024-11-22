@@ -1968,10 +1968,14 @@ namespace SaintsField.Editor.Core
                 HashSet<string> trackedSubPropertyNames = new HashSet<string>();
                 bool isReference = property.propertyType == SerializedPropertyType.ManagedReference;
 #endif
+
                 // bool watch = !property.isArray ||
                 //              (property.isArray && !SaintsFieldConfigUtil.DisableOnValueChangedWatchArrayFieldUIToolkit());
                 // if(watch)
                 {
+
+                    // see:
+                    // https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed
                     VisualElement trackerContainer = new VisualElement();
                     fallbackField.Add(trackerContainer);
 
@@ -2007,7 +2011,6 @@ namespace SaintsField.Editor.Core
                     }
 #endif
                 }
-                // https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed
                 // else  // this does not work on some unity version, e.g. 2022.3.14f1, for serialized class
                 // {
                 //     fallbackField.RegisterValueChangeCallback(evt =>
@@ -2047,7 +2050,7 @@ namespace SaintsField.Editor.Core
                     continue;
                 }
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED || true
                 Debug.Log($"Add sub track: {subProperty.propertyPath}/{trackedSubPropertyNames.Count}");
 #endif
                 tracker.TrackPropertyValue(subProperty,
