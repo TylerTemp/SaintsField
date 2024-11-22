@@ -1,9 +1,11 @@
 # Changelog
 
-## WIP ##
+## 3.4.13 ##
 
 1.  UI Toolkit: Fix an issue with `MinMaxSlider(free: true)` that the high/low is jump back to code value when you input an out-ranged value, then slide back to in-range value
 2.  Fix `Button` won't work if there are two methods with the same name (but different arguments overload) in the same class, [#104](https://github.com/TylerTemp/SaintsField/issues/104)
+3.  UI Toolkit: Fix `OnValueChanged` won't get triggered when a `SerializeReference` field is changed, [#97](https://github.com/TylerTemp/SaintsField/issues/97)
+4.  `SaintsEditor`: Add `OnArraySizeChanged` to watch the array size change, [#97](https://github.com/TylerTemp/SaintsField/issues/97)
 
 ## 3.4.12 ##
 

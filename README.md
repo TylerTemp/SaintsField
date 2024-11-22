@@ -77,10 +77,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**WIP**
+**3.4.13**
 
 1.  UI Toolkit: Fix an issue with `MinMaxSlider(free: true)` that the high/low is jump back to code value when you input an out-ranged value, then slide back to in-range value
 2.  Fix `Button` won't work if there are two methods with the same name (but different arguments overload) in the same class, [#104](https://github.com/TylerTemp/SaintsField/issues/104)
+3.  UI Toolkit: Fix `OnValueChanged` won't get triggered when a `SerializeReference` field is changed, [#97](https://github.com/TylerTemp/SaintsField/issues/97)
+4.  `SaintsEditor`: Add `OnArraySizeChanged` to watch the array size change, [#97](https://github.com/TylerTemp/SaintsField/issues/97)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -284,6 +286,39 @@ public string TakeAGuess()
 
 ![post_field_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bdd9446b-97fe-4cd2-900a-f5ed5f1ccb56)
 
+#### `PlayaRichLabel` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+This is like `RichLabel`, but it can change label of an array/list
+
+Please note: at the moment it only works for serialized property, and is only tested on array/list. It's suggested to use `RichLabel` for non-array/list
+serialized fields.
+
+Parameters:
+
+*   `string richTextXml` the rich text xml for the label. Note: custom rich label tag created by this project only works in UI Toolkit mode.
+*   `bool isCallback=false` if it's a callback (a method/property/field)
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[PlayaRichLabel("<color=lame>It's Labeled!")]
+public List<string> myList;
+
+[PlayaRichLabel(nameof(MethodLabel), true)]
+public string[] myArray;
+
+private string MethodLabel(string[] values)
+{
+    return $"<color=green><label /> {string.Join("", values.Select(_ => "<icon=star.png />"))}";
+}
+```
+
+![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
+
 #### `InfoBox`/`BelowInfoBox` ####
 
 Draw an info box above/below the field.
@@ -348,6 +383,77 @@ private string DynamicMessage() => _content ? "False" : "True";
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/c96b4b14-594d-4bfd-9cc4-e53390ed99be)](https://github.com/TylerTemp/SaintsField/assets/6391063/03ac649a-9e89-407d-a59d-3e224a7f84c8)
+
+#### `PlayaInfoBox`/`PlayaBelowInfoBox` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+This is like `InfoBox`, but it can be applied to array/list/button etc.
+
+*   `string content`
+
+    The content of the info box.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
+*   `EMessageType messageType=EMessageType.Info`
+
+    Message icon. Options are
+
+    *   `None`
+    *   `Info`
+    *   `Warning`
+    *   `Error`
+
+*   `string show=null`
+
+    a callback name or property name for show or hide this info box.
+
+*   `bool isCallback=false`
+
+    if true, the `content` will be interpreted as a property/callback function.
+
+    If the value (or returned value) is a string, then the content will be changed
+
+    If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
+
+*   `bool below=false`
+
+    Draw the info box below the field instead of above
+
+*   `string groupBy=""` See `GroupBy` section
+
+*   AllowMultiple: Yes
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
+[PlayaBelowInfoBox("$" + nameof(DynamicFromArray))]  // callback
+public string[] strings = {};
+
+public string dynamic;
+
+private string DynamicFromArray(string[] value) => value.Length > 0? string.Join("\n", value): "null";
+
+[PlayaInfoBox("MethodWithButton")]
+[Button("Click Me!")]
+[PlayaBelowInfoBox("GroupExample", groupBy: "group")]
+[PlayaBelowInfoBox("$" + nameof(dynamic), groupBy: "group")]
+public void MethodWithButton()
+{
+}
+
+[PlayaInfoBox("Method")]
+[PlayaBelowInfoBox("$" + nameof(dynamic))]
+public void Method()
+{
+}
+```
+
+![image](https://github.com/user-attachments/assets/81d82ee4-4f8d-4ae3-bae5-dcb13d3af7c5)
 
 #### `Separator` / `BelowSeparator` ####
 
@@ -523,6 +629,50 @@ private void Toggle() => _errorOut = !_errorOut;
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
+
+
+### `Button` ###
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments.
+
+*   `string buttonLabel = null` the button label. If null, it'll use the function name.
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Button]
+private void EditorButton()
+{
+    Debug.Log("EditorButton");
+}
+
+[Button("Label")]
+private void EditorLabeledButton()
+{
+    Debug.Log("EditorLabeledButton");
+}
+```
+
+![button](https://github.com/TylerTemp/SaintsField/assets/6391063/2f32336d-ca8b-46e0-9ac8-7bc44aada54b)
+
+Example with arguments:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Button]
+private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
+{
+    Debug.Log($"{myObj}, {myInt}, {myStr}");
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/7a79ed1f-e227-4cf4-8885-e2ea81f4df3a)
 
 ### Game Related ###
 
@@ -719,29 +869,6 @@ using SaintsField;
 
 
 
-#### `ParticlePlay` ####
-
-A button to play a particle system of the field value, or the one on the field value.
-
-Unity allows play ParticleSystem in the editor, but only if you selected the target GameObject. It can only play one at a time.
-
-This decorator allows you to play multiple ParticleSystem as long as you have the expected fields.
-
-Parameters:
-
-*   `string groupBy = ""` for error grouping.
-
-*   Allow Multiple: No
-
-Note: because of the limitation from Unity, it can NOT detect if a `ParticleSystem` is finished playing
-
-```csharp
-[ParticlePlay] public ParticleSystem particle;
-// It also works if the field target has a particleSystem component
-[ParticlePlay, FieldType(typeof(ParticleSystem), false)] public GameObject particle2;
-```
-
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
 
 ### Data Editor ###
 
@@ -989,6 +1116,67 @@ using SaintsField.Editor.Playa;
 [CustomPropertyDrawer(typeof(Nest))]
 public class MySaintsRowAttributeDrawer: SaintsRowAttributeDrawer {}
 ```
+
+#### `ListDrawerSettings` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+Allow you to search and paging a large list/array.
+
+Parameters:
+
+*   `bool searchable = false`: allow search in the list/array
+*   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Serializable]
+public struct MyData
+{
+    public int myInt;
+    public string myString;
+    public GameObject myGameObject;
+    public string[] myStrings;
+}
+
+[ListDrawerSettings(searchable: true, numberOfItemsPerPage: 3)]
+public MyData[] myDataArr;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/08c6da9a-e613-4e94-8933-3d7a92f7cb33)
+
+The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
+
+
+#### `ShowInInspector` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+Show a non-field property.
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+// const
+[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
+// static
+[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+
+// auto-property
+[ShowInInspector, Ordered]
+public Color AutoColor
+{
+    get => Color.green;
+    set {}
+}
+```
+
+![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
 
 ### Numerical ###
 
@@ -1717,6 +1905,40 @@ private void ChangedAnyType(object anyObj, int index=-1)
 }
 ```
 
+#### `OnArraySizeChanged` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+`OnValueChanged` can not detect if an array/list is changed in size. `OnArraySizeChanged` attribute will call a callback for that.
+
+Using it together with `OnValueChanged` to get all changing notification for an array/list.
+
+Parameters:
+
+*   `string callback`: the callback function when the size changed.
+*   Allow Multiple: No
+
+```csharp
+using SaintsField;  // namespace for OnValueChanged
+using SaintsField.Playa;  // namespace for OnArraySizeChanged
+
+[Serializable]
+public class MyClass  // generic class change is also detectable
+{
+    public string unique;
+}
+
+[OnValueChanged(nameof(ValueChanged))]  // optional
+[OnArraySizeChanged(nameof(SizeChanged))]
+public MyClass[] myClasses;
+
+public void ValueChanged(MyClass myClass, int index) => Debug.Log($"OnValueChanged: {myClass.unique} at {index}");
+
+// if you do not care about values, just omit the parameters
+public void SizeChanged(IReadOnlyList<MyClass> myClassNewValues) => Debug.Log($"OnArraySizeChanged {myClassNewValues.Count}: {string.Join("; ", myClassNewValues.Select(each => each?.unique))}");
+```
+
 #### `ReadOnly`/`DisableIf`/`EnableIf` ####
 
 A tool to set field enable/disable status. Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
@@ -1854,6 +2076,45 @@ public bool boolVal;
 // dis=!editor || dis=!bool => en=editor&&bool
 [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
 ```
+
+It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+
+#### `PlayaEnableIf`/`PlayaDisableIf` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
+
+Different from `EnableIf`/`DisableIf` in the following:
+1.  apply on an array will directly enable or disable the array itself, rather than each element.
+2.  Callback function can not receive value and index
+3.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[PlayaDisableIf] public int[] justDisable;
+[PlayaEnableIf] public int[] justEnable;
+
+[PlayaDisableIf(nameof(boolValue))] public int[] disableIf;
+[PlayaEnableIf(nameof(boolValue))] public int[] enableIf;
+
+[PlayaDisableIf(EMode.Edit)] public int[] disableEdit;
+[PlayaDisableIf(EMode.Play)] public int[] disablePlay;
+[PlayaEnableIf(EMode.Edit)] public int[] enableEdit;
+[PlayaEnableIf(EMode.Play)] public int[] enablePlay;
+
+[Button, PlayaDisableIf(nameof(boolValue))] private void DisableIfBtn() => Debug.Log("DisableIfBtn");
+[Button, PlayaEnableIf(nameof(boolValue))] private void EnableIfBtn() => Debug.Log("EnableIfBtn");
+[Button, PlayaDisableIf(EMode.Edit)] private void DisableEditBtn() => Debug.Log("DisableEditBtn");
+[Button, PlayaDisableIf(EMode.Play)] private void DisablePlayBtn() => Debug.Log("DisablePlayBtn");
+[Button, PlayaEnableIf(EMode.Edit)] private void EnableEditBtn() => Debug.Log("EnableEditBtn");
+[Button, PlayaEnableIf(EMode.Play)] private void EnablePlayBtn() => Debug.Log("EnablePlayBtn");
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
 
 It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
 
@@ -2011,6 +2272,60 @@ public bool boolValue;
 
 It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
 
+
+#### `PlayaShowIf`/`PlayaHideIf` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
+
+Different from `ShowIf`/`HideIf`:
+1.  apply on an array will directly show or hide the array itself, rather than each element.
+2.  Callback function can not receive value and index
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public bool boolValue;
+
+[PlayaHideIf] public int[] justHide;
+[PlayaShowIf] public int[] justShow;
+
+[PlayaHideIf(nameof(boolValue))] public int[] hideIf;
+[PlayaShowIf(nameof(boolValue))] public int[] showIf;
+
+[PlayaHideIf(EMode.Edit)] public int[] hideEdit;
+[PlayaHideIf(EMode.Play)] public int[] hidePlay;
+[PlayaShowIf(EMode.Edit)] public int[] showEdit;
+[PlayaShowIf(EMode.Play)] public int[] showPlay;
+
+[ShowInInspector, PlayaHideIf(nameof(boolValue))] public const float HideIfConst = 3.14f;
+[ShowInInspector, PlayaShowIf(nameof(boolValue))] public const float ShowIfConst = 3.14f;
+[ShowInInspector, PlayaHideIf(EMode.Edit)] public const float HideEditConst = 3.14f;
+[ShowInInspector, PlayaHideIf(EMode.Play)] public const float HidePlayConst = 3.14f;
+[ShowInInspector, PlayaShowIf(EMode.Edit)] public const float ShowEditConst = 3.14f;
+[ShowInInspector, PlayaShowIf(EMode.Play)] public const float ShowPlayConst = 3.14f;
+
+[ShowInInspector, PlayaHideIf(nameof(boolValue))] public static readonly Color HideIfStatic = Color.green;
+[ShowInInspector, PlayaShowIf(nameof(boolValue))] public static readonly Color ShowIfStatic = Color.green;
+[ShowInInspector, PlayaHideIf(EMode.Edit)] public static readonly Color HideEditStatic = Color.green;
+[ShowInInspector, PlayaHideIf(EMode.Play)] public static readonly Color HidePlayStatic = Color.green;
+[ShowInInspector, PlayaShowIf(EMode.Edit)] public static readonly Color ShowEditStatic = Color.green;
+[ShowInInspector, PlayaShowIf(EMode.Play)] public static readonly Color ShowPlayStatic = Color.green;
+
+[Button, PlayaHideIf(nameof(boolValue))] private void HideIfBtn() => Debug.Log("HideIfBtn");
+[Button, PlayaShowIf(nameof(boolValue))] private void ShowIfBtn() => Debug.Log("ShowIfBtn");
+[Button, PlayaHideIf(EMode.Edit)] private void HideEditBtn() => Debug.Log("HideEditBtn");
+[Button, PlayaHideIf(EMode.Play)] private void HidePlayBtn() => Debug.Log("HidePlayBtn");
+[Button, PlayaShowIf(EMode.Edit)] private void ShowEditBtn() => Debug.Log("ShowEditBtn");
+[Button, PlayaShowIf(EMode.Play)] private void ShowPlayBtn() => Debug.Log("ShowPlayBtn");
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
+
+It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
 
 #### `Required` ####
 
@@ -2224,6 +2539,369 @@ public string[] myArr;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/4a2f3d42-d574-4212-a57a-76328fbf218f)
+
+
+
+#### `PlayaArraySize` ####
+
+**Deprecated**. Use `ArraySize` instead.
+
+### Layout ###
+
+#### `Ordered` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+`SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
+
+Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Ordered] public string myStartField;
+
+[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
+[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+
+[ShowInInspector, Ordered]
+public Color AutoColor
+{
+    get => Color.green;
+    set {}
+}
+
+[Button, Ordered]
+private void EditorButton()
+{
+    Debug.Log("EditorButton");
+}
+
+[Ordered] public string myOtherFieldUnderneath;
+```
+
+![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
+
+#### `Layout` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+A layout decorator to group fields.
+
+*   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
+*   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
+*   `bool keepGrouping=false`: See `LayoutStart` below
+*   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
+*   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
+
+Options are:
+
+*   `Vertical`
+*   `Horizontal`
+*   `Background` draw a background color for the whole group
+*   `Title` show the title
+*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw an separator between title and the rest of the content.
+    On `UI Toolkit` it will draw a background color for the title.
+*   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
+*   `Collapse` Same as `Foldout` but is collapsed by default.
+*   `Tab` make this group a tab page separated rather than grouping it
+*   `TitleBox` = `Background | Title | TitleOut`
+*   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
+*   `CollapseBox` = `Background | Title | TitleOut | Collapse`
+
+**Known Issue**
+
+`Horizental` style is buggy, for the following reasons:
+
+1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
+2.  On UI Toolkit we have the well-behaved layout system, but because Unity will try to align the first label, all the field except the first one will get the super-shrank label width which makes it unreadable.
+
+![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
+
+**Appearance**
+
+![layout](https://github.com/user-attachments/assets/1e2e6dfa-85a9-4225-ac8f-8beefc26ae52)
+
+**Example**
+
+```csharp
+using SaintsField;
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Layout("Titled", ELayout.Title | ELayout.TitleOut)]
+public string titledItem1, titledItem2;
+
+// title
+[Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
+public string titledBoxItem1;
+[Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
+public string titledBoxItem2;
+
+// foldout
+[LayoutStart("Collapse", ELayout.CollapseBox)]
+public string collapseItem1;
+public string collapseItem2;
+
+[LayoutStart("Foldout", ELayout.FoldoutBox)]
+public string foldoutItem1;
+public string foldoutItem2;
+
+// tabs
+[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
+[LayoutStart("./Tab1")]
+public string tab1Item1;
+public int tab1Item2;
+
+[LayoutStart("../Tab2")]
+public string tab2Item1;
+public int tab2Item2;
+
+[LayoutStart("../Tab3")]
+public string tab3Item1;
+public int tab3Item2;
+
+// nested groups
+[LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
+public int nestedOne;
+
+[LayoutStart("./Nested Group 1", ELayout.TitleOut)]
+public int nestedTwo;
+public int nestedThree;
+
+[LayoutStart("./Nested Group 2", ELayout.TitleOut)]
+public int nestedFour;
+public string nestedFive;
+
+// Unlabeled Box
+[Layout("Unlabeled Box", ELayout.Background)]
+public int unlabeledBoxItem1, unlabeledBoxItem2;
+
+// Foldout In A Box
+[Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
+public int foldoutInABoxItem1, foldoutInABoxItem2;
+
+// Complex example. Button and ShowInInspector works too
+[Ordered]
+[Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
+[Layout("Root/V1")]
+[SepTitle("Basic", EColor.Pink)]
+public string hv1Item1;
+
+[Ordered]
+[Layout("Root/V1/buttons", ELayout.Horizontal)]
+[Button("Root/V1 Button1")]
+public void RootV1Button()
+{
+    Debug.Log("Root/V1 Button");
+}
+[Ordered]
+[Layout("Root/V1/buttons")]
+[Button("Root/V1 Button2")]
+public void RootV1Button2()
+{
+    Debug.Log("Root/V1 Button");
+}
+
+[Ordered]
+[Layout("Root/V1")]
+[ShowInInspector]
+public static Color color1 = Color.red;
+
+[Ordered]
+[DOTweenPlay("Tween1", "Root/V1")]
+public Tween RootV1Tween1()
+{
+    return DOTween.Sequence();
+}
+
+[Ordered]
+[DOTweenPlay("Tween2", "Root/V1")]
+public Tween RootV1Tween2()
+{
+    return DOTween.Sequence();
+}
+
+[Ordered]
+[Layout("Root/V1")]
+public string hv1Item2;
+
+// public string below;
+
+[Ordered]
+[Layout("Root/V2")]
+public string hv2Item1;
+
+[Ordered]
+[Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
+public string hv2Item2, hv2Item3;
+
+[Ordered]
+[Layout("Root/V2")]
+public string hv2Item4;
+
+[Ordered]
+[Layout("Root/V3", ELayout.Horizontal)]
+[ResizableTextArea, RichLabel(null)]
+public string hv3Item1, hv3Item2;
+
+[Ordered]
+[Layout("Root/Buggy")]
+[InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
+public string buggy = "See below:";
+
+[Ordered]
+[Layout("Root/Buggy/H", ELayout.Horizontal)]
+public string buggy1, buggy2, buggy3;
+
+[Ordered]
+[Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
+[Layout("Title+Tab/g1")]
+public string titleTabG11, titleTabG21;
+
+[Ordered]
+[Layout("Title+Tab/g2")]
+public string titleTabG12, titleTabG22;
+
+[Ordered]
+[Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
+[Layout("All Together/g1")]
+public string allTogetherG11, allTogetherG21;
+
+[Ordered]
+[Layout("All Together/g2")]
+public string allTogetherG12, allTogetherG22;
+```
+
+[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
+
+#### `LayoutStart` / `LayoutEnd` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
+
+`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
+
+For `LayoutStart`:
+
+*   `string groupBy` same as `Layout`
+*   `ELayout layout=0` same as `Layout`
+*   `float marginTop = -1f` same as `Layout`
+*   `float marginBottom = -1f` same as `Layout`
+
+For `LayoutEnd`:
+
+*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
+
+It supports `./SubGroup` to create a nested subgroup:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[LayoutStart("Root", ELayout.FoldoutBox)]
+public string root1;
+public string root2;
+
+[LayoutStart("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
+public string sub1;
+public string sub2;
+[LayoutEnd(".")]
+
+[LayoutStart("./Another", ELayout.FoldoutBox)]  // equals "Root/Another"
+public string another1;
+public string another2;
+
+[LayoutEnd(".")]  // equals "Root"
+public string root3;  // this should still belong to "Root"
+public string root4;
+
+[LayoutEnd]  // this should close any existing group
+public string outOfAll;
+
+[LayoutStart("Tabs", ELayout.Tab | ELayout.Collapse)]
+[LayoutStart("./Tab1")]
+public string tab1Item1;
+public int tab1Item2;
+[LayoutEnd(".")]
+
+[LayoutStart("./Tab2")]
+public string tab2Item1;
+public int tab2Item2;
+```
+
+![image](https://github.com/user-attachments/assets/ebd29cbe-cd84-4f76-8834-91d1ae44fd59)
+
+example of using `LayoutStart` with `LayoutEnd`:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public string beforeGroup;
+
+[LayoutStart("Group", ELayout.Background | ELayout.TitleOut)]
+public string group1;
+public string group2;  // starts from this will be automatically grouped into "Group"
+public string group3;
+
+[LayoutEnd("Group")]  // this will end the "Group"
+public string afterGroup;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ce1f52ce-9717-4929-95bf-a6dae580631e)
+
+example of using new group name to stop grouping:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public string breakBefore;
+
+[LayoutStart("break", ELayout.Background | ELayout.TitleOut)]
+public string breakGroup1;
+public string breakGroup2;
+
+// this group will stop the grouping of "break"
+[LayoutStart("breakIn", ELayout.Background | ELayout.TitleOut)]
+public string breakIn1;
+public string breakIn2;
+
+[LayoutStart("break")]  // this will be grouped into "break", and also end the "breakIn" group
+public string breakGroup3;
+public string breakGroup4;
+
+[LayoutEnd("break")]  // end, it will not be grouped
+public string breakAfter;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ab45aa2f-0dbb-44e4-be54-e17913e8aba9)
+
+example of using `keepGrouping: false` to stop grouping, but keep the last one in group:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public string beforeGroupLast;
+
+[LayoutStart("GroupLast")]
+public string groupLast1;
+public string groupLast2;
+public string groupLast3;
+[Layout("GroupLast", ELayout.Background | ELayout.TitleOut)]  // close this group, but be included
+public string groupLast4;
+
+public string afterGroupLast;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
 
 
 
@@ -2744,6 +3422,31 @@ public string alignField;
 ![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
 
 
+#### `ParticlePlay` ####
+
+A button to play a particle system of the field value, or the one on the field value.
+
+Unity allows play ParticleSystem in the editor, but only if you selected the target GameObject. It can only play one at a time.
+
+This decorator allows you to play multiple ParticleSystem as long as you have the expected fields.
+
+Parameters:
+
+*   `string groupBy = ""` for error grouping.
+
+*   Allow Multiple: No
+
+Note: because of the limitation from Unity, it can NOT detect if a `ParticleSystem` is finished playing
+
+```csharp
+[ParticlePlay] public ParticleSystem particle;
+// It also works if the field target has a particleSystem component
+[ParticlePlay, FieldType(typeof(ParticleSystem), false)] public GameObject particle2;
+```
+
+[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
+
+
 #### `ButtonAddOnClick` ####
 
 Add a callback to a button's `onClick` event. Note this at this point does only supports callback with no arguments.
@@ -2776,6 +3479,121 @@ private void OnClick()
 ```
 
 ![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
+
+#### `OnButtonClick` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+This is a method decorator, which will bind this method to the target button's click event.
+
+Parameters:
+
+*   `string buttonTarget=null` the target button. `null` to get it form the current target.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[OnButtonClick]
+public void OnButtonClickVoid()
+{
+    Debug.Log("OnButtonClick Void");
+}
+
+[OnButtonClick(value: 2)]
+public void OnButtonClickInt(int value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+[OnButtonClick(value: true)]
+public void OnButtonClickBool(bool value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+[OnButtonClick(value: 0.3f)]
+public void OnButtonClickFloat(float value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+private GameObject ThisGo => this.gameObject;
+
+[OnButtonClick(value: nameof(ThisGo), isCallback: true)]
+public void OnButtonClickComp(UnityEngine.Object value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/25c6b4fc-77f4-4731-a9a3-b84573fce179)
+
+Note:
+
+1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
+2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
+
+#### `OnEvent` ####
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
+This is a method decorator, which will bind this method to the target `UnityEvent` (allows generic type) invoke event.
+
+Parameters:
+
+*   `string eventTarget` the target `UnityEvent`. If you have dot in it, it will first find the field (or property/function), then find the target event on the found field using the name after the dot(s) recursively.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+Note:
+
+1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
+2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
+
+Example:
+
+```csharp
+public UnityEvent<int, int> intIntEvent;
+
+[OnEvent(nameof(intIntEvent))]
+public void OnInt2(int int1, int int2)  // dynamic parameter binding
+{
+}
+
+[OnEvent(nameof(intIntEvent), value: 1)]
+public void OnInt1(int int1)  // static parameter binding
+{
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/34db0516-6aad-4394-a6bc-e57bd97b6b57)
+
+Example of using dot(s):
+
+```csharp
+// CustomEventChild.cs
+public class CustomEventChild : MonoBehaviour
+{
+    [field: SerializeField] private UnityEvent<int> _intEvent;
+}
+
+// CustomEventExample.cs
+public class CustomEventExample : SaintsMonoBehaviour
+{
+    public CustomEventChild _child;
+
+    // it will find the `_intEvent` on the `_child` field
+    [OnEvent(nameof(_child) + "._intEvent")]
+    public void OnChildInt(int int1)
+    {
+    }
+}
+```
 
 ## Data Types ##
 
@@ -3037,34 +3855,13 @@ public int areaName;
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
 
-## SaintsEditor ##
 
-`SaintsEditor` is a `UnityEditor.Editor` level component.
-
-Namespace: `SaintsField.Playa`
-
-Compared with `NaughtyAttributes` and `MarkupAttributes`:
-
-1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`. It's IMGUI only.
-2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property. It's IMGUI only. It also supports shader editor.
-3.  `SaintsEditor`
-
-    *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). it has `LayoutGrooup`/`LayoutEnd` for convenience coding.
-    *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
-    *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
-    *   Supports both `UI Toolkit` and `IMGUI`.
-
-Please note, any `Editor` level component can not work together with each other (it will not cause trouble, but only one will actually work). Which means, `OdinInspector`, `NaughtyAttributes`, `MarkupAttributes`, `SaintsEditor` can not work together.
-
-If you are interested, here is how to use it.
-
-### Setup SaintsEditor ###
-
-`Window` - `Saints` - `Enable SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
-
-If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
+## DOTween ##
 
 ### `DOTweenPlay` ###
+
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
 
 A method decorator to play a `DOTween` animation returned by the method.
 
@@ -3121,6 +3918,9 @@ To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Cr
 
 ### `DOTweenPlayStart` / `DOTweenPlayEnd` ###
 
+> [!IMPORTANT]  
+> Enable `SaintsEditor` before using
+
 A convenient way to add many method to `DOTweenPlay`.
 
 ```csharp
@@ -3164,743 +3964,32 @@ public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be a
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
 
-### `Button` ###
+## SaintsEditor ##
 
-Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments.
+`SaintsEditor` is a `UnityEditor.Editor` level component.
 
-*   `string buttonLabel = null` the button label. If null, it'll use the function name.
+Namespace: `SaintsField.Playa`
 
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
+Compared with `NaughtyAttributes` and `MarkupAttributes`:
 
-[Button]
-private void EditorButton()
-{
-    Debug.Log("EditorButton");
-}
+1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`. It's IMGUI only.
+2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property. It's IMGUI only. It also supports shader editor.
+3.  `SaintsEditor`
 
-[Button("Label")]
-private void EditorLabeledButton()
-{
-    Debug.Log("EditorLabeledButton");
-}
-```
+    *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). it has `LayoutGrooup`/`LayoutEnd` for convenience coding.
+    *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
+    *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
+    *   Supports both `UI Toolkit` and `IMGUI`.
 
-![button](https://github.com/TylerTemp/SaintsField/assets/6391063/2f32336d-ca8b-46e0-9ac8-7bc44aada54b)
+Please note, any `Editor` level component can not work together with each other (it will not cause trouble, but only one will actually work). Which means, `OdinInspector`, `NaughtyAttributes`, `MarkupAttributes`, `SaintsEditor` can not work together.
 
-Example with arguments:
+If you are interested, here is how to use it.
 
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
+**Setup SaintsEditor**
 
-[Button]
-private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
-{
-    Debug.Log($"{myObj}, {myInt}, {myStr}");
-}
-```
+`Window` - `Saints` - `Enable SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/7a79ed1f-e227-4cf4-8885-e2ea81f4df3a)
-
-### `ShowInInspector` ###
-
-Show a non-field property.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-// const
-[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
-// static
-[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
-
-// auto-property
-[ShowInInspector, Ordered]
-public Color AutoColor
-{
-    get => Color.green;
-    set {}
-}
-```
-
-![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
-
-### `Ordered` ###
-
-`SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
-
-Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Ordered] public string myStartField;
-
-[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
-[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
-
-[ShowInInspector, Ordered]
-public Color AutoColor
-{
-    get => Color.green;
-    set {}
-}
-
-[Button, Ordered]
-private void EditorButton()
-{
-    Debug.Log("EditorButton");
-}
-
-[Ordered] public string myOtherFieldUnderneath;
-```
-
-![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
-
-### `Layout` ###
-
-A layout decorator to group fields.
-
-*   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
-*   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
-*   `bool keepGrouping=false`: See `LayoutStart` below
-*   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
-*   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
-
-Options are:
-
-*   `Vertical`
-*   `Horizontal`
-*   `Background` draw a background color for the whole group
-*   `Title` show the title
-*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw an separator between title and the rest of the content.
-    On `UI Toolkit` it will draw a background color for the title.
-*   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
-*   `Collapse` Same as `Foldout` but is collapsed by default.
-*   `Tab` make this group a tab page separated rather than grouping it
-*   `TitleBox` = `Background | Title | TitleOut`
-*   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
-*   `CollapseBox` = `Background | Title | TitleOut | Collapse`
-
-**Known Issue**
-
-`Horizental` style is buggy, for the following reasons:
-
-1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
-2.  On UI Toolkit we have the well-behaved layout system, but because Unity will try to align the first label, all the field except the first one will get the super-shrank label width which makes it unreadable.
-
-![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
-
-**Appearance**
-
-![layout](https://github.com/user-attachments/assets/1e2e6dfa-85a9-4225-ac8f-8beefc26ae52)
-
-**Example**
-
-```csharp
-using SaintsField;
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Layout("Titled", ELayout.Title | ELayout.TitleOut)]
-public string titledItem1, titledItem2;
-
-// title
-[Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
-public string titledBoxItem1;
-[Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
-public string titledBoxItem2;
-
-// foldout
-[LayoutStart("Collapse", ELayout.CollapseBox)]
-public string collapseItem1;
-public string collapseItem2;
-
-[LayoutStart("Foldout", ELayout.FoldoutBox)]
-public string foldoutItem1;
-public string foldoutItem2;
-
-// tabs
-[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutStart("./Tab1")]
-public string tab1Item1;
-public int tab1Item2;
-
-[LayoutStart("../Tab2")]
-public string tab2Item1;
-public int tab2Item2;
-
-[LayoutStart("../Tab3")]
-public string tab3Item1;
-public int tab3Item2;
-
-// nested groups
-[LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
-public int nestedOne;
-
-[LayoutStart("./Nested Group 1", ELayout.TitleOut)]
-public int nestedTwo;
-public int nestedThree;
-
-[LayoutStart("./Nested Group 2", ELayout.TitleOut)]
-public int nestedFour;
-public string nestedFive;
-
-// Unlabeled Box
-[Layout("Unlabeled Box", ELayout.Background)]
-public int unlabeledBoxItem1, unlabeledBoxItem2;
-
-// Foldout In A Box
-[Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
-public int foldoutInABoxItem1, foldoutInABoxItem2;
-
-// Complex example. Button and ShowInInspector works too
-[Ordered]
-[Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
-[Layout("Root/V1")]
-[SepTitle("Basic", EColor.Pink)]
-public string hv1Item1;
-
-[Ordered]
-[Layout("Root/V1/buttons", ELayout.Horizontal)]
-[Button("Root/V1 Button1")]
-public void RootV1Button()
-{
-    Debug.Log("Root/V1 Button");
-}
-[Ordered]
-[Layout("Root/V1/buttons")]
-[Button("Root/V1 Button2")]
-public void RootV1Button2()
-{
-    Debug.Log("Root/V1 Button");
-}
-
-[Ordered]
-[Layout("Root/V1")]
-[ShowInInspector]
-public static Color color1 = Color.red;
-
-[Ordered]
-[DOTweenPlay("Tween1", "Root/V1")]
-public Tween RootV1Tween1()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[DOTweenPlay("Tween2", "Root/V1")]
-public Tween RootV1Tween2()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[Layout("Root/V1")]
-public string hv1Item2;
-
-// public string below;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item1;
-
-[Ordered]
-[Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
-public string hv2Item2, hv2Item3;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item4;
-
-[Ordered]
-[Layout("Root/V3", ELayout.Horizontal)]
-[ResizableTextArea, RichLabel(null)]
-public string hv3Item1, hv3Item2;
-
-[Ordered]
-[Layout("Root/Buggy")]
-[InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
-public string buggy = "See below:";
-
-[Ordered]
-[Layout("Root/Buggy/H", ELayout.Horizontal)]
-public string buggy1, buggy2, buggy3;
-
-[Ordered]
-[Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
-[Layout("Title+Tab/g1")]
-public string titleTabG11, titleTabG21;
-
-[Ordered]
-[Layout("Title+Tab/g2")]
-public string titleTabG12, titleTabG22;
-
-[Ordered]
-[Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
-[Layout("All Together/g1")]
-public string allTogetherG11, allTogetherG21;
-
-[Ordered]
-[Layout("All Together/g2")]
-public string allTogetherG12, allTogetherG22;
-```
-
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
-
-### `LayoutStart` / `LayoutEnd` ###
-
-`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
-
-`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
-
-For `LayoutStart`:
-
-*   `string groupBy` same as `Layout`
-*   `ELayout layout=0` same as `Layout`
-*   `float marginTop = -1f` same as `Layout`
-*   `float marginBottom = -1f` same as `Layout`
-
-For `LayoutEnd`:
-
-*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
-
-It supports `./SubGroup` to create a nested subgroup:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[LayoutStart("Root", ELayout.FoldoutBox)]
-public string root1;
-public string root2;
-
-[LayoutStart("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
-public string sub1;
-public string sub2;
-[LayoutEnd(".")]
-
-[LayoutStart("./Another", ELayout.FoldoutBox)]  // equals "Root/Another"
-public string another1;
-public string another2;
-
-[LayoutEnd(".")]  // equals "Root"
-public string root3;  // this should still belong to "Root"
-public string root4;
-
-[LayoutEnd]  // this should close any existing group
-public string outOfAll;
-
-[LayoutStart("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutStart("./Tab1")]
-public string tab1Item1;
-public int tab1Item2;
-[LayoutEnd(".")]
-
-[LayoutStart("./Tab2")]
-public string tab2Item1;
-public int tab2Item2;
-```
-
-![image](https://github.com/user-attachments/assets/ebd29cbe-cd84-4f76-8834-91d1ae44fd59)
-
-example of using `LayoutStart` with `LayoutEnd`:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public string beforeGroup;
-
-[LayoutStart("Group", ELayout.Background | ELayout.TitleOut)]
-public string group1;
-public string group2;  // starts from this will be automatically grouped into "Group"
-public string group3;
-
-[LayoutEnd("Group")]  // this will end the "Group"
-public string afterGroup;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ce1f52ce-9717-4929-95bf-a6dae580631e)
-
-example of using new group name to stop grouping:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public string breakBefore;
-
-[LayoutStart("break", ELayout.Background | ELayout.TitleOut)]
-public string breakGroup1;
-public string breakGroup2;
-
-// this group will stop the grouping of "break"
-[LayoutStart("breakIn", ELayout.Background | ELayout.TitleOut)]
-public string breakIn1;
-public string breakIn2;
-
-[LayoutStart("break")]  // this will be grouped into "break", and also end the "breakIn" group
-public string breakGroup3;
-public string breakGroup4;
-
-[LayoutEnd("break")]  // end, it will not be grouped
-public string breakAfter;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ab45aa2f-0dbb-44e4-be54-e17913e8aba9)
-
-example of using `keepGrouping: false` to stop grouping, but keep the last one in group:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public string beforeGroupLast;
-
-[LayoutStart("GroupLast")]
-public string groupLast1;
-public string groupLast2;
-public string groupLast3;
-[Layout("GroupLast", ELayout.Background | ELayout.TitleOut)]  // close this group, but be included
-public string groupLast4;
-
-public string afterGroupLast;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
-
-### `PlayaShowIf`/`PlayaHideIf` ###
-
-This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
-
-Different from `ShowIf`/`HideIf`:
-1.  apply on an array will directly show or hide the array itself, rather than each element.
-2.  Callback function can not receive value and index
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public bool boolValue;
-
-[PlayaHideIf] public int[] justHide;
-[PlayaShowIf] public int[] justShow;
-
-[PlayaHideIf(nameof(boolValue))] public int[] hideIf;
-[PlayaShowIf(nameof(boolValue))] public int[] showIf;
-
-[PlayaHideIf(EMode.Edit)] public int[] hideEdit;
-[PlayaHideIf(EMode.Play)] public int[] hidePlay;
-[PlayaShowIf(EMode.Edit)] public int[] showEdit;
-[PlayaShowIf(EMode.Play)] public int[] showPlay;
-
-[ShowInInspector, PlayaHideIf(nameof(boolValue))] public const float HideIfConst = 3.14f;
-[ShowInInspector, PlayaShowIf(nameof(boolValue))] public const float ShowIfConst = 3.14f;
-[ShowInInspector, PlayaHideIf(EMode.Edit)] public const float HideEditConst = 3.14f;
-[ShowInInspector, PlayaHideIf(EMode.Play)] public const float HidePlayConst = 3.14f;
-[ShowInInspector, PlayaShowIf(EMode.Edit)] public const float ShowEditConst = 3.14f;
-[ShowInInspector, PlayaShowIf(EMode.Play)] public const float ShowPlayConst = 3.14f;
-
-[ShowInInspector, PlayaHideIf(nameof(boolValue))] public static readonly Color HideIfStatic = Color.green;
-[ShowInInspector, PlayaShowIf(nameof(boolValue))] public static readonly Color ShowIfStatic = Color.green;
-[ShowInInspector, PlayaHideIf(EMode.Edit)] public static readonly Color HideEditStatic = Color.green;
-[ShowInInspector, PlayaHideIf(EMode.Play)] public static readonly Color HidePlayStatic = Color.green;
-[ShowInInspector, PlayaShowIf(EMode.Edit)] public static readonly Color ShowEditStatic = Color.green;
-[ShowInInspector, PlayaShowIf(EMode.Play)] public static readonly Color ShowPlayStatic = Color.green;
-
-[Button, PlayaHideIf(nameof(boolValue))] private void HideIfBtn() => Debug.Log("HideIfBtn");
-[Button, PlayaShowIf(nameof(boolValue))] private void ShowIfBtn() => Debug.Log("ShowIfBtn");
-[Button, PlayaHideIf(EMode.Edit)] private void HideEditBtn() => Debug.Log("HideEditBtn");
-[Button, PlayaHideIf(EMode.Play)] private void HidePlayBtn() => Debug.Log("HidePlayBtn");
-[Button, PlayaShowIf(EMode.Edit)] private void ShowEditBtn() => Debug.Log("ShowEditBtn");
-[Button, PlayaShowIf(EMode.Play)] private void ShowPlayBtn() => Debug.Log("ShowPlayBtn");
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
-
-It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
-
-### `PlayaEnableIf`/`PlayaDisableIf` ###
-
-This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
-
-Different from `EnableIf`/`DisableIf` in the following:
-1.  apply on an array will directly enable or disable the array itself, rather than each element.
-2.  Callback function can not receive value and index
-3.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[PlayaDisableIf] public int[] justDisable;
-[PlayaEnableIf] public int[] justEnable;
-
-[PlayaDisableIf(nameof(boolValue))] public int[] disableIf;
-[PlayaEnableIf(nameof(boolValue))] public int[] enableIf;
-
-[PlayaDisableIf(EMode.Edit)] public int[] disableEdit;
-[PlayaDisableIf(EMode.Play)] public int[] disablePlay;
-[PlayaEnableIf(EMode.Edit)] public int[] enableEdit;
-[PlayaEnableIf(EMode.Play)] public int[] enablePlay;
-
-[Button, PlayaDisableIf(nameof(boolValue))] private void DisableIfBtn() => Debug.Log("DisableIfBtn");
-[Button, PlayaEnableIf(nameof(boolValue))] private void EnableIfBtn() => Debug.Log("EnableIfBtn");
-[Button, PlayaDisableIf(EMode.Edit)] private void DisableEditBtn() => Debug.Log("DisableEditBtn");
-[Button, PlayaDisableIf(EMode.Play)] private void DisablePlayBtn() => Debug.Log("DisablePlayBtn");
-[Button, PlayaEnableIf(EMode.Edit)] private void EnableEditBtn() => Debug.Log("EnableEditBtn");
-[Button, PlayaEnableIf(EMode.Play)] private void EnablePlayBtn() => Debug.Log("EnablePlayBtn");
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
-
-It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
-
-### `PlayaArraySize` ###
-
-**Deprecated**. Use `ArraySize` instead.
-
-### `PlayaRichLabel` ###
-
-This is like `RichLabel`, but it can change label of an array/list
-
-Please note: at the moment it only works for serialized property, and is only tested on array/list. It's suggested to use `RichLabel` for non-array/list
-serialized fields.
-
-Parameters:
-
-*   `string richTextXml` the rich text xml for the label. Note: custom rich label tag created by this project only works in UI Toolkit mode.
-*   `bool isCallback=false` if it's a callback (a method/property/field)
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[PlayaRichLabel("<color=lame>It's Labeled!")]
-public List<string> myList;
-
-[PlayaRichLabel(nameof(MethodLabel), true)]
-public string[] myArray;
-
-private string MethodLabel(string[] values)
-{
-    return $"<color=green><label /> {string.Join("", values.Select(_ => "<icon=star.png />"))}";
-}
-```
-
-![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
-
-### `PlayaInfoBox`/`PlayaBelowInfoBox` ###
-
-This is like `InfoBox`, but it can be applied to array/list/button etc.
-
-*   `string content`
-
-    The content of the info box.
-
-    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
-
-*   `EMessageType messageType=EMessageType.Info`
-
-    Message icon. Options are
-
-    *   `None`
-    *   `Info`
-    *   `Warning`
-    *   `Error`
-
-*   `string show=null`
-
-    a callback name or property name for show or hide this info box.
-
-*   `bool isCallback=false`
-
-    if true, the `content` will be interpreted as a property/callback function.
-
-    If the value (or returned value) is a string, then the content will be changed
-
-    If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
-
-*   `bool below=false`
-
-    Draw the info box below the field instead of above
-
-*   `string groupBy=""` See `GroupBy` section
-
-*   AllowMultiple: Yes
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
-[PlayaBelowInfoBox("$" + nameof(DynamicFromArray))]  // callback
-public string[] strings = {};
-
-public string dynamic;
-
-private string DynamicFromArray(string[] value) => value.Length > 0? string.Join("\n", value): "null";
-
-[PlayaInfoBox("MethodWithButton")]
-[Button("Click Me!")]
-[PlayaBelowInfoBox("GroupExample", groupBy: "group")]
-[PlayaBelowInfoBox("$" + nameof(dynamic), groupBy: "group")]
-public void MethodWithButton()
-{
-}
-
-[PlayaInfoBox("Method")]
-[PlayaBelowInfoBox("$" + nameof(dynamic))]
-public void Method()
-{
-}
-```
-
-![image](https://github.com/user-attachments/assets/81d82ee4-4f8d-4ae3-bae5-dcb13d3af7c5)
-
-### `OnButtonClick` ###
-
-This is a method decorator, which will bind this method to the target button's click event.
-
-Parameters:
-
-*   `string buttonTarget=null` the target button. `null` to get it form the current target.
-*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
-*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[OnButtonClick]
-public void OnButtonClickVoid()
-{
-    Debug.Log("OnButtonClick Void");
-}
-
-[OnButtonClick(value: 2)]
-public void OnButtonClickInt(int value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-
-[OnButtonClick(value: true)]
-public void OnButtonClickBool(bool value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-
-[OnButtonClick(value: 0.3f)]
-public void OnButtonClickFloat(float value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-
-private GameObject ThisGo => this.gameObject;
-
-[OnButtonClick(value: nameof(ThisGo), isCallback: true)]
-public void OnButtonClickComp(UnityEngine.Object value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/25c6b4fc-77f4-4731-a9a3-b84573fce179)
-
-Note:
-
-1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
-2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
-
-### `OnEvent` ###
-
-This is a method decorator, which will bind this method to the target `UnityEvent` (allows generic type) invoke event.
-
-Parameters:
-
-*   `string eventTarget` the target `UnityEvent`. If you have dot in it, it will first find the field (or property/function), then find the target event on the found field using the name after the dot(s) recursively.
-*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
-*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
-
-Note:
-
-1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
-2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
-
-Example:
-
-```csharp
-public UnityEvent<int, int> intIntEvent;
-
-[OnEvent(nameof(intIntEvent))]
-public void OnInt2(int int1, int int2)  // dynamic parameter binding
-{
-}
-
-[OnEvent(nameof(intIntEvent), value: 1)]
-public void OnInt1(int int1)  // static parameter binding
-{
-}
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/34db0516-6aad-4394-a6bc-e57bd97b6b57)
-
-Example of using dot(s):
-
-```csharp
-// CustomEventChild.cs
-public class CustomEventChild : MonoBehaviour
-{
-    [field: SerializeField] private UnityEvent<int> _intEvent;
-}
-
-// CustomEventExample.cs
-public class CustomEventExample : SaintsMonoBehaviour
-{
-    public CustomEventChild _child;
-
-    // it will find the `_intEvent` on the `_child` field
-    [OnEvent(nameof(_child) + "._intEvent")]
-    public void OnChildInt(int int1)
-    {
-    }
-}
-```
-
-### `ListDrawerSettings` ###
-
-Allow you to search and paging a large list/array.
-
-Parameters:
-
-*   `bool searchable = false`: allow search in the list/array
-*   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Serializable]
-public struct MyData
-{
-    public int myInt;
-    public string myString;
-    public GameObject myGameObject;
-    public string[] myStrings;
-}
-
-[ListDrawerSettings(searchable: true, numberOfItemsPerPage: 3)]
-public MyData[] myDataArr;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/08c6da9a-e613-4e94-8933-3d7a92f7cb33)
-
-The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
+If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
 ## Misc ##
 
