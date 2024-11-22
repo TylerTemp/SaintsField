@@ -349,20 +349,21 @@ namespace SaintsField.Editor.Drawers
             // Debug.Log(property.propertyPath);
             // var s = property.propertyPath;
 
-//             object managedReference;
-//             try
-//             {
-//                 managedReference = property.managedReferenceValue;
-//             }
-//             catch (Exception e) when (e is ObjectDisposedException || e is NullReferenceException || e is InvalidOperationException)
-//             {
-// #if SAINTSFIELD_DEBUG
-//                 Debug.LogException(e);
-// #endif
-//                 return;
-//             }
+            object managedReference;
+            try
+            {
+                managedReference = property.managedReferenceValue;
+            }
+            // ReSharper disable once MergeIntoLogicalPattern
+            catch (Exception e) when (e is ObjectDisposedException || e is NullReferenceException || e is InvalidOperationException)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning(e);
+#endif
+                return;
+            }
 
-            UpdateLabel(property, container, property.managedReferenceValue);
+            UpdateLabel(property, container, managedReference);
         }
 
         private static void PropSetValue(VisualElement container, SerializedProperty property, object newValue)
