@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 
         public void SizeChanged(IReadOnlyList<MyClass> myClassNewValues)
         {
-            Debug.Log($"OnArraySizeChanged: {string.Join("; ", myClassNewValues.Select(each => each?.unique))}");
+            Debug.Log($"OnArraySizeChanged {myClassNewValues.Count}: {string.Join("; ", myClassNewValues.Select(each => each?.unique))}");
         }
 
 #if UNITY_2021_3_OR_NEWER

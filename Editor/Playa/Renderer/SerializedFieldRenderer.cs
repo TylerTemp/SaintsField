@@ -23,6 +23,80 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
+        private static void InvokeCallback(string callback, object newValue, object parent)
+        {
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
+            types.Reverse();
+
+            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+            foreach (Type type in types)
+            {
+                MethodInfo methodInfo = type.GetMethod(callback, bindAttr);
+                if (methodInfo == null)
+                {
+                    continue;
+                }
+
+                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                {
+                    newValue,
+                });
+
+                try
+                {
+                    methodInfo.Invoke(parent, passParams);
+                }
+                catch (TargetInvocationException e)
+                {
+                    Debug.LogException(e);
+                    // Debug.Assert(e.InnerException != null);
+                    // return e.InnerException?.Message ?? e.Message;
+                    return;
+                }
+                catch (InvalidCastException e)
+                {
+                    Debug.LogException(e);
+                    // return e.Message;
+                    return;
+                }
+                catch (Exception e)
+                {
+                    // _error = e.Message;
+                    Debug.LogException(e);
+                    // return e.Message;
+                    return;
+                }
+
+                // return "";
+                return;
+            }
+
+            string error = $"No field or method named `{callback}` found on `{parent}`";
+            Debug.LogError(error);
+        }
+
+        private static void InvokeArraySizeCallback(string callback, SerializedProperty property, MemberInfo memberInfo)
+        {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning("Property disposed unexpectedly");
+                return;
+            }
+
+            (string error, int _, object newValue) = Util.GetValue(property, memberInfo, parent);
+            if (error != "")
+            {
+                Debug.LogError(error);
+                return;
+            }
+
+            InvokeCallback(callback, newValue, parent);
+
+        }
+
         #region UI Toolkit
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
@@ -121,78 +195,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
 
                 arraySize = newSize;
-
-                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                if (parent == null)
-                {
-                    Debug.LogWarning("Property disposed unexpectedly");
-                    return;
-                }
-
-                (string error, int _, object newValue) = Util.GetValue(property, memberInfo, parent);
-                if (error != "")
-                {
-                    Debug.LogError(error);
-                    return;
-                }
-
-                InvokeCallback(callback, newValue, parent);
-
+                InvokeArraySizeCallback(callback, property, memberInfo);
             });
-        }
-
-        private static void InvokeCallback(string callback, object newValue, object parent)
-        {
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
-            types.Reverse();
-
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
-
-            foreach (Type type in types)
-            {
-                MethodInfo methodInfo = type.GetMethod(callback, bindAttr);
-                if (methodInfo == null)
-                {
-                    continue;
-                }
-
-                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
-                {
-                    newValue,
-                });
-
-                try
-                {
-                    methodInfo.Invoke(parent, passParams);
-                }
-                catch (TargetInvocationException e)
-                {
-                    Debug.LogException(e);
-                    // Debug.Assert(e.InnerException != null);
-                    // return e.InnerException?.Message ?? e.Message;
-                    return;
-                }
-                catch (InvalidCastException e)
-                {
-                    Debug.LogException(e);
-                    // return e.Message;
-                    return;
-                }
-                catch (Exception e)
-                {
-                    // _error = e.Message;
-                    Debug.LogException(e);
-                    // return e.Message;
-                    return;
-                }
-
-                // return "";
-                return;
-            }
-
-            string error = $"No field or method named `{callback}` found on `{parent}`";
-            Debug.LogError(error);
         }
 
         private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, int minSize, int maxSize)
@@ -632,6 +636,15 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
+            bool isArray = FieldWithInfo.SerializedProperty.isArray;
+            OnArraySizeChangedAttribute onArraySizeChangedAttribute =
+                FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
+            int arraySize = -1;
+            if (isArray && onArraySizeChangedAttribute != null)
+            {
+                arraySize = FieldWithInfo.SerializedProperty.arraySize;
+            }
+
             if (preCheckResult.ArraySize != -1 && (
                     (preCheckResult.ArraySize == 0 && FieldWithInfo.SerializedProperty.arraySize > 0)
                     || (preCheckResult.ArraySize > 0 && FieldWithInfo.SerializedProperty.arraySize == 0)
@@ -656,7 +669,19 @@ namespace SaintsField.Editor.Playa.Renderer
                 float listDrawerHeight = GetHeightIMGUI(rect.width);
                 Rect position = GUILayoutUtility.GetRect(0, listDrawerHeight);
                 ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
-                DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
+                    if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
+                       arraySize != FieldWithInfo.SerializedProperty.arraySize)
+                    {
+                        FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                        InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
+                            FieldWithInfo.SerializedProperty,
+                            (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+                    }
+
+                }
                 return;
             }
 
@@ -664,7 +689,21 @@ namespace SaintsField.Editor.Playa.Renderer
                 ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length))
                 : new GUIContent(FieldWithInfo.SerializedProperty.displayName);
 
-            EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent, GUILayout.ExpandWidth(true));
+            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            {
+                EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent,
+                    GUILayout.ExpandWidth(true));
+
+                if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
+                   arraySize != FieldWithInfo.SerializedProperty.arraySize)
+                {
+                    // Debug.Log("size changed");
+                    FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                    InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
+                        FieldWithInfo.SerializedProperty,
+                        (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+                }
+            }
 
             if (preCheckResult.HasRichLabel)
             {
@@ -764,6 +803,15 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
         {
+            bool isArray = FieldWithInfo.SerializedProperty.isArray;
+            OnArraySizeChangedAttribute onArraySizeChangedAttribute =
+                FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
+            int arraySize = -1;
+            if (isArray && onArraySizeChangedAttribute != null)
+            {
+                arraySize = FieldWithInfo.SerializedProperty.arraySize;
+            }
+
             if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
             {
                 FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
@@ -780,7 +828,19 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     _imGuiListInfo.PreCheckResult = preCheckResult;
                     ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
-                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
+                    // ReSharper disable once ConvertToUsingDeclaration
+                    using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                    {
+                        DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
+                        if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
+                           arraySize != FieldWithInfo.SerializedProperty.arraySize)
+                        {
+                            FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                            InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
+                                FieldWithInfo.SerializedProperty,
+                                (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+                        }
+                    }
                     return;
                 }
 
@@ -788,7 +848,18 @@ namespace SaintsField.Editor.Playa.Renderer
                     ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length), tooltip: FieldWithInfo.SerializedProperty.tooltip)
                     : new GUIContent(FieldWithInfo.SerializedProperty.displayName, tooltip: FieldWithInfo.SerializedProperty.tooltip);
 
-                EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, useGUIContent, true);
+                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, useGUIContent, true);
+                    if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
+                       arraySize != FieldWithInfo.SerializedProperty.arraySize)
+                    {
+                        FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                        InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
+                            FieldWithInfo.SerializedProperty,
+                            (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+                    }
+                }
 
                 #region RichLabel
                 if (preCheckResult.HasRichLabel)
@@ -822,7 +893,6 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             // EditorGUI.DrawRect(position, Color.blue);
         }
-
         private class UnsetGuiStyleFixedHeight : IDisposable
         {
             private readonly GUIStyle _guiStyle;
