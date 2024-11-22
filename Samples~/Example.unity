@@ -15173,33 +15173,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1484731013}
-  - component: {fileID: 1484731012}
+  - component: {fileID: 1484731014}
   m_Layer: 0
-  m_Name: Onchanged
+  m_Name: OnValueChanged
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1484731012
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1484731011}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 285828b4b0a19cb46804e478c7f9acf0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dir: -51
-  value: 39
-  go: {fileID: 1830778823}
-  srs:
-  - {fileID: 579857408}
-  numbers: 
-  changedInfo: 
 --- !u!4 &1484731013
 Transform:
   m_ObjectHideFlags: 0
@@ -15215,6 +15196,48 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1484731014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484731011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 285828b4b0a19cb46804e478c7f9acf0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dir: 0
+  value: 0
+  go: {fileID: 0}
+  srs: []
+  numbers: 84ffffff
+  changedInfo: '[0] changed to -124'
+  myStruct:
+    v: 104
+  myStructs:
+  - v: 114
+  structInter:
+    rid: 7411922737504452620
+  structInters:
+  - rid: 7411922737504452618
+  - rid: 7411922737504452619
+  references:
+    version: 2
+    RefIds:
+    - rid: 7411922737504452618
+      type: {class: OnValueChangedExample/ClassInter, ns: SaintsField.Samples.Scripts, asm: today.comes.saintsfield.Samples}
+      data:
+        v: 37
+    - rid: 7411922737504452619
+      type: {class: OnValueChangedExample/StructInter, ns: SaintsField.Samples.Scripts, asm: today.comes.saintsfield.Samples}
+      data:
+        v: -28
+    - rid: 7411922737504452620
+      type: {class: OnValueChangedExample/ClassInter, ns: SaintsField.Samples.Scripts, asm: today.comes.saintsfield.Samples}
+      data:
+        v: 153
 --- !u!1 &1486592966
 GameObject:
   m_ObjectHideFlags: 0

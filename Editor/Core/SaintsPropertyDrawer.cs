@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
@@ -1866,6 +1867,8 @@ namespace SaintsField.Editor.Core
             throw new NotImplementedException();
         }
 
+        // for SerializeReference, and general class/struct, we need to manually tracking the changed properties.
+
         // ReSharper disable once UnusedMember.Local
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
             object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
@@ -1878,6 +1881,10 @@ namespace SaintsField.Editor.Core
                 string _ = property.propertyPath;
             }
             catch (ObjectDisposedException)
+            {
+                return;
+            }
+            catch (NullReferenceException)
             {
                 return;
             }
@@ -1956,45 +1963,100 @@ namespace SaintsField.Editor.Core
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();
                 fallbackField.BindProperty(property);
-                // fallbackField.TrackPropertyValue(property, prop =>
+#if UNITY_2021_3_OR_NEWER
+                HashSet<string> _trackedSubPropertyNames = new HashSet<string>();
+                bool isReference = property.propertyType == SerializedPropertyType.ManagedReference;
+#endif
+
+                fallbackField.TrackPropertyValue(property, prop =>
+                {
+                    object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(prop).parent;
+                    if (noCacheParent == null)
+                    {
+                        Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
+                        return;
+                    }
+                    (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
+                    if (error == "")
+                    {
+                        onValueChangedCallback(curValue);
+                    }
+
+#if UNITY_2021_3_OR_NEWER
+                    if(isReference)
+                    {
+                        TrackPropertyManagedUIToolkit(_trackedSubPropertyNames, onValueChangedCallback, prop, prop, fieldInfo, fallbackField,
+                            noCacheParent);
+                    }
+#endif
+                });
+#if UNITY_2021_3_OR_NEWER
+                if(isReference)
+                {
+                    TrackPropertyManagedUIToolkit(_trackedSubPropertyNames, onValueChangedCallback, property, property, fieldInfo, fallbackField, parent);
+                }
+#endif
+
+                // this does not work on some unity version, e.g. 2022.3.14f1
+                // fallbackField.RegisterValueChangeCallback(evt =>
                 // {
-                //     object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(prop).parent;
-                //     if (noCacheParent == null)
+                //     SerializedProperty prop = evt.changedProperty;
+                //     if(SerializedProperty.EqualContents(prop, property))
                 //     {
-                //         Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
-                //         return;
-                //     }
-                //     (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
-                //     if (error == "")
-                //     {
-                //         onValueChangedCallback(curValue);
+                //         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                //         if (noCacheParent == null)
+                //         {
+                //             Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
+                //             return;
+                //         }
+                //         (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
+                //         if (error == "")
+                //         {
+                //             onValueChangedCallback(curValue);
+                //         }
                 //     }
                 // });
-                // this does not work on some unity version, e.g. 2022.3.14f1
-                fallbackField.RegisterValueChangeCallback(evt =>
-                {
-                    SerializedProperty prop = evt.changedProperty;
-                    if(SerializedProperty.EqualContents(prop, property))
-                    {
-                        object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                        if (noCacheParent == null)
-                        {
-                            Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
-                            return;
-                        }
-                        (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
-                        if (error == "")
-                        {
-                            onValueChangedCallback(curValue);
-                        }
-                    }
-                });
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
             }
             else
             {
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
             }
+        }
+
+        private static void TrackPropertyManagedUIToolkit(HashSet<string> trackedSubPropertyNames, Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, SerializedProperty getValueProperty, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
+        {
+#if UNITY_2021_3_OR_NEWER
+            foreach ((string name, SerializedProperty subProperty) in SaintsRowAttributeDrawer.GetSerializableFieldInfo(watchSubProperty))
+            {
+                if (!trackedSubPropertyNames.Add(name))
+                {
+                    continue;
+                }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                Debug.Log($"Add sub track: {name}/{trackedSubPropertyNames.Count}");
+#endif
+                tracker.TrackPropertyValue(subProperty,
+                    _ =>
+                    {
+                        // object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(p).parent;
+                        (string subError, int _, object subValue) = Util.GetValue(getValueProperty, memberInfo, newFetchParent);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER || true
+                        if (subError != "")
+                        {
+                            Debug.LogError(subError);
+                        }
+#endif
+
+                        if (subError == "")
+                        {
+                            // ReSharper disable once RedundantAssignment
+                            onValueChangedCallback(subValue);
+                        }
+                    });
+            }
+#endif
         }
 
         private void OnAwakeReady(SerializedProperty property, VisualElement containerElement,
@@ -2056,6 +2118,10 @@ namespace SaintsField.Editor.Core
                 string _ = property.propertyPath;
             }
             catch (ObjectDisposedException)
+            {
+                return;
+            }
+            catch (NullReferenceException)
             {
                 return;
             }
