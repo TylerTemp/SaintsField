@@ -300,7 +300,7 @@ public string TakeAGuess()
 
 #### `PlayaRichLabel` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 This is like `RichLabel`, but it can change label of an array/list
@@ -398,7 +398,7 @@ private string DynamicMessage() => _content ? "False" : "True";
 
 #### `PlayaInfoBox`/`PlayaBelowInfoBox` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 This is like `InfoBox`, but it can be applied to array/list/button etc.
@@ -643,9 +643,9 @@ private void Toggle() => _errorOut = !_errorOut;
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
 
 
-### `Button` ###
+#### `Button` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments.
@@ -1131,7 +1131,7 @@ public class MySaintsRowAttributeDrawer: SaintsRowAttributeDrawer {}
 
 #### `ListDrawerSettings` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 Allow you to search and paging a large list/array.
@@ -1165,7 +1165,7 @@ The first input is where you can search. The next input can adjust how many item
 
 #### `ShowInInspector` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 Show a non-field property.
@@ -1930,7 +1930,7 @@ private void ChangedAnyType(object anyObj, int index=-1)
 
 #### `OnArraySizeChanged` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 `OnValueChanged` can not detect if an array/list is changed in size. `OnArraySizeChanged` attribute will call a callback for that.
@@ -2104,7 +2104,7 @@ It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value 
 
 #### `PlayaEnableIf`/`PlayaDisableIf` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
@@ -2298,7 +2298,7 @@ It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value 
 
 #### `PlayaShowIf`/`PlayaHideIf` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
@@ -2573,7 +2573,7 @@ public string[] myArr;
 
 #### `Ordered` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 `SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
@@ -2609,7 +2609,7 @@ private void EditorButton()
 
 #### `Layout` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 A layout decorator to group fields.
@@ -2803,7 +2803,7 @@ public string allTogetherG12, allTogetherG22;
 
 #### `LayoutStart` / `LayoutEnd` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 `LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
@@ -3505,7 +3505,7 @@ private void OnClick()
 
 #### `OnButtonClick` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 This is a method decorator, which will bind this method to the target button's click event.
@@ -3562,7 +3562,7 @@ Note:
 
 #### `OnEvent` ####
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 This is a method decorator, which will bind this method to the target `UnityEvent` (allows generic type) invoke event.
@@ -3883,7 +3883,7 @@ public int areaName;
 
 ### `DOTweenPlay` ###
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 A method decorator to play a `DOTween` animation returned by the method.
@@ -3941,7 +3941,7 @@ To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Cr
 
 ### `DOTweenPlayStart` / `DOTweenPlayEnd` ###
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 A convenient way to add many method to `DOTweenPlay`.
