@@ -146,7 +146,9 @@ namespace SaintsField.Editor.Drawers
             object newValue)
         {
             // Debug.Log($"OK I got a new value {newValue}; {this}");
-            string error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, newValue, SerializedUtils.PropertyPathIndex(property.propertyPath), parent);
+            string propPath = property.propertyPath;
+            int propIndex = SerializedUtils.PropertyPathIndex(propPath);
+            string error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, newValue, propIndex, parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             helpBox.text = error;
             helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
