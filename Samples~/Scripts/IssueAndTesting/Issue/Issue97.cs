@@ -48,7 +48,17 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             public string myString = "Default String";
             public override string ToString() => $"MyClassIn: {classInt}/{myString}";
         }
-        [SerializeReference, ReferencePicker, OnArraySizeChanged(nameof(InterfaceSizeChanged)), OnValueChanged(nameof(InterfacesValueChanged))]
+
+        [Serializable]
+        public class MyClass3 : IMyInterface
+        {
+            public int int2;
+            public override string ToString() => $"MyClass3: {int2}";
+        }
+        [SerializeReference,
+         ReferencePicker,
+         // OnArraySizeChanged(nameof(InterfaceSizeChanged)),
+         OnValueChanged(nameof(InterfacesValueChanged))]
         public IMyInterface[] myInterfaces;
 
         public void InterfaceSizeChanged(IReadOnlyList<IMyInterface> newValues)

@@ -987,6 +987,11 @@ namespace SaintsField.Editor.Utils
                 return (e.Message, -1, null);
             }
 
+            return GetValueAtIndex(arrayIndex, fieldInfo, parent);
+        }
+
+        public static (string error, int index, object value) GetValueAtIndex(int arrayIndex, MemberInfo fieldInfo, object parent)
+        {
             if (fieldInfo == null)
             {
                 return ("No MemberInfo given", arrayIndex, null);

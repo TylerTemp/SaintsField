@@ -1421,18 +1421,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myClasses:
-  - unique: 1
-  - unique: 3222
+  - unique: 123
+  - unique: 333
   myInterfaces:
-  - rid: 7411922739809484817
+  - rid: 6556766580135166124
+  - rid: 6556766580135166134
+  - rid: 6556766580135166135
   references:
     version: 2
     RefIds:
-    - rid: 7411922739809484817
+    - rid: 6556766580135166124
+      type: {class: Issue97/MyClass3, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        int2: 11
+    - rid: 6556766580135166134
+      type: {class: Issue97/MyStructIn, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        myInt: 123
+    - rid: 6556766580135166135
       type: {class: Issue97/MyClassIn, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        classInt: 213
-        myString: 1
+        classInt: 0
+        myString: string value
 --- !u!1 &943755158
 GameObject:
   m_ObjectHideFlags: 0
@@ -2744,7 +2754,6 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0

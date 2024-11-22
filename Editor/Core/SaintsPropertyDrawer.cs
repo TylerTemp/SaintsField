@@ -1964,52 +1964,35 @@ namespace SaintsField.Editor.Core
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();
                 fallbackField.BindProperty(property);
+                bool isReference = false;
 #if UNITY_2021_3_OR_NEWER
-                HashSet<string> trackedSubPropertyNames = new HashSet<string>();
-                bool isReference = property.propertyType == SerializedPropertyType.ManagedReference;
+                // HashSet<string> trackedSubPropertyNames = new HashSet<string>();
+                isReference = property.propertyType == SerializedPropertyType.ManagedReference;
 #endif
 
                 // bool watch = !property.isArray ||
                 //              (property.isArray && !SaintsFieldConfigUtil.DisableOnValueChangedWatchArrayFieldUIToolkit());
                 // if(watch)
+                // see:
+                // https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                Debug.Log($"watch {property.propertyPath}");
+#endif
+                // foreach (VisualElement oldTracker in containerElement.Query<VisualElement>(name: UIToolkitOnChangedTrackerName(property)).ToList())
+                // {
+                //     oldTracker.RemoveFromHierarchy();
+                // }
+                // VisualElement trackerContainer = new VisualElement
+                // {
+                //     // name = UIToolkitOnChangedTrackerName(property),
+                // };
+                // fallbackField.Add(trackerContainer);
+
+                VisualElement trackerMain = BindWatchUIToolkit(property, onValueChangedCallback, isReference, fallbackField, fieldInfo, parent);
+                if (isReference)
                 {
-
-                    // see:
-                    // https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed
-                    VisualElement trackerContainer = new VisualElement();
-                    fallbackField.Add(trackerContainer);
-
-                    trackerContainer.TrackPropertyValue(property, prop =>
-                    {
-                        object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(prop).parent;
-                        if (noCacheParent == null)
-                        {
-                            Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
-                            return;
-                        }
-
-                        (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
-                        if (error == "")
-                        {
-                            onValueChangedCallback(curValue);
-                        }
-
-#if UNITY_2021_3_OR_NEWER
-                        if (isReference)
-                        {
-                            TrackPropertyManagedUIToolkit(trackedSubPropertyNames, onValueChangedCallback, prop,
-                                prop, fieldInfo, trackerContainer,
-                                noCacheParent);
-                        }
-#endif
-                    });
-#if UNITY_2021_3_OR_NEWER
-                    if (isReference)
-                    {
-                        TrackPropertyManagedUIToolkit(trackedSubPropertyNames, onValueChangedCallback, property,
-                            property, fieldInfo, trackerContainer, parent);
-                    }
-#endif
+                    TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
+                        property, fieldInfo, trackerMain, parent);
                 }
                 // else  // this does not work on some unity version, e.g. 2022.3.14f1, for serialized class
                 // {
@@ -2040,25 +2023,152 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        private static void TrackPropertyManagedUIToolkit(HashSet<string> trackedSubPropertyNames, Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, SerializedProperty getValueProperty, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
+        private static string UIToolkitOnChangedTrackerName(SerializedProperty property) =>
+            $"saints-field-tracker--{property.propertyPath}";
+
+        private static VisualElement BindWatchUIToolkit(SerializedProperty property, Action<object> onValueChangedCallback, bool isReference, PropertyField propertyField, FieldInfo fieldInfo, object parent)
+        {
+            // PropertyField fallbackField = propertyField.Q<PropertyField>(name: UIToolkitFallbackName(property));
+            VisualElement trackerMain = propertyField.Q<VisualElement>(name: UIToolkitOnChangedTrackerName(property));
+            if (trackerMain != null)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                Debug.Log($"remove old tracker main: {trackerMain}");
+#endif
+                trackerMain.RemoveFromHierarchy();
+            }
+            // if (trackerMain == null)
+            {
+                trackerMain = new VisualElement
+                {
+                    name = UIToolkitOnChangedTrackerName(property),
+                };
+                propertyField.Add(trackerMain);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                Debug.Log($"add main tracker {property.propertyPath}/{trackerMain}");
+#endif
+                trackerMain.TrackPropertyValue(property, prop =>
+                {
+                    object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(prop).parent;
+                    if (noCacheParent == null)
+                    {
+                        Debug.LogWarning("Property disposed unexpectedly, skip onChange callback.");
+                        return;
+                    }
+
+                    (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
+                    if (error == "")
+                    {
+                        onValueChangedCallback(curValue);
+                    }
+
+                    if (isReference)
+                    {
+                        // reference changing will destroy the old one, and create a new one (weird... what's wrong with you Unity...)
+                        // so we need to rebind the watch
+                        BindWatchUIToolkit(property, onValueChangedCallback, true, propertyField, fieldInfo,
+                            parent);
+                        // TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
+                        //     property, fieldInfo, trackerMain,
+                        //     parent);
+                    }
+                });
+            }
+            // else
+            // {
+            //     Debug.Log($"exists main tracker {trackerMain}");
+            // }
+
+            if (isReference)
+            {
+                TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
+                    property, fieldInfo, trackerMain,
+                    parent);
+            }
+
+            return trackerMain;
+//             bool hasTracker = trackerContainer != null;
+//             if (!hasTracker)
+//             {
+//                 trackerContainer = new VisualElement
+//                 {
+//                     name = UIToolkitOnChangedTrackerName(property),
+//                 };
+//                 fallbackField.Add(trackerContainer);
+//             }
+//
+//             Debug.Log($"hasTracker={hasTracker}");
+//             // VisualElement
+//
+//
+//             trackerContainer.TrackPropertyValue(property, prop =>
+//             {
+//                 object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(prop).parent;
+//                 if (noCacheParent == null)
+//                 {
+//                     Debug.LogWarning("Property disposed unexpectedly, skip onChange callback.");
+//                     return;
+//                 }
+//
+//                 (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
+//                 if (error == "")
+//                 {
+//                     onValueChangedCallback(curValue);
+//                 }
+//
+// // #if UNITY_2021_3_OR_NEWER
+//                 if (isReference && !hasTracker)
+//                 {
+//                     // reference changing will destroy the old one, and create a new one (weird... what's wrong with you Unity...)
+//                     // so we need to rebind the watch
+//                     VisualElement newTrackerContainer = BindWatchUIToolkit(property, onValueChangedCallback, true, containerElement, fieldInfo,
+//                         parent);
+//                     TrackPropertyManagedUIToolkit(onValueChangedCallback, prop,
+//                         prop, fieldInfo, newTrackerContainer,
+//                         noCacheParent);
+//                 }
+// // #endif
+//             });
+//
+//             return trackerContainer;
+
+        }
+
+        private static void TrackPropertyManagedUIToolkit(Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, SerializedProperty getValueProperty, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
         {
 #if UNITY_2021_3_OR_NEWER
             foreach ((string _, SerializedProperty subProperty) in SaintsRowAttributeDrawer.GetSerializableFieldInfo(watchSubProperty))
             {
-                if (!trackedSubPropertyNames.Add(subProperty.propertyPath))
+                int propertyIndex = SerializedUtils.PropertyPathIndex(getValueProperty.propertyPath);
+                VisualElement subTracker = tracker.Q<VisualElement>(name: UIToolkitOnChangedTrackerName(subProperty));
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                Debug.Log($"Try add sub track: {subProperty.propertyPath}; real value prop = {getValueProperty.propertyPath}, index={propertyIndex}/{subTracker}");
+#endif
+                if (subTracker != null)
                 {
-                    continue;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                    Debug.Log($"Remove old sub track: {subProperty.propertyPath} {subTracker}");
+#endif
+                    // continue;
+                    subTracker.RemoveFromHierarchy();
                 }
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED || true
-                Debug.Log($"Add sub track: {subProperty.propertyPath}/{trackedSubPropertyNames.Count}");
+                subTracker = new VisualElement
+                {
+                    name = UIToolkitOnChangedTrackerName(subProperty),
+                };
+                tracker.Add(subTracker);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                Debug.Log($"Add new sub track: {subProperty.propertyPath} {subTracker}");
 #endif
-                tracker.TrackPropertyValue(subProperty,
+                subTracker.TrackPropertyValue(subProperty,
                     _ =>
                     {
                         // object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(p).parent;
-                        (string subError, int _, object subValue) = Util.GetValue(getValueProperty, memberInfo, newFetchParent);
-                        // Debug.Log($"getValueProperty={getValueProperty.propertyPath}, newValue={subValue}");
+                        // this won't work as `getValueProperty` will be disposed, giving propertyPath = ""
+                        // (string subError, int _, object subValue) = Util.GetValue(getValueProperty, memberInfo, newFetchParent);
+                        (string subError, int _, object subValue) = Util.GetValueAtIndex(propertyIndex, memberInfo, newFetchParent);
+                        // Debug.Log($"propertyIndex={propertyIndex}, newValue={subValue}");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
                         if (subError != "")
                         {
