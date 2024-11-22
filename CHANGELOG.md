@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.4.13 ##
+## 3.5.0 ##
 
 1.  UI Toolkit: Fix an issue with `MinMaxSlider(free: true)` that the high/low is jump back to code value when you input an out-ranged value, then slide back to in-range value
 2.  Fix `Button` won't work if there are two methods with the same name (but different arguments overload) in the same class, [#104](https://github.com/TylerTemp/SaintsField/issues/104)
@@ -11,7 +11,7 @@
     Unity changed how the `TrackPropertyValue` and `RegisterValueChangeCallback` works. Using on a `SerializeReference`, you can still get the correct callback, but the callback will happen multiple times for one change.
 
     Using `OnValueChanged` on an array/list of `SerializeReference` can cause some problem when you add/remove an element: the `Console` will give error, and the inspector view will display incorrect data. Selecting out then selecting back will fix this issue.
-    However, you can just switch back to the old way if you do not care about the field change in the reference field. (Because Unity, still, does not fix related issues about property tracking...)
+    However, you can just switch back to the old way if you do not care about the field change in the reference field, (Because Unity, still, does not fix related issues about property tracking...) by clicking `Window` - `Saints` - `Create or Edit SaintsField Config` and change the config here.
 
     These two issues can not be fixed unless Unity fixes it.
     
