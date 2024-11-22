@@ -1970,51 +1970,54 @@ namespace SaintsField.Editor.Core
                 isReference = property.propertyType == SerializedPropertyType.ManagedReference;
 #endif
 
-                // bool watch = !property.isArray ||
-                //              (property.isArray && !SaintsFieldConfigUtil.DisableOnValueChangedWatchArrayFieldUIToolkit());
-                // if(watch)
-                // see:
-                // https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
-                Debug.Log($"watch {property.propertyPath}");
-#endif
-                // foreach (VisualElement oldTracker in containerElement.Query<VisualElement>(name: UIToolkitOnChangedTrackerName(property)).ToList())
-                // {
-                //     oldTracker.RemoveFromHierarchy();
-                // }
-                // VisualElement trackerContainer = new VisualElement
-                // {
-                //     // name = UIToolkitOnChangedTrackerName(property),
-                // };
-                // fallbackField.Add(trackerContainer);
-
-                VisualElement trackerMain = BindWatchUIToolkit(property, onValueChangedCallback, isReference, fallbackField, fieldInfo, parent);
-                if (isReference)
+                bool watch = !property.isArray ||
+                             (property.isArray && !SaintsFieldConfigUtil.DisableOnValueChangedWatchArrayFieldUIToolkit());
+                if(watch)
                 {
-                    TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
-                        property, fieldInfo, trackerMain, parent);
+                    // see:
+                    // https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+                    Debug.Log($"watch {property.propertyPath}");
+#endif
+                    // foreach (VisualElement oldTracker in containerElement.Query<VisualElement>(name: UIToolkitOnChangedTrackerName(property)).ToList())
+                    // {
+                    //     oldTracker.RemoveFromHierarchy();
+                    // }
+                    // VisualElement trackerContainer = new VisualElement
+                    // {
+                    //     // name = UIToolkitOnChangedTrackerName(property),
+                    // };
+                    // fallbackField.Add(trackerContainer);
+
+                    VisualElement trackerMain = BindWatchUIToolkit(property, onValueChangedCallback, isReference,
+                        fallbackField, fieldInfo, parent);
+                    if (isReference || property.propertyType == SerializedPropertyType.Generic)
+                    {
+                        TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
+                            property, fieldInfo, trackerMain, parent);
+                    }
                 }
-                // else  // this does not work on some unity version, e.g. 2022.3.14f1, for serialized class
-                // {
-                //     fallbackField.RegisterValueChangeCallback(evt =>
-                //     {
-                //         SerializedProperty prop = evt.changedProperty;
-                //         if(SerializedProperty.EqualContents(prop, property))
-                //         {
-                //             object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                //             if (noCacheParent == null)
-                //             {
-                //                 Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
-                //                 return;
-                //             }
-                //             (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
-                //             if (error == "")
-                //             {
-                //                 onValueChangedCallback(curValue);
-                //             }
-                //         }
-                //     });
-                // }
+                else  // this does not work on some unity version, e.g. 2022.3.14f1, for serialized class
+                {
+                    fallbackField.RegisterValueChangeCallback(evt =>
+                    {
+                        SerializedProperty prop = evt.changedProperty;
+                        if(SerializedProperty.EqualContents(prop, property))
+                        {
+                            object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                            if (noCacheParent == null)
+                            {
+                                Debug.LogWarning($"Property disposed unexpectedly, skip onChange callback.");
+                                return;
+                            }
+                            (string error, int _, object curValue) = Util.GetValue(property, fieldInfo, noCacheParent);
+                            if (error == "")
+                            {
+                                onValueChangedCallback(curValue);
+                            }
+                        }
+                    });
+                }
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
             }
             else

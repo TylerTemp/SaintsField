@@ -86,7 +86,11 @@ namespace: `SaintsField`
     **Known Issue**:
 
     Unity changed how the `TrackPropertyValue` and `RegisterValueChangeCallback` works. Using on a `SerializeReference`, you can still get the correct callback, but the callback will happen multiple times for one change.
-    This issue can not be fixed unless Unity fixes it.
+
+    Using `OnValueChanged` on an array/list of `SerializeReference` can cause some problem when you add/remove an element: the `Console` will give error, and the inspector view will display incorrect data. Selecting out then selecting back will fix this issue.
+    However, you can just switch back to the old way if you do not care about the field change in the reference field. (Because Unity, still, does not fix related issues about property tracking...)
+
+    These two issues can not be fixed unless Unity fixes it.
 
     See: [1](https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed), [2](https://issuetracker.unity3d.com/issues/visualelement-dot-trackpropertyvalue-doesnt-invoke-the-callback-when-the-property-is-under-serializereference-and-serializefield-attributes)
 
@@ -1890,7 +1894,11 @@ Special Note: `AnimatorState` will have a different `OnValueChanged` parameter p
 **Known Issue**:
 
 Unity changed how the `TrackPropertyValue` and `RegisterValueChangeCallback` works. Using on a `SerializeReference`, you can still get the correct callback, but the callback will happen multiple times for one change.
-This issue can not be fixed unless Unity fixes it.
+
+Using `OnValueChanged` on an array/list of `SerializeReference` can cause some problem when you add/remove an element: the `Console` will give error, and the inspector view will display incorrect data. Selecting out then selecting back will fix this issue.
+However, you can just switch back to the old way if you do not care about the field change in the reference field. (Because Unity, still, does not fix related issues about property tracking...)
+
+These two issues can not be fixed unless Unity fixes it.
 
 See: [1](https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed), [2](https://issuetracker.unity3d.com/issues/visualelement-dot-trackpropertyvalue-doesnt-invoke-the-callback-when-the-property-is-under-serializereference-and-serializefield-attributes)
 

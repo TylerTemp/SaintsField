@@ -13,9 +13,9 @@ namespace SaintsField.Utils
 
         // [Space]
         //
-        // [InfoBox("UI Toolkit: Aggressive OnValueChanged watcher", EMessageType.None)]
-        // [InfoBox("This allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]
-        // [LeftToggle] public bool disableOnValueChangedWatchArrayFieldUIToolkit;
+        [InfoBox("UI Toolkit: Aggressive OnValueChanged watcher", EMessageType.None)]
+        [InfoBox("This allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]
+        [LeftToggle] public bool disableOnValueChangedWatchArrayFieldUIToolkit;
 
         [LayoutStart("Auto Getters Configs", ELayout.FoldoutBox, marginTop: 10)]
 

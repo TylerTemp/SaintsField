@@ -63,6 +63,6 @@ namespace SaintsField.Utils
         public static EXP FindComponentExp(EXP defaultValue) => GetConfig()?.findComponentExp ?? defaultValue;
 
         public static int ResizableTextAreaMinRow() => GetConfig()?.resizableTextAreaMinRow ?? 3;
-        // public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => GetConfig()?.disableOnValueChangedWatchArrayFieldUIToolkit ?? false;
+        public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => GetConfig()?.disableOnValueChangedWatchArrayFieldUIToolkit ?? false;
     }
 }

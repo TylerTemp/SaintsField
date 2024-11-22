@@ -57,8 +57,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         }
         [SerializeReference,
          ReferencePicker,
-         // OnArraySizeChanged(nameof(InterfaceSizeChanged)),
-         OnValueChanged(nameof(InterfacesValueChanged))]
+         OnArraySizeChanged(nameof(InterfaceSizeChanged)),
+         OnValueChanged(nameof(InterfacesValueChanged)),
+        ]
         public IMyInterface[] myInterfaces;
 
         public void InterfaceSizeChanged(IReadOnlyList<IMyInterface> newValues)
