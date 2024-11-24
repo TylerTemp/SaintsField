@@ -349,15 +349,6 @@ namespace SaintsField.Editor.Drawers
                         throw new ArgumentOutOfRangeException(nameof(userPayload.playState), userPayload.playState, null);
                 }
             };
-        }
-
-        protected override void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            VisualElement root = container.Q<VisualElement>(NameContainer(property));
-            UserPayload userPayload = (UserPayload)root.userData;
-            Button stopButton = root.Q<Button>(NameStopButton(property));
-            Button playPauseButton = root.Q<Button>(NamePlayPauseButton(property));
 
             root.schedule.Execute(() => UpdateParticleSystem(stopButton, playPauseButton, userPayload)).Every(1);
         }

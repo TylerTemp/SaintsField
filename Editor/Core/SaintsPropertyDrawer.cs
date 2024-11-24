@@ -2228,10 +2228,10 @@ namespace SaintsField.Editor.Core
                 saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, fieldInfo, parent);
             }
 
-            foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
-            {
-                saintsPropertyInfo.Drawer.OnStartUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, fieldInfo, parent);
-            }
+            // foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
+            // {
+            //     saintsPropertyInfo.Drawer.OnStartUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, fieldInfo, parent);
+            // }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
             OnUpdateUiToolKitInternal(property, containerElement, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
@@ -2261,7 +2261,7 @@ namespace SaintsField.Editor.Core
                 saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info);
             }
 
-            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(100);
+            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
         }
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -2270,11 +2270,11 @@ namespace SaintsField.Editor.Core
         {
         }
 
-        protected virtual void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-        }
+        // protected virtual void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        //     int index,
+        //     VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        // {
+        // }
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,

@@ -28,9 +28,10 @@ namespace SaintsField.Utils
         }
 
 #if UNITY_EDITOR
-#if UNITY_2019_2_OR_NEWER
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
-#endif
+// #if UNITY_2019_2_OR_NEWER
+//         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+// #endif
+        [InitializeOnLoadMethod]
         public static void ReloadConfig()
         {
 #if SAINTSFIELD_DEBUG
@@ -64,5 +65,9 @@ namespace SaintsField.Utils
 
         public static int ResizableTextAreaMinRow() => GetConfig()?.resizableTextAreaMinRow ?? 3;
         public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => GetConfig()?.disableOnValueChangedWatchArrayFieldUIToolkit ?? false;
+
+        public static int GetByXPathDelayMs() => GetConfig()?.getByXPathDelayMs ?? 0;
+        public static int GetByXPathLoopIntervalMs() => GetConfig()?.getByXPathLoopIntervalMs ?? SaintsFieldConfig.UpdateLoopDefaultMs;
+
     }
 }

@@ -14,6 +14,7 @@ using SaintsField.SaintsXPathParser.XPathFilter;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
+using SaintsField.Utils;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
@@ -124,15 +125,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
 
-            (string error, IReadOnlyList<object> getXPathResults) = GetXPathValues(getByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+            GetXPathValuesResult r = GetXPathValues(getByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
                 expectedType, interfaceType, property, info, updatedParent);
-            if (error != "")
+            if (r.XPathError != "")
             {
-                Debug.LogError(error);
+                Debug.LogError(r.XPathError);
                 return;
             }
 
-            Object[] objResults = getXPathResults.OfType<Object>().ToArray();
+            Object[] objResults = r.Results.OfType<Object>().ToArray();
             List<Object> assetObj = new List<Object>();
             List<Object> sceneObj = new List<Object>();
             foreach (Object objResult in objResults)
@@ -193,7 +194,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             double curTime = EditorApplication.timeSinceStartup;
 
             // IMGUI has much worse performance issue. Don't overwhelm the update
-            if(configExists && curTime - existedInitUserData.ImGuiLastTime < 0.5)
+            int loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+            bool noLoop = loopInterval <= 0;
+            bool loopDelayReached = configExists && curTime - existedInitUserData.ImGuiLastTime < loopInterval / 1000f;
+
+            if(configExists && (noLoop || loopDelayReached))
             {
                 return GetPostFieldWidthValue(firstAttribute, existedInitUserData);
             }
@@ -212,14 +217,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             (GetByXPathAttribute[] allGetByXPathAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(property);
 
-            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(allGetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(), expectType, expectInterface, property, info, parent);
+            GetXPathValuesResult r = GetXPathValues(allGetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(), expectType, expectInterface, property, info, parent);
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            object targetValue = results.ElementAtOrDefault(propertyIndex == -1? 0: propertyIndex);
+
+            // IReadOnlyList<object> results = r.Results.ToArray();
 
             SerializedProperty arrProp = null;
+            object targetValue = null;
+            bool targetValueInit = false;
 
-            if (propertyIndex != -1 && xPathError == "")
+            if (propertyIndex != -1 && r.XPathError == "")
             {
                 // handle array size if this is the first element
                 // if (firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull)
@@ -227,18 +235,29 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
                 if (arrayError != "")
                 {
-                    xPathError = arrayError;
+                    r.XPathError = arrayError;
                 }
                 else
                 {
                     arrProp = arrayProperty;
-                    if(arrProp.arraySize != results.Count)
+                    if(propertyIndex == 0)
                     {
-                        arrProp.arraySize = results.Count;
-                        arrProp.serializedObject.ApplyModifiedProperties();
+                        targetValueInit = true;
+                        IReadOnlyList<object> results = r.Results.ToArray();
+                        r.Results = results;
+                        targetValue = results.Count > 0? results[0]: null;
+                        if (arrProp.arraySize != results.Count)
+                        {
+                            arrProp.arraySize = results.Count;
+                            arrProp.serializedObject.ApplyModifiedProperties();
+                        }
                     }
                 }
-                // }
+            }
+
+            if(!targetValueInit)
+            {
+                targetValue = r.Results.ElementAtOrDefault(propertyIndex == -1 ? 0 : propertyIndex);
             }
 
             InitUserData initUserData = new InitUserData
@@ -251,11 +270,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 ExpectInterface = expectInterface,
                 ArrayProperty = arrProp,
                 GetByXPathAttributes = allGetByXPathAttributes,
-                CheckFieldResult = xPathError == ""
+                CheckFieldResult = r.XPathError == ""
                     ? CheckField(property, info, parent, targetValue)
                     : new CheckFieldResult
                     {
-                        Error = xPathError,
+                        Error = r.XPathError,
                     },
                 ImGuiLastTime = curTime,
             };
@@ -283,7 +302,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             return GetPostFieldWidthValue(firstAttribute, initUserData);
         }
 
-        private float GetPostFieldWidthValue(GetByXPathAttribute firstAttribute, InitUserData initUserData)
+        private static float GetPostFieldWidthValue(GetByXPathAttribute firstAttribute, InitUserData initUserData)
         {
             float useWidth = firstAttribute.UsePickerButton ? SingleLineHeight : 0;
 
@@ -481,16 +500,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         private class InitUserData
         {
             public string Error;
+            public SerializedProperty Property;
             public SerializedProperty TargetProperty;
+            public FieldInfo Info;
             public MemberInfo MemberInfo;
             public Type ExpectType;
             public Type ExpectInterface;
 
+            public int DecoratorIndex;
+
             public SerializedProperty ArrayProperty;
-            public IReadOnlyList<object> ArrayValues;
+            public GetXPathValuesResult ArrayValues;
             public GetByXPathAttribute GetByXPathAttribute;
             public IReadOnlyList<GetByXPathAttribute> GetByXPathAttributes;
-            public int DecoratorIndex;
 
             public double ImGuiLastTime;
 
@@ -500,6 +522,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         #region UIToolkit
 #if UNITY_2021_3_OR_NEWER
 
+        private static string ClassArrayContainer(SerializedProperty property) => $"{property.propertyPath}__GetByXPath";
+        private static string ClassContainer(SerializedProperty property) => $"{property.propertyPath}__GetByXPath";
         private static string NameContainer(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath";
 
         private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_HelpBox";
@@ -507,16 +531,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         private static string NameRemoveButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_RemoveButton";
         private static string NameSelectorButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_SelectorButton";
 
-        private const string ClassGetByXPath = "saints-field-get-by-xpath-attribute-drawer";
+        // private const string ClassGetByXPath = "saints-field-get-by-xpath-attribute-drawer";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
+            string className = ClassContainer(property);
             GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute)saintsAttribute;
+
             InitUserData initUserData = new InitUserData
             {
                 GetByXPathAttribute = getByXPathAttribute,
-                DecoratorIndex = index,
+                Property = property,
+                Info = info,
             };
             VisualElement root = new VisualElement
             {
@@ -529,7 +556,24 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 name = NameContainer(property, index),
                 userData = initUserData,
             };
-            root.AddToClassList(ClassGetByXPath);
+            // root.AddToClassList(ClassGetByXPath);
+            root.AddToClassList(className);
+
+            // get array property
+            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (propertyIndex != -1)
+            {
+                // array need to know all element to decide the size
+                (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
+                if (arrayError != "")
+                {
+                    initUserData.Error = arrayError;
+                    return root;
+                }
+
+                initUserData.ArrayProperty = arrayProperty;
+                root.AddToClassList(ClassArrayContainer(arrayProperty));
+            }
 
             Button refreshButton = new Button
             {
@@ -600,8 +644,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             if (error != "")
             {
                 initUserData.Error = error;
-                return null;
+                return root;
             }
+
+
 
             // CheckFieldResult checkResult = CheckField(property, info, parent, targetValue);
             initUserData.Error = "";
@@ -609,12 +655,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             initUserData.MemberInfo = memberInfo;
             initUserData.ExpectType = expectType;
             initUserData.ExpectInterface = expectInterface;
-            // initUserData.CheckFieldResult = checkResult;
 
-            // if(getByXPathAttribute.UseResignButton)
-            // {
-            //     UpdateButtons(checkResult, refreshButton, removeButton);
-            // }
+            bool alreadyHadElement = container.Q<VisualElement>(className: className) != null;
+            if (alreadyHadElement)
+            {
+                root.style.display = DisplayStyle.None;
+            }
 
             return root;
         }
@@ -702,108 +748,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
             VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
-            if (root == null)
+            if (root == null || root.style.display == DisplayStyle.None)
             {
+                Debug.Log($"skip {root}");
                 return;
             }
 
             InitUserData initUserData = (InitUserData) root.userData;
-            GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
-
-            if (initUserData.Error != "")
-            {
-                UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
-                return;
-            }
-
-            if(!getByXPathAttribute.KeepOriginalPicker)
-            {
-                StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
-                container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).styleSheets.Add(hideStyle);
-            }
-
-            InitUserData[] allXPathInitData = container
-                .Query<VisualElement>(className: ClassGetByXPath)
-                .ToList()
-                .Select(each => (InitUserData)each.userData)
-                .ToArray();
-
-            bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
-            if (!imTheFirst)
-            {
-                return;
-            }
-
-            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(allXPathInitData.SelectMany(each => each.GetByXPathAttribute.XPathInfoAndList).ToArray(), initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
-            initUserData.ArrayValues = results;
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            object targetValue = results.ElementAtOrDefault(propertyIndex == -1? 0: propertyIndex);
-            if (propertyIndex != -1 && xPathError == "")
-            {
-                // handle array size if this is the first element
-                // if (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull)
-                // {
-                (SerializedProperty arrayProperty, int _, string arrayError) = Util.GetArrayProperty(property, info, parent);
-                if (arrayError != "")
-                {
-                    initUserData.Error = arrayError;
-                }
-                else
-                {
-                    initUserData.ArrayProperty = arrayProperty;
-                }
-                // }
-            }
 
-            initUserData.CheckFieldResult = CheckField(property, info, parent, targetValue);
-
-            if (initUserData.Error != "")
-            {
-                UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
-                return;
-            }
-
-            // init check
-            // ReSharper disable once MergeIntoPattern
-            if (initUserData.CheckFieldResult.Error == "")
-            {
-                bool originIsNull = Util.IsNull(initUserData.CheckFieldResult.OriginalValue);
-
-                bool noMore = false;
-                if (getByXPathAttribute.InitSign && initUserData.ArrayProperty != null && originIsNull && initUserData.ArrayProperty.arraySize == 1)
-                {
-                    if (initUserData.ArrayValues.Count != initUserData.ArrayProperty.arraySize)
-                    {
-                        int newSize = initUserData.ArrayValues.Count;
-                        container.schedule.Execute(() =>
-                        {
-                            initUserData.ArrayProperty.arraySize = newSize;
-                            initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
-                        });
-                        noMore = newSize == 0;
-                    }
-                }
-
-                if(getByXPathAttribute.InitSign && !noMore && originIsNull && initUserData.CheckFieldResult.MisMatch)
-                {
-                    CheckFieldResult checkResult = new CheckFieldResult
-                    {
-                        Error = "",
-                        MisMatch = false,
-                        OriginalValue = initUserData.CheckFieldResult.TargetValue,
-                        TargetValue = initUserData.CheckFieldResult.TargetValue,
-                        Index = initUserData.CheckFieldResult.Index,
-                    };
-
-                    initUserData.CheckFieldResult = checkResult;
-
-                    SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent,
-                        initUserData.CheckFieldResult.TargetValue);
-                    initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(initUserData.CheckFieldResult.TargetValue);
-                }
-            }
+            // if(propertyIndex == 0)
+            // {
+            //     ListView listView = UIToolkitUtils.IterUpWithSelf(container).OfType<ListView>().First();
+            // }
 
             Button refreshButton = root.Q<Button>(NameResignButton(property, index));
             Button removeButton = root.Q<Button>(NameRemoveButton(property, index));
@@ -820,8 +778,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             removeButton.clicked += () =>
             {
-                int arrayIndex = initUserData.CheckFieldResult.Index;
-                if(arrayIndex == -1)
+                // int arrayIndex = initUserData.CheckFieldResult.Index;
+                if(propertyIndex == -1)
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
@@ -829,10 +787,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 }
                 else
                 {
-                    initUserData.ArrayProperty.DeleteArrayElementAtIndex(arrayIndex);
+                    // Debug.Log($"Remove index {propertyIndex}");
+                    initUserData.ArrayProperty.DeleteArrayElementAtIndex(propertyIndex);
                     initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
                 }
             };
+
+            GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
+            InitUserData[] allXPathInitData = container
+                .Query<VisualElement>(className: ClassContainer(property))
+                .ToList()
+                .Select(each => (InitUserData)each.userData)
+                .ToArray();
 
             if (getByXPathAttribute.UsePickerButton)
             {
@@ -855,121 +821,402 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         }, updatedParent);
                 };
             }
+
+            if (propertyIndex > 0)  // element 0 response for everything. Other element's behavior is disabled
+            {
+                return;
+            }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+            Debug.Log($"Awake {property.propertyPath}");
+#endif
+            if (initUserData.Error != "")
+            {
+                UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
+                return;
+            }
+
+            if(!getByXPathAttribute.KeepOriginalPicker)
+            {
+                StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
+                container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).styleSheets.Add(hideStyle);
+            }
+
+            // bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
+            // if (!imTheFirst)
+            // {
+            //     return;
+            // }
+
+            GetXPathValuesResult getXPathValuesResult = GetXPathValues(allXPathInitData.SelectMany(each => each.GetByXPathAttribute.XPathInfoAndList).ToArray(), initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
+            initUserData.ArrayValues = getXPathValuesResult;
+
+            object targetValue = null;
+            bool targetValueInit = false;
+            bool checkFieldResultInit = false;
+
+            // init check
+            // ReSharper disable once MergeIntoPattern
+            // bool hasSizeChange = false;
+            if (initUserData.Error == "")
+            {
+                // bool originIsNull = Util.IsNull(initUserData.CheckFieldResult.OriginalValue);
+
+                // bool noMore = false;
+                if (getByXPathAttribute.InitSign && initUserData.ArrayProperty != null && initUserData.ArrayProperty.arraySize == 1)
+                {
+                    object[] findValues = initUserData.ArrayValues.Results.ToArray();
+                    // Debug.Log($"findValues count {findValues.Length}");
+                    initUserData.ArrayValues.Results = findValues;
+                    targetValueInit = true;
+                    targetValue = findValues.WithIndex().FirstOrDefault(each => each.index == propertyIndex).value;
+
+                    initUserData.CheckFieldResult = CheckField(property, info, parent, targetValue);
+                    checkFieldResultInit = true;
+
+                    if (Util.IsNull(initUserData.CheckFieldResult.OriginalValue) && findValues.Length != initUserData.ArrayProperty.arraySize)
+                    {
+                        int newSize = findValues.Length;
+                        container.schedule.Execute(() =>
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                            Debug.Log($"size to {newSize}");
+#endif
+                            initUserData.ArrayProperty.arraySize = newSize;
+                            initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
+                        });
+                        // initUserData.ArrayProperty.arraySize = newSize;
+                        // initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
+                        // noMore = newSize == 0;
+                        // hasSizeChange = true;
+                    }
+                }
+
+                // if(getByXPathAttribute.InitSign && !noMore)
+                // {
+                //     if (!targetValueInit)
+                //     {
+                //         object[] findValues = initUserData.ArrayValues.Results.ToArray();
+                //         // Debug.Log($"findValues count {findValues.Length}");
+                //         initUserData.ArrayValues.Results = findValues;
+                //         targetValueInit = true;
+                //         targetValue = findValues.WithIndex().FirstOrDefault(each => each.index == propertyIndex).value;
+                //     }
+                //     if (!checkFieldResultInit)
+                //     {
+                //         initUserData.CheckFieldResult = CheckField(property, info, parent, targetValue);
+                //         checkFieldResultInit = true;
+                //     }
+                //
+                //     if(initUserData.CheckFieldResult.MisMatch && Util.IsNull(initUserData.CheckFieldResult.OriginalValue))
+                //     {
+                //         CheckFieldResult checkResult = new CheckFieldResult
+                //         {
+                //             Error = "",
+                //             MisMatch = false,
+                //             OriginalValue = initUserData.CheckFieldResult.TargetValue,
+                //             TargetValue = initUserData.CheckFieldResult.TargetValue,
+                //             Index = initUserData.CheckFieldResult.Index,
+                //         };
+                //
+                //         initUserData.CheckFieldResult = checkResult;
+                //
+                //         // SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent,
+                //         //     initUserData.CheckFieldResult.TargetValue);
+                //         // initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                //         // onValueChangedCallback.Invoke(initUserData.CheckFieldResult.TargetValue);
+                //     }
+                // }
+            }
+
+            if (!targetValueInit)
+            {
+                targetValue =
+                    initUserData.ArrayValues.Results.ElementAtOrDefault(propertyIndex == -1 ? 0 : propertyIndex);
+            }
+
+            if(!checkFieldResultInit)
+            {
+                initUserData.CheckFieldResult = CheckField(property, info, parent, targetValue);
+            }
+
+            if (initUserData.Error != "")
+            {
+                UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
+                return;
+            }
+
+            // container.schedule.Execute(() =>
+            //         ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info))
+            //     .StartingIn(500);
+            // container.schedule.Execute(() =>
+            //         ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info));
+            // if (hasSizeChange)
+            // {
+            //     container.schedule.Execute(() =>
+            //             ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info));
+            // }
+            // else
+            // {
+            //     ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info);
+            // }
+
+            IVisualElementScheduledItem task = container.schedule.Execute(() =>
+            {
+                ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, true);
+                int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+                if (loop > 0)
+                {
+                    container.schedule.Execute(() =>
+                        ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
+                            info, false)).Every(loop);
+                }
+            });
+            int delay = SaintsFieldConfigUtil.GetByXPathDelayMs();
+
+            if (delay > 0)
+            {
+                task.StartingIn(delay);
+            }
+            // ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info);
         }
 
-
-#if !(SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE)
-
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        private static void ActualUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info, bool isInit)
         {
             if (EditorApplication.isPlaying)
             {
                 return;
             }
 
-            VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
-            if (root == null)
+            try
             {
-                Debug.Log($"{property.propertyPath} no root");
+                string _ = property.propertyPath;
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+            catch (NullReferenceException)
+            {
                 return;
             }
 
-            InitUserData initUserData = (InitUserData) root.userData;
+            VisualElement firstRoot = container.Q<VisualElement>(NameContainer(property, index));
+            if (firstRoot == null)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"{property.propertyPath} no root");
+#endif
+                return;
+            }
+
+            InitUserData initUserData = (InitUserData) firstRoot.userData;
             if (initUserData.Error != "")
             {
-                Debug.Log($"{property.propertyPath} error {initUserData.Error}");
+                Debug.LogWarning($"{property.propertyPath} error {initUserData.Error}");
                 return;
+            }
+
+            List<VisualElement> targetRoots = new List<VisualElement>();
+            SerializedProperty arrayProp = initUserData.ArrayProperty;
+            if (arrayProp == null)
+            {
+                targetRoots.Add(firstRoot);
+            }
+            else
+            {
+                targetRoots.AddRange(UIToolkitUtils.IterUpWithSelf(container).OfType<ListView>().First().Query<VisualElement>(className: ClassArrayContainer(arrayProp)).ToList());
+                // Debug.Log($"{targetRoots.Count}/{ClassArrayContainer(arrayProp)}");
             }
 
             InitUserData[] allXPathInitData = container
-                .Query<VisualElement>(className: ClassGetByXPath)
+                .Query<VisualElement>(className: ClassContainer(property))
                 .ToList()
                 .Select(each => (InitUserData)each.userData)
                 .ToArray();
-
-            bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
-            if (!imTheFirst)
-            {
-                return;
-            }
-
-            Button refreshButton = root.Q<Button>(NameResignButton(property, index));
-            Button removeButton = root.Q<Button>(NameRemoveButton(property, index));
-
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-
             GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
+            GetXPathValuesResult r = GetXPathValues(allXPathInitData.SelectMany(each => each.GetByXPathAttribute.XPathInfoAndList).ToArray(),  initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
 
-            (string xPathError, IReadOnlyList<object> xPathResults) = GetXPathValues(allXPathInitData.SelectMany(each => each.GetByXPathAttribute.XPathInfoAndList).ToArray(),  initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
-
-            int arraySize = int.MaxValue;
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-
-            if (xPathError == "" && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull) && initUserData.ArrayProperty != null &&
-                initUserData.ArrayProperty.arraySize != xPathResults.Count)
+            if (r.XPathError != "")
             {
-                arraySize = xPathResults.Count;
-                initUserData.ArrayProperty.arraySize = arraySize;
-                initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
-            }
-
-            if(propertyIndex >= arraySize)
-            {
+                initUserData.Error = r.XPathError;
+                UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
                 return;
             }
 
-            int useIndex = propertyIndex == -1? 0: propertyIndex;
-            object targetValue = xPathResults.Count > useIndex ? xPathResults[useIndex] : null;
-
-            CheckFieldResult checkResult = xPathError == ""
-                ? CheckField(property, info, parent, targetValue)
-                : new CheckFieldResult
-                {
-                    Error = xPathError,
-                    MisMatch = initUserData.CheckFieldResult.MisMatch,
-                    OriginalValue = initUserData.CheckFieldResult.OriginalValue,
-                    TargetValue = initUserData.CheckFieldResult.TargetValue,
-                    Index = initUserData.CheckFieldResult.Index,
-                };
-
-            // ReSharper disable once MergeIntoPattern
-            if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull))
+            IEnumerable<object> xPathResults;
+            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (propertyIndex == -1)
             {
-                bool doResignValue = getByXPathAttribute.AutoResignToValue &&
-                                     !Util.IsNull(targetValue);
-                bool doResignNull = getByXPathAttribute.AutoResignToNull &&
-                                    Util.IsNull(targetValue);
+                xPathResults = new []{r.Results.ElementAtOrDefault(0)};
+            }
+            else
+            {
+                xPathResults = r.Results.ToArray();
+            }
 
-                if (doResignNull || doResignValue)
+            int requireSizeCount = 0;
+
+            foreach ((bool hasRoot, VisualElement root, bool hasValue, object targetValue) in ZipTwoLongest(targetRoots, xPathResults))
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"{hasValue}:{targetValue}/{hasRoot}:{root}");
+#endif
+                if(hasValue)
                 {
-                    SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, checkResult.TargetValue);
-                    initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                    onValueChanged.Invoke(checkResult.TargetValue);
-                    checkResult = new CheckFieldResult
-                    {
-                        Error = "",
-                        MisMatch = false,
-                        OriginalValue = checkResult.TargetValue,
-                        TargetValue = checkResult.TargetValue,
-                        Index = checkResult.Index,
-                    };
+                    requireSizeCount += 1;
                 }
+                if (hasRoot)
+                {
+                    InitUserData userData = (InitUserData)root.userData;
+                    Button refreshButton = root.Q<Button>(NameResignButton(userData.Property, index));
+                    Button removeButton = root.Q<Button>(NameRemoveButton(userData.Property, index));
+                    CheckFieldResult checkResult = CheckField(userData.Property, userData.Info, parent, targetValue);
+
+                    // ReSharper disable once MergeIntoPattern
+                    if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull))
+                    {
+                        bool targetIsNull = Util.IsNull(targetValue);
+                        bool doResignValue = getByXPathAttribute.AutoResignToValue &&
+                                             !targetIsNull;
+                        bool doResignNull = getByXPathAttribute.AutoResignToNull &&
+                                            targetIsNull;
+
+                        bool doResignInit = isInit && getByXPathAttribute.InitSign;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                        Debug.Log($"{getByXPathAttribute.AutoResignToNull}/{Util.IsNull(targetValue)}");
+#endif
+                        if (doResignNull || doResignValue || doResignInit)
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                            Debug.Log($"resign {checkResult.OriginalValue} -> {checkResult.TargetValue} ({userData.TargetProperty.propertyPath})");
+#endif
+                            SetValue(userData.TargetProperty, userData.MemberInfo, parent, checkResult.TargetValue);
+                            userData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                            onValueChanged.Invoke(checkResult.TargetValue);
+                            checkResult = new CheckFieldResult
+                            {
+                                Error = "",
+                                MisMatch = false,
+                                OriginalValue = checkResult.TargetValue,
+                                TargetValue = checkResult.TargetValue,
+                                Index = checkResult.Index,
+                            };
+                            // userData.CheckFieldResult = checkResult;
+                        }
+                    }
+
+                    // Debug.Log($"{checkResult.TargetValue}///{checkResult.TargetValue.GetType()}");
+
+                    initUserData.CheckFieldResult = checkResult;
+
+                    if(getByXPathAttribute.UseResignButton)
+                    {
+                        UpdateButtons(checkResult, refreshButton, removeButton);
+                    }
+                    // UpdateErrorMessage(getByXPathAttribute, root, userData.CheckFieldResult, userData.Property, index);
+                }
+                // else  // has no root with value, need to increase the array size; non-array will always have a root
+                // {
+                //     Debug.Log($"hasRoot={hasRoot}, hasValue={hasValue}");
+                //     requireSizeCount += 1;
+                // }
+
+
+
+                // int arraySize = int.MaxValue;
+
+                // if (r.xPathError == ""
+                //     && (
+                //         getByXPathAttribute.AutoResignToValue
+                //         || getByXPathAttribute.AutoResignToNull)
+                //     && initUserData.ArrayProperty != null
+                //     && initUserData.ArrayProperty.arraySize != xPathResults.Count)
+                // {
+                //     arraySize = xPathResults.Count;
+                //     initUserData.ArrayProperty.arraySize = arraySize;
+                //     initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
+                // }
+
+                // if(propertyIndex >= arraySize)
+                // {
+                //     return;
+                // }
+
+                // int useIndex = propertyIndex == -1? 0: propertyIndex;
+                // object targetValue = xPathResults.Count > useIndex ? xPathResults[useIndex] : null;
+
+                // CheckFieldResult checkResult = r.xPathError == ""
+                //     ? CheckField(property, info, parent, targetValue)
+                //     : new CheckFieldResult
+                //     {
+                //         Error = r.xPathError,
+                //         MisMatch = initUserData.CheckFieldResult.MisMatch,
+                //         OriginalValue = initUserData.CheckFieldResult.OriginalValue,
+                //         TargetValue = initUserData.CheckFieldResult.TargetValue,
+                //         Index = initUserData.CheckFieldResult.Index,
+                //     };
+
             }
 
-            // Debug.Log($"{checkResult.TargetValue}///{checkResult.TargetValue.GetType()}");
-
-            initUserData.CheckFieldResult = checkResult;
-
-            if(getByXPathAttribute.UseResignButton)
+            if (arrayProp != null && arrayProp.arraySize != requireSizeCount && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull))
             {
-                UpdateButtons(checkResult, refreshButton, removeButton);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"resize {arrayProp.arraySize} -> {requireSizeCount}");
+#endif
+                arrayProp.arraySize = requireSizeCount;
+                arrayProp.serializedObject.ApplyModifiedProperties();
             }
-
-            UpdateErrorMessage(getByXPathAttribute, container, initUserData.CheckFieldResult, property, index);
         }
 
-#endif
+
+// #if !(SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE)
+//
+//         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+//             VisualElement container, Action<object> onValueChanged, FieldInfo info)
+//         {
+//             ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChanged, info);
+//         }
+//
+// #endif
+
+        private static IEnumerable<(bool hasRoot, VisualElement root, bool hasValue, object value)> ZipTwoLongest(IEnumerable<VisualElement> left, IEnumerable<object> right)
+        {
+
+            // IEnumerator<T> leftEnumerator = left.GetEnumerator();
+            // IEnumerator<T> rightEnumerator = right.GetEnumerator();
+
+            // ReSharper disable once ConvertToUsingDeclaration
+            using(IEnumerator<VisualElement> leftEnumerator = left.GetEnumerator())
+            using(IEnumerator<object> rightEnumerator = right.GetEnumerator())
+            {
+                bool hasLeft = leftEnumerator.MoveNext();
+                bool hasRight = rightEnumerator.MoveNext();
+
+                while (hasLeft || hasRight)
+                {
+                    // ReSharper disable once ConvertIfStatementToSwitchStatement
+                    if (hasLeft && hasRight)
+                    {
+                        yield return (true, leftEnumerator.Current, true, rightEnumerator.Current);
+                    }
+                    else if (hasLeft)
+                    {
+                        yield return (true, leftEnumerator.Current, false, default);
+                    }
+                    else
+                    {
+                        yield return (false, default, true, rightEnumerator.Current);
+                    }
+
+                    hasLeft = leftEnumerator.MoveNext();
+                    hasRight = rightEnumerator.MoveNext();
+                }
+            }
+        }
 
         private static void UpdateErrorMessage(GetByXPathAttribute getByXPathAttribute, VisualElement root, CheckFieldResult checkFieldResult, SerializedProperty property, int index)
         {
@@ -1171,16 +1418,40 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             public string FolderPath;
         }
 
-        private static (string error, IReadOnlyList<object>) GetXPathValues(IReadOnlyList<IReadOnlyList<GetByXPathAttribute.XPathInfo>> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, FieldInfo info, object parent)
+        // private class GetXPathValueException : Exception
+        // {
+        //     public GetXPathValueException()
+        //     {
+        //     }
+        //
+        //     public GetXPathValueException(string message) : base(message)
+        //     {
+        //     }
+        //
+        //     public GetXPathValueException(string message, Exception innerException) : base(message, innerException)
+        //     {
+        //     }
+        // }
+
+        private class GetXPathValuesResult
         {
+            public string XPathError;
+            // ReSharper disable once NotAccessedField.Local
+            public bool AnyResult;
+            public IEnumerable<object> Results;
+        }
+
+        private static GetXPathValuesResult GetXPathValues(IReadOnlyList<IReadOnlyList<GetByXPathAttribute.XPathInfo>> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, FieldInfo info, object parent)
+        {
+            bool anyResult = false;
             List<string> errors = new List<string>();
-            List<object> finalResults = new List<object>();
+            IEnumerable<object> finalResults = Array.Empty<object>();
 
             foreach (IReadOnlyList<GetByXPathAttribute.XPathInfo> orXPathInfoList in andXPathInfoList)
             {
                 foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList)
                 {
-                    IReadOnlyList<ResourceInfo> accValues = new []
+                    IEnumerable<ResourceInfo> accValues = new []
                     {
                         new ResourceInfo
                         {
@@ -1220,18 +1491,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                         IEnumerable<ResourceInfo> attrResources = GetValuesFromAttr(xPathStep.Attr, nodeTestResources);
                         IEnumerable<ResourceInfo> predicatesResources = GetValuesFromPredicates(xPathStep.Predicates, attrResources);
-                        accValues = predicatesResources.ToArray();
-                        if (accValues.Count == 0)
-                        {
-                            // Debug.Log($"Found 0 in {xPathStep}, break");
-    #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                            Debug.Log($"Found 0 in {xPathStep}");
-    #endif
-                            break;
-                        }
+                        accValues = predicatesResources;
+                        //                     accValues = predicatesResources.ToArray();
+                        //                     if (accValues.Count == 0)
+                        //                     {
+                        //                         // Debug.Log($"Found 0 in {xPathStep}, break");
+                        // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                        //                         Debug.Log($"Found 0 in {xPathStep}");
+                        // #endif
+                        //                         break;
+                        //                     }
                     }
 
-                    object[] results = accValues
+                    IEnumerable<object> results = accValues
                         .Select(each =>
                         {
                             // ReSharper disable once InvertIf
@@ -1248,12 +1520,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         .Where(each => !Util.IsNull(each))
                         .Select(each => ValidateXPathResult(each, expectedType, expectedInterface))
                         .Where(each => each.valid)
-                        .Select(each => each.value)
-                        .ToArray();
+                        .Select(each => each.value);
 
-                    if (results.Length != 0)
+                    // if (results.Length != 0)
+                    // {
+                    //     finalResults.AddRange(results);
+                    //     break;
+                    // }
+                    (bool hasElement, IEnumerable<object> elements) = HasAnyElement(results);
+                    if (hasElement)
                     {
-                        finalResults.AddRange(results);
+                        anyResult = true;
+                        finalResults = finalResults.Concat(elements);
                         break;
                     }
                 }
@@ -1261,9 +1539,39 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             // return (string.Join("\n", errors), Array.Empty<object>());
 
-            return finalResults.Count > 0
-                ? ("", finalResults)
-                : (string.Join("\n", errors), finalResults);
+            return anyResult
+                ? new GetXPathValuesResult
+                {
+                    XPathError = "",
+                    AnyResult = true,
+                    Results = finalResults,
+                }
+                : new GetXPathValuesResult
+                {
+                    XPathError = string.Join("\n", errors),
+                    AnyResult = false,
+                    Results = finalResults,
+                };
+        }
+
+        private static (bool hasElement, IEnumerable<T> elements) HasAnyElement<T>(IEnumerable<T> elements)
+        {
+            IEnumerator<T> enumerator = elements.GetEnumerator();
+            if (!enumerator.MoveNext())
+            {
+                return (false, Array.Empty<T>());
+            }
+
+            T first = enumerator.Current;
+            return (true, RePrependEnumerable(first, enumerator));
+        }
+
+        private static IEnumerable<T> RePrependEnumerable<T>(T first, IEnumerator<T> enumerator)
+        {
+            yield return first;
+            while (enumerator.MoveNext()) {
+                yield return enumerator.Current;
+            }
         }
 
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, Axis axis, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)
@@ -2674,7 +2982,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             Type arrayElementType = ReflectUtils.GetElementType(info.FieldType);
             bool arrayElementIsWrapProp = typeof(IWrapProp).IsAssignableFrom(arrayElementType);
-            Type expectType = arrayElementType;
             // Type expectInterface = null;
 
             // we can not get what prop is wrapped when array size is 0
@@ -2693,11 +3000,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return false;
             }
 
-            (string xPathError, IReadOnlyList<object> results) = GetXPathValues(attributes.SelectMany(each => each.XPathInfoAndList).ToArray(), expectType, null, arrayProperty, info, parent);
-            if (xPathError != "")
+            GetXPathValuesResult r = GetXPathValues(attributes.SelectMany(each => each.XPathInfoAndList).ToArray(), arrayElementType, null, arrayProperty, info, parent);
+            if (r.XPathError != "")
             {
                 return true;
             }
+
+            IReadOnlyList<object> results = r.Results.ToArray();
 
             bool needApply = false;
             // int resultSize = -1;

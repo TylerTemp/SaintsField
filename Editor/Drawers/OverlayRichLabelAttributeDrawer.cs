@@ -300,7 +300,7 @@ namespace SaintsField.Editor.Drawers
             return helpBox;
         }
 
-        protected override void OnStartUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {

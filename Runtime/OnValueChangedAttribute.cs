@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -15,7 +16,7 @@ namespace SaintsField
 
         public OnValueChangedAttribute(string callback)
         {
-            Callback = callback;
+            Callback = RuntimeUtil.ParseCallback(callback).content;
         }
     }
 }

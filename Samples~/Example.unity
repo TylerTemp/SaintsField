@@ -587,15 +587,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getComponentInParentArray:
   - {fileID: 74059532}
-  - {fileID: 74059534}
+  - {fileID: 454510170}
   getComponentInParentsList:
   - {fileID: 74059532}
-  - {fileID: 74059534}
   - {fileID: 454510170}
-  - {fileID: 454510169}
-  - {fileID: 454510172}
   - {fileID: 842523985}
-  - {fileID: 842523986}
+  getComponentInParents: {fileID: 74059532}
 --- !u!114 &74059532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2462,12 +2459,8 @@ MonoBehaviour:
   getComponent: {fileID: 454510170}
   getComponentArray:
   - {fileID: 454510170}
-  - {fileID: 454510169}
-  - {fileID: 454510172}
   getComponentList:
   - {fileID: 454510170}
-  - {fileID: 454510169}
-  - {fileID: 454510172}
   getComponentArrayXPath:
   - {fileID: 454510170}
   - {fileID: 454510169}
@@ -2517,34 +2510,28 @@ MonoBehaviour:
   - {fileID: 1271404094}
   - {fileID: 1516486913}
   - {fileID: 1631756501}
-  - {fileID: 1001589383}
-  - {fileID: 842523985}
-  - {fileID: 842523986}
-  - {fileID: 454510170}
-  - {fileID: 454510169}
-  - {fileID: 454510172}
-  - {fileID: 74059532}
-  - {fileID: 74059534}
-  - {fileID: 1902718156}
-  - {fileID: 1902718155}
   - {fileID: 1423887157}
   - {fileID: 632590880}
+  - {fileID: 1001589383}
+  - {fileID: 842523985}
+  - {fileID: 454510170}
+  - {fileID: 74059532}
+  - {fileID: 1902718156}
+  - {fileID: 1200378385}
+  - {fileID: 822337505}
   getComponentInParentsList:
   - {fileID: 1271404094}
   - {fileID: 1516486913}
   - {fileID: 1631756501}
-  - {fileID: 1001589383}
-  - {fileID: 842523985}
-  - {fileID: 842523986}
-  - {fileID: 454510170}
-  - {fileID: 454510169}
-  - {fileID: 454510172}
-  - {fileID: 74059532}
-  - {fileID: 74059534}
-  - {fileID: 1902718156}
-  - {fileID: 1902718155}
   - {fileID: 1423887157}
   - {fileID: 632590880}
+  - {fileID: 1001589383}
+  - {fileID: 842523985}
+  - {fileID: 454510170}
+  - {fileID: 74059532}
+  - {fileID: 1902718156}
+  - {fileID: 1200378385}
+  - {fileID: 822337505}
 --- !u!1 &458927138
 GameObject:
   m_ObjectHideFlags: 0
@@ -9990,7 +9977,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fbb524b8b9189b43b7cadc1645e79fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  getComponentInChildrenArray: []
+  getComponentInChildrenArray:
+  - {fileID: 842523985}
+  - {fileID: 454510170}
+  - {fileID: 74059532}
+  - {fileID: 1902718156}
 --- !u!114 &842523988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10007,12 +9998,8 @@ MonoBehaviour:
   getComponentByPathArray:
   - {fileID: 454510170}
   - {fileID: 454510169}
-  - {fileID: 454510172}
-  - {fileID: 1902718156}
-  - {fileID: 1902718155}
   getComponentByPathList:
   - {fileID: 1902718156}
-  - {fileID: 1902718155}
 --- !u!114 &842523989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11620,7 +11607,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myToggle: 0
   richToggleImGui: 1
-  richToggleUIToolkit: 0
   richToggle2: 0
   normalToggle: 0
   myStruct:
@@ -17505,14 +17491,14 @@ MonoBehaviour:
   slash2Sth: {fileID: 1540778734}
   slash3Sth: {fileID: 1540778734}
   directSubMultiDisabled: {fileID: 1957647119}
-  dummyXPath: {fileID: 632590878}
+  dummyXPath: {fileID: 0}
   direct1XPath: {fileID: 1671624918}
   directPosTg1XPath: {fileID: 1957647119}
   directLastXPath: {fileID: 1112995838}
   directSubMultiXPath: {fileID: 1957647119}
   notExistsXPath: {fileID: 0}
-  slashSthXPath: {fileID: 575593403}
-  slash2SthXPath: {fileID: 1540778734}
+  slashSthXPath: {fileID: 0}
+  slash2SthXPath: {fileID: 0}
 --- !u!4 &1830778825
 Transform:
   m_ObjectHideFlags: 0
@@ -24227,17 +24213,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
-  m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
-  m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
-  m_LightCookieSize: {x: 1, y: 1}
-  m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 0
 --- !u!1 &2137894679
 GameObject:
   m_ObjectHideFlags: 0
