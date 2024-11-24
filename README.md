@@ -77,7 +77,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.5.1-Preview**
+**3.5.1**
 
 1.  Performance improvement, mainly for UI Toolkit, and partly for IMGUI, [#98](https://github.com/TylerTemp/SaintsField/issues/98)
 2.  `SaintsFieldConfig` add `delay` and `update interval` for auto getters so you can have better control about it.

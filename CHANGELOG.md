@@ -1,11 +1,11 @@
 # Changelog
 
-## 3.5.1-Preview ##
+## 3.5.1 ##
 
 1.  Performance improvement, mainly for UI Toolkit, and partly for IMGUI, [#98](https://github.com/TylerTemp/SaintsField/issues/98)
 2.  `SaintsFieldConfig` add `delay` and `update interval` for auto getters so you can have better control about it.
-    
-    It's recommended to set `delay` to 100 and `update interval` 0 (means disabled), because usually you'll not need to frequently check the resources. Everytime clicking on the target will do an update, which is enough for most cases. 
+
+    It's recommended to set `delay` to 100 and `update interval` 0 (means disabled), because usually you'll not need to frequently check the resources. Everytime clicking on the target will do an update, which is enough for most cases.
 
 ## 3.5.0 ##
 
@@ -21,7 +21,7 @@
     However, you can just switch back to the old way if you do not care about the field change in the reference field, (Because Unity, still, does not fix related issues about property tracking...) by clicking `Window` - `Saints` - `Create or Edit SaintsField Config` and change the config here.
 
     These two issues can not be fixed unless Unity fixes it.
-    
+
     See: [1](https://issuetracker.unity3d.com/issues/visualelements-that-use-trackpropertyvalue-keep-tracking-properties-when-they-are-removed), [2](https://issuetracker.unity3d.com/issues/visualelement-dot-trackpropertyvalue-doesnt-invoke-the-callback-when-the-property-is-under-serializereference-and-serializefield-attributes)
 
 4.  `SaintsEditor`: Add `OnArraySizeChanged` to watch the array size change, [#97](https://github.com/TylerTemp/SaintsField/issues/97)
