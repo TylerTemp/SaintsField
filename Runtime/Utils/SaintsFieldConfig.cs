@@ -24,7 +24,7 @@ namespace SaintsField.Utils
         [LayoutStart("Auto Getters Configs", ELayout.FoldoutBox, marginTop: 10)]
 
         [InfoBox("How much delay should a getter wait until the first resource check. 0 means as soon as possible. (but not right now, it'll still use some delay)", EMessageType.None)]
-        [MinValue(0), RichLabel("Delay (ms)")]
+        [MinValue(0), RichLabel("Delay (ms) (UI Toolkit)")]
         public int getByXPathDelayMs;
 
         [InfoBox("How often should a getter check the resource changes. 0 means never check it", EMessageType.None)]

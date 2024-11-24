@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.5.1-Preview ##
+
+1.  Performance improvement, mainly for UI Toolkit, and partly for IMGUI, [#98](https://github.com/TylerTemp/SaintsField/issues/98)
+2.  `SaintsFieldConfig` add `delay` and `update interval` for auto getters so you can have better control about it.
+    
+    It's recommended to set `delay` to 100 and `update interval` 0 (means disabled), because usually you'll not need to frequently check the resources. Everytime clicking on the target will do an update, which is enough for most cases. 
+
 ## 3.5.0 ##
 
 1.  UI Toolkit: Fix an issue with `MinMaxSlider(free: true)` that the high/low is jump back to code value when you input an out-ranged value, then slide back to in-range value
