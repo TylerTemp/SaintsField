@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.5.2 ##
+
+1.  Fix multiple auto getters on a same field will cause partly filled values.
+2.  Add `bool delayedSearch = false` for `ListDrawerSettings` to delay the search until you hit enter or blur the search field
+
 ## 3.5.1 ##
 
 1.  Performance improvement, mainly for UI Toolkit, and partly for IMGUI, [#98](https://github.com/TylerTemp/SaintsField/issues/98)

@@ -29,5 +29,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
 
         [ListDrawerSettings(searchable: true), GetScriptableObject, Expandable] public Scriptable[] searchScriptable;
+        [ListDrawerSettings(searchable: true, delayedSearch: true), GetScriptableObject, Expandable] public Scriptable[] searchDelayScriptable;
     }
 }

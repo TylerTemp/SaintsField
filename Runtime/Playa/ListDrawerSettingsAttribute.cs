@@ -17,9 +17,9 @@ namespace SaintsField.Playa
 
         public ListDrawerSettingsAttribute(bool searchable = false, int numberOfItemsPerPage = 0, bool delayedSearch = false)
         {
-            Searchable = searchable;
             NumberOfItemsPerPage = numberOfItemsPerPage;
             Delayed = delayedSearch;
+            Searchable = Delayed || searchable;
         }
 
     }

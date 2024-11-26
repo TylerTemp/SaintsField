@@ -77,12 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.5.1**
+**3.5.2**
 
-1.  Performance improvement, mainly for UI Toolkit, and partly for IMGUI, [#98](https://github.com/TylerTemp/SaintsField/issues/98)
-2.  `SaintsFieldConfig` add `delay` and `update interval` for auto getters so you can have better control about it.
-
-    It's recommended to set `delay` to 100 and `update interval` 0 (means disabled), because usually you'll not need to frequently check the resources. Everytime clicking on the target will do an update, which is enough for most cases.
+1.  Fix multiple auto getters on a same field will cause partly filled values.
+2.  Add `bool delayedSearch = false` for `ListDrawerSettings` to delay the search until you hit enter or blur the search field
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1128,6 +1126,7 @@ Parameters:
 
 *   `bool searchable = false`: allow search in the list/array
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
+*   `bool delayedSearch = false`: when `true`, delay the search until you hit enter or blur the search field
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1149,7 +1148,6 @@ public MyData[] myDataArr;
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/08c6da9a-e613-4e94-8933-3d7a92f7cb33)
 
 The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
-
 
 #### `ShowInInspector` ####
 
