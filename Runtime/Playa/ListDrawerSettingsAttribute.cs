@@ -11,12 +11,15 @@ namespace SaintsField.Playa
         // ReSharper disable InconsistentNaming
         public readonly int NumberOfItemsPerPage;
         public readonly bool Searchable;
+
+        public readonly bool Delayed;
         // ReSharper enable InconsistentNaming
 
-        public ListDrawerSettingsAttribute(bool searchable = false, int numberOfItemsPerPage = 0)
+        public ListDrawerSettingsAttribute(bool searchable = false, int numberOfItemsPerPage = 0, bool delayedSearch = false)
         {
             Searchable = searchable;
             NumberOfItemsPerPage = numberOfItemsPerPage;
+            Delayed = delayedSearch;
         }
 
     }

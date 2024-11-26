@@ -265,6 +265,14 @@ namespace SaintsField.Editor.Playa.Renderer
                     flexShrink = 1,
                 },
             };
+            if(listDrawerSettingsAttribute.Delayed)
+            {
+                TextField text = searchField.Q<TextField>();
+                if (text != null)
+                {
+                    text.isDelayed = true;
+                }
+            }
             // searchContainer.Add(searchField);
             preContent.Add(searchField);
 
@@ -669,9 +677,10 @@ namespace SaintsField.Editor.Playa.Renderer
                 float listDrawerHeight = GetHeightIMGUI(rect.width);
                 Rect position = GUILayoutUtility.GetRect(0, listDrawerHeight);
                 ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
+                // ReSharper disable once ConvertToUsingDeclaration
                 using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
-                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
+                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute, listDrawerSettingsAttribute.Delayed);
                     if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
                        arraySize != FieldWithInfo.SerializedProperty.arraySize)
                     {
@@ -831,7 +840,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     // ReSharper disable once ConvertToUsingDeclaration
                     using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                     {
-                        DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute);
+                        DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute, listDrawerSettingsAttribute.Delayed);
                         if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
                            arraySize != FieldWithInfo.SerializedProperty.arraySize)
                         {
@@ -911,7 +920,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute)
+        private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute, bool delayed)
         {
             Rect usePosition = new Rect(position)
             {
@@ -937,7 +946,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     height = usePosition.height - 2,
                     width = usePosition.width - 12,
                 };
-                DrawListDrawerHeader(paddingTitle);
+                DrawListDrawerHeader(paddingTitle, delayed);
                 return;
             }
 
@@ -955,7 +964,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         headerHeight = SaintsPropertyDrawer.SingleLineHeight * ((_imGuiListInfo.HasPaging || _imGuiListInfo.HasSearch)? 2: 1),
                     };
-                _imGuiReorderableList.drawHeaderCallback += DrawListDrawerHeader;
+                _imGuiReorderableList.drawHeaderCallback += v => DrawListDrawerHeader(v, delayed);
                 _imGuiReorderableList.elementHeightCallback += DrawListDrawerItemHeight;
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
 
@@ -1004,7 +1013,7 @@ namespace SaintsField.Editor.Playa.Renderer
         private Texture2D _iconLeft;
         private Texture2D _iconRight;
 
-        private void DrawListDrawerHeader(Rect rect)
+        private void DrawListDrawerHeader(Rect rect, bool delayed)
         {
             // const float twoNumberInputWidth = 20;
             const float inputWidth = 30;
@@ -1110,10 +1119,20 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if(_imGuiListInfo.HasSearch)
             {
-                _imGuiListInfo.SearchText = EditorGUI.TextField(new Rect(searchRect)
+                if(delayed)
                 {
-                    width = searchRect.width - gap,
-                }, GUIContent.none, _imGuiListInfo.SearchText);
+                    _imGuiListInfo.SearchText = EditorGUI.DelayedTextField(new Rect(searchRect)
+                    {
+                        width = searchRect.width - gap,
+                    }, GUIContent.none, _imGuiListInfo.SearchText);
+                }
+                else
+                {
+                    _imGuiListInfo.SearchText = EditorGUI.TextField(new Rect(searchRect)
+                    {
+                        width = searchRect.width - gap,
+                    }, GUIContent.none, _imGuiListInfo.SearchText);
+                }
                 if (string.IsNullOrEmpty(_imGuiListInfo.SearchText))
                 {
                     EditorGUI.LabelField(new Rect(searchRect)
@@ -1285,6 +1304,10 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 propertyType = property.propertyType;
             }
+            catch (ObjectDisposedException)
+            {
+                return false;
+            }
             catch (NullReferenceException)
             {
                 return false;
@@ -1400,17 +1423,20 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private static bool SearchSoProp(ScriptableObject so, string search)
         {
-            SerializedObject serializedObject = new SerializedObject(so);
-            SerializedProperty iterator = serializedObject.GetIterator();
-            while (iterator.NextVisible(true))
+            // ReSharper disable once ConvertToUsingDeclaration
+            using(SerializedObject serializedObject = new SerializedObject(so))
             {
-                if(SearchProp(iterator, search))
+                SerializedProperty iterator = serializedObject.GetIterator();
+                while (iterator.NextVisible(true))
                 {
-                    return true;
+                    if (SearchProp(iterator, search))
+                    {
+                        return true;
+                    }
                 }
-            }
 
-            return false;
+                return false;
+            }
         }
 
         private struct PagingInfo
