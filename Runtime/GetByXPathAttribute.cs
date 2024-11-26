@@ -33,6 +33,11 @@ namespace SaintsField
             public string Callback;
 #if UNITY_EDITOR
             public IReadOnlyList<XPathStep> XPathSteps;
+
+            public override string ToString()
+            {
+                return XPathSteps == null? Callback: string.Join("/", XPathSteps);
+            }
 #endif
         }
 

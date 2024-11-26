@@ -196,9 +196,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             // IMGUI has much worse performance issue. Don't overwhelm the update
             int loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
             bool noLoop = loopInterval <= 0;
-            bool loopDelayReached = configExists && curTime - existedInitUserData.ImGuiLastTime < loopInterval / 1000f;
+            bool loopDelayNotReached = configExists && curTime - existedInitUserData.ImGuiLastTime < loopInterval / 1000f;
 
-            if(configExists && (noLoop || loopDelayReached))
+            if(configExists && (noLoop || loopDelayNotReached))
             {
                 return GetPostFieldWidthValue(firstAttribute, existedInitUserData);
             }
@@ -522,8 +522,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         #region UIToolkit
 #if UNITY_2021_3_OR_NEWER
 
-        private static string ClassArrayContainer(SerializedProperty property) => $"{property.propertyPath}__GetByXPath";
+        private static string ClassArrayContainer(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath";
         private static string ClassContainer(SerializedProperty property) => $"{property.propertyPath}__GetByXPath";
+        // private static string ClassAttributesContainer(SerializedProperty property) => $"{property.propertyPath}__GetByXPath_Attributes";
         private static string NameContainer(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath";
 
         private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_HelpBox";
@@ -544,6 +545,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 GetByXPathAttribute = getByXPathAttribute,
                 Property = property,
                 Info = info,
+                DecoratorIndex = index,
             };
             VisualElement root = new VisualElement
             {
@@ -572,7 +574,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 }
 
                 initUserData.ArrayProperty = arrayProperty;
-                root.AddToClassList(ClassArrayContainer(arrayProperty));
+
+                root.AddToClassList(ClassArrayContainer(arrayProperty, index));
             }
 
             Button refreshButton = new Button
@@ -652,6 +655,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             // CheckFieldResult checkResult = CheckField(property, info, parent, targetValue);
             initUserData.Error = "";
             initUserData.TargetProperty = targetProperty;
+            // Debug.Log($"set target property {targetProperty.propertyPath}");
             initUserData.MemberInfo = memberInfo;
             initUserData.ExpectType = expectType;
             initUserData.ExpectInterface = expectInterface;
@@ -750,7 +754,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
             if (root == null || root.style.display == DisplayStyle.None)
             {
-                Debug.Log($"skip {root}");
+                // Debug.Log($"skip {root}");
                 return;
             }
 
@@ -800,6 +804,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 .Select(each => (InitUserData)each.userData)
                 .ToArray();
 
+            bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
+            if (!imTheFirst)
+            {
+                return;
+            }
+
             if (getByXPathAttribute.UsePickerButton)
             {
                 selectorButton.style.display = DisplayStyle.Flex;
@@ -842,12 +852,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).styleSheets.Add(hideStyle);
             }
 
-            // bool imTheFirst = allXPathInitData[0].DecoratorIndex == index;
-            // if (!imTheFirst)
-            // {
-            //     return;
-            // }
-
             GetXPathValuesResult getXPathValuesResult = GetXPathValues(allXPathInitData.SelectMany(each => each.GetByXPathAttribute.XPathInfoAndList).ToArray(), initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
             initUserData.ArrayValues = getXPathValuesResult;
 
@@ -866,7 +870,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 if (getByXPathAttribute.InitSign && initUserData.ArrayProperty != null && initUserData.ArrayProperty.arraySize == 1)
                 {
                     object[] findValues = initUserData.ArrayValues.Results.ToArray();
-                    // Debug.Log($"findValues count {findValues.Length}");
+                    Debug.Log($"findValues count {findValues.Length}");
                     initUserData.ArrayValues.Results = findValues;
                     targetValueInit = true;
                     targetValue = findValues.WithIndex().FirstOrDefault(each => each.index == propertyIndex).value;
@@ -964,13 +968,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             IVisualElementScheduledItem task = container.schedule.Execute(() =>
             {
                 ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, true);
-                int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
-                if (loop > 0)
-                {
-                    container.schedule.Execute(() =>
-                        ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
-                            info, false)).Every(loop);
-                }
+                // int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+                // if (loop > 0)
+                // {
+                //     container.schedule.Execute(() =>
+                //         ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
+                //             info, false)).Every(loop);
+                // }
             });
             int delay = SaintsFieldConfigUtil.GetByXPathDelayMs();
 
@@ -1026,7 +1030,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
             else
             {
-                targetRoots.AddRange(UIToolkitUtils.IterUpWithSelf(container).OfType<ListView>().First().Query<VisualElement>(className: ClassArrayContainer(arrayProp)).ToList());
+                targetRoots.AddRange(
+                    UIToolkitUtils.IterUpWithSelf(container)
+                        .OfType<ListView>()
+                        .First()
+                        .Query<VisualElement>(className: ClassArrayContainer(arrayProp, index))
+                        .ToList()
+                );
                 // Debug.Log($"{targetRoots.Count}/{ClassArrayContainer(arrayProp)}");
             }
 
@@ -1072,6 +1082,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 if (hasRoot)
                 {
                     InitUserData userData = (InitUserData)root.userData;
+                    // Debug.Log(userData.TargetProperty.propertyPath);
                     Button refreshButton = root.Q<Button>(NameResignButton(userData.Property, index));
                     Button removeButton = root.Q<Button>(NameRemoveButton(userData.Property, index));
                     CheckFieldResult checkResult = CheckField(userData.Property, userData.Info, parent, targetValue);
@@ -1443,12 +1454,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
         private static GetXPathValuesResult GetXPathValues(IReadOnlyList<IReadOnlyList<GetByXPathAttribute.XPathInfo>> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, FieldInfo info, object parent)
         {
+            // Debug.Log($"andXPathInfoList Count={andXPathInfoList.Count}");
             bool anyResult = false;
             List<string> errors = new List<string>();
-            IEnumerable<object> finalResults = Array.Empty<object>();
+            // IEnumerable<object> finalResults = Array.Empty<object>();
+            List<IEnumerable<object>> finalResultsCollected = new List<IEnumerable<object>>();
 
             foreach (IReadOnlyList<GetByXPathAttribute.XPathInfo> orXPathInfoList in andXPathInfoList)
             {
+                // Debug.Log($"loop andXPathInfoList");
                 foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList)
                 {
                     IEnumerable<ResourceInfo> accValues = new []
@@ -1531,7 +1545,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     if (hasElement)
                     {
                         anyResult = true;
-                        finalResults = finalResults.Concat(elements);
+                        // finalResults = finalResults.Concat(elements);
+                        finalResultsCollected.Add(elements);
+                        // Debug.Log($"has value, break on {finalResultsCollected.Count}");
                         break;
                     }
                 }
@@ -1544,13 +1560,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     XPathError = "",
                     AnyResult = true,
-                    Results = finalResults,
+                    Results = finalResultsCollected.SelectMany(each => each),
                 }
                 : new GetXPathValuesResult
                 {
                     XPathError = string.Join("\n", errors),
                     AnyResult = false,
-                    Results = finalResults,
+                    Results = Array.Empty<object>(),
                 };
         }
 
@@ -3111,8 +3127,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 arrayProperty.serializedObject.ApplyModifiedProperties();
             }
-            return firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull;
-
+            return arrayProperty.arraySize == 0;
         }
     }
 }
