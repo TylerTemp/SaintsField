@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
     [CustomPropertyDrawer(typeof(DrawLabelAttribute))]
     public class DrawLabelAttributeDrawer: SaintsPropertyDrawer
     {
-        private class LabelInfoUIToolkit
+        private class LabelInfo
         {
             public string Content;
             public bool IsCallback;
@@ -64,7 +64,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             return ($"{property.propertyType} is not GameObject or Component", null);
         }
 
-        private static void OnSceneGUIInternal(SceneView _, LabelInfoUIToolkit labelInfo)
+        private static void OnSceneGUIInternal(SceneView _, LabelInfo labelInfo)
         {
             if (string.IsNullOrEmpty(labelInfo.ActualContent))
             {
@@ -89,17 +89,29 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             Vector3 pos = labelInfo.Transform.position;
             Handles.Label(pos, labelInfo.ActualContent, labelInfo.GUIStyle);
         }
+        ~DrawLabelAttributeDrawer()
+        {
+            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+        }
 
         #region IMGUI
 
-        private static readonly Dictionary<string, LabelInfoUIToolkit> IdToMinMaxRange = new Dictionary<string, LabelInfoUIToolkit>();
+        private static readonly Dictionary<string, LabelInfo> IdToMinMaxRange = new Dictionary<string, LabelInfo>();
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
 #if UNITY_2019_3_OR_NEWER
         [InitializeOnEnterPlayMode]
         [InitializeOnLoadMethod]
 #endif
-        private static void ImGuiClearSharedData() => IdToMinMaxRange.Clear();
+        private static void ImGuiClearSharedData()
+        {
+            foreach (LabelInfo labelInfo in IdToMinMaxRange.Values)
+            {
+                SceneView.duringSceneGui -= labelInfo.OnSceneGUIIMGUI;
+            }
+            IdToMinMaxRange.Clear();
+        }
 
         private string _cacheKey = "";
 
@@ -107,17 +119,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             base.ImGuiOnDispose();
             // ReSharper disable once InvertIf
-            if(IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfoUIToolkit labelInfo))
+            if(IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfo labelInfo))
             {
                 SceneView.duringSceneGui -= labelInfo.OnSceneGUIIMGUI;
                 IdToMinMaxRange.Remove(_cacheKey);
             }
-        }
-
-        ~DrawLabelAttributeDrawer()
-        {
-            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -140,21 +146,63 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             _cacheKey = GetKey(property);
             // ReSharper disable once InvertIf
-            if (!IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfoUIToolkit labelInfo))
+            if (!IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfo labelInfo))
             {
-                labelInfo = new LabelInfoUIToolkit
+                DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
+
+                (string error, Transform trans) = GetTargetField(property, info, parent);
+                if (error != "")
                 {
+                    Debug.LogError(error);
+                    return position;
+                }
+
+                labelInfo = new LabelInfo
+                {
+                    Content = drawLabelAttribute.Content,
+                    ActualContent = drawLabelAttribute.Content,
+                    IsCallback = drawLabelAttribute.IsCallback,
+                    EColor = drawLabelAttribute.EColor,
+                    Transform = trans,
+                    GUIStyle = drawLabelAttribute.EColor == EColor.White
+                        ? GUI.skin.label
+                        : new GUIStyle
+                        {
+                            normal = { textColor = drawLabelAttribute.EColor.GetColor() },
+                        },
                     OnSceneGUIIMGUI = OnSceneGUIIMGUI,
                 };
                 IdToMinMaxRange[_cacheKey] = labelInfo;
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
             }
+
+            if (!labelInfo.IsCallback)
+            {
+                return position;
+            }
+
+            (string valueError, object value) = Util.GetOf<object>(labelInfo.Content, null, property, fieldInfo, parent);
+            if (valueError != "")
+            {
+                Debug.LogError(valueError);
+                return position;
+            }
+
+            if (value is IWrapProp wrapProp)
+            {
+                value = Util.GetWrapValue(wrapProp);
+            }
+
+            labelInfo.ActualContent = $"{value}";
             return position;
         }
 
         private void OnSceneGUIIMGUI(SceneView sceneView)
         {
-            OnSceneGUIInternal(sceneView, _labelInfoUIToolkit);
+            if (IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfo labelInfo))
+            {
+                OnSceneGUIInternal(sceneView, labelInfo);
+            }
         }
 
         #endregion
@@ -162,7 +210,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
-        private LabelInfoUIToolkit _labelInfoUIToolkit;
+        private LabelInfo _labelInfoUIToolkit;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
@@ -179,7 +227,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 name = "draw-label-attribute-drawer",
             };
 
-            _labelInfoUIToolkit = new LabelInfoUIToolkit
+            _labelInfoUIToolkit = new LabelInfo
             {
                 Content = drawLabelAttribute.Content,
                 ActualContent = drawLabelAttribute.Content,
