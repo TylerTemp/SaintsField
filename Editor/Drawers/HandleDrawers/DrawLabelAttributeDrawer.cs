@@ -213,6 +213,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 #if UNITY_2021_3_OR_NEWER
 
         #region UIToolkit
+        private static string NameDrawLabel(SerializedProperty property) => $"{property.propertyPath}_DrawLabel";
+
         private LabelInfo _labelInfoUIToolkit;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -225,11 +227,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return new HelpBox(error, HelpBoxMessageType.Error);
             }
 
-            VisualElement child = new VisualElement
-            {
-                name = "draw-label-attribute-drawer",
-            };
-
             _labelInfoUIToolkit = new LabelInfo
             {
                 Content = drawLabelAttribute.Content,
@@ -238,11 +235,20 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 EColor = drawLabelAttribute.EColor,
                 Transform = trans,
             };
+            return null;
+        }
 
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            VisualElement child = new VisualElement
+            {
+                name = NameDrawLabel(property),
+            };
+            // SceneView.duringSceneGui += OnSceneGUIUIToolkit;
             child.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUIUIToolkit);
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
-
-            return child;
+            container.Add(child);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

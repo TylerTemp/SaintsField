@@ -2927,13 +2927,15 @@ Handles is drawn in the scene view instead of inspector.
 
 Draw a text in the view scene where the field object is.
 
-This is useful if you want to track an object's state (e.g. a charator's basic states) in the scene.
+This is useful if you want to track an object's state (e.g. a character's basic states) in the scene.
 
 Parameters:
 
 *   [Optional] `EColor eColor`: color of the label. Default is white.
 *   `string content`: the label text to show. Starting with `$` to make it an attribute/callback
 *   `bool isCallback = false`: make the content an attribute/callback. The callback can receive the value of the field, and the index if it's in an array/list.
+
+**Known Issue**: IMGUI implementation, the handle will not get cleaned up when select another object. This will be fixed in the future.
 
 ```csharp
 [DrawLabel("Test"), GetComponent]

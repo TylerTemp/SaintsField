@@ -18,6 +18,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
 
         public MonsterState monsterState;
 
-        [DrawLabel(EColor.Yellow ,"$" + nameof(monsterState))] public GameObject child;
+        [DrawLabel(EColor.Yellow ,"$" + nameof(monsterState))]
+        public GameObject child;
     }
 }
