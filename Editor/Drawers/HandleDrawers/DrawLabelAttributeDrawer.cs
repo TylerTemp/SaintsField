@@ -26,6 +26,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public FieldInfo Info;
 
             public Transform Transform;
+            public GUIStyle GUIStyle;
         }
 
         private LabelInfoUIToolkit _labelInfoUIToolkit;
@@ -40,6 +41,21 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return new HelpBox(error, HelpBoxMessageType.Error);
             }
 
+            GUIStyle guiStyle = GUI.skin.label;
+            if(drawLabelAttributeUIToolkit.EColor != EColor.White)
+            {
+                guiStyle = new GUIStyle
+                {
+                    normal = {textColor = drawLabelAttributeUIToolkit.EColor.GetColor()},
+                };
+            }
+
+            VisualElement child = new VisualElement
+            {
+                name = "draw-label-attribute-drawer",
+            };
+            container.Add(child);
+
             _labelInfoUIToolkit = new LabelInfoUIToolkit
             {
                 EColor = drawLabelAttributeUIToolkit.EColor,
@@ -48,22 +64,29 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 Property = property,
                 Info = info,
                 Transform = trans,
+                GUIStyle = guiStyle,
             };
 
-            container.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUI);
-            container.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUI);
+            child.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUI);
+            child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUI);
+
             return null;
         }
 
         private void OnSceneGUI(SceneView obj)
         {
+            if (Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
             if (_labelInfoUIToolkit.Transform is null)
             {
                 return;
             }
 
             Vector3 pos = _labelInfoUIToolkit.Transform.position;
-            Handles.Label(pos, _labelInfoUIToolkit.Content);
+            Handles.Label(pos, _labelInfoUIToolkit.Content, _labelInfoUIToolkit.GUIStyle);
         }
 
         private static (string error, Transform trans) GetTargetField(SerializedProperty property, FieldInfo info, object parent)
