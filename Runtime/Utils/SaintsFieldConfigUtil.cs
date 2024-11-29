@@ -110,7 +110,7 @@ namespace SaintsField.Utils
         public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => IsConfigLoaded && Config.disableOnValueChangedWatchArrayFieldUIToolkit;
 
         public static int GetByXPathDelayMs() => IsConfigLoaded? Config.getByXPathDelayMs: 0;
-        public static int GetByXPathLoopIntervalMs() => IsConfigLoaded? Config.getByXPathLoopIntervalMs: 0;
+        public static int GetByXPathLoopIntervalMs() => IsConfigLoaded? Config.getByXPathLoopIntervalMs: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMs;
 
     }
 }

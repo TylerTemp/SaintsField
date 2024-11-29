@@ -24,6 +24,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public Transform Transform;
             public GUIStyle GUIStyle;
 
+            // ReSharper disable once InconsistentNaming
             public Action<SceneView> OnSceneGUIIMGUI;
         }
 

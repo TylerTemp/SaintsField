@@ -778,6 +778,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, expectedData);
                 initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(expectedData);
+
+                // initUserData.CheckFieldResult.MisMatch = false;
+                // UpdateButtons(initUserData.CheckFieldResult, refreshButton, removeButton);
             };
 
             removeButton.clicked += () =>
@@ -788,6 +791,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(null);
+
+                    // initUserData.CheckFieldResult.OriginalValue = null;
+                    // initUserData.CheckFieldResult.MisMatch = false;
+                    // UpdateButtons(initUserData.CheckFieldResult, refreshButton, removeButton);
+
                 }
                 else
                 {
@@ -968,13 +976,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             IVisualElementScheduledItem task = container.schedule.Execute(() =>
             {
                 ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, true);
-                // int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
-                // if (loop > 0)
-                // {
-                //     container.schedule.Execute(() =>
-                //         ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
-                //             info, false)).Every(loop);
-                // }
+                int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+                if (loop > 0)
+                {
+                    container.schedule.Execute(() =>
+                        ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
+                            info, false)).Every(loop);
+                }
             });
             int delay = SaintsFieldConfigUtil.GetByXPathDelayMs();
 
@@ -1193,6 +1201,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 //         }
 //
 // #endif
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
+            object parent,
+            Action<object> onValueChangedCallback,
+            object newValue)
+        {
+            // Debug.Log($"Do Update {newValue}");
+            ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
+                info, false);
+        }
 
         private static IEnumerable<(bool hasRoot, VisualElement root, bool hasValue, object value)> ZipTwoLongest(IEnumerable<VisualElement> left, IEnumerable<object> right)
         {

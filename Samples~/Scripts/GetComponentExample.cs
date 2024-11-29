@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class GetComponentExample: MonoBehaviour
     {
-        [GetComponent] public BoxCollider otherComponent;
+        [GetComponent(EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker)] public BoxCollider otherComponent;
         [GetComponent] public GameObject selfGameObject;  // get the GameObject itself
         [GetComponent] public RectTransform selfRectTransform;  // useful for UI
 
