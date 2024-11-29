@@ -4,6 +4,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
+using System;
 using UnityEngine.UIElements;
 #endif
 
@@ -16,17 +17,18 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
         #region UIToolkit
 
-        private struct LabelInfoUIToolkit
+        private class LabelInfoUIToolkit
         {
-            public EColor EColor;
             public string Content;
             public bool IsCallback;
+            public string ActualContent;
+            public EColor EColor;
 
             public SerializedProperty Property;
             public FieldInfo Info;
 
             public Transform Transform;
-            public GUIStyle GUIStyle;
+            // public GUIStyle GUIStyle;
         }
 
         private LabelInfoUIToolkit _labelInfoUIToolkit;
@@ -34,59 +36,93 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            DrawLabelAttribute drawLabelAttributeUIToolkit = (DrawLabelAttribute)saintsAttribute;
+            DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
             (string error, Transform trans) = GetTargetField(property, info, parent);
             if (error != "")
             {
                 return new HelpBox(error, HelpBoxMessageType.Error);
             }
 
-            GUIStyle guiStyle = GUI.skin.label;
-            if(drawLabelAttributeUIToolkit.EColor != EColor.White)
-            {
-                guiStyle = new GUIStyle
-                {
-                    normal = {textColor = drawLabelAttributeUIToolkit.EColor.GetColor()},
-                };
-            }
+
 
             VisualElement child = new VisualElement
             {
                 name = "draw-label-attribute-drawer",
             };
-            container.Add(child);
 
             _labelInfoUIToolkit = new LabelInfoUIToolkit
             {
-                EColor = drawLabelAttributeUIToolkit.EColor,
-                Content = drawLabelAttributeUIToolkit.Content,
-                IsCallback = drawLabelAttributeUIToolkit.IsCallback,
+                Content = drawLabelAttribute.Content,
+                ActualContent = drawLabelAttribute.Content,
+                IsCallback = drawLabelAttribute.IsCallback,
+                EColor = drawLabelAttribute.EColor,
                 Property = property,
                 Info = info,
                 Transform = trans,
-                GUIStyle = guiStyle,
             };
 
             child.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUI);
-            child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUI);
+            child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUI);
 
-            return null;
+            return child;
         }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        {
+            if (!_labelInfoUIToolkit.IsCallback)
+            {
+                return;
+            }
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
+            (string error, object value) = Util.GetOf<object>(_labelInfoUIToolkit.Content, null, property, fieldInfo, parent);
+            if (error != "")
+            {
+                return;
+            }
+
+            if (value is IWrapProp wrapProp)
+            {
+                value = Util.GetWrapValue(wrapProp);
+            }
+
+            _labelInfoUIToolkit.ActualContent = $"{value}";
+            // Debug.Log($"Updated: {_labelInfoUIToolkit.ActualContent}");
+            // SceneView.duringSceneGui -= OnSceneGUI;
+        }
+
+        private GUIStyle _guiStyleUIToolkit;
 
         private void OnSceneGUI(SceneView obj)
         {
-            if (Event.current.type != EventType.Repaint)
+            if (string.IsNullOrEmpty(_labelInfoUIToolkit.ActualContent))
             {
                 return;
             }
 
-            if (_labelInfoUIToolkit.Transform is null)
+            if(_guiStyleUIToolkit == null)
             {
-                return;
+                if (_labelInfoUIToolkit.EColor == EColor.White)
+                {
+                    _guiStyleUIToolkit = GUI.skin.label;
+                }
+                else
+                {
+                    _guiStyleUIToolkit = new GUIStyle
+                    {
+                        normal = { textColor = _labelInfoUIToolkit.EColor.GetColor() },
+                    };
+                }
             }
 
             Vector3 pos = _labelInfoUIToolkit.Transform.position;
-            Handles.Label(pos, _labelInfoUIToolkit.Content, _labelInfoUIToolkit.GUIStyle);
+            Handles.Label(pos, _labelInfoUIToolkit.ActualContent, _guiStyleUIToolkit);
+
+            // Handles.color = Color.magenta;
+            // Handles.RadiusHandle(Quaternion.identity, _labelInfoUIToolkit.Transform.position, 0.1f);
         }
 
         private static (string error, Transform trans) GetTargetField(SerializedProperty property, FieldInfo info, object parent)

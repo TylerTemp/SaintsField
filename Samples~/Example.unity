@@ -13482,6 +13482,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   thisObj: {fileID: 1228599970}
+  monsterState: 0
   child: {fileID: 417762861}
 --- !u!1 &1233131287
 GameObject:

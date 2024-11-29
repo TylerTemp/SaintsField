@@ -13,7 +13,7 @@ namespace SaintsField
 
         public readonly EColor EColor;
         public readonly string Content;
-        public bool IsCallback;
+        public readonly bool IsCallback;
 
         public DrawLabelAttribute(EColor eColor, string content, bool isCallback = false)
         {
