@@ -1101,8 +1101,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     Button removeButton = root.Q<Button>(NameRemoveButton(userData.Property, index));
                     CheckFieldResult checkResult = CheckField(userData.Property, userData.Info, parent, targetValue);
 
+                    bool doResignInit = isInit && getByXPathAttribute.InitSign;
                     // ReSharper disable once MergeIntoPattern
-                    if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull))
+                    if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull || doResignInit))
                     {
                         bool targetIsNull = Util.IsNull(targetValue);
                         bool doResignValue = getByXPathAttribute.AutoResignToValue &&
@@ -1110,7 +1111,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         bool doResignNull = getByXPathAttribute.AutoResignToNull &&
                                             targetIsNull;
 
-                        bool doResignInit = isInit && getByXPathAttribute.InitSign;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                         Debug.Log($"{getByXPathAttribute.AutoResignToNull}/{Util.IsNull(targetValue)}");
 #endif

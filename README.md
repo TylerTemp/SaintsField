@@ -77,12 +77,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.5.1**
+**3.6.0**
 
-1.  Performance improvement, mainly for UI Toolkit, and partly for IMGUI, [#98](https://github.com/TylerTemp/SaintsField/issues/98)
-2.  `SaintsFieldConfig` add `delay` and `update interval` for auto getters so you can have better control about it.
+1.  Fix auto getters `includeinctive` checked the `gameObject` itself is enabled, but should be `activeInHierarchy`, [#103](https://github.com/TylerTemp/SaintsField/issues/103).
+2.  Add `DrawLabel` handle to draw label in the scene view, [#95](https://github.com/TylerTemp/SaintsField/issues/95)
+3.  Improve the logic of how `SaintsField Config` is loaded to reduce the times of loading the config.
+4.  UI Toolkit: fix auto getters won't work if you completely disable the update loop.
 
-    It's recommended to set `delay` to 100 and `update interval` 0 (means disabled), because usually you'll not need to frequently check the resources. Everytime clicking on the target will do an update, which is enough for most cases.
+Since this version we start to use the `semantic versioning` for version number.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
