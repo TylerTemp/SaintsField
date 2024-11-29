@@ -2919,6 +2919,41 @@ public string afterGroupLast;
 
 
 
+### Handles ###
+
+Handles is drawn in the scene view instead of inspector.
+
+#### DrawLabel ####
+
+Draw a text in the view scene where the field object is.
+
+This is useful if you want to track an object's state (e.g. a charator's basic states) in the scene.
+
+Parameters:
+
+*   [Optional] `EColor eColor`: color of the label. Default is white.
+*   `string content`: the label text to show. Starting with `$` to make it an attribute/callback
+*   `bool isCallback = false`: make the content an attribute/callback. The callback can receive the value of the field, and the index if it's in an array/list.
+
+```csharp
+[DrawLabel("Test"), GetComponent]
+public GameObject thisObj;
+
+[Serializable]
+public enum MonsterState
+{
+    Idle,
+    Attacking,
+    Dead,
+}
+
+public MonsterState monsterState;
+
+[DrawLabel(EColor.Yellow ,"$" + nameof(monsterState))] public GameObject child;
+```
+
+![draw-label](https://github.com/user-attachments/assets/4f1ec6e7-fed9-4889-9920-d2d2a9b8c0a9)
+
 ### Miscellaneous ###
 
 #### `Dropdown` ####
