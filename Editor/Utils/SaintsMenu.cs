@@ -11,13 +11,17 @@ namespace SaintsField.Editor.Utils
     public static class SaintsMenu
     {
 
-        #region UI Toolkit
+        #region Config
 
         [MenuItem("Window/Saints/Create or Edit SaintsField Config")]
         public static void CreateOrEditSaintsFieldConfig()
         {
-            SaintsFieldConfig saintsFieldConfig = SaintsFieldConfigUtil.GetConfig();
-            if (saintsFieldConfig == null)
+            SaintsFieldConfig saintsFieldConfig;
+            if (SaintsFieldConfigUtil.ReloadConfig())
+            {
+                saintsFieldConfig = SaintsFieldConfigUtil.Config;
+            }
+            else
             {
                 if (!Directory.Exists("Assets/Editor Default Resources"))
                 {
@@ -32,9 +36,14 @@ namespace SaintsField.Editor.Utils
                 }
 
                 saintsFieldConfig = ScriptableObject.CreateInstance<SaintsFieldConfig>();
-                Debug.Log($"Create saintsFieldConfig: Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
-                AssetDatabase.CreateAsset(saintsFieldConfig, $"Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
+                Debug.Log(
+                    $"Create saintsFieldConfig: Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
+                AssetDatabase.CreateAsset(saintsFieldConfig,
+                    $"Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
                 AssetDatabase.SaveAssets();
+
+                SaintsFieldConfigUtil.ReloadConfig();
+                saintsFieldConfig = SaintsFieldConfigUtil.Config;
             }
 
             Selection.activeObject = saintsFieldConfig;

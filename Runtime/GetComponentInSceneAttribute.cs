@@ -23,7 +23,7 @@ namespace SaintsField
         private void ParseArguments(bool includeInactive, Type compType)
         {
             string compFilter = GetComponentFilter(compType);
-            string activeFilter = includeInactive ? "" : "[@{gameObject.activeSelf}]";
+            string activeFilter = includeInactive ? "" : "[@{gameObject.activeInHierarchy}]";
             string allFilter = $"{activeFilter}{compFilter}";
             // string sepFilter = allFilter == ""? "": $"/{allFilter}";
 

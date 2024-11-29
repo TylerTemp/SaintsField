@@ -23,11 +23,9 @@ namespace SaintsField.Editor.Drawers
         private static readonly Dictionary<string, Vector2> IdToMinMaxRange = new Dictionary<string, Vector2>();
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
-#if UNITY_2019_2_OR_NEWER
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-#endif
 #if UNITY_2019_3_OR_NEWER
         [InitializeOnEnterPlayMode]
+        [InitializeOnLoadMethod]
 #endif
         private static void ImGuiClearSharedData() => IdToMinMaxRange.Clear();
 

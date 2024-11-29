@@ -744,6 +744,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
+        private bool _selfChange;
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
@@ -777,7 +779,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 // Debug.Log($"expectedData={expectedData}, targetProp={initUserData.TargetProperty.propertyPath} memberInfo={initUserData.MemberInfo.Name}");
                 SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, expectedData);
                 initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                _selfChange = true;
                 onValueChangedCallback.Invoke(expectedData);
+                _selfChange = false;
+
+                // initUserData.CheckFieldResult.MisMatch = false;
+                // UpdateButtons(initUserData.CheckFieldResult, refreshButton, removeButton);
             };
 
             removeButton.clicked += () =>
@@ -787,7 +794,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                    _selfChange = true;
                     onValueChangedCallback.Invoke(null);
+                    _selfChange = false;
+
+                    // initUserData.CheckFieldResult.OriginalValue = null;
+                    // initUserData.CheckFieldResult.MisMatch = false;
+                    // UpdateButtons(initUserData.CheckFieldResult, refreshButton, removeButton);
+
                 }
                 else
                 {
@@ -968,13 +982,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             IVisualElementScheduledItem task = container.schedule.Execute(() =>
             {
                 ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info, true);
-                // int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
-                // if (loop > 0)
-                // {
-                //     container.schedule.Execute(() =>
-                //         ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
-                //             info, false)).Every(loop);
-                // }
+                int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+                if (loop > 0)
+                {
+                    container.schedule.Execute(() =>
+                        ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
+                            info, false)).Every(loop);
+                }
             });
             int delay = SaintsFieldConfigUtil.GetByXPathDelayMs();
 
@@ -1087,8 +1101,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     Button removeButton = root.Q<Button>(NameRemoveButton(userData.Property, index));
                     CheckFieldResult checkResult = CheckField(userData.Property, userData.Info, parent, targetValue);
 
+                    bool doResignInit = isInit && getByXPathAttribute.InitSign;
                     // ReSharper disable once MergeIntoPattern
-                    if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull))
+                    if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull || doResignInit))
                     {
                         bool targetIsNull = Util.IsNull(targetValue);
                         bool doResignValue = getByXPathAttribute.AutoResignToValue &&
@@ -1096,7 +1111,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         bool doResignNull = getByXPathAttribute.AutoResignToNull &&
                                             targetIsNull;
 
-                        bool doResignInit = isInit && getByXPathAttribute.InitSign;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                         Debug.Log($"{getByXPathAttribute.AutoResignToNull}/{Util.IsNull(targetValue)}");
 #endif
@@ -1193,6 +1207,23 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 //         }
 //
 // #endif
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
+            object parent,
+            Action<object> onValueChangedCallback,
+            object newValue)
+        {
+            // Debug.Log($"Do Update {newValue}");
+            if(!_selfChange)
+            {
+                ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
+                    info, false);
+            }
+
+            _selfChange = false;
+        }
 
         private static IEnumerable<(bool hasRoot, VisualElement root, bool hasValue, object value)> ZipTwoLongest(IEnumerable<VisualElement> left, IEnumerable<object> right)
         {
