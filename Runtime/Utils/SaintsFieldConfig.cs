@@ -29,7 +29,7 @@ namespace SaintsField.Utils
 
         [InfoBox("How often should a getter check the resource changes. 0 means never check it", EMessageType.None)]
         [MinValue(0), RichLabel("Update Interval (ms)")]
-        public int getByXPathLoopIntervalMs = UpdateLoopDefaultMs;
+        public int getByXPathLoopIntervalMs;
 
         [Space]
 
