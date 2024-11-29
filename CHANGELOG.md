@@ -2,7 +2,7 @@
 
 ## 3.6.0 ##
 
-1.  Fix auto getters `includeinctive` checked the `gameObject` itself is enabled, but should be `activeInHierarchy`, [#103](https://github.com/TylerTemp/SaintsField/issues/103).
+1.  Fix auto getters `includeInactive` checked the `gameObject` itself is enabled, but should be `activeInHierarchy`, [#103](https://github.com/TylerTemp/SaintsField/issues/103).
 2.  Add `DrawLabel` handle to draw label in the scene view, [#95](https://github.com/TylerTemp/SaintsField/issues/95)
 3.  Improve the logic of how `SaintsField Config` is loaded to reduce the times of loading the config.
 4.  UI Toolkit: fix auto getters won't work if you completely disable the update loop.
