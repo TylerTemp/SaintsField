@@ -1,7 +1,7 @@
 
 using System;
-#if UNITY_EDITOR
 using UnityEditor;
+#if UNITY_EDITOR
 using UnityEngine;
 #endif
 
@@ -10,7 +10,7 @@ namespace SaintsField.Utils
 
 #if UNITY_EDITOR
     [InitializeOnLoad]
-    public class SaintsFieldConfigDeleteWatcher : AssetModificationProcessor
+    public class SaintsFieldConfigDeleteWatcher : UnityEditor.AssetModificationProcessor
     {
         // ReSharper disable once EmptyConstructor
         static SaintsFieldConfigDeleteWatcher()

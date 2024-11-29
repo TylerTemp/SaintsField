@@ -100,20 +100,20 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
         #region IMGUI
 
-        private static readonly Dictionary<string, LabelInfo> IdToMinMaxRange = new Dictionary<string, LabelInfo>();
+        private static readonly Dictionary<string, LabelInfo> IdToLabelInfo = new Dictionary<string, LabelInfo>();
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
 #if UNITY_2019_3_OR_NEWER
         [InitializeOnEnterPlayMode]
-        [InitializeOnLoadMethod]
 #endif
+        [InitializeOnLoadMethod]
         private static void ImGuiClearSharedData()
         {
-            foreach (LabelInfo labelInfo in IdToMinMaxRange.Values)
+            foreach (LabelInfo labelInfo in IdToLabelInfo.Values)
             {
                 SceneView.duringSceneGui -= labelInfo.OnSceneGUIIMGUI;
             }
-            IdToMinMaxRange.Clear();
+            IdToLabelInfo.Clear();
         }
 
         private string _cacheKey = "";
@@ -122,10 +122,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             base.ImGuiOnDispose();
             // ReSharper disable once InvertIf
-            if(IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfo labelInfo))
+            if(IdToLabelInfo.TryGetValue(_cacheKey, out LabelInfo labelInfo))
             {
                 SceneView.duringSceneGui -= labelInfo.OnSceneGUIIMGUI;
-                IdToMinMaxRange.Remove(_cacheKey);
+                IdToLabelInfo.Remove(_cacheKey);
             }
         }
 
@@ -149,7 +149,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             _cacheKey = GetKey(property);
             // ReSharper disable once InvertIf
-            if (!IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfo labelInfo))
+            if (!IdToLabelInfo.TryGetValue(_cacheKey, out LabelInfo labelInfo))
             {
                 DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
 
@@ -175,7 +175,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                         },
                     OnSceneGUIIMGUI = OnSceneGUIIMGUI,
                 };
-                IdToMinMaxRange[_cacheKey] = labelInfo;
+                IdToLabelInfo[_cacheKey] = labelInfo;
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
             }
 
@@ -202,7 +202,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
         private void OnSceneGUIIMGUI(SceneView sceneView)
         {
-            if (IdToMinMaxRange.TryGetValue(_cacheKey, out LabelInfo labelInfo))
+            if (IdToLabelInfo.TryGetValue(_cacheKey, out LabelInfo labelInfo))
             {
                 OnSceneGUIInternal(sceneView, labelInfo);
             }
