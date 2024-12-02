@@ -182,6 +182,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 return 0;
             }
+
+            try
+            {
+                string _ = property.propertyPath;
+            }
+            catch (ObjectDisposedException)
+            {
+                return 0;
+            }
+            catch (NullReferenceException)
+            {
+                return 0;
+            }
+
             // IReadOnlyList<GetByXPathAttribute> allGetByXPathAttributes = AttributesIfImTheFirst(property, (GetByXPathAttribute)saintsAttribute);
             bool configExists = ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData);
             if(configExists && existedInitUserData.DecoratorIndex != index)
@@ -338,6 +352,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             {
                 return false;
             }
+
+            try
+            {
+                string _ = property.propertyPath;
+            }
+            catch (ObjectDisposedException)
+            {
+                return 0;
+            }
+            catch (NullReferenceException)
+            {
+                return 0;
+            }
+
             if(!ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData) || existedInitUserData.DecoratorIndex != index)
             {
                 return false;

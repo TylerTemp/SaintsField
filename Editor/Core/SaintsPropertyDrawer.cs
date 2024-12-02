@@ -1737,7 +1737,14 @@ namespace SaintsField.Editor.Core
                 }
 #endif
 
-                EditorGUI.PropertyField(position, property, label, true);
+                try
+                {
+                    EditorGUI.PropertyField(position, property, label, true);
+                }
+                catch (InvalidOperationException e)
+                {
+                    Debug.LogError(e);
+                }
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
             }
             // Debug.Log($"UnityDraw exit, isSub={isSubDrawer}");
