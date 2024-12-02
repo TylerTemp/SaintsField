@@ -176,7 +176,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                     OnSceneGUIIMGUI = OnSceneGUIIMGUI,
                 };
                 IdToLabelInfo[_cacheKey] = labelInfo;
+                ImGuiEnsureDispose(property.serializedObject.targetObject);
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
+                SceneView.RepaintAll();
             }
 
             if (!labelInfo.IsCallback)
