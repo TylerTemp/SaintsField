@@ -8,6 +8,7 @@ namespace SaintsField.Samples.Scripts
         [ResizableTextArea, RichLabel("<icon=star.png /><label />")] public string _short;
         [ResizableTextArea] public string _long;
         [RichLabel(null), ResizableTextArea] public string _noLabel;
+        [RichLabel("long long long long long long long long long long long long long label"), ResizableTextArea] public string longLabel;
 
         // [ResizableTextArea(false)] public string _inlineShort;
         // [ResizableTextArea(false)] public string _inlineLong;

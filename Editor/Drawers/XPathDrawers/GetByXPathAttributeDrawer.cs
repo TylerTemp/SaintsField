@@ -208,7 +208,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             double curTime = EditorApplication.timeSinceStartup;
 
             // IMGUI has much worse performance issue. Don't overwhelm the update
-            int loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+            int loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI();
             bool noLoop = loopInterval <= 0;
             bool loopDelayNotReached = configExists && curTime - existedInitUserData.ImGuiLastTime < loopInterval / 1000f;
 
@@ -359,11 +359,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
             catch (ObjectDisposedException)
             {
-                return 0;
+                return false;
             }
             catch (NullReferenceException)
             {
-                return 0;
+                return false;
             }
 
             if(!ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData) || existedInitUserData.DecoratorIndex != index)

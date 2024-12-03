@@ -79,6 +79,7 @@ namespace SaintsField.Editor.Drawers
 #endif
 
             RichTextDrawer.RichTextChunk[] parsedXmlNode = RichTextDrawer.ParseRichXml(labelXml, labelText, info, parent).ToArray();
+
             _richTextDrawer.DrawChunks(position, label, parsedXmlNode);
         }
 

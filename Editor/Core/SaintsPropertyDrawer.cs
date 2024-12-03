@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Core
 
         private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
-#if UNITY_2022_1_OR_NEWER
+#if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
         private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
             new Dictionary<Type, IReadOnlyList<Type>>();
 #endif
@@ -215,7 +215,7 @@ namespace SaintsField.Editor.Core
 // #endif
                 }
 
-#if UNITY_2022_1_OR_NEWER
+#if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
                 _propertyAttributeToDecoratorDrawers = attrToDecoratorDrawers.ToDictionary(each => each.Key, each => (IReadOnlyList<Type>)each.Value);
 #endif
             }
@@ -1292,12 +1292,42 @@ namespace SaintsField.Editor.Core
                         labelDrawerInstance.WillDrawLabel(property, labelAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
                     if (hasLabelSpace)
                     {
+                        bool hasLeftToggle = false;
+                        bool hasTextArea = false;
+                        foreach (SaintsWithIndex saintsWithIndex in allSaintsAttributes)
+                        {
+                            if (saintsWithIndex.SaintsAttribute is LeftToggleAttribute)
+                            {
+                                hasLeftToggle = true;
+                            }
+                            else if (saintsWithIndex.SaintsAttribute is ResizableTextAreaAttribute)
+                            {
+                                hasTextArea = true;
+                            }
+                        }
+
+                        const float leftToggleSpace = 18;
+                        float useWidth = EditorGUIUtility.labelWidth - preLabelWidth;
+                        float useX = fieldUseRectWithPost.x;
+
+                        if (hasLeftToggle)
+                        {
+                            useWidth = fieldUseRectWithPost.width - preLabelWidth - leftToggleSpace;
+                            useX = fieldUseRectWithPost.x + leftToggleSpace;
+                        }
+                        else if(hasTextArea)
+                        {
+                            useWidth = fieldUseRectWithPost.width - preLabelWidth;
+                            useX = fieldUseRectWithPost.x;
+                        }
+
                         labelDrawerInfo = new LabelDrawerInfo
                         {
                             labelDrawerInstance = labelDrawerInstance,
                             rect = new Rect(fieldUseRectWithPost)
                             {
-                                width = EditorGUIUtility.labelWidth - preLabelWidth,
+                                x = useX,
+                                width = useWidth,
                                 height = EditorGUIUtility.singleLineHeight,
                             },
                         };

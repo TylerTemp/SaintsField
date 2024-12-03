@@ -77,14 +77,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.6.0**
+**3.6.1**
 
-1.  Fix auto getters `includeInactive` checked the `gameObject` itself is enabled, but should be `activeInHierarchy`, [#103](https://github.com/TylerTemp/SaintsField/issues/103).
-2.  Add `DrawLabel` handle to draw label in the scene view, [#95](https://github.com/TylerTemp/SaintsField/issues/95)
-3.  Improve the logic of how `SaintsField Config` is loaded to reduce the times of loading the config.
-4.  UI Toolkit: fix auto getters won't work if you completely disable the update loop.
-
-Since this version we start to use the `semantic versioning` for version number.
+1.  IMGUI: Fix accessing disposed `SerializedProperty`, [#102](https://github.com/TylerTemp/SaintsField/issues/102)
+2.  IMGUI: Split config for auto getters from UI Toolkit, and change the default behavior of IMGUI auto getters to be never update while on inspector (same as old behavior of auto getters). Might be related to [#98](https://github.com/TylerTemp/SaintsField/issues/98)
+3.  IMGUI: Fix `RichLabel` has some indent and truncate issue with `LeftToggle` and `ResiziableTextArea`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3313,13 +3310,11 @@ using SaintsField;
 
 A toggle button on the left of the bool field. Only works on boolean field.
 
-IMGUI: To use with `RichLabel`, you need to add 6 spaces ahead as a hack
-
 ```csharp
 using SaintsField;
 
 [LeftToggle] public bool myToggle;
-[LeftToggle, RichLabel("      <color=green><label />")] public bool richToggle;
+[LeftToggle, RichLabel("<color=green><label />")] public bool richToggle;
 ```
 
 ![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
