@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.DebugTool
         {
             return new HelpBox
             {
-                text = "You're using <color=green>UI Toolkit</green>. Nice.",
+                text = "You're using <color=green>UI Toolkit</color>. Nice.",
                 messageType = HelpBoxMessageType.Info,
             };
         }
