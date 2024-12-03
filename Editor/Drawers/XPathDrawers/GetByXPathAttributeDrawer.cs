@@ -197,7 +197,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
 
             // IReadOnlyList<GetByXPathAttribute> allGetByXPathAttributes = AttributesIfImTheFirst(property, (GetByXPathAttribute)saintsAttribute);
-            bool configExists = ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData);
+            string key = GetKey(property);
+            bool configExists = ImGuiSharedUserData.TryGetValue(key, out InitUserData existedInitUserData);
             if(configExists && existedInitUserData.DecoratorIndex != index)
             {
                 return 0;
@@ -264,6 +265,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         {
                             arrProp.arraySize = results.Count;
                             arrProp.serializedObject.ApplyModifiedProperties();
+                            ImGuiSharedUserData.Remove(key);
+                            return 0;
                         }
                     }
                 }
@@ -292,7 +295,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     },
                 ImGuiLastTime = curTime,
             };
-            ImGuiSharedUserData[GetKey(property)] = initUserData;
+            ImGuiSharedUserData[key] = initUserData;
 
             // Debug.Log($"initUserData.CheckFieldResult.MisMatch={initUserData.CheckFieldResult.MisMatch}, initUserData.CheckFieldResult.OriginalValue={initUserData.CheckFieldResult.OriginalValue}");
 
@@ -372,20 +375,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
             IReadOnlyList<GetByXPathAttribute> allGetByXPathAttributes = existedInitUserData.GetByXPathAttributes;
 
-            InitUserData initUserData = ImGuiSharedUserData[GetKey(property)];
             GetByXPathAttribute firstAttribute = allGetByXPathAttributes[0];
             bool willDraw = false;
             bool drawPicker = firstAttribute.UsePickerButton;
             Rect pickerRect = position;
 
-            if (initUserData.CheckFieldResult.Error == "")
+            if (existedInitUserData.CheckFieldResult.Error == "")
             {
-                if (initUserData.CheckFieldResult.MisMatch && firstAttribute.UseResignButton)
+                if (existedInitUserData.CheckFieldResult.MisMatch && firstAttribute.UseResignButton)
                 {
                     willDraw = true;
                     (Rect actionButtonRect, Rect leftRect) = RectUtils.SplitWidthRect(position, SingleLineHeight);
                     pickerRect = leftRect;
-                    if (Util.IsNull(initUserData.CheckFieldResult.TargetValue))
+                    if (Util.IsNull(existedInitUserData.CheckFieldResult.TargetValue))
                     {
                         if (_removeIcon == null)
                         {
@@ -395,17 +397,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         if (GUI.Button(actionButtonRect, _removeIcon))
                         {
 
-                            int arrayIndex = initUserData.CheckFieldResult.Index;
+                            int arrayIndex = existedInitUserData.CheckFieldResult.Index;
                             if(arrayIndex == -1)
                             {
-                                SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
-                                initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                                SetValue(existedInitUserData.TargetProperty, existedInitUserData.MemberInfo, parent, null);
+                                existedInitUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                                 onGUIPayload.SetValue(null);
                             }
                             else
                             {
-                                initUserData.ArrayProperty.DeleteArrayElementAtIndex(arrayIndex);
-                                initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
+                                existedInitUserData.ArrayProperty.DeleteArrayElementAtIndex(arrayIndex);
+                                existedInitUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
                             }
                         }
                     }
@@ -418,8 +420,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
                         if (GUI.Button(actionButtonRect, _refreshIcon))
                         {
-                            SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, initUserData.CheckFieldResult.TargetValue);
-                            initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                            SetValue(existedInitUserData.TargetProperty, existedInitUserData.MemberInfo, parent, existedInitUserData.CheckFieldResult.TargetValue);
+                            existedInitUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                             onGUIPayload.SetValue(null);
                         }
                     }
@@ -439,11 +441,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     else
                     {
                         OpenPicker(property, info, allGetByXPathAttributes,
-                            initUserData.ExpectType, initUserData.ExpectInterface,
+                            existedInitUserData.ExpectType, existedInitUserData.ExpectInterface,
                             newValue =>
                             {
-                                SetValue(initUserData.TargetProperty, initUserData.MemberInfo, updatedParent, newValue);
-                                initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                                SetValue(existedInitUserData.TargetProperty, existedInitUserData.MemberInfo, updatedParent, newValue);
+                                existedInitUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                                 onGUIPayload.SetValue(newValue);
                             }, updatedParent);
                     }
