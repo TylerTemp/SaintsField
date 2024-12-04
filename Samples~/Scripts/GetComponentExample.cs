@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class GetComponentExample: MonoBehaviour
     {
-        [GetComponent(EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker)] public BoxCollider otherComponent;
+        [GetComponent(EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker), PostFieldButton(nameof(DebugShow), "D")] public BoxCollider otherComponent;
         [GetComponent] public GameObject selfGameObject;  // get the GameObject itself
         [GetComponent] public RectTransform selfRectTransform;  // useful for UI
 
@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts
         [GetComponent] public Dummy otherScript;  // other script
         [GetComponent] public SpriteRenderer noSuch;  // other script
 
-        [Separator("GetByXPath2")]
+        [Separator("GetByXPath")]
         // alternative
         [GetByXPath(".")] public BoxCollider otherComponentAlternative;
         [GetByXPath(".")] public GameObject selfGameObjectAlternative;  // get the GameObject itself
@@ -20,5 +20,7 @@ namespace SaintsField.Samples.Scripts
 
         [GetByXPath(".")] public GetComponentExample selfScriptAlternative;  // yeah you can get your script itself
         [GetByXPath(".")] [GetComponent] public Dummy otherScriptAlternative;  // other script
+
+        private void DebugShow(object o) => Debug.Log(o);
     }
 }
