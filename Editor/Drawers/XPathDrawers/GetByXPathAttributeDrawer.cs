@@ -680,8 +680,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return root;
             }
 
-
-
             // CheckFieldResult checkResult = CheckField(property, info, parent, targetValue);
             initUserData.Error = "";
             initUserData.TargetProperty = targetProperty;
@@ -774,7 +772,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        private bool _selfChange;
+        // private bool _selfChange;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -809,9 +807,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 // Debug.Log($"expectedData={expectedData}, targetProp={initUserData.TargetProperty.propertyPath} memberInfo={initUserData.MemberInfo.Name}");
                 SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, expectedData);
                 initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                _selfChange = true;
+                // _selfChange = true;
                 onValueChangedCallback.Invoke(expectedData);
-                _selfChange = false;
+                // _selfChange = false;
 
                 // initUserData.CheckFieldResult.MisMatch = false;
                 // UpdateButtons(initUserData.CheckFieldResult, refreshButton, removeButton);
@@ -824,9 +822,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                    _selfChange = true;
+                    // _selfChange = true;
                     onValueChangedCallback.Invoke(null);
-                    _selfChange = false;
+                    // _selfChange = false;
 
                     // initUserData.CheckFieldResult.OriginalValue = null;
                     // initUserData.CheckFieldResult.MisMatch = false;
@@ -1089,8 +1087,30 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 .ToList()
                 .Select(each => (InitUserData)each.userData)
                 .ToArray();
+
+            if (allXPathInitData[0].DecoratorIndex != index)
+            {
+                return;
+            }
+            GetByXPathAttribute getByXPathAttribute = allXPathInitData[0].GetByXPathAttribute;
+
+            // Debug.Log($"{index}/{property.propertyPath}");
+            if (!getByXPathAttribute.AutoResignToValue && !getByXPathAttribute.AutoResignToNull &&
+                !getByXPathAttribute.InitSign)  // just a picker
+            {
+                return;
+            }
+
+            // no auto sign, and it's not the first shoot
+            if(!isInit && !getByXPathAttribute.AutoResignToValue && !getByXPathAttribute.AutoResignToNull)
+            {
+                return;
+            }
+
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            GetByXPathAttribute getByXPathAttribute = (GetByXPathAttribute) saintsAttribute;
+
+
+
             GetXPathValuesResult r = GetXPathValues(allXPathInitData.SelectMany(each => each.GetByXPathAttribute.XPathInfoAndList).ToArray(),  initUserData.ExpectType, initUserData.ExpectInterface, property, info, parent);
 
             if (r.XPathError != "")
@@ -1131,18 +1151,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     Button removeButton = root.Q<Button>(NameRemoveButton(userData.Property, index));
                     CheckFieldResult checkResult = CheckField(userData.Property, userData.Info, parent, targetValue);
 
-                    bool doResignInit = isInit && getByXPathAttribute.InitSign;
+                    // bool doResignInit = isInit && getByXPathAttribute.InitSign;
                     // ReSharper disable once MergeIntoPattern
-                    if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull || doResignInit))
+                    if (checkResult.Error == "" && checkResult.MisMatch && (getByXPathAttribute.AutoResignToValue || getByXPathAttribute.AutoResignToNull || getByXPathAttribute.InitSign))
                     {
                         bool targetIsNull = Util.IsNull(targetValue);
                         bool doResignValue = getByXPathAttribute.AutoResignToValue &&
                                              !targetIsNull;
                         bool doResignNull = getByXPathAttribute.AutoResignToNull &&
                                             targetIsNull;
+                        bool doResignInit = isInit && getByXPathAttribute.InitSign && targetIsNull;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                        Debug.Log($"{getByXPathAttribute.AutoResignToNull}/{Util.IsNull(targetValue)}");
+                        Debug.Log($"{getByXPathAttribute.AutoResignToValue}/{getByXPathAttribute.AutoResignToNull}/{getByXPathAttribute.InitSign}/{isInit}/{targetIsNull}");
 #endif
                         if (doResignNull || doResignValue || doResignInit)
                         {
@@ -1246,13 +1267,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             object newValue)
         {
             // Debug.Log($"Do Update {newValue}");
-            if(!_selfChange)
-            {
-                ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
-                    info, false);
-            }
+            // if(!_selfChange)
+            // {
+            // }
+            //
+            // _selfChange = false;
+            ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback,
+                info, false);
 
-            _selfChange = false;
         }
 
         private static IEnumerable<(bool hasRoot, VisualElement root, bool hasValue, object value)> ZipTwoLongest(IEnumerable<VisualElement> left, IEnumerable<object> right)
