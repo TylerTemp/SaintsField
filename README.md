@@ -84,7 +84,7 @@ namespace: `SaintsField`
 3.  IMGUI: Fix `RichLabel` has some indent and truncate issue with `LeftToggle` and `ResiziableTextArea`
 4.  Fix Auto Getters won't work if you disabled the update
 5.  UI Toolkit: Remove some unnecessary call to improve some performance
-6.  UI Toolkit: Now scene view will notice you if there is an auto-getter signed a value to a filed.
+6.  UI Toolkit: Now scene view will notice you if there is an auto-getter signed a value to a field.
 
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
