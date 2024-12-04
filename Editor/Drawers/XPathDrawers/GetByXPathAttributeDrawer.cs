@@ -183,9 +183,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return 0;
             }
 
+            string key;
+
             try
             {
-                string _ = property.propertyPath;
+                key = GetKey(property);
             }
             catch (ObjectDisposedException)
             {
@@ -197,7 +199,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
 
             // IReadOnlyList<GetByXPathAttribute> allGetByXPathAttributes = AttributesIfImTheFirst(property, (GetByXPathAttribute)saintsAttribute);
-            string key = GetKey(property);
+
             bool configExists = ImGuiSharedUserData.TryGetValue(key, out InitUserData existedInitUserData);
             if(configExists && existedInitUserData.DecoratorIndex != index)
             {
@@ -362,9 +364,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return false;
             }
 
+            string key = "";
+
             try
             {
-                string _ = property.propertyPath;
+                key = GetKey(property);
             }
             catch (ObjectDisposedException)
             {
@@ -375,7 +379,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return false;
             }
 
-            if(!ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData) || existedInitUserData.DecoratorIndex != index)
+            if(!ImGuiSharedUserData.TryGetValue(key, out InitUserData existedInitUserData) || existedInitUserData.DecoratorIndex != index)
             {
                 return false;
             }
@@ -505,7 +509,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
         private static string GetErrorMessage(SerializedProperty property, GetByXPathAttribute getByXPathAttribute, int index)
         {
-            if(!ImGuiSharedUserData.TryGetValue(GetKey(property), out InitUserData existedInitUserData) || existedInitUserData.DecoratorIndex != index)
+            string key;
+            try
+            {
+                key = GetKey(property);
+            }
+            catch (ObjectDisposedException)
+            {
+                return "";
+            }
+            catch (NullReferenceException)
+            {
+                return "";
+            }
+
+            if(!ImGuiSharedUserData.TryGetValue(key, out InitUserData existedInitUserData) || existedInitUserData.DecoratorIndex != index)
             {
                 return "";
             }
