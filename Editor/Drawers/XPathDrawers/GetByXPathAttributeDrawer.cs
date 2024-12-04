@@ -221,7 +221,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             (string error, SerializedProperty targetProperty, MemberInfo memberInfo, Type expectType, Type expectInterface) = GetExpectedType(property, info, parent);
             if (error != "")
             {
-                ImGuiSharedUserData[GetKey(property)] = new InitUserData
+                ImGuiSharedUserData[key] = new InitUserData
                 {
                     DecoratorIndex = index,
                     Error = error,
@@ -302,17 +302,23 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             if(!configExists && firstAttribute.InitSign && initUserData.CheckFieldResult.MisMatch && Util.IsNull(initUserData.CheckFieldResult.OriginalValue)
                || ((firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull) && initUserData.CheckFieldResult.MisMatch))
             {
+                bool targetIsNull = Util.IsNull(initUserData.CheckFieldResult.TargetValue);
+
                 bool doResignValue = firstAttribute.AutoResignToValue &&
-                                     !Util.IsNull(initUserData.CheckFieldResult.TargetValue);
+                                     !targetIsNull;
                 bool doResignNull = firstAttribute.AutoResignToNull &&
-                                    Util.IsNull(initUserData.CheckFieldResult.TargetValue);
+                                    targetIsNull;
+
+                bool sourceIsNull = Util.IsNull(initUserData.CheckFieldResult.OriginalValue);
+                bool doResignInit = firstAttribute.InitSign && sourceIsNull;
                 // Debug.Log($"init sign {firstAttribute.AutoResignToValue}/{firstAttribute.AutoResignToNull}/{Util.IsNull(initUserData.CheckFieldResult.TargetValue)}");
-                if(doResignValue || doResignNull)
+                if(doResignValue || doResignNull || doResignInit)
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent,
                         initUserData.CheckFieldResult.TargetValue);
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
                     onGuiPayload.SetValue(initUserData.CheckFieldResult.TargetValue);
+                    initUserData.CheckFieldResult.MisMatch = false;
                 }
             }
 

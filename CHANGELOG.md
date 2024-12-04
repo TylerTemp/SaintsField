@@ -5,6 +5,7 @@
 1.  IMGUI: Fix accessing disposed `SerializedProperty`, [#102](https://github.com/TylerTemp/SaintsField/issues/102)
 2.  IMGUI: Split config for auto getters from UI Toolkit, and change the default behavior of IMGUI auto getters to be never update while on inspector (same as old behavior of auto getters). Might be related to [#98](https://github.com/TylerTemp/SaintsField/issues/98)
 3.  IMGUI: Fix `RichLabel` has some indent and truncate issue with `LeftToggle` and `ResiziableTextArea`
+4.  Fix Auto Getters won't work if you disabled the update
 
 ## 3.6.0 ##
 
