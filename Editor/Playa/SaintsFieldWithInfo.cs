@@ -7,7 +7,6 @@ namespace SaintsField.Editor.Playa
 {
     public struct SaintsFieldWithInfo
     {
-        // ReSharper disable InconsistentNaming
         public int InherentDepth;
         public int Order;
 
@@ -22,7 +21,6 @@ namespace SaintsField.Editor.Playa
         public FieldInfo FieldInfo;
         public MethodInfo MethodInfo;
         public PropertyInfo PropertyInfo;
-        // ReSharper enable InconsistentNaming
 
         public override string ToString()
         {

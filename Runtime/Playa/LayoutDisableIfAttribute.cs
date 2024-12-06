@@ -1,27 +1,26 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using SaintsField.Condition;
 
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class LayoutDisableIfAttribute: Attribute, IPlayaAttribute, ISaintsLayout
+    public class LayoutDisableIfAttribute: Attribute, IPlayaAttribute, ISaintsLayoutToggle
     {
-        public string LayoutBy { get; }
-        public ELayout Layout { get; }
-        public bool KeepGrouping { get; }
+        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
+        public readonly EMode EditorMode;
 
-        public float MarginTop { get; }
-        public float MarginBottom { get; }
-
-        public LayoutDisableIfAttribute(string layoutBy, ELayout layout = 0, bool keepGrouping = false, float marginTop = -1f, float marginBottom = -1f)
+        public LayoutDisableIfAttribute(params object[] by): this(EMode.Edit | EMode.Play, by)
         {
-            LayoutBy = layoutBy.Trim('/');
-            Layout = layout;
-            KeepGrouping = keepGrouping;
+        }
 
-            MarginTop = marginTop;
-            MarginBottom = marginBottom;
+        public LayoutDisableIfAttribute(EMode editorMode, params object[] by)
+        {
+            EditorMode = editorMode;
+            ConditionInfos = Parser.Parse(by).ToArray();
         }
     }
 }

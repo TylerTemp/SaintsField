@@ -14,10 +14,8 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        // ReSharper disable InconsistentNaming
         public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
         public readonly EMode EditorMode;
-        // ReSharper enable InconsistentNaming
 
         public ReadOnlyAttribute(params object[] by): this(EMode.Edit | EMode.Play, by)
         {
