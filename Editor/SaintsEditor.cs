@@ -283,7 +283,7 @@ namespace SaintsField.Editor
                                 fieldInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
-                                    Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                    Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
                                     Target = target,
 
                                     RenderType = SaintsRenderType.SerializedField,
@@ -306,7 +306,7 @@ namespace SaintsField.Editor
                                 fieldInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
-                                    Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                    Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
                                     Target = target,
 
                                     RenderType = SaintsRenderType.NonSerializedField,
@@ -331,7 +331,7 @@ namespace SaintsField.Editor
                                 propertyInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
-                                    Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                    Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
                                     Target = target,
 
                                     RenderType = SaintsRenderType.NativeProperty,
@@ -367,7 +367,7 @@ namespace SaintsField.Editor
                             methodInfos.Add(new SaintsFieldWithInfo
                             {
                                 PlayaAttributes = playaAttributes,
-                                Groups = playaAttributes.OfType<ISaintsGroup>().ToArray(),
+                                Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
                                 Target = target,
 
                                 // memberType = MemberTypes.Method,
@@ -396,7 +396,7 @@ namespace SaintsField.Editor
                     fieldWithInfos.Insert(0, new SaintsFieldWithInfo
                     {
                         PlayaAttributes = Array.Empty<IPlayaAttribute>(),
-                        Groups = Array.Empty<ISaintsGroup>(),
+                        Groups = Array.Empty<ISaintsLayout>(),
                         Target = target,
 
                         RenderType = SaintsRenderType.SerializedField,
@@ -501,7 +501,7 @@ namespace SaintsField.Editor
                 bool isNewInherent = saintsFieldWithInfo.InherentDepth != inherent;
                 inherent = saintsFieldWithInfo.InherentDepth;
 
-                IReadOnlyList<ISaintsGroup> groups = saintsFieldWithInfo.Groups;
+                IReadOnlyList<ISaintsLayout> groups = saintsFieldWithInfo.Groups;
                 RendererGroupInfo lastGroupInfo = null;
 
                 if (isNewInherent)
@@ -513,7 +513,7 @@ namespace SaintsField.Editor
                 if (groups.Count > 0)
                 {
                     string preAbsGroupBy = null;
-                    foreach (ISaintsGroup saintsGroup in groups)
+                    foreach (ISaintsLayout saintsGroup in groups)
                     {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                         Debug.Log($"Layout processing {saintsGroup}/{saintsGroup.LayoutBy}");

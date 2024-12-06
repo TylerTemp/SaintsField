@@ -1,6 +1,6 @@
 ﻿namespace SaintsField.Playa
 {
-    public interface ISaintsGroup
+    public interface ISaintsLayout: ISaintsLayoutBase
     {
         string LayoutBy { get; }
         ELayout Layout { get; }

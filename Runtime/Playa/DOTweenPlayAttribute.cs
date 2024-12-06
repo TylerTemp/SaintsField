@@ -6,7 +6,7 @@ namespace SaintsField.Playa
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
     // ReSharper disable once InconsistentNaming
-    public class DOTweenPlayAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, ISaintsGroup
+    public class DOTweenPlayAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, ISaintsLayout
     {
         // ReSharper disable InconsistentNaming
         public readonly string Label;
