@@ -5,13 +5,13 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaEnableIfAttribute: PlayaDisableIfAttribute
+    public class LayoutEnableIfAttribute: LayoutReadOnlyAttribute
     {
-        public PlayaEnableIfAttribute(EMode editorMode, params object[] by) : base(editorMode, by)
+        public LayoutEnableIfAttribute(params object[] by): base(0, by)
         {
         }
 
-        public PlayaEnableIfAttribute(params object[] by) : base(by)
+        public LayoutEnableIfAttribute(EMode editorMode, params object[] by): base(editorMode, by)
         {
         }
     }

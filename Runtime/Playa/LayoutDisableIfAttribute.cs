@@ -1,26 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using SaintsField.Condition;
 
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class LayoutDisableIfAttribute: Attribute, IPlayaAttribute, ISaintsLayoutToggle
+    public class LayoutDisableIfAttribute: LayoutReadOnlyAttribute
     {
-        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
-        public readonly EMode EditorMode;
-
-        public LayoutDisableIfAttribute(params object[] by): this(EMode.Edit | EMode.Play, by)
+        public LayoutDisableIfAttribute(params object[] by): base(by)
         {
         }
 
-        public LayoutDisableIfAttribute(EMode editorMode, params object[] by)
+        public LayoutDisableIfAttribute(EMode editorMode, params object[] by): base(editorMode, by)
         {
-            EditorMode = editorMode;
-            ConditionInfos = Parser.Parse(by).ToArray();
         }
     }
 }

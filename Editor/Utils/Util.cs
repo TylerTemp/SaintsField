@@ -742,6 +742,7 @@ namespace SaintsField.Editor.Utils
 
             foreach (ConditionInfo conditionInfo in conditionInfos)
             {
+                // ReSharper disable once UseNegatedPatternInIsExpression
                 if (!(conditionInfo.Target is string conditionStringTarget))
                 {
                     Debug.Assert(conditionInfo.Compare == LogicCompare.Truly, $"target {conditionInfo.Target} should be truly compared");

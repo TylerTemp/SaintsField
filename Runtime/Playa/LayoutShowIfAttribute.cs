@@ -8,24 +8,24 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaDisableIfAttribute: Attribute, IPlayaAttribute
+    public class LayoutShowIfAttribute: Attribute, IPlayaAttribute, ISaintsLayoutToggle
     {
-        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
-        public readonly EMode EditorMode;
+        public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
+        public EMode EditorMode { get; }
 
-        public PlayaDisableIfAttribute(EMode editorMode, params object[] by)
+        public LayoutShowIfAttribute(EMode editorMode, params object[] by)
         {
             EditorMode = editorMode;
             ConditionInfos = Parser.Parse(by).ToArray();
         }
 
-        public PlayaDisableIfAttribute(params object[] by): this(EMode.Edit | EMode.Play, by)
+        public LayoutShowIfAttribute(params object[] by): this(EMode.Edit | EMode.Play, by)
         {
         }
 
         public override string ToString()
         {
-            return $"<PlayaDisableIf eMode={EditorMode} conditions={string.Join(", ", ConditionInfos)}>";
+            return $"<LayoutShowIfAttribute eMode={EditorMode} conditions={string.Join(", ", ConditionInfos)}>";
         }
     }
 }

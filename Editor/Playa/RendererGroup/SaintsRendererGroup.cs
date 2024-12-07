@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer;
+using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -24,6 +26,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             public bool IsDoTween;
             public float MarginTop;
             public float MarginBottom;
+            public IReadOnlyList<ISaintsLayoutToggle> Toggles;
         }
 
         private int _curSelected;
@@ -44,12 +47,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private bool _foldout;
 
-        public SaintsRendererGroup(string groupPath, Config config)
+        private readonly object _containerObject;
+
+        public SaintsRendererGroup(string groupPath, Config config, object containerObject)
         {
             _groupPath = groupPath;
             _config = config;
             _eLayout = config.ELayout;
             _foldout = !config.ELayout.HasFlag(ELayout.Collapse);
+            _containerObject = containerObject;
         }
 
         public void Add(string groupPath, ISaintsRenderer renderer)
@@ -768,6 +774,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             VisualElement body = new VisualElement
             {
+                name = $"saints-editor-layout-{_groupPath}",
                 style =
                 {
                     flexGrow = 1,
@@ -1097,7 +1104,96 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 root.RegisterCallback<AttachToPanelEvent>(_ => StartToCheckOutOfScoopFoldout(root));
             }
 
+            if(_config.Toggles.Count > 0)
+            {
+                // foreach (ISaintsLayoutToggle layoutToggle in _config.Toggles)
+                // {
+                //     body.Add(new TextElement
+                //     {
+                //         text = layoutToggle.ToString(),
+                //     });
+                // }
+
+                root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_config.Toggles, root, body, _containerObject)).Every(150);
+            }
+
             return root;
+        }
+
+        private static void LoopCheckTogglesUIToolkit(IReadOnlyList<ISaintsLayoutToggle> configToggles, VisualElement root, VisualElement body, object target)
+        {
+            // List<LayoutReadOnlyAttribute> layoutReadOnly = new List<LayoutReadOnlyAttribute>();
+            // List<LayoutEnableIfAttribute> layoutEnableIf = new List<LayoutEnableIfAttribute>();
+
+            List<ToggleCheckInfo> toggleCheckInfos = new List<ToggleCheckInfo>();
+
+            foreach (ISaintsLayoutToggle configToggle in configToggles)
+            {
+                switch (configToggle)
+                {
+                    case LayoutEnableIfAttribute layoutEnableIfAttribute:
+                        // layoutEnableIf.Add(layoutEnableIfAttribute);
+                        // Debug.Log(layoutEnableIfAttribute);
+                        toggleCheckInfos.Add(new ToggleCheckInfo
+                        {
+                            Type = ToggleType.Enable,
+                            ConditionInfos = layoutEnableIfAttribute.ConditionInfos,
+                            EditorMode = layoutEnableIfAttribute.EditorMode,
+                            Target = target,
+                        });
+                        break;
+                    case LayoutReadOnlyAttribute layoutReadOnlyAttribute:
+                        toggleCheckInfos.Add(new ToggleCheckInfo
+                        {
+                            Type = ToggleType.Disable,
+                            ConditionInfos = layoutReadOnlyAttribute.ConditionInfos,
+                            EditorMode = layoutReadOnlyAttribute.EditorMode,
+                            Target = target,
+                        });
+                        break;
+
+                    case LayoutHideIfAttribute layoutHideIfAttribute:
+                        toggleCheckInfos.Add(new ToggleCheckInfo
+                        {
+                            Type = ToggleType.Hide,
+                            ConditionInfos = layoutHideIfAttribute.ConditionInfos,
+                            EditorMode = layoutHideIfAttribute.EditorMode,
+                            Target = target,
+                        });
+                        break;
+                    case LayoutShowIfAttribute layoutShowIfAttribute:
+                        toggleCheckInfos.Add(new ToggleCheckInfo
+                        {
+                            Type = ToggleType.Show,
+                            ConditionInfos = layoutShowIfAttribute.ConditionInfos,
+                            EditorMode = layoutShowIfAttribute.EditorMode,
+                            Target = target,
+                        });
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(configToggle), configToggle, null);
+                }
+            }
+
+            foreach (ToggleCheckInfo toggleCheckInfo in toggleCheckInfos)
+            {
+                SaintsEditorUtils.FillResult(toggleCheckInfo);
+            }
+
+            (bool show, bool disable) = SaintsEditorUtils.GetToggleResult(toggleCheckInfos);
+
+            bool currentDisabled = !body.enabledSelf;
+            if (currentDisabled != disable)
+            {
+                body.SetEnabled(!disable);
+            }
+
+            bool currentVisible = root.style.display != DisplayStyle.None;
+            if (currentVisible != show)
+            {
+                root.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+            }
         }
 
         private readonly HashSet<Toggle> _processedToggles = new HashSet<Toggle>();

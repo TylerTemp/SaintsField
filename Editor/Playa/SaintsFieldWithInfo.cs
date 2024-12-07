@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Playa
         public int InherentDepth;
         public int Order;
 
-        public IReadOnlyList<ISaintsLayout> Groups;
+        public IReadOnlyList<ISaintsLayoutBase> LayoutBases;
         public IReadOnlyList<IPlayaAttribute> PlayaAttributes;
         public object Target;
 

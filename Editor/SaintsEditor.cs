@@ -283,7 +283,7 @@ namespace SaintsField.Editor
                                 fieldInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
-                                    Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
+                                    LayoutBases = playaAttributes.OfType<ISaintsLayoutBase>().ToArray(),
                                     Target = target,
 
                                     RenderType = SaintsRenderType.SerializedField,
@@ -306,7 +306,7 @@ namespace SaintsField.Editor
                                 fieldInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
-                                    Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
+                                    LayoutBases = playaAttributes.OfType<ISaintsLayoutBase>().ToArray(),
                                     Target = target,
 
                                     RenderType = SaintsRenderType.NonSerializedField,
@@ -331,7 +331,7 @@ namespace SaintsField.Editor
                                 propertyInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
-                                    Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
+                                    LayoutBases = playaAttributes.OfType<ISaintsLayoutBase>().ToArray(),
                                     Target = target,
 
                                     RenderType = SaintsRenderType.NativeProperty,
@@ -367,7 +367,7 @@ namespace SaintsField.Editor
                             methodInfos.Add(new SaintsFieldWithInfo
                             {
                                 PlayaAttributes = playaAttributes,
-                                Groups = playaAttributes.OfType<ISaintsLayout>().ToArray(),
+                                LayoutBases = playaAttributes.OfType<ISaintsLayoutBase>().ToArray(),
                                 Target = target,
 
                                 // memberType = MemberTypes.Method,
@@ -396,7 +396,7 @@ namespace SaintsField.Editor
                     fieldWithInfos.Insert(0, new SaintsFieldWithInfo
                     {
                         PlayaAttributes = Array.Empty<IPlayaAttribute>(),
-                        Groups = Array.Empty<ISaintsLayout>(),
+                        LayoutBases = Array.Empty<ISaintsLayoutBase>(),
                         Target = target,
 
                         RenderType = SaintsRenderType.SerializedField,
@@ -449,10 +449,11 @@ namespace SaintsField.Editor
                         ISaintsRendererGroup group =
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
                             rendererGroupInfo.Config.IsDoTween
+                                // ReSharper disable once RedundantCast
                                 ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
-                                : new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config)
+                                : new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
 #else
-                            new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config)
+                            new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
 #endif
                         ;
 
@@ -501,7 +502,8 @@ namespace SaintsField.Editor
                 bool isNewInherent = saintsFieldWithInfo.InherentDepth != inherent;
                 inherent = saintsFieldWithInfo.InherentDepth;
 
-                IReadOnlyList<ISaintsLayout> groups = saintsFieldWithInfo.Groups;
+                IReadOnlyList<ISaintsLayoutBase> layoutBases = saintsFieldWithInfo.LayoutBases;
+                IReadOnlyList<ISaintsLayout> layouts = layoutBases.OfType<ISaintsLayout>().ToArray();
                 RendererGroupInfo lastGroupInfo = null;
 
                 if (isNewInherent)
@@ -510,19 +512,31 @@ namespace SaintsField.Editor
                     lastGroupInfo = null;
                 }
 
-                if (groups.Count > 0)
+                if (layouts.Count > 0)
                 {
                     string preAbsGroupBy = null;
-                    foreach (ISaintsLayout saintsGroup in groups)
+                    List<ISaintsLayoutToggle> layoutToggles = new List<ISaintsLayoutToggle>();
+
+                    foreach (ISaintsLayoutBase layoutBase in layoutBases)
                     {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                        Debug.Log($"Layout processing {saintsGroup}/{saintsGroup.LayoutBy}");
+                        Debug.Log($"Layout processing {layoutBase}");
 #endif
 
-                        switch (saintsGroup)
+                        switch (layoutBase)
                         {
+                            case ISaintsLayoutToggle layoutToggle:
+                                layoutToggles.Add(layoutToggle);
+                                break;
                             case LayoutEndAttribute layoutEndAttribute:
                             {
+                                // does not work with toggles, just clear it
+                                if(layoutToggles.Count > 0)
+                                {
+                                    Debug.LogWarning($"layout toggles does not work with LayoutEnd. Please adjust the order of the attributes. ({string.Join(", ", layoutToggles)})");
+                                    layoutToggles.Clear();
+                                }
+
                                 string endGroupBy = layoutEndAttribute.LayoutBy;
                                 if (endGroupBy == null)
                                 {
@@ -607,7 +621,7 @@ namespace SaintsField.Editor
                                 }
                             }
                                 break;
-                            default:
+                            case ISaintsLayout saintsGroup:
                             {
                                 string groupBy = saintsGroup.LayoutBy;
                                 if (groupBy.StartsWith("."))
@@ -635,7 +649,6 @@ namespace SaintsField.Editor
                                     MarginBottom = saintsGroup.MarginBottom,
                                 };
                                 SaintsRendererGroup.Config oldConfig = targetGroup.Config;
-
                                 targetGroup.Config = new SaintsRendererGroup.Config
                                 {
                                     ELayout = newConfig.ELayout == 0? oldConfig.ELayout: newConfig.ELayout,
@@ -643,7 +656,9 @@ namespace SaintsField.Editor
                                     MarginTop = newConfig.MarginTop >= 0? newConfig.MarginTop: oldConfig.MarginTop,
                                     MarginBottom = newConfig.MarginBottom >= 0? newConfig.MarginBottom: oldConfig.MarginBottom,
                                     KeepGrouping = saintsGroup.KeepGrouping,
+                                    Toggles = (oldConfig?.Toggles ?? Array.Empty<ISaintsLayoutToggle>()).Concat(layoutToggles).ToArray(),
                                 };
+                                layoutToggles.Clear();
 
                                 if (targetGroup.Config.KeepGrouping)
                                 {

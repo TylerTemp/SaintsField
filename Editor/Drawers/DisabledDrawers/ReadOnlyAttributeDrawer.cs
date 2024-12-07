@@ -99,8 +99,16 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             List<bool> allResults = new List<bool>();
 
             ReadOnlyAttribute[] targetAttributes = SerializedUtils.GetAttributesAndDirectParent<ReadOnlyAttribute>(property).attributes;
-            foreach (var targetAttribute in targetAttributes)
+            foreach (ReadOnlyAttribute targetAttribute in targetAttributes)
             {
+                bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
+                // And Mode, shortcut it
+                if (!editorModeOk)
+                {
+                    allResults.Add(false);
+                    continue;
+                }
+
                 (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);
 
                 if (errors.Count > 0)
@@ -108,10 +116,9 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
                     return (string.Join("\n\n", errors), false);
                 }
 
-                bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
                 // And Mode
                 bool boolResultsOk = boolResults.All(each => each);
-                allResults.Add(editorModeOk && boolResultsOk);
+                allResults.Add(boolResultsOk);
             }
 
             // Or Mode
