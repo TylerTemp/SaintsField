@@ -19,7 +19,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
-    public abstract partial class AbsRenderer: ISaintsRenderer
+    public abstract class AbsRenderer: ISaintsRenderer
     {
         // ReSharper disable InconsistentNaming
         public readonly SaintsFieldWithInfo FieldWithInfo;
