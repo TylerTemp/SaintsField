@@ -77,15 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.6.1**
+**3.7.0**
 
-1.  IMGUI: Fix accessing disposed `SerializedProperty`, [#102](https://github.com/TylerTemp/SaintsField/issues/102)
-2.  IMGUI: Split config for auto getters from UI Toolkit, and change the default behavior of IMGUI auto getters to be never update while on inspector (same as old behavior of auto getters). Might be related to [#98](https://github.com/TylerTemp/SaintsField/issues/98)
-3.  IMGUI: Fix `RichLabel` has some indent and truncate issue with `LeftToggle` and `ResiziableTextArea`
-4.  Fix Auto Getters won't work if you disabled the update
-5.  UI Toolkit: Remove some unnecessary call to improve some performance
-6.  UI Toolkit: Now scene view will notice you if there is an auto-getter signed a value to a field.
-
+1.  Add `LayoutShowIf`, `LayoutHideIf`, `LayoutEnableIf`, `LayoutDisableIf` to toggle show/enable status of an entire group. [#100](https://github.com/TylerTemp/SaintsField/issues/100), [#73](https://github.com/TylerTemp/SaintsField/issues/73)
+2.  Fix auto getter accesses disposed property in some cases in `SaintsEditor`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

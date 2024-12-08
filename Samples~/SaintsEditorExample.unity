@@ -1107,13 +1107,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editableMain: 0
-  editable1: 1
-  editable2: 1
   visibleMain: 1
+  editable1: 1
   visible1: 1
-  visible2: 1
   int1: 0
   string1: 
+  editable2: 1
+  visible2: 1
   int2: 0
   string2: 
   layoutEnd: 
@@ -2263,13 +2263,6 @@ MonoBehaviour:
   getComponentByPathList:
   - {fileID: 187152648}
   - {fileID: 187152646}
-  getComponentIArray:
-  - <V>k__BackingField: {fileID: 282662869}
-  - <V>k__BackingField: {fileID: 282662868}
-  - <V>k__BackingField: {fileID: 282662863}
-  - <V>k__BackingField: {fileID: 187152648}
-  - <V>k__BackingField: {fileID: 187152646}
-  getComponentIList: []
 --- !u!114 &1704623440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2328,12 +2321,6 @@ MonoBehaviour:
   - {fileID: 5246858966939522138, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
   - {fileID: 5246858966939522138, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
   - {fileID: 8617927036001643582, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
-  getComponentIArray:
-  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-  - <V>k__BackingField: {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
-  - <V>k__BackingField: {fileID: 1637141728839897546, guid: f0b3d0f9ee7a35e43a0adfa553bb717d, type: 3}
-  - <V>k__BackingField: {fileID: -2017994943238096811, guid: de2d4e879e7c1454c8209ae3d7091920, type: 3}
-  getComponentIList: []
 --- !u!114 &1704623442
 MonoBehaviour:
   m_ObjectHideFlags: 0
