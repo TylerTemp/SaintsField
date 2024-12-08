@@ -46,7 +46,7 @@ Unity: 2019.1 or higher
         "dependencies": {
             "today.comes.saintsfield": "https://github.com/TylerTemp/SaintsField.git",
             // your other dependencies...
-        }https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca
+        }
     }
     ```
 
