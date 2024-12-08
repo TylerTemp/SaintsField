@@ -8,13 +8,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public bool editableMain;
         public bool visibleMain;
 
-        [LayoutDisableIf(nameof(editableMain))]
+        [LayoutEnableIf(nameof(editableMain))]
         [LayoutShowIf(nameof(visibleMain))]
         [LayoutStart("Main", ELayout.FoldoutBox)]
         public bool editable1;
         public bool visible1;
 
-        [LayoutDisableIf(nameof(editable1))]
+        [LayoutEnableIf(nameof(editable1))]
         [LayoutShowIf(nameof(visible1))]
         [LayoutStart("./1", ELayout.FoldoutBox, marginBottom: 10)]
         public int int1;
@@ -25,13 +25,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public bool visible2;
 
 
-        [LayoutDisableIf(nameof(editable2))]
+        [LayoutEnableIf(nameof(editable2))]
         [LayoutShowIf(nameof(visible2))]
         [LayoutStart("./2", ELayout.FoldoutBox)]
         public int int2;
         public string string2;
 
         [LayoutEnd]
+        [Space]
         public string layoutEnd;
 
         // [EnableIf(EMode.Edit)] public string enableIfEdit;

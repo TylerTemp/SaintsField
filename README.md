@@ -46,7 +46,7 @@ Unity: 2019.1 or higher
         "dependencies": {
             "today.comes.saintsfield": "https://github.com/TylerTemp/SaintsField.git",
             // your other dependencies...
-        }
+        }https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca
     }
     ```
 
@@ -79,7 +79,7 @@ namespace: `SaintsField`
 
 **3.7.0**
 
-1.  Add `LayoutShowIf`, `LayoutHideIf`, `LayoutEnableIf`, `LayoutDisableIf` to toggle show/enable status of an entire group. [#100](https://github.com/TylerTemp/SaintsField/issues/100), [#73](https://github.com/TylerTemp/SaintsField/issues/73)
+1.  Add `LayoutShowIf`, `LayoutHideIf`, `LayoutEnableIf`, `LayoutDisableIf` to toggle show/enable status of an entire layout group. [#100](https://github.com/TylerTemp/SaintsField/issues/100), [#73](https://github.com/TylerTemp/SaintsField/issues/73)
 2.  Fix auto getter accesses disposed property in some cases in `SaintsEditor`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
@@ -2912,8 +2912,119 @@ public string afterGroupLast;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
 
+#### `LayoutDisableIf` / `LayoutEnableIf` ####
 
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
 
+Disable or enable an entire layout group. These attributes will work on the first layout underneath it.
+
+Arguments:
+
+*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+
+    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter), it does not check the mode at all.
+
+*   `object by...`
+
+    callbacks or attributes for the condition.
+
+*   AllowMultiple: Yes
+
+You can use multiple `LayoutDisableIf`, `LayoutEnableIf`, and even a mix of the two.
+
+For `LayoutDisableIf`: The layout group will be disabled if **ALL** condition is true (`and` operation)
+
+For `LayoutEnableIf`: The layout group will be enabled if **ANY** condition is true (`or` operation)
+
+For multiple attributes: The layout group will be disabled if **ANY** condition is true (`or` operation)
+
+It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+
+```csharp
+using SaintsField.Playa;
+
+public bool editableMain;
+
+[LayoutEnableIf(nameof(editableMain))]
+[LayoutStart("Main", ELayout.FoldoutBox)]
+public bool editable1;
+
+[LayoutEnableIf(nameof(editable1))]
+[LayoutStart("./1", ELayout.FoldoutBox, marginBottom: 10)]
+public int int1;
+public string string1;
+
+[LayoutStart("..")]
+public bool editable2;
+
+[LayoutEnableIf(nameof(editable2))]
+[LayoutStart("./2", ELayout.FoldoutBox)]
+public int int2;
+public string string2;
+
+[LayoutEnd]
+[Space]
+public string layoutEnd;
+```
+
+[![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
+
+#### `LayoutShowIf` / `LayoutHideIf` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Show or hide an entire layout group. These attributes will work on the first layout underneath it.
+
+Arguments:
+
+*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+
+    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter), it does not check the mode at all.
+
+*   `object by...`
+
+    callbacks or attributes for the condition.
+
+*   Allow Multiple: Yes
+
+You can use multiple `LayoutShowIf`, `LayoutHideIf`, and even a mix of the two.
+
+For `LayoutShowIf`: The layout group will be shown if **ALL** condition is true (`and` operation)
+
+For `LayoutHideIf`: The layout group will be hidden if **ANY** condition is true (`or` operation)
+
+For multiple attributes: The layout group will be shown if **ANY** condition is true (`or` operation)
+
+```csharp
+using SaintsField.Playa;
+
+public bool visibleMain;
+
+[LayoutShowIf(nameof(visibleMain))]
+[LayoutStart("Main", ELayout.FoldoutBox)]
+public bool visible1;
+
+[LayoutShowIf(nameof(visible1))]
+[LayoutStart("./1", ELayout.FoldoutBox, marginBottom: 10)]
+public int int1;
+public string string1;
+
+[LayoutStart("..")]
+public bool visible2;
+
+[LayoutShowIf(nameof(visible2))]
+[LayoutStart("./2", ELayout.FoldoutBox)]
+public int int2;
+public string string2;
+
+[LayoutEnd]
+[Space]
+public string layoutEnd;
+```
+
+[![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
 
 ### Handles ###
 
