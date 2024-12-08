@@ -11,17 +11,11 @@ namespace SaintsField.Playa
     public class PlayaShowIfAttribute: Attribute, IPlayaAttribute, IVisibilityAttribute
     {
         public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
-        public EMode EditorMode { get; }
         public virtual bool IsShow => true;
 
-        public PlayaShowIfAttribute(EMode editorMode, params object[] andCallbacks)
+        public PlayaShowIfAttribute(params object[] andCallbacks)
         {
-            EditorMode = editorMode;
             ConditionInfos = Parser.Parse(andCallbacks).ToArray();
-        }
-
-        public PlayaShowIfAttribute(params object[] andCallbacks): this(EMode.Edit | EMode.Play, andCallbacks)
-        {
         }
     }
 }

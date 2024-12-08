@@ -15,17 +15,11 @@ namespace SaintsField
         public string GroupBy => "";
 
         public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
-        public EMode EditorMode { get; }
         public virtual bool IsShow => true;
 
-        public ShowIfAttribute(EMode editorMode, params object[] andCallbacks)
+        public ShowIfAttribute(params object[] andCallbacks)
         {
-            EditorMode = editorMode;
             ConditionInfos = Parser.Parse(andCallbacks).ToArray();
-        }
-
-        public ShowIfAttribute(params object[] andCallbacks): this(EMode.Edit | EMode.Play, andCallbacks)
-        {
         }
     }
 }

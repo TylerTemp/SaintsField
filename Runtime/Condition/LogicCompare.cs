@@ -2,6 +2,7 @@ namespace SaintsField.Condition
 {
     public enum LogicCompare
     {
+        EditorMode,
         Truly,
         Equal,  // ==
         NotEqual,  // !=

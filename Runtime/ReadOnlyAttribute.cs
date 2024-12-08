@@ -9,21 +9,15 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class ReadOnlyAttribute: PropertyAttribute, ISaintsAttribute
+    public class ReadOnlyAttribute: PropertyAttribute, ISaintsAttribute, IConditions
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
-        public readonly EMode EditorMode;
+        public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
 
-        public ReadOnlyAttribute(params object[] by): this(EMode.Edit | EMode.Play, by)
+        public ReadOnlyAttribute(params object[] by)
         {
-        }
-
-        public ReadOnlyAttribute(EMode editorMode, params object[] by)
-        {
-            EditorMode = editorMode;
             ConditionInfos = Parser.Parse(by).ToArray();
         }
     }

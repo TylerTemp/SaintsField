@@ -27,6 +27,19 @@ namespace SaintsField.Condition
 #endif
 
                 object rawObjectCondition = rawConditions[index];
+                if (rawObjectCondition is EMode eMode)
+                {
+                    yield return new ConditionInfo
+                    {
+                        Target = eMode,
+                        Compare = LogicCompare.EditorMode,
+                        Value = null,
+                        ValueIsCallback = false,
+                        Reverse = false,
+                    };
+                    continue;
+                }
+                // ReSharper disable once UseNegatedPatternInIsExpression
                 if (!(rawObjectCondition is string rawCondition))
                 {
                     yield return new ConditionInfo

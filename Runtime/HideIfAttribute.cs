@@ -8,11 +8,7 @@ namespace SaintsField
     public class HideIfAttribute: ShowIfAttribute
     {
         public override bool IsShow => false;
-        public HideIfAttribute(EMode editorMode, params object[] orCallbacks) : base(editorMode, orCallbacks)
-        {
-        }
-
-        public HideIfAttribute(params object[] orCallbacks) : base(0, orCallbacks)
+        public HideIfAttribute(params object[] orCallbacks) : base(orCallbacks)
         {
         }
     }

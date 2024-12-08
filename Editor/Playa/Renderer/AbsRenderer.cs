@@ -71,7 +71,6 @@ namespace SaintsField.Editor.Playa.Renderer
                         {
                             Type = visibilityAttribute.IsShow? ToggleType.Show: ToggleType.Hide,
                             ConditionInfos = visibilityAttribute.ConditionInfos,
-                            EditorMode = visibilityAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
                         break;
@@ -80,7 +79,6 @@ namespace SaintsField.Editor.Playa.Renderer
                         {
                             Type = ToggleType.Enable,
                             ConditionInfos = enableIfAttribute.ConditionInfos,
-                            EditorMode = enableIfAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
                         break;
@@ -89,7 +87,6 @@ namespace SaintsField.Editor.Playa.Renderer
                         {
                             Type = ToggleType.Disable,
                             ConditionInfos = disableIfAttribute.ConditionInfos,
-                            EditorMode = disableIfAttribute.EditorMode,
                             Target = fieldWithInfo.Target,
                         });
                         break;
@@ -108,87 +105,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
             foreach (ToggleCheckInfo preCheckInternalInfo in preCheckInternalInfos)
             {
-                FillResult(preCheckInternalInfo);
+                SaintsEditorUtils.FillResult(preCheckInternalInfo);
             }
 
-            List<bool> showResults = new List<bool>();
-            // bool hide = false;
-            // no disable attribute: not-disable
-            // any disable attribute is true: disable; otherwise: not-disable
-            bool disable = false;
-            // no enable attribute: enable
-            // any enable attribute is true: enable; otherwise: not-enable
-            bool enable = true;
-
-            foreach (ToggleCheckInfo preCheckInternalInfo in preCheckInternalInfos.Where(each => each.Errors.Count == 0))
-            {
-                switch (preCheckInternalInfo.Type)
-                {
-                    case ToggleType.Show:
-                    {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
-                        Debug.Log(
-                            $"show, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
-#endif
-                        showResults.Add(preCheckInternalInfo.BoolResults.All(each => each));
-                    }
-                        break;
-                    case ToggleType.Hide:
-                    {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
-                        Debug.Log(
-                            $"hide, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
-#endif
-
-                        // Any(empty)=false=!hide=show. But because in ShowIf, empty=true=show, so we need to negate it.
-                        if (preCheckInternalInfo.EditorMode == 0 && preCheckInternalInfo.BoolResults.Count == 0)
-                        {
-                            showResults.Add(false);  // don't show
-                        }
-                        else
-                        {
-                            bool willHide = preCheckInternalInfo.BoolResults.Any(each => each);
-                            showResults.Add(!willHide);
-                        }
-                    }
-                        break;
-                    case ToggleType.Disable:
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
-                        Debug.Log(
-                            $"disable, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
-#endif
-                        if (preCheckInternalInfo.BoolResults.Count == 0 || preCheckInternalInfo.BoolResults.All(each => each))
-                        {
-                            disable = true;
-                        }
-                        break;
-                    case ToggleType.Enable:
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
-                        Debug.Log(
-                            $"enable, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
-#endif
-                        if (preCheckInternalInfo.BoolResults.Count != 0 && !preCheckInternalInfo.BoolResults.Any(each => each))
-                        {
-                            enable = false;
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(preCheckInternalInfo.Type), preCheckInternalInfo.Type, null);
-                }
-            }
-
-            bool showIfResult;
-            bool disableIfResult;
-            if (preCheckInternalInfos.Any(each => each.Errors.Count > 0))
-            {
-                showIfResult = true;
-                disableIfResult = false;
-            }
-            else
-            {
-                showIfResult = showResults.Count == 0 || showResults.Any(each => each);
-                disableIfResult = disable || !enable;
-            }
+            (bool showIfResult, bool disableIfResult) = SaintsEditorUtils.GetToggleResult(preCheckInternalInfos);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
             Debug.Log(
@@ -272,22 +192,6 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        private static void FillResult(ToggleCheckInfo toggleCheckInfo)
-        {
-            toggleCheckInfo.EditorModeResult = Util.ConditionEditModeChecker(toggleCheckInfo.EditorMode);
-
-            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(toggleCheckInfo.ConditionInfos, null, null, toggleCheckInfo.Target);
-
-            if (errors.Count > 0)
-            {
-                toggleCheckInfo.Errors = errors;
-                toggleCheckInfo.BoolResults = Array.Empty<bool>();
-                return;
-            }
-
-            toggleCheckInfo.Errors = Array.Empty<string>();
-            toggleCheckInfo.BoolResults = boolResults;
-        }
 
         private static (string error, object rawResult) GetCallback(SaintsFieldWithInfo fieldWithInfo, string by)
         {

@@ -7,10 +7,6 @@ namespace SaintsField.Playa
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
     public class PlayaEnableIfAttribute: PlayaDisableIfAttribute
     {
-        public PlayaEnableIfAttribute(EMode editorMode, params object[] by) : base(editorMode, by)
-        {
-        }
-
         public PlayaEnableIfAttribute(params object[] by) : base(by)
         {
         }

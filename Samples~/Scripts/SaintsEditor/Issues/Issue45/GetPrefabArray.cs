@@ -10,19 +10,21 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
         [GetPrefabWithComponent(typeof(Dummy))] public List<GameObject> dummyGos;
 
 
-        [Serializable]
-        public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
+        // saintsInterface is broken atm
+        // TODO: fix this
+        // [Serializable]
+        // public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
+        //
+        // [GetPrefabWithComponent, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        // public GeneralInterface[] getComponentIArray;
+        //
+        // [GetPrefabWithComponent(typeof(Dummy)), PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        // public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
 
-        [GetPrefabWithComponent, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
-        public GeneralInterface[] getComponentIArray;
-
-        [GetPrefabWithComponent(typeof(Dummy)), PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
-        public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
-
-        private string DummyNumberI(GeneralInterface dummyInter)
-        {
-            return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
-        }
+        // private string DummyNumberI(GeneralInterface dummyInter)
+        // {
+        //     return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
+        // }
 
         private string DummyNumberG(SaintsInterface<UnityEngine.Object, IDummy> dummyInter)
         {

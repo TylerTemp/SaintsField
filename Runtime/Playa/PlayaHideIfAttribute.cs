@@ -9,11 +9,7 @@ namespace SaintsField.Playa
     {
         public override bool IsShow => false;
 
-        public PlayaHideIfAttribute(EMode editorMode, params object[] orCallbacks): base(editorMode, orCallbacks)
-        {
-        }
-
-        public PlayaHideIfAttribute(params object[] orCallbacks): base(0, orCallbacks)
+        public PlayaHideIfAttribute(params object[] orCallbacks): base(orCallbacks)
         {
         }
     }

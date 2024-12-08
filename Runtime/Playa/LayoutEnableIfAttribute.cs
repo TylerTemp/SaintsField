@@ -7,11 +7,7 @@ namespace SaintsField.Playa
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
     public class LayoutEnableIfAttribute: LayoutReadOnlyAttribute
     {
-        public LayoutEnableIfAttribute(params object[] by): base(0, by)
-        {
-        }
-
-        public LayoutEnableIfAttribute(EMode editorMode, params object[] by): base(editorMode, by)
+        public LayoutEnableIfAttribute(params object[] by): base(by)
         {
         }
     }

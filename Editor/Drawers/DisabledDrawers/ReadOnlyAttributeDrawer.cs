@@ -101,14 +101,6 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
             ReadOnlyAttribute[] targetAttributes = SerializedUtils.GetAttributesAndDirectParent<ReadOnlyAttribute>(property).attributes;
             foreach (ReadOnlyAttribute targetAttribute in targetAttributes)
             {
-                bool editorModeOk = Util.ConditionEditModeChecker(targetAttribute.EditorMode);
-                // And Mode, shortcut it
-                if (!editorModeOk)
-                {
-                    allResults.Add(false);
-                    continue;
-                }
-
                 (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);
 
                 if (errors.Count > 0)

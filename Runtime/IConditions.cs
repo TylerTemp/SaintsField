@@ -3,8 +3,8 @@ using SaintsField.Condition;
 
 namespace SaintsField
 {
-    public interface IVisibilityAttribute: IConditions
+    public interface IConditions
     {
-        bool IsShow { get; }
+        IReadOnlyList<ConditionInfo> ConditionInfos { get; }
     }
 }

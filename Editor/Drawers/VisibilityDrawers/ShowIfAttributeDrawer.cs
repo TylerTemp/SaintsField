@@ -12,10 +12,11 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
     {
         protected override (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
         {
-            return HelperShowIfIsShown(targetAttribute.ConditionInfos, targetAttribute.EditorMode, property, info, target);
+            return HelperShowIfIsShown(targetAttribute.ConditionInfos, property, info, target);
         }
 
-        public static (string error, bool shown) HelperShowIfIsShown(IEnumerable<ConditionInfo> conditionInfos, EMode editorMode, SerializedProperty property, FieldInfo info, object target)
+        public static (string error, bool shown) HelperShowIfIsShown(IEnumerable<ConditionInfo> conditionInfos,
+            SerializedProperty property, FieldInfo info, object target)
         {
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(conditionInfos, property, info, target);
 
@@ -24,9 +25,8 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
                 return (string.Join("\n\n", errors), true);
             }
 
-            bool editorModeOk = Util.ConditionEditModeChecker(editorMode);
             // and; empty = true, thus empty=show
-            return ("",  boolResults.Prepend(editorModeOk).All(each => each));
+            return ("",  boolResults.All(each => each));
         }
     }
 }

@@ -72,7 +72,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             Type = ToggleType.Enable,
                             ConditionInfos = layoutEnableIfAttribute.ConditionInfos,
-                            EditorMode = layoutEnableIfAttribute.EditorMode,
                             Target = _containerObject,
                         });
                         break;
@@ -81,7 +80,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             Type = ToggleType.Disable,
                             ConditionInfos = layoutReadOnlyAttribute.ConditionInfos,
-                            EditorMode = layoutReadOnlyAttribute.EditorMode,
                             Target = _containerObject,
                         });
                         break;
@@ -91,7 +89,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             Type = ToggleType.Hide,
                             ConditionInfos = layoutHideIfAttribute.ConditionInfos,
-                            EditorMode = layoutHideIfAttribute.EditorMode,
                             Target = _containerObject,
                         });
                         break;
@@ -100,7 +97,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             Type = ToggleType.Show,
                             ConditionInfos = layoutShowIfAttribute.ConditionInfos,
-                            EditorMode = layoutShowIfAttribute.EditorMode,
                             Target = _containerObject,
                         });
                         break;

@@ -10,9 +10,5 @@ namespace SaintsField.Playa
         public LayoutDisableIfAttribute(params object[] by): base(by)
         {
         }
-
-        public LayoutDisableIfAttribute(EMode editorMode, params object[] by): base(editorMode, by)
-        {
-        }
     }
 }

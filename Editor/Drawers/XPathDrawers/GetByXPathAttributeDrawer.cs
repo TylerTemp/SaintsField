@@ -1052,7 +1052,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         }
 
         // private string _toastInfoUIToolkit = "";
-        private static readonly HashSet<string> _toastInfoUIToolkit = new HashSet<string>();
+        private static readonly HashSet<string> ToastInfoUIToolkit = new HashSet<string>();
 
         private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, bool isInit)
@@ -1099,10 +1099,16 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
             else
             {
+                ListView listView = UIToolkitUtils.IterUpWithSelf(container)
+                    .OfType<ListView>()
+                    .FirstOrDefault();
+                if(listView == null)
+                {
+                    Debug.LogWarning($"{container} disposed, skip.");
+                    return;
+                }
                 targetRoots.AddRange(
-                    UIToolkitUtils.IterUpWithSelf(container)
-                        .OfType<ListView>()
-                        .First()
+                        listView
                         .Query<VisualElement>(className: ClassArrayContainer(arrayProp, index))
                         .ToList()
                 );
@@ -1180,6 +1186,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 if (hasRoot)
                 {
                     InitUserData userData = (InitUserData)root.userData;
+
+                    try
+                    {
+                        string _ = userData.Property.propertyPath;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        Debug.LogWarning($"Property disappeared unexpectedly");
+                        return;
+                    }
+                    catch(ObjectDisposedException)
+                    {
+                        Debug.LogWarning($"Property disposed unexpectedly");
+                        return;
+                    }
                     // Debug.Log(userData.TargetProperty.propertyPath);
                     Button refreshButton = root.Q<Button>(NameResignButton(userData.Property, index));
                     Button removeButton = root.Q<Button>(NameRemoveButton(userData.Property, index));
@@ -1207,7 +1228,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                             Debug.Log($"resign {checkResult.OriginalValue} -> {checkResult.TargetValue} ({userData.TargetProperty.propertyPath})");
 #endif
-                            _toastInfoUIToolkit.Add($"Auto sign {(targetIsNull? "NULL": targetValue.ToString())} to {property.displayName}");
+                            ToastInfoUIToolkit.Add($"Auto sign {(targetIsNull? "NULL": targetValue.ToString())} to {property.displayName}");
                             SceneView.duringSceneGui += ToastOnceUIToolkit;
                             SetValue(userData.TargetProperty, userData.MemberInfo, parent, checkResult.TargetValue);
                             userData.TargetProperty.serializedObject.ApplyModifiedProperties();
@@ -1289,15 +1310,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
         private static void ToastOnceUIToolkit(SceneView sv)
         {
-            if (_toastInfoUIToolkit.Count == 0)
+            if (ToastInfoUIToolkit.Count == 0)
             {
                 return;
             }
 
-            sv.ShowNotification(new GUIContent(string.Join("\n", _toastInfoUIToolkit)));
+            sv.ShowNotification(new GUIContent(string.Join("\n", ToastInfoUIToolkit)));
             SceneView.RepaintAll();
             SceneView.duringSceneGui -= ToastOnceUIToolkit;
-            _toastInfoUIToolkit.Clear();
+            ToastInfoUIToolkit.Clear();
         }
 
         // #if !(SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE)
@@ -3164,11 +3185,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             if (needInitSign && results.Count > 0)
             {
+                // Debug.Log($"{arrayProperty.propertyPath} set init size {results.Count}");
                 arrayProperty.arraySize = results.Count;
                 needApply = true;
             }
             if((firstAttribute.AutoResignToValue || firstAttribute.AutoResignToNull) && arrayProperty.arraySize != results.Count)
             {
+                // Debug.Log($"{arrayProperty.propertyPath} set update size {results.Count}");
                 arrayProperty.arraySize = results.Count;
                 needApply = true;
             }
@@ -3235,10 +3258,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         anyChange = true;
                         if (curValues is Array arr)
                         {
+                            // Debug.Log($"{arrayProperty.propertyPath} arr set {index} = {targetValue}");
                             arr.SetValue(targetValue, index);
                         }
                         else if (curValues is IList list)
                         {
+                            // Debug.Log($"{arrayProperty.propertyPath} lis set {index} = {targetValue}");
                             list[index] = targetValue;
                         }
                     }
@@ -3248,8 +3273,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             if (anyChange)
             {
                 int index = 0;
-                foreach (object eachValue in (IEnumerable)curValues)
+                foreach (object eachValue in results)
                 {
+                    // Debug.Log($"{arrayProperty.propertyPath} access {index}");
                     Util.SignPropertyValue(arrayProperty.GetArrayElementAtIndex(index), null, parent, eachValue);
                     index++;
                 }

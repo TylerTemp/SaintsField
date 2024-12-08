@@ -98,8 +98,6 @@ namespace SaintsField.Editor.Playa.Utils
 
         public static void FillResult(ToggleCheckInfo toggleCheckInfo)
         {
-            toggleCheckInfo.EditorModeResult = Util.ConditionEditModeChecker(toggleCheckInfo.EditorMode);
-
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(toggleCheckInfo.ConditionInfos, null, null, toggleCheckInfo.Target);
 
             if (errors.Count > 0)
@@ -139,8 +137,7 @@ namespace SaintsField.Editor.Playa.Utils
                         Debug.Log(
                             $"show, count={toggleCheckInfo.boolResults.Count}, values={string.Join(",", toggleCheckInfo.boolResults)}");
 #endif
-                        showResults.Add(toggleCheckInfo.BoolResults.Prepend(toggleCheckInfo.EditorModeResult)
-                            .All(each => each));
+                        showResults.Add(toggleCheckInfo.BoolResults.All(each => each));
                     }
                         break;
                     case ToggleType.Hide:
@@ -151,13 +148,13 @@ namespace SaintsField.Editor.Playa.Utils
 #endif
 
                         // Any(empty)=false=!hide=show. But because in ShowIf, empty=true=show, so we need to negate it.
-                        if (toggleCheckInfo.EditorMode == 0 && toggleCheckInfo.BoolResults.Count == 0)
+                        if (toggleCheckInfo.BoolResults.Count == 0)
                         {
                             showResults.Add(false);  // don't show
                         }
                         else
                         {
-                            bool willHide = toggleCheckInfo.BoolResults.Prepend(toggleCheckInfo.EditorModeResult).Any(each => each);
+                            bool willHide = toggleCheckInfo.BoolResults.Any(each => each);
                             showResults.Add(!willHide);
                         }
                     }
@@ -167,26 +164,19 @@ namespace SaintsField.Editor.Playa.Utils
                         Debug.Log(
                             $"disable, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
 #endif
-                        if (toggleCheckInfo.BoolResults.Prepend(toggleCheckInfo.EditorModeResult).All(each => each))
+                        if (toggleCheckInfo.BoolResults.All(each => each))
                         {
                             disable = true;
                         }
                         break;
                     case ToggleType.Enable:
-                        if (toggleCheckInfo.EditorMode == 0 && toggleCheckInfo.BoolResults.Count == 0)
+                        if (toggleCheckInfo.BoolResults.Count == 0)
                         {
                             // nothing means enable it or ignore
                         }
                         else
                         {
-                            IEnumerable<bool> toCheck = toggleCheckInfo.BoolResults;
-                            if (toggleCheckInfo.EditorMode != 0)
-                            {
-                                toCheck = toCheck.Prepend(toggleCheckInfo.EditorModeResult);
-                            }
-
-                            bool thisEnable = toCheck.Any(each => each);
-                            if (!thisEnable)
+                            if (!toggleCheckInfo.BoolResults.Any(each => each))
                             {
                                 enable = false;
                             }

@@ -11,21 +11,15 @@ namespace SaintsField.Playa
     public class PlayaDisableIfAttribute: Attribute, IPlayaAttribute
     {
         public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
-        public readonly EMode EditorMode;
 
-        public PlayaDisableIfAttribute(EMode editorMode, params object[] by)
+        public PlayaDisableIfAttribute(params object[] by)
         {
-            EditorMode = editorMode;
             ConditionInfos = Parser.Parse(by).ToArray();
-        }
-
-        public PlayaDisableIfAttribute(params object[] by): this(EMode.Edit | EMode.Play, by)
-        {
         }
 
         public override string ToString()
         {
-            return $"<PlayaDisableIf eMode={EditorMode} conditions={string.Join(", ", ConditionInfos)}>";
+            return $"<PlayaDisableIf conditions={string.Join(", ", ConditionInfos)}>";
         }
     }
 }

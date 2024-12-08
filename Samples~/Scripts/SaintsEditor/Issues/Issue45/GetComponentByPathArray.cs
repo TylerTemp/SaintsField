@@ -16,11 +16,15 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
         [Serializable]
         public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
 
-        [GetComponentByPath("*"), PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
-        public GeneralInterface[] getComponentIArray;
+        // saintsInterface is broken atm
+        // TODO: fix this
+        // [GetComponentByPath("*"), PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        // public GeneralInterface[] getComponentIArray;
 
-        [GetComponentByPath("*[1]"), PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
-        public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
+        // saintsInterface is broken atm
+        // TODO: fix this
+        // [GetComponentByPath("*[1]"), PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        // public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
 
         private string DummyNumberI(GeneralInterface dummyInter)
         {

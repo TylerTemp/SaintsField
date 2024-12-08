@@ -3,9 +3,7 @@ using SaintsField.Condition;
 
 namespace SaintsField.Playa
 {
-    public interface ISaintsLayoutToggle: ISaintsLayoutBase
+    public interface ISaintsLayoutToggle: ISaintsLayoutBase, IConditions
     {
-        IReadOnlyList<ConditionInfo> ConditionInfos { get; }
-        EMode EditorMode { get; }
     }
 }

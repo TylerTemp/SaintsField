@@ -713,7 +713,7 @@ namespace SaintsField.Editor.Utils
             return result;
         }
 
-        public static bool ConditionEditModeChecker(EMode editorMode)
+        private static bool ConditionEditModeChecker(EMode editorMode)
         {
             bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
             bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
@@ -742,6 +742,11 @@ namespace SaintsField.Editor.Utils
 
             foreach (ConditionInfo conditionInfo in conditionInfos)
             {
+                if (conditionInfo.Compare == LogicCompare.EditorMode)
+                {
+                    callbackBoolResults.Add(ConditionEditModeChecker((EMode) conditionInfo.Target));
+                    continue;
+                }
                 // ReSharper disable once UseNegatedPatternInIsExpression
                 if (!(conditionInfo.Target is string conditionStringTarget))
                 {
