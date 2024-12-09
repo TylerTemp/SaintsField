@@ -1,6 +1,10 @@
 # Changelog
 
-## 3.7.0 ## 
+## 3.7.1 ##
+
+UI Toolkit: Fix `ProgressBar` won't display updated value if the value is changed externally.
+
+## 3.7.0 ##
 
 1.  Add `LayoutShowIf`, `LayoutHideIf`, `LayoutEnableIf`, `LayoutDisableIf` to toggle show/enable status of an entire layout group. [#100](https://github.com/TylerTemp/SaintsField/issues/100), [#73](https://github.com/TylerTemp/SaintsField/issues/73)
 2.  Fix auto getter accesses disposed property in some cases in `SaintsEditor`

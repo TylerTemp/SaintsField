@@ -17,19 +17,23 @@ namespace SaintsField.Editor.Drawers
     {
         private struct MetaInfo
         {
-            // ReSharper disable InconsistentNaming
             public string Error;
 
             public float Min;  // dynamic
             public float Max;  // dynamic
             public Color Color;
             public Color BackgroundColor;
-            // ReSharper enable InconsistentNaming
+
+            public float Value;
         }
 
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute) saintsAttribute;
+
+            float propertyValue = property.propertyType == SerializedPropertyType.Integer
+                ? property.intValue
+                : property.floatValue;
 
             float min = progressBarAttribute.Min;
             if(progressBarAttribute.MinCallback != null)
@@ -41,6 +45,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         Error = error,
                         Max = 100f,
+                        Value = propertyValue,
                     };
                 }
                 min = value;
@@ -56,6 +61,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         Error = error,
                         Max = 100f,
+                        Value = propertyValue,
                     };
                 }
                 max = value;
@@ -74,6 +80,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         Error = error,
                         Max = 100f,
+                        Value = propertyValue,
                     };
                 }
                 color = value;
@@ -90,6 +97,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         Error = error,
                         Max = 100f,
+                        Value = propertyValue,
                     };
                 }
                 backgroundColor = value;
@@ -102,7 +110,7 @@ namespace SaintsField.Editor.Drawers
                 Max = max,
                 Color = color,
                 BackgroundColor = backgroundColor,
-                // Title = title,
+                Value = propertyValue,
             };
         }
 
@@ -518,17 +526,17 @@ namespace SaintsField.Editor.Drawers
 
             bool changed = false;
             string error = metaInfo.Error;
+            float propValue = metaInfo.Value;
+            float progressValue = progressBar.value - metaInfo.Min;
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if(metaInfo.Min != oldMetaInfo.Min
                // ReSharper disable once CompareOfFloatsByEqualityOperator
-               || metaInfo.Max != oldMetaInfo.Max)
+               || metaInfo.Max != oldMetaInfo.Max
+               || !Mathf.Approximately(progressValue, propValue))
             {
                 changed = true;
                 progressBar.highValue = metaInfo.Max - metaInfo.Min;
-                float propValue = property.propertyType == SerializedPropertyType.Integer
-                    ? property.intValue
-                    : property.floatValue;
 
                 ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
