@@ -79,7 +79,8 @@ namespace: `SaintsField`
 
 **3.7.1**
 
-UI Toolkit: Fix `ProgressBar` won't display updated value if the value is changed externally.
+1.  UI Toolkit: All the buttons now support `Coroutine`. If the target function returns an `IEnumerator`, the button will start a coroutine and wait for it to finish.
+2.  UI Toolkit: Fix `ProgressBar` won't display updated value if the value is changed externally.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

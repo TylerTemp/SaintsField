@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Drawers
 
             if (GUI.Button(buttonRect, string.Empty))
             {
-                GetOrCreateErrorInfo(property).ExecError = CallButtonFunc(property, decButtonAttribute, info, target);
+                GetOrCreateErrorInfo(property).ExecError = CallButtonFunc(property, decButtonAttribute, info, target).error;
             }
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
@@ -130,58 +130,10 @@ namespace SaintsField.Editor.Drawers
         }
         #endregion
 
-        private static string CallButtonFunc(SerializedProperty property, DecButtonAttribute decButtonAttribute, FieldInfo fieldInfo, object target)
+        private static (string error, object result) CallButtonFunc(SerializedProperty property, DecButtonAttribute decButtonAttribute, FieldInfo fieldInfo, object target)
         {
-            (string error, object _) = Util.GetMethodOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target);
-            return error;
-            // List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            // types.Reverse();
-            // Debug.Assert(fieldInfo != null);
-            //
-            // foreach (Type objType in types)
-            // {
-            //     MethodInfo methodInfo = objType.GetMethod(decButtonAttribute.FuncName, BindAttr);
-            //     if (methodInfo == null)
-            //     {
-            //         continue;
-            //     }
-            //
-            //     int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            //     object rawValue = fieldInfo.GetValue(target);
-            //     object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-            //     object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-            //         ? new[]
-            //         {
-            //             curValue,
-            //         }
-            //         : new []
-            //         {
-            //             curValue,
-            //             arrayIndex,
-            //         });
-            //
-            //     try
-            //     {
-            //         methodInfo.Invoke(target, passParams);
-            //     }
-            //     catch (TargetInvocationException e)
-            //     {
-            //         Debug.LogException(e);
-            //
-            //         Debug.Assert(e.InnerException != null);
-            //         return e.InnerException.Message;
-            //
-            //     }
-            //     catch (Exception e)
-            //     {
-            //         Debug.LogException(e);
-            //         return e.Message;
-            //     }
-            //
-            //     return "";
-            // }
-            //
-            // return $"No field or method named `{decButtonAttribute.FuncName}` found on `{target}`";
+            return Util.GetMethodOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target);
+            // return error;
         }
 
 #if UNITY_2021_3_OR_NEWER
@@ -196,12 +148,31 @@ namespace SaintsField.Editor.Drawers
         protected static VisualElement DrawUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent, VisualElement container)
         {
-            Button button = new Button(() =>
+            Button buttonElement = null;
+            IVisualElementScheduledItem buttonTask = null;
+            buttonElement = new Button(() =>
             {
-                string error = CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent);
+                (string buttonError, object buttonResult) = CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent);
                 HelpBox helpBox = container.Query<HelpBox>(className: ClassExecError(property, index)).First();
-                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-                helpBox.text = error;
+                helpBox.style.display = buttonError == ""? DisplayStyle.None: DisplayStyle.Flex;
+                helpBox.text = buttonError;
+
+                buttonTask?.Pause();
+                if (buttonResult is System.Collections.IEnumerator enumerator)
+                {
+                    buttonElement.userData = enumerator;
+                    buttonTask?.Pause();
+                    buttonTask = buttonElement.schedule.Execute(() =>
+                    {
+                        if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
+                        {
+                            if (!bindEnumerator.MoveNext())
+                            {
+                                buttonTask?.Pause();
+                            }
+                        }
+                    }).Every(1);
+                }
             })
             {
                 style =
@@ -225,10 +196,10 @@ namespace SaintsField.Editor.Drawers
             labelContainer.AddToClassList(ClassLabelContainer(property, index));
             // labelContainer.Add(new Label("test label"));
 
-            button.Add(labelContainer);
+            buttonElement.Add(labelContainer);
             // button.AddToClassList();
-            button.AddToClassList(ClassAllowDisable);
-            return button;
+            buttonElement.AddToClassList(ClassAllowDisable);
+            return buttonElement;
         }
 
         protected static HelpBox DrawLabelError(SerializedProperty property, int index) => DrawError(ClassLabelError(property, index));
@@ -294,55 +265,5 @@ namespace SaintsField.Editor.Drawers
         #endregion
 
 #endif
-
-        // protected static (string error, string label) GetButtonLabelXml(DecButtonAttribute decButtonAttribute, object target, Type objType)
-        // {
-        //     if (!decButtonAttribute.IsCallback)
-        //     {
-        //         return ("", decButtonAttribute.ButtonLabel);
-        //     }
-        //
-        //     (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-        //         ReflectUtils.GetProp(objType, decButtonAttribute.ButtonLabel);
-        //     switch (getPropType)
-        //     {
-        //         case ReflectUtils.GetPropType.NotFound:
-        //         {
-        //             string error = $"No field or method named `{decButtonAttribute.ButtonLabel}` found on `{target}`";
-        //             return (error, decButtonAttribute.ButtonLabel);
-        //         }
-        //         case ReflectUtils.GetPropType.Field:
-        //         {
-        //             FieldInfo findFieldInfo = (FieldInfo)fieldOrMethodInfo;
-        //             object value = findFieldInfo.GetValue(target);
-        //             return ("", value == null ? string.Empty : value.ToString());
-        //         }
-        //         case ReflectUtils.GetPropType.Property:
-        //         {
-        //             PropertyInfo propertyInfo = (PropertyInfo)fieldOrMethodInfo;
-        //             object value = propertyInfo.GetValue(target);
-        //             return ("", value == null ? string.Empty : value.ToString());
-        //         }
-        //         case ReflectUtils.GetPropType.Method:
-        //         {
-        //             MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-        //             ParameterInfo[] methodParams = methodInfo.GetParameters();
-        //             Debug.Assert(methodParams.All(p => p.IsOptional));
-        //             // Debug.Assert(methodInfo.ReturnType == typeof(string));
-        //             // ReSharper disable once InvertIf
-        //             if (methodInfo.ReturnType != typeof(string))
-        //             {
-        //                 string error = $"Return type of callback method `{decButtonAttribute.ButtonLabel}` should be string";
-        //                 return (error, decButtonAttribute.ButtonLabel);
-        //             }
-        //
-        //             // _error = "";
-        //             return
-        //                 ("", (string)methodInfo.Invoke(target, methodParams.Select(p => p.DefaultValue).ToArray()));
-        //         }
-        //         default:
-        //             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-        //     }
-        // }
     }
 }

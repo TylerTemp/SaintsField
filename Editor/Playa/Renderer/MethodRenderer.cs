@@ -286,10 +286,28 @@ namespace SaintsField.Editor.Playa.Renderer
 
             }
 
-            Button buttonElement = new Button(() =>
+            Button buttonElement = null;
+            IVisualElementScheduledItem buttonTask = null;
+            buttonElement = new Button(() =>
             {
                 object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
-                methodInfo.Invoke(target, paraValues);
+                object returnValue = methodInfo.Invoke(target, paraValues);
+                // ReSharper disable once InvertIf
+                if (returnValue is System.Collections.IEnumerator enumerator)
+                {
+                    buttonElement.userData = enumerator;
+                    buttonTask?.Pause();
+                    buttonTask = buttonElement.schedule.Execute(() =>
+                    {
+                        if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
+                        {
+                            if (!bindEnumerator.MoveNext())
+                            {
+                                buttonTask?.Pause();
+                            }
+                        }
+                    }).Every(1);
+                }
             })
             {
                 text = buttonText,
