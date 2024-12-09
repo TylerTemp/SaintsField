@@ -282,7 +282,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public virtual VisualElement CreateVisualElement()
         {
-            VisualElement root = new VisualElement();
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
             root.AddToClassList(ClassSaintsFieldPlaya);
 
             (VisualElement aboveTarget, bool aboveNeedUpdate) = CreateAboveUIToolkit();
@@ -461,12 +467,22 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             InfoBoxUserData infoBoxUserData = (InfoBoxUserData)helpBox.userData;
 
+            bool willShow = true;
             bool showHasError = false;
             if (!string.IsNullOrEmpty(infoBoxUserData.InfoBoxAttribute.ShowCallback))
             {
-                string showError = UpdateInfoBoxShow(helpBox, infoBoxUserData);
-
+                (string showError, bool show) = UpdateInfoBoxShow(helpBox, infoBoxUserData);
                 showHasError = showError != "";
+                willShow = show;
+            }
+
+            if (!willShow)
+            {
+                if (helpBox.style.display != DisplayStyle.None)
+                {
+                    helpBox.style.display = DisplayStyle.None;
+                }
+                return;
             }
 
             if (!showHasError)
@@ -475,7 +491,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        private static string UpdateInfoBoxShow(HelpBox helpBox,
+        private static (string error, bool show) UpdateInfoBoxShow(HelpBox helpBox,
             InfoBoxUserData infoBoxUserData)
         {
             (string showError, object showResult) = Util.GetOfNoParams<object>(infoBoxUserData.FieldWithInfo.Target,
@@ -487,7 +503,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 helpBox.text = showError;
                 helpBox.style.display = DisplayStyle.Flex;
-                return showError;
+                return (showError, true);
             }
 
             bool willShow = ReflectUtils.Truly(showResult);
@@ -497,7 +513,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 infoBoxUserData.XmlContent = "";
             }
 
-            return "";
+            return ("", willShow);
         }
 
         private static void UpdateInfoBoxContent(HelpBox helpBox, InfoBoxUserData infoBoxUserData)
@@ -563,7 +579,6 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 label.Add(richTextElement);
             }
-            helpBox.style.display = DisplayStyle.Flex;
         }
 
         protected virtual PreCheckResult OnUpdateUIToolKit()

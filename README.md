@@ -77,10 +77,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.7.1**
+**3.7.2**
 
-1.  UI Toolkit: All the buttons now support `Coroutine`. If the target function returns an `IEnumerator`, the button will start a coroutine and wait for it to finish.
-2.  UI Toolkit: Fix `ProgressBar` won't display updated value if the value is changed externally.
+UI Toolkit: Fix `PlayaInfoBox` won't hide when `show` returns `false`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

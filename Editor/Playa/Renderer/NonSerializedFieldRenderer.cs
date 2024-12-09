@@ -51,6 +51,12 @@ namespace SaintsField.Editor.Playa.Renderer
         // private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo, VisualElement container, bool callUpdate)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
+
+            if (_fieldElement is null)
+            {
+                return preCheckResult;
+            }
+
             object userData = _fieldElement.userData;
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.7.2 ##
+
+UI Toolkit: Fix `PlayaInfoBox` won't hide when `show` returns `false`
+
 ## 3.7.1 ##
 
 1.  UI Toolkit: All the buttons now support `Coroutine`. If the target function returns an `IEnumerator`, the button will start a coroutine and wait for it to finish.
