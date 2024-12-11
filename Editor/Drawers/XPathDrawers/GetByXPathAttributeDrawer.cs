@@ -1062,15 +1062,22 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
 
+            int indexInArray = -1;
             try
             {
-                string _ = property.propertyPath;
+                indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                // string _ = property.propertyPath;
             }
             catch (ObjectDisposedException)
             {
                 return;
             }
             catch (NullReferenceException)
+            {
+                return;
+            }
+
+            if (indexInArray > 0)  // -1=normal field; 0=first element in row; otherwise ignore it
             {
                 return;
             }
