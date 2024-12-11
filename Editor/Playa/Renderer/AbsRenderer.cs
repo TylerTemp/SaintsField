@@ -956,7 +956,7 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             using (new EditorGUI.DisabledScope(disabled))
             {
-                if (type == null && value == null)
+                if (value == null)
                 {
                     Rect rt = GUILayoutUtility.GetRect(new GUIContent(label), EditorStyles.label);
                     EditorGUI.DrawRect(new Rect(rt)
