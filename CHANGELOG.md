@@ -3,9 +3,11 @@
 ## 3.8.0 ##
 
 1.  Add `PositionHandle` which can change position of target field in scene view. The target can be either a `GameObject`, a `Component`, or a Vector2/Vector3 target.
-2.  UI Toolkit: fix `AnimatorParam` can't display the correct label with `RichLabel`
-3.  `DrawLabel` now support to draw a label for a `Vector2` or `Vector3` field with `Space` argument
-4.  `AnimatorState` now support `AnimatorOverrideController`
+2.  IMGUI: fix `DrawLabel` won't disappear when you select away
+3.  UI Toolkit: fix auto-getters might get looped calls in list/array
+4.  UI Toolkit: fix `AnimatorParam` can't display the correct label with `RichLabel`
+5.  `DrawLabel` now support to draw a label for a `Vector2` or `Vector3` field with `Space` argument
+6.  `AnimatorState` now support `AnimatorOverrideController`
 
 ## 3.7.2 ##
 
