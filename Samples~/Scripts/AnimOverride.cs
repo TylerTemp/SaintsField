@@ -6,6 +6,6 @@ namespace SaintsField.Samples.Scripts
     {
         [AnimatorParam] public string animParam;
 
-        [AnimatorState] public AnimatorState state;
+        [AnimatorState] public AnimatorState animState;
     }
 }

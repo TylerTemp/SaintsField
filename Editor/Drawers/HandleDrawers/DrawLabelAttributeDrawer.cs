@@ -16,6 +16,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
     {
         private class LabelInfo
         {
+            public Space Space;
+
             public string Content;
             public bool IsCallback;
             public string ActualContent;
@@ -24,9 +26,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
 
             public GUIStyle GUIStyle;
-
-            // ReSharper disable once InconsistentNaming
-            public Action<SceneView> OnSceneGUIIMGUI;
         }
 
 
@@ -73,21 +72,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
         #region IMGUI
 
-        private static readonly Dictionary<string, LabelInfo> IdToLabelInfo = new Dictionary<string, LabelInfo>();
+        private readonly Dictionary<string, LabelInfo> IdToLabelInfo = new Dictionary<string, LabelInfo>();
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
-
-#if UNITY_2019_3_OR_NEWER
-        [InitializeOnEnterPlayMode]
-#endif
-        [InitializeOnLoadMethod]
-        private static void ImGuiClearSharedData()
-        {
-            foreach (LabelInfo labelInfo in IdToLabelInfo.Values)
-            {
-                SceneView.duringSceneGui -= labelInfo.OnSceneGUIIMGUI;
-            }
-            IdToLabelInfo.Clear();
-        }
 
         private string _cacheKey = "";
 
@@ -95,11 +81,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             base.ImGuiOnDispose();
             // ReSharper disable once InvertIf
-            if(IdToLabelInfo.TryGetValue(_cacheKey, out LabelInfo labelInfo))
-            {
-                SceneView.duringSceneGui -= labelInfo.OnSceneGUIIMGUI;
-                IdToLabelInfo.Remove(_cacheKey);
-            }
+            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+            IdToLabelInfo.Remove(_cacheKey);
+
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -135,6 +119,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
                 labelInfo = new LabelInfo
                 {
+                    Space = drawLabelAttribute.Space,
                     Content = drawLabelAttribute.Content,
                     ActualContent = drawLabelAttribute.Content,
                     IsCallback = drawLabelAttribute.IsCallback,
@@ -146,12 +131,17 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                         {
                             normal = { textColor = drawLabelAttribute.EColor.GetColor() },
                         },
-                    OnSceneGUIIMGUI = OnSceneGUIIMGUI,
                 };
                 IdToLabelInfo[_cacheKey] = labelInfo;
                 ImGuiEnsureDispose(property.serializedObject.targetObject);
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
                 SceneView.RepaintAll();
+                return position;
+            }
+
+            if (!labelInfo.TargetWorldPosInfo.IsTransform)
+            {
+                labelInfo.TargetWorldPosInfo = Util.GetTargetWorldPosInfo(labelInfo.Space, property, info, parent);
             }
 
             if (!labelInfo.IsCallback)
@@ -159,7 +149,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return position;
             }
 
-            (string valueError, object value) = Util.GetOf<object>(labelInfo.Content, null, property, fieldInfo, parent);
+            (string valueError, object value) = Util.GetOf<object>(labelInfo.Content, null, property, info, parent);
             if (valueError != "")
             {
                 Debug.LogError(valueError);

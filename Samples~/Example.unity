@@ -1560,7 +1560,7 @@ Transform:
   m_GameObject: {fileID: 292114043}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.8557146, y: -0.2, z: -0.9604445}
+  m_LocalPosition: {x: 1.7532172, y: -1.7525561, z: -0.9604445}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1786,7 +1786,7 @@ Transform:
   m_GameObject: {fileID: 305475998}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.99, y: -0.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1804,10 +1804,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96398aef690daab4583343a4e08258ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldPos3: {x: -1.724026, y: 0.3802607, z: 1.5474792}
-  worldPos2: {x: -5.0264907, y: 0.5261375}
-  localPos3: {x: -2.6702747, y: 0.2820463, z: -5.0389934}
-  localPos2: {x: -1.8602543, y: -2.3823662}
+  worldPos3: {x: -1.1090167, y: 0.23773932, z: 1.5474792}
+  worldPos2: {x: -3.533132, y: 1.2846097}
+  localPos3: {x: -2.8401546, y: 0.6523657, z: -5.0389934}
+  localPos2: {x: 1.996362, y: -3.4324265}
 --- !u!1 &308851076
 GameObject:
   m_ObjectHideFlags: 0
@@ -17506,7 +17506,7 @@ Transform:
   m_GameObject: {fileID: 1709981029}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.1231256, y: -0.03668797, z: -3.110609}
+  m_LocalPosition: {x: -3.2881613, y: -0.27872813, z: -3.110609}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18644,7 +18644,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animParam: Some Bool
-  state:
+  animState:
     <layerIndex>k__BackingField: 0
     <stateNameHash>k__BackingField: -1075812047
     <stateName>k__BackingField: SubNewState
@@ -18652,7 +18652,7 @@ MonoBehaviour:
     <stateTag>k__BackingField: 
     <animationClip>k__BackingField: {fileID: 7400000, guid: 76331895325d39644bfee2c64ed56780, type: 2}
     <subStateMachineNameChain>k__BackingField:
-    - SubStateMachine1
+    - SubStateMachine2
 --- !u!1 &1881364799
 GameObject:
   m_ObjectHideFlags: 0
