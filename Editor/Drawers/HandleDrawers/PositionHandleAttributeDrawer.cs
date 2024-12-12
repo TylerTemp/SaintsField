@@ -106,7 +106,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
         }
 
-        private void OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
+        private bool OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
         {
             Vector3 worldPos;
             if (positionHandleInfo.TargetWorldPosInfo.IsTransform)
@@ -114,9 +114,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 Transform trans = positionHandleInfo.TargetWorldPosInfo.Transform;
                 if (trans == null)
                 {
-                    Debug.LogWarning("Transform disposed, removing SceneGUI");
-                    SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
-                    return;
+                    return false;
                 }
                 worldPos = trans.position;
             }
@@ -135,6 +133,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                     positionHandleInfo.Property.serializedObject.ApplyModifiedProperties();
                 }
             }
+
+            return true;
         }
 
         ~PositionHandleAttributeDrawer()
@@ -212,7 +212,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             if (_idToInfoImGui.TryGetValue(_cacheKey, out PositionHandleInfo positionHandleInfo))
             {
-                OnSceneGUIInternal(sceneView, positionHandleInfo);
+                if (!OnSceneGUIInternal(sceneView, positionHandleInfo))
+                {
+                    Debug.LogWarning($"Target disposed, remove SceneGUI");
+                    SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                }
             }
         }
 
@@ -304,7 +308,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return;
             }
 
-            OnSceneGUIInternal(sceneView, _positionHandleInfoUIToolkit);
+            if(!OnSceneGUIInternal(sceneView, _positionHandleInfoUIToolkit)) {
+                Debug.LogWarning("Target disposed, removing SceneGUI");
+                SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+            }
         }
         #endregion
 
