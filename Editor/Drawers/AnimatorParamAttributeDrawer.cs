@@ -450,7 +450,7 @@ namespace SaintsField.Editor.Drawers
             IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
         {
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            UIToolkitUtils.SetLabel(dropdownField.ButtonLabelElement, richTextChunks, richTextDrawer);
+            UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
         }
 
         private static string GetParameterLabel(AnimatorControllerParameter each) => $"{each.name} [{each.type}]";

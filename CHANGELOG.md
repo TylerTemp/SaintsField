@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.8.0 ##
+
+1.  Add `PositionHandle` which can change position of target field in scene view. The target can be either a `GameObject`, a `Component`, or a Vector2/Vector3 target.
+2.  UI Toolkit: fix `AnimatorParam` can't display the correct label with `RichLabel`
+3.  `DrawLabel` now support to draw a label for a `Vector2` or `Vector3` field with `Space` argument
+4.  `AnimatorState` now support `AnimatorOverrideController`
+
 ## 3.7.2 ##
 
 UI Toolkit: Fix `PlayaInfoBox` won't hide when `show` returns `false`

@@ -411,7 +411,31 @@ namespace SaintsField.Editor.Drawers
                 };
             }
 
-            AnimatorController controller = (AnimatorController)animator.runtimeAnimatorController;
+            // Debug.Log(animator.runtimeAnimatorController);
+
+            AnimatorController controller = null;
+            Dictionary<AnimationClip, AnimationClip> clipOverrideDict = new Dictionary<AnimationClip, AnimationClip>();
+
+            switch (animator.runtimeAnimatorController)
+            {
+                case AnimatorController ac:
+                    controller = ac;
+                    break;
+                case AnimatorOverrideController overrideController:
+                {
+                    controller = (AnimatorController)overrideController.runtimeAnimatorController;
+
+                    List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrideController.overridesCount);
+                    overrideController.GetOverrides(overrides);
+                    foreach (KeyValuePair<AnimationClip,AnimationClip> keyValuePair in overrides)
+                    {
+                        // Debug.Log($"{keyValuePair.Key} -> {keyValuePair.Value}");
+                        clipOverrideDict[keyValuePair.Key] = keyValuePair.Value;
+                    }
+                }
+                    break;
+            }
+
             if (controller == null)
             {
                 return new MetaInfo
@@ -426,13 +450,18 @@ namespace SaintsField.Editor.Drawers
             {
                 foreach ((UnityEditor.Animations.AnimatorState state, IReadOnlyList<string> subStateMachineNameChain) in GetAnimatorStateRecursively(animatorControllerLayer.stateMachine, animatorControllerLayer.stateMachine.stateMachines.Select(each => each.stateMachine), Array.Empty<string>()))
                 {
+                    AnimationClip clip = (AnimationClip)state.motion;
+                    if (clip != null && clipOverrideDict.TryGetValue(clip, out AnimationClip overrideClip))
+                    {
+                        clip = overrideClip;
+                    }
                     animatorStates.Add(new AnimatorStateChanged
                     {
                         layer = animatorControllerLayer,
                         layerIndex = layerIndex,
                         state = state,
 
-                        animationClip = (AnimationClip)state.motion,
+                        animationClip = clip,
                         subStateMachineNameChain = subStateMachineNameChain.ToArray(),
                     });
                 }
