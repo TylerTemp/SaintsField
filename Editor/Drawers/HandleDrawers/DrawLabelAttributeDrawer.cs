@@ -21,53 +21,24 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public string ActualContent;
             public EColor EColor;
 
-            public Transform Transform;
+            public Util.TargetWorldPosInfo TargetWorldPosInfo;
+
             public GUIStyle GUIStyle;
 
             // ReSharper disable once InconsistentNaming
             public Action<SceneView> OnSceneGUIIMGUI;
         }
 
-        private static (string error, Transform trans) GetTargetField(SerializedProperty property, FieldInfo info, object parent)
-        {
-            if (property.propertyType == SerializedPropertyType.Generic)
-            {
-                (string error, int _, object propertyValue) = Util.GetValue(property, info, parent);
 
-                if (error == "" && propertyValue is IWrapProp wrapProp)
-                {
-                    object propWrapValue = Util.GetWrapValue(wrapProp);
-                    switch (propWrapValue)
-                    {
-                        case null:
-                            return ("", null);
-                        case GameObject wrapGo:
-                            return ("", wrapGo.transform);
-                        case Component wrapComp:
-                            return ("", wrapComp.transform);
-                        default:
-                            return ($"{propWrapValue} is not GameObject or Component", null);
-                    }
-                }
-
-                return ($"{property.propertyType} is not supported", null);
-            }
-            if (property.objectReferenceValue is GameObject isGo)
-            {
-                return ("", isGo.transform);
-            }
-            if(property.objectReferenceValue is Component comp)
-            {
-                return ("", comp.transform);
-                // go = ((Component) property.objectReferenceValue)?.gameObject;
-            }
-
-            return ($"{property.propertyType} is not GameObject or Component", null);
-        }
 
         private static void OnSceneGUIInternal(SceneView _, LabelInfo labelInfo)
         {
             if (string.IsNullOrEmpty(labelInfo.ActualContent))
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(labelInfo.TargetWorldPosInfo.Error))
             {
                 return;
             }
@@ -87,7 +58,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 }
             }
 
-            Vector3 pos = labelInfo.Transform.position;
+            Vector3 pos = labelInfo.TargetWorldPosInfo.IsTransform
+                ? labelInfo.TargetWorldPosInfo.Transform.position
+                : labelInfo.TargetWorldPosInfo.WorldPos;
             Handles.Label(pos, labelInfo.ActualContent, labelInfo.GUIStyle);
         }
         ~DrawLabelAttributeDrawer()
@@ -153,10 +126,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             {
                 DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
 
-                (string error, Transform trans) = GetTargetField(property, info, parent);
-                if (error != "")
+                Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
+                if (targetWorldPosInfo.Error != "")
                 {
-                    Debug.LogError(error);
+                    Debug.LogError(targetWorldPosInfo.Error);
                     return position;
                 }
 
@@ -166,7 +139,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                     ActualContent = drawLabelAttribute.Content,
                     IsCallback = drawLabelAttribute.IsCallback,
                     EColor = drawLabelAttribute.EColor,
-                    Transform = trans,
+                    TargetWorldPosInfo = targetWorldPosInfo,
                     GUIStyle = drawLabelAttribute.EColor == EColor.White
                         ? GUI.skin.label
                         : new GUIStyle
@@ -223,10 +196,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
-            (string error, Transform trans) = GetTargetField(property, info, parent);
-            if (error != "")
+            Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
+            if (targetWorldPosInfo.Error != "")
             {
-                return new HelpBox(error, HelpBoxMessageType.Error);
+                return new HelpBox(targetWorldPosInfo.Error, HelpBoxMessageType.Error);
             }
 
             _labelInfoUIToolkit = new LabelInfo
@@ -235,8 +208,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 ActualContent = drawLabelAttribute.Content,
                 IsCallback = drawLabelAttribute.IsCallback,
                 EColor = drawLabelAttribute.EColor,
-                Transform = trans,
+                TargetWorldPosInfo = targetWorldPosInfo,
             };
+
             return null;
         }
 
@@ -247,7 +221,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             {
                 name = NameDrawLabel(property),
             };
-            // SceneView.duringSceneGui += OnSceneGUIUIToolkit;
             child.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUIUIToolkit);
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
             container.Add(child);
@@ -257,25 +230,38 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
-            if (!_labelInfoUIToolkit.IsCallback)
+            if (_labelInfoUIToolkit.IsCallback)
             {
-                return;
+                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
+                (string error, object value) =
+                    Util.GetOf<object>(_labelInfoUIToolkit.Content, null, property, info, parent);
+
+                if (error != "")
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
+                    return;
+                }
+
+                if (value is IWrapProp wrapProp)
+                {
+                    value = Util.GetWrapValue(wrapProp);
+                }
+
+                _labelInfoUIToolkit.ActualContent = $"{value}";
             }
 
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-
-            (string error, object value) = Util.GetOf<object>(_labelInfoUIToolkit.Content, null, property, fieldInfo, parent);
-            if (error != "")
+            if (!_labelInfoUIToolkit.TargetWorldPosInfo.IsTransform)
             {
-                return;
+                DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
+                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if(parent != null)
+                {
+                    _labelInfoUIToolkit.TargetWorldPosInfo = Util.GetTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
+                }
             }
-
-            if (value is IWrapProp wrapProp)
-            {
-                value = Util.GetWrapValue(wrapProp);
-            }
-
-            _labelInfoUIToolkit.ActualContent = $"{value}";
         }
 
         private GUIStyle _guiStyleUIToolkit;

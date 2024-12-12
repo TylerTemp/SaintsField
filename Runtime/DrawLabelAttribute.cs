@@ -15,15 +15,18 @@ namespace SaintsField
         public readonly string Content;
         public readonly bool IsCallback;
 
-        public DrawLabelAttribute(EColor eColor, string content, bool isCallback = false)
+        public readonly Space Space;
+
+        public DrawLabelAttribute(EColor eColor, string content, bool isCallback = false, Space space = Space.World)
         {
             EColor = eColor;
             (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(content, isCallback);
             Content = parsedContent;
             IsCallback = parsedIsCallback;
+            Space = space;
         }
 
-        public DrawLabelAttribute(string content, bool isCallback = false): this(EColor.White, content, isCallback)
+        public DrawLabelAttribute(string content, bool isCallback = false, Space space = Space.World): this(EColor.White, content, isCallback, space)
         {
         }
     }

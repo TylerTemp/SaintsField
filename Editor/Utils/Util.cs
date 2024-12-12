@@ -1134,5 +1134,133 @@ namespace SaintsField.Editor.Utils
 
             return obj == null;
         }
+
+        #region Scene Related
+
+        public struct TargetWorldPosInfo
+        {
+            public string Error;
+
+            public bool IsTransform;
+
+            public Transform Transform;
+            public Vector3 WorldPos;
+        }
+
+        public static TargetWorldPosInfo GetTargetWorldPosInfo(Space space, SerializedProperty property, FieldInfo info, object parent)
+        {
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Generic:
+                {
+                    (string error, int _, object propertyValue) = Util.GetValue(property, info, parent);
+
+                    if (error == "" && propertyValue is IWrapProp wrapProp)
+                    {
+                        object propWrapValue = Util.GetWrapValue(wrapProp);
+                        switch (propWrapValue)
+                        {
+                            case null:
+                                return new TargetWorldPosInfo { Error = "Target is null" };
+                            case GameObject wrapGo:
+                                return new TargetWorldPosInfo
+                                {
+                                    Error = "",
+                                    IsTransform = true,
+                                    Transform = wrapGo.transform,
+                                };
+                            case Component wrapComp:
+                                return new TargetWorldPosInfo
+                                {
+                                    Error = "",
+                                    IsTransform = true,
+                                    Transform = wrapComp.transform,
+                                };
+                            default:
+                                return new TargetWorldPosInfo
+                                {
+                                    Error = $"{propWrapValue} is not GameObject or Component",
+                                };
+                        }
+                    }
+
+                    return new TargetWorldPosInfo
+                    {
+                        Error = $"{property.propertyType} is not supported",
+                    };
+                }
+                case SerializedPropertyType.ObjectReference when property.objectReferenceValue is GameObject isGo:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = "",
+                        IsTransform = true,
+                        Transform = isGo.transform,
+                    };
+                case SerializedPropertyType.ObjectReference when property.objectReferenceValue is Component comp:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = "",
+                        IsTransform = true,
+                        Transform = comp.transform,
+                    };
+                    // return ("", comp.transform);
+                    // go = ((Component) property.objectReferenceValue)?.gameObject;
+                case SerializedPropertyType.Vector2:
+                    return GetValueFromVector(space, property, property.vector2Value);
+                case SerializedPropertyType.Vector3:
+                    return GetValueFromVector(space, property, property.vector3Value);
+                default:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = $"{property.propertyType} is not supported",
+                    };
+            }
+        }
+
+        private static TargetWorldPosInfo GetValueFromVector(Space space, SerializedProperty property,
+            Vector3 v3Value)
+        {
+            if (space == Space.World)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = "",
+                    IsTransform = false,
+                    WorldPos = v3Value,
+                };
+            }
+
+            (string error, Transform container) = GetContainingTransform(property);
+            if (error != "")
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = error,
+                };
+            }
+
+            return new TargetWorldPosInfo
+            {
+                Error = "",
+                IsTransform = false,
+                WorldPos = container.TransformPoint(v3Value),
+            };
+        }
+
+        private static (string error, Transform container) GetContainingTransform(SerializedProperty property)
+        {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (property.serializedObject.targetObject)
+            {
+                case GameObject go:
+                    return ("", go.transform);
+                case Component comp:
+                    return ("", comp.transform);
+                default:
+                    return ($"Target is not GameObject or Component", null);
+            }
+        }
+
+        #endregion
     }
 }
