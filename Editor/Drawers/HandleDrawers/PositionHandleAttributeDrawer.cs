@@ -94,12 +94,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             }
         }
 
-        private struct PositionHandleInfo
+        private class PositionHandleInfo
         {
             public SerializedProperty Property;
             public FieldInfo Info;
             public object Parent;
             public Space Space;
+
+            public Util.TargetWorldPosInfo TargetWorldPosInfo;
         }
 
         ~PositionHandleAttributeDrawer()
@@ -125,12 +127,15 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            PositionHandleAttribute positionHandleAttribute = (PositionHandleAttribute)saintsAttribute;
             _positionHandleInfoUIToolkit = new PositionHandleInfo
             {
                 Property = property,
                 Info = info,
                 Parent = parent,
-                Space = ((PositionHandleAttribute)saintsAttribute).Space,
+                Space = positionHandleAttribute.Space,
+
+                TargetWorldPosInfo = Util.GetTargetWorldPosInfo(positionHandleAttribute.Space, property, info, parent),
             };
 
             VisualElement child = new VisualElement
@@ -142,31 +147,39 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             container.Add(child);
         }
 
-        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     int index,
-        //     VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        // {
-        //
-        //     object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-        //
-        //     (string error, object value) = Util.GetOf<object>(_labelInfoUIToolkit.Content, null, property, fieldInfo, parent);
-        //     if (error != "")
-        //     {
-        //         return;
-        //     }
-        //
-        //     if (value is IWrapProp wrapProp)
-        //     {
-        //         value = Util.GetWrapValue(wrapProp);
-        //     }
-        //
-        //     _labelInfoUIToolkit.ActualContent = $"{value}";
-        // }
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        {
+            if (_positionHandleInfoUIToolkit.TargetWorldPosInfo.Error != "")
+            {
+                return;
+            }
+
+            if (_positionHandleInfoUIToolkit.TargetWorldPosInfo.IsTransform)
+            {
+                return;
+            }
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
+            if (parent == null)
+            {
+                return;
+            }
+
+            _positionHandleInfoUIToolkit.TargetWorldPosInfo = Util.GetTargetWorldPosInfo(_positionHandleInfoUIToolkit.Space, property, info, parent);
+        }
 
         // private GUIStyle _guiStyleUIToolkit;
 
         private void OnSceneGUIUIToolkit(SceneView sceneView)
         {
+            if (_positionHandleInfoUIToolkit.TargetWorldPosInfo.Error != "")
+            {
+                return;
+            }
+
             try
             {
                 string _ = _positionHandleInfoUIToolkit.Property.propertyPath;
@@ -184,21 +197,27 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return;
             }
 
-            Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetTargetWorldPosInfo(_positionHandleInfoUIToolkit.Space, _positionHandleInfoUIToolkit.Property, _positionHandleInfoUIToolkit.Info, _positionHandleInfoUIToolkit.Parent);
-            if(targetWorldPosInfo.Error != "")
+            Vector3 worldPos;
+            if (_positionHandleInfoUIToolkit.TargetWorldPosInfo.IsTransform)
             {
-#if SAINTSFIELD_DEBUG
-                Debug.LogError(targetWorldPosInfo.Error);
-#endif
-                return;
+                Transform trans = _positionHandleInfoUIToolkit.TargetWorldPosInfo.Transform;
+                if (trans == null)
+                {
+                    Debug.LogWarning("Transform disposed, removing SceneGUI");
+                    SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+                    return;
+                }
+                worldPos = trans.position;
             }
-
-            // Debug.Log(worldPos);
+            else
+            {
+                worldPos = _positionHandleInfoUIToolkit.TargetWorldPosInfo.WorldPos;
+            }
 
             // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                Vector3 newTargetPosition = Handles.PositionHandle(targetWorldPosInfo.IsTransform? targetWorldPosInfo.Transform.position: targetWorldPosInfo.WorldPos, Quaternion.identity);
+                Vector3 newTargetPosition = Handles.PositionHandle(worldPos, Quaternion.identity);
                 if (changed.changed)
                 {
                     SetValue(newTargetPosition, _positionHandleInfoUIToolkit.Space, _positionHandleInfoUIToolkit.Property, _positionHandleInfoUIToolkit.Info, _positionHandleInfoUIToolkit.Parent);
