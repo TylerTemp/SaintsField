@@ -796,7 +796,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        // private bool _selfChange;
+        private bool _selfChange;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -831,9 +831,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 // Debug.Log($"expectedData={expectedData}, targetProp={initUserData.TargetProperty.propertyPath} memberInfo={initUserData.MemberInfo.Name}");
                 SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, expectedData);
                 initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                // _selfChange = true;
+                _selfChange = true;
                 onValueChangedCallback.Invoke(expectedData);
-                // _selfChange = false;
+                _selfChange = false;
 
                 // initUserData.CheckFieldResult.MisMatch = false;
                 // UpdateButtons(initUserData.CheckFieldResult, refreshButton, removeButton);
@@ -846,9 +846,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                    // _selfChange = true;
+                    _selfChange = true;
                     onValueChangedCallback.Invoke(null);
-                    // _selfChange = false;
+                    _selfChange = false;
 
                     // initUserData.CheckFieldResult.OriginalValue = null;
                     // initUserData.CheckFieldResult.MisMatch = false;
@@ -1054,7 +1054,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         // private string _toastInfoUIToolkit = "";
         private static readonly HashSet<string> ToastInfoUIToolkit = new HashSet<string>();
 
-        private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
+        private void ActualUpdateUIToolkit(SerializedProperty property, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, bool isInit)
         {
             if (EditorApplication.isPlaying)
@@ -1239,7 +1239,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                             SceneView.duringSceneGui += ToastOnceUIToolkit;
                             SetValue(userData.TargetProperty, userData.MemberInfo, parent, checkResult.TargetValue);
                             userData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                            _selfChange = true;
                             onValueChanged.Invoke(checkResult.TargetValue);
+                            _selfChange = false;
                             checkResult = new CheckFieldResult
                             {
                                 Error = "",
