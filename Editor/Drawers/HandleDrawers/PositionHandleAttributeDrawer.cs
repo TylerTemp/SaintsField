@@ -106,7 +106,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
         }
 
-        private bool OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
+        private static bool OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
         {
             Vector3 worldPos;
             if (positionHandleInfo.TargetWorldPosInfo.IsTransform)

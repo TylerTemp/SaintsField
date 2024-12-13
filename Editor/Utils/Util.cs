@@ -1153,11 +1153,11 @@ namespace SaintsField.Editor.Utils
             {
                 case SerializedPropertyType.Generic:
                 {
-                    (string error, int _, object propertyValue) = Util.GetValue(property, info, parent);
+                    (string error, int _, object propertyValue) = GetValue(property, info, parent);
 
                     if (error == "" && propertyValue is IWrapProp wrapProp)
                     {
-                        object propWrapValue = Util.GetWrapValue(wrapProp);
+                        object propWrapValue = GetWrapValue(wrapProp);
                         switch (propWrapValue)
                         {
                             case null:

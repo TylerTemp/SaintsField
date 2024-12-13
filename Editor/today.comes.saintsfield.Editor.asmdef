@@ -4,7 +4,8 @@
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:69448af7b92c7f342b298e06a37122aa",
-        "GUID:86c9d8e67265f41469be06142c397d17"
+        "GUID:86c9d8e67265f41469be06142c397d17",
+        "GUID:fba8816aea0721e408c5e4f86120a363"
     ],
     "includePlatforms": [
         "Editor"
@@ -33,6 +34,11 @@
             "name": "com.unity.ai.navigation",
             "expression": "",
             "define": "SAINTSFIELD_AI_NAVIGATION"
+        },
+        {
+            "name": "today.comes.saintsdraw",
+            "expression": "",
+            "define": "SAINTSFIELD_SAINTSDRAW"
         }
     ],
     "noEngineReferences": false
