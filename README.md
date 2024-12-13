@@ -77,9 +77,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.7.2**
+**3.8.0**
 
-UI Toolkit: Fix `PlayaInfoBox` won't hide when `show` returns `false`
+1.  Add `PositionHandle` which can change position of target field in scene view. The target can be either a `GameObject`, a `Component`, or a Vector2/Vector3 target.
+2.  IMGUI: fix `DrawLabel` won't disappear when you select away
+3.  UI Toolkit: fix auto-getters might get looped calls in list/array
+4.  UI Toolkit: fix `AnimatorParam` can't display the correct label with `RichLabel`
+5.  `DrawLabel` now support to draw a label for a `Vector2` or `Vector3` field with `Space` argument
+6.  `AnimatorState` now support `AnimatorOverrideController`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3031,7 +3036,7 @@ Handles is drawn in the scene view instead of inspector.
 
 #### DrawLabel ####
 
-Draw a text in the view scene where the field object is.
+Draw a text in the view scene where the field object is. The decorated field need to be either a `GameObject`/`Component` or a `Vector3`/`Vector2`.
 
 This is useful if you want to track an object's state (e.g. a character's basic states) in the scene.
 
@@ -3040,8 +3045,7 @@ Parameters:
 *   [Optional] `EColor eColor`: color of the label. Default is white.
 *   `string content`: the label text to show. Starting with `$` to make it an attribute/callback
 *   `bool isCallback = false`: make the content an attribute/callback. The callback can receive the value of the field, and the index if it's in an array/list.
-
-**Known Issue**: IMGUI implementation, the handle will not get cleaned up when select another object. This will be fixed in the future.
+*   `Space space = Space.World`: when using on a `Vector3` or `Vector2`, should it be in world space or local space.
 
 ```csharp
 [DrawLabel("Test"), GetComponent]
@@ -3061,6 +3065,37 @@ public MonsterState monsterState;
 ```
 
 ![draw-label](https://github.com/user-attachments/assets/4f1ec6e7-fed9-4889-9920-d2d2a9b8c0a9)
+
+#### `PositionHandle` ####
+
+Draw and use a position handle in the scene. If The decorated field is a `GameObject`/`Component`, the handle will just it's position. If the field is a `Vector3`/`Vector2`, the handle will write the world/local position to the field.
+
+Parameters:
+
+*   `Space space=Space.World`: the space of the handle. Default is world space. Only works for `Vector3`/`Vector2` type.
+
+Example of using it with vector types + `DrawLabel`:
+
+```csharp
+[PositionHandle, DrawLabel(nameof(worldPos3))] public Vector3 worldPos3;
+[PositionHandle, DrawLabel(nameof(worldPos2))] public Vector2 worldPos2;
+
+[PositionHandle(space: Space.Self), DrawLabel(nameof(localPos3), space: Space.Self)] public Vector3 localPos3;
+[PositionHandle(space: Space.Self), DrawLabel(nameof(localPos2), space: Space.Self)] public Vector2 localPos2;
+```
+
+[![video](https://github.com/user-attachments/assets/16a85513-ad65-4da7-9fec-a3388af9ff43)](https://github.com/user-attachments/assets/b74cf98d-c83d-4eb3-ba8d-4baeb8f49e1d)
+
+Example of using with objects:
+
+```csharp
+[PositionHandle, DrawLabel("$" + nameof(LabelName)), GetComponentInChildren(excludeSelf: true)]
+public MeshRenderer[] meshChildren;
+
+private string LabelName(MeshRenderer target, int index) => $"{target.name}[{index}]";
+```
+
+[![video](https://github.com/user-attachments/assets/e8971069-182e-4ea6-b23a-4dc93fc05457)](https://github.com/user-attachments/assets/358001c8-f433-40e9-8a61-2fc63f9998c6)
 
 ### Miscellaneous ###
 
