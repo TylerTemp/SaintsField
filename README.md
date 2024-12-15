@@ -77,14 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.8.0**
+**3.9.0**
 
-1.  Add `PositionHandle` which can change position of target field in scene view. The target can be either a `GameObject`, a `Component`, or a Vector2/Vector3 target.
-2.  IMGUI: fix `DrawLabel` won't disappear when you select away
-3.  UI Toolkit: fix auto-getters might get looped calls in list/array
-4.  UI Toolkit: fix `AnimatorParam` can't display the correct label with `RichLabel`
-5.  `DrawLabel` now support to draw a label for a `Vector2` or `Vector3` field with `Space` argument
-6.  `AnimatorState` now support `AnimatorOverrideController`
+1.  UI Toolkit: Add `SaintsArrow` to draw arrows in the scene (IMGUI support will be added later)
+2.  UI Toolkit: Fix auto-getters get looped calls when changing ordered in an array/list
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3034,7 +3030,7 @@ public string layoutEnd;
 
 Handles is drawn in the scene view instead of inspector.
 
-#### DrawLabel ####
+#### `DrawLabel` ####
 
 Draw a text in the view scene where the field object is. The decorated field need to be either a `GameObject`/`Component` or a `Vector3`/`Vector2`.
 
@@ -3096,6 +3092,61 @@ private string LabelName(MeshRenderer target, int index) => $"{target.name}[{ind
 ```
 
 [![video](https://github.com/user-attachments/assets/e8971069-182e-4ea6-b23a-4dc93fc05457)](https://github.com/user-attachments/assets/358001c8-f433-40e9-8a61-2fc63f9998c6)
+
+#### `SaintsArrow` ####
+
+Note: this feature requires [`SaintsDraw` 4.0.5](https://github.com/TylerTemp/SaintsDraw) installed
+
+Draw an arrow between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
+
+Parameters:
+
+*   `string start = null`: where does the arrow start. `null` for the current field.
+*   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
+*   `Space startSpace = Space.World`: if the start is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `string end = null`: where does the arrow end. `null` for the current field. 
+*   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
+*   `Space endSpace = Space.World`: if the end is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `EColor color = EColor.White`: the color of the arrow.
+*   `float colorAlpha = 1f`: the alpha of the color.
+*   `float headLength = 0.5f`: the length of the arrow head.
+*   `float headAngle = 20.0f`: the angle of the arrow head.
+
+Specially
+1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
+2.  `startIndex` & `endIndex` can be negative, which means to count from the end. `-1` means the last element.
+
+A complex showcase:
+
+```csharp
+[SerializeField, GetComponent, DrawLabel("Entrance"),
+ // connect this to worldPos[0]
+ SaintsArrow(end: nameof(worldPos), endIndex: 0, endSpace: Space.Self),
+] private GameObject entrance;
+
+[
+    // connect every element in the list
+    SaintsArrow(color: EColor.Green, startSpace: Space.Self, headLength: 0.1f),
+    // connect every element to the `centerPoint`
+    SaintsArrow(start: nameof(centerPoint), color: EColor.Red, startSpace: Space.Self, endSpace: Space.Self, headLength: 0.1f, colorAlpha: 0.4f),
+
+    PositionHandle(space: Space.Self),
+    DrawLabel("$" + nameof(PosIndexLabel), space: Space.Self),
+]
+public Vector3[] worldPos;
+
+[DrawLabel("Center", space: Space.Self), PositionHandle(space: Space.Self)] public Vector3 centerPoint;
+
+[DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true), PositionHandle,
+ // connect worldPos[0] to this
+ SaintsArrow(start: nameof(worldPos), startIndex: -1, startSpace: Space.Self),
+] public Transform exit;
+
+private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
+```
+
+[![video](https://github.com/user-attachments/assets/39003fcf-bc20-40e8-947c-c14829d9d357)](https://github.com/user-attachments/assets/44982e29-edc6-4c3e-892e-228b134d0bb2)
+
 
 ### Miscellaneous ###
 

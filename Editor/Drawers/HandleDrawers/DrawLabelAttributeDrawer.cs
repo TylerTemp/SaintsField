@@ -32,7 +32,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
         private static void OnSceneGUIInternal(SceneView _, LabelInfo labelInfo)
         {
-            if (string.IsNullOrEmpty(labelInfo.ActualContent))
+            // ReSharper disable once ReplaceWithStringIsNullOrEmpty
+            // ReSharper disable once MergeIntoLogicalPattern
+            if (labelInfo.ActualContent == null || labelInfo.ActualContent == "")
             {
                 return;
             }
@@ -110,7 +112,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             {
                 DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
 
-                Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
+                Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
                 if (targetWorldPosInfo.Error != "")
                 {
                     Debug.LogError(targetWorldPosInfo.Error);
@@ -141,7 +143,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
             if (!labelInfo.TargetWorldPosInfo.IsTransform)
             {
-                labelInfo.TargetWorldPosInfo = Util.GetTargetWorldPosInfo(labelInfo.Space, property, info, parent);
+                labelInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(labelInfo.Space, property, info, parent);
             }
 
             if (!labelInfo.IsCallback)
@@ -186,7 +188,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
             DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
-            Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
+            Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
             if (targetWorldPosInfo.Error != "")
             {
                 return new HelpBox(targetWorldPosInfo.Error, HelpBoxMessageType.Error);
@@ -249,7 +251,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                 if(parent != null)
                 {
-                    _labelInfoUIToolkit.TargetWorldPosInfo = Util.GetTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
+                    _labelInfoUIToolkit.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(drawLabelAttribute.Space, property, info, parent);
                 }
             }
         }

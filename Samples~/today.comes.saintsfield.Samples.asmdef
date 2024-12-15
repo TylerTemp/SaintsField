@@ -6,6 +6,7 @@
         "today.comes.saintsfield.Editor",
         "Unity.Addressables",
         "DOTween.Modules",
+        "AYellowpaper.SerializedCollections",
         "NaughtyAttributes.Core"
     ],
     "includePlatforms": [],

@@ -21,6 +21,15 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.XPathDrawers
 {
+    // Note about this drawer in UI Toolkit:
+    // if the list/array is not drawn by a ListView, the 1st item the drawer will fail to deliver the correct message to the rest of the items
+    // and if the list is drawn by a custom drawer, then the 1st item will not even get drawn
+    // the correct way is to think is that there is no way to correctly store the cached data -> use a static
+    // it's not granted that the 1st element will get drawn -> use any drawn element
+    // because some config just update the data, some config will only update the UI, and some both -> the responsible drawer should only update the data, and any drawn element just fetch the cached data to update it's own UI accordingly
+
+    // ATM: we just think the 1st element will always be drawn, and there is always a listView parent
+    // and use the _selfChange to prevent loop calling on element dragging
     [CustomPropertyDrawer(typeof(GetByXPathAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentInChildrenAttribute))]
@@ -796,7 +805,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
         }
 
-        // private bool _selfChange;
+        private bool _selfChange;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -831,9 +840,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 // Debug.Log($"expectedData={expectedData}, targetProp={initUserData.TargetProperty.propertyPath} memberInfo={initUserData.MemberInfo.Name}");
                 SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, expectedData);
                 initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                // _selfChange = true;
+                _selfChange = true;
                 onValueChangedCallback.Invoke(expectedData);
-                // _selfChange = false;
+                _selfChange = false;
 
                 // initUserData.CheckFieldResult.MisMatch = false;
                 // UpdateButtons(initUserData.CheckFieldResult, refreshButton, removeButton);
@@ -846,9 +855,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 {
                     SetValue(initUserData.TargetProperty, initUserData.MemberInfo, parent, null);
                     initUserData.TargetProperty.serializedObject.ApplyModifiedProperties();
-                    // _selfChange = true;
+                    _selfChange = true;
                     onValueChangedCallback.Invoke(null);
-                    // _selfChange = false;
+                    _selfChange = false;
 
                     // initUserData.CheckFieldResult.OriginalValue = null;
                     // initUserData.CheckFieldResult.MisMatch = false;
@@ -904,7 +913,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-            Debug.Log($"Awake {property.propertyPath}");
+            Debug.Log($"{index} Awake {property.propertyPath}");
 #endif
             if (initUserData.Error != "")
             {
@@ -1054,7 +1063,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
         // private string _toastInfoUIToolkit = "";
         private static readonly HashSet<string> ToastInfoUIToolkit = new HashSet<string>();
 
-        private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
+        private void ActualUpdateUIToolkit(SerializedProperty property, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info, bool isInit)
         {
             if (EditorApplication.isPlaying)
@@ -1062,7 +1071,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
 
-            int indexInArray = -1;
+            int indexInArray;
             try
             {
                 indexInArray = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -1114,6 +1123,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     Debug.LogWarning($"{container} disposed, skip.");
                     return;
                 }
+                // here is a boundary case:
+                // when dragging inside a list, there will be duplicated elements
+                // also, we should not assume that all element is displayed
                 targetRoots.AddRange(
                         listView
                         .Query<VisualElement>(className: ClassArrayContainer(arrayProp, index))
@@ -1133,7 +1145,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                 return;
             }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-            Debug.Log($"{property.propertyPath} update, init = {isInit}");
+            Debug.Log($"{index} {property.propertyPath} update, init = {isInit}");
 #endif
 
             GetByXPathAttribute getByXPathAttribute = allXPathInitData[0].GetByXPathAttribute;
@@ -1183,9 +1195,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             int requireSizeCount = 0;
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+            int accCount = 0;
+#endif
             foreach ((bool hasRoot, VisualElement root, bool hasValue, object targetValue) in ZipTwoLongest(targetRoots, xPathResults))
             {
-
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"loop {accCount} hasRoot={hasRoot} hasValue={hasValue} targetValue={targetValue} targetRoot={root}");
+                accCount++;
+#endif
                 if(hasValue)
                 {
                     requireSizeCount += 1;
@@ -1227,28 +1245,36 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                         bool doResignInit = isInit && getByXPathAttribute.InitSign && sourceIsNull;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                        Debug.Log($"{getByXPathAttribute.AutoResignToValue}/{getByXPathAttribute.AutoResignToNull}/{getByXPathAttribute.InitSign}/{isInit}/{targetIsNull}/{targetValue}/null: {targetValue == null}");
-                        Debug.Log($"mismatch? {checkResult.MisMatch}; {checkResult.OriginalValue} -> {checkResult.TargetValue} ({userData.TargetProperty.propertyPath})");
+                        Debug.Log($"{index} {getByXPathAttribute.AutoResignToValue}/{getByXPathAttribute.AutoResignToNull}/{getByXPathAttribute.InitSign}/{isInit}/{targetIsNull}/{targetValue}/null: {targetValue == null}");
+                        Debug.Log($"{index} mismatch? {checkResult.MisMatch}; {checkResult.OriginalValue} -> {checkResult.TargetValue} ({userData.TargetProperty.propertyPath})");
 #endif
                         if (doResignNull || doResignValue || doResignInit)
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                            Debug.Log($"resign {checkResult.OriginalValue} -> {checkResult.TargetValue} ({userData.TargetProperty.propertyPath})");
+                            Debug.Log($"{index} resign {checkResult.OriginalValue} -> {checkResult.TargetValue} ({userData.TargetProperty.propertyPath})");
 #endif
                             ToastInfoUIToolkit.Add($"Auto sign {(targetIsNull? "NULL": targetValue.ToString())} to {property.displayName}");
                             SceneView.duringSceneGui += ToastOnceUIToolkit;
+                            checkResult.OriginalValue = checkResult.TargetValue;
+                            checkResult.MisMatch = false;
+                            checkResult.Error = "";
+
                             SetValue(userData.TargetProperty, userData.MemberInfo, parent, checkResult.TargetValue);
                             userData.TargetProperty.serializedObject.ApplyModifiedProperties();
+                            _selfChange = true;
                             onValueChanged.Invoke(checkResult.TargetValue);
-                            checkResult = new CheckFieldResult
-                            {
-                                Error = "",
-                                MisMatch = false,
-                                OriginalValue = checkResult.TargetValue,
-                                TargetValue = checkResult.TargetValue,
-                                Index = checkResult.Index,
-                            };
-                            // userData.CheckFieldResult = checkResult;
+                            _selfChange = false;
+                            //
+                            //
+                            //
+                            // checkResult = new CheckFieldResult
+                            // {
+                            //     Error = "",
+                            //     MisMatch = false,
+                            //     OriginalValue = checkResult.TargetValue,
+                            //     TargetValue = checkResult.TargetValue,
+                            //     Index = checkResult.Index,
+                            // };
                         }
                     }
 
@@ -1262,46 +1288,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
                     }
                     // UpdateErrorMessage(getByXPathAttribute, root, userData.CheckFieldResult, userData.Property, index);
                 }
-                // else  // has no root with value, need to increase the array size; non-array will always have a root
-                // {
-                //     Debug.Log($"hasRoot={hasRoot}, hasValue={hasValue}");
-                //     requireSizeCount += 1;
-                // }
-
-
-
-                // int arraySize = int.MaxValue;
-
-                // if (r.xPathError == ""
-                //     && (
-                //         getByXPathAttribute.AutoResignToValue
-                //         || getByXPathAttribute.AutoResignToNull)
-                //     && initUserData.ArrayProperty != null
-                //     && initUserData.ArrayProperty.arraySize != xPathResults.Count)
-                // {
-                //     arraySize = xPathResults.Count;
-                //     initUserData.ArrayProperty.arraySize = arraySize;
-                //     initUserData.ArrayProperty.serializedObject.ApplyModifiedProperties();
-                // }
-
-                // if(propertyIndex >= arraySize)
-                // {
-                //     return;
-                // }
-
-                // int useIndex = propertyIndex == -1? 0: propertyIndex;
-                // object targetValue = xPathResults.Count > useIndex ? xPathResults[useIndex] : null;
-
-                // CheckFieldResult checkResult = r.xPathError == ""
-                //     ? CheckField(property, info, parent, targetValue)
-                //     : new CheckFieldResult
-                //     {
-                //         Error = r.xPathError,
-                //         MisMatch = initUserData.CheckFieldResult.MisMatch,
-                //         OriginalValue = initUserData.CheckFieldResult.OriginalValue,
-                //         TargetValue = initUserData.CheckFieldResult.TargetValue,
-                //         Index = initUserData.CheckFieldResult.Index,
-                //     };
 
             }
 
@@ -1328,16 +1314,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             ToastInfoUIToolkit.Clear();
         }
 
-        // #if !(SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH_NO_UPDATE)
-//
-//         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-//             VisualElement container, Action<object> onValueChanged, FieldInfo info)
-//         {
-//             ActualUpdateUIToolkit(property, saintsAttribute, index, container, onValueChanged, info);
-//         }
-//
-// #endif
-
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container,
             FieldInfo info,
@@ -1346,11 +1322,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             object newValue)
         {
             // Debug.Log($"Do Update {newValue}");
-            // if(!_selfChange)
-            // {
-            // }
-            //
-            // _selfChange = false;
+            if (_selfChange)
+            {
+                return;
+            }
+
             ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
                 info, false);
 
@@ -1512,7 +1488,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
 
             return ("", targetProperty, targetMemberInfo, expectedType, expectedInterface);
         }
-        private struct CheckFieldResult
+        private class CheckFieldResult
         {
             public string Error;
             public bool MisMatch;
@@ -1561,7 +1537,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
             }
 
 #if SAINTSFIELD_DEBUG_GET_BY_XPATH
-            Debug.Log($"Mismatch {property.propertyPath}: {propValue} != {targetValue}; {propValue is UnityEngine.Object}/{targetValue is UnityEngine.Object}");
+            Debug.Log($"Mismatch {property.propertyPath}: {propValue} != {targetValue}; {propValue is Object}/{targetValue is Object}");
 #endif
             return new CheckFieldResult
             {
