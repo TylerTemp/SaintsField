@@ -10,7 +10,9 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers.HandleDrawers
 {
