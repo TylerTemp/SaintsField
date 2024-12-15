@@ -65,7 +65,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 }
 
                 SerializedProperty preProperty = arrayProperty.GetArrayElementAtIndex(index - 1);
-                Util.TargetWorldPosInfo arrayStartTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.Space, preProperty, arrowConstInfo.Info, arrowConstInfo.Parent);
+                Util.TargetWorldPosInfo arrayStartTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.StartSpace, preProperty, arrowConstInfo.Info, arrowConstInfo.Parent);
                 if(arrayStartTargetWorldPosInfo.Error != "")
                 {
                     Debug.LogError(arrayStartTargetWorldPosInfo.Error);
@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                         Error = arrayStartTargetWorldPosInfo.Error,
                     };
                 }
-                Util.TargetWorldPosInfo arrayEndTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.Space, arrowConstInfo.Property, arrowConstInfo.Info, arrowConstInfo.Parent);
+                Util.TargetWorldPosInfo arrayEndTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.StartSpace, arrowConstInfo.Property, arrowConstInfo.Info, arrowConstInfo.Parent);
                 if (arrayEndTargetWorldPosInfo.Error != "")
                 {
                     return new ArrowInfo
@@ -95,7 +95,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             }
 
             // normal connection
-            Util.TargetWorldPosInfo startTargetWorldPosInfo = GetTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.Start, arrowConstInfo.SaintsArrowAttribute.StartIndex, arrowConstInfo.SaintsArrowAttribute.Space, arrowConstInfo.Property, arrowConstInfo.Info, arrowConstInfo.Parent);
+            Util.TargetWorldPosInfo startTargetWorldPosInfo = GetTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.Start, arrowConstInfo.SaintsArrowAttribute.StartIndex, arrowConstInfo.SaintsArrowAttribute.StartSpace, arrowConstInfo.Property, arrowConstInfo.Info, arrowConstInfo.Parent);
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_CONNECT
 //             Debug.Log($"normal connect {arrowConstInfo.Property.propertyPath} start {startTargetWorldPosInfo}");
 // #endif
@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                     Error = startTargetWorldPosInfo.Error,
                 };
             }
-            Util.TargetWorldPosInfo endTargetWorldPosInfo = GetTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.End, arrowConstInfo.SaintsArrowAttribute.EndIndex, arrowConstInfo.SaintsArrowAttribute.Space, arrowConstInfo.Property, arrowConstInfo.Info, arrowConstInfo.Parent);
+            Util.TargetWorldPosInfo endTargetWorldPosInfo = GetTargetWorldPosInfo(arrowConstInfo.SaintsArrowAttribute.End, arrowConstInfo.SaintsArrowAttribute.EndIndex, arrowConstInfo.SaintsArrowAttribute.EndSpace, arrowConstInfo.Property, arrowConstInfo.Info, arrowConstInfo.Parent);
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_CONNECT
 //             Debug.Log($"normal connect {arrowConstInfo.Property.propertyPath} end {endTargetWorldPosInfo}");
 // #endif
@@ -345,7 +345,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 arrowHeadLength: headLength,
                 arrowHeadAngle: arrowInfo.ArrowConstInfo.SaintsArrowAttribute.HeadAngle);
 
-            using (new HandleColorScoop(arrowInfo.ArrowConstInfo.SaintsArrowAttribute.EColor.GetColor()))
+            using (new HandleColorScoop(arrowInfo.ArrowConstInfo.SaintsArrowAttribute.EColor.GetColor() * new Color(1, 1, 1, arrowInfo.ArrowConstInfo.SaintsArrowAttribute.ColorAlpha)))
             {
                 Handles.DrawLine(head, tail);
                 Handles.DrawLine(head, arrowheadLeft);
@@ -372,17 +372,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
         private ArrowInfo _arrowInfoUIToolkit;
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
-        {
-            SaintsArrowAttribute saintsArrowAttribute = (SaintsArrowAttribute)saintsAttribute;
-            Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(saintsArrowAttribute.Space, property, info, parent);
-            if (targetWorldPosInfo.Error != "")
-            {
-                return new HelpBox(targetWorldPosInfo.Error, HelpBoxMessageType.Error);
-            }
-            return null;
-        }
+        // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+        // {
+        //     return null;
+        // }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)

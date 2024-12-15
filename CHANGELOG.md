@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.9.0 ##
+
+1.  UI Toolkit: Add `SaintsArrow` to draw arrows in the scene (IMGUI support will be added later)
+2.  UI Toolkit: Fix auto-getters get looped calls when changing ordered in an array/list
+
 ## 3.8.0 ##
 
 1.  Add `PositionHandle` which can change position of target field in scene view. The target can be either a `GameObject`, a `Component`, or a Vector2/Vector3 target.
