@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE
+#if SAINTSFIELD_SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE || SAINTSDRAW
 
 using System;
 using System.Collections;
@@ -442,7 +442,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 }
 
 #else
-using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -502,7 +501,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             {
                 style =
                 {
-                    flexDirection = FlexDirection.Column,
+                    flexDirection = FlexDirection.Row,
                 },
             };
 
@@ -510,6 +509,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             {
                 text = ErrorMessage,
                 messageType = HelpBoxMessageType.Error,
+                style =
+                {
+                    flexGrow = 1,
+                },
             });
             root.Add(new Button(() => Application.OpenURL(Url))
             {
