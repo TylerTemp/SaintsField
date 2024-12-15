@@ -1145,10 +1145,49 @@ namespace SaintsField.Editor.Utils
 
             public Transform Transform;
             public Vector3 WorldPos;
+
+            public override string ToString()
+            {
+                if (Error != "")
+                {
+                    return $"<TargetWorldPosInfo Error={Error} />";
+                }
+                return IsTransform
+                    ? $"<TargetWorldPosInfo Transform={Transform.gameObject.name} />"
+                    : $"<TargetWorldPosInfo WorldPos={WorldPos} />";
+            }
         }
 
-        public static TargetWorldPosInfo GetTargetWorldPosInfo(Space space, SerializedProperty property, FieldInfo info, object parent)
+        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfo(Space space, SerializedProperty property, FieldInfo info, object parent)
         {
+            SerializedPropertyType propertyType;
+            try
+            {
+                propertyType = property.propertyType;
+            }
+            catch (InvalidCastException)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = $"Property disposed",
+                };
+            }
+            catch (NullReferenceException)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = $"Property disposed",
+                };
+            }
+            catch (ObjectDisposedException)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = $"Property disposed",
+                };
+            }
+
+
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Generic:
@@ -1217,7 +1256,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static TargetWorldPosInfo GetValueFromVector(Space space, SerializedProperty property,
+        public static TargetWorldPosInfo GetValueFromVector(Space space, SerializedProperty property,
             Vector3 v3Value)
         {
             if (space == Space.World)

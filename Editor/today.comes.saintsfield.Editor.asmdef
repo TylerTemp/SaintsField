@@ -5,7 +5,7 @@
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:69448af7b92c7f342b298e06a37122aa",
         "GUID:86c9d8e67265f41469be06142c397d17",
-        "GUID:fba8816aea0721e408c5e4f86120a363"
+        "GUID:390b3c03330b4d14c909ce1485f4fd21"
     ],
     "includePlatforms": [
         "Editor"
@@ -37,7 +37,7 @@
         },
         {
             "name": "today.comes.saintsdraw",
-            "expression": "",
+            "expression": "[1.0.4,2]",
             "define": "SAINTSFIELD_SAINTSDRAW"
         }
     ],

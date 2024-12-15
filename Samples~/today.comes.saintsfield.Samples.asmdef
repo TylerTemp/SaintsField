@@ -5,8 +5,9 @@
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:9e24947de15b9834991c9d8411ea37cf",
         "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178",
-        "DOTween.Modules",
-        "GUID:d525ad6bd40672747bde77962f1c401e"
+        "GUID:8cc6eb5a5ba8ae046a118e1687234e0e",
+        "GUID:d525ad6bd40672747bde77962f1c401e",
+        "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -183,7 +183,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             {
                 PositionHandleAttribute positionHandleAttribute = (PositionHandleAttribute)saintsAttribute;
 
-                Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetTargetWorldPosInfo(positionHandleAttribute.Space, property, info, parent);
+                Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(positionHandleAttribute.Space, property, info, parent);
                 if (targetWorldPosInfo.Error != "")
                 {
                     Debug.LogError(targetWorldPosInfo.Error);
@@ -204,7 +204,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 SceneView.RepaintAll();
             }
 
-            positionHandleInfo.TargetWorldPosInfo = Util.GetTargetWorldPosInfo(positionHandleInfo.Space, property, info, parent);
+            positionHandleInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(positionHandleInfo.Space, property, info, parent);
             return position;
         }
 
@@ -246,7 +246,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 Parent = parent,
                 Space = positionHandleAttribute.Space,
 
-                TargetWorldPosInfo = Util.GetTargetWorldPosInfo(positionHandleAttribute.Space, property, info, parent),
+                TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(positionHandleAttribute.Space, property, info, parent),
             };
 
             VisualElement child = new VisualElement
@@ -279,7 +279,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return;
             }
 
-            _positionHandleInfoUIToolkit.TargetWorldPosInfo = Util.GetTargetWorldPosInfo(_positionHandleInfoUIToolkit.Space, property, info, parent);
+            _positionHandleInfoUIToolkit.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(_positionHandleInfoUIToolkit.Space, property, info, parent);
         }
 
         // private GUIStyle _guiStyleUIToolkit;

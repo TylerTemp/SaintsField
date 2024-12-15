@@ -5,27 +5,44 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class SaintsArrowAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        public readonly string StartTarget;
+        public readonly string Start;
         public readonly int StartIndex;
-        public readonly string EndTarget;
+        public readonly string End;
         public readonly int EndIndex;
         public readonly Space Space;
         public readonly EColor EColor;
+        public readonly float ColorAlpha;
 
-        public SaintsArrowAttribute(string startTarget = null, int startIndex = 0, string endTarget = null, int endIndex = 0, Space space = Space.World, EColor color = EColor.White)
+        public readonly float HeadLength;
+        public readonly float HeadAngle;
+
+        public SaintsArrowAttribute(
+            string start = null, int startIndex = 0,
+            string end = null, int endIndex = 0,
+            Space space = Space.World,
+            EColor color = EColor.White, float colorAlpha = 1f,
+            float headLength = 0.5f,
+            float headAngle = 20.0f
+        )
         {
-            StartTarget = startTarget;
+            Start = start;
             StartIndex = startIndex;
-            EndTarget = endTarget;
+            End = end;
             EndIndex = endIndex;
+
             Space = space;
+
             EColor = color;
+            ColorAlpha = colorAlpha;
+
+            HeadLength = headLength;
+            HeadAngle = headAngle;
         }
     }
 }
