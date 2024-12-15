@@ -441,4 +441,86 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
     }
 }
 
+#else
+using System;
+using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace SaintsField.Editor.Drawers.HandleDrawers
+{
+    [CustomPropertyDrawer(typeof(SaintsArrowAttribute))]
+    public class SaintsArrowAttributeDrawer : SaintsPropertyDrawer
+    {
+        private const string Url = "https://github.com/TylerTemp/SaintsDraw";
+        private const string ErrorMessage = "Requires SaintsDraw (>= 1.0.4): " + Url;
+
+        #region IMGUI
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            FieldInfo info,
+            object parent)
+        {
+            return true;
+        }
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            return ImGuiHelpBox.GetHeight(ErrorMessage, width, MessageType.Error) + SingleLineHeight;
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            Rect leftRect = ImGuiHelpBox.Draw(position, ErrorMessage, MessageType.Error);
+            (Rect buttonRect, Rect emptyRect) = RectUtils.SplitHeightRect(leftRect, SingleLineHeight);
+            if (GUI.Button(buttonRect, "Open"))
+            {
+                Application.OpenURL(Url);
+            }
+            return emptyRect;
+        }
+
+        #endregion
+
+#if UNITY_2021_3_OR_NEWER
+
+        #region UIToolkit
+
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container,
+            FieldInfo info,
+            object parent)
+        {
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Column,
+                },
+            };
+
+            root.Add(new HelpBox
+            {
+                text = ErrorMessage,
+                messageType = HelpBoxMessageType.Error,
+            });
+            root.Add(new Button(() => Application.OpenURL(Url))
+            {
+                text = "Open",
+            });
+
+            return root;
+        }
+        #endregion
+
+#endif
+    }
+}
 #endif
