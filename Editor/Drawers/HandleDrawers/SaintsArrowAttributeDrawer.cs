@@ -111,7 +111,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return;
             }
 
-            var arrowPoints = SaintsDraw.Arrow.GetPoints()
+            // var arrowPoints = SaintsDraw.Arrow.GetPoints()
 
             using (new HandleColorScoop(arrowInfo.ArrowConstInfo.SaintsArrowAttribute.EColor.GetColor()))
             {
