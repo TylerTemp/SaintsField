@@ -10,14 +10,11 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
-using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers.HandleDrawers
+namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
 {
     [CustomPropertyDrawer(typeof(SaintsArrowAttribute))]
-    public class SaintsArrowAttributeDrawer: SaintsPropertyDrawer
+    public partial class SaintsArrowAttributeDrawer: SaintsPropertyDrawer
     {
         private struct ArrowConstInfo
         {
@@ -35,7 +32,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public Util.TargetWorldPosInfo EndTargetWorldPosInfo;
         }
 
-        private ArrowInfo GetArrowInfo(ArrowConstInfo arrowConstInfo)
+        private static ArrowInfo GetArrowInfo(ArrowConstInfo arrowConstInfo)
         {
             bool isArrayConnecting = arrowConstInfo.SaintsArrowAttribute.Start == null
                                      && arrowConstInfo.SaintsArrowAttribute.End == null
@@ -85,6 +82,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                     };
                 }
 
+                Debug.Log($"{arrayStartTargetWorldPosInfo} -> {arrayEndTargetWorldPosInfo}");
+
                 return new ArrowInfo
                 {
                     Error = "",
@@ -129,7 +128,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             };
         }
 
-        private Util.TargetWorldPosInfo GetTargetWorldPosInfo(string target, int targetIndex, Space space, SerializedProperty property, FieldInfo info, object parent)
+        private static Util.TargetWorldPosInfo GetTargetWorldPosInfo(string target, int targetIndex, Space space, SerializedProperty property, FieldInfo info, object parent)
         {
             // use on the field itself
             if (string.IsNullOrEmpty(target))
@@ -305,32 +304,32 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             }
         }
 
-        private void OnSceneGUIInternal(SceneView sceneView, ArrowInfo arrowInfo)
+        private bool OnSceneGUIInternal(SceneView sceneView, ArrowInfo arrowInfo)
         {
             if (arrowInfo.Error != "")
             {
-                return;
+                return false;
             }
 
             (bool okStart, Vector3 worldPosStart) = GetWorldPosFromInfo(arrowInfo.StartTargetWorldPosInfo);
             if (!okStart)
             {
                 // Debug.LogError("Start target disposed");
-                return;
+                return false;
             }
 
             (bool okEnd, Vector3 worldPosEnd) = GetWorldPosFromInfo(arrowInfo.EndTargetWorldPosInfo);
             if (!okEnd)
             {
                 // Debug.LogError("End target disposed");
-                return;
+                return false;
             }
 
             float sqrMagnitude = (worldPosStart - worldPosEnd).sqrMagnitude;
 
             if(sqrMagnitude < Mathf.Epsilon)
             {
-                return;
+                return false;
             }
 
             float headLength = arrowInfo.ArrowConstInfo.SaintsArrowAttribute.HeadLength;
@@ -352,9 +351,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 Handles.DrawLine(head, arrowheadRight);
                 // Handles.DrawLine(worldPosStart, worldPosEnd);
             }
+
+            return true;
         }
 
-        private (bool ok, Vector3 worldPos) GetWorldPosFromInfo(Util.TargetWorldPosInfo worldPosInfo)
+        private static (bool ok, Vector3 worldPos) GetWorldPosFromInfo(Util.TargetWorldPosInfo worldPosInfo)
         {
             if (!worldPosInfo.IsTransform)
             {
@@ -365,75 +366,13 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             return trans == null ? (false, Vector3.zero) : (true, trans.position);
         }
 
+        ~SaintsArrowAttributeDrawer()
+        {
+            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
 #if UNITY_2021_3_OR_NEWER
-
-        #region UIToolkit
-        private static string NameSaintsArrow(SerializedProperty property) => $"{property.propertyPath}_SaintsArrow";
-
-        private ArrowInfo _arrowInfoUIToolkit;
-
-        // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
-        // {
-        //     return null;
-        // }
-
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            ArrowConstInfo arrowConstInfo = new ArrowConstInfo
-            {
-                SaintsArrowAttribute = (SaintsArrowAttribute) saintsAttribute,
-                Property = property,
-                Info = info,
-                Parent = parent,
-            };
-
-            _arrowInfoUIToolkit = GetArrowInfo(arrowConstInfo);
-
-            VisualElement child = new VisualElement
-            {
-                name = NameSaintsArrow(property),
-            };
-            child.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUIUIToolkit);
-            child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
-            container.Add(child);
-        }
-
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        {
-            // ReSharper disable once MergeIntoNegatedPattern
-            if (_arrowInfoUIToolkit == null || _arrowInfoUIToolkit.Error != "")
-            {
-                return;
-            }
-
-            if (!_arrowInfoUIToolkit.StartTargetWorldPosInfo.IsTransform || !_arrowInfoUIToolkit.EndTargetWorldPosInfo.IsTransform)
-            {
-                _arrowInfoUIToolkit = GetArrowInfo(_arrowInfoUIToolkit.ArrowConstInfo);
-            }
-        }
-
-        private GUIStyle _guiStyleUIToolkit;
-
-        private void OnSceneGUIUIToolkit(SceneView sceneView)
-        {
-            if (_arrowInfoUIToolkit is null)
-            {
-                // Debug.Log($"no config");
-                return;
-            }
-
-            // Debug.Log($"render {_arrowInfoUIToolkit}");
-
-            OnSceneGUIInternal(sceneView, _arrowInfoUIToolkit);
-        }
-
-        #endregion
-
+            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
 #endif
+        }
     }
 }
 

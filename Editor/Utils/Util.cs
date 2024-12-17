@@ -1038,7 +1038,19 @@ namespace SaintsField.Editor.Utils
 
         public static (SerializedProperty arrayProperty, int index, string error) GetArrayProperty(SerializedProperty property, MemberInfo info, object parent)
         {
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            int arrayIndex;
+            try
+            {
+                arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            }
+            catch (NullReferenceException)
+            {
+                return (null, -1, "Property disposed");
+            }
+            catch (ObjectDisposedException)
+            {
+                return (null, -1, "Property disposed");
+            }
 
             if (arrayIndex != -1)
             {

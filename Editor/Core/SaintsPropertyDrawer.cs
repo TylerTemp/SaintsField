@@ -245,6 +245,7 @@ namespace SaintsField.Editor.Core
         {
             Selection.selectionChanged -= ImGuiCheckChanged;
             _imGuiObject = null;
+
         }
 
         private void ImGuiCheckChanged()
