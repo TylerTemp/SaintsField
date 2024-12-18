@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Reflection;
 using UnityEditor;
@@ -94,3 +95,4 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         #endregion
     }
 }
+#endif
