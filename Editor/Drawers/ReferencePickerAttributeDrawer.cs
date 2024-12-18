@@ -22,11 +22,11 @@ namespace SaintsField.Editor.Drawers
         {
             string typename = property.managedReferenceFieldTypename;
             // Debug.Log(typename);
-            string[] typeSplitString = typename.Split(' ');
+            string[] typeSplitString = typename.Split(' ', count: 2);
             string typeAssemblyName = typeSplitString[0];
             string typeContainerSlashClass = typeSplitString[1];
             Type realType = Type.GetType($"{typeContainerSlashClass}, {typeAssemblyName}");
-            // Debug.Log(realType);
+            // Debug.Log($"{typeContainerSlashClass} -> {typeAssemblyName} = {realType}");
 
             return TypeCache.GetTypesDerivedFrom(realType)
                 .Prepend(realType)
