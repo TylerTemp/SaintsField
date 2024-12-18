@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
@@ -10,19 +11,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
     {
         #region IMGUI
 
-        private readonly Dictionary<string, LabelInfo> IdToLabelInfo = new Dictionary<string, LabelInfo>();
+        private readonly Dictionary<string, LabelInfo> _idToLabelInfo = new Dictionary<string, LabelInfo>();
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
-
-        private string _cacheKey = "";
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            // ReSharper disable once InvertIf
-            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-            IdToLabelInfo.Remove(_cacheKey);
-
-        }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -42,9 +32,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            _cacheKey = GetKey(property);
-            // ReSharper disable once InvertIf
-            if (!IdToLabelInfo.TryGetValue(_cacheKey, out LabelInfo labelInfo))
+            string key = GetKey(property);
+
+            if (!_idToLabelInfo.TryGetValue(key, out LabelInfo labelInfo))
             {
                 DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
 
@@ -70,11 +60,44 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
                             normal = { textColor = drawLabelAttribute.EColor.GetColor() },
                         },
                 };
-                IdToLabelInfo[_cacheKey] = labelInfo;
-                ImGuiEnsureDispose(property.serializedObject.targetObject);
+                _idToLabelInfo[key] = labelInfo;
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
                 SceneView.RepaintAll();
+
+                Selection.selectionChanged += OnSelectionChanged;
+
                 return position;
+
+                void OnSelectionChanged()
+                {
+                    bool remove = false;
+                    UnityEngine.Object oriObject = null;
+                    try
+                    {
+                        oriObject = property.serializedObject.targetObject;
+                    }
+                    catch (Exception)
+                    {
+                        remove = true;
+                    }
+
+                    if (!remove)
+                    {
+                        if (oriObject == null)
+                        {
+                            remove = true;
+                        }
+                        else
+                        {
+                            remove = Array.IndexOf(Selection.objects, oriObject) == -1;
+                        }
+                    }
+
+                    if (remove)
+                    {
+                        Unsub();
+                    }
+                }
             }
 
             if (!labelInfo.TargetWorldPosInfo.IsTransform)
@@ -101,13 +124,20 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 
             labelInfo.ActualContent = $"{value}";
             return position;
-        }
 
-        private void OnSceneGUIIMGUI(SceneView sceneView)
-        {
-            if (IdToLabelInfo.TryGetValue(_cacheKey, out LabelInfo labelInfo))
+            // ReSharper disable once InconsistentNaming
+            void OnSceneGUIIMGUI(SceneView sceneView)
             {
-                OnSceneGUIInternal(sceneView, labelInfo);
+                if (_idToLabelInfo.TryGetValue(key, out LabelInfo cachedLabelInfo))
+                {
+                    OnSceneGUIInternal(sceneView, cachedLabelInfo);
+                }
+            }
+
+            void Unsub()
+            {
+                SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                _idToLabelInfo.Remove(key);
             }
         }
 

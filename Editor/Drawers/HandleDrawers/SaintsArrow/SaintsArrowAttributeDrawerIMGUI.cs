@@ -1,5 +1,6 @@
 #if SAINTSFIELD_SAINTSDRAW || SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
@@ -15,14 +16,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
         private readonly Dictionary<string, ArrowInfo> _idToInfoImGui = new Dictionary<string, ArrowInfo>();
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
-        private string _cacheKey;
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-            _idToInfoImGui.Remove(_cacheKey);
-        }
+        // private string _cacheKey;
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -42,9 +36,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            _cacheKey = GetKey(property);
+            string key = GetKey(property);
             // ReSharper disable once InvertIf
-            if (!_idToInfoImGui.ContainsKey(_cacheKey))
+            if (!_idToInfoImGui.ContainsKey(key))
             {
                 SaintsArrowAttribute saintsArrowAttribute = (SaintsArrowAttribute)saintsAttribute;
 
@@ -55,37 +49,79 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
                     Info = info,
                     Parent = parent,
                 };
-                _idToInfoImGui[_cacheKey] = GetArrowInfo(arrowConstInfo);
+                _idToInfoImGui[key] = GetArrowInfo(arrowConstInfo);
                 ImGuiEnsureDispose(property.serializedObject.targetObject);
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
                 SceneView.RepaintAll();
+
+                Selection.selectionChanged += OnSelectionChanged;
+
                 return position;
+
+                void OnSelectionChanged()
+                {
+                    bool remove = false;
+                    UnityEngine.Object oriObject = null;
+                    try
+                    {
+                        oriObject = property.serializedObject.targetObject;
+                    }
+                    catch (Exception)
+                    {
+                        remove = true;
+                    }
+
+                    if (!remove)
+                    {
+                        if (oriObject == null)
+                        {
+                            remove = true;
+                        }
+                        else
+                        {
+                            remove = Array.IndexOf(Selection.objects, oriObject) == -1;
+                        }
+                    }
+
+                    if (remove)
+                    {
+                        Unsub();
+                    }
+                }
             }
             return position;
-        }
 
-        private void OnSceneGUIIMGUI(SceneView sceneView)
-        {
-            if (_idToInfoImGui.TryGetValue(_cacheKey, out ArrowInfo arrowInfo))
+            // ReSharper disable once InconsistentNaming
+            void OnSceneGUIIMGUI(SceneView sceneView)
             {
-                if (arrowInfo == null || arrowInfo.Error != "")
+                if (_idToInfoImGui.TryGetValue(key, out ArrowInfo arrowInfo))
                 {
-                    return;
-                }
+                    if (arrowInfo == null || arrowInfo.Error != "")
+                    {
+                        return;
+                    }
 
-                // update here!
-                if (!arrowInfo.StartTargetWorldPosInfo.IsTransform || !arrowInfo.EndTargetWorldPosInfo.IsTransform)
-                {
-                    _idToInfoImGui[_cacheKey] = arrowInfo =  GetArrowInfo(arrowInfo.ArrowConstInfo);
-                }
+                    // update here!
+                    if (!arrowInfo.StartTargetWorldPosInfo.IsTransform || !arrowInfo.EndTargetWorldPosInfo.IsTransform)
+                    {
+                        _idToInfoImGui[key] = arrowInfo =  GetArrowInfo(arrowInfo.ArrowConstInfo);
+                    }
 
-                if (!OnSceneGUIInternal(sceneView, arrowInfo))
-                {
-                    Debug.LogWarning($"Target disposed, remove SceneGUI");
-                    SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                    if (!OnSceneGUIInternal(sceneView, arrowInfo))
+                    {
+                        Debug.LogWarning($"Target disposed, remove SceneGUI");
+                        SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                    }
                 }
             }
+
+            void Unsub()
+            {
+                SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                _idToInfoImGui.Remove(key);
+            }
         }
+
 
         #endregion
     }

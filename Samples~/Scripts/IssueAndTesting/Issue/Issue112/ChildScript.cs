@@ -17,7 +17,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue112
             public string orange;
         }
 
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_6000_OR_NEWER
         [SerializeReference, ReferencePicker] public Base2Fruit item;
 #endif
     }

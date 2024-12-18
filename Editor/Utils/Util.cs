@@ -1300,8 +1300,26 @@ namespace SaintsField.Editor.Utils
 
         private static (string error, Transform container) GetContainingTransform(SerializedProperty property)
         {
+            UnityEngine.Object targetObj;
+            try
+            {
+                targetObj = property.serializedObject.targetObject;
+            }
+            catch (ArgumentNullException e)
+            {
+                return (e.Message, null);
+            }
+            catch (NullReferenceException e)
+            {
+                return (e.Message, null);
+            }
+            catch (ObjectDisposedException e)
+            {
+                return (e.Message, null);
+            }
+
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (property.serializedObject.targetObject)
+            switch (targetObj)
             {
                 case GameObject go:
                     return ("", go.transform);

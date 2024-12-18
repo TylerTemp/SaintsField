@@ -137,7 +137,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
         ~PositionHandleAttributeDrawer()
         {
-            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+            // SceneView.duringSceneGui -= OnSceneGUIIMGUI;
 #if UNITY_2021_3_OR_NEWER
             SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
 #endif

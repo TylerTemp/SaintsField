@@ -82,7 +82,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
                     };
                 }
 
-                Debug.Log($"{arrayStartTargetWorldPosInfo} -> {arrayEndTargetWorldPosInfo}");
+                // Debug.Log($"{arrayStartTargetWorldPosInfo} -> {arrayEndTargetWorldPosInfo}");
 
                 return new ArrowInfo
                 {
@@ -368,7 +368,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
 
         ~SaintsArrowAttributeDrawer()
         {
-            SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+            // SceneView.duringSceneGui -= OnSceneGUIIMGUI;
 #if UNITY_2021_3_OR_NEWER
             SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
 #endif

@@ -1,164 +1,16 @@
-﻿#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
-using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.ReferencePicker
 {
-    [CustomPropertyDrawer(typeof(ReferencePickerAttribute))]
-    public class ReferencePickerAttributeDrawer: SaintsPropertyDrawer
+    public partial class ReferencePickerAttributeDrawer
     {
-        private static IEnumerable<Type> GetTypes(SerializedProperty property)
-        {
-            string typename = property.managedReferenceFieldTypename;
-            // Debug.Log(typename);
-            string[] typeSplitString = typename.Split(' ', count: 2);
-            string typeAssemblyName = typeSplitString[0];
-            string typeContainerSlashClass = typeSplitString[1];
-            Type realType = Type.GetType($"{typeContainerSlashClass}, {typeAssemblyName}");
-            // Debug.Log($"{typeContainerSlashClass} -> {typeAssemblyName} = {realType}");
-
-            return TypeCache.GetTypesDerivedFrom(realType)
-                .Prepend(realType)
-                .Where(each => !each.IsSubclassOf(typeof(UnityEngine.Object)))
-                .Where(each => !each.IsAbstract) // abstract classes
-                .Where(each => !each.ContainsGenericParameters) // generic classes
-                .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null);
-        }
-
-        private static object CopyObj(object oldObj, object newObj)
-        {
-            if (newObj == null || oldObj == null)
-            {
-                return newObj;
-            }
-            // MyObject copyObject = ...
-            Type type = oldObj.GetType();
-            while (type != null)
-            {
-                UpdateForType(type, oldObj, newObj);
-                type = type.BaseType;
-            }
-
-            return newObj;
-        }
-
-        private static void UpdateForType(Type type, object source, object destination)
-        {
-            FieldInfo[] myObjectFields = type.GetFields(
-                BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (FieldInfo fi in myObjectFields)
-            {
-                try
-                {
-                    fi.SetValue(destination, fi.GetValue(source));
-                }
-                catch (Exception)
-                {
-                    // do nothing
-                    // Debug.LogException(e);
-                }
-            }
-        }
-
-        #region IMGUI
-
-        private const float ImGuiButtonWidth = 20f;
-
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute,
-            int index,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
-        {
-            object managedReferenceValue = property.managedReferenceValue;
-
-            string displayLabel = managedReferenceValue == null
-                ? ""
-                : managedReferenceValue.GetType().Name;
-
-            GUIContent fullLabel = new GUIContent(displayLabel);
-            GUIStyle textStyle = new GUIStyle(EditorStyles.label)
-            {
-                richText = true,
-            };
-            float width = textStyle.CalcSize(fullLabel).x;
-            if(!((ReferencePickerAttribute)saintsAttribute).HideLabel)
-            {
-                GUI.Label(new Rect(position)
-                {
-                    x = position.x - width,
-                    width = width,
-                    height = SingleLineHeight,
-                }, fullLabel, textStyle);
-            }
-
-            Rect dropdownRect = new Rect(position)
-            {
-                height = SingleLineHeight,
-            };
-
-            // ReSharper disable once InvertIf
-            if (EditorGUI.DropdownButton(dropdownRect, new GUIContent(" "), FocusType.Keyboard))
-            {
-                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
-                {
-                    {"[Null]", null},
-                    AdvancedDropdownList<Type>.Separator(),
-                };
-
-                int totalCount = 1;
-                foreach (Type type in GetTypes(property))
-                {
-                    totalCount += 1;
-                    string displayName = $"{type.Name}: {type.Namespace}";
-                    dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
-                }
-
-                Vector2 size = new Vector2(position.width, totalCount * SingleLineHeight + AdvancedDropdownAttribute.DefaultTitleHeight);
-
-                SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(
-                    dropdownList,
-                    size,
-                    position,
-                    new AdvancedDropdownState(),
-                    curItem =>
-                    {
-                        object instance = curItem == null
-                            ? null
-                            : Activator.CreateInstance((Type)curItem);
-                        property.managedReferenceValue = instance;
-                        property.serializedObject.ApplyModifiedProperties();
-                        onGUIPayload.SetValue(instance);
-                    },
-                    _ => null);
-                dropdown.Show(position);
-                dropdown.BindWindowPosition();
-            }
-
-            return true;
-        }
-
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
-        {
-            return ImGuiButtonWidth;
-        }
-
-        #endregion
-
-#if UNITY_2021_3_OR_NEWER
-
         #region UI Toolkit
         // private static string NamePropertyContainer(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField_Container";
         // private static string NamePropertyField(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField";
@@ -391,8 +243,7 @@ namespace SaintsField.Editor.Drawers
             }
         }
         #endregion
-
-#endif
     }
 }
+
 #endif
