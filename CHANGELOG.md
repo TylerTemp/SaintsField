@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.9.1 ##
+
+1.  IMGUI: Fix `DrawLabel` won't work on array/list
+2.  IMGUI: `SaintsArrow` is now available in IMGUI
+3.  Fix `ReferencePicker` didn't work if the definition is inside a generic class etc. [#112](https://github.com/TylerTemp/SaintsField/issues/112)
+
 ## 3.9.0 ##
 
 1.  UI Toolkit: Add `SaintsArrow` to draw arrows in the scene (IMGUI support will be added later)
