@@ -1561,7 +1561,7 @@ Transform:
   m_GameObject: {fileID: 292114043}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.7532172, y: -1.7525561, z: -0.9604445}
+  m_LocalPosition: {x: 1.9223857, y: -1.7525561, z: -0.2744928}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1805,10 +1805,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96398aef690daab4583343a4e08258ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldPos3: {x: -0.7, y: 0.23773932, z: 1.7818513}
+  worldPos3: {x: 1.6496265, y: 0.23773932, z: -2.3840299}
   worldPos2: {x: -2.85, y: 1.2846097}
   localPos3: {x: -2.708602, y: 0.6523657, z: -4.602842}
-  localPos2: {x: 2.2298548, y: -3.4324265}
+  localPos2: {x: 0.23284078, y: -4.4419274}
 --- !u!1 &308851076
 GameObject:
   m_ObjectHideFlags: 0
@@ -14272,8 +14272,8 @@ MonoBehaviour:
   entrance: {fileID: 1310105964}
   worldPos:
   - {x: 0.9110596, y: 0, z: 0.62067866}
-  - {x: 2.0013344, y: 0, z: 0.21836811}
-  - {x: 2.77, y: 0, z: -0.5540707}
+  - {x: 1.7746711, y: 0, z: 1.5670317}
+  - {x: 2.5758612, y: 0, z: -0.6209427}
   - {x: 1.7046227, y: 0, z: -1.3993264}
   - {x: 0.755986, y: 0, z: -1.9952565}
   - {x: -0.6783613, y: 0, z: -1.1269207}
