@@ -235,6 +235,44 @@ namespace SaintsField.Editor.Utils
                 yield return visualElement;
             }
         }
+
+
+        /// <summary>
+        /// Applies a color to a visual element via the color attribute
+        /// <see href="https://github.com/v0lt13/EditorAttributes/blob/main/Editor/Scripts/Utilities/ColorUtils.cs" />
+        /// </summary>
+        /// <param name="visualElement">The visual element to color</param>
+        /// <param name="color">The color attribute</param>
+        public static void ApplyColor(VisualElement visualElement, Color color)
+        {
+            List<Label> labels = visualElement.Query<Label>().ToList();
+
+            foreach (Label label in labels)
+                label.style.color = color;
+
+            List<TextElement> textElements = visualElement.Query<TextElement>().ToList();
+
+            foreach (TextElement textElement in textElements)
+                textElement.style.color = color;
+
+            List<ScrollView> scrollViews = visualElement.Query<ScrollView>(className: "unity-collection-view__scroll-view").ToList();
+
+            foreach (ScrollView scrollView in scrollViews)
+                scrollView.style.backgroundColor = color / 3f;
+
+            List<VisualElement> inputFields = visualElement.Query(className: "unity-property-field__input").ToList();
+
+            foreach (VisualElement inputField in inputFields)
+                inputField.style.backgroundColor = color / 3f;
+
+            List<VisualElement> checkMarks = visualElement.Query(className: "unity-toggle__checkmark").ToList();
+
+            foreach (VisualElement checkMark in checkMarks)
+            {
+                checkMark.style.unityBackgroundImageTintColor = color;
+                checkMark.parent.style.backgroundColor = StyleKeyword.Initial;
+            }
+        }
     }
 #endif
 }
