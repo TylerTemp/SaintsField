@@ -15,14 +15,17 @@ namespace SaintsField.Samples.Scripts.HandleExamples
             // connect every element to the `centerPoint`
             DrawLineTo(space: Space.Self, target: nameof(centerPoint), targetSpace: Space.Self, color: EColor.Red, colorAlpha: 0.4f),
 
-            PositionHandle(space: Space.Self),
+            // PositionHandle(space: Space.Self),
             DrawLabel("$" + nameof(PosIndexLabel), space: Space.Self),
         ]
         public Vector3[] localPos;
 
-        [DrawLabel("Center", space: Space.Self), PositionHandle(space: Space.Self)] public Vector3 centerPoint;
+        [DrawLabel("Center", space: Space.Self),
+         // PositionHandle(space: Space.Self)
+        ] public Vector3 centerPoint;
 
-        [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true), PositionHandle,
+        [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
+         // PositionHandle,
          // connect worldPos[0] to this
          DrawLineFrom(target: nameof(localPos), targetIndex: -1, targetSpace: Space.Self),
         ] public Transform exit;

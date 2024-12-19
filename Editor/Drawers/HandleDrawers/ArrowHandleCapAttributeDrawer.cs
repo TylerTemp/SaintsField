@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                     // transform.rotation * Quaternion.LookRotation(Vector3.right),
                     Quaternion.LookRotation(worldPosEnd - worldPosStart),
                     (worldPosStart - worldPosEnd).magnitude,
+                    // HandleUtility.GetHandleSize(worldPosStart - worldPosEnd) * 2,
                     EventType.Repaint
                 );
             }
