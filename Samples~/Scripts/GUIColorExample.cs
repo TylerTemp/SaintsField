@@ -4,9 +4,26 @@ namespace SaintsField.Samples.Scripts
 {
     public class GUIColorExample : MonoBehaviour
     {
+        // EColor
         [GUIColor(EColor.Cyan)] public int intField;
-        [GUIColor(EColor.Blue), PropRange(0, 10)] public int rangeField;
+        // Hex color
+        [GUIColor("#FFC0CB")] public string[] stringArray;
+        // rgb/rgba
+        [GUIColor(112 / 255f, 181 / 255f, 131 / 255f)]
+        public GameObject lightGreen;
+        [GUIColor(0, 136 / 255f, 247 / 255f, 0.3f)]
+        public Transform transparentBlue;
 
-        [GUIColor(EColor.Maroon)] public string[] stringArray;
+        [Space]
+
+        // Dynamic color of field
+        [GUIColor("$" + nameof(dynamicColor)), Range(0, 10)] public int rangeField;
+        public Color dynamicColor;
+
+        [Space]
+
+        // Dynamic color of callback
+        [GUIColor("$" + nameof(DynamicColorFunc)), TextArea] public string textArea;
+        private Color DynamicColorFunc() => dynamicColor;
     }
 }

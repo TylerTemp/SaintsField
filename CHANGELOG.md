@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.10.0 ##
+
+1.  Add `DrawLine` to draw a line between different objects
+2.  Add `ArrowHandleCap` to draw an arrow between different objects without `SaintsDraw` installed
+
 ## 3.9.1 ##
 
 1.  IMGUI: Fix `DrawLabel` won't work on array/list

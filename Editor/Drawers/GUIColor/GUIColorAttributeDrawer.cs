@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.GUIColor
             {
                 return ("", guiColorAttribute.Color);
             }
-            (string error, object result) = Util.GetMethodOf<object>(guiColorAttribute.Callback, null, property, info, target);
+            (string error, object result) = Util.GetOf<object>(guiColorAttribute.Callback, null, property, info, target);
             if (error != "")
             {
                 return (error, default);

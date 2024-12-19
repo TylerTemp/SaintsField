@@ -21,7 +21,7 @@ namespace SaintsField
 
         public GUIColorAttribute(string hexColor)
         {
-            if (hexColor.StartsWith("!"))
+            if (hexColor.StartsWith("$"))
             {
                 IsCallback = true;
                 Callback = RuntimeUtil.ParseCallback(hexColor).content;
