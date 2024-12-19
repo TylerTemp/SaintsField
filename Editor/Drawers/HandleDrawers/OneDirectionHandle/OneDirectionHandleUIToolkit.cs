@@ -1,35 +1,33 @@
-#if SAINTSFIELD_SAINTSDRAW || SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE
-#if UNITY_2021_3_OR_NEWER
-
 using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+#if UNITY_2021_3_OR_NEWER
 
-namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
+namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 {
-    public  partial class SaintsArrowAttributeDrawer
+    public abstract partial class OneDirectionHandleBase
     {
 
         #region UIToolkit
-        private static string NameSaintsArrow(SerializedProperty property) => $"{property.propertyPath}_SaintsArrow";
+        private static string NameSaintsArrow(SerializedProperty property) => $"{property.propertyPath}_OneDirectionHandle";
 
-        private ArrowInfo _arrowInfoUIToolkit;
+        private OneDirectionInfo _oneDirectionInfoUIToolkit;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            ArrowConstInfo arrowConstInfo = new ArrowConstInfo
+            OneDirectionConstInfo oneDirectionConstInfo = new OneDirectionConstInfo
             {
-                SaintsArrowAttribute = (SaintsArrowAttribute) saintsAttribute,
+                OneDirectionAttribute = (SaintsArrowAttribute) saintsAttribute,
                 Property = property,
                 Info = info,
                 Parent = parent,
             };
 
-            _arrowInfoUIToolkit = GetArrowInfo(arrowConstInfo);
+            _oneDirectionInfoUIToolkit = GetArrowInfo(oneDirectionConstInfo);
 
             VisualElement child = new VisualElement
             {
@@ -45,22 +43,22 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             // ReSharper disable once MergeIntoNegatedPattern
-            if (_arrowInfoUIToolkit == null || _arrowInfoUIToolkit.Error != "")
+            if (_oneDirectionInfoUIToolkit == null || _oneDirectionInfoUIToolkit.Error != "")
             {
                 return;
             }
 
-            if (!_arrowInfoUIToolkit.StartTargetWorldPosInfo.IsTransform || !_arrowInfoUIToolkit.EndTargetWorldPosInfo.IsTransform)
+            if (!_oneDirectionInfoUIToolkit.StartTargetWorldPosInfo.IsTransform || !_oneDirectionInfoUIToolkit.EndTargetWorldPosInfo.IsTransform)
             {
-                _arrowInfoUIToolkit = GetArrowInfo(_arrowInfoUIToolkit.ArrowConstInfo);
+                _oneDirectionInfoUIToolkit = GetArrowInfo(_oneDirectionInfoUIToolkit.OneDirectionConstInfo);
             }
         }
 
         private GUIStyle _guiStyleUIToolkit;
 
-        private void OnSceneGUIUIToolkit(SceneView sceneView)
+        protected void OnSceneGUIUIToolkit(SceneView sceneView)
         {
-            if (_arrowInfoUIToolkit is null)
+            if (_oneDirectionInfoUIToolkit is null)
             {
                 // Debug.Log($"no config");
                 return;
@@ -69,7 +67,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
             // Debug.Log($"render {_arrowInfoUIToolkit}");
 
             // ReSharper disable once InvertIf
-            if (!OnSceneGUIInternal(sceneView, _arrowInfoUIToolkit))
+            if (!OnSceneGUIInternal(sceneView, _oneDirectionInfoUIToolkit))
             {
                 Debug.LogWarning($"Target disposed, remove SceneGUI");
                 SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
@@ -81,5 +79,4 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
     }
 }
 
-#endif
 #endif

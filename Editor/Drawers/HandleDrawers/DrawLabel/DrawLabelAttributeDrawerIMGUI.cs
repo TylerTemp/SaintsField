@@ -121,7 +121,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
                         Util.GetOf<object>(cachedLabelInfo.Content, null, property, info, parent);
                     if (valueError != "")
                     {
+#if SAINTSFIELD_DEBUG
                         Debug.LogError(valueError);
+#endif
+                        Unsub();
                         return;
                     }
 

@@ -1,19 +1,16 @@
-#if SAINTSFIELD_SAINTSDRAW || SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
+namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 {
-    public partial class SaintsArrowAttributeDrawer
+    public abstract partial class OneDirectionHandleBase
     {
         #region IMGUI
 
-        private readonly Dictionary<string, ArrowInfo> _idToInfoImGui = new Dictionary<string, ArrowInfo>();
+        private readonly Dictionary<string, OneDirectionInfo> _idToInfoImGui = new Dictionary<string, OneDirectionInfo>();
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
         // private string _cacheKey;
@@ -40,16 +37,16 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
             // ReSharper disable once InvertIf
             if (!_idToInfoImGui.ContainsKey(key))
             {
-                SaintsArrowAttribute saintsArrowAttribute = (SaintsArrowAttribute)saintsAttribute;
+                OneDirectionBaseAttribute saintsArrowAttribute = (OneDirectionBaseAttribute)saintsAttribute;
 
-                ArrowConstInfo arrowConstInfo = new ArrowConstInfo
+                OneDirectionConstInfo oneDirectionConstInfo = new OneDirectionConstInfo
                 {
-                    SaintsArrowAttribute = saintsArrowAttribute,
+                    OneDirectionAttribute = saintsArrowAttribute,
                     Property = property,
                     Info = info,
                     Parent = parent,
                 };
-                _idToInfoImGui[key] = GetArrowInfo(arrowConstInfo);
+                _idToInfoImGui[key] = GetArrowInfo(oneDirectionConstInfo);
                 ImGuiEnsureDispose(property.serializedObject.targetObject);
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
                 SceneView.RepaintAll();
@@ -94,7 +91,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
             // ReSharper disable once InconsistentNaming
             void OnSceneGUIIMGUI(SceneView sceneView)
             {
-                if (_idToInfoImGui.TryGetValue(key, out ArrowInfo arrowInfo))
+                if (_idToInfoImGui.TryGetValue(key, out OneDirectionInfo arrowInfo))
                 {
                     if (arrowInfo == null || arrowInfo.Error != "")
                     {
@@ -104,7 +101,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
                     // update here!
                     if (!arrowInfo.StartTargetWorldPosInfo.IsTransform || !arrowInfo.EndTargetWorldPosInfo.IsTransform)
                     {
-                        _idToInfoImGui[key] = arrowInfo =  GetArrowInfo(arrowInfo.ArrowConstInfo);
+                        _idToInfoImGui[key] = arrowInfo =  GetArrowInfo(arrowInfo.OneDirectionConstInfo);
                     }
 
                     if (!OnSceneGUIInternal(sceneView, arrowInfo))
@@ -126,4 +123,3 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SaintsArrow
         #endregion
     }
 }
-#endif
