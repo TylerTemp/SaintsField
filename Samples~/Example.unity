@@ -13345,7 +13345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   intField: 0
-  rangeField: 0
+  rangeField: 6
   stringArray:
   - 
   - 
