@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             }
             else
             {
-                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stacks, string _) = AdvancedDropdownUtil.GetSelected(curValues[0], Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdownListValue);
+                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stacks, string _) = AdvancedDropdownUtil.GetSelected(curValues[curValues.Count - 1], Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdownListValue);
                 curSelected = stacks;
             }
 

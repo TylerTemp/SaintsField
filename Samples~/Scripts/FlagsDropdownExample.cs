@@ -10,11 +10,11 @@ namespace SaintsField.Samples.Scripts
         {
             [RichLabel("Option0")]
             Zero,
-            [RichLabel("Option1/1")]
+            [RichLabel("Option1/Value1")]
             One = 1,
-            [RichLabel("Option1/2")]
+            [RichLabel("Option1/Value2")]
             Two = 1 << 1,
-            [RichLabel("Option1/3")]
+            [RichLabel("Option1/Value3")]
             Three = 1 << 2,
             Four = 1 << 3,
         }

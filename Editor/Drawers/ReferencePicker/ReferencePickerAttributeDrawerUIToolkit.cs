@@ -174,7 +174,8 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                     metaInfo,
                     root.worldBound.width,
                     maxHeight,
-                    (newDisplay, curItem) =>
+                    false,
+                    (_, curItem) =>
                     {
                         object instance = curItem == null
                             ? null

@@ -76,6 +76,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     metaInfo,
                     root.worldBound.width,
                     maxHeight,
+                    false,
                     (newDisplay, curItem) =>
                     {
                         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);

@@ -73,7 +73,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     dropdownMetaInfo,
                     root.worldBound.width,
                     maxHeight,
-                    (newDisplay, curItem) =>
+                    true,
+                    (_, curItem) =>
                     {
                         int selectedValue = (int)curItem;
                         int newMask = EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);

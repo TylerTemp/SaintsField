@@ -25,13 +25,15 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         private readonly bool _isFlat;
         private readonly float _maxHeight;
+        private readonly bool _allowUnSelect;
 
-        public SaintsAdvancedDropdownUIToolkit(AdvancedDropdownMetaInfo metaInfo, float width, float maxHeight, Action<string, object> setValue)
+        public SaintsAdvancedDropdownUIToolkit(AdvancedDropdownMetaInfo metaInfo, float width, float maxHeight, bool allowUnSelect, Action<string, object> setValue)
         {
             _width = width;
             _metaInfo = metaInfo;
             _setValue = setValue;
             _maxHeight = maxHeight;
+            _allowUnSelect = allowUnSelect;
 
             _isFlat = metaInfo.DropdownListValue.All(each => each.ChildCount() == 0);
         }
@@ -104,6 +106,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 SwapToolbarBreadcrumbs(toolbarBreadcrumbs, newStack, GoToStackEvent.Invoke);
                 SwapPage(
+                    _metaInfo.CurValues,
+                    _allowUnSelect,
                     _metaInfo.DropdownListValue,
                     scrollViewContainer,
                     _metaInfo.SelectStacks,
@@ -189,7 +193,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                         // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
                         bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN || true
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                         Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
 #endif
 
@@ -198,30 +202,39 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(icon);
                         }
 
+                        if (curSelect)
+                        {
+                            selectImage.visible = true;
+                        }
+
                         if (disabled)
                         {
                             itemContainer.SetEnabled(false);
                             itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
                             itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
                         }
-
-                        if (curSelect)
+                        else  // not disabled (no not-enabled appearance)
                         {
-                            itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                            Debug.Log($"cur selected: {value}");
-#endif
-                            selectImage.visible = true;
-                            itemContainer.pickingMode = PickingMode.Ignore;
-                        }
-                        else
-                        {
-                            itemContainer.clicked += () =>
+                            if (curSelect && !_allowUnSelect)
                             {
-                                _setValue(stackDisplay, value);
-                                editorWindow.Close();
-                            };
+                                itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
+                                Debug.Log($"cur selected: {value}");
+#endif
+
+                                itemContainer.pickingMode = PickingMode.Ignore;
+                            }
+                            else
+                            {
+                                itemContainer.clicked += () =>
+                                {
+                                    _setValue(stackDisplay, value);
+                                    editorWindow.Close();
+                                };
+                            }
                         }
+
+
                     }
 
                     scrollView.Add(elementItem);
@@ -324,7 +337,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static void SwapPage(IAdvancedDropdownList mainDropdownList,
+        private static void SwapPage(
+            IReadOnlyList<object> curValues,
+            bool _allowUnSelect,
+            IAdvancedDropdownList mainDropdownList,
             VisualElement scrollViewContainer,
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack,
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> pageStack,
@@ -460,7 +476,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
                         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
                     }
-                    else if(selectIndex == index)
+                    else if(selectIndex == index && !_allowUnSelect)
                     {
                         itemContainer.pickingMode = PickingMode.Ignore;
                         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
@@ -478,7 +494,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     }
                 }
 
-                bool isSelected = selectIndex == index;
+                // bool isSelected = selectIndex == index;
+                bool isSelected = curValues.Contains(dropdownItem.value);
                 // Debug.Log($"isSelected={isSelected}, {index}");
                 if (isSelected)
                 {
