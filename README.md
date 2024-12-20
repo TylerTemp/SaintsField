@@ -591,6 +591,9 @@ private Color ValidateColor()
 
 [![video](https://github.com/user-attachments/assets/94c1aab5-e606-411b-b87b-6e98e632c579)](https://github.com/user-attachments/assets/9ce32483-17f9-4166-b878-f8e067761ca3)
 
+(UI Toolkit implementation code is partly from [EditorAttributes](https://github.com/v0lt13/EditorAttributes/),
+go give a star to them!)
+
 ### Button ###
 
 #### `AboveButton`/`BelowButton`/`PostFieldButton` ####
