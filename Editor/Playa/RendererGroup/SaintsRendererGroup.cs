@@ -1138,6 +1138,23 @@ namespace SaintsField.Editor.Playa.RendererGroup
             root.Add(titleRow);
             root.Add(body);
 
+
+            // UIToolkitUtils.WaitUntilThenDo(body, () =>
+            // {
+            //     var l = body.Query<Label>().ToList();
+            //     if (l.Count <= 1)
+            //     {
+            //         Debug.Log($"not found");
+            //         return (false, null);
+            //     }
+            //
+            //     return (true, l);
+            // }, labels =>
+            // {
+            //     Debug.Log($"fix labels {labels.Count}");
+            //     labels.ForEach(UIToolkitUtils.FixLabelWidthUIToolkit);
+            // }, 200);
+
             if (_eLayout.HasFlag(ELayout.Tab))
             {
                 // ReSharper disable once ConvertToLocalFunction

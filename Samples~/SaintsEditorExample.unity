@@ -266,6 +266,52 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   searchDelayScriptable: []
+--- !u!1 &75259799
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 75259801}
+  - component: {fileID: 75259800}
+  m_Layer: 0
+  m_Name: LayoutH
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &75259800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75259799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc6093053f8fe1f4e862ab12c6f76236, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  i: 0
+  thisIsALongDriveForPeopleWithNothingToThinkAbout: 
+--- !u!4 &75259801
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75259799}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &94141467
 GameObject:
   m_ObjectHideFlags: 0
@@ -2936,3 +2982,4 @@ SceneRoots:
   - {fileID: 452664843}
   - {fileID: 730554296}
   - {fileID: 1301169200}
+  - {fileID: 75259801}

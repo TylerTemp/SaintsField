@@ -132,6 +132,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         flexGrow = 1,
                     },
+                    name = FieldWithInfo.SerializedProperty.propertyPath,
                 }
                 : MakeListDrawerSettingsField(listDrawerSettingsAttribute, arraySizeAttribute?.Min ?? -1, arraySizeAttribute?.Max ?? -1);
 

@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Reflection;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -157,19 +158,19 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                     dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
                 }
 
-                AdvancedDropdownAttributeDrawer.MetaInfo metaInfo = new AdvancedDropdownAttributeDrawer.MetaInfo
+                AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
                 {
                     Error = "",
                     CurDisplay = managedReferenceValue == null
                         ? "-"
                         : managedReferenceValue.GetType().Name,
-                    CurValue = managedReferenceValue,
+                    CurValues = managedReferenceValue == null? Array.Empty<object>(): new []{managedReferenceValue},
                     DropdownListValue = dropdownList,
                     SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
                 };
 
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUiToolkit(
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,
                     root.worldBound.width,
                     maxHeight,

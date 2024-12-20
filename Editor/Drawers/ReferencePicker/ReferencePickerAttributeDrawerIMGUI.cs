@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Reflection;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -64,7 +65,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 
                 Vector2 size = new Vector2(position.width, totalCount * SingleLineHeight + AdvancedDropdownAttribute.DefaultTitleHeight);
 
-                SaintsAdvancedDropdown dropdown = new SaintsAdvancedDropdown(
+                SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
                     dropdownList,
                     size,
                     position,

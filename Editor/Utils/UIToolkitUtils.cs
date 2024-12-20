@@ -14,32 +14,36 @@ namespace SaintsField.Editor.Utils
     public static class UIToolkitUtils
     {
 
-        // public static void FixLabelWidthLoopUIToolkit(Label label)
-        // {
-        //     // FixLabelWidthUIToolkit(label);
-        //     // label.schedule.Execute(() => FixLabelWidthUIToolkit(label)).StartingIn(250);
-        //     label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
-        // }
-        //
-        // // ReSharper disable once SuggestBaseTypeForParameter
-        // public static void FixLabelWidthUIToolkit(Label label)
-        // {
-        //     StyleLength autoLength = new StyleLength(StyleKeyword.Auto);
-        //     StyleLength curLenght = label.style.width;
-        //     float resolvedWidth = label.resolvedStyle.width;
-        //     // if(curLenght.value != autoLength)
-        //     // don't ask me why we need to compare with 0, ask Unity...
-        //     if(
-        //         // !(curLenght.value.IsAuto()  // IsAuto() is not available in 2021.3.0f1
-        //         !(curLenght.keyword == StyleKeyword.Auto
-        //           || curLenght.value == 0)
-        //         && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
-        //     {
-        //         // Debug.Log($"try fix {label.style.width}({curLenght.value.IsAuto()}); {resolvedWidth > 0} {resolvedWidth}");
-        //         label.style.width = autoLength;
-        //         // label.schedule.Execute(() => label.style.width = autoLength);
-        //     }
-        // }
+        public static void FixLabelWidthLoopUIToolkit(Label label)
+        {
+            // FixLabelWidthUIToolkit(label);
+            // label.schedule.Execute(() => FixLabelWidthUIToolkit(label)).StartingIn(250);
+            label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        public static void FixLabelWidthUIToolkit(Label label)
+        {
+            // label.ClearClassList();
+            label.RemoveFromClassList(BaseField<object>.alignedFieldUssClassName);
+            label.style.minWidth = 200;
+
+            StyleLength autoLength = new StyleLength(StyleKeyword.Auto);
+            StyleLength curLenght = label.style.width;
+            float resolvedWidth = label.resolvedStyle.width;
+            // if(curLenght.value != autoLength)
+            // don't ask me why we need to compare with 0, ask Unity...
+            if(
+                // !(curLenght.value.IsAuto()  // IsAuto() is not available in 2021.3.0f1
+                !(curLenght.keyword == StyleKeyword.Auto
+                  || curLenght.value == 0)
+                && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
+            {
+                // Debug.Log($"try fix {label.style.width}({curLenght.value.IsAuto()}); {resolvedWidth > 0} {resolvedWidth}");
+                label.style.width = autoLength;
+                // label.schedule.Execute(() => label.style.width = autoLength);
+            }
+        }
 
         public static void WaitUntilThenDo<T>(VisualElement container, Func<(bool ok, T result)> until, Action<T> thenDo, long delay=0)
         {
