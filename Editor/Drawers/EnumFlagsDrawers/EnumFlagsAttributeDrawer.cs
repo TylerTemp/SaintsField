@@ -19,19 +19,16 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         private Texture2D _checkboxEmptyTexture2D;
         private Texture2D _checkboxIndeterminateTexture2D;
 
-        private static int ToggleBit(int curValue, int bitValue)
+        private void LoadIcons()
         {
-            if (EnumFlagsUtil.isOn(curValue, bitValue))
-            {
-                int fullBits = curValue | bitValue;
-                return fullBits ^ bitValue;
-            }
-
-            // int bothOnBits = curValue & bitValue;
-            // Debug.Log($"curValue={curValue}, bitValue={bitValue}, bothOnBits={bothOnBits}");
-            // return bothOnBits ^ curValue;
-            return curValue | bitValue;
+            _checkboxCheckedTexture2D = Util.LoadResource<Texture2D>("checkbox-checked.png");
+            _checkboxEmptyTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
+            _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
         }
 
+        ~EnumFlagsAttributeDrawer()
+        {
+            _checkboxCheckedTexture2D = _checkboxEmptyTexture2D = _checkboxIndeterminateTexture2D = null;
+        }
     }
 }

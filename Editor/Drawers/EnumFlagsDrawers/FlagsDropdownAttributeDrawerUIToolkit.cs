@@ -52,50 +52,50 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             int index, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            // UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
-            // VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
-            // dropdownButton.ButtonElement.clicked += () =>
-            // {
-            //     var curMask = property.intValue;
-            //     AdvancedDropdownMetaInfo dropdownMetaInfo = new AdvancedDropdownMetaInfo
-            //     {
-            //
-            //     };
-            //
-            //     // AdvancedDropdownAttributeDrawer.MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
-            //     float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
-            //     Rect worldBound = root.worldBound;
-            //     if (maxHeight < 100)
-            //     {
-            //         worldBound.y -= 300 + worldBound.height;
-            //         maxHeight = 300;
-            //     }
-            //
-            //     UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
-            //         metaInfo,
-            //         root.worldBound.width,
-            //         maxHeight,
-            //         (newDisplay, curItem) =>
-            //         {
-            //             ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
-            //             Util.SignPropertyValue(property, info, parent, curItem);
-            //             property.serializedObject.ApplyModifiedProperties();
-            //
-            //             dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).ButtonLabelElement.text = newDisplay;
-            //             dropdownButton.userData = curItem;
-            //             onValueChangedCallback(curItem);
-            //         }
-            //     ));
-            //
-            //     string curError = metaInfo.Error;
-            //     HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-            //     // ReSharper disable once InvertIf
-            //     if (helpBox.text != curError)
-            //     {
-            //         helpBox.text = curError;
-            //         helpBox.style.display = curError == ""? DisplayStyle.None : DisplayStyle.Flex;
-            //     }
-            // };
+            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
+            VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
+            EnumFlagsMetaInfo metaInfo = (EnumFlagsMetaInfo)dropdownButton.userData;
+
+            dropdownButton.ButtonElement.clicked += () =>
+            {
+                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.BitValueToName);
+
+                // AdvancedDropdownAttributeDrawer.MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
+                float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
+                Rect worldBound = root.worldBound;
+                if (maxHeight < 100)
+                {
+                    worldBound.y -= 300 + worldBound.height;
+                    maxHeight = 300;
+                }
+
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                    dropdownMetaInfo,
+                    root.worldBound.width,
+                    maxHeight,
+                    (newDisplay, curItem) =>
+                    {
+                        int selectedValue = (int)curItem;
+                        int newMask = EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
+                        property.intValue = newMask;
+                        property.serializedObject.ApplyModifiedProperties();
+
+                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).ButtonLabelElement.text = GetSelectedNames(metaInfo.BitValueToName, newMask);
+                        dropdownButton.userData = curItem;
+                        onValueChangedCallback(curItem);
+                    }
+                ));
+
+                string curError = dropdownMetaInfo.Error;
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+                // ReSharper disable once InvertIf
+                if (helpBox.text != curError)
+                {
+                    helpBox.text = curError;
+                    helpBox.style.display = curError == ""? DisplayStyle.None : DisplayStyle.Flex;
+                }
+            };
         }
     }
 }

@@ -125,7 +125,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             // string curDisplay = "";
-            (IReadOnlyList<SelectStack> curSelected, string display) = GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValueUnique);
+            (IReadOnlyList<SelectStack> curSelected, string display) = AdvancedDropdownUtil.GetSelected(curValue, Array.Empty<SelectStack>(), dropdownListValueUnique);
             #endregion
 
             return new AdvancedDropdownMetaInfo
@@ -264,60 +264,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 ? "-"
                 : string.Join("/", metaInfo.SelectStacks.Skip(1).Select(each => each.Display).Append(metaInfo.CurDisplay));
         }
-
-        private static (IReadOnlyList<SelectStack> stack, string display) GetSelected(object curValue, IReadOnlyList<SelectStack> curStacks, IAdvancedDropdownList dropdownPage)
-        {
-            foreach ((IAdvancedDropdownList item, int index) in dropdownPage.children.WithIndex())
-            {
-                if (item.isSeparator)
-                {
-                    continue;
-                }
-
-                if (item.children.Count > 0)  // it's a group
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                    Debug.Log($"GetSelected group {dropdownPage.displayName}");
-#endif
-                    (IReadOnlyList<SelectStack> subResult, string display) = GetSelected(curValue, curStacks.Append(new SelectStack
-                    {
-                        Display = dropdownPage.displayName,
-                        Index = index,
-                    }).ToArray(), item);
-                    if (subResult.Count > 0)
-                    {
-                        return (subResult, display);
-                    }
-
-                    continue;
-                }
-
-                IEnumerable<SelectStack> thisLoopResult = curStacks.Append(new SelectStack
-                {
-                    Display = dropdownPage.displayName,
-                    Index = index,
-                });
-
-                if (curValue is IWrapProp wrapProp)
-                {
-                    curValue = Util.GetWrapValue(wrapProp);
-                }
-
-                // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (Util.GetIsEqual(curValue, item.value))
-                {
-                    return (thisLoopResult.ToArray(), item.displayName);
-                }
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                Debug.Log($"Not Equal: {curValue} != {item.value}");
-#endif
-            }
-
-            // Debug.Log($"GetSelected end in empty");
-            // nothing selected
-            return (Array.Empty<SelectStack>(), "");
-        }
-
 
 
         private static IEnumerable<(string stackDisplay, string display, string icon, bool disabled, object value)> FlattenChild(string prefix, IEnumerable<IAdvancedDropdownList> children)

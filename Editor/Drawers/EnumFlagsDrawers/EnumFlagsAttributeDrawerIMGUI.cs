@@ -65,18 +65,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             };
         }
 
-        private void LoadIcons()
-        {
-            _checkboxCheckedTexture2D = Util.LoadResource<Texture2D>("checkbox-checked.png");
-            _checkboxEmptyTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
-            _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
-        }
-
-        ~EnumFlagsAttributeDrawer()
-        {
-            _checkboxCheckedTexture2D = _checkboxEmptyTexture2D = _checkboxIndeterminateTexture2D = null;
-        }
-
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
@@ -233,7 +221,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                         Label = btnLabel,
                         LabelStyle = EditorStyles.miniButton,
                         LabelWidth = EditorStyles.miniButton.CalcSize(btnLabel).x,
-                        Action = () => property.intValue = ToggleBit(property.intValue, value),
+                        Action = () => property.intValue = EnumFlagsUtil.ToggleBit(property.intValue, value),
                         Disabled = false,
                         Toggled = on,
                     });
@@ -272,7 +260,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     {
                         if (GUI.Button(btnRect, $"{(on ? "☑" : "☐")} | {name}", normalBtn))
                         {
-                            property.intValue = ToggleBit(property.intValue, value);
+                            property.intValue = EnumFlagsUtil.ToggleBit(property.intValue, value);
                         }
                     }
                 }

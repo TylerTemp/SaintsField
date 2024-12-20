@@ -339,7 +339,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     // int curValue = property.intValue;
                     int bitValue = (int)thisButton.userData;
 
-                    int newValue = property.intValue = ToggleBit(property.intValue, bitValue);
+                    int newValue = property.intValue = EnumFlagsUtil.ToggleBit(property.intValue, bitValue);
 
                     property.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback.Invoke(newValue);

@@ -187,9 +187,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                         itemContainer.Q<Label>("item-content").text = display;
 
-                        bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                        Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValue}, value={value}, _metaInfo.CurValue == value: {_metaInfo.CurValue == value}");
+                        // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
+                        bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN || true
+                        Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
 #endif
 
                         if(!string.IsNullOrEmpty(icon))
@@ -412,7 +413,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 Image selectImage = itemContainer.Q<Image>("item-checked-image");
                 selectImage.image = dropdownItem.children.Count > 0
                     ? checkGroup
-                    :check;
+                    : check;
                 // allSelectImage.Add(selectImage);
 
                 itemContainer.Q<Label>("item-content").text = dropdownItem.displayName;
