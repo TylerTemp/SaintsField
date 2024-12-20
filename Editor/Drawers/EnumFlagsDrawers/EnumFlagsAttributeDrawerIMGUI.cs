@@ -19,6 +19,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         private GUIContent _checkBoxIndeterminateContent;
 
         private GUIStyle _iconButtonStyle;
+        private GUIStyle _miniButtonStyle;
+        private GUIStyle _normalButtonStyle;
 
         private struct BtnInfo
         {
@@ -62,6 +64,15 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             _iconButtonStyle = new GUIStyle(EditorStyles.miniButton)
             {
                 padding = new RectOffset(padding, padding, padding, padding),
+                richText = true,
+            };
+            _miniButtonStyle = new GUIStyle(EditorStyles.miniButton)
+            {
+                richText = true,
+            };
+            _normalButtonStyle = new GUIStyle(_miniButtonStyle)
+            {
+                alignment = TextAnchor.MiddleLeft,
             };
         }
 
@@ -219,8 +230,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     btnInfos.Add(new BtnInfo
                     {
                         Label = btnLabel,
-                        LabelStyle = EditorStyles.miniButton,
-                        LabelWidth = EditorStyles.miniButton.CalcSize(btnLabel).x,
+                        LabelStyle = _miniButtonStyle,
+                        LabelWidth = _miniButtonStyle.CalcSize(btnLabel).x,
                         Action = () => property.intValue = EnumFlagsUtil.ToggleBit(property.intValue, value),
                         Disabled = false,
                         Toggled = on,
@@ -243,10 +254,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 {
                     bool on = EnumFlagsUtil.isOn(curValue, value);
 
-                    GUIStyle normalBtn = new GUIStyle(GUI.skin.button)
-                    {
-                        alignment = TextAnchor.LowerLeft,
-                    };
+                    // GUIStyle normalBtn = _normalButtonStyle;
 
                     Rect btnRect = new Rect(fieldRect)
                     {
@@ -259,7 +267,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
                     using (EditorGUIBackgroundColor.ToggleButton(on))
                     {
-                        if (GUI.Button(btnRect, $"{(on ? "☑" : "☐")} | {name}", normalBtn))
+                        if (GUI.Button(btnRect, $"{(on ? "☑" : "☐")} | {name}", _normalButtonStyle))
                         {
                             property.intValue = EnumFlagsUtil.ToggleBit(property.intValue, value);
                         }
@@ -296,7 +304,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 .Where(each => each.Item1 != 0 && each.Item1 != allCheckedInt)
                 .Select(each => each.Item2);
 
-            float totalBtnWidth = EditorGUIUtility.singleLineHeight + stringValues.Sum(each => EditorStyles.miniButton.CalcSize(new GUIContent(each)).x);
+            float totalBtnWidth = EditorGUIUtility.singleLineHeight + stringValues.Sum(each => _miniButtonStyle.CalcSize(new GUIContent(each)).x);
 
             _forceUnfold = totalBtnWidth > positionWidth;
             // Debug.Log($"totalBtnWidth = {totalBtnWidth}, positionWidth = {positionWidth}, _forceUnfold = {_forceUnfold}, event={Event.current.type}");
