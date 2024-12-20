@@ -77,11 +77,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.9.1**
+**3.10.0**
 
-1.  IMGUI: Fix `DrawLabel` won't work on array/list
-2.  IMGUI: `SaintsArrow` is now available in IMGUI
-3.  Fix `ReferencePicker` didn't work if the definition is inside a generic class etc. [#112](https://github.com/TylerTemp/SaintsField/issues/112)
+1.  Add `DrawLine` to draw a line between different objects
+2.  Add `ArrowHandleCap` to draw an arrow between different objects without `SaintsDraw` installed
+3.  Add `GUIColor` to color a field, [#107](https://github.com/TylerTemp/SaintsField/issues/107)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -543,7 +543,53 @@ public string content2;
 
 #### `GUIColor` ####
 
+Change the color of the field.
 
+**Override**:
+
+*   `GUIColorAttribute(EColor eColor)`
+
+    Use `EColor`
+
+*   `GUIColorAttribute(string hexColorOrCallback)`
+
+    Use hex color which starts with `#`, or use a callback which starts with `$`, to get the color
+
+*   `GUIColorAttribute(float r, float g, float b, float a = 1f)`
+
+    Use rgb/rgba color (0-1 range)
+
+```csharp
+// EColor
+[GUIColor(EColor.Cyan)] public int intField;
+// Hex color
+[GUIColor("#FFC0CB")] public string[] stringArray;
+// rgb/rgba
+[GUIColor(112 / 255f, 181 / 255f, 131 / 255f)]
+public GameObject lightGreen;
+[GUIColor(0, 136 / 255f, 247 / 255f, 0.3f)]
+public Transform transparentBlue;
+
+// Dynamic color of field
+[GUIColor("$" + nameof(dynamicColor)), Range(0, 10)] public int rangeField;
+public Color dynamicColor;
+
+// Dynamic color of callback
+[GUIColor("$" + nameof(DynamicColorFunc)), TextArea] public string textArea;
+private Color DynamicColorFunc() => dynamicColor;
+
+// validation
+[GUIColor("$" + nameof(ValidateColor))]
+public int validate;
+
+private Color ValidateColor()
+{
+    const float c = 207 / 255f;
+    return validate < 5 ? Color.red : new Color(c, c, c);
+}
+```
+
+[![video](https://github.com/user-attachments/assets/94c1aab5-e606-411b-b87b-6e98e632c579)](https://github.com/user-attachments/assets/9ce32483-17f9-4166-b878-f8e067761ca3)
 
 ### Button ###
 

@@ -13345,12 +13345,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   intField: 0
+  stringArray: []
+  lightGreen: {fileID: 0}
+  transparentBlue: {fileID: 0}
   rangeField: 6
-  stringArray:
-  - 
-  - 
-  - 
-  - 
+  dynamicColor: {r: 0.8679245, g: 0.70958126, b: 0.38892844, a: 1}
+  textArea: 
 --- !u!1 &1160369190
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,6 +4,7 @@
 
 1.  Add `DrawLine` to draw a line between different objects
 2.  Add `ArrowHandleCap` to draw an arrow between different objects without `SaintsDraw` installed
+3.  Add `GUIColor` to color a field, [#107](https://github.com/TylerTemp/SaintsField/issues/107)
 
 ## 3.9.1 ##
 

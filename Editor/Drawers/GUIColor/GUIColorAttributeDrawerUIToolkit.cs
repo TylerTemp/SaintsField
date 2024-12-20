@@ -18,6 +18,8 @@ namespace SaintsField.Editor.Drawers.GUIColor
         {
             GUIColorAttribute guiColorAttribute = (GUIColorAttribute)saintsAttribute;
             (string error, Color color) = GetColor(guiColorAttribute, property, info, parent);
+            // Debug.Log($"{error}/{color}/{_colorUIToolkit}");
+
             if (error != "")
             {
 #if SAINTSFIELD_DEBUG
@@ -25,6 +27,8 @@ namespace SaintsField.Editor.Drawers.GUIColor
 #endif
                 return;
             }
+
+            _colorUIToolkit = color;
             container.schedule.Execute(() => UIToolkitUtils.ApplyColor(container, color)).StartingIn(150);
         }
 
@@ -32,9 +36,21 @@ namespace SaintsField.Editor.Drawers.GUIColor
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             GUIColorAttribute guiColorAttribute = (GUIColorAttribute)saintsAttribute;
-            (string error, Color color) = GetColor(guiColorAttribute, property, info, null);
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError($"parent is null for {property}");
+#endif
+                return;
+            }
+            (string error, Color color) = GetColor(guiColorAttribute, property, info, parent);
+            // Debug.Log($"{error}/{color}/{_colorUIToolkit}");
             if (error != "")
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(error);
+#endif
                 return;
             }
 

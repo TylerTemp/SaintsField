@@ -25,5 +25,14 @@ namespace SaintsField.Samples.Scripts
         // Dynamic color of callback
         [GUIColor("$" + nameof(DynamicColorFunc)), TextArea] public string textArea;
         private Color DynamicColorFunc() => dynamicColor;
+
+        [GUIColor("$" + nameof(ValidateColor))]
+        public int validate;
+
+        private Color ValidateColor()
+        {
+            const float c = 207 / 255f;
+            return validate < 5 ? Color.red : new Color(c, c, c);
+        }
     }
 }
