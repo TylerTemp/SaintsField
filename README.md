@@ -3659,7 +3659,7 @@ using SaintsField;
 [Serializable, Flags]
 public enum F
 {
-    [RichLabel("[Null]")]
+    [RichLabel("[Null]")]  // RichLabel is optional
     Zero,
     [RichLabel("Options/Value1")]
     One = 1,
