@@ -79,7 +79,7 @@ namespace: `SaintsField`
 
 **3.11.0**
 
-1.  Add `FlagsDropdown` to toggle flags with search support
+1.  Add `FlagsDropdown` to toggle flags with search support, [#96](https://github.com/TylerTemp/SaintsField/issues/96)
 2.  `AnimatorState` now supports `RuntimeAnimatorController` type, [#113](https://github.com/TylerTemp/SaintsField/discussions/113)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
