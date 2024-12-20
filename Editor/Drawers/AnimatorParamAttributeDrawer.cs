@@ -29,11 +29,65 @@ namespace SaintsField.Editor.Drawers
             // ReSharper enable InconsistentNaming
         }
 
+        public static (string error, Animator animator) GetAnimator(string animatorName, SerializedProperty property, FieldInfo fieldInfo, object parent)
+        {
+            if (animatorName != null)
+            {
+                // search parent first
+                (string error, Animator result) = Util.GetOf<Animator>(animatorName, null, property, fieldInfo, parent);
+                if (result == null)
+                {
+                    return ($"Animator {animatorName} can not be null.", null);
+                }
+                if (error == "")
+                {
+                    return ("", result);
+                }
+
+                // otherwise, search the serialized property
+                SerializedObject targetSer = property.serializedObject;
+                SerializedProperty animProp = targetSer.FindProperty(animatorName) ??
+                                              SerializedUtils.FindPropertyByAutoPropertyName(targetSer,
+                                                  animatorName);
+                // ReSharper disable once MergeIntoPattern
+                if(animProp?.objectReferenceValue is Animator anim)
+                {
+                    if (anim == null)
+                    {
+                        return ($"Animator {animatorName} can not be null.", null);
+                    }
+
+                    return ("", anim);
+                }
+            }
+
+            // otherwise, search on the serialized object
+            Object targetObj = property.serializedObject.targetObject;
+            Animator animator;
+            switch (targetObj)
+            {
+                case GameObject go:
+                    animator = go.GetComponent<Animator>();
+                    break;
+                case Component component:
+                    animator = component.GetComponent<Animator>();
+                    break;
+                default:
+                    // string error = $"Animator controller not found in {targetObj}. Try specific a name instead.";
+                    string error = $"Target {targetObj} is not a GameObject or Component";
+                    return (error, null);
+            }
+
+            return animator == null
+                ? ($"Animator not found or is null in {targetObj}.", null)
+                : ("", animator);
+        }
+
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo fieldInfo, object parent)
         {
             AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
 
-            (string error, Animator animatorController) = AnimatorUtils.GetAnimator(animatorParamAttribute.AnimatorName, property, fieldInfo, parent);
+            (string error, Animator animator) = GetAnimator(animatorParamAttribute.AnimatorName, property, fieldInfo, parent);
             if (error != "")
             {
                 return new MetaInfo
@@ -46,7 +100,7 @@ namespace SaintsField.Editor.Drawers
             List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>();
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (AnimatorControllerParameter parameter in animatorController.parameters)
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
             {
                 if (animatorParamAttribute.AnimatorParamType == null ||
                     parameter.type == animatorParamAttribute.AnimatorParamType)
@@ -58,7 +112,7 @@ namespace SaintsField.Editor.Drawers
             return new MetaInfo
             {
                 Error = "",
-                Animator = animatorController,
+                Animator = animator,
                 AnimatorParameters = animatorParameters,
             };
         }

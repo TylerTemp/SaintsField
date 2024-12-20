@@ -77,11 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.10.0**
+**3.11.0**
 
-1.  Add `DrawLine` to draw a line between different objects
-2.  Add `ArrowHandleCap` to draw an arrow between different objects without `SaintsDraw` installed
-3.  Add `GUIColor` to color a field, [#107](https://github.com/TylerTemp/SaintsField/issues/107)
+1.  Add `FlagsDropdown` to toggle flags with search support
+2.  `AnimatorState` now supports `RuntimeAnimatorController` type, [#113](https://github.com/TylerTemp/SaintsField/discussions/113)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3591,8 +3590,6 @@ public enum MyEnum
 
 ![image](https://github.com/user-attachments/assets/ebc2e2f7-3534-4ff7-8710-29a990f5dea4)
 
-
-
 #### `EnumFlags` ####
 
 A toggle buttons group for enum flags (bit mask). It provides a button to toggle all bits on/off.
@@ -3650,6 +3647,33 @@ public BitMask myMask;
 ```
 
 ![image](https://github.com/user-attachments/assets/556ff203-aa55-44c9-9cc1-6ca2675b995f)
+
+#### `FlagsDropdown` ####
+
+A searchable dropdown for enum flags (bit mask). Useful when you have a big enum flags type.
+
+```csharp
+using SaintsField;
+
+[Serializable, Flags]
+public enum F
+{
+    [RichLabel("[Null]")]
+    Zero,
+    [RichLabel("Options/Value1")]
+    One = 1,
+    [RichLabel("Options/Value2")]
+    Two = 1 << 1,
+    [RichLabel("Options/Value3")]
+    Three = 1 << 2,
+    Four = 1 << 3,
+}
+
+[FlagsDropdown]
+public F flags;
+```
+
+![image](https://github.com/user-attachments/assets/3080d503-3bd5-4624-936a-dc5e150e0e43)
 
 #### `ResizableTextArea` ####
 

@@ -8,13 +8,13 @@ namespace SaintsField.Samples.Scripts
         [Serializable, Flags]
         public enum F
         {
-            [RichLabel("Option0")]
+            [RichLabel("[Null]")]
             Zero,
-            [RichLabel("Option1/Value1")]
+            [RichLabel("Options/Value1")]
             One = 1,
-            [RichLabel("Option1/Value2")]
+            [RichLabel("Options/Value2")]
             Two = 1 << 1,
-            [RichLabel("Option1/Value3")]
+            [RichLabel("Options/Value3")]
             Three = 1 << 2,
             Four = 1 << 3,
         }

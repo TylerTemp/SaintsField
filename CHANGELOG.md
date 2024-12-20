@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.11.0 ##
+
+1.  Add `FlagsDropdown` to toggle flags with search support
+2.  `AnimatorState` now supports `RuntimeAnimatorController` type, [#113](https://github.com/TylerTemp/SaintsField/discussions/113)
+
 ## 3.10.0 ##
 
 1.  Add `DrawLine` to draw a line between different objects

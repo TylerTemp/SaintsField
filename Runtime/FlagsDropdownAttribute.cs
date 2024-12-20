@@ -6,9 +6,5 @@ namespace SaintsField
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "";
-
-        public FlagsDropdownAttribute()
-        {
-        }
     }
 }

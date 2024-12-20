@@ -18,21 +18,21 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
         public class EnumFlagsField : BaseField<Enum>
         {
-            public readonly VisualElement rootElement;
-            public readonly VisualElement inlineContainerElement;
-            public readonly VisualElement expandControllerElement;
+            public readonly VisualElement RootElement;
+            public readonly VisualElement InlineContainerElement;
+            public readonly VisualElement ExpandControllerElement;
 
-            public bool autoExpand;
+            public bool AutoExpand;
 
-            public int curValue;
-            public float inlineWidth = -1f;
+            public int CurValue;
+            public float InlineWidth = -1f;
 
             public EnumFlagsField(string label, VisualElement visualInput, VisualElement inlineContainer, VisualElement expandController, bool autoExpand) : base(label, visualInput)
             {
-                rootElement = visualInput;
-                inlineContainerElement = inlineContainer;
-                expandControllerElement = expandController;
-                this.autoExpand = autoExpand;
+                RootElement = visualInput;
+                InlineContainerElement = inlineContainer;
+                ExpandControllerElement = expandController;
+                AutoExpand = autoExpand;
             }
         }
 
@@ -106,11 +106,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             });
             inlineRowLayout.Add(hToggleButton);
 
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in metaInfo.BitValueToName)
+            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in metaInfo.BitValueToName
+                         .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt))
             {
                 Button inlineToggleButton = new Button
                 {
-                    text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName.Split('/').Last(): bitValueToName.Value.Name,
+                    text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name,
                     userData = bitValueToName.Key,
                     style =
                     {
@@ -180,7 +181,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             expandMajorToggles.Add(expandToggleAllButton);
             expandControllerLayout.Add(expandMajorToggles);
 
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in metaInfo.BitValueToName)
+            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in metaInfo.BitValueToName
+                         .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt))
             {
                 Button bitButton = new Button
                 {
@@ -210,7 +212,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 };
                 bitButtonImage.AddToClassList(ClassToggleBitButtonImage(property));
                 bitButton.Add(bitButtonImage);
-                bitButton.Add(new Label(bitValueToName.Value.HasRichName? bitValueToName.Value.RichName.Split('/').Last(): bitValueToName.Value.Name)
+                bitButton.Add(new Label(bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name)
                 {
                     style =
                     {
@@ -243,7 +245,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 },
             };
             enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
-            enumFlagsField.AddToClassList("unity-base-field__aligned");
+            enumFlagsField.AddToClassList(BaseField<object>.alignedFieldUssClassName);
             enumFlagsField.name = NameEnumFlags(property);
 
             enumFlagsField.labelElement.style.maxHeight = SingleLineHeight;
@@ -404,25 +406,25 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         {
             foldout.SetValueWithoutNotify(expand);
 
-            enumFlagsField.inlineContainerElement.style.display = expand ? DisplayStyle.None : DisplayStyle.Flex;
-            enumFlagsField.expandControllerElement.style.display = expand ? DisplayStyle.Flex : DisplayStyle.None;
+            enumFlagsField.InlineContainerElement.style.display = expand ? DisplayStyle.None : DisplayStyle.Flex;
+            enumFlagsField.ExpandControllerElement.style.display = expand ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private static bool GetShouldExpand(EnumFlagsField enumFlagsField, Foldout foldout)
         {
-            if (!enumFlagsField.autoExpand)
+            if (!enumFlagsField.AutoExpand)
             {
                 return foldout.value;
             }
 
-            float containerWidth = enumFlagsField.rootElement.resolvedStyle.width;
+            float containerWidth = enumFlagsField.RootElement.resolvedStyle.width;
             if (double.IsNaN(containerWidth) || containerWidth <= 0)
             {
                 return foldout.value;
             }
 
 
-            if (containerWidth - enumFlagsField.inlineWidth <= WidthDiff)
+            if (containerWidth - enumFlagsField.InlineWidth <= WidthDiff)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ENUM_FLAGS
                 Debug.Log($"true: containerWidth={containerWidth}, inlineWidth={enumFlagsField.inlineWidth}");
@@ -457,18 +459,18 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             EnumFlagsField enumFlagsField = container.Q<EnumFlagsField>(NameEnumFlags(property));
-            if (enumFlagsField.inlineWidth < 0)
+            if (enumFlagsField.InlineWidth < 0)
             {
-                VisualElement inlineContainer = enumFlagsField.inlineContainerElement;
+                VisualElement inlineContainer = enumFlagsField.InlineContainerElement;
                 float inlineWidth = inlineContainer.Children().Select(each => each.resolvedStyle.width).Sum();
 
-                VisualElement rootContainer = enumFlagsField.rootElement;
+                VisualElement rootContainer = enumFlagsField.RootElement;
                 float rootWidth = rootContainer.resolvedStyle.width;
 
                 // ReSharper disable once InvertIf
                 if (!double.IsNaN(inlineWidth) && inlineWidth > 0 && !double.IsNaN(rootWidth) && rootWidth > 0)
                 {
-                    enumFlagsField.inlineWidth = inlineWidth;
+                    enumFlagsField.InlineWidth = inlineWidth;
 
                     // actual init...
 
@@ -504,7 +506,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
                     foldout.RegisterValueChangedCallback(changed =>
                     {
-                        enumFlagsField.autoExpand = false;
+                        enumFlagsField.AutoExpand = false;
                         SetExpandStatus(changed.newValue, enumFlagsField, foldout);
                     });
                 }
@@ -512,11 +514,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 return;
             }
 
-            int curValue = enumFlagsField.curValue;
+            int curValue = enumFlagsField.CurValue;
             // ReSharper disable once InvertIf
             if (curValue != property.intValue)
             {
-                enumFlagsField.curValue = curValue = property.intValue;
+                enumFlagsField.CurValue = curValue = property.intValue;
                 UpdateButtonDisplay(curValue, property, info, container);
             }
         }

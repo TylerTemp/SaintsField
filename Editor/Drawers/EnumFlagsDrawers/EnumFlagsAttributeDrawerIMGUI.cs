@@ -208,7 +208,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
                 List<BtnInfo> btnInfos = new List<BtnInfo>{toggleButton};
                 int curValue = property.intValue;
-                foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> kv in metaInfo.BitValueToName)
+                foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> kv in metaInfo.BitValueToName.Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt))
                 {
                     int value = kv.Key;
                     string name = kv.Value.HasRichName? kv.Value.RichName: kv.Value.Name;
@@ -238,7 +238,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             {
                 int curValue = property.intValue;
                 foreach ((int value, string name, int index) in metaInfo.BitValueToName
-                             .Select((each, index) => (each.Key, each.Value.HasRichName? each.Value.RichName.Split('/').Last(): each.Value.Name, index)))
+                             .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt)
+                             .Select((each, index) => (each.Key, each.Value.HasRichName? each.Value.RichName: each.Value.Name, index)))
                 {
                     bool on = EnumFlagsUtil.isOn(curValue, value);
 

@@ -27,10 +27,54 @@ namespace SaintsField.Editor.Drawers
         private struct MetaInfo
         {
             // ReSharper disable InconsistentNaming
-            public Animator Animator;
+            public RuntimeAnimatorController RuntimeAnimatorController;
             public IReadOnlyList<AnimatorStateChanged> AnimatorStates;
             public string Error;
             // ReSharper enable InconsistentNaming
+        }
+
+        public static (string error, RuntimeAnimatorController animator) GetRuntimeAnimatorController(string animatorName, SerializedProperty property, FieldInfo fieldInfo, object parent)
+        {
+            if (animatorName != null)
+            {
+                // search parent first
+                (string error, object result) = Util.GetOf<object>(animatorName, null, property, fieldInfo, parent);
+                if (error != "")
+                {
+                    return (error, null);
+                }
+                // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+                switch (result)
+                {
+                    case Animator animatorResult:
+                        return ("", animatorResult.runtimeAnimatorController);
+                    case RuntimeAnimatorController controllerResult:
+                        return ("", controllerResult);
+                    default:
+                        return ($"No Animator or RuntimeAnimatorController found in {animatorName}.", null);
+                }
+            }
+
+            // otherwise, search on the serialized object
+            Object targetObj = property.serializedObject.targetObject;
+            RuntimeAnimatorController animatorController;
+            switch (targetObj)
+            {
+                case GameObject go:
+                    animatorController = go.GetComponent<Animator>().runtimeAnimatorController;
+                    break;
+                case Component component:
+                    animatorController = component.GetComponent<Animator>().runtimeAnimatorController;
+                    break;
+                default:
+                    // string error = $"Animator controller not found in {targetObj}. Try specific a name instead.";
+                    string error = $"Target {targetObj} is not a GameObject or Component";
+                    return (error, null);
+            }
+
+            return animatorController == null
+                ? ($"Animator not found or is null in {targetObj}.", null)
+                : ("", animatorController);
         }
 
         #region IMGUI
@@ -116,7 +160,7 @@ namespace SaintsField.Editor.Drawers
                     optionContents.Concat(new[]
                     {
                         GUIContent.none,
-                        new GUIContent($"Edit {metaInfo.Animator.runtimeAnimatorController.name}..."),
+                        new GUIContent($"Edit {metaInfo.RuntimeAnimatorController.name}..."),
                     }).ToArray(),
                     EditorStyles.popup);
 
@@ -127,7 +171,7 @@ namespace SaintsField.Editor.Drawers
                     {
                         // Selection.activeObject = metaInfo.Animator.runtimeAnimatorController;
                         // EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
-                        OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
+                        OpenAnimator(metaInfo.RuntimeAnimatorController);
                     }
                     else
                     {
@@ -401,7 +445,7 @@ namespace SaintsField.Editor.Drawers
             AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute) saintsAttribute;
             string animFieldName = animatorStateAttribute.AnimFieldName;
 
-            (string error, Animator animator) = AnimatorUtils.GetAnimator(animFieldName, property, fieldInfo, parent);
+            (string error, RuntimeAnimatorController runtimeAnimatorController) = GetRuntimeAnimatorController(animFieldName, property, fieldInfo, parent);
             if (error != "")
             {
                 return new MetaInfo
@@ -416,7 +460,7 @@ namespace SaintsField.Editor.Drawers
             AnimatorController controller = null;
             Dictionary<AnimationClip, AnimationClip> clipOverrideDict = new Dictionary<AnimationClip, AnimationClip>();
 
-            switch (animator.runtimeAnimatorController)
+            switch (runtimeAnimatorController)
             {
                 case AnimatorController ac:
                     controller = ac;
@@ -440,7 +484,7 @@ namespace SaintsField.Editor.Drawers
             {
                 return new MetaInfo
                 {
-                    Error = $"No AnimatorController on {animator}",
+                    Error = $"No AnimatorController on {runtimeAnimatorController}",
                     AnimatorStates = Array.Empty<AnimatorStateChanged>(),
                 };
             }
@@ -469,7 +513,7 @@ namespace SaintsField.Editor.Drawers
 
             return new MetaInfo
             {
-                Animator = animator,
+                RuntimeAnimatorController = runtimeAnimatorController,
                 AnimatorStates = animatorStates,
                 Error = "",
             };
@@ -644,7 +688,7 @@ namespace SaintsField.Editor.Drawers
                     isReadOnly = true,
                 };
                 textField.SetEnabled(false);
-                textField.AddToClassList("unity-base-field__aligned");
+                textField.AddToClassList(BaseField<object>.alignedFieldUssClassName);
                 properties.Add(textField);
             }
 
@@ -725,15 +769,15 @@ namespace SaintsField.Editor.Drawers
                 });
             }
 
-            if(metaInfo.Animator != null)
+            if(metaInfo.RuntimeAnimatorController != null)
             {
                 if (metaInfo.AnimatorStates.Count > 0)
                 {
                     genericDropdownMenu.AddSeparator("");
                 }
 
-                genericDropdownMenu.AddItem($"Edit {metaInfo.Animator.runtimeAnimatorController.name}...", false,
-                    () => OpenAnimator(metaInfo.Animator.runtimeAnimatorController));
+                genericDropdownMenu.AddItem($"Edit {metaInfo.RuntimeAnimatorController.name}...", false,
+                    () => OpenAnimator(metaInfo.RuntimeAnimatorController));
             }
 
             UIToolkitUtils.DropdownButtonField root = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));

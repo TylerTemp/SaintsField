@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
             dropdownButton.ButtonElement.clicked += () =>
             {
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.BitValueToName);
+                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
 
                 // AdvancedDropdownAttributeDrawer.MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
                 float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
@@ -77,7 +77,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     (_, curItem) =>
                     {
                         int selectedValue = (int)curItem;
-                        int newMask = EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
+                        int newMask = selectedValue == 0
+                            ? 0
+                            : EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
                         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
                         property.intValue = newMask;
                         property.serializedObject.ApplyModifiedProperties();

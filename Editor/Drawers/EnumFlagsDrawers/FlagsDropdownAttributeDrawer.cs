@@ -16,10 +16,25 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return names.Length == 0? "-":  string.Join(",", names);
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfo(int curMask, IReadOnlyDictionary<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName)
+        private static string GetNameFromInt(IReadOnlyDictionary<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName, int selectedInt, string fallback)
         {
-            AdvancedDropdownList<object> dropdownListValue = new AdvancedDropdownList<object>();
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> kv in bitValueToName)
+            if(bitValueToName.TryGetValue(selectedInt, out EnumFlagsUtil.EnumDisplayInfo info))
+            {
+                return info.HasRichName? info.RichName: info.Name;
+            }
+
+            return fallback;
+        }
+
+        private static AdvancedDropdownMetaInfo GetMetaInfo(int curMask, int fullMask, IReadOnlyDictionary<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName)
+        {
+            AdvancedDropdownList<object> dropdownListValue = new AdvancedDropdownList<object>
+            {
+                {GetNameFromInt(bitValueToName, 0, "Nothing"), 0},
+                {GetNameFromInt(bitValueToName, fullMask,"Everything"), fullMask},
+            };
+            dropdownListValue.AddSeparator();
+            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> kv in bitValueToName.Where(each => each.Key != 0 & each.Key != fullMask))
             {
                 dropdownListValue.Add(kv.Value.HasRichName? kv.Value.RichName: kv.Value.Name, kv.Key);
             }

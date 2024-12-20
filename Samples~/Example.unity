@@ -11579,23 +11579,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b27e5bf5a78bf440aecf873429a7d1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stateName: 
+  stateName: Sub2State
   state:
-    <layerIndex>k__BackingField: 1
-    <stateNameHash>k__BackingField: 1370463806
-    <stateName>k__BackingField: TestSubState
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1198717087
+    <stateName>k__BackingField: Sub2State
     <stateSpeed>k__BackingField: 1
     <stateTag>k__BackingField: 
     <animationClip>k__BackingField: {fileID: 0}
     <subStateMachineNameChain>k__BackingField:
-    - TestStateMachine
+    - SubStateMachine2
+    - Sub2-2
   stateBase:
     <layerIndex>k__BackingField: 0
-    <stateNameHash>k__BackingField: 0
-    <stateName>k__BackingField: 
-    <stateSpeed>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1075812047
+    <stateName>k__BackingField: SubNewState
+    <stateSpeed>k__BackingField: 2.42
     <stateTag>k__BackingField: 
-    <subStateMachineNameChain>k__BackingField: []
+    <subStateMachineNameChain>k__BackingField:
+    - SubStateMachine2
 --- !u!95 &972998066
 Animator:
   serializedVersion: 5
@@ -12179,7 +12181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45cb9069ce004c2ab4ee78763c064fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myMask: 0
+  myMask: 26
   myMask2: 0
   myStruct:
     myMask: 0
@@ -13378,7 +13380,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fada7cfbf14b7f44eb1299110a01b59a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flags: 14
+  flags: 12
 --- !u!4 &1157478913
 Transform:
   m_ObjectHideFlags: 0
@@ -18250,6 +18252,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noAttrFallback:
     value: []
+--- !u!1 &1762957544
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1762957546}
+  - component: {fileID: 1762957545}
+  m_Layer: 0
+  m_Name: RuntimeAnimator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1762957545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1762957544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4226d646ce7d6174b963b7887ef64cd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animController: {fileID: 22100000, guid: 09185dcfeceae8141bfc9763f984acb2, type: 2}
+  animState:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1075812047
+    <stateName>k__BackingField: SubNewState
+    <stateSpeed>k__BackingField: 2.42
+    <stateTag>k__BackingField: 
+    <animationClip>k__BackingField: {fileID: 7400000, guid: 76331895325d39644bfee2c64ed56780, type: 2}
+    <subStateMachineNameChain>k__BackingField:
+    - SubStateMachine2
+--- !u!4 &1762957546
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1762957544}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 80
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1772932194
 GameObject:
   m_ObjectHideFlags: 0

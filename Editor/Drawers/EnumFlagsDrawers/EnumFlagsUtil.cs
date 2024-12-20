@@ -38,7 +38,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 );
 
             int allCheckedInt = allIntToName.Keys.Aggregate(0, (acc, value) => acc | value);
-            Dictionary<int, EnumDisplayInfo> bitValueToName = allIntToName.Where(each => each.Key != 0 && each.Key != allCheckedInt).ToDictionary(each => each.Key, each => each.Value);
+            Dictionary<int, EnumDisplayInfo> bitValueToName = allIntToName
+                // .Where(each => each.Key != 0 && each.Key != allCheckedInt)
+                // .Where(each => each.Key != 0 && each.Key != allCheckedInt)
+                .ToDictionary(each => each.Key, each => each.Value);
             return new EnumFlagsMetaInfo
             {
                 BitValueToName = bitValueToName,
@@ -46,7 +49,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             };
         }
 
-        public static bool isOn(int curValue, int checkValue) => (curValue & checkValue) == checkValue;
+        public static bool isOn(int curValue, int checkValue)
+        {
+            if (checkValue == 0)
+            {
+                return false;
+            }
+            return (curValue & checkValue) == checkValue;
+        }
 
         public static int ToggleBit(int curValue, int bitValue)
         {

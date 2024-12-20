@@ -16,11 +16,11 @@ namespace SaintsField
         public const float DefaultTitleHeight = 45f;
         private const float DefaultSepHeight = 4f;
 
-        public readonly float TitleHeight = DefaultTitleHeight;
-        public readonly float ItemHeight = -1f;
-        public readonly float SepHeight = DefaultSepHeight;
-        public readonly float MinHeight = -1f;
-        public readonly bool UseTotalItemCount = false;
+        public const float TitleHeight = DefaultTitleHeight;
+        public const float ItemHeight = -1f;
+        public const float SepHeight = DefaultSepHeight;
+        public const float MinHeight = -1f;
+        public const bool UseTotalItemCount = false;
         public readonly EUnique EUnique;
 
         // public AdvancedDropdownAttribute(string funcName)

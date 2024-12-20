@@ -1,23 +1,22 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.DropdownBase;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
+namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
-    public partial class AdvancedDropdownAttributeDrawer
+    public partial class FlagsDropdownAttributeDrawer
     {
-        #region IMGUI
-
         private string _error = "";
 
         private readonly Dictionary<string, Texture2D> _iconCache = new Dictionary<string, Texture2D>();
 
-        ~AdvancedDropdownAttributeDrawer()
+        ~FlagsDropdownAttributeDrawer()
         {
             _iconCache.Clear();
         }
@@ -33,39 +32,37 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute)saintsAttribute;
-            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, advancedDropdownAttribute, info, parent);
-            _error = metaInfo.Error;
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
+            _error = dropdownMetaInfo.Error;
 
             #region Dropdown
 
             Rect leftRect = EditorGUI.PrefixLabel(position, label);
 
             GUI.SetNextControlName(FieldControlName);
-            string display = GetMetaStackDisplay(metaInfo);
+            string display = GetSelectedNames(metaInfo.BitValueToName, property.intValue);
             // Debug.Assert(false, "Here");
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
             {
                 float minHeight = AdvancedDropdownAttribute.MinHeight;
-                float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
-                    ? AdvancedDropdownAttribute.ItemHeight
-                    : EditorGUIUtility.singleLineHeight;
+                float itemHeight = EditorGUIUtility.singleLineHeight;
                 float titleHeight = AdvancedDropdownAttribute.TitleHeight;
                 Vector2 size;
                 if (minHeight < 0)
                 {
-                    if(AdvancedDropdownAttribute.UseTotalItemCount)
-                    {
-                        float totalItemCount = GetValueItemCounts(metaInfo.DropdownListValue);
-                        // Debug.Log(totalItemCount);
-                        size = new Vector2(position.width, totalItemCount * itemHeight + titleHeight);
-                    }
-                    else
-                    {
-                        float maxChildCount = GetDropdownPageHeight(metaInfo.DropdownListValue, itemHeight, AdvancedDropdownAttribute.SepHeight).Max();
-                        size = new Vector2(position.width, maxChildCount + titleHeight);
-                    }
+                    // if(AdvancedDropdownAttribute.UseTotalItemCount)
+                    // {
+                    float totalItemCount = GetValueItemCounts(dropdownMetaInfo.DropdownListValue);
+                    // Debug.Log(totalItemCount);
+                    size = new Vector2(position.width, totalItemCount * itemHeight + titleHeight);
+                    // }
+                    // else
+                    // {
+                    //     float maxChildCount = GetDropdownPageHeight(metaInfo.DropdownListValue, itemHeight, advancedDropdownAttribute.SepHeight).Max();
+                    //     size = new Vector2(position.width, maxChildCount + titleHeight);
+                    // }
                 }
                 else
                 {
@@ -74,16 +71,21 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 // Vector2 size = new Vector2(position.width, maxChildCount * EditorGUIUtility.singleLineHeight + 31f);
                 SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
-                    metaInfo.DropdownListValue,
+                    dropdownMetaInfo.DropdownListValue,
                     size,
                     position,
                     new AdvancedDropdownState(),
                     curItem =>
                     {
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
-                        Util.SignPropertyValue(property, info, parent, curItem);
+                        int selectedValue = (int)curItem;
+                        int newMask = selectedValue == 0
+                            ? 0
+                            : EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
+
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
+                        Util.SignPropertyValue(property, info, parent, newMask);
                         property.serializedObject.ApplyModifiedProperties();
-                        onGUIPayload.SetValue(curItem);
+                        onGUIPayload.SetValue(newMask);
                         if(ExpandableIMGUIScoop.IsInScoop)
                         {
                             property.serializedObject.ApplyModifiedProperties();
@@ -95,26 +97,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             #endregion
-        }
-
-        private static IEnumerable<float> GetDropdownPageHeight(IAdvancedDropdownList dropdownList, float itemHeight, float sepHeight)
-        {
-            if (dropdownList.ChildCount() == 0)
-            {
-                // Debug.Log($"yield 0");
-                yield return 0;
-                yield break;
-            }
-
-            // Debug.Log($"yield {dropdownList.children.Count}");
-            yield return dropdownList.ChildCount() * itemHeight + dropdownList.SepCount() * sepHeight;
-            foreach (IEnumerable<float> eachChildHeight in dropdownList.children.Select(child => GetDropdownPageHeight(child, itemHeight, sepHeight)))
-            {
-                foreach (int i in eachChildHeight)
-                {
-                    yield return i;
-                }
-            }
         }
 
         private static int GetValueItemCounts(IAdvancedDropdownList dropdownList)
@@ -129,34 +111,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 return 1;
             }
 
-            int count = 0;
-            foreach (IAdvancedDropdownList child in dropdownList.children)
-            {
-                count += GetValueItemCounts(child);
-            }
-
-            return count;
-
-            // if(dropdownList.ChildCount() == 0)
-            // {
-            //     Debug.Log(1);
-            //     yield return 1;
-            //     yield break;
-            // }
-            //
-            // // Debug.Log(dropdownList.ChildCount());
-            // // yield return dropdownList.children.Count(each => each.ChildCount() == 0);
-            // foreach (IAdvancedDropdownList eachChild in dropdownList.children)
-            // {
-            //     foreach (int subChildCount in GetChildCounts(eachChild))
-            //     {
-            //         if(subChildCount > 0)
-            //         {
-            //             Debug.Log(subChildCount);
-            //             yield return subChildCount;
-            //         }
-            //     }
-            // }
+            return dropdownList.children.Sum(child => GetValueItemCounts(child));
         }
 
         private Texture2D GetIcon(string icon)
@@ -190,6 +145,5 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
-        #endregion
     }
 }
