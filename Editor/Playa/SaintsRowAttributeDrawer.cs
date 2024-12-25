@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 using SaintsField.Playa;
-using SaintsField.Editor.Playa.Renderer;
 #endif
 
 namespace SaintsField.Editor.Playa
 {
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
-    public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder
+    public class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder, IMakeRenderer
     {
         private static (string error, int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
@@ -88,7 +88,7 @@ namespace SaintsField.Editor.Playa
                 Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                     .ToDictionary(each => each.name, each => each.property);
                 return _imGuiRenderers[index] =
-                    SaintsEditor.GetRenderers(serializedFieldNames, property.serializedObject, current);
+                    SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, this, current);
             }
 
             Debug.LogWarning(error);
@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Playa
 
             SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute) attribute;
 
-            IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.GetRenderers(serializedFieldNames, property.serializedObject, value);
+            IReadOnlyList<ISaintsRenderer> renderer = SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, this, value);
 
             // VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
             VisualElement bodyElement = new VisualElement();
@@ -248,5 +248,10 @@ namespace SaintsField.Editor.Playa
         }
 #endif
         #endregion
+
+        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        {
+            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
+        }
     }
 }

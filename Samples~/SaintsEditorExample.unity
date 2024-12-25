@@ -295,8 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc6093053f8fe1f4e862ab12c6f76236, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  i: 0
-  thisIsALongDriveForPeopleWithNothingToThinkAbout: 
+  inputs: []
 --- !u!4 &75259801
 Transform:
   m_ObjectHideFlags: 0
