@@ -30,9 +30,20 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
+        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+
+        private static readonly Dictionary<string, object> AsyncChangedCache = new Dictionary<string, object>();
+
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            string key = GetKey(property);
+            if (AsyncChangedCache.TryGetValue(key, out object changedValue))
+            {
+                onGUIPayload.SetValue(changedValue);
+                AsyncChangedCache.Remove(key);
+            }
+
             AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute)saintsAttribute;
             AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, advancedDropdownAttribute, info, parent);
             _error = metaInfo.Error;
@@ -73,6 +84,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
 
                 // Vector2 size = new Vector2(position.width, maxChildCount * EditorGUIUtility.singleLineHeight + 31f);
+
+                // OnGUIPayload targetPayload = onGUIPayload;
                 SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
                     metaInfo.DropdownListValue,
                     size,
@@ -83,11 +96,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
-                        onGUIPayload.SetValue(curItem);
-                        if(ExpandableIMGUIScoop.IsInScoop)
-                        {
-                            property.serializedObject.ApplyModifiedProperties();
-                        }
+                        AsyncChangedCache[key] = curItem;
+                        // Debug.Log($"Advanced Changed: {AsyncChangedCache[key].changed}/{AsyncChangedCache[key].GetHashCode()}");
+                        // if(ExpandableIMGUIScoop.IsInScoop)
+                        // {
+                        //     property.serializedObject.ApplyModifiedProperties();
+                        // }
                     },
                     GetIcon);
                 dropdown.Show(position);

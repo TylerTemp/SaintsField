@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.12.0 ##
+
+1.  Add `SaintsEditorWindow` to easily make an `EditorWindow`.
+2.  IMGUI: Fix `OnValueChanged` didn't work with `Dropdown` and `AdvancedDropdown`
+
 ## 3.11.0 ##
 
 1.  Add `FlagsDropdown` to toggle flags with search support, [#96](https://github.com/TylerTemp/SaintsField/issues/96)

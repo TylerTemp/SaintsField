@@ -93,17 +93,29 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
+            if (!_renderField)
+            {
+                return;
+            }
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
             FieldLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
         }
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
+            if (!_renderField)
+            {
+                return 0;
+            }
             return FieldHeight(FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target), ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
         }
 
         protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
         {
+            if (!_renderField)
+            {
+                return;
+            }
             object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
             FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
                 .FieldInfo.Name));
