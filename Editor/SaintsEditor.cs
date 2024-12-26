@@ -11,6 +11,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -26,6 +27,9 @@ namespace SaintsField.Editor
     {
         // private MonoScript _monoScript;
         // private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
+
+        [NonSerialized]
+        public bool EditorShowMonoScript = true;
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
         private static readonly HashSet<IDOTweenPlayRecorder> AliveInstances = new HashSet<IDOTweenPlayRecorder>();

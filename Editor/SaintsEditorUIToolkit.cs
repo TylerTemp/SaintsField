@@ -43,6 +43,10 @@ namespace SaintsField.Editor
                 objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
                 objectField.Bind(serializedObject);
                 objectField.SetEnabled(false);
+                if(!EditorShowMonoScript)
+                {
+                    objectField.style.display = DisplayStyle.None;
+                }
                 root.Add(objectField);
             }
 

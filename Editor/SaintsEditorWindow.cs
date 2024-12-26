@@ -1,21 +1,43 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using SaintsField.Playa;
 using UnityEditor;
+using UnityEngine;
+using UnityEngine.Events;
 
 
 namespace SaintsField.Editor
 {
     public partial class SaintsEditorWindow: EditorWindow
     {
+        #region Inline Editor
+
+        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
+        public class WindowInlineEditorAttribute : Attribute, IPlayaAttribute
+        {
+
+        }
+
+        #endregion
+
+        // [NonSerialized] private readonly UnityEvent<UnityEngine.Object> _editorChangeTargetEvent = new UnityEvent<UnityEngine.Object>();
+
+        [NonSerialized]
+        // ReSharper disable once UnassignedField.Global
+        public bool EditorShowMonoScript;
+
         #region LifeCircle
+
+        // public virtual UnityEngine.Object EditorGetInitTarget(UnityEngine.Object oldTarget) => this;
+        // public void EditorChangeTarget(UnityEngine.Object newTarget) => _editorChangeTargetEvent.Invoke(newTarget);
+
         private void OnDestroy()
         {
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChange;
-            if (_saintsEditorWindowSpecialEditor != null)
-            {
-                DestroyImmediate(_saintsEditorWindowSpecialEditor);
-                _saintsEditorWindowSpecialEditor = null;
-            }
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+            EditorCleanUpUIToolkit();
+#endif
+            EditorCleanUpIMGUI();
             OnEditorDestroy();
         }
 
@@ -46,23 +68,11 @@ namespace SaintsField.Editor
 
         #endregion
 
-        private void OnPlayModeStateChange(PlayModeStateChange stateChange)
-        {
-            if (stateChange != PlayModeStateChange.EnteredEditMode &&
-                stateChange != PlayModeStateChange.EnteredPlayMode)
-            {
-                return;
-            }
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-            OnPlayModeStateRebindUIToolkit();
-#endif
-        }
-
         #region Update
 
         private readonly HashSet<IEnumerator> _coroutines = new HashSet<IEnumerator>();
 
-        private void OnEditorUpdateInternal()
+        private void EditorOnUpdateInternal()
          {
              HashSet<IEnumerator> toRemove = new HashSet<IEnumerator>();
              // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator

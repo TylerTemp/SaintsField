@@ -69,18 +69,22 @@ namespace SaintsField.Editor
             AliveInstances.Add(this);
 #endif
 
-            MonoScript monoScript = GetMonoScript(target);
-            if(monoScript)
+            // MonoScript monoScript = EditorShowMonoScript? GetMonoScript(target): null;
+            if(EditorShowMonoScript)
             {
-                using (new EditorGUI.DisabledScope(true))
+                MonoScript monoScript = GetMonoScript(target);
+                if (monoScript)
                 {
-                    try
+                    using (new EditorGUI.DisabledScope(true))
                     {
-                        EditorGUILayout.ObjectField("Script", monoScript, GetType(), false);
-                    }
-                    catch (NullReferenceException)
-                    {
-                        // ignored
+                        try
+                        {
+                            EditorGUILayout.ObjectField("Script", monoScript, GetType(), false);
+                        }
+                        catch (NullReferenceException)
+                        {
+                            // ignored
+                        }
                     }
                 }
             }
