@@ -9,6 +9,9 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 {
     public partial class WindowInlineEditorRenderer
     {
+        private UnityEditor.Editor _editor;
+        private Object _curTarget;
+
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
             // if (Event.current.type != EventType.Layout)
@@ -25,29 +28,27 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
                 return;
             }
 
-            // ReSharper disable once ConvertToUsingDeclaration
-            using(SerializedObject so = new SerializedObject(target))
-            using(new ExpandableIMGUIScoop())
+            if (!ReferenceEquals(target, _curTarget))
             {
-                // using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                // {
-                foreach (SerializedProperty iterator in SerializedUtils.GetAllField(so))
+                if (_editor != null)
                 {
-                    try
-                    {
-                        EditorGUILayout.PropertyField(iterator, true);
-                    }
-                    catch (ArgumentException)
-                    {
-                        return;
-                    }
+                    Object.DestroyImmediate(_editor);
+                    _editor = null;
                 }
+            }
 
-                    // if(changed.changed)
-                    // {
-                    so.ApplyModifiedProperties();
-                    // }
-                // }
+            if (_editor == null)
+            {
+                _editor = UnityEditor.Editor.CreateEditor(target);
+            }
+
+            try
+            {
+                _editor.OnInspectorGUI();
+            }
+            catch (ArgumentException)
+            {
+                // ignored
             }
         }
 

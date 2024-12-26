@@ -77,10 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.11.0**
+**3.12.0**
 
-1.  Add `FlagsDropdown` to toggle flags with search support
-2.  `AnimatorState` now supports `RuntimeAnimatorController` type, [#113](https://github.com/TylerTemp/SaintsField/discussions/113)
+1.  Add `SaintsEditorWindow` to easily make an `EditorWindow`.
+2.  IMGUI: Fix `OnValueChanged` didn't work with `Dropdown` and `AdvancedDropdown`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4424,6 +4424,157 @@ If you are interested, here is how to use it.
 `Window` - `Saints` - `Enable SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
+
+## `SaintsEditorWindow` ##
+
+An `EditorWindow` class to easily create an editor (a bit like Odin's `OdinEditorWindow`), with support of `StartEditorCoroutine`
+and `StopEditorCoroutine`
+
+### Usage & Example ###
+
+
+Basic usage: inherent from `SaintsField.Editor.SaintsEditorWindow`
+
+```csharp
+#if UNITY_EDITOR
+using SaintsField.Editor;
+
+public class ExamplePanel: SaintsEditorWindow
+{
+
+    [MenuItem("Window/Saints/Example/SaintsEditor")]
+    public static void OpenWindow()
+    {
+        EditorWindow window = GetWindow<ExamplePanel>(false, "My Panel");
+        window.Show();
+    }
+
+    // fields
+    [ResizableTextArea]
+    public string myString;
+
+    [ProgressBar(100f)] public float myProgress;
+
+    // life-circle: OnUpdate function
+    public override void OnEditorUpdate()
+    {
+        myProgress = (myProgress + 1f) % 100;
+    }
+
+    [ProgressBar(100f)] public float myCoroutine;
+
+    // Layout supported
+    [LayoutStart("Coroutine", ELayout.Horizontal)]
+
+    private IEnumerator _startProcessing;
+
+    // Button etc supported
+    // EditorCoroutine supported
+    [Button]
+    public void StartIt()
+    {
+        StartEditorCoroutine(_startProcessing = StartProcessing());
+    }
+
+    [Button]
+    public void StopIt()
+    {
+        if (_startProcessing != null)
+        {
+            StopEditorCoroutine(_startProcessing);
+        }
+
+        _startProcessing = null;
+    }
+
+    private IEnumerator StartProcessing()
+    {
+        myCoroutine = 0;
+        while (myCoroutine < 100f)
+        {
+            myCoroutine += 1f;
+            yield return null;
+        }
+    }
+
+    // Other life-circle
+    public override void OnEditorEnable()
+    {
+        Debug.Log("Enable");
+    }
+
+    public override void OnEditorDisable()
+    {
+        Debug.Log("Disable");
+    }
+
+    public override void OnEditorDestroy()
+    {
+        Debug.Log("Destroy");
+    }
+}
+
+#endif
+```
+
+[![video](https://github.com/user-attachments/assets/a724f450-0d36-4b39-aada-c180d2d8990b)](https://github.com/user-attachments/assets/f80f4de2-4d12-47dc-be82-aff2e3ba2c0b)
+
+An example of using as a `ScriptableObject` editor (or any serializable object)
+
+```csharp
+#if UNITY_EDITOR
+using SaintsField.Editor;
+using SaintsField.Playa;
+
+public class ExampleSo: SaintsEditorWindow
+{
+    [MenuItem("Window/Saints/Example/ScriptableEditor")]
+    public static void OpenWindow()
+    {
+        EditorWindow window = GetWindow<ExampleSo>(false, "Scriptable Editor");
+        window.Show();
+    }
+
+    [
+        AdvancedDropdown(nameof(ShowDropdown)),
+        OnValueChanged(nameof(TargetChanged))
+    ]
+    public ScriptableObject inspectTarget;
+
+    [WindowInlineEditor]  // this will inline the serialized object editor
+    public Object editorInlineInspect;
+
+    private IReadOnlyList<ScriptableObject> GetAllSo() => Resources.LoadAll<ScriptableObject>("");
+
+    private AdvancedDropdownList<ScriptableObject> ShowDropdown()
+    {
+        AdvancedDropdownList<ScriptableObject> down = new AdvancedDropdownList<ScriptableObject>();
+        down.Add("[Null]", null);
+        foreach (ScriptableObject scriptableObject in GetAllSo())
+        {
+            down.Add(scriptableObject.name, scriptableObject);
+        }
+
+        return down;
+    }
+
+    private void TargetChanged(ScriptableObject so)
+    {
+        Debug.Log($"changed to {so}");
+        editorInlineInspect = so;
+        titleContent = new GUIContent(so == null? "Pick One": $"Edit {so.name}");
+    }
+
+    [LayoutStart("Buttons", ELayout.Horizontal)]
+
+    [Button]
+    private void Save() {}
+
+    [Button]
+    private void Discard() {}
+}
+#endif
+```
 
 ## Misc ##
 
