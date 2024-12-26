@@ -4576,6 +4576,25 @@ public class ExampleSo: SaintsEditorWindow
 #endif
 ```
 
+[![video](https://github.com/user-attachments/assets/855b628a-0c3a-4cc1-90b7-115d401f1cfa)](https://github.com/user-attachments/assets/665ebe8a-22b1-4df8-8f20-47fa8b23e3b9)
+
+### Life Circle & Functions ###
+
+The following are the life circle functions, some are wrapped around Unity EditorWindow's default life circle callback:
+
+*   `public virtual void OnEditorDestroy()` -> [OnDestroy](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/EditorWindow.OnDestroy.html)
+*   `public virtual void OnEditorEnable()` -> [OnEnable](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/ScriptableObject.OnEnable.html)
+*   `public virtual void OnEditorDisable()` -> [OnDisable](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/ScriptableObject.OnDisable.html)
+*   `public virtual void OnEditorUpdate()`: like `OnUpdate`, gets called every 1 millisecond in UI Toolkit, and every frame when user have interactive in IMGUI.
+*   `public void StartEditorCoroutine(IEnumerator routine)`: like `StartCoroutine`, but for editor coroutine. No return value.
+*   `public void StopEditorCoroutine(IEnumerator routine)`: like `StopCoroutine`, but for editor coroutine.
+
+### `WindowInlineEditor` ###
+
+This decorator only works in `SaintsEditorWindow`. It'll render the target object's editor in the window. Not work for array/list.
+
+See the example above.
+
 ## Misc ##
 
 ### About GroupBy ##

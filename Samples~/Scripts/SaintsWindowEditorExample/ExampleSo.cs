@@ -58,6 +58,9 @@ namespace SaintsField.Samples.Scripts.SaintsWindowEditorExample
 
         [Button]
         private void Discard() {}
+
+        // [Button]
+        // private void Test() => Debug.Log(editorInlineInspect);
     }
 }
 #endif
