@@ -1,5 +1,7 @@
 using System;
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.DOTweenEditor;
+#endif
 using SaintsField.Editor.Playa;
 using UnityEditor;
 using UnityEngine;

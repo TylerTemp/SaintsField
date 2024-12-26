@@ -222,7 +222,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
 
             float marginTop = _config.MarginTop >= 0 ? _config.MarginTop : 2;
-            EditorGUILayout.GetControlRect(false, marginTop);
+            try
+            {
+                EditorGUILayout.GetControlRect(false, marginTop);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
 
             GUIStyle fullBoxStyle = (_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
                 ? new GUIStyle(EditorStyles.helpBox)

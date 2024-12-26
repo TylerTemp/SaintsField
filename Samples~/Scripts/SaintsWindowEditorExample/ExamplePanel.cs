@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts.SaintsWindowEditorExample
 #if SAINTSFIELD_DEBUG
         [MenuItem("Saints/SaintsEditor")]
 #else
-        [MenuItem("Windows/Saints/Example/SaintsEditor")]
+        [MenuItem("Window/Saints/Example/SaintsEditor")]
 #endif
         public static void TestOpenWindow()
         {
