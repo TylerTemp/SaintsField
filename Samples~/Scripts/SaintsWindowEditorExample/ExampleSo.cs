@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using SaintsField.Editor;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,16 +21,14 @@ namespace SaintsField.Samples.Scripts.SaintsWindowEditorExample
             window.Show();
         }
 
-        // public override Object EditorGetInitTarget(Object oldTarget)
-        // {
-        //     return GetAllSo()[0];
-        // }
-
-        [AdvancedDropdown(nameof(ShowDropdown)), OnValueChanged(nameof(TargetChanged))]
+        [
+            AdvancedDropdown(nameof(ShowDropdown)),
+            OnValueChanged(nameof(TargetChanged))
+        ]
         public ScriptableObject inspectTarget;
 
         [WindowInlineEditor]
-        public UnityEngine.Object editorInlineInspect;
+        public Object editorInlineInspect;
 
         private IReadOnlyList<ScriptableObject> GetAllSo() => Resources.LoadAll<ScriptableObject>("");
 
@@ -45,13 +44,20 @@ namespace SaintsField.Samples.Scripts.SaintsWindowEditorExample
             return down;
         }
 
-        private void TargetChanged(ScriptableObject so) => editorInlineInspect = so;
+        private void TargetChanged(ScriptableObject so)
+        {
+            Debug.Log($"changed to {so}");
+            editorInlineInspect = so;
+            titleContent = new GUIContent(so == null? "Pick One": $"Edit {so.name}");
+        }
 
-        [Playa.Button]
-        private void Save(){}
+        [LayoutStart("Buttons", ELayout.Horizontal)]
 
-        [Playa.Button]
-        private void Discard(){}
+        [Button]
+        private void Save() {}
+
+        [Button]
+        private void Discard() {}
     }
 }
 #endif

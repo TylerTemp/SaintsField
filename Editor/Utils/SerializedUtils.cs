@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils
 {
@@ -266,5 +267,35 @@ namespace SaintsField.Editor.Utils
             return $"{property.serializedObject.targetObject.GetInstanceID()}.{property.propertyPath}";
         }
 
+        public static Object GetSerObject(SerializedProperty property, FieldInfo info, object parent)
+        {
+            if (property.propertyType != SerializedPropertyType.Generic)
+            {
+                return property.objectReferenceValue;
+            }
+
+            (string error, int _, object propertyValue) = Util.GetValue(property, info, parent);
+
+            if (error == "" && propertyValue is IWrapProp wrapProp)
+            {
+                return (Object)Util.GetWrapValue(wrapProp);
+            }
+
+            return null;
+        }
+
+        public static IEnumerable<SerializedProperty> GetAllField(SerializedObject obj)
+        {
+            obj.UpdateIfRequiredOrScript();
+            SerializedProperty iterator = obj.GetIterator();
+            for (bool enterChildren = true; iterator.NextVisible(enterChildren); enterChildren = false)
+            {
+                // using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath))
+                if("m_Script" != iterator.propertyPath)
+                {
+                    yield return iterator;
+                }
+            }
+        }
     }
 }

@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Drawers
             {
                 return expandableInfo;
             }
-            Object serObject = GetSerObject(property, info, parent);
+            Object serObject = SerializedUtils.GetSerObject(property, info, parent);
             if (serObject == null)
             {
                 if(IdToInfo.TryGetValue(_cacheKey, out ExpandableInfo expandableNullInfo))
@@ -187,7 +187,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             serInfo.SerializedObject.UpdateIfRequiredOrScript();
-            float expandedHeight = GetAllField(serInfo.SerializedObject)
+            float expandedHeight = SerializedUtils.GetAllField(serInfo.SerializedObject)
                 .Select(childProperty => EditorGUI.GetPropertyHeight(childProperty, true) + 2)
                 .Sum();
             return basicHeight + expandedHeight;
@@ -229,7 +229,7 @@ namespace SaintsField.Editor.Drawers
             using(new ResetIndentScoop())
             using(new ExpandableIMGUIScoop())
             {
-                foreach (SerializedProperty iterator in GetAllField(serInfo.SerializedObject))
+                foreach (SerializedProperty iterator in SerializedUtils.GetAllField(serInfo.SerializedObject))
                 {
                     float childHeight = EditorGUI.GetPropertyHeight(iterator, true) + 2;
                     (Rect childRect, Rect leftOutRect) = RectUtils.SplitHeightRect(indentedRect, childHeight);
@@ -259,37 +259,6 @@ namespace SaintsField.Editor.Drawers
         }
 
         #endregion
-
-        private static IEnumerable<SerializedProperty> GetAllField(SerializedObject obj)
-        {
-            obj.UpdateIfRequiredOrScript();
-            SerializedProperty iterator = obj.GetIterator();
-            for (bool enterChildren = true; iterator.NextVisible(enterChildren); enterChildren = false)
-            {
-                // using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath))
-                if("m_Script" != iterator.propertyPath)
-                {
-                    yield return iterator;
-                }
-            }
-        }
-
-        private static Object GetSerObject(SerializedProperty property, FieldInfo info, object parent)
-        {
-            if (property.propertyType != SerializedPropertyType.Generic)
-            {
-                return property.objectReferenceValue;
-            }
-
-            (string error, int _, object propertyValue) = Util.GetValue(property, info, parent);
-
-            if (error == "" && propertyValue is IWrapProp wrapProp)
-            {
-                return (Object)Util.GetWrapValue(wrapProp);
-            }
-
-            return null;
-        }
 
 #if UNITY_2021_3_OR_NEWER
 
@@ -363,7 +332,7 @@ namespace SaintsField.Editor.Drawers
             VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
             Object curObject = (Object) propsElement.userData;
 
-            Object serObject = GetSerObject(property, info, parent);
+            Object serObject = SerializedUtils.GetSerObject(property, info, parent);
 
             if (ReferenceEquals(serObject, curObject))
             {
