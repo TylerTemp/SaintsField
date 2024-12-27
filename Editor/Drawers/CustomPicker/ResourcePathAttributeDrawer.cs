@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -389,8 +390,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             }
             else
             {
-                payload.hasCorrectValue = true;
-                payload.correctValue = newObjectValue;
+                payload.HasCorrectValue = true;
+                payload.CorrectValue = newObjectValue;
             }
 
             objectField.RegisterValueChangedCallback(evt =>
@@ -411,8 +412,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             if (errorMessage == "")
             {
                 helpBox.style.display = DisplayStyle.None;
-                payload.hasCorrectValue = true;
-                payload.correctValue = newValue;
+                payload.HasCorrectValue = true;
+                payload.CorrectValue = newValue;
 
                 // ObjectField target = container.Q<ObjectField>(NameObjectField(property));
                 string newStringValue = property.stringValue = GetNewValue(newValue, resourcePathAttribute.EStr);
@@ -429,21 +430,21 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             }
             else
             {
-                if(resourcePathAttribute.FreeSign || !payload.hasCorrectValue)
+                if(resourcePathAttribute.FreeSign || !payload.HasCorrectValue)
                 {
                     helpBox.text = errorMessage;
                     helpBox.style.display = DisplayStyle.Flex;
                 }
                 else
                 {
-                    Debug.Assert(!resourcePathAttribute.FreeSign && payload.hasCorrectValue,
+                    Debug.Assert(!resourcePathAttribute.FreeSign && payload.HasCorrectValue,
                         "Code should not be here. This is a BUG.");
                     // string correctValue = property.stringValue = GetNewValue(payload.correctValue, resourcePathAttribute.EStr);
                     // property.serializedObject.ApplyModifiedProperties();
-                    Debug.LogWarning($"{errorMessage} Change reverted to {(payload.correctValue == null ? "null" : payload.correctValue.ToString())}.");
+                    Debug.LogWarning($"{errorMessage} Change reverted to {(payload.CorrectValue == null ? "null" : payload.CorrectValue.ToString())}.");
                     // careful for infinite loop!
                     // onValueChangedCallback(correctValue);
-                    objectField.SetValueWithoutNotify(payload.correctValue);
+                    objectField.SetValueWithoutNotify(payload.CorrectValue);
                 }
             }
         }
