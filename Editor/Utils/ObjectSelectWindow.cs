@@ -555,6 +555,7 @@ namespace SaintsField.Editor.Utils
         {
             if(_assetItems == null)
             {
+                // ReSharper disable once UseNegatedPatternInIsExpression
                 _assetItems = FetchAllAssets().Where(FetchAllAssetsFilter).Prepend(NullItemInfo).ToArray();
             }
 
@@ -570,6 +571,7 @@ namespace SaintsField.Editor.Utils
         {
             if (_sceneItems == null)
             {
+                // ReSharper disable once UseNegatedPatternInIsExpression
                 _sceneItems = FetchAllSceneObject().Where(FetchAllSceneObjectFilter).Prepend(NullItemInfo).ToArray();
             }
 
