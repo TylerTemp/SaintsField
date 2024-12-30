@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -102,7 +103,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 }
 
                 Type itemType = itemInfo.Object.GetType();
-                return checkTypes.All(requiredType => itemType.IsInstanceOfType(requiredType));
+                return checkTypes.All(requiredType => itemType.IsAssignableFrom(requiredType));
             }
         }
 
@@ -113,5 +114,148 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 .ToArray();
         }
 
+        protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
+        {
+            FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick,
+                ReflectUtils.GetElementType(info.FieldType), requireTypeAttribute.RequiredTypes, fieldResult =>
+                {
+                    Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+                    Object result = OnSelectWindowSelected(fieldResult, fieldType, requireTypeAttribute.RequiredTypes);
+                    if(requireTypeAttribute.FreeSign && Util.IsNull(result))
+                    {
+                        result = NoInterfaceGetResult(fieldResult, fieldType);
+                    }
+                    property.objectReferenceValue = result;
+                    property.serializedObject.ApplyModifiedProperties();
+                    // onGUIPayload.SetValue(result);
+                    onChangeCallback(result);
+                });
+        }
+
+
+        private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType, IReadOnlyList<Type> requiredTypes)
+        {
+            if (Util.IsNull(fieldResult))
+            {
+                return null;
+            }
+
+            List<Type> interfaceTypes = new List<Type>();
+            List<Type> normalTypes = new List<Type>
+            {
+                fieldType,
+            };
+
+            foreach (Type requiredType in requiredTypes)
+            {
+                if (requiredType.IsInterface)
+                {
+                    interfaceTypes.Add(requiredType);
+                }
+                else
+                {
+                    normalTypes.Add(requiredType);
+                }
+            }
+
+            if (interfaceTypes.Count == 0)
+            {
+                return NoInterfaceGetResult(fieldResult, fieldType);
+            }
+
+            List<Object> toCheckTargets = new List<Object>();
+            switch (fieldResult)
+            {
+                case GameObject go:
+                    toCheckTargets.AddRange(go.GetComponents<Component>());
+                    break;
+                case Component comp:
+                    toCheckTargets.AddRange(comp.GetComponents<Component>());
+                    break;
+                case ScriptableObject so:
+                    toCheckTargets.Add(so);
+                    break;
+            }
+
+            IReadOnlyList<Object> processingTargets = toCheckTargets;
+
+            if (interfaceTypes.Count > 0)
+            {
+                processingTargets = GetQualifiedInterfaces(processingTargets, interfaceTypes).ToArray();
+            }
+
+            processingTargets = GetQualifiedComponent(processingTargets, normalTypes).ToArray();
+
+            foreach (Object processedResult in processingTargets)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+                Debug.Log($"checking {processedResult} for {fieldType}");
+#endif
+                switch (processedResult)
+                {
+                    case null:
+                        // property.objectReferenceValue = null;
+                        continue;
+                    case GameObject go:
+                        // ReSharper disable once RedundantCast
+                    {
+                        Object r = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
+                        if (r != null)
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+                            Debug.Log($"Return {r} for {fieldType}");
+#endif
+                            return r;
+                        }
+                    }
+                        break;
+                        // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
+                    case Component comp:
+                    {
+                        if (fieldType.IsAssignableFrom(comp.GetType()))
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+                            Debug.Log($"Return {comp} for {fieldType}");
+#endif
+                            return comp;
+                        }
+                    }
+                        break;
+                    case ScriptableObject so:
+                    {
+                        if (fieldType.IsAssignableFrom(so.GetType()))
+                        {
+                            return so;
+                        }
+                    }
+                        break;
+                }
+            }
+
+            return null;
+        }
+
+        private static Object NoInterfaceGetResult(Object fieldResult, Type fieldType)
+        {
+            Object result = null;
+            switch (fieldResult)
+            {
+                case null:
+                    // property.objectReferenceValue = null;
+                    break;
+                case GameObject go:
+                    // ReSharper disable once RedundantCast
+                    result = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
+                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
+                    break;
+                case Component comp:
+                    result = fieldType == typeof(GameObject)
+                        // ReSharper disable once RedundantCast
+                        ? (Object)comp.gameObject
+                        : comp.GetComponent(fieldType);
+                    break;
+            }
+            return result;
+        }
     }
 }

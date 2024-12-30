@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 {
@@ -15,7 +17,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
         protected string _error { private get; set; } = "";
         protected bool ImGuiFirstChecked { get; private set; }
 
-        private UnityEngine.Object _previousValue;
+        private Object _previousValue;
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
@@ -66,7 +68,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 // Debug.Log($"_imGuiFirstChecked={_imGuiFirstChecked}/freeSign={fieldInterfaceAttribute.FreeSign}");
 
 
-                UnityEngine.Object curValue = GetCurFieldValue(property, requireTypeAttribute);
+                Object curValue = GetCurFieldValue(property, requireTypeAttribute);
                 if (curValue is null)
                 {
                     return customPicker;
@@ -103,20 +105,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             return customPicker;
         }
 
-        protected virtual UnityEngine.Object GetCurFieldValue(SerializedProperty property, RequireTypeAttribute _) => property.objectReferenceValue;
-
-        protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
-        {
-            FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick,
-                ReflectUtils.GetElementType(info.FieldType), requireTypeAttribute.RequiredTypes, fieldResult =>
-            {
-                UnityEngine.Object result = OnSelectWindowSelected(fieldResult, ReflectUtils.GetElementType(info.FieldType));
-                property.objectReferenceValue = result;
-                property.serializedObject.ApplyModifiedProperties();
-                // onGUIPayload.SetValue(result);
-                onChangeCallback(result);
-            });
-        }
+        protected virtual Object GetCurFieldValue(SerializedProperty property, RequireTypeAttribute _) => property.objectReferenceValue;
 
         protected virtual void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent)
         {
@@ -126,28 +115,128 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
         protected virtual object GetPreviousValue() => _previousValue;
 
-        private static UnityEngine.Object OnSelectWindowSelected(UnityEngine.Object fieldResult, Type fieldType)
-        {
-            UnityEngine.Object result = null;
-            switch (fieldResult)
-            {
-                case null:
-                    // property.objectReferenceValue = null;
-                    break;
-                case GameObject go:
-                    // ReSharper disable once RedundantCast
-                    result = fieldType == typeof(GameObject) ? (UnityEngine.Object)go : go.GetComponent(fieldType);
-                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
-                    break;
-                case Component comp:
-                    result = fieldType == typeof(GameObject)
-                        // ReSharper disable once RedundantCast
-                        ? (UnityEngine.Object)comp.gameObject
-                        : comp.GetComponent(fieldType);
-                    break;
-            }
 
-            return result;
+        private static IEnumerable<Object> GetQualifiedInterfaces(IReadOnlyList<Object> toCheckTargets,
+            IReadOnlyList<Type> interfaceTypes)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (Object target in toCheckTargets)
+            {
+                // Debug.Log($"{target} -> {string.Join(",", interfaceTypes)}");
+                if(interfaceTypes.All(each => each.IsAssignableFrom(target.GetType())))
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+                    Debug.Log($"GetQualifiedInterfaces: {target}");
+#endif
+                    yield return target;
+                }
+            }
+        }
+
+        private static IEnumerable<Object> GetQualifiedComponent(IReadOnlyList<Object> toCheckTargets,
+            IReadOnlyList<Type> normalTypes)
+        {
+            foreach (Object fieldResult in toCheckTargets)
+            {
+                switch (fieldResult)
+                {
+                    case GameObject go:
+                    {
+                        bool incapable = false;
+                        List<Type> toCheckComponents = new List<Type>();
+                        foreach (Type normalType in normalTypes)
+                        {
+                            // ScriptableObject can not be on a GameObject
+                            if (typeof(ScriptableObject).IsAssignableFrom(normalType))
+                            {
+                                incapable = true;
+                                break;
+                            }
+
+                            if (!typeof(GameObject).IsAssignableFrom(normalType))
+                            {
+                                continue;  // skip GameObject
+                            }
+
+                            if (!typeof(Component).IsAssignableFrom(normalType))  // only Component can be on a gameObject
+                            {
+                                incapable = true;
+                                break;
+                            }
+
+                            toCheckComponents.Add(normalType);
+                        }
+
+                        if (incapable)
+                        {
+                            continue;
+                        }
+
+                        if(toCheckComponents.All(requiredComp => go.GetComponent(requiredComp) != null))
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+                            Debug.Log($"IsQualifiedGo: {go}");
+#endif
+                            yield return go;
+                        }
+
+//                         foreach (Component comp in toCheckComponents.Select(eachCompType => go.GetComponent(eachCompType)).Where(each => each != null))
+//                         {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+//                             Debug.Log($"GetQualifiedComp: {comp}");
+// #endif
+//                             yield return comp;
+//                         }
+                    }
+                        break;
+                    case ScriptableObject so:
+                    {
+                        if(normalTypes.All(each => each.IsAssignableFrom(so.GetType())))
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+                            Debug.Log($"IsQualifiedSo: {so}");
+#endif
+                            yield return so;
+                        }
+                    }
+                        break;
+                    case Component comp:
+                    {
+                        bool incapable = false;
+                        foreach (Type normalType in normalTypes)
+                        {
+                            if (typeof(GameObject).IsAssignableFrom(normalType))
+                            {
+                                continue;
+                            }
+
+                            if (typeof(ScriptableObject).IsAssignableFrom(normalType))
+                            {
+                                incapable = true;
+                                break;
+                            }
+
+                            if (comp.GetComponent(normalType) == null)
+                            {
+                                incapable = true;
+                                break;
+                            }
+                        }
+
+                        if (incapable)
+                        {
+                            continue;
+                        }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
+                        Debug.Log($"IsQualifiedComp: {comp}");
+#endif
+                        yield return comp;
+
+                    }
+                        break;
+                }
+            }
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,

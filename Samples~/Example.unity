@@ -3191,7 +3191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d63abfca054ba296fbd216b3e8b551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interSr: {fileID: 4398206394473841024}
+  interSr: {fileID: 7009648041155977125, guid: bfe71e2debe494743bb20374ae988950, type: 3}
   interfaceGo: {fileID: 4273993127172390033}
   srNoPickerFreeSign: {fileID: 417627792}
   goNoPickerFreeSign: {fileID: 539722464}
@@ -24749,7 +24749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1caeda21c2ba13245b8059165fdd2837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  issue114Script: {fileID: 1990568729}
+  issue114Script: {fileID: 1990568728}
 --- !u!1 &2002997101
 GameObject:
   m_ObjectHideFlags: 0
@@ -25990,11 +25990,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 55109c2cb42e3634384eb8633eb668cb, type: 3}
---- !u!212 &4398206394473841024 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 4059975827856200105, guid: 55109c2cb42e3634384eb8633eb668cb, type: 3}
-  m_PrefabInstance: {fileID: 4398206394473841023}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4747155408333943610
 Transform:
   m_ObjectHideFlags: 0

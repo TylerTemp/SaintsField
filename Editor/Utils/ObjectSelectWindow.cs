@@ -665,7 +665,18 @@ namespace SaintsField.Editor.Utils
 
             while (property.Next(null))
             {
-                Object go = property.pptrValue;
+                Object go;
+                try
+                {
+                    go = property.pptrValue;
+                }
+                catch (Exception e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogException(e);
+#endif
+                    continue;
+                }
                 if (go == null)
                 {
                     // go = null;  // Object(null) is not null in Unity because Unity overrides `==`
