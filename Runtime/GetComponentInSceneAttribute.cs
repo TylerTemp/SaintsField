@@ -13,11 +13,17 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
+        public readonly Type CompType;
+        public readonly bool IncludeInactive;
+
         public GetComponentInSceneAttribute(bool includeInactive = false, Type compType = null, string groupBy = "")
         {
             ParseOptions(SaintsFieldConfigUtil.GetComponentInSceneExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseArguments(includeInactive, compType);
             GroupBy = groupBy;
+
+            CompType = compType;
+            IncludeInactive = includeInactive;
         }
 
         private void ParseArguments(bool includeInactive, Type compType)

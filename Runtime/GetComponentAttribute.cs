@@ -13,6 +13,8 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
+        public readonly Type CompType;
+
         public GetComponentAttribute(Type compType = null, string groupBy = "")
         {
             ParseOptions(SaintsFieldConfigUtil.GetComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull));
@@ -24,6 +26,7 @@ namespace SaintsField
         {
             ParseOptions(exp);
             ParseXPath(compType);
+            CompType = compType;
             GroupBy = groupBy;
         }
 

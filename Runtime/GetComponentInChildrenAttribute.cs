@@ -14,11 +14,19 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
+        public readonly Type CompType;
+        public readonly bool IncludeInactive;
+        public readonly bool ExcludeSelf;
+
         public GetComponentInChildrenAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
             ParseOptions(SaintsFieldConfigUtil.GetComponentInChildrenExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseArguments(includeInactive, compType, excludeSelf);
             GroupBy = groupBy;
+
+            CompType = compType;
+            IncludeInactive = includeInactive;
+            ExcludeSelf = excludeSelf;
         }
 
         public GetComponentInChildrenAttribute(EXP config, bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
