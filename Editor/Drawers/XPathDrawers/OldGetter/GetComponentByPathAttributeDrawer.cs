@@ -9,7 +9,9 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.XPathDrawers.OldGetter

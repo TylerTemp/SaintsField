@@ -1,6 +1,4 @@
-﻿#if UNITY_2021_3_OR_NEWER
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +6,9 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.XPathDrawers.OldGetter
