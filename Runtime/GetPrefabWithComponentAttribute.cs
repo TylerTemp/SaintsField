@@ -13,11 +13,15 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
+        public readonly Type CompType;
+
         public GetPrefabWithComponentAttribute(Type compType = null, string groupBy = "")
         {
             ParseOptions(SaintsFieldConfigUtil.GetPrefabWithComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseXPath(compType);
             GroupBy = groupBy;
+
+            CompType = compType;
         }
 
         public GetPrefabWithComponentAttribute(EXP config, Type compType = null, string groupBy = "")

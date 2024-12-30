@@ -1854,13 +1854,35 @@ namespace SaintsField.Editor.Playa.Renderer
             };
             foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
             {
-                object fieldValue = fieldInfo.GetValue(value);
+                object fieldValue;
+                try
+                {
+                    fieldValue = fieldInfo.GetValue(value);
+                }
+                catch (NullReferenceException e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogException(e);
+#endif
+                    continue;
+                }
                 genFoldout.Add(UIToolkitLayout(fieldValue, fieldInfo.Name, fieldInfo.FieldType));
             }
 
             foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
             {
-                object propertyValue = propertyInfo.GetValue(value);
+                object propertyValue;
+                try
+                {
+                    propertyValue = propertyInfo.GetValue(value);
+                }
+                catch (NullReferenceException e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogException(e);
+#endif
+                    continue;
+                }
                 genFoldout.Add(UIToolkitLayout(propertyValue, propertyInfo.Name, propertyInfo.PropertyType));
             }
 

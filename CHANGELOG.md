@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.12.1 ##
+
+1.  Fix `RequireType` didn't give a correct component when using with `interface`
+2.  Fix `ShowInInspector` sometimes can not draw a correct value when a nested field is null
+
 ## 3.12.0 ##
 
 1.  Add `SaintsEditorWindow` to easily make an `EditorWindow`.

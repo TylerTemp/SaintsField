@@ -12,8 +12,13 @@ namespace SaintsField
     public class GetScriptableObjectAttribute: GetByXPathAttribute
     {
         public override string GroupBy { get; }
+
+        public readonly string PathSuffix;
+
         public GetScriptableObjectAttribute(string pathSuffix=null, string groupBy="")
         {
+            PathSuffix = string.IsNullOrEmpty(pathSuffix)? null: pathSuffix + ".asset";
+
             ParseOptions(SaintsFieldConfigUtil.GetScriptableObjectExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseXPath(pathSuffix);
             GroupBy = groupBy;

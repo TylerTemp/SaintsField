@@ -31,6 +31,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
     // ATM: we just think the 1st element will always be drawn, and there is always a listView parent
     // and use the _selfChange to prevent loop calling on element dragging
     [CustomPropertyDrawer(typeof(GetByXPathAttribute))]
+#if !SAINTSFIELD_OLD_GETTER
     [CustomPropertyDrawer(typeof(GetComponentAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentInChildrenAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentInParentAttribute))]
@@ -40,6 +41,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers
     [CustomPropertyDrawer(typeof(GetPrefabWithComponentAttribute))]
     [CustomPropertyDrawer(typeof(GetScriptableObjectAttribute))]
     [CustomPropertyDrawer(typeof(FindComponentAttribute))]
+#endif
     public class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
         private class GetByPickerWindow : ObjectSelectWindow
