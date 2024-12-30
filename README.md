@@ -77,10 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.12.0**
+**3.12.1**
 
-1.  Add `SaintsEditorWindow` to easily make an `EditorWindow`.
-2.  IMGUI: Fix `OnValueChanged` didn't work with `Dropdown` and `AdvancedDropdown`
+1.  Fix `RequireType` didn't give a correct component when using with `interface`
+2.  Fix `ShowInInspector` sometimes can not draw a correct value when a nested field is null
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
