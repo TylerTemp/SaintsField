@@ -1,0 +1,157 @@
+using System.Collections.Generic;
+using System.Reflection;
+using SaintsField.Editor.Utils;
+using UnityEditor;
+using UnityEngine;
+
+namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
+{
+    public partial class ResourceFolderAttributeDrawer
+    {
+        private static Texture2D _folderIcon;
+
+        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+
+        private class CacheInfo
+        {
+            public string ChangedValue;
+            public string Error = "";
+            // public string OldValue;
+        }
+
+        private static readonly Dictionary<string, CacheInfo> AsyncCacheInfo = new Dictionary<string, CacheInfo>();
+
+        private static readonly HashSet<int> InspectingTargets = new HashSet<int>();
+
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        {
+            return property.propertyType == SerializedPropertyType.String
+                ? SingleLineHeight
+                : 0;
+        }
+
+        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return false;
+            }
+
+            string key = GetKey(property);
+
+            var curHash = property.serializedObject.targetObject.GetInstanceID();
+            if (InspectingTargets.Add(curHash))
+            {
+
+            }
+
+            if (onGUIPayload.changed)
+            {
+                if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+                {
+                    cacheInfo.Error = "";
+                }
+            }
+            else
+            {
+                if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+                {
+                    if(cacheInfo.ChangedValue != null)
+                    {
+                        onGUIPayload.SetValue(cacheInfo.ChangedValue);
+                        AsyncCacheInfo.Remove(key);
+                    }
+                }
+            }
+
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (_folderIcon is null)
+            {
+                _folderIcon = Util.LoadResource<Texture2D>("resources-folder.png");
+            }
+
+            ResourceFolderAttribute folderAttribute = (ResourceFolderAttribute)saintsAttribute;
+
+            // ReSharper disable once InvertIf
+            if(GUI.Button(new Rect(position)
+               {
+                   x = position.x + 1,
+                   width = position.width - 2,
+               }, _folderIcon, GUIStyle.none))
+            {
+                (string error, string actualFolder) = OnClick(property, folderAttribute);
+                if(error == "")
+                {
+                    // ReSharper disable once InvertIf
+                    if(actualFolder != "")
+                    {
+                        property.stringValue = actualFolder;
+                        property.serializedObject.ApplyModifiedProperties();
+                        // onGUIPayload.SetValue(actualFolder);
+                        AsyncCacheInfo[key] = new CacheInfo { ChangedValue = actualFolder };
+                    }
+                }
+                else
+                {
+                    AsyncCacheInfo[key] = new CacheInfo { Error = error };
+                }
+            }
+
+            return true;
+        }
+
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
+            object parent)
+        {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return true;
+            }
+            string key = GetKey(property);
+            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+            {
+                return cacheInfo.Error != "";
+            }
+
+            return false;
+        }
+
+        private static string GetMismatchError(SerializedProperty property) => $"target {property.propertyPath} is not a string: {property.propertyType}";
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return ImGuiHelpBox.GetHeight(GetMismatchError(property), width, MessageType.Error);
+            }
+
+            string key = GetKey(property);
+            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo) && cacheInfo.Error != "")
+            {
+                return ImGuiHelpBox.GetHeight(cacheInfo.Error, width, MessageType.Error);
+            }
+
+            return 0;
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return ImGuiHelpBox.Draw(position, GetMismatchError(property), MessageType.Error);
+            }
+
+            string key = GetKey(property);
+            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+            {
+                return ImGuiHelpBox.Draw(position, cacheInfo.Error, MessageType.Error);
+            }
+
+            return position;
+        }
+    }
+}

@@ -347,7 +347,6 @@ namespace SaintsField.Editor.Playa.Renderer
                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                 },
-                // text = "<",
             };
             IntegerField pageField = new IntegerField
             {

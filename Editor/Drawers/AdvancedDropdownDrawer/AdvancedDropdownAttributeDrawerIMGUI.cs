@@ -11,7 +11,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
     public partial class AdvancedDropdownAttributeDrawer
     {
-        #region IMGUI
 
         private string _error = "";
 
@@ -204,6 +203,5 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
-        #endregion
     }
 }

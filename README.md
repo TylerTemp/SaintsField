@@ -3711,7 +3711,7 @@ using SaintsField;
 
 #### `ResourcePath` ####
 
-A tool to pick an resource path (a string) with:
+A tool to pick a resource path (a string) with:
 1.  required types or interfaces
 2.  display a type instead of showing a string
 3.  pick a suitable object using a custom picker
@@ -3768,7 +3768,14 @@ public string myInterface;
 
 ![resource_path](https://github.com/TylerTemp/SaintsField/assets/6391063/35d683bf-7d19-4854-bdf6-ee63532fed80)
 
+#### `ResourceFolder` ###
 
+A folder picker to pick a resource folder under any `Resources`. It'll give error if the selected folder is not a resource.
+
+```csharp
+[ResourceFolder] public string resourcesFolder;
+[ResourceFolder] public string[] resourcesFolders;
+```
 
 #### `AssetPreview` ####
 

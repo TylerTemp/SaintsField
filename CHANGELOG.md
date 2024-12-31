@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.13.0 ##
+
+1.  Add `AssetFolder` to pick a folder under `Assets` folder.
+2.  Add `ResourceFolder` to pick a folder under Unity's `Resources` folders
+
 ## 3.12.1 ##
 
 1.  Fix `RequireType` didn't give a correct component when using with `interface`

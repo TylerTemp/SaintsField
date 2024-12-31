@@ -10,8 +10,6 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 {
     public partial class ReferencePickerAttributeDrawer
     {
-        #region IMGUI
-
         private const float ImGuiButtonWidth = 20f;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
@@ -92,8 +90,6 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         {
             return ImGuiButtonWidth;
         }
-
-        #endregion
     }
 }
 #endif
