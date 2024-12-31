@@ -46,15 +46,16 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
             string key = GetKey(property);
 
             Object curHash = property.serializedObject.targetObject;
+            // Debug.Log($"keys={string.Join(", ", AsyncCacheInfo.Keys)}");
 
-            if (!InspectingTargets.TryGetValue(curHash, out HashSet<string> list))
+            if (!InspectingTargets.TryGetValue(curHash, out HashSet<string> keySet))
             {
-                InspectingTargets[curHash] = list = new HashSet<string>();
+                InspectingTargets[curHash] = keySet = new HashSet<string>();
 
                 void OnSelectionChangedIMGUI()
                 {
                     bool stillSelected = Array.IndexOf(Selection.objects, curHash) != -1;
-                    Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
+                    // Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
                     if (stillSelected)
                     {
                         return;
@@ -65,8 +66,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
                     {
                         foreach (string removeKey in set)
                         {
-                            Debug.Log($"remove key {removeKey}");
-                            AsyncCacheInfo.Remove(key);
+                            // Debug.Log($"remove key {removeKey}");
+                            AsyncCacheInfo.Remove(removeKey);
                         }
                     }
                     InspectingTargets.Remove(curHash);
@@ -74,7 +75,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
                 Selection.selectionChanged += OnSelectionChangedIMGUI;
             }
-            list.Add(key);
+            keySet.Add(key);
 
             if (onGUIPayload.changed)
             {
@@ -124,7 +125,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
                 }
                 else
                 {
-                    Debug.Log($"add error key {key} = {error}");
+                    // Debug.Log($"add error key {key} = {error}");
                     AsyncCacheInfo[key] = new CacheInfo { Error = error };
                 }
             }

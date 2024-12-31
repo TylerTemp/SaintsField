@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 {
@@ -41,10 +42,13 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
         protected override string WrapFolderToOpen(string folder)
         {
-            string assetsPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
-            return ProcessResultFolder(assetsPath, string.IsNullOrEmpty(folder)
+            string projectPath = Directory.GetCurrentDirectory();
+            string assetsPath = Path.Combine(projectPath, "Assets");
+            string result = ProcessResultFolder(projectPath, string.IsNullOrEmpty(folder)
                 ? FindFirstResourcesFolder(assetsPath)
                 : FindFirstMatchedResourceFolder(assetsPath, folder));
+
+            return result;
         }
 
         private static string ProcessResultFolder(string root, string find)

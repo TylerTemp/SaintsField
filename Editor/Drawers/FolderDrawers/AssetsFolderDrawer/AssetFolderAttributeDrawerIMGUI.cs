@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
 {
@@ -16,9 +18,13 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
         {
             public string ChangedValue;
             public string Error = "";
+            // public string OldValue;
         }
 
         private static readonly Dictionary<string, CacheInfo> AsyncCacheInfo = new Dictionary<string, CacheInfo>();
+
+        // private static readonly HashSet<Object> InspectingTargets = new HashSet<Object>();
+        private static readonly Dictionary<Object, HashSet<string>> InspectingTargets = new Dictionary<Object, HashSet<string>>();
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
@@ -37,16 +43,62 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
             }
 
             string key = GetKey(property);
-            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo) && cacheInfo.ChangedValue != null)
+
+            Object curHash = property.serializedObject.targetObject;
+            // Debug.Log($"keys={string.Join(", ", AsyncCacheInfo.Keys)}");
+
+            if (!InspectingTargets.TryGetValue(curHash, out HashSet<string> keySet))
             {
-                onGUIPayload.SetValue(cacheInfo.ChangedValue);
-                AsyncCacheInfo.Remove(key);
+                InspectingTargets[curHash] = keySet = new HashSet<string>();
+
+                void OnSelectionChangedIMGUI()
+                {
+                    bool stillSelected = Array.IndexOf(Selection.objects, curHash) != -1;
+                    // Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
+                    if (stillSelected)
+                    {
+                        return;
+                    }
+
+                    Selection.selectionChanged -= OnSelectionChangedIMGUI;
+                    if (InspectingTargets.TryGetValue(curHash, out HashSet<string> set))
+                    {
+                        foreach (string removeKey in set)
+                        {
+                            // Debug.Log($"remove key {removeKey}");
+                            AsyncCacheInfo.Remove(removeKey);
+                        }
+                    }
+                    InspectingTargets.Remove(curHash);
+                }
+
+                Selection.selectionChanged += OnSelectionChangedIMGUI;
+            }
+            keySet.Add(key);
+
+            if (onGUIPayload.changed)
+            {
+                if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+                {
+                    cacheInfo.Error = "";
+                }
+            }
+            else
+            {
+                if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+                {
+                    if(cacheInfo.ChangedValue != null)
+                    {
+                        onGUIPayload.SetValue(cacheInfo.ChangedValue);
+                        AsyncCacheInfo.Remove(key);
+                    }
+                }
             }
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_folderIcon is null)
             {
-                _folderIcon = Util.LoadResource<Texture2D>("folder.png");
+                _folderIcon = Util.LoadResource<Texture2D>("resources-folder.png");
             }
 
             AssetFolderAttribute folderAttribute = (AssetFolderAttribute)saintsAttribute;
@@ -72,6 +124,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
                 }
                 else
                 {
+                    // Debug.Log($"add error key {key} = {error}");
                     AsyncCacheInfo[key] = new CacheInfo { Error = error };
                 }
             }
@@ -82,6 +135,10 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return true;
+            }
             string key = GetKey(property);
             if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
             {
@@ -91,11 +148,18 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
             return false;
         }
 
+        private static string GetMismatchError(SerializedProperty property) => $"target {property.propertyPath} is not a string: {property.propertyType}";
+
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return ImGuiHelpBox.GetHeight(GetMismatchError(property), width, MessageType.Error);
+            }
+
             string key = GetKey(property);
-            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo) && cacheInfo.Error != "")
             {
                 return ImGuiHelpBox.GetHeight(cacheInfo.Error, width, MessageType.Error);
             }
@@ -106,6 +170,11 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return ImGuiHelpBox.Draw(position, GetMismatchError(property), MessageType.Error);
+            }
+
             string key = GetKey(property);
             if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
             {

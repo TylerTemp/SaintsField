@@ -77,10 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.12.1**
+**3.13.0**
 
-1.  Fix `RequireType` didn't give a correct component when using with `interface`
-2.  Fix `ShowInInspector` sometimes can not draw a correct value when a nested field is null
+1.  Add `AssetFolder` to pick a folder under `Assets` folder.
+2.  Add `ResourceFolder` to pick a folder under Unity's `Resources` folders
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3772,10 +3772,39 @@ public string myInterface;
 
 A folder picker to pick a resource folder under any `Resources`. It'll give error if the selected folder is not a resource.
 
+Parameters:
+
+*   `string folder=""` default folder to open. If it's an empty string, it'll first try the current value of the field, then the first `Resources` folder found.
+*   `string title="Choose a folder inside resources"` title of the picker
+*   `string groupBy = ""` See the `GroupBy` section
+
 ```csharp
+using SaintsField;
+
 [ResourceFolder] public string resourcesFolder;
 [ResourceFolder] public string[] resourcesFolders;
 ```
+
+[![video](https://github.com/user-attachments/assets/ad5042db-6de3-4f98-8c5d-6387178e3dec)](https://github.com/user-attachments/assets/3c391078-8fcf-4dba-954d-28b6db21b57b)
+
+#### `AssetFolder` ####
+
+A folder picker to pick a folder under `Assets`. It'll give error if the selected folder is outside of `Assets`.
+
+Parameters:
+
+*   `string folder="Assets"` default folder to open.
+*   `string title="Choose a folder inside assets"` title of the picker
+*   `string groupBy = ""` See the `GroupBy` section
+
+```csharp
+using SaintsField;
+
+[AssetFolder] public string assetsFolder;
+[AssetFolder] public string[] assetsFolders;
+```
+
+[![video](https://github.com/user-attachments/assets/bb11f6b5-5940-4057-9c5a-e3877ab41b54)](https://github.com/user-attachments/assets/322c6dbb-6fb7-4887-90ad-22aaf3905152)
 
 #### `AssetPreview` ####
 

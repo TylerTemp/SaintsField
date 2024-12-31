@@ -35,8 +35,9 @@ namespace SaintsField.Editor.Drawers.FolderDrawers
         {
             string oriValue = property.stringValue;
             string passValue = string.IsNullOrEmpty(oriValue) ? folderAttribute.Folder : oriValue;
+            string wrapValue = WrapFolderToOpen(passValue);
 
-            string path = EditorUtility.OpenFolderPanel(folderAttribute.Title, passValue, "");
+            string path = EditorUtility.OpenFolderPanel(folderAttribute.Title, wrapValue, "");
             return string.IsNullOrEmpty(path)
                 ? ("", "")
                 // DirectoryInfo d = new DirectoryInfo(path);
