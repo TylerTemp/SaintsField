@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
             List<string> resourcePaths = new List<string>();
             bool found = false;
-            foreach (string part in assetsFolder.Split("/"))
+            foreach (string part in assetsFolder.Split('/'))
             {
                 if (part == "")
                 {
