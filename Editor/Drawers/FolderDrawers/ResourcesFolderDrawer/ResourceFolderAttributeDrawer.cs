@@ -44,20 +44,26 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
         {
             string projectPath = Directory.GetCurrentDirectory();
             string assetsPath = Path.Combine(projectPath, "Assets");
-            string result = ProcessResultFolder(projectPath, string.IsNullOrEmpty(folder)
-                ? FindFirstResourcesFolder(assetsPath)
-                : FindFirstMatchedResourceFolder(assetsPath, folder));
+            string resultFolder;
+            if (string.IsNullOrEmpty(folder))
+            {
+                resultFolder = FindFirstResourcesFolder(assetsPath);
+            }
+            else
+            {
+                resultFolder = FindFirstMatchedResourceFolder(assetsPath, folder) ?? FindFirstResourcesFolder(assetsPath);
+            }
 
-            return result;
-        }
-
-        private static string ProcessResultFolder(string root, string find)
-        {
-            if (find is null)
+            if(resultFolder is null)
             {
                 return "Assets";
             }
 
+            return ProcessResultFolder(projectPath, resultFolder);
+        }
+
+        private static string ProcessResultFolder(string root, string find)
+        {
             // ReSharper disable once ReplaceSubstringWithRangeIndexer
             string r = find.Substring(root.Length).Replace("\\", "/");
             if (r.StartsWith("/"))
