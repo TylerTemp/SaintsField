@@ -54,12 +54,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
                 resultFolder = FindFirstMatchedResourceFolder(assetsPath, folder) ?? FindFirstResourcesFolder(assetsPath);
             }
 
-            if(resultFolder is null)
-            {
-                return "Assets";
-            }
-
-            return ProcessResultFolder(projectPath, resultFolder);
+            return resultFolder is null ? "Assets" : ProcessResultFolder(projectPath, resultFolder);
         }
 
         private static string ProcessResultFolder(string root, string find)

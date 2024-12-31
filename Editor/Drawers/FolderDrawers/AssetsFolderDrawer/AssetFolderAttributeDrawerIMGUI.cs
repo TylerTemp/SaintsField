@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_folderIcon is null)
             {
-                _folderIcon = Util.LoadResource<Texture2D>("resources-folder.png");
+                _folderIcon = Util.LoadResource<Texture2D>("folder.png");
             }
 
             AssetFolderAttribute folderAttribute = (AssetFolderAttribute)saintsAttribute;
