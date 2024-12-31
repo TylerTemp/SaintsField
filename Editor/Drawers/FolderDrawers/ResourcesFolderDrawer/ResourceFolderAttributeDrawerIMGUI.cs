@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 {
@@ -21,7 +24,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
         private static readonly Dictionary<string, CacheInfo> AsyncCacheInfo = new Dictionary<string, CacheInfo>();
 
-        private static readonly HashSet<int> InspectingTargets = new HashSet<int>();
+        // private static readonly HashSet<Object> InspectingTargets = new HashSet<Object>();
+        private static readonly Dictionary<Object, HashSet<string>> InspectingTargets = new Dictionary<Object, HashSet<string>>();
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
@@ -41,11 +45,36 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
             string key = GetKey(property);
 
-            var curHash = property.serializedObject.targetObject.GetInstanceID();
-            if (InspectingTargets.Add(curHash))
-            {
+            Object curHash = property.serializedObject.targetObject;
 
+            if (!InspectingTargets.TryGetValue(curHash, out HashSet<string> list))
+            {
+                InspectingTargets[curHash] = list = new HashSet<string>();
+
+                void OnSelectionChangedIMGUI()
+                {
+                    bool stillSelected = Array.IndexOf(Selection.objects, curHash) != -1;
+                    Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
+                    if (stillSelected)
+                    {
+                        return;
+                    }
+
+                    Selection.selectionChanged -= OnSelectionChangedIMGUI;
+                    if (InspectingTargets.TryGetValue(curHash, out HashSet<string> set))
+                    {
+                        foreach (string removeKey in set)
+                        {
+                            Debug.Log($"remove key {removeKey}");
+                            AsyncCacheInfo.Remove(key);
+                        }
+                    }
+                    InspectingTargets.Remove(curHash);
+                }
+
+                Selection.selectionChanged += OnSelectionChangedIMGUI;
             }
+            list.Add(key);
 
             if (onGUIPayload.changed)
             {
@@ -95,6 +124,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
                 }
                 else
                 {
+                    Debug.Log($"add error key {key} = {error}");
                     AsyncCacheInfo[key] = new CacheInfo { Error = error };
                 }
             }
