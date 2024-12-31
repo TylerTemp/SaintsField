@@ -2559,8 +2559,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   assetsFolder: Assets/SaintsField/Runtime
   assetsFolders:
-  - Assets/SaintsField/Runtime
-  - Assets/SaintsField/Editor
+  - 
+  - 
 --- !u!1 &435171140
 GameObject:
   m_ObjectHideFlags: 0
