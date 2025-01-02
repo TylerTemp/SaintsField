@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
             List<string> resourcePaths = new List<string>();
             bool found = false;
-            foreach (string part in assetsFolder.Split("/"))
+            foreach (string part in assetsFolder.Split('/'))
             {
                 if (part == "")
                 {
@@ -44,20 +44,21 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
         {
             string projectPath = Directory.GetCurrentDirectory();
             string assetsPath = Path.Combine(projectPath, "Assets");
-            string result = ProcessResultFolder(projectPath, string.IsNullOrEmpty(folder)
-                ? FindFirstResourcesFolder(assetsPath)
-                : FindFirstMatchedResourceFolder(assetsPath, folder));
+            string resultFolder;
+            if (string.IsNullOrEmpty(folder))
+            {
+                resultFolder = FindFirstResourcesFolder(assetsPath);
+            }
+            else
+            {
+                resultFolder = FindFirstMatchedResourceFolder(assetsPath, folder) ?? FindFirstResourcesFolder(assetsPath);
+            }
 
-            return result;
+            return resultFolder is null ? "Assets" : ProcessResultFolder(projectPath, resultFolder);
         }
 
         private static string ProcessResultFolder(string root, string find)
         {
-            if (find is null)
-            {
-                return "Assets";
-            }
-
             // ReSharper disable once ReplaceSubstringWithRangeIndexer
             string r = find.Substring(root.Length).Replace("\\", "/");
             if (r.StartsWith("/"))
