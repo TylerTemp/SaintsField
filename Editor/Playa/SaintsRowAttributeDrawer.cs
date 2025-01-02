@@ -219,7 +219,11 @@ namespace SaintsField.Editor.Playa
             VisualElement bodyElement = new VisualElement();
             foreach (ISaintsRenderer saintsRenderer in renderer)
             {
-                bodyElement.Add(saintsRenderer.CreateVisualElement());
+                VisualElement rendererElement = saintsRenderer.CreateVisualElement();
+                if(rendererElement != null)
+                {
+                    bodyElement.Add(rendererElement);
+                }
             }
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED

@@ -5,17 +5,30 @@ namespace SaintsField.Editor.Utils
 {
     public class ImGuiLabelStyleRichTextScoop: IDisposable
     {
+        private readonly bool _applied;
         private readonly bool _richText;
 
         public ImGuiLabelStyleRichTextScoop()
         {
-            _richText = EditorStyles.label.richText;
-            EditorStyles.label.richText = true;
+            try
+            {
+                _richText = EditorStyles.label.richText;
+                EditorStyles.label.richText = true;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
+
+            _applied = true;
         }
 
         public void Dispose()
         {
-            EditorStyles.label.richText = _richText;
+            if(_applied)
+            {
+                EditorStyles.label.richText = _richText;
+            }
         }
     }
 }

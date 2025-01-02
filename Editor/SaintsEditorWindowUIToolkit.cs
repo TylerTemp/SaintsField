@@ -58,7 +58,10 @@ namespace SaintsField.Editor
             SaintsEditorWindowSpecialEditor editor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(this, typeof(SaintsEditorWindowSpecialEditor));
             editor.EditorShowMonoScript = EditorShowMonoScript;
             InspectorElement element = new InspectorElement(editor);
-            root.Add(element);
+
+            ScrollView sv = new ScrollView();
+            sv.Add(element);
+            root.Add(sv);
 
             element.schedule.Execute(EditorOnUpdateInternal).Every(1);
         }

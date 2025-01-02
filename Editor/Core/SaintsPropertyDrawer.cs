@@ -652,9 +652,6 @@ namespace SaintsField.Editor.Core
 
                 IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
 
-                EditorStyles.label.richText = true;
-                EditorStyles.foldout.richText = true;
-
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
                     GUIContent label = imguiLabelHelper.NoLabel

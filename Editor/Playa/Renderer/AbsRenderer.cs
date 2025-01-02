@@ -287,13 +287,16 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     flexGrow = 1,
                 },
+                name = ToString(),
             };
             root.AddToClassList(ClassSaintsFieldPlaya);
+            bool hasAnyChildren = false;
 
             (VisualElement aboveTarget, bool aboveNeedUpdate) = CreateAboveUIToolkit();
             if (aboveTarget != null)
             {
                 root.Add(aboveTarget);
+                hasAnyChildren = true;
             }
             (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit();
             if (target != null)
@@ -309,14 +312,17 @@ namespace SaintsField.Editor.Playa.Renderer
                 targetContainer.AddToClassList(ClassSaintsFieldPlayaContainer);
                 targetContainer.Add(target);
                 root.Add(targetContainer);
+                hasAnyChildren = true;
             }
             (VisualElement belowTarget, bool belowNeedUpdate) = CreateBelowUIToolkit();
             if (belowTarget != null)
             {
                 root.Add(belowTarget);
+                hasAnyChildren = true;
             }
 
-            if (aboveNeedUpdate || targetNeedUpdate || belowNeedUpdate)
+            bool anyNeedUpdate = aboveNeedUpdate || targetNeedUpdate || belowNeedUpdate;
+            if (anyNeedUpdate)
             {
                 root.RegisterCallback<AttachToPanelEvent>(_ =>
                 {
@@ -324,8 +330,12 @@ namespace SaintsField.Editor.Playa.Renderer
                     root.schedule.Execute(() => OnUpdateUIToolKit()).Every(100);
                 });
             }
+            if(anyNeedUpdate || hasAnyChildren)
+            {
+                return _rootElement = root;
+            }
 
-            return _rootElement = root;
+            return null;
         }
 
         protected virtual (VisualElement target, bool needUpdate) CreateAboveUIToolkit()
@@ -336,6 +346,7 @@ namespace SaintsField.Editor.Playa.Renderer
             Dictionary<string, VisualElement> groupElements = new Dictionary<string, VisualElement>();
 
             bool needUpdate = false;
+            bool hasAnyChildren = false;
 
             foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
             {
@@ -344,6 +355,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
                     {
                         (HelpBox helpBox, bool helpBoxNeedUpdate) = CreateInfoBox(FieldWithInfo, infoBoxAttribute);
+                        hasAnyChildren = true;
                         MergeIntoGroup(groupElements, infoBoxAttribute.GroupBy, visualElement, helpBox);
                         if (helpBoxNeedUpdate)
                         {
@@ -354,7 +366,12 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
-            return (visualElement, needUpdate);
+            if(needUpdate || hasAnyChildren)
+            {
+                return (visualElement, needUpdate);
+            }
+
+            return (null, false);
         }
 
         protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit();
@@ -362,11 +379,12 @@ namespace SaintsField.Editor.Playa.Renderer
         protected virtual (VisualElement target, bool needUpdate) CreateBelowUIToolkit()
         {
             VisualElement visualElement = new VisualElement();
-            visualElement.AddToClassList($"${ClassSaintsFieldPlaya}-above");
+            visualElement.AddToClassList($"{ClassSaintsFieldPlaya}-below");
 
             Dictionary<string, VisualElement> groupElements = new Dictionary<string, VisualElement>();
 
             bool needUpdate = false;
+            bool hasAnyChildren = false;
 
             foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
             {
@@ -375,6 +393,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
                     {
                         (HelpBox helpBox, bool helpBoxNeedUpdate) = CreateInfoBox(FieldWithInfo, infoBoxAttribute);
+                        hasAnyChildren = true;
                         MergeIntoGroup(groupElements, infoBoxAttribute.GroupBy, visualElement, helpBox);
                         if (helpBoxNeedUpdate)
                         {
@@ -385,7 +404,12 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
-            return (visualElement, needUpdate);
+            if(needUpdate || hasAnyChildren)
+            {
+                return (visualElement, needUpdate);
+            }
+
+            return (null, false);
         }
 
         private static void MergeIntoGroup(Dictionary<string, VisualElement> groupElements, string groupBy, VisualElement root, VisualElement child)

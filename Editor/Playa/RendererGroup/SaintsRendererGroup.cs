@@ -1115,17 +1115,16 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
                 VisualElement fieldElement = renderer.CreateVisualElement();
-                // if(_eLayout.HasFlag(ELayout.Background))
-                // {
-                //     fieldElement.style.marginRight = 4;
-                // }
-
-                if(!fieldToVisualElement.TryGetValue(groupId, out List<VisualElement> visualElements))
+                if(fieldElement != null)
                 {
-                    fieldToVisualElement[groupId] = visualElements = new List<VisualElement>();
+                    if (!fieldToVisualElement.TryGetValue(groupId, out List<VisualElement> visualElements))
+                    {
+                        fieldToVisualElement[groupId] = visualElements = new List<VisualElement>();
+                    }
+
+                    visualElements.Add(fieldElement);
+                    body.Add(fieldElement);
                 }
-                visualElements.Add(fieldElement);
-                body.Add(fieldElement);
             }
 
             bool fancyBox = _eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab);
