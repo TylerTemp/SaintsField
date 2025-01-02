@@ -1,8 +1,6 @@
 using System;
-using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.SaintsEditorWindowUtils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor
 {
@@ -15,7 +13,7 @@ namespace SaintsField.Editor
             if(_saintsEditorWindowSpecialEditor == null)
             {
                 // Debug.Log("Create Editor for IMGUI");
-                _saintsEditorWindowSpecialEditor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(this,
+                _saintsEditorWindowSpecialEditor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(EditorGetTargetInternal(),
                     typeof(SaintsEditorWindowSpecialEditor));
                 _saintsEditorWindowSpecialEditor.EditorShowMonoScript = EditorShowMonoScript;
             }

@@ -55,7 +55,7 @@ namespace SaintsField.Editor
             // UnityEngine.Object target = _editorTargetUIToolkit == null ? this : _editorTargetUIToolkit;
             // UnityEngine.Object target = _editorTargetUIToolkit == null ? this : _editorTargetUIToolkit;
             // Debug.Log(target);
-            SaintsEditorWindowSpecialEditor editor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(this, typeof(SaintsEditorWindowSpecialEditor));
+            SaintsEditorWindowSpecialEditor editor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(EditorGetTargetInternal(), typeof(SaintsEditorWindowSpecialEditor));
             editor.EditorShowMonoScript = EditorShowMonoScript;
             InspectorElement element = new InspectorElement(editor);
 

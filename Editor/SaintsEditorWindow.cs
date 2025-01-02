@@ -27,6 +27,32 @@ namespace SaintsField.Editor
         // ReSharper disable once UnassignedField.Global
         public bool EditorShowMonoScript;
 
+        private UnityEngine.Object EditorGetTargetInternal()
+        {
+            return EditorInspectingTarget = GetTarget();
+        }
+
+        // ReSharper disable once MemberCanBeProtected.Global
+        public virtual UnityEngine.Object GetTarget()
+        {
+            return this;
+        }
+
+        [NonSerialized] public UnityEngine.Object EditorInspectingTarget;
+
+        public void EditorRefreshTarget()
+        {
+            if (_saintsEditorWindowSpecialEditor != null)
+            {
+                DestroyImmediate(_saintsEditorWindowSpecialEditor);
+                _saintsEditorWindowSpecialEditor = null;
+            }
+
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+            EditorRelinkRootUIToolkit();
+#endif
+        }
+
         #region LifeCircle
 
         // public virtual UnityEngine.Object EditorGetInitTarget(UnityEngine.Object oldTarget) => this;
