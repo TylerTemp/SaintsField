@@ -94,7 +94,7 @@ namespace SaintsField.Editor.AutoRunner
                                     continue;
                                 }
                                 MemberInfo memberInfo = info.fieldOrProp.IsField
-                                    ? info.fieldOrProp.FieldInfo
+                                    ? (MemberInfo)info.fieldOrProp.FieldInfo
                                     : info.fieldOrProp.PropertyInfo;
                                 PropertyAttribute[] attributes = memberInfo.GetCustomAttributes()
                                     .OfType<PropertyAttribute>()
