@@ -4,6 +4,7 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 {
+    [CustomEditor(typeof(SaintsEditorWindow), editorForChildClasses: true)]
     public class SaintsEditorWindowSpecialEditor: SaintsEditor
     {
         public override bool RequiresConstantRepaint() =>
@@ -13,6 +14,12 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             false
 #endif
         ;
+
+        public override void OnEnable()
+        {
+            EditorShowMonoScript = false;
+            base.OnEnable();
+        }
 
         public override AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {

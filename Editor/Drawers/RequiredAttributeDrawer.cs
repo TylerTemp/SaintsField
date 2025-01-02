@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Drawers
     [CustomPropertyDrawer(typeof(RequiredAttribute))]
     public class RequiredAttributeDrawer: SaintsPropertyDrawer
     {
-        private static (string error, bool result) Truly(SerializedProperty property, FieldInfo field, object target)
+        private static (string error, bool result) Truly(SerializedProperty property, MemberInfo field, object target)
         {
             (string curError, int _, object curValue) = Util.GetValue(property, field, target);
             return curError != ""

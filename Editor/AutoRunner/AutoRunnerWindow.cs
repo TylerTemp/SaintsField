@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -31,7 +34,7 @@ namespace SaintsField.Editor.AutoRunner
         // [Button]
         public override Object GetTarget()
         {
-            Object autoRunnerWindow = EditorGUIUtility.Load(EditorResourcePath);
+            AutoRunnerWindow autoRunnerWindow = EditorGUIUtility.Load(EditorResourcePath) as AutoRunnerWindow;
             Debug.Log($"load: {autoRunnerWindow}");
             if (autoRunnerWindow == null)
             {
@@ -65,12 +68,41 @@ namespace SaintsField.Editor.AutoRunner
                     // Debug.Log(rootGameObject);
                     foreach (Component comp in rootGameObject.transform.GetComponentsInChildren<Component>(true))
                     {
-                        using(SerializedObject so = new SerializedObject(comp))
+                        SerializedObject so;
+                        try
+                        {
+                            so = new SerializedObject(comp);
+                        }
+                        catch (ArgumentException)
+                        {
+                            continue;
+                        }
+
+                        using(so)
                         {
                             SerializedProperty iterator = so.GetIterator();
                             while (iterator.NextVisible(true))
                             {
-                                Debug.Log(iterator.propertyPath);
+                                // Debug.Log(iterator.propertyPath);
+                                (SerializedUtils.FieldOrProp fieldOrProp, object parent) info;
+                                try
+                                {
+                                    info = SerializedUtils.GetFieldInfoAndDirectParent(iterator);
+                                }
+                                catch (Exception)
+                                {
+                                    continue;
+                                }
+                                MemberInfo memberInfo = info.fieldOrProp.IsField
+                                    ? info.fieldOrProp.FieldInfo
+                                    : info.fieldOrProp.PropertyInfo;
+                                PropertyAttribute[] attributes = memberInfo.GetCustomAttributes()
+                                    .OfType<PropertyAttribute>()
+                                    .ToArray();
+                                if (attributes.Any(each => each is RequiredAttribute))
+                                {
+                                    Debug.Log(iterator.propertyPath);
+                                }
                             }
                         }
                     }
@@ -97,7 +129,8 @@ namespace SaintsField.Editor.AutoRunner
 
             Debug.Log(
                 $"Create saintsFieldConfig: Assets/Editor Default Resources/{EditorResourcePath}");
-            AssetDatabase.CreateAsset(this, $"Assets/Editor Default Resources/{EditorResourcePath}");
+            AutoRunnerWindow copy = Instantiate(this);
+            AssetDatabase.CreateAsset(copy, $"Assets/Editor Default Resources/{EditorResourcePath}");
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

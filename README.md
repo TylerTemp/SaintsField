@@ -77,10 +77,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.13.0**
+**3.13.1**
 
-1.  Add `AssetFolder` to pick a folder under `Assets` folder.
-2.  Add `ResourceFolder` to pick a folder under Unity's `Resources` folders
+1.  UI Toolkit: Fix `SaintsEditor` created many unused empty `VisualElement`
+2.  UI Toolkit: Fix rich label style might be null when falling back to IMGUI drawer
+3.  UI Toolkit: Fix `SaintsEditorWindow` can not vertically scroll when the window is very high
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

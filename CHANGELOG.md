@@ -1,6 +1,6 @@
 # Changelog
 
-## WIP ##
+## 3.13.1 ##
 
 1.  UI Toolkit: Fix `SaintsEditor` created many unused empty `VisualElement`
 2.  UI Toolkit: Fix rich label style might be null when falling back to IMGUI drawer
