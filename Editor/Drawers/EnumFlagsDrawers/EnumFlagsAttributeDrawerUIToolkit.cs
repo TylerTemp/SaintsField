@@ -14,7 +14,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
     public partial class EnumFlagsAttributeDrawer
     {
-        #region UIToolkit
 
         public class EnumFlagsField : BaseField<Enum>
         {
@@ -531,8 +530,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
             UIToolkitUtils.SetLabel(enumFlagsField.labelElement, richTextChunks, richTextDrawer);
         }
-
-        #endregion
     }
 }
 #endif

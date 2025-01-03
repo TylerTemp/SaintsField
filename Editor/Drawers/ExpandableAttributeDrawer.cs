@@ -301,7 +301,7 @@ namespace SaintsField.Editor.Drawers
                 style =
                 {
                     display = DisplayStyle.None,
-                    backgroundColor = EColor.CharcoalGray.GetColor(),
+                    backgroundColor = EColor.EditorEmphasized.GetColor(),
                 },
                 name = NameProps(property),
                 userData = null,
