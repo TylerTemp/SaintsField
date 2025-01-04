@@ -45,6 +45,14 @@ namespace SaintsField.Utils
 
         private bool GetByXPathDelayMsDisabled(int v) => v <= 0;
 
+        [InfoBox("Init Update Pass. Unity can failed on setting/getting values in IMGUI, this helps to re-sign the value with some loops. Please don't set it less than 4.<color=red><b>(IMGUI)</b></color>")]
+        [MinValue(1), AboveRichLabel("Field Pass Count<color=brown><b>(IMGUI)"), RichLabel(null)]
+        public int getByXPathFieldPassIMGUI = GetByXPathDefaultFieldPassIMGUI;
+        public const int GetByXPathDefaultFieldPassIMGUI = 10;
+        [MinValue(1), AboveRichLabel("Array Pass Count<color=brown><b>(IMGUI)"), RichLabel(null)]
+        public int getByXPathArrayPassIMGUI = GetByXPathDefaultArrayPassIMGUI;
+        public const int GetByXPathDefaultArrayPassIMGUI = 2;
+
         [LayoutEnd(".")]
 
         [Space]

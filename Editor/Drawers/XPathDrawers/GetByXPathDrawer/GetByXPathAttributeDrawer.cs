@@ -475,16 +475,23 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     : -1;
                 // if(!target.IndexToPropertyCache.TryGetValue(propertyCacheKey, out PropertyCache propertyCache))
                 // {
-                    (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
-                    PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
-                    {
-                        MemberInfo = fieldOrProp.IsField? fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
-                        Parent = fieldParent,
-                        SerializedProperty = processingProperty,
-                    };
+                //     (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
+                //     propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
+                //     {
+                //         MemberInfo = fieldOrProp.IsField? fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
+                //         Parent = fieldParent,
+                //         SerializedProperty = processingProperty,
+                //     };
                 // }
+                (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
+                PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
+                {
+                    MemberInfo = fieldOrProp.IsField? fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
+                    Parent = fieldParent,
+                    SerializedProperty = processingProperty,
+                };
 
-                propertyCache.SerializedProperty = processingProperty;
+                // propertyCache.SerializedProperty = processingProperty;
 
                 (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty, propertyCache.MemberInfo, propertyCache.Parent);
                 if (originalValueError != "")
@@ -527,9 +534,46 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
         }
 
+        // no longer process with element remove, because we'll always adjust array size to correct size.
+        private static void DoSignPropertyCache(PropertyCache propertyCache)
+        {
+            try
+            {
+                string _ = propertyCache.SerializedProperty.propertyPath;
+            }
+            catch (NullReferenceException e)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogException(e);
+#endif
+                return;
+            }
+            catch (ObjectDisposedException e)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogException(e);
+#endif
+                return;
+            }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+            Debug.Log($"#GetByXPath# Sign {propertyCache.SerializedProperty.propertyPath} from {propertyCache.OriginalValue} to {propertyCache.TargetValue}");
+#endif
+            propertyCache.MisMatch = false;
+
+            EnqueueSceneViewNotification($"Auto sign {(propertyCache.TargetIsNull? "null" : propertyCache.TargetValue)} to {propertyCache.SerializedProperty.displayName}");
+
+            ReflectUtils.SetValue(
+                propertyCache.SerializedProperty.propertyPath,
+                propertyCache.SerializedProperty.serializedObject.targetObject,
+                propertyCache.MemberInfo,
+                propertyCache.Parent,
+                propertyCache.TargetValue);
+            Util.SignPropertyValue(propertyCache.SerializedProperty, propertyCache.MemberInfo, propertyCache.Parent, propertyCache.TargetValue);
+        }
+
         public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info, bool isImGui)
         {
-            // return false;
             if (EditorApplication.isPlaying)
             {
                 return false;
