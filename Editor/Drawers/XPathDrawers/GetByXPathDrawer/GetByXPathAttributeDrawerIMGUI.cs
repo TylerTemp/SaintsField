@@ -31,6 +31,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private class GetByXPathGenericCache
         {
+            public int RenderCount;  // IMGUI fix
+
             public double UpdatedLastTime;
             public string Error;
 
@@ -80,13 +82,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             EnqueueSceneViewNotification($"Auto sign {(propertyCache.TargetIsNull? "null" : propertyCache.TargetValue)} to {propertyCache.SerializedProperty.displayName}");
 
-            Util.SignPropertyValue(propertyCache.SerializedProperty, propertyCache.MemberInfo, propertyCache.Parent, propertyCache.TargetValue);
             ReflectUtils.SetValue(
                 propertyCache.SerializedProperty.propertyPath,
                 propertyCache.SerializedProperty.serializedObject.targetObject,
                 propertyCache.MemberInfo,
                 propertyCache.Parent,
                 propertyCache.TargetValue);
+            Util.SignPropertyValue(propertyCache.SerializedProperty, propertyCache.MemberInfo, propertyCache.Parent, propertyCache.TargetValue);
         }
 
         private static readonly Dictionary<UnityEngine.Object, HashSet<string>> InspectingTargets = new Dictionary<UnityEngine.Object, HashSet<string>>();
@@ -156,29 +158,43 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             bool configExists = ImGuiSharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
             bool needUpdate = !configExists;
+            const int requiredCounter = 4;
             if (configExists)
             {
-                double curTime = EditorApplication.timeSinceStartup;
-                double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI();
-                needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
-                // if(needUpdate)
-                // {
-                //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
-                // }
+                needUpdate = genericCache.RenderCount <= requiredCounter;
+                if (!needUpdate)
+                {
+                    double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI();
+                    if(loopInterval > 0)
+                    {
+                        double curTime = EditorApplication.timeSinceStartup;
+                        needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
+                    }
+                }
             }
-
-
 
             if (needUpdate)
             {
                 if (genericCache == null)
                 {
-                    genericCache = new GetByXPathGenericCache();
+                    genericCache = new GetByXPathGenericCache
+                    {
+                        RenderCount = 1,
+                        Error = "",
+                    };
                 }
+                else
+                {
+                    genericCache.RenderCount++;
+                }
+
+                bool firstTime = genericCache.RenderCount <= requiredCounter;
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
+                Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={firstTime}, renderCount={genericCache.RenderCount}");
 #endif
-                UpdateImGuiSharedCache(genericCache, !configExists, property, info);
+                UpdateImGuiSharedCache(genericCache, firstTime, property, info);
+                property.serializedObject.ApplyModifiedProperties();
                 ImGuiSharedCache[arrayRemovedKey] = genericCache;
             }
 

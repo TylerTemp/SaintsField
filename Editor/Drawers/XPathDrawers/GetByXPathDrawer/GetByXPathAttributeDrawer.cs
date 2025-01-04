@@ -376,7 +376,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             };
         }
 
-                private static void UpdateImGuiSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info)
+        private static void UpdateImGuiSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info)
         {
             target.UpdatedLastTime = EditorApplication.timeSinceStartup;
 
@@ -473,16 +473,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 int propertyCacheKey = isArray
                     ? index
                     : -1;
-                if(!target.IndexToPropertyCache.TryGetValue(propertyCacheKey, out PropertyCache propertyCache))
-                {
+                // if(!target.IndexToPropertyCache.TryGetValue(propertyCacheKey, out PropertyCache propertyCache))
+                // {
                     (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
-                    target.IndexToPropertyCache[propertyCacheKey] = propertyCache = new PropertyCache
+                    PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
                     {
                         MemberInfo = fieldOrProp.IsField? fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
                         Parent = fieldParent,
                         SerializedProperty = processingProperty,
                     };
-                }
+                // }
+
+                propertyCache.SerializedProperty = processingProperty;
 
                 (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty, propertyCache.MemberInfo, propertyCache.Parent);
                 if (originalValueError != "")
@@ -499,7 +501,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 propertyCache.MisMatch = !Util.GetIsEqual(originalValue, targetResult);
 
-                // Debug.Log($"#GetByXPath# mismatch={propertyCache.MisMatch}, {originalValue}, {targetResult}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"#GetByXPath# mismatch={propertyCache.MisMatch}, {originalValue}, {targetResult}: {propertyCache.SerializedProperty.propertyPath}");
+                // Debug.Log(property.objectReferenceValue);
+                Debug.Log(Event.current);
+#endif
 
                 if(propertyCache.MisMatch)
                 {
@@ -521,7 +527,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
         }
 
-        public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info)
+        public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info, bool isImGui)
         {
             // return false;
             if (EditorApplication.isPlaying)
@@ -531,14 +537,16 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             if (arrayProperty.arraySize > 0)
             {
-                return false;
+                return isImGui;
             }
+
             string key = arrayProperty.propertyPath;
 
             (GetByXPathAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(arrayProperty);
 
             GetByXPathGenericCache target = new GetByXPathGenericCache
             {
+                RenderCount = 1,
                 Error = "",
                 GetByXPathAttributes = attributes,
                 ArrayProperty = arrayProperty,
@@ -618,7 +626,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             ImGuiSharedCache[key] = target;
 
-            return false;
+            return isImGui;
         }
 
         private static string GetMismatchErrorMessage(object originalValue, object targetValue, bool targetValueIsNull)

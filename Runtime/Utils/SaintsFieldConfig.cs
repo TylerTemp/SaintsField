@@ -41,7 +41,7 @@ namespace SaintsField.Utils
         [MinValue(0), AboveRichLabel("Update Interval (ms) <color=brown><b>(IMGUI)"), RichLabel(null)]
         [InfoBox("Update Loop Disabled <color=red>(IMGUI)</color>", show: nameof(GetByXPathDelayMsDisabled), below: true)]
         public int getByXPathLoopIntervalMsIMGUI = GetByXPathLoopIntervalDefaultMsIMGUI;
-        public const int GetByXPathLoopIntervalDefaultMsIMGUI = 5000;
+        public const int GetByXPathLoopIntervalDefaultMsIMGUI = 2500;
 
         private bool GetByXPathDelayMsDisabled(int v) => v <= 0;
 

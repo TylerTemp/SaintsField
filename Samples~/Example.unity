@@ -2774,6 +2774,7 @@ GameObject:
   - component: {fileID: 454510170}
   - component: {fileID: 454510169}
   - component: {fileID: 454510172}
+  - component: {fileID: 454510173}
   m_Layer: 0
   m_Name: GetComponentArray
   m_TagString: Untagged
@@ -2839,6 +2840,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: gc2
   targetTransform: {fileID: 0}
+--- !u!114 &454510173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454510167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79df818bce4963b49a4136431481d698, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getComponent: {fileID: 0}
 --- !u!1 &458927138
 GameObject:
   m_ObjectHideFlags: 0

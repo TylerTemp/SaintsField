@@ -191,6 +191,7 @@ namespace SaintsField.Editor.Utils
                     break;
                 case SerializedPropertyType.ObjectReference:
                     property.objectReferenceValue = (UnityEngine.Object) newValue;
+                    // Debug.Log($"#Util# {property.propertyPath} -> {newValue} = {property.objectReferenceValue}");
                     break;
                 case SerializedPropertyType.Vector2:
                     property.vector2Value = (Vector2) newValue;
