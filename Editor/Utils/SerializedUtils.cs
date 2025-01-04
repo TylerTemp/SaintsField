@@ -114,6 +114,14 @@ namespace SaintsField.Editor.Utils
             return (fieldOrProp, sourceObj);
         }
 
+        public static string GetUniqueIdArray(SerializedProperty property)
+        {
+            string[] paths = property.propertyPath.Split('.');
+
+            (bool _, IEnumerable<string> propPathSegments) = TrimEndArray(paths);
+            return string.Join(".", propPathSegments);
+        }
+
         public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
         {
             // Debug.Log(property.propertyPath);

@@ -48,6 +48,10 @@ namespace SaintsField.Editor.Core
         // ReSharper disable once InconsistentNaming
         protected readonly string FieldControlName;
 
+        private static double SceneViewNotificationTime;
+        private static bool SceneViewNotificationListened;
+        private static HashSet<string> SceneViewNotifications = new HashSet<string>();
+
         private struct SaintsWithIndex : IEquatable<SaintsWithIndex>
         {
             public ISaintsAttribute SaintsAttribute;
@@ -112,6 +116,37 @@ namespace SaintsField.Editor.Core
             // _propertyAttributeToDrawers.Clear();
 
             EnsureAndGetTypeToDrawers();
+        }
+
+        private static void OnSceneViewNotification(SceneView sv)
+        {
+            if (SceneViewNotifications.Count == 0)
+            {
+                SceneViewNotificationTime = EditorApplication.timeSinceStartup;
+                return;
+            }
+
+            if(EditorApplication.timeSinceStartup - SceneViewNotificationTime < 0.5f)
+            {
+                return;
+            }
+
+            SceneViewNotificationTime = EditorApplication.timeSinceStartup;
+            sv.ShowNotification(new GUIContent(string.Join("\n", SceneViewNotifications)));
+            SceneViewNotifications.Clear();
+            SceneView.RepaintAll();
+        }
+
+        protected static void EnqueueSceneViewNotification(string message)
+        {
+            if (!SceneViewNotificationListened)
+            {
+                SceneViewNotificationListened = true;
+                SceneViewNotificationTime = EditorApplication.timeSinceStartup;
+                SceneView.duringSceneGui += OnSceneViewNotification;
+            }
+
+            SceneViewNotifications.Add(message);
         }
 
         public static IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> EnsureAndGetTypeToDrawers()

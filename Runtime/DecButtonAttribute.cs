@@ -16,7 +16,7 @@ namespace SaintsField
 
         protected DecButtonAttribute(string funcName, string buttonLabel=null, bool isCallback=false, string groupBy = "")
         {
-            FuncName = funcName;
+            FuncName = RuntimeUtil.ParseCallback(funcName).content;
 
             (string content, bool isCallback) parsed = RuntimeUtil.ParseCallback(buttonLabel, isCallback);
             ButtonLabel = parsed.content;
