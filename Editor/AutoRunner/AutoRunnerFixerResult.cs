@@ -9,5 +9,10 @@ namespace SaintsField.Editor.AutoRunner
         public Action Callback;
         public string Error;
         public string ExecError;
+
+        public override string ToString()
+        {
+            return $"{nameof(CanFix)}: {CanFix}, {nameof(Error)}: {Error}, {nameof(ExecError)}: {ExecError}";
+        }
     }
 }

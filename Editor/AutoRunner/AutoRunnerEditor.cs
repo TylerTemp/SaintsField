@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.SaintsEditorWindowUtils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 #if UNITY_2021_3_OR_NEWER
+using SaintsField.Editor.Utils;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
@@ -35,6 +38,27 @@ namespace SaintsField.Editor.AutoRunner
                 return (_root, true);
             }
 
+            private struct MainTarget : IEquatable<MainTarget>
+            {
+                public string MainTargetString;
+                public bool MainTargetIsAssetPath;
+
+                public bool Equals(MainTarget other)
+                {
+                    return MainTargetString == other.MainTargetString && MainTargetIsAssetPath == other.MainTargetIsAssetPath;
+                }
+
+                public override bool Equals(object obj)
+                {
+                    return obj is MainTarget other && Equals(other);
+                }
+
+                public override int GetHashCode()
+                {
+                    return Util.CombineHashCode(MainTargetString, MainTargetIsAssetPath);
+                }
+            }
+
             protected override PreCheckResult OnUpdateUIToolKit()
                 // private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
             {
@@ -48,24 +72,29 @@ namespace SaintsField.Editor.AutoRunner
                 _results = _autoRunner.results;
                 _root.Clear();
 
-                foreach ((object mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResult>> subGroup) in _autoRunner.results
-                             .GroupBy(each => (object)each.mainTarget ?? each.mainTargetString)
+                foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResult>> subGroup) in _autoRunner.results
+                             .GroupBy(each => new MainTarget
+                             {
+                                    MainTargetString = each.mainTargetString,
+                                    MainTargetIsAssetPath = each.mainTargetIsAssetPath,
+                             })
                              .Select(each => (
                                  each.Key,
                                  each.GroupBy(sub => sub.subTarget)
                             )))
                 {
+                    // Debug.Log($"#AutoRunner# draw {mainTarget}");
                     Foldout group = new Foldout
                     {
                         // text = mainTarget as string ?? mainTarget.ToString(),
                     };
-                    if (mainTarget is string s)
+                    if (!mainTarget.MainTargetIsAssetPath)
                     {
-                        group.text = s;
+                        group.text = mainTarget.MainTargetString;
                     }
                     else
                     {
-                        Object obj = (Object)mainTarget;
+                        Object obj = AssetDatabase.LoadAssetAtPath<Object>(mainTarget.MainTargetString);
                         if (obj == null)
                         {
                             continue;

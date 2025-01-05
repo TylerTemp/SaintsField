@@ -978,18 +978,41 @@ namespace SaintsField.Editor.Utils
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2);
 #else
-            return 17 * 31 + (object1?.GetHashCode() ?? 0) * 31 + (object2?.GetHashCode() ?? 0);
+            MockHashCode(new[] {object1, object2});
 #endif
         }
         public static int CombineHashCode(object object1, object object2, object object3)
         {
             // HashCode.Combine does not exist in old Unity
-#if UNITY_2021_1_OR_NEWER || false
+#if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2, object3);
 #else
-            return 17 * 31 + (object1?.GetHashCode() ?? 0) * 17 * 31 + (object2?.GetHashCode() ?? 0) * 31 + (object1?.GetHashCode() ?? 0) * 31;
+            MockHashCode(new[] {object1, object2, object3});
 #endif
         }
+
+        public static int CombineHashCode(object object1, object object2, object object3, object object4)
+        {
+            // HashCode.Combine does not exist in old Unity
+#if UNITY_2021_1_OR_NEWER
+            return HashCode.Combine(object1, object2, object3, object4);
+#else
+            MockHashCode(new[] {object1, object2, object3, object4});
+#endif
+        }
+
+#if !UNITY_2021_1_OR_NEWER
+        private static int MockHashCode(object[] objects)
+        {
+            int result = 17;
+            foreach (object obj in objects)
+            {
+                result = result * 31 + (obj?.GetHashCode() ?? 0);
+            }
+
+            return result;
+        }
+#endif
 
         public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)
         {

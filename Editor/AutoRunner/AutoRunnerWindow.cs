@@ -74,13 +74,13 @@ namespace SaintsField.Editor.AutoRunner
         private static IEnumerable<SerializedObject> GetSerializedObjectFromFolderSearch(FolderSearch folderSearch)
         {
             // var fullPath = Path.Join(Directory.GetCurrentDirectory(), folderSearch.path).Replace("/", "\\");
-            Debug.Log($"#AutoRunner# Processing path {folderSearch.path}: {folderSearch.searchPattern}");
+            Debug.Log($"#AutoRunner# Processing path {folderSearch.path}: {folderSearch.searchPattern}, {folderSearch.searchOption}");
             string[] listed = string.IsNullOrEmpty(folderSearch.searchPattern)
                 ? Directory.GetFiles(folderSearch.path)
-                : Directory.GetFiles(folderSearch.path, folderSearch.searchPattern);
+                : Directory.GetFiles(folderSearch.path, folderSearch.searchPattern, folderSearch.searchOption);
             foreach (string file in listed.Where(each => !each.EndsWith(".meta")).Select(each => each.Replace("\\", "/")))
             {
-                Debug.Log($"#AutoRunner# Processing {file}");
+                // Debug.Log($"#AutoRunner# Processing {file}");
                 Object obj = AssetDatabase.LoadAssetAtPath<Object>(file);
                 if (obj == null)
                 {
@@ -235,12 +235,31 @@ namespace SaintsField.Editor.AutoRunner
                                     if(autoRunnerResult != null)
                                     {
                                         hasFixer = true;
-                                        // Debug.Log(autoRunnerResult.Error);
+                                        Debug.Log($"#AutoRunner# Fixer found for {target}: {autoRunnerResult}");
+
+                                        string mainTargetString;
+                                        bool mainTargetIsAssetPath;
+                                        if(target is string s)
+                                        {
+                                            mainTargetString = s;
+                                            mainTargetIsAssetPath = false;
+                                        }
+                                        else if (target is Scene scene)
+                                        {
+                                            mainTargetString = scene.path;
+                                            mainTargetIsAssetPath = true;
+                                        }
+                                        else
+                                        {
+                                            mainTargetString = AssetDatabase.GetAssetPath((Object) target);
+                                            mainTargetIsAssetPath = true;
+                                        }
+
                                         autoRunnerResults.Add(new AutoRunnerResult
                                         {
                                             FixerResult = autoRunnerResult,
-                                            mainTarget = target as Object,
-                                            mainTargetString = target as string,
+                                            mainTargetString = mainTargetString,
+                                            mainTargetIsAssetPath = mainTargetIsAssetPath,
                                             subTarget = so.targetObject,
                                             propertyPath = property.propertyPath,
                                             // SerializedProperty = prop,
@@ -262,7 +281,7 @@ namespace SaintsField.Editor.AutoRunner
             }
             EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
             results = autoRunnerResults.ToArray();
-            Debug.Log($"#AutoRunner# All done");
+            Debug.Log($"#AutoRunner# All done, {results.Length} found");
         }
 
         [Ordered, Button("Save To Project"), PlayaHideIf(nameof(_isFromFile))]

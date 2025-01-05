@@ -7,8 +7,9 @@ namespace SaintsField.Editor.AutoRunner
     [Serializable]
     public struct AutoRunnerResult : IEquatable<AutoRunnerResult>
     {
-        public UnityEngine.Object mainTarget;
+        // public UnityEngine.Object mainTarget;
         public string mainTargetString;
+        public bool mainTargetIsAssetPath;
         public UnityEngine.Object subTarget;
         public string propertyPath;
         public SerializedObject SerializedObject;
@@ -17,7 +18,7 @@ namespace SaintsField.Editor.AutoRunner
 
         public bool Equals(AutoRunnerResult other)
         {
-            return Equals(mainTarget, other.mainTarget) && Equals(subTarget, other.subTarget) && propertyPath == other.propertyPath;
+            return Equals(mainTargetString, other.mainTargetString) && Equals(mainTargetIsAssetPath, other.mainTargetIsAssetPath) && Equals(subTarget, other.subTarget) && propertyPath == other.propertyPath;
         }
 
         public override bool Equals(object obj)
@@ -27,7 +28,7 @@ namespace SaintsField.Editor.AutoRunner
 
         public override int GetHashCode()
         {
-            return Util.CombineHashCode(mainTarget, subTarget, propertyPath);
+            return Util.CombineHashCode(mainTargetString, mainTargetIsAssetPath, subTarget, propertyPath);
             // return HashCode.Combine(mainTarget, subTarget, propertyPath);
         }
     }
