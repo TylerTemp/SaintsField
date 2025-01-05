@@ -22,7 +22,7 @@ namespace SaintsField.Editor.AutoRunner
 #if SAINTSFIELD_DEBUG
         [MenuItem("Saints/Auto Runner")]
 #else
-        // [MenuItem("Window/Saints/Auto Runner")]
+        [MenuItem("Window/Saints/Auto Runner")]
 #endif
         public static void OpenWindow()
         {

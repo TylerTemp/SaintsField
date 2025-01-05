@@ -77,11 +77,42 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.13.1**
+**3.14.0**
 
-1.  UI Toolkit: Fix `SaintsEditor` created many unused empty `VisualElement`
-2.  UI Toolkit: Fix rich label style might be null when falling back to IMGUI drawer
-3.  UI Toolkit: Fix `SaintsEditorWindow` can not vertically scroll when the window is very high
+1.  Overhaul the auto getters. This might be related to [#102](https://github.com/TylerTemp/SaintsField/issues/102).
+
+    The issue is because, usually you can just `SerializedProperty.SerializedObject.ApplyModifiedProperties()`. However, if the serialized target is newly created, this behavior will fail, for no good reason. This behavior is not documented in Unity's API.
+
+    To resolve this, UI Toolkit will delay the action a bit later. IMGUI will attempt multiple times.
+
+    This version also makes the auto getters for list not depending on the first element drawer. This means three things:
+
+    1.  When working with `ListDrawerSettings`, search function will not trigger the auto getters re-running.
+    2.  Draging element in list will not cause any troubles now. But the value will swap back once auto getters auto updated. (auto updating is depended on your configuration)
+    3.  Better performance, especially for IMGUI.
+
+2.  UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Runner`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
+
+    This tool allows you to check if some target has `Required` but not filled. You can specify the targets as you want. Currently, it supports scenes, and folder searching.
+
+    This tool is very simple, and will get more update in the future.
+
+    This tool is only available for UI Toolkit at the moment.
+
+3.  **Breaking Changes**: If you use `IWrapProp`, you need to change
+
+    ```csharp
+    // an auto getter
+    private string EditorPropertyName => nameof(myField);
+    ```
+
+    to
+
+    ```csharp
+    // a static field (private or public, with or without readonly)
+    private static readonly string EditorPropertyName = nameof(myField);
+    ```
+
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4128,7 +4159,7 @@ public class MyList : IWrapProp
     [SerializeField] public List<string> myStrings;
 
 #if UNITY_EDITOR
-    public string EditorPropertyName => nameof(myStrings);
+    private static readonly string EditorPropertyName = nameof(myStrings);
 #endif
 }
 
@@ -4961,6 +4992,16 @@ Note: `csc.rsp` can override settings by Saints Menu.
 **Using project settings**
 
 `Edit` - `Project Settings` - `Player`, find your platform, then go `Other Settings` - `Script Compliation` - `Scripting Define Symbols` to add your marcos. Don't forget to click `Apply` before closing the window.
+
+### Auto Runner ###
+
+UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Runner`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
+
+This tool allows you to check if some target has `Required` but not filled. You can specify the targets as you want. Currently, it supports scenes, and folder searching.
+
+This tool is very simple, and will get more update in the future.
+
+This tool is only available for UI Toolkit at the moment.
 
 ### Common Pitfalls & Compatibility ###
 

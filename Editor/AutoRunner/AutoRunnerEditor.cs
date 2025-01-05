@@ -66,6 +66,10 @@ namespace SaintsField.Editor.AutoRunner
                     else
                     {
                         Object obj = (Object)mainTarget;
+                        if (obj == null)
+                        {
+                            continue;
+                        }
                         group.Add(new ObjectField
                         {
                             value = obj,

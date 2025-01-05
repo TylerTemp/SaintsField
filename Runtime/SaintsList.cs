@@ -13,7 +13,7 @@ namespace SaintsField
 
 #if UNITY_EDITOR
         // ReSharper disable once StaticMemberInGenericType
-        public static string EditorPropertyName = nameof(value);
+        public static readonly string EditorPropertyName = nameof(value);
 #endif
 
         public override string ToString()

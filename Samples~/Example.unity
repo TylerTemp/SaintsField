@@ -12165,7 +12165,7 @@ MonoBehaviour:
     - 
   myArr:
   - myArray: 00000000
-  - myArray: 0000000000000000
+  - myArray: 110000007b000000
 --- !u!1 &1030583575
 GameObject:
   m_ObjectHideFlags: 0

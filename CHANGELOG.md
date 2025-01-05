@@ -1,5 +1,41 @@
 # Changelog
 
+## 3.14.0 ##
+
+1.  Overhaul the auto getters. This might be related to [#102](https://github.com/TylerTemp/SaintsField/issues/102).
+
+    The issue is because, usually you can just `SerializedProperty.SerializedObject.ApplyModifiedProperties()`. However, if the serialized target is newly created, this behavior will fail, for no good reason. This behavior is not documented in Unity's API.
+
+    To resolve this, UI Toolkit will delay the action a bit later. IMGUI will attempt multiple times.
+
+    This version also makes the auto getters for list not depending on the first element drawer. This means three things:
+
+    1.  When working with `ListDrawerSettings`, search function will not trigger the auto getters re-running.
+    2.  Draging element in list will not cause any troubles now. But the value will swap back once auto getters auto updated. (auto updating is depended on your configuration)
+    3.  Better performance, especially for IMGUI.
+
+2.  UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Runner`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
+
+    This tool allows you to check if some target has `Required` but not filled. You can specify the targets as you want. Currently, it supports scenes, and folder searching.
+
+    This tool is very simple, and will get more update in the future.
+
+    This tool is only available for UI Toolkit at the moment.
+
+3.  **Breaking Changes**: If you use `IWrapProp`, you need to change
+
+    ```csharp
+    // an auto getter
+    private string EditorPropertyName => nameof(myField);
+    ```
+
+    to
+
+    ```csharp
+    // a static field (private or public, with or without readonly)
+    private static readonly string EditorPropertyName = nameof(myField);
+    ```
+
 ## 3.13.1 ##
 
 1.  UI Toolkit: Fix `SaintsEditor` created many unused empty `VisualElement`

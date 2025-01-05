@@ -13,7 +13,7 @@ namespace SaintsField
 
 #if UNITY_EDITOR
         // ReSharper disable once StaticMemberInGenericType
-        public static string EditorPropertyName = nameof(V);
+        public static readonly string EditorPropertyName = nameof(V);
         public virtual bool EditorCustomPicker => true;
 #endif
 
