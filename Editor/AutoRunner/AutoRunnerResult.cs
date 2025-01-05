@@ -1,18 +1,35 @@
 using System;
+using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.AutoRunner
 {
     [Serializable]
-    public struct AutoRunnerResult
+    public struct AutoRunnerResult : IEquatable<AutoRunnerResult>
     {
-        public UnityEngine.Object MainTarget;
-        public UnityEngine.Object SubTarget;
-        public SerializedProperty SerializedProperty;
+        public UnityEngine.Object mainTarget;
+        public string mainTargetString;
+        public UnityEngine.Object subTarget;
+        public string propertyPath;
         public SerializedObject SerializedObject;
-
+        [NonSerialized]
         public AutoRunnerFixerResult FixerResult;
+
+        public bool Equals(AutoRunnerResult other)
+        {
+            return Equals(mainTarget, other.mainTarget) && Equals(subTarget, other.subTarget) && propertyPath == other.propertyPath;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is AutoRunnerResult other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return Util.CombineHashCode(mainTarget, subTarget, propertyPath);
+            // return HashCode.Combine(mainTarget, subTarget, propertyPath);
+        }
     }
 
     // [CustomPropertyDrawer(typeof(AutoRunnerResult))]

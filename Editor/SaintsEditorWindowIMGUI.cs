@@ -14,7 +14,7 @@ namespace SaintsField.Editor
             {
                 // Debug.Log("Create Editor for IMGUI");
                 _saintsEditorWindowSpecialEditor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(EditorGetTargetInternal(),
-                    typeof(SaintsEditorWindowSpecialEditor));
+                    EditorDrawerType);
                 _saintsEditorWindowSpecialEditor.EditorShowMonoScript = EditorShowMonoScript;
             }
             _saintsEditorWindowSpecialEditor.OnInspectorGUI();

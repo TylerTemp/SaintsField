@@ -2,7 +2,7 @@ using System;
 
 namespace SaintsField.Editor.AutoRunner
 {
-    [Serializable]
+    // [Serializable]
     public class AutoRunnerFixerResult
     {
         public bool CanFix;

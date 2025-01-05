@@ -981,6 +981,15 @@ namespace SaintsField.Editor.Utils
             return 17 * 31 + (object1?.GetHashCode() ?? 0) * 31 + (object2?.GetHashCode() ?? 0);
 #endif
         }
+        public static int CombineHashCode(object object1, object object2, object object3)
+        {
+            // HashCode.Combine does not exist in old Unity
+#if UNITY_2021_1_OR_NEWER || false
+            return HashCode.Combine(object1, object2, object3);
+#else
+            return 17 * 31 + (object1?.GetHashCode() ?? 0) * 17 * 31 + (object2?.GetHashCode() ?? 0) * 31 + (object1?.GetHashCode() ?? 0) * 31;
+#endif
+        }
 
         public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)
         {

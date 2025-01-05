@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using SaintsField.Editor.Playa.SaintsEditorWindowUtils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -26,6 +27,8 @@ namespace SaintsField.Editor
         [NonSerialized]
         // ReSharper disable once UnassignedField.Global
         public bool EditorShowMonoScript;
+
+        public virtual Type EditorDrawerType => typeof(SaintsEditorWindowSpecialEditor);
 
         private UnityEngine.Object EditorGetTargetInternal()
         {
