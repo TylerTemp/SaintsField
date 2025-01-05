@@ -80,6 +80,7 @@ namespace SaintsField.Editor.AutoRunner
                 : Directory.GetFiles(folderSearch.path, folderSearch.searchPattern);
             foreach (string file in listed.Where(each => !each.EndsWith(".meta")).Select(each => each.Replace("\\", "/")))
             {
+                Debug.Log($"#AutoRunner# Processing {file}");
                 Object obj = AssetDatabase.LoadAssetAtPath<Object>(file);
                 if (obj == null)
                 {
@@ -102,13 +103,15 @@ namespace SaintsField.Editor.AutoRunner
             }
         }
 
-        private static IEnumerable<SerializedObject> GetSerializedObjectFromScenePath(string scenePath)
+        private static IEnumerable<SerializedObject> GetSerializedObjectFromCurrentScene()
         {
-            Debug.Log($"#AutoRunner# Processing {scenePath}");
-            Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
-
-            GameObject[] rootGameObjects = scene.GetRootGameObjects();
-            Debug.Log($"#AutoRunner# Scene {scenePath} has {rootGameObjects.Length} root game objects");
+            // Debug.Log($"#AutoRunner# Processing {scenePath}");
+            // Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+            //
+            // GameObject[] rootGameObjects = scene.GetRootGameObjects();
+            Scene scene = SceneManager.GetActiveScene();
+            GameObject[] rootGameObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+            Debug.Log($"#AutoRunner# Scene {scene} has {rootGameObjects.Length} root game objects");
             foreach (GameObject rootGameObject in rootGameObjects)
             {
                 foreach (Component comp in rootGameObject.transform.GetComponentsInChildren<Component>(true))
@@ -138,10 +141,13 @@ namespace SaintsField.Editor.AutoRunner
             return (buildingScenes? InBuildScenes.Length: 0) + sceneList.Length + folderSearches.Length;
         }
 
+        [Ordered, ShowInInspector, PlayaShowIf(nameof(_processedItemCount))] private int _processedItemCount = 0;
+
         [Ordered, Button("Run!")]
         // ReSharper disable once UnusedMember.Local
         private IEnumerator RunAutoRunners()
         {
+            _processedItemCount = 0;
             processing = 0;
             string[] scenePaths = sceneList
                 .Select(AssetDatabase.GetAssetPath)
@@ -150,20 +156,43 @@ namespace SaintsField.Editor.AutoRunner
                     : Array.Empty<string>())
                 .ToArray();
 
-            IEnumerable<(object, IEnumerable<SerializedObject>)> sceneSoIterations = scenePaths.Select(each => (
-                (object)AssetDatabase.LoadAssetAtPath<SceneAsset>(each),
-                GetSerializedObjectFromScenePath(each)
-            ));
-            IEnumerable<(object, IEnumerable<SerializedObject>)> folderSoIterations = folderSearches.Select(each => (
-                (object)$"{each.path}{each.searchPattern}",
-                GetSerializedObjectFromFolderSearch(each)
-            ));
+            List<(object, IEnumerable<SerializedObject>)> sceneSoIterations =
+                new List<(object, IEnumerable<SerializedObject>)>();
+
+            foreach (string scenePath in scenePaths)
+            {
+                Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                sceneSoIterations.Add((scene, GetSerializedObjectFromCurrentScene()));
+                yield return null;
+            }
+
+            // IEnumerable<(object, IEnumerable<SerializedObject>)> sceneSoIterations = scenePaths.Select(each => (
+            //     (object)AssetDatabase.LoadAssetAtPath<SceneAsset>(each),
+            //     GetSerializedObjectFromScenePath(each)
+            // ));
+            List<(object, IEnumerable<SerializedObject>)> folderSoIterations =
+                new List<(object, IEnumerable<SerializedObject>)>();
+            foreach (FolderSearch folderSearch in folderSearches)
+            {
+                folderSoIterations.Add((folderSearch, GetSerializedObjectFromFolderSearch(folderSearch)));
+                yield return null;
+            }
+            // IEnumerable<(object, IEnumerable<SerializedObject>)> folderSoIterations = folderSearches.Select(each => (
+            //     (object)$"{each.path}{each.searchPattern}",
+            //     GetSerializedObjectFromFolderSearch(each)
+            // ));
 
             List<AutoRunnerResult> autoRunnerResults = new List<AutoRunnerResult>();
             foreach ((object target, IEnumerable<SerializedObject> serializedObjects) in sceneSoIterations.Concat(folderSoIterations))
             {
                 foreach (SerializedObject so in serializedObjects)
                 {
+                    _processedItemCount++;
+                    if(_processedItemCount % 100 == 0)
+                    {
+                        yield return null;
+                    }
+                    // Debug.Log($"#AutoRunner# Processing {so.targetObject}");
                     bool hasFixer = false;
 
                     SerializedProperty property = so.GetIterator();
@@ -231,37 +260,9 @@ namespace SaintsField.Editor.AutoRunner
 
                 processing += 1;
             }
-
-            foreach (string scenePath in scenePaths)
-            {
-                Debug.Log($"Processing {scenePath}");
-                Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
-
-                foreach (GameObject rootGameObject in scene.GetRootGameObjects())
-                {
-                    // Debug.Log(rootGameObject);
-                    foreach (Component comp in rootGameObject.transform.GetComponentsInChildren<Component>(true))
-                    {
-                        yield return null;
-                        SerializedObject so;
-                        try
-                        {
-                            so = new SerializedObject(comp);
-                        }
-                        catch (ArgumentException)
-                        {
-                            continue;
-                        }
-
-
-                    }
-                }
-
-                yield return null;
-            }
-
             EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
             results = autoRunnerResults.ToArray();
+            Debug.Log($"#AutoRunner# All done");
         }
 
         [Ordered, Button("Save To Project"), PlayaHideIf(nameof(_isFromFile))]
@@ -300,6 +301,7 @@ namespace SaintsField.Editor.AutoRunner
         {
             _typeToDrawer = SaintsPropertyDrawer.EnsureAndGetTypeToDrawers();
             processing = 0;
+            _processedItemCount = 0;
         }
 
         public override void OnEditorDestroy()
