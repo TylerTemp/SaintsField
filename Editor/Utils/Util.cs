@@ -978,7 +978,7 @@ namespace SaintsField.Editor.Utils
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2);
 #else
-            MockHashCode(new[] {object1, object2});
+            return MockHashCode(new[] {object1, object2});
 #endif
         }
         public static int CombineHashCode(object object1, object object2, object object3)
@@ -987,7 +987,7 @@ namespace SaintsField.Editor.Utils
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2, object3);
 #else
-            MockHashCode(new[] {object1, object2, object3});
+            return MockHashCode(new[] {object1, object2, object3});
 #endif
         }
 
@@ -997,21 +997,13 @@ namespace SaintsField.Editor.Utils
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2, object3, object4);
 #else
-            MockHashCode(new[] {object1, object2, object3, object4});
+            return MockHashCode(new[] {object1, object2, object3, object4});
 #endif
         }
 
 #if !UNITY_2021_1_OR_NEWER
-        private static int MockHashCode(object[] objects)
-        {
-            int result = 17;
-            foreach (object obj in objects)
-            {
-                result = result * 31 + (obj?.GetHashCode() ?? 0);
-            }
-
-            return result;
-        }
+        private static int MockHashCode(object[] objects) =>
+            objects.Aggregate(17, (current, obj) => current * 31 + (obj?.GetHashCode() ?? 0));
 #endif
 
         public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)

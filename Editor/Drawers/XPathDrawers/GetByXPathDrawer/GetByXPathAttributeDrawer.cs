@@ -480,7 +480,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
                 PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
                 {
-                    MemberInfo = fieldOrProp.IsField? fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
+                    MemberInfo = fieldOrProp.IsField? (MemberInfo)fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
                     Parent = fieldParent,
                     SerializedProperty = processingProperty,
                 };
@@ -669,7 +669,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         = target.IndexToPropertyCache[propertyCacheKey]
                             = new PropertyCache
                             {
-                                MemberInfo = fieldOrProp.IsField ? fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo,
+                                MemberInfo = fieldOrProp.IsField ? (MemberInfo)fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo,
                                 Parent = fieldParent,
                                 SerializedProperty = processingProperty,
                             };
