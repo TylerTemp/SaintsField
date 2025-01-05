@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
             [SerializeField] public List<string> myStrings;
 
 #if UNITY_EDITOR
-            public string EditorPropertyName => nameof(myStrings);
+            public static string EditorPropertyName = nameof(myStrings);
 #endif
         }
 

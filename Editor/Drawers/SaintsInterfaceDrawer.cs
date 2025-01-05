@@ -184,7 +184,7 @@ namespace SaintsField.Editor.Drawers
             {
                 _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
             }
-            SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorPropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, _imGuiPropInfo.EditorPropertyName);
+            SerializedProperty valueProp = property.FindPropertyRelative(ReflectUtils.GetIWrapPropName(_imGuiPropInfo.GetType())) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, ReflectUtils.GetIWrapPropName(_imGuiPropInfo.GetType()));
             return EditorGUI.GetPropertyHeight(valueProp, label, true);
         }
 
@@ -198,9 +198,9 @@ namespace SaintsField.Editor.Drawers
                     _imGuiPropInfo = GetSerName(property, fieldInfo).propInfo;
                 }
 
-                SerializedProperty valueProp = property.FindPropertyRelative(_imGuiPropInfo.EditorPropertyName) ??
+                SerializedProperty valueProp = property.FindPropertyRelative(ReflectUtils.GetIWrapPropName(_imGuiPropInfo.GetType())) ??
                                                SerializedUtils.FindPropertyByAutoPropertyName(property,
-                                                   _imGuiPropInfo.EditorPropertyName);
+                                                   ReflectUtils.GetIWrapPropName(_imGuiPropInfo.GetType()));
 
                 Type interfaceContainer = ReflectUtils.GetElementType(fieldInfo.FieldType);
                 Type mostBaseType = ReflectUtils.GetMostBaseType(interfaceContainer);
@@ -280,7 +280,7 @@ namespace SaintsField.Editor.Drawers
             {
                 return new HelpBox(error, HelpBoxMessageType.Error);
             }
-            SerializedProperty valueProp = property.FindPropertyRelative(saintsInterfaceProp.EditorPropertyName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, saintsInterfaceProp.EditorPropertyName);
+            SerializedProperty valueProp = property.FindPropertyRelative(ReflectUtils.GetIWrapPropName(saintsInterfaceProp.GetType())) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, ReflectUtils.GetIWrapPropName(saintsInterfaceProp.GetType()));
             string displayLabel = curInArrayIndex == -1 ? property.displayName : $"Element {curInArrayIndex}";
             PropertyField propertyField = new PropertyField(valueProp, "")
             {

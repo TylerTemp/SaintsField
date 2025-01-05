@@ -389,6 +389,8 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        // public static string GetIWrapPropName(Type type) => GetFieldStringValueFromType(type, "EditorPropertyName");
+
         public static string GetFieldStringValueFromType(Type type, string fieldName)
         {
             PropertyInfo r = type.GetProperty(fieldName,

@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Utils
 
         public static SerializedUtils.FieldOrProp GetWrapProp(IWrapProp wrapProp)
         {
-            string propName = wrapProp.EditorPropertyName;
+            string propName = ReflectUtils.GetIWrapPropName(wrapProp.GetType());
             const BindingFlags bind = BindingFlags.Instance | BindingFlags.NonPublic |
                                       BindingFlags.Public | BindingFlags.FlattenHierarchy;
             foreach (Type selfAndBaseType in ReflectUtils.GetSelfAndBaseTypes(wrapProp))
@@ -104,9 +104,9 @@ namespace SaintsField.Editor.Utils
             {
                 case SerializedPropertyType.Generic:
                     (string error, int _, object value) = GetValue(property, fieldInfo, parent);
-                    if (error == "" && value is IWrapProp wrapProp)
+                    if (error == "" && value is IWrapProp)
                     {
-                        string propName = wrapProp.EditorPropertyName;
+                        string propName = ReflectUtils.GetIWrapPropName(value.GetType());
                         SerializedProperty wrapProperty = property.FindPropertyRelative(propName) ??
                                                           SerializedUtils.FindPropertyByAutoPropertyName(property,
                                                               propName);
@@ -924,53 +924,53 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public struct SaintsInterfaceInfo
-        {
-            public string Error;
-            public Type InterfaceType;
-            public Type FieldType;
-            public SerializedProperty TargetProperty;
-        }
-
-        public static SaintsInterfaceInfo GetSaintsInterfaceInfo(SerializedProperty property, IWrapProp wrapProp)
-        {
-            Type interfaceType = null;
-            Type fieldType = wrapProp.GetType();
-
-            Type mostBaseType = ReflectUtils.GetMostBaseType(fieldType);
-            if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
-            {
-                IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
-                if (genericArguments.Count == 2)
-                {
-                    interfaceType = genericArguments[1];
-                }
-            }
-            SerializedProperty targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
-                             SerializedUtils.FindPropertyByAutoPropertyName(property,
-                                 wrapProp.EditorPropertyName);
-
-            if(targetProperty == null)
-            {
-                return new SaintsInterfaceInfo
-                {
-                    Error = $"{wrapProp.EditorPropertyName} not found in {property.propertyPath}",
-                };
-            }
-
-            SerializedUtils.FieldOrProp wrapFieldOrProp = GetWrapProp(wrapProp);
-            fieldType = wrapFieldOrProp.IsField
-                ? wrapFieldOrProp.FieldInfo.FieldType
-                : wrapFieldOrProp.PropertyInfo.PropertyType;
-
-            return new SaintsInterfaceInfo
-            {
-                Error = "",
-                InterfaceType = interfaceType,
-                FieldType = fieldType,
-                TargetProperty = targetProperty,
-            };
-        }
+        // public struct SaintsInterfaceInfo
+        // {
+        //     public string Error;
+        //     public Type InterfaceType;
+        //     public Type FieldType;
+        //     public SerializedProperty TargetProperty;
+        // }
+        //
+        // public static SaintsInterfaceInfo GetSaintsInterfaceInfo(SerializedProperty property, IWrapProp wrapProp)
+        // {
+        //     Type interfaceType = null;
+        //     Type fieldType = wrapProp.GetType();
+        //
+        //     Type mostBaseType = ReflectUtils.GetMostBaseType(fieldType);
+        //     if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+        //     {
+        //         IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+        //         if (genericArguments.Count == 2)
+        //         {
+        //             interfaceType = genericArguments[1];
+        //         }
+        //     }
+        //     SerializedProperty targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
+        //                      SerializedUtils.FindPropertyByAutoPropertyName(property,
+        //                          wrapProp.EditorPropertyName);
+        //
+        //     if(targetProperty == null)
+        //     {
+        //         return new SaintsInterfaceInfo
+        //         {
+        //             Error = $"{wrapProp.EditorPropertyName} not found in {property.propertyPath}",
+        //         };
+        //     }
+        //
+        //     SerializedUtils.FieldOrProp wrapFieldOrProp = GetWrapProp(wrapProp);
+        //     fieldType = wrapFieldOrProp.IsField
+        //         ? wrapFieldOrProp.FieldInfo.FieldType
+        //         : wrapFieldOrProp.PropertyInfo.PropertyType;
+        //
+        //     return new SaintsInterfaceInfo
+        //     {
+        //         Error = "",
+        //         InterfaceType = interfaceType,
+        //         FieldType = fieldType,
+        //         TargetProperty = targetProperty,
+        //     };
+        // }
 
         public static int CombineHashCode(object object1, object object2)
         {
@@ -1065,9 +1065,9 @@ namespace SaintsField.Editor.Utils
                 return (null, index, propError);
             }
 
-            if (propertyValue is IWrapProp wrapProp)
+            if (propertyValue is IWrapProp)
             {
-                string targetPropName = wrapProp.EditorPropertyName;
+                string targetPropName = ReflectUtils.GetIWrapPropName(propertyValue.GetType());
                 SerializedProperty arrProp = property.FindPropertyRelative(targetPropName) ??
                           SerializedUtils.FindPropertyByAutoPropertyName(property, targetPropName);
                 if (arrProp == null)

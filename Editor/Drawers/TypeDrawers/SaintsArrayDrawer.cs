@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
             }
 
             IWrapProp curValue = (IWrapProp) value;
-            return ("", curValue.EditorPropertyName, arrayIndex);
+            return ("", ReflectUtils.GetIWrapPropName(curValue.GetType()), arrayIndex);
         }
 
         #region IMGUI
