@@ -111,7 +111,7 @@ namespace SaintsField.Editor.AutoRunner
             // GameObject[] rootGameObjects = scene.GetRootGameObjects();
             Scene scene = SceneManager.GetActiveScene();
             GameObject[] rootGameObjects = SceneManager.GetActiveScene().GetRootGameObjects();
-            Debug.Log($"#AutoRunner# Scene {scene} has {rootGameObjects.Length} root game objects");
+            Debug.Log($"#AutoRunner# Scene {scene.path} has {rootGameObjects.Length} root game objects");
             foreach (GameObject rootGameObject in rootGameObjects)
             {
                 foreach (Component comp in rootGameObject.transform.GetComponentsInChildren<Component>(true))
