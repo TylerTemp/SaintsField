@@ -18,7 +18,8 @@ namespace SaintsField
         public T[] value;
 
 #if UNITY_EDITOR
-        public string EditorPropertyName => nameof(value);
+        // ReSharper disable once StaticMemberInGenericType
+        public static readonly string EditorPropertyName = nameof(value);
 #endif
 
         // Implicit conversion operator: Converts SaintsArray<T> to T[]

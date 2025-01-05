@@ -369,6 +369,46 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static string GetIWrapPropName(Type type)
+        {
+            Type lastType = type;
+
+            while (true)
+            {
+                string name = GetFieldStringValueFromType(lastType, "EditorPropertyName");
+                if (!string.IsNullOrEmpty(name))
+                {
+                    return name;
+                }
+
+                lastType = lastType.BaseType;
+                if (lastType == null)
+                {
+                    return null;
+                }
+            }
+        }
+
+        public static string GetFieldStringValueFromType(Type type, string fieldName)
+        {
+            PropertyInfo r = type.GetProperty(fieldName,
+                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            if (r != null)
+            {
+                return (string)r.GetValue(null);
+            }
+            FieldInfo f = type.GetField(fieldName,
+                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            if (f != null)
+            {
+                return (string)f.GetValue(null);
+            }
+
+            return null;
+        }
+
+
+
         public static Type GetDictionaryType(Type type)
         {
             // IDictionary

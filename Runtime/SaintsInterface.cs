@@ -12,7 +12,8 @@ namespace SaintsField
         public TInterface I => V as TInterface;
 
 #if UNITY_EDITOR
-        public virtual string EditorPropertyName => nameof(V);
+        // ReSharper disable once StaticMemberInGenericType
+        public static string EditorPropertyName = nameof(V);
         public virtual bool EditorCustomPicker => true;
 #endif
 

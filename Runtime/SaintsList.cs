@@ -12,7 +12,8 @@ namespace SaintsField
         public List<T> value;
 
 #if UNITY_EDITOR
-        public string EditorPropertyName => nameof(value);
+        // ReSharper disable once StaticMemberInGenericType
+        public static string EditorPropertyName = nameof(value);
 #endif
 
         public override string ToString()
