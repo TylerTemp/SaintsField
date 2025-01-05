@@ -924,53 +924,53 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        // public struct SaintsInterfaceInfo
-        // {
-        //     public string Error;
-        //     public Type InterfaceType;
-        //     public Type FieldType;
-        //     public SerializedProperty TargetProperty;
-        // }
-        //
-        // public static SaintsInterfaceInfo GetSaintsInterfaceInfo(SerializedProperty property, IWrapProp wrapProp)
-        // {
-        //     Type interfaceType = null;
-        //     Type fieldType = wrapProp.GetType();
-        //
-        //     Type mostBaseType = ReflectUtils.GetMostBaseType(fieldType);
-        //     if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
-        //     {
-        //         IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
-        //         if (genericArguments.Count == 2)
-        //         {
-        //             interfaceType = genericArguments[1];
-        //         }
-        //     }
-        //     SerializedProperty targetProperty = property.FindPropertyRelative(wrapProp.EditorPropertyName) ??
-        //                      SerializedUtils.FindPropertyByAutoPropertyName(property,
-        //                          wrapProp.EditorPropertyName);
-        //
-        //     if(targetProperty == null)
-        //     {
-        //         return new SaintsInterfaceInfo
-        //         {
-        //             Error = $"{wrapProp.EditorPropertyName} not found in {property.propertyPath}",
-        //         };
-        //     }
-        //
-        //     SerializedUtils.FieldOrProp wrapFieldOrProp = GetWrapProp(wrapProp);
-        //     fieldType = wrapFieldOrProp.IsField
-        //         ? wrapFieldOrProp.FieldInfo.FieldType
-        //         : wrapFieldOrProp.PropertyInfo.PropertyType;
-        //
-        //     return new SaintsInterfaceInfo
-        //     {
-        //         Error = "",
-        //         InterfaceType = interfaceType,
-        //         FieldType = fieldType,
-        //         TargetProperty = targetProperty,
-        //     };
-        // }
+        public struct SaintsInterfaceInfo
+        {
+            public string Error;
+            public Type InterfaceType;
+            public Type FieldType;
+            public SerializedProperty TargetProperty;
+        }
+
+        public static SaintsInterfaceInfo GetSaintsInterfaceInfo(SerializedProperty property, IWrapProp wrapProp)
+        {
+            Type interfaceType = null;
+            Type fieldType = wrapProp.GetType();
+
+            Type mostBaseType = ReflectUtils.GetMostBaseType(fieldType);
+            if (mostBaseType.IsGenericType && mostBaseType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+            {
+                IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
+                if (genericArguments.Count == 2)
+                {
+                    interfaceType = genericArguments[1];
+                }
+            }
+            SerializedProperty targetProperty = property.FindPropertyRelative(ReflectUtils.GetIWrapPropName(wrapProp.GetType())) ??
+                             SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                 ReflectUtils.GetIWrapPropName(wrapProp.GetType()));
+
+            if(targetProperty == null)
+            {
+                return new SaintsInterfaceInfo
+                {
+                    Error = $"{ReflectUtils.GetIWrapPropName(wrapProp.GetType())} not found in {property.propertyPath}",
+                };
+            }
+
+            SerializedUtils.FieldOrProp wrapFieldOrProp = GetWrapProp(wrapProp);
+            fieldType = wrapFieldOrProp.IsField
+                ? wrapFieldOrProp.FieldInfo.FieldType
+                : wrapFieldOrProp.PropertyInfo.PropertyType;
+
+            return new SaintsInterfaceInfo
+            {
+                Error = "",
+                InterfaceType = interfaceType,
+                FieldType = fieldType,
+                TargetProperty = targetProperty,
+            };
+        }
 
         public static int CombineHashCode(object object1, object object2)
         {
