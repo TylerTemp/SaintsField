@@ -172,7 +172,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
 #endif
-                UpdateImGuiSharedCache(genericCache, !configExists, property, info);
+                UpdateSharedCache(genericCache, !configExists, property, info, false);
                 ImGuiSharedCache[arrayRemovedKey] = genericCache;
             }
 
@@ -244,7 +244,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 {
                     container.schedule.Execute(() =>
                         ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
-                            info, false)).Every(loop);
+                            info)).Every(loop);
+                }
+                else
+                {
+                    ActualUpdateUIToolkit(property, index, container, onValueChangedCallback, info);
                 }
             });
             int delay = SaintsFieldConfigUtil.GetByXPathDelayMs();
@@ -258,8 +262,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         // private string _toastInfoUIToolkit = "";
         // private static readonly HashSet<string> ToastInfoUIToolkit = new HashSet<string>();
 
-        private void ActualUpdateUIToolkit(SerializedProperty property, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info, bool isInit)
+        private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             if (EditorApplication.isPlaying)
             {
@@ -290,7 +294,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
 #endif
-                UpdateImGuiSharedCache(genericCache, !configExists, property, info);
+                UpdateSharedCache(genericCache, !configExists, property, info, false);
                 ImGuiSharedCache[arrayRemovedKey] = genericCache;
             }
 
@@ -305,7 +309,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             // update information for this property
-            PropertyCache propertyCache = genericCache.IndexToPropertyCache[propertyIndex];
+            if (!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
+            {
+                return;
+            }
             GetByXPathAttribute firstAttribute = genericCache.GetByXPathAttributes[0];
             Button refreshButton = container.Q<Button>(NameResignButton(property, index));
             Button removeButton = container.Q<Button>(NameRemoveButton(property, index));

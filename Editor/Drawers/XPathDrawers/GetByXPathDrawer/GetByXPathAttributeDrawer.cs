@@ -376,7 +376,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             };
         }
 
-        private static void UpdateImGuiSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info)
+        private static void UpdateSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info, bool isImGui)
         {
             target.UpdatedLastTime = EditorApplication.timeSinceStartup;
 
@@ -392,6 +392,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 target.Parent = parent;
                 target.GetByXPathAttributes = attributes;
+            }
+
+            if (NothingSigner(target.GetByXPathAttributes[0]))
+            {
+                return;
             }
 
             bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
@@ -441,21 +446,41 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 target.ExpectedInterface = expectInterface;
             }
 
-            GetXPathValuesResult iterResults = GetXPathValues(
-                target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
-                target.ExpectedType,
-                target.ExpectedInterface,
-                property,
-                info,
-                target.Parent);
-
-            object[] expandedResults = isArray
-                ? iterResults.Results.ToArray()
-                : new[] {iterResults.Results.FirstOrDefault()};
-
-            if(isArray && target.ArrayProperty.arraySize != expandedResults.Length)
+            bool refreshResources = true;
+            if (isImGui)
             {
-                target.ArrayProperty.arraySize = expandedResults.Length;
+                refreshResources = EditorApplication.timeSinceStartup - target.UpdatedLastTime > SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI() / 1000f;
+            }
+
+            IReadOnlyList<object> expandedResults;
+            if(refreshResources)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"#GetByXPath# refresh resources for {property.propertyPath}");
+#endif
+                target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
+                GetXPathValuesResult iterResults = GetXPathValues(
+                    target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+                    target.ExpectedType,
+                    target.ExpectedInterface,
+                    property,
+                    info,
+                    target.Parent);
+
+                expandedResults
+                    = target.CachedResults
+                    = isArray
+                    ? iterResults.Results.ToArray()
+                    : new[] { iterResults.Results.FirstOrDefault() };
+            }
+            else
+            {
+                expandedResults = target.CachedResults;
+            }
+
+            if(isArray && target.ArrayProperty.arraySize != expandedResults.Count)
+            {
+                target.ArrayProperty.arraySize = expandedResults.Count;
                 EnqueueSceneViewNotification($"Adjust array {target.ArrayProperty.displayName} to length {target.ArrayProperty.arraySize}");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# Raw: Adjust array {target.ArrayProperty.displayName} to length {target.ArrayProperty.arraySize}");
@@ -511,7 +536,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# mismatch={propertyCache.MisMatch}, {originalValue}, {targetResult}: {propertyCache.SerializedProperty.propertyPath}");
                 // Debug.Log(property.objectReferenceValue);
-                Debug.Log(Event.current);
+                // Debug.Log(Event.current);
 #endif
 
                 if(propertyCache.MisMatch)
@@ -586,15 +611,26 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             string key = arrayProperty.propertyPath;
 
-            (GetByXPathAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(arrayProperty);
-
             GetByXPathGenericCache target = new GetByXPathGenericCache
             {
-                RenderCount = 1,
+                ImGuiRenderCount = 1,
                 Error = "",
-                GetByXPathAttributes = attributes,
+                // GetByXPathAttributes = attributes,
                 ArrayProperty = arrayProperty,
             };
+
+            if (ImGuiSharedCache.TryGetValue(key, out GetByXPathGenericCache exists))
+            {
+                target = exists;
+            }
+
+            (GetByXPathAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(arrayProperty);
+            target.GetByXPathAttributes = attributes;
+
+            if(NothingSigner(target.GetByXPathAttributes[0]))
+            {
+                return false;
+            }
 
             (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(arrayProperty, info, parent);
             if (typeError != "")
@@ -605,22 +641,44 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             target.ExpectedType = expectType;
             target.ExpectedInterface = expectInterface;
 
-            GetXPathValuesResult iterResults = GetXPathValues(
-                target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
-                target.ExpectedType,
-                target.ExpectedInterface,
-                arrayProperty,
-                null,
-                parent);
+            bool refreshResources = true;
+            if (isImGui)
+            {
+                refreshResources = EditorApplication.timeSinceStartup - target.ImGuiResourcesLastTime > SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI() / 1000f;
+            }
 
-            object[] expandedResults = iterResults.Results.ToArray();
+            IReadOnlyList<object> expandedResults;
+            if(refreshResources)
+            {
 
-            if (expandedResults.Length == 0)
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"#GetByXPath# refresh resources for {arrayProperty.propertyPath}");
+#endif
+
+                GetXPathValuesResult iterResults = GetXPathValues(
+                    target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+                    target.ExpectedType,
+                    target.ExpectedInterface,
+                    arrayProperty,
+                    null,
+                    parent);
+
+                expandedResults = iterResults.Results.ToArray();
+                target.CachedResults = expandedResults;
+                target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
+            }
+            else
+            {
+                expandedResults = target.CachedResults;
+                Debug.Assert(expandedResults != null);
+            }
+
+            if (expandedResults.Count == 0)
             {
                 return true;
             }
 
-            arrayProperty.arraySize = expandedResults.Length;
+            arrayProperty.arraySize = expandedResults.Count;
             EnqueueSceneViewNotification($"Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
             Debug.Log($"#GetByXPath# Helper: Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
@@ -676,6 +734,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         private static string GetMismatchErrorMessage(object originalValue, object targetValue, bool targetValueIsNull)
         {
             return $"Expected {(targetValueIsNull? "null": targetValue)}, but got {(Util.IsNull(originalValue)? "null": originalValue)}";
+        }
+
+        private static bool NothingSigner(GetByXPathAttribute getByXPathAttribute)
+        {
+            return !getByXPathAttribute.AutoResignToValue && !getByXPathAttribute.AutoResignToNull && !getByXPathAttribute.InitSign
+                && !getByXPathAttribute.UseResignButton && !getByXPathAttribute.UseErrorMessage;
         }
     }
 }

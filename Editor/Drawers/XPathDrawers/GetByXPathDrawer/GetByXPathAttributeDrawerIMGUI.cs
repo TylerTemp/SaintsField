@@ -31,7 +31,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private class GetByXPathGenericCache
         {
-            public int RenderCount;  // IMGUI fix
+            public int ImGuiRenderCount;  // IMGUI fix
+            public double ImGuiResourcesLastTime;  // IMGUI fix
 
             public double UpdatedLastTime;
             public string Error;
@@ -43,6 +44,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public Type ExpectedInterface;
 
             public IReadOnlyList<GetByXPathAttribute> GetByXPathAttributes;
+            public IReadOnlyList<object> CachedResults;
 
             public SerializedProperty ArrayProperty;
             // public bool IsArray;
@@ -137,6 +139,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             PropertyCache propertyCache = genericCache.IndexToPropertyCache[propertyIndex];
             GetByXPathAttribute firstAttribute = genericCache.GetByXPathAttributes[0];
 
+            if (NothingSigner(genericCache.GetByXPathAttributes[0]))
+            {
+                return firstAttribute.UsePickerButton ? SingleLineHeight : 0;;
+            }
+
             float useWidth = firstAttribute.UsePickerButton ? SingleLineHeight : 0;
             if (genericCache.Error != "")
             {
@@ -192,9 +199,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // the first pass will just fall. And the old version need 2 pass. This new version need 4 pass.
             int requiredCounter = isArray? SaintsFieldConfigUtil.GetByXPathArrayPassIMGUI(): SaintsFieldConfigUtil.GetByXPathFieldPassIMGUI();
             // int requiredCounter = 1;
-            if (configExists)
+            if (!needUpdate)
             {
-                needUpdate = genericCache.RenderCount <= requiredCounter;
+                needUpdate = genericCache.ImGuiRenderCount <= requiredCounter;
                 if (!needUpdate)
                 {
                     double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI();
@@ -212,21 +219,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 {
                     genericCache = new GetByXPathGenericCache
                     {
-                        RenderCount = 1,
+                        ImGuiRenderCount = 1,
                         Error = "",
                     };
                 }
                 else
                 {
-                    genericCache.RenderCount = Mathf.Min(100, genericCache.RenderCount + 1);
+                    genericCache.ImGuiRenderCount = Mathf.Min(100, genericCache.ImGuiRenderCount + 1);
                 }
 
-                bool firstTime = genericCache.RenderCount <= requiredCounter;
+                bool firstTime = genericCache.ImGuiRenderCount <= requiredCounter;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {key} ({property.propertyPath}), firstTime={firstTime}, renderCount={genericCache.RenderCount}");
+                Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {key} ({property.propertyPath}), firstTime={firstTime}, renderCount={genericCache.ImGuiRenderCount}");
 #endif
-                UpdateImGuiSharedCache(genericCache, firstTime, property, info);
+                UpdateSharedCache(genericCache, firstTime, property, info, true);
                 // var propCache = genericCache.IndexToPropertyCache[SerializedUtils.PropertyPathIndex(property.propertyPath)];
                 // onGUIPayload.SetValue(property.objectReferenceValue);
                 // property.serializedObject.ApplyModifiedProperties();
@@ -254,6 +261,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             if (!ReferenceEquals(genericCache.GetByXPathAttributes[0], saintsAttribute))
             {
                 return false;
+            }
+
+            if (NothingSigner(genericCache.GetByXPathAttributes[0]))
+            {
+                return DrawPicker(genericCache.GetByXPathAttributes[0], genericCache, position, property,
+                    genericCache.IndexToPropertyCache[SerializedUtils.PropertyPathIndex(property.propertyPath)], onGUIPayload, info);
             }
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -329,36 +342,60 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return willDraw;
         }
 
-        // protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     int index,
-        //     FieldInfo info,
-        //     object parent)
-        // {
-        //     string content = GetBelowMessage(property, saintsAttribute);
-        //     return !string.IsNullOrEmpty(content);
-        // }
-        //
-        // protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-        //     ISaintsAttribute saintsAttribute,
-        //     int index,
-        //     FieldInfo info, object parent)
-        // {
-        //     string content = GetBelowMessage(property, saintsAttribute);
-        //     return string.IsNullOrEmpty(content)
-        //         ? 0
-        //         : ImGuiHelpBox.GetHeight(content, width, MessageType.Error);
-        // }
-        //
-        // protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-        //     ISaintsAttribute saintsAttribute,
-        //     int index,
-        //     FieldInfo info, object parent)
-        // {
-        //     string content = GetBelowMessage(property, saintsAttribute);
-        //     return string.IsNullOrEmpty(content)
-        //         ? position
-        //         : ImGuiHelpBox.Draw(position, content, MessageType.Error);
-        // }
+        private static bool DrawPicker(GetByXPathAttribute firstAttr, GetByXPathGenericCache genericCache, Rect leftRect, SerializedProperty property,
+            PropertyCache propertyCache, OnGUIPayload onGUIPayload, FieldInfo info)
+        {
+            if (!firstAttr.UsePickerButton)
+            {
+                return false;
+            }
+
+            if (GUI.Button(leftRect, "●"))
+            {
+                OpenPicker(property, info, genericCache.GetByXPathAttributes,
+                    genericCache.ExpectedType, genericCache.ExpectedInterface,
+                    newValue =>
+                    {
+                        propertyCache.TargetValue = newValue;
+                        DoSignPropertyCache(propertyCache);
+                        onGUIPayload.SetValue(newValue);
+                    }, propertyCache.Parent);
+            }
+
+            return true;
+
+        }
+
+        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            FieldInfo info,
+            object parent)
+        {
+            string content = GetBelowMessage(property, saintsAttribute);
+            return !string.IsNullOrEmpty(content);
+        }
+
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute,
+            int index,
+            FieldInfo info, object parent)
+        {
+            string content = GetBelowMessage(property, saintsAttribute);
+            return string.IsNullOrEmpty(content)
+                ? 0
+                : ImGuiHelpBox.GetHeight(content, width, MessageType.Error);
+        }
+
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            int index,
+            FieldInfo info, object parent)
+        {
+            string content = GetBelowMessage(property, saintsAttribute);
+            return string.IsNullOrEmpty(content)
+                ? position
+                : ImGuiHelpBox.Draw(position, content, MessageType.Error);
+        }
 
         private static string GetBelowMessage(SerializedProperty property,
             ISaintsAttribute saintsAttribute)
