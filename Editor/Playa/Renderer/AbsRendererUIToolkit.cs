@@ -363,7 +363,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected PreCheckResult UpdatePreCheckUIToolkit(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
-            PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo);
+            PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo, false);
             if(result.enabledSelf != !preCheckResult.IsDisabled)
             {
                 result.SetEnabled(!preCheckResult.IsDisabled);
@@ -383,7 +383,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return preCheckResult;
         }
 
-        private static StyleSheet nullUss;
+        private static StyleSheet _nullUss;
 
         protected static VisualElement UIToolkitLayout(object value, string label, Type type=null)
         {
@@ -395,11 +395,11 @@ namespace SaintsField.Editor.Playa.Renderer
                     pickingMode = PickingMode.Ignore,
                 };
 
-                if(nullUss == null)
+                if(_nullUss == null)
                 {
-                    nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
+                    _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
                 }
-                textField.styleSheets.Add(nullUss);
+                textField.styleSheets.Add(_nullUss);
 
                 return WrapVisualElement(textField);
             }

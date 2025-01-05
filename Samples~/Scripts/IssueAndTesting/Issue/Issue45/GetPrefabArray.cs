@@ -1,22 +1,21 @@
 using System;
 using System.Collections.Generic;
+using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
-    public class GetPrefabArray : MonoBehaviour
+    public class GetPrefabArray : SaintsMonoBehaviour
     {
         [GetPrefabWithComponent] public Dummy dummy;
         [GetPrefabWithComponent] public Dummy[] dummies;
         [GetPrefabWithComponent(typeof(Dummy))] public List<GameObject> dummyGos;
-
 
         [Serializable]
         public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
 
         [GetPrefabWithComponent, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getComponentIArray;
-
         [GetPrefabWithComponent(typeof(Dummy)), PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
         public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
 

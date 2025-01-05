@@ -284,13 +284,31 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return ("", rawType, null);
             }
 
+            IWrapProp wrapProp;
+            try
+            {
+                wrapProp = (IWrapProp)Activator.CreateInstance(rawType);
+                Type wrapType = GetIWrapPropType(wrapProp);
+                return ("", wrapType, GetInterface(rawType));
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+
             (string error, int _, object value) = Util.GetValue(property, info, parent);
             if (error != "")
             {
                 return (error, rawType, null);
             }
 
-            IWrapProp wrapProp = (IWrapProp) value;
+            wrapProp = value as IWrapProp;
+            if (wrapProp == null)
+            {
+                return ($"Failed to get type from {value}", rawType, null);
+            }
+
+            // IWrapProp wrapProp = (IWrapProp) value;
             string prop = wrapProp.EditorPropertyName;
             Type expectedType;
             PropertyInfo wrapPropertyInfo = value.GetType().GetProperty(prop, BindingFlags.Public | BindingFlags.Instance);
@@ -305,14 +323,37 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 expectedType = wrapPropertyInfo.PropertyType;
             }
 
-            Type expectedInterface = null;
+            Type expectedInterface = GetInterface(rawType);
+
+            return ("", expectedType, expectedInterface);
+        }
+
+        private static Type GetIWrapPropType(IWrapProp wrapProp)
+        {
+            string prop = wrapProp.EditorPropertyName;
+            Type expectedType;
+            PropertyInfo wrapPropertyInfo = wrapProp.GetType().GetProperty(prop, BindingFlags.Public | BindingFlags.Instance);
+            if (wrapPropertyInfo == null)
+            {
+                FieldInfo wrapFieldInfo = wrapProp.GetType().GetField(prop, BindingFlags.Public | BindingFlags.Instance);
+                Debug.Assert(wrapFieldInfo != null);
+                return wrapFieldInfo.FieldType;
+            }
+            else
+            {
+                return wrapPropertyInfo.PropertyType;
+            }
+        }
+
+        private static Type GetInterface(Type rawType)
+        {
             Type mostBaseType = ReflectUtils.GetMostBaseType(rawType);
             if(ReflectUtils.IsSubclassOfRawGeneric(typeof(SaintsInterface<,>), mostBaseType))
             {
-                expectedInterface = mostBaseType.GetGenericArguments()[1];
+                return mostBaseType.GetGenericArguments()[1];
             }
 
-            return ("", expectedType, expectedInterface);
+            return null;
         }
 
         private class CheckFieldResult
