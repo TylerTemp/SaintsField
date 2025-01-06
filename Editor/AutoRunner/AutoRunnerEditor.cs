@@ -28,7 +28,7 @@ namespace SaintsField.Editor.AutoRunner
             }
 
             private VisualElement _root;
-            private AutoRunnerResult[] _results = {};
+            private IReadOnlyList<AutoRunnerResult> _results = new List<AutoRunnerResult>();
 
             protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
             {
@@ -69,10 +69,11 @@ namespace SaintsField.Editor.AutoRunner
                     return preCheckResult;
                 }
 
-                _results = _autoRunner.results;
+                _results = _autoRunner.results.ToArray();
                 _root.Clear();
 
                 foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResult>> subGroup) in _autoRunner.results
+                             .Where(each => each.FixerResult != null)
                              .GroupBy(each => new MainTarget
                              {
                                     MainTargetString = each.mainTargetString,

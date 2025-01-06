@@ -32,27 +32,20 @@ namespace SaintsField.Editor.AutoRunner
 
         public override Type EditorDrawerType => typeof(AutoRunnerEditor);
 
-        private bool _isFromFile;
-
         // [Button]
         public override Object GetTarget()
         {
             AutoRunnerWindow autoRunnerWindow = EditorGUIUtility.Load(EditorResourcePath) as AutoRunnerWindow;
             Debug.Log($"load: {autoRunnerWindow}");
-            if (autoRunnerWindow == null)
-            {
-                _isFromFile = false;
-                return this;
-            }
-
-            _isFromFile = true;
-            return autoRunnerWindow;
+            return autoRunnerWindow == null
+                ? this
+                : autoRunnerWindow;
         }
 
         [Ordered, LeftToggle] public bool buildingScenes;
 
         [Ordered, ShowInInspector, PlayaShowIf(nameof(buildingScenes))]
-        private SceneAsset[] InBuildScenes => EditorBuildSettings.scenes
+        private static SceneAsset[] InBuildScenes => EditorBuildSettings.scenes
             .Where(scene => scene.enabled)
             .Select(each => AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path))
             .ToArray();
@@ -67,9 +60,20 @@ namespace SaintsField.Editor.AutoRunner
             public string searchPattern;
             [ShowIf(nameof(searchPattern))]
             public SearchOption searchOption;
+
+            public override string ToString()
+            {
+                return string.IsNullOrEmpty(searchPattern)
+                    ? path
+                    : $"{path}:{searchPattern}({searchOption})";
+            }
         }
 
-        [Ordered] public FolderSearch[] folderSearches = {};
+        [Ordered, RichLabel("$" + nameof(FolderSearchLabel))] public FolderSearch[] folderSearches = {};
+
+        private string FolderSearchLabel(FolderSearch fs, int index) => string.IsNullOrEmpty(fs.path)
+            ? $"Element {index}"
+            : fs.ToString();
 
         private static IEnumerable<SerializedObject> GetSerializedObjectFromFolderSearch(FolderSearch folderSearch)
         {
@@ -134,14 +138,16 @@ namespace SaintsField.Editor.AutoRunner
 
         private IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _typeToDrawer;
 
-        [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(ResourceTotal))] public int processing;
+        [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(ResourceTotal)), BelowInfoBox("$" + nameof(_processingMessage))] public int processing;
+
+        private string _processingMessage;
 
         private int ResourceTotal()
         {
             return (buildingScenes? InBuildScenes.Length: 0) + sceneList.Length + folderSearches.Length;
         }
 
-        [Ordered, ShowInInspector, PlayaShowIf(nameof(_processedItemCount))] private int _processedItemCount = 0;
+        [Ordered, ShowInInspector, PlayaShowIf(nameof(_processedItemCount))] private int _processedItemCount;
 
         [Ordered, Button("Run!")]
         // ReSharper disable once UnusedMember.Local
@@ -182,7 +188,8 @@ namespace SaintsField.Editor.AutoRunner
             //     GetSerializedObjectFromFolderSearch(each)
             // ));
 
-            List<AutoRunnerResult> autoRunnerResults = new List<AutoRunnerResult>();
+            // List<AutoRunnerResult> autoRunnerResults = new List<AutoRunnerResult>();
+            results.Clear();
             foreach ((object target, IEnumerable<SerializedObject> serializedObjects) in sceneSoIterations.Concat(folderSoIterations))
             {
                 foreach (SerializedObject so in serializedObjects)
@@ -235,7 +242,10 @@ namespace SaintsField.Editor.AutoRunner
                                     if(autoRunnerResult != null)
                                     {
                                         hasFixer = true;
-                                        Debug.Log($"#AutoRunner# Fixer found for {target}/{so.targetObject}: {autoRunnerResult}");
+                                        _processingMessage =
+                                            $"Fixer found for {target}/{so.targetObject}: {autoRunnerResult}";
+                                        Debug.Log($"#AutoRunner# {_processingMessage}");
+
 
                                         string mainTargetString;
                                         bool mainTargetIsAssetPath;
@@ -255,7 +265,7 @@ namespace SaintsField.Editor.AutoRunner
                                             mainTargetIsAssetPath = true;
                                         }
 
-                                        autoRunnerResults.Add(new AutoRunnerResult
+                                        results.Add(new AutoRunnerResult
                                         {
                                             FixerResult = autoRunnerResult,
                                             mainTargetString = mainTargetString,
@@ -280,8 +290,9 @@ namespace SaintsField.Editor.AutoRunner
                 processing += 1;
             }
             EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
-            results = autoRunnerResults.ToArray();
-            Debug.Log($"#AutoRunner# All done, {results.Length} found");
+            // results = autoRunnerResults.ToArray();
+            _processingMessage = $"All done, {results.Count} found";
+            Debug.Log($"#AutoRunner# {_processingMessage}");
         }
 
         private bool IsFromFile()
@@ -309,7 +320,7 @@ namespace SaintsField.Editor.AutoRunner
             Debug.Log(
                 $"Create saintsFieldConfig: Assets/Editor Default Resources/{EditorResourcePath}");
             AutoRunnerWindow copy = Instantiate(this);
-            copy.results = Array.Empty<AutoRunnerResult>();
+            copy.results = new List<AutoRunnerResult>();
             AssetDatabase.CreateAsset(copy, $"Assets/Editor Default Resources/{EditorResourcePath}");
 
             AssetDatabase.SaveAssets();
@@ -320,13 +331,15 @@ namespace SaintsField.Editor.AutoRunner
         }
 
         // public AutoRunnerResult result = new AutoRunnerResult();
-        [Ordered] public AutoRunnerResult[] results = {};
+        [Ordered] public List<AutoRunnerResult> results = new List<AutoRunnerResult>();
 
         public override void OnEditorEnable()
         {
+            EditorRefreshTarget();
             _typeToDrawer = SaintsPropertyDrawer.EnsureAndGetTypeToDrawers();
             processing = 0;
             _processedItemCount = 0;
+            _processingMessage = null;
         }
 
         public override void OnEditorDestroy()
@@ -346,7 +359,7 @@ namespace SaintsField.Editor.AutoRunner
                 }
             }
 
-            results = Array.Empty<AutoRunnerResult>();
+            results = new List<AutoRunnerResult>();
         }
     }
 }
