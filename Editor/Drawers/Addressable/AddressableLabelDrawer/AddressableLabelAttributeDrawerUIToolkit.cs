@@ -1,4 +1,5 @@
-﻿#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,62 +10,13 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers.Addressable
+
+namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
 {
-    [CustomPropertyDrawer(typeof(AddressableLabelAttribute))]
-    public class AddressableLabelAttributeDrawer: SaintsPropertyDrawer
+    public partial class AddressableLabelAttributeDrawer
     {
-        private static string ErrorNoSettings => "Addressable has no settings created yet.";
-
-        #region IMGUI
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute,
-            FieldInfo info,
-            bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
-
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
-        {
-            // ReSharper disable once Unity.NoNullPropagation
-            List<string> labels = AddressableAssetSettingsDefaultObject.Settings?.GetLabels() ?? new List<string>();
-
-            GUIContent[] contents = labels
-                .Select(each => new GUIContent(each.Replace('/', '\u2215').Replace('&', '＆')))
-                .Concat(new []
-                {
-                    GUIContent.none,
-                    new GUIContent("Edit Addressable Group..."),
-                })
-                .ToArray();
-
-            // ReSharper disable once ConvertToUsingDeclaration
-            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-            {
-                int index = labels.IndexOf(property.stringValue);
-                int newIndex = EditorGUI.Popup(position, label, index, contents);
-                // ReSharper disable once InvertIf
-                if(changed.changed)
-                {
-                    if (newIndex < labels.Count)
-                    {
-                        property.stringValue = labels[newIndex];
-                    }
-                    else
-                    {
-                        EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
-                    }
-                }
-            }
-        }
-        #endregion
-
-#if UNITY_2021_3_OR_NEWER
-
-        #region UIToolkit
 
         private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__AddressableLabel_DropdownField";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AddressableLabel_HelpBox";
@@ -133,10 +85,7 @@ namespace SaintsField.Editor.Drawers.Addressable
                 genericDropdownMenu.AddSeparator("");
             }
 
-            genericDropdownMenu.AddItem("Edit Addressable Group...", false, () =>
-            {
-                EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
-            });
+            genericDropdownMenu.AddItem("Edit Addressable Group...", false, AddressableUtil.OpenGroupEditor);
 
             genericDropdownMenu.DropDown(dropdownField.ButtonElement.worldBound, dropdownField, true);
         }
@@ -158,7 +107,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         {
             if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
             {
-                UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), ErrorNoSettings);
+                UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), AddressableUtil.ErrorNoSettings);
                 return;
             }
 
@@ -177,9 +126,7 @@ namespace SaintsField.Editor.Drawers.Addressable
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
             UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
         }
-        #endregion
-
-#endif
     }
 }
+#endif
 #endif

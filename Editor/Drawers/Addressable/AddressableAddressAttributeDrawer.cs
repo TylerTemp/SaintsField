@@ -101,14 +101,12 @@ namespace SaintsField.Editor.Drawers.Addressable
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
-        private static string ErrorNoSettings => "Addressable has no settings created yet.";
-
         private static (string error, IReadOnlyList<string> assetGroups) SetupAssetGroup(AddressableAddressAttribute addressableAddressAttribute)
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
             if(settings == null)
             {
-                return (ErrorNoSettings, Array.Empty<string>());
+                return (AddressableUtil.ErrorNoSettings, Array.Empty<string>());
             }
 
             // AddressableAssetGroup[] targetGroups;
@@ -235,7 +233,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         {
             if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
             {
-                UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), ErrorNoSettings);
+                UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), AddressableUtil.ErrorNoSettings);
                 return;
             }
 

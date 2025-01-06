@@ -9,9 +9,10 @@ namespace SaintsField.Samples.Scripts.Addressable
     public class AddressableResourceExample: MonoBehaviour
     {
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
-        // [AddressableResource]
+        [AddressableResource, PostFieldButton(nameof(DebugButton), "D")]
         public AssetReferenceSprite spriteRef;
-#endif
 
+        private void DebugButton(AssetReferenceSprite ars) => Debug.Log(ars == null);
+#endif
     }
 }

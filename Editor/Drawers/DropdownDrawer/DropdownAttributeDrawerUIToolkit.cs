@@ -12,8 +12,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 {
     public partial class DropdownAttributeDrawer
     {
-        #region UIToolkit
-
         private static string NameDropdownButtonField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Button";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Dropdown_HelpBox";
 
@@ -171,8 +169,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 genericDropdownMenu.DropDown(dropdownButtonField.ButtonElement.worldBound, dropdownButtonField, true);
             }
         }
-
-        #endregion
     }
 }
 

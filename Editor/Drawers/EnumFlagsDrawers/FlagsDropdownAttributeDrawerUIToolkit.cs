@@ -62,12 +62,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
 
                 // AdvancedDropdownAttributeDrawer.MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
-                float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
+                float maxHeight = Screen.currentResolution.height - root.worldBound.y - root.worldBound.height - 100;
                 Rect worldBound = root.worldBound;
                 if (maxHeight < 100)
                 {
-                    worldBound.y -= 300 + worldBound.height;
-                    maxHeight = 300;
+                    worldBound.y -= 100 + worldBound.height;
+                    maxHeight = 100;
                 }
 
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
