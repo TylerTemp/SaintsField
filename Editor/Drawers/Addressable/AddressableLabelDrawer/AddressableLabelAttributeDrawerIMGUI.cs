@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
                     }
                     else
                     {
-                        AddressableUtil.OpenGroupEditor();
+                        AddressableUtil.OpenLabelEditor();
                     }
                 }
             }

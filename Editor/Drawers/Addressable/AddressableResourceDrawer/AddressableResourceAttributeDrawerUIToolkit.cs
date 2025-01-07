@@ -1,12 +1,14 @@
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.GUI;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -210,16 +212,24 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 List<string> labels = settings.GetLabels();
 
                 AdvancedDropdownList<string> dropdownListValue = new AdvancedDropdownList<string>();
-                List<AdvancedDropdownMetaInfo> metaInfos = new List<AdvancedDropdownMetaInfo>();
                 string[] curValues = (string[])labelDown.userData;
                 (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stacks, string _) =
                     AdvancedDropdownUtil.GetSelected(curValues.Length > 0 ? curValues[curValues.Length - 1] : "",
                         Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdownListValue);
 
+                bool hasLabels = false;
                 foreach (string label in labels)
                 {
+                    hasLabels = true;
                     dropdownListValue.Add(label, label);
                 }
+
+                if (hasLabels)
+                {
+                    dropdownListValue.AddSeparator();
+                }
+
+                dropdownListValue.Add("Edit Labels...", "");
 
                 AdvancedDropdownMetaInfo dropdownMetaInfo = new AdvancedDropdownMetaInfo
                 {
@@ -244,25 +254,25 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     true,
                     (_, curItem) =>
                     {
-                        string selected = (string)curItem;
-                        if (selected == "")
+                        string selectedValue = (string)curItem;
+                        if (selectedValue == "")
                         {
-                            AddressableUtil.
+                            AddressableUtil.OpenLabelEditor();
+                            return;
                         }
-                        int selectedValue = (int)curItem;
-                        int newMask = selectedValue == 0
-                            ? 0
-                            : EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
-                        property.intValue = newMask;
-                        property.serializedObject.ApplyModifiedProperties();
 
-                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).ButtonLabelElement.text = GetSelectedNames(metaInfo.BitValueToName, newMask);
-                        dropdownButton.userData = curItem;
-                        onValueChangedCallback(curItem);
+                        string[] newData = Array.IndexOf(curValues, selectedValue) == -1
+                            ? curValues.Append(selectedValue).ToArray()
+                            : curValues.Where(each => each != selectedValue).ToArray();
+
+                        labelDown.userData = newData;
+                        labelDown.ButtonLabelElement.text = newData.Length == 0 ? "" : string.Join(",", newData);
                     }
                 ));
             };
+
+            Debug.Log(property.propertyType);
+            Debug.Log(property.FindPropertyRelative("m_AssetGUID").stringValue);
         }
     }
 }

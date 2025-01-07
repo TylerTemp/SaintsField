@@ -8,7 +8,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
     [CustomPropertyDrawer(typeof(AddressableResourceAttribute))]
     public partial class AddressableResourceAttributeDrawer: SaintsPropertyDrawer
     {
-
     }
 }
 #endif

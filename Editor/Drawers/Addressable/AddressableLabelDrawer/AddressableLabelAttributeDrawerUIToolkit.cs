@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
                 genericDropdownMenu.AddSeparator("");
             }
 
-            genericDropdownMenu.AddItem("Edit Addressable Group...", false, AddressableUtil.OpenGroupEditor);
+            genericDropdownMenu.AddItem("Edit Labels...", false, AddressableUtil.OpenLabelEditor);
 
             genericDropdownMenu.DropDown(dropdownField.ButtonElement.worldBound, dropdownField, true);
         }
