@@ -233,12 +233,12 @@ namespace SaintsField.Editor.AutoRunner
                             foreach (Type drawerType in drawers.Where(each => each.isSaints).Select(each => each.drawerType))
                             {
                                 SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
-                                if (saintsPropertyDrawer is IAutoRunnerDrawer autoRunnerDrawer)
+                                if (saintsPropertyDrawer is IAutoRunnerFixDrawer autoRunnerDrawer)
                                 {
                                     // Debug.Log($"{property.propertyPath}/{autoRunnerDrawer}");
                                     SerializedProperty prop = property.Copy();
                                     AutoRunnerFixerResult autoRunnerResult =
-                                        autoRunnerDrawer.AutoRun(prop, memberInfo, info.parent);
+                                        autoRunnerDrawer.AutoRunFix(prop, memberInfo, info.parent);
                                     if(autoRunnerResult != null)
                                     {
                                         hasFixer = true;

@@ -168,8 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRef:
-    m_AssetGUID: ea9687beea43f0f418551ed2136a27e7
-    m_SubObjectName: ID0140ShunXinMao
+    m_AssetGUID: 674be595820f4324db32a60bc2ac207a
+    m_SubObjectName: ID10043ShuiGanLiuNiDaoWuGeng
     m_SubObjectType: UnityEngine.Sprite, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
     m_EditorAssetChanged: 1

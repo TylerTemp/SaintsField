@@ -8,7 +8,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.RequiredDrawer
 {
     [CustomPropertyDrawer(typeof(RequiredAttribute))]
-    public partial class RequiredAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerDrawer
+    public partial class RequiredAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static (string error, bool result) Truly(SerializedProperty property, MemberInfo field, object target)
         {
@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
                 : ("", ReflectUtils.Truly(curValue));
         }
 
-        public AutoRunnerFixerResult AutoRun(SerializedProperty property, MemberInfo memberInfo, object parent)
+        public AutoRunnerFixerResult AutoRunFix(SerializedProperty property, MemberInfo memberInfo, object parent)
         {
             (string curError, int _, object curValue) = Util.GetValue(property, memberInfo, parent);
             if (curError != "")

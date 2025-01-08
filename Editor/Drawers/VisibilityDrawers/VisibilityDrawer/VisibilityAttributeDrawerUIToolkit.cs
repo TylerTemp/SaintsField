@@ -1,70 +1,17 @@
-﻿using System;
+#if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.VisibilityDrawers
+namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
 {
-    public abstract class VisibilityAttributeDrawer: SaintsPropertyDrawer
+    public partial class VisibilityAttributeDrawer
     {
-        #region IMGUI
-        protected override bool GetThisDecoratorVisibility(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
-        {
-            (string error, bool shown) = IsShown(targetAttribute, property, info, target);
-            _error = error;
-            return shown;
-        }
-
-        protected abstract (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target);
-
-        private string _error = "";
-
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            FieldInfo info,
-            object parent)
-        {
-            return _error != "";
-        }
-
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
-        {
-            if (_error == "")
-            {
-                return position;
-            }
-
-            // string error = string.Join("\n\n", _errors);
-
-            (Rect errorRect, Rect leftRect) = RectUtils.SplitHeightRect(position, ImGuiHelpBox.GetHeight(_error, position.width, MessageType.Error));
-            ImGuiHelpBox.Draw(errorRect, _error, MessageType.Error);
-            return leftRect;
-        }
-
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
-            float width,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
-        {
-            // Debug.Log("check extra height!");
-            if (_error == "")
-            {
-                return 0;
-            }
-
-            // Debug.Log(HelpBox.GetHeight(_error));
-            return ImGuiHelpBox.GetHeight(string.Join("\n\n", _error), width, MessageType.Error);
-        }
-        #endregion
-
-#if UNITY_2021_3_OR_NEWER
-
-        #region UIToolkit
 
         private static string NameVisibility(SerializedProperty property, int index) => $"{property.propertyType}_{index}__Visibility";
         private static string ClassVisibility(SerializedProperty property) => $"{property.propertyType}__Visibility";
@@ -118,8 +65,24 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
             }
 
             bool curShow = container.style.display != DisplayStyle.None;
+            (string error, bool nowShow) = GetNowShowUIToolkit(property, info);
 
-            bool nowShow;
+            if (curShow != nowShow)
+            {
+                container.style.display = nowShow ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            HelpBox helpBox = container.Q<HelpBox>(NameVisibilityHelpBox(property, index));
+            // ReSharper disable once InvertIf
+            if (helpBox.text != error)
+            {
+                helpBox.text = error;
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+        }
+
+        private static (string error, bool show) GetNowShowUIToolkit(SerializedProperty property, FieldInfo info)
+        {
             (ShowIfAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ShowIfAttribute>(property);
 
             List<bool> showOrResults = new List<bool>();
@@ -140,30 +103,14 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
 
             if (error != "")
             {
-                nowShow = true;
-            }
-            else
-            {
-                Debug.Assert(showOrResults.Count > 0);
-                nowShow = showOrResults.Any(each => each);
+                return (error, true);
             }
 
-            if (curShow != nowShow)
-            {
-                container.style.display = nowShow ? DisplayStyle.Flex : DisplayStyle.None;
-            }
-
-            HelpBox helpBox = container.Q<HelpBox>(NameVisibilityHelpBox(property, index));
-            // ReSharper disable once InvertIf
-            if (helpBox.text != error)
-            {
-                helpBox.text = error;
-                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-            }
+            Debug.Assert(showOrResults.Count > 0);
+            return ("", showOrResults.Any(each => each));
         }
 
-        #endregion
 
-#endif
     }
 }
+#endif
