@@ -136,6 +136,8 @@ namespace SaintsField.Editor.AutoRunner
             }
         }
 
+        [Ordered, LeftToggle] public bool skipHiddenFields;
+
         private IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _typeToDrawer;
 
         [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(ResourceTotal)), BelowInfoBox("$" + nameof(_processingMessage))] public int processing;
@@ -223,8 +225,16 @@ namespace SaintsField.Editor.AutoRunner
                             .OfType<PropertyAttribute>()
                             .Where(each => each is ISaintsAttribute)
                             .ToArray();
+
+                        List<AutoRunnerResult> autoRunnerResults = new List<AutoRunnerResult>();
+                        bool skipThisField = false;
                         foreach (PropertyAttribute saintsPropertyAttribute in saintsAttribute)
                         {
+                            if (skipThisField)
+                            {
+                                break;
+                            }
+
                             if (!_typeToDrawer.TryGetValue(saintsPropertyAttribute.GetType(), out IReadOnlyList<(bool isSaints, Type drawerType)> drawers))
                             {
                                 continue;
@@ -233,6 +243,19 @@ namespace SaintsField.Editor.AutoRunner
                             foreach (Type drawerType in drawers.Where(each => each.isSaints).Select(each => each.drawerType))
                             {
                                 SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
+
+                                if(skipHiddenFields && saintsPropertyDrawer is IAutoRunnerSkipDrawer skipDrawer)
+                                {
+                                    if(skipDrawer.AutoRunnerSkip(property, memberInfo, info.parent))
+                                    {
+                                        Debug.Log($"#AutoRunner# skip {target}/{property.propertyPath}");
+                                        autoRunnerResults.Clear();
+                                        skipThisField = true;
+                                        break;
+                                    }
+                                }
+
+                                // ReSharper disable once InvertIf
                                 if (saintsPropertyDrawer is IAutoRunnerFixDrawer autoRunnerDrawer)
                                 {
                                     // Debug.Log($"{property.propertyPath}/{autoRunnerDrawer}");
@@ -241,7 +264,6 @@ namespace SaintsField.Editor.AutoRunner
                                         autoRunnerDrawer.AutoRunFix(prop, memberInfo, info.parent);
                                     if(autoRunnerResult != null)
                                     {
-                                        hasFixer = true;
                                         _processingMessage =
                                             $"Fixer found for {target}/{so.targetObject}: {autoRunnerResult}";
                                         Debug.Log($"#AutoRunner# {_processingMessage}");
@@ -265,7 +287,7 @@ namespace SaintsField.Editor.AutoRunner
                                             mainTargetIsAssetPath = true;
                                         }
 
-                                        results.Add(new AutoRunnerResult
+                                        autoRunnerResults.Add(new AutoRunnerResult
                                         {
                                             FixerResult = autoRunnerResult,
                                             mainTargetString = mainTargetString,
@@ -278,6 +300,11 @@ namespace SaintsField.Editor.AutoRunner
                                     }
                                 }
                             }
+                        }
+                        results.AddRange(autoRunnerResults);
+                        if (autoRunnerResults.Count > 0)
+                        {
+                            hasFixer = true;
                         }
                     }
 

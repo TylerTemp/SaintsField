@@ -7,11 +7,11 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
 {
     public partial class VisibilityAttributeDrawer
     {
-        protected abstract (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target);
+        // protected abstract (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target);
 
         protected override bool GetThisDecoratorVisibility(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
         {
-            (string error, bool shown) = IsShown(targetAttribute, property, info, target);
+            (string error, bool shown) = GetShow(property, info);
             _error = error;
             return shown;
         }

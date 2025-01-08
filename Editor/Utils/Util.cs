@@ -426,7 +426,7 @@ namespace SaintsField.Editor.Utils
         //         : ("", ReflectUtils.Truly(value));
         // }
 
-        public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
+        public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
         {
             if (target == null)
             {
@@ -467,7 +467,7 @@ namespace SaintsField.Editor.Utils
                         }
                         else
                         {
-                            (string error, int arrayIndex, object curValue) = GetValue(property, fieldInfo, target);
+                            (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, target);
                             if (error != "")
                             {
                                 return (error, defaultValue);
@@ -736,7 +736,7 @@ namespace SaintsField.Editor.Utils
             );
         }
 
-        public static (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) ConditionChecker(IEnumerable<ConditionInfo> conditionInfos, SerializedProperty property, FieldInfo info, object target)
+        public static (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) ConditionChecker(IEnumerable<ConditionInfo> conditionInfos, SerializedProperty property, MemberInfo info, object target)
         {
             List<bool> callbackBoolResults = new List<bool>();
             List<string> errors = new List<string>();

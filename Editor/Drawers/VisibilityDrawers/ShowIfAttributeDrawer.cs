@@ -11,13 +11,13 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers
     [CustomPropertyDrawer(typeof(ShowIfAttribute))]
     public class ShowIfAttributeDrawer: VisibilityAttributeDrawer
     {
-        protected override (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
-        {
-            return HelperShowIfIsShown(targetAttribute.ConditionInfos, property, info, target);
-        }
+        // protected override (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
+        // {
+        //     return HelperShowIfIsShown(targetAttribute.ConditionInfos, property, info, target);
+        // }
 
         public static (string error, bool shown) HelperShowIfIsShown(IEnumerable<ConditionInfo> conditionInfos,
-            SerializedProperty property, FieldInfo info, object target)
+            SerializedProperty property, MemberInfo info, object target)
         {
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(conditionInfos, property, info, target);
 
