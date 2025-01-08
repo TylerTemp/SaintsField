@@ -91,6 +91,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 name = ActionAreaName(property),
                 style =
                 {
+                    display = DisplayStyle.None,
+
                     backgroundColor = EColor.EditorEmphasized.GetColor(),
                     paddingTop = 4,
                     paddingBottom = 4,
