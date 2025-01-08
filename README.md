@@ -4275,7 +4275,7 @@ using SaintsField.Addressable;
 public string addressableLabel;
 ```
 
-![addressable_label](https://github.com/TylerTemp/SaintsField/assets/6391063/c0485d73-0f5f-4748-9684-d16f712e00e9)
+![addressable_label](https://github.com/user-attachments/assets/55122753-7247-42a1-8743-ffec6e60e6ef)
 
 ### `AddressableAddress` ###
 
@@ -4309,6 +4309,21 @@ public string addressLabelAnd;
 ```
 
 ![addressable_address](https://github.com/TylerTemp/SaintsField/assets/6391063/5646af00-c167-4131-be06-7e0b8e9b102e)
+
+### `AddressableResource` ###
+
+A simple inline editor for `AssetReference` field.
+
+This tool allows you to add/edit/delete an addressable asset's address, label, and group, without opening the `Addressable` window.
+
+*   Allow Multiple: No
+
+```csharp
+[AddressableResource]
+public AssetReferenceSprite spriteRef;
+```
+
+
 
 ## AI Navigation ##
 
