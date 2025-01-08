@@ -4,6 +4,9 @@ using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
+using UnityEngine.AddressableAssets;
+#endif
 
 namespace SaintsField.Editor.Drawers.RequiredDrawer
 {
@@ -15,7 +18,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
             (string curError, int _, object curValue) = Util.GetValue(property, field, target);
             return curError != ""
                 ? (curError, false)
-                : ("", ReflectUtils.Truly(curValue));
+                : ("", string.IsNullOrEmpty(ValidateValue(curValue)));
         }
 
         public AutoRunnerFixerResult AutoRunFix(SerializedProperty property, MemberInfo memberInfo, object parent)
@@ -31,7 +34,8 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
                 };
             }
 
-            if (ReflectUtils.Truly(curValue))
+            string validateInfo = ValidateValue(curValue);
+            if (string.IsNullOrEmpty(validateInfo))
             {
                 return null;
             }
@@ -39,10 +43,41 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
             return new AutoRunnerFixerResult
             {
                 CanFix = false,
-                Error = $"{property.displayName} is required ({property.propertyPath})",
+                Error = $"{property.displayName}({property.propertyPath}): {validateInfo}",
                 ExecError = "",
             };
         }
+
+        private static string ValidateValue(object curValue)
+        {
+            if (ReflectUtils.Truly(curValue))
+            {
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
+                if (curValue is AssetReference ar)
+                {
+                    return ValidateAddresable(ar);
+                }
+#endif
+
+                return "";
+            }
+
+
+
+            return $"Target `{curValue}` is not a truly value";
+        }
+
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
+        private static string ValidateAddresable(AssetReference ar)
+        {
+            if (ar.editorAsset == null)
+            {
+                return $"AssetReference is null";
+            }
+
+            return "";
+        }
+#endif
 
         private struct MetaInfo
         {

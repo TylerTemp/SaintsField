@@ -244,15 +244,14 @@ namespace SaintsField.Editor.AutoRunner
                             {
                                 SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
 
-                                if(skipHiddenFields && saintsPropertyDrawer is IAutoRunnerSkipDrawer skipDrawer)
+                                if(skipHiddenFields
+                                   && saintsPropertyDrawer is IAutoRunnerSkipDrawer skipDrawer
+                                   && skipDrawer.AutoRunnerSkip(property, memberInfo, info.parent))
                                 {
-                                    if(skipDrawer.AutoRunnerSkip(property, memberInfo, info.parent))
-                                    {
-                                        Debug.Log($"#AutoRunner# skip {target}/{property.propertyPath}");
-                                        autoRunnerResults.Clear();
-                                        skipThisField = true;
-                                        break;
-                                    }
+                                    // Debug.Log($"#AutoRunner# skip {target}/{property.propertyPath}");
+                                    autoRunnerResults.Clear();
+                                    skipThisField = true;
+                                    break;
                                 }
 
                                 // ReSharper disable once InvertIf

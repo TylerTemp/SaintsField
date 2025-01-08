@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
                 return true;
             }
 
-            return show;
+            return !show;
         }
 
         private static (string error, bool show) GetShow(SerializedProperty property, MemberInfo info)
