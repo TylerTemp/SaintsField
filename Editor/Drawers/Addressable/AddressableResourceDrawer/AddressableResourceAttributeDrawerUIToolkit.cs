@@ -142,6 +142,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 style =
                 {
                     flexGrow = 1,
+                    flexShrink = 1,
                     // borderTopRightRadius = 0,
                     // borderBottomRightRadius = 0,
                 },
@@ -418,6 +419,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 AddressableAssetEntry entry = settings.FindAssetEntry(AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(curObj)).ToString());
                 if(entry == null)
                 {
+                    nameInput.value = GetObjectName((string)nameButton.userData, curObj);
                     return;
                 }
 

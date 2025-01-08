@@ -1,6 +1,12 @@
 # Changelog
 
-## 3.14.0 ##
+## 3.15.0 ##
+
+1.  UI Toolkit: Add `AddressableResource` for `AssetReference` inline editing
+2.  Using `Required` on addressable's `AssetReference` will check if the target asset is valid
+3.  UI Toolkit: `AutoRunner` now can specify if you want to skip the hidden fields (hidden by `ShowIf`, `HideIf`. Not work for `LayoutShowIf`, `LayoutHideIf`)
+
+## 3.14.1 ##
 
 1.  Overhaul the auto getters. This might be related to [#102](https://github.com/TylerTemp/SaintsField/issues/102).
 

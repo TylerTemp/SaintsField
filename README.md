@@ -77,42 +77,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.14.0**
+**3.15.0**
 
-1.  Overhaul the auto getters. This might be related to [#102](https://github.com/TylerTemp/SaintsField/issues/102).
-
-    The issue is because, usually you can just `SerializedProperty.SerializedObject.ApplyModifiedProperties()`. However, if the serialized target is newly created, this behavior will fail, for no good reason. This behavior is not documented in Unity's API.
-
-    To resolve this, UI Toolkit will delay the action a bit later. IMGUI will attempt multiple times.
-
-    This version also makes the auto getters for list not depending on the first element drawer. This means three things:
-
-    1.  When working with `ListDrawerSettings`, search function will not trigger the auto getters re-running.
-    2.  Draging element in list will not cause any troubles now. But the value will swap back once auto getters auto updated. (auto updating is depended on your configuration)
-    3.  Better performance, especially for IMGUI.
-
-2.  UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Runner`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
-
-    This tool allows you to check if some target has `Required` but not filled. You can specify the targets as you want. Currently, it supports scenes, and folder searching.
-
-    This tool is very simple, and will get more update in the future.
-
-    This tool is only available for UI Toolkit at the moment.
-
-3.  **Breaking Changes**: If you use `IWrapProp`, you need to change
-
-    ```csharp
-    // an auto getter
-    private string EditorPropertyName => nameof(myField);
-    ```
-
-    to
-
-    ```csharp
-    // a static field (private or public, with or without readonly)
-    private static readonly string EditorPropertyName = nameof(myField);
-    ```
-
+1.  UI Toolkit: Add `AddressableResource` for `AssetReference` inline editing
+2.  Using `Required` on addressable's `AssetReference` will check if the target asset is valid
+3.  UI Toolkit: `AutoRunner` now can specify if you want to skip the hidden fields (hidden by `ShowIf`, `HideIf`. Not work for `LayoutShowIf`, `LayoutHideIf`)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2430,6 +2399,8 @@ This will check if the field value is a `truly` value, which means:
 2.  It works on reference type and will NOT skip Unity's life-circle null check
 3.  You may not want to use it on `int`, `float` (because only `0` is not `truly`) or `bool`, but it's still allowed if you insist
 
+If you have addressable installed, using `Required` on addressable's `AssetReference` will check if the target asset is valid
+
 Parameters:
 
 *   `string errorMessage = null` Error message. Default is `{label} is required`
@@ -4323,7 +4294,7 @@ This tool allows you to add/edit/delete an addressable asset's address, label, a
 public AssetReferenceSprite spriteRef;
 ```
 
-
+[![video](https://github.com/user-attachments/assets/7cd6d490-6551-4a51-b1e8-0fbff41ac519)](https://github.com/user-attachments/assets/48601cc1-85c5-487f-b87e-94531517f849)
 
 ## AI Navigation ##
 
@@ -5013,6 +4984,8 @@ Note: `csc.rsp` can override settings by Saints Menu.
 UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Runner`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
 
 This tool allows you to check if some target has `Required` but not filled. You can specify the targets as you want. Currently, it supports scenes, and folder searching.
+
+It can also specify if you want to skip the hidden fields (hidden by `ShowIf`, `HideIf`. Not work for `LayoutShowIf`, `LayoutHideIf`)
 
 This tool is very simple, and will get more update in the future.
 
