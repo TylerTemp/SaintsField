@@ -1,17 +1,18 @@
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.GUI;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+// using UnityEngine.AddressableAssets;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -21,15 +22,38 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
 {
     public partial class AddressableResourceAttributeDrawer
     {
-        private static string ButtonName(SerializedProperty property) =>
+        private static string ToggleButtonName(SerializedProperty property) =>
             $"{property.propertyPath}__AddressableResource_Button";
         private static string HelpBoxName(SerializedProperty property) =>
             $"{property.propertyPath}__AddressableResource_HelpBox";
 
+        private static string ActionAreaName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_ActionArea";
         private static string GroupDownName(SerializedProperty property) =>
             $"{property.propertyPath}__AddressableResource_Group";
         private static string LabelDownName(SerializedProperty property) =>
             $"{property.propertyPath}__AddressableResource_Label";
+        private static string ResourceObjectName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_Resource";
+
+        private static string NameInputContainerName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_NameInputContainer";
+
+        private static string NameInputName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_Name";
+        private static string NameButtonName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_NameButton";
+
+        private static string SaveButtonName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_SaveButton";
+
+        private static string DeleteButtonName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_DeleteButton";
+
+        private static string CheckButtonName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_CheckButton";
+        public static string CloseButtonName(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableResource_CloseButton";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
@@ -38,7 +62,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             {
                 style =
                 {
-                    backgroundImage = Util.LoadResource<Texture2D>("folder.png"),
+                    backgroundImage = Util.LoadResource<Texture2D>("pencil.png"),
 #if UNITY_2022_2_OR_NEWER
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
@@ -50,16 +74,21 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     paddingLeft = 8,
                     paddingRight = 8,
                 },
-                name = ButtonName(property),
+                name = ToggleButtonName(property),
             };
             return button;
         }
 
+        private bool _isSprite;
+
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement root = new VisualElement
+            VisualElement root = new VisualElement();
+
+            VisualElement actionArea = new VisualElement
             {
+                name = ActionAreaName(property),
                 style =
                 {
                     backgroundColor = EColor.EditorEmphasized.GetColor(),
@@ -69,11 +98,16 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     paddingRight = 8,
                 },
             };
-
-            VisualElement actionArea = new VisualElement();
             root.Add(actionArea);
 
-            ObjectField objField = new ObjectField("Resource");
+            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            _isSprite = typeof(AssetReferenceSprite).IsAssignableFrom(fieldType);
+
+            ObjectField objField = new ObjectField("Resource")
+            {
+                objectType = _isSprite? typeof(Sprite): typeof(Object),
+                name = ResourceObjectName(property),
+            };
             objField.AddToClassList(ClassAllowDisable);
             objField.AddToClassList(BaseField<Object>.alignedFieldUssClassName);
             actionArea.Add(objField);
@@ -91,6 +125,56 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             dropdownLabel.AddToClassList(ClassAllowDisable);
             actionArea.Add(dropdownLabel);
 
+            VisualElement nameInputContainer = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexDirection = FlexDirection.Row,
+                },
+                name = NameInputContainerName(property),
+            };
+            TextField nameInput = new TextField("Name")
+            {
+                name = NameInputName(property),
+                style =
+                {
+                    flexGrow = 1,
+                    // borderTopRightRadius = 0,
+                    // borderBottomRightRadius = 0,
+                },
+            };
+            nameInput.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/TextFieldRightNoRadius.uss"));
+            nameInput.AddToClassList(ClassAllowDisable);
+            nameInput.AddToClassList(BaseField<string>.alignedFieldUssClassName);
+            nameInputContainer.Add(nameInput);
+
+            Button nameButton = new Button
+            {
+                style =
+                {
+                    width = SingleLineHeight,
+                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown.png"),
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(SingleLineHeight - 4, SingleLineHeight),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
+                    marginLeft = 0,
+                    marginRight = 0,
+                    borderLeftWidth = 0,
+                },
+                name = NameButtonName(property),
+            };
+            nameInputContainer.Add(nameButton);
+
+            actionArea.Add(nameInputContainer);
+
             VisualElement buttons = new VisualElement
             {
                 style =
@@ -100,6 +184,24 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     height = SingleLineHeight,
                 },
             };
+            buttons.Add(new Button
+            {
+                style =
+                {
+                    // flexGrow = 1,
+                    backgroundImage = Util.LoadResource<Texture2D>("save.png"),
+                    unityBackgroundImageTintColor = Color.green,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                },
+                name = SaveButtonName(property),
+            });
             buttons.Add(new Button
             {
                 style =
@@ -116,6 +218,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                 },
+                name = DeleteButtonName(property),
             });
 
             buttons.Add(new VisualElement
@@ -141,6 +244,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                 },
+                name = CheckButtonName(property),
             });
 
             buttons.Add(new Button
@@ -158,6 +262,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
                 },
+                name = CloseButtonName(property),
             });
             actionArea.Add(buttons);
 
@@ -178,14 +283,20 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
-            Button button = container.Q<Button>(ButtonName(property));
+            Button toggleButton = container.Q<Button>(ToggleButtonName(property));
             if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
             {
                 helpBox.text = "No addressable config found. Please create one.";
-                button.SetEnabled(false);
+                toggleButton.SetEnabled(false);
                 // EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
                 return;
             }
+
+            VisualElement actionArea = container.Q<VisualElement>(ActionAreaName(property));
+            toggleButton.clicked += () => actionArea.style.display = actionArea.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None;
+
+            // Debug.Log(info.FieldType);
+            ObjectField objField = container.Q<ObjectField>(ResourceObjectName(property));
 
             UIToolkitUtils.DropdownButtonField groupDown = container.Q<UIToolkitUtils.DropdownButtonField>(GroupDownName(property));
             groupDown.ButtonElement.clicked += () =>
@@ -271,10 +382,214 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 ));
             };
 
-            Debug.Log(property.propertyType);
-            Debug.Log(property.FindPropertyRelative("m_AssetGUID").stringValue);
+            // Debug.Log(property.propertyType);
+            // Debug.Log(property.FindPropertyRelative("m_AssetGUID").stringValue);
+
+            VisualElement nameInputContainer = container.Q<VisualElement>(NameInputContainerName(property));
+            TextField nameInput = nameInputContainer.Q<TextField>(NameInputName(property));
+            Button nameButton = nameInputContainer.Q<Button>(NameButtonName(property));
+            nameButton.userData = "File Path";
+            nameButton.clicked += () =>
+            {
+                GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+                foreach (string nameType in new[]{"File Path", "File Name Base", "File Name", "GUID"})
+                {
+                    genericDropdownMenu.AddItem(nameType, false, () =>
+                    {
+                        nameButton.userData = nameType;
+                        Object curObj = objField.value;
+                        if (curObj == null)
+                        {
+                            return;
+                        }
+
+                        nameInput.value = GetObjectName(nameType, curObj);
+                    });
+                }
+                genericDropdownMenu.DropDown(nameInputContainer.worldBound, nameInputContainer, true);
+            };
+
+            objField.RegisterValueChangedCallback(evt =>
+            {
+                Object curObj = evt.newValue;
+                AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+                AddressableAssetEntry entry = settings.FindAssetEntry(AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(curObj)).ToString());
+                if(entry == null)
+                {
+                    return;
+                }
+
+                groupDown.ButtonLabelElement.text = entry.parentGroup.Name;
+                labelDown.userData = entry.labels.ToArray();
+                labelDown.ButtonLabelElement.text = string.Join(",", entry.labels);
+                nameInput.value = entry.address;
+            });
+
+            Button saveButton = container.Q<Button>(SaveButtonName(property));
+            saveButton.clicked += () => SaveToAddressable();
+            Button deleteButton = container.Q<Button>(DeleteButtonName(property));
+            deleteButton.clicked += () =>
+            {
+                Object curObj = objField.value;
+                if (curObj == null)
+                {
+                    return;
+                }
+
+                AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+                string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(curObj));
+                settings.RemoveAssetEntry(guid);
+
+                objField.value = null;
+                groupDown.ButtonLabelElement.text = "";
+                labelDown.userData = Array.Empty<string>();
+                labelDown.ButtonLabelElement.text = "";
+                nameInput.value = "";
+            };
+
+            Button checkButton = container.Q<Button>(CheckButtonName(property));
+            checkButton.clicked += () =>
+            {
+                (string guid, Object target) = SaveToAddressable();
+                if (string.IsNullOrEmpty(guid))
+                {
+                    return;
+                }
+
+                property.FindPropertyRelative("m_AssetGUID").stringValue = guid;
+
+
+                // sub asset
+                if (_isSprite && target is Sprite sprite)
+                {
+                    property.FindPropertyRelative("m_SubObjectName").stringValue = sprite.name;
+                    property.FindPropertyRelative("m_SubObjectType").stringValue = typeof(Sprite).AssemblyQualifiedName;
+                }
+
+                property.serializedObject.ApplyModifiedProperties();
+                CloseActionArea();
+            };
+
+            Button closeButton = container.Q<Button>(CloseButtonName(property));
+            closeButton.clicked += CloseActionArea;
+
+            string guid = property.FindPropertyRelative("m_AssetGUID").stringValue;
+            // ReSharper disable once InvertIf
+            if (!string.IsNullOrEmpty(guid))
+            {
+                Object curObj = AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(guid));
+                if (curObj != null)
+                {
+                    UpdateValue(property, container, curObj);
+                }
+            }
+
+            return;
+
+            (string guid, Object target) SaveToAddressable() {
+                Object curObj = objField.value;
+                if (curObj == null)
+                {
+                    return (null, null);
+                }
+
+                AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+
+                string groupName = groupDown.ButtonLabelElement.text;
+                AddressableAssetGroup group = settings.groups.FirstOrDefault(each => each.Name == groupName);
+
+                string curGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(curObj));
+                AddressableAssetEntry entry = settings.CreateOrMoveEntry(curGuid, group);
+                entry.address = nameInput.value;
+                foreach (string label in (IReadOnlyList<string>)labelDown.userData)
+                {
+                    entry.SetLabel(label, true);
+                }
+
+                return (curGuid, curObj);
+            }
+
+            void CloseActionArea()
+            {
+                actionArea.style.display = DisplayStyle.None;
+            }
         }
+
+        private static string GetObjectName(string nameType, Object curObj)
+        {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (nameType)
+            {
+                case "File Path":
+                    return AssetDatabase.GetAssetPath(curObj);
+                case "File Name Base":
+                    return Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(curObj));
+                case "File Name":
+                    return Path.GetFileName(AssetDatabase.GetAssetPath(curObj));
+                case "GUID":
+                    return AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(curObj));
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(nameType), nameType, null);
+            }
+        }
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
+        {
+            UpdateValue(property, container, ((AssetReference)newValue).editorAsset);
+        }
+
+        private static void UpdateValue(SerializedProperty property, VisualElement container, Object newTarget)
+        {
+            // Debug.Log(newTarget);
+            HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
+
+            ObjectField objField = container.Q<ObjectField>(ResourceObjectName(property));
+            UIToolkitUtils.DropdownButtonField groupDown = container.Q<UIToolkitUtils.DropdownButtonField>(GroupDownName(property));
+            UIToolkitUtils.DropdownButtonField labelDown = container.Q<UIToolkitUtils.DropdownButtonField>(LabelDownName(property));
+
+            VisualElement nameInputContainer = container.Q<VisualElement>(NameInputContainerName(property));
+            TextField nameInput = nameInputContainer.Q<TextField>(NameInputName(property));
+
+            if (helpBox.style.display != DisplayStyle.None)
+            {
+                helpBox.style.display = DisplayStyle.None;
+            }
+
+            bool notInAddressable = newTarget == null;
+            AddressableAssetEntry entry = null;
+            if (!notInAddressable)
+            {
+                AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+                // AssetReference assetRef = (AssetReference)newValue;
+                string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(newTarget));
+                entry = settings.FindAssetEntry(guid);
+                // Debug.Log($"{entry}/{guid}/{newTarget}");
+                notInAddressable = entry == null;
+            }
+
+            if (notInAddressable)
+            {
+                objField.value = null;
+                groupDown.ButtonLabelElement.text = "";
+                labelDown.userData = Array.Empty<string>();
+                labelDown.ButtonLabelElement.text = "";
+                nameInput.value = "";
+                return;
+            }
+
+            objField.value = newTarget;
+            groupDown.ButtonLabelElement.text = entry.parentGroup.Name;
+            labelDown.userData = entry.labels.ToArray();
+            labelDown.ButtonLabelElement.text = string.Join(",", entry.labels);
+            nameInput.value = entry.address;
+        }
+
+
+
     }
+
+
 }
 
 #endif

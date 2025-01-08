@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         public static void OpenGroupEditor() => EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
         public static void OpenLabelEditor()
         {
-            LabelWindow window = UnityEditor.EditorWindow.GetWindow<LabelWindow>();
+            LabelWindow window = EditorWindow.GetWindow<LabelWindow>();
             window.Intialize(AddressableAssetSettingsDefaultObject.GetSettings(false));
             window.Show();
         }

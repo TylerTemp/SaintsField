@@ -195,7 +195,7 @@ namespace SaintsField.Editor.Core
                 // {
                 //     Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
                 // });
-                VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property);
+                VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, saintsPropertyDrawers);
                 fallback.AddToClassList(ClassFieldUIToolkit(property));
                 fieldContainer.Add(fallback);
                 containerElement.visible = false;
@@ -336,7 +336,7 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static VisualElement UnityFallbackUIToolkit(FieldInfo fieldInfo, SerializedProperty property)
+        private static VisualElement UnityFallbackUIToolkit(FieldInfo fieldInfo, SerializedProperty property, VisualElement containerElement, IEnumerable<SaintsPropertyInfo> saintsPropertyDrawers)
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
@@ -368,6 +368,26 @@ namespace SaintsField.Editor.Core
                 Debug.Assert(imGuiGetPropertyHeightMethod != null);
                 Debug.Assert(imGuiOnGUIMethodInfo != null);
 
+                Action<object> onValueChangedCallback = null;
+                onValueChangedCallback = (object value) =>
+                {
+                    object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                    if (newFetchParent == null)
+                    {
+                        Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                        return;
+                    }
+
+                    foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
+                    {
+                        saintsPropertyInfo.Drawer.OnValueChanged(
+                            property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement,
+                            fieldInfo, newFetchParent,
+                            onValueChangedCallback,
+                            value);
+                    }
+                };
+
                 IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
 
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
@@ -376,14 +396,34 @@ namespace SaintsField.Editor.Core
                         ? GUIContent.none
                         : new GUIContent(imguiLabelHelper.RichLabel);
 
-                    float height =
-                        (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
-                    Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
 
                     using(new ImGuiFoldoutStyleRichTextScoop())
                     using(new ImGuiLabelStyleRichTextScoop())
+                    using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                     {
+                        float height =
+                            (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
+                        Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
                         imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
+
+                        // Debug.Log(changed.changed);
+
+                        // ReSharper disable once InvertIf
+                        if (changed.changed)
+                        {
+                            object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                            if (newFetchParent == null)
+                            {
+                                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                                return;
+                            }
+
+                            (string error, int _, object value) = Util.GetValue(property, fieldInfo, newFetchParent);
+                            if (error == "")
+                            {
+                                onValueChangedCallback(value);
+                            }
+                        }
                     }
                 })
                 {
@@ -426,9 +466,9 @@ namespace SaintsField.Editor.Core
 
         }
 
-        private static StyleSheet noDecoratorDrawer;
+        private static StyleSheet _noDecoratorDrawer;
 
-                private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
+        private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
             object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
@@ -820,9 +860,9 @@ namespace SaintsField.Editor.Core
 
         protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property)
         {
-            if (noDecoratorDrawer == null)
+            if (_noDecoratorDrawer == null)
             {
-                noDecoratorDrawer = Util.LoadResource<StyleSheet>("UIToolkit/NoDecoratorDrawer.uss");
+                _noDecoratorDrawer = Util.LoadResource<StyleSheet>("UIToolkit/NoDecoratorDrawer.uss");
             }
 
             // PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
@@ -837,7 +877,7 @@ namespace SaintsField.Editor.Core
 
             // propertyField.AddToClassList(SaintsFieldFallbackClass);
             propertyField.AddToClassList(ClassAllowDisable);
-            propertyField.styleSheets.Add(noDecoratorDrawer);
+            propertyField.styleSheets.Add(_noDecoratorDrawer);
             // propertyField.AddToClassList("unity-base-field__aligned");
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;
