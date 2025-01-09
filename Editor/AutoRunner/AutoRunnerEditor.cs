@@ -17,7 +17,7 @@ namespace SaintsField.Editor.AutoRunner
 {
     public class AutoRunnerEditor: SaintsEditorWindowSpecialEditor
     {
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private class ResultsRenderer: SerializedFieldRenderer
         {
             private readonly AutoRunnerWindow _autoRunner;

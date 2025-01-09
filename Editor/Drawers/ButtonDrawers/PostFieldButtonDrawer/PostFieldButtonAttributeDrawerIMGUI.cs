@@ -1,23 +1,16 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
-using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
 {
-
-    [CustomPropertyDrawer(typeof(PostFieldButtonAttribute))]
-    public class PostFieldButtonAttributeDrawer: DecButtonAttributeDrawer
+    public partial class PostFieldButtonAttributeDrawer
     {
         private const float PaddingWidth = 3f;
-
-        #region IMGUI
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
@@ -25,8 +18,9 @@ namespace SaintsField.Editor.Drawers
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute)saintsAttribute;
 
             object target = property.serializedObject.targetObject;
-            (string xmlError, string labelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, target);
-            GetOrCreateErrorInfo(property).Error = xmlError;
+            (string xmlError, string labelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel,
+                decButtonAttribute.IsCallback, info, target);
+            GetOrCreateButtonInfo(property).Error = xmlError;
 
             IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -47,7 +41,8 @@ namespace SaintsField.Editor.Drawers
                 richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, info, parent).ToArray();
             }
 
-            return PaddingWidth * 2 + Mathf.Min(position.width, Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, richChunks)));
+            return PaddingWidth * 2 + Mathf.Min(position.width,
+                Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, richChunks)));
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
@@ -84,38 +79,5 @@ namespace SaintsField.Editor.Drawers
                 ? position
                 : ImGuiHelpBox.Draw(position, displayError, MessageType.Error);
         }
-
-        #endregion
-
-#if UNITY_2021_3_OR_NEWER
-
-        #region UIToolkit
-
-        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
-        {
-            VisualElement element = DrawUIToolkit(property, saintsAttribute, index, info, parent, container);
-            element.style.flexGrow = StyleKeyword.Null;
-            return element;
-        }
-
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
-        {
-            VisualElement visualElement = new VisualElement
-            {
-                style =
-                {
-                    flexGrow = 1,
-                },
-            };
-            visualElement.Add(DrawLabelError(property, index));
-            visualElement.Add(DrawExecError(property, index));
-            return visualElement;
-        }
-
-        #endregion
-
-#endif
     }
 }

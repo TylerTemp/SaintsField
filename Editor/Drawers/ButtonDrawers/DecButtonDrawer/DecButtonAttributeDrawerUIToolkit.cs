@@ -1,144 +1,18 @@
-﻿using System;
+#if UNITY_2021_3_OR_NEWER
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEditor.PackageManager;
-using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 {
-    public abstract class DecButtonAttributeDrawer: SaintsPropertyDrawer
+    public partial class DecButtonAttributeDrawer
     {
-        protected class ErrorInfo
-        {
-            public string Error = "";
-            public string ExecError = "";
-        }
 
-        private static readonly Dictionary<string, ErrorInfo> ImGuiSharedErrorInfo = new Dictionary<string, ErrorInfo>();
-
-#if UNITY_2019_2_OR_NEWER
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-#endif
-        [InitializeOnLoadMethod]
-        private static void ImGuiClearSharedData() => ImGuiSharedErrorInfo.Clear();
-
-        protected static string GetDisplayError(SerializedProperty property)
-        {
-            string key = SerializedUtils.GetUniqueId(property);
-            if (!ImGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
-            {
-                return "";
-            }
-
-            string error = errorInfo.Error;
-            string execError = errorInfo.ExecError;
-
-            if (error != "" && execError != "")
-            {
-                return $"{error}\n\n{execError}";
-            }
-            return $"{error}{execError}";
-        }
-
-        protected static ErrorInfo GetOrCreateErrorInfo(SerializedProperty property)
-        {
-            string key = SerializedUtils.GetUniqueId(property);
-            if (!ImGuiSharedErrorInfo.TryGetValue(key, out ErrorInfo errorInfo))
-            {
-                errorInfo = new ErrorInfo
-                {
-                    Error = "",
-                    ExecError = "",
-                };
-                ImGuiSharedErrorInfo[key] = errorInfo;
-            }
-
-            return errorInfo;
-        }
-
-        // ReSharper disable once InconsistentNaming
-        protected readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            RichTextDrawer.Dispose();
-        }
-
-        #region IMGUI
-        protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object target)
-        {
-            DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
-
-            (Rect buttonRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
-
-            // object target = GetParentTarget(property);
-            (string xmlError, string buttonLabelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel, decButtonAttribute.IsCallback, info, target);
-            // Error = xmlError;
-            if (xmlError != "")
-            {
-                GetOrCreateErrorInfo(property).Error = xmlError;
-            }
-
-            if (GUI.Button(buttonRect, string.Empty))
-            {
-                GetOrCreateErrorInfo(property).ExecError = CallButtonFunc(property, decButtonAttribute, info, target).error;
-            }
-
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if (buttonLabelXml is null)
-            {
-                buttonLabelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
-                richChunks = new[]
-                {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = false,
-                        Content = buttonLabelXml,
-                    },
-                };
-            }
-            else
-            {
-                richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text, info, target).ToArray();
-            }
-
-            // GetWidth
-            float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
-            Rect labelRect = buttonRect;
-            // EditorGUI.DrawRect(labelRect, Color.blue);
-            if (textWidth < labelRect.width)
-            {
-                float space = (labelRect.width - textWidth) / 2f;
-                labelRect.x += space;
-                labelRect.width -= space;
-                // EditorGUI.DrawRect(labelRect, Color.yellow);
-            }
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
-            RichTextDrawer.DrawChunks(labelRect, label, richChunks);
-
-            return leftRect;
-
-        }
-        #endregion
-
-        private static (string error, object result) CallButtonFunc(SerializedProperty property, DecButtonAttribute decButtonAttribute, FieldInfo fieldInfo, object target)
-        {
-            return Util.GetMethodOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target);
-            // return error;
-        }
-
-#if UNITY_2021_3_OR_NEWER
-
-        #region UIToolkit
 
         // private static string ClassButton(SerializedProperty property) => $"{property.propertyPath}__Button";
         private static string ClassLabelContainer(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__LabelContainer";
@@ -261,9 +135,6 @@ namespace SaintsField.Editor.Drawers
                 labelContainer.Add(visualElement);
             }
         }
-
-        #endregion
-
-#endif
     }
 }
+#endif
