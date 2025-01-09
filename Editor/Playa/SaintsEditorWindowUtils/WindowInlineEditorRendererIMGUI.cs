@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             throw new System.NotSupportedException();
         }
 
-        protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
+        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             throw new System.NotSupportedException();
         }

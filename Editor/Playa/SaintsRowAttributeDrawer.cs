@@ -174,7 +174,7 @@ namespace SaintsField.Editor.Playa
                         y = yAcc,
                         height = height,
                     };
-                    saintsRenderer.RenderPosition(rect);
+                    saintsRenderer.RenderPositionIMGUI(rect);
                     yAcc += height;
                 }
             }

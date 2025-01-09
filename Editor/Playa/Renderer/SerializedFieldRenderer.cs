@@ -810,7 +810,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return height;
         }
 
-        protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
+        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             bool isArray = FieldWithInfo.SerializedProperty.isArray;
             OnArraySizeChangedAttribute onArraySizeChangedAttribute =

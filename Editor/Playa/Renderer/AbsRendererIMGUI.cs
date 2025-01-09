@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public abstract partial class AbsRenderer
     {
-        public virtual void Render()
+        public virtual void RenderIMGUI()
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
             if (!preCheckResult.IsShown)
@@ -245,7 +245,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return totalHeight;
         }
 
-        public virtual void RenderPosition(Rect position)
+        public virtual void RenderPositionIMGUI(Rect position)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
             if (!preCheckResult.IsShown)
@@ -257,7 +257,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             float targetHeight = GetFieldHeightIMGUI(position.width, preCheckResult);
             (Rect targetRect, Rect belowRect) = RectUtils.SplitHeightRect(aboveRect, targetHeight);
-            RenderPositionTarget(targetRect, preCheckResult);
+            RenderPositionTargetIMGUI(targetRect, preCheckResult);
             RenderPositionBelow(belowRect);
         }
 
@@ -306,7 +306,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return result;
         }
 
-        protected abstract void RenderPositionTarget(Rect position, PreCheckResult preCheckResult);
+        protected abstract void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult);
 
         protected virtual void RenderPositionBelow(Rect position)
         {

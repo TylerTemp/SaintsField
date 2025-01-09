@@ -12,11 +12,11 @@ namespace SaintsField.Editor.Playa
         public VisualElement CreateVisualElement();
 #endif
 
-        void Render();
+        void RenderIMGUI();
 
         float GetHeightIMGUI(float width);
 
-        void RenderPosition(Rect position);
+        void RenderPositionIMGUI(Rect position);
 
         void OnDestroy();
     }

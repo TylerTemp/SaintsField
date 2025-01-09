@@ -182,7 +182,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return (_dropdownIcon, _dropdownRightIcon);
         }
 
-        public void Render()
+        public void RenderIMGUI()
         {
             bool show = true;
             bool disable = false;
@@ -383,7 +383,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     foreach (ISaintsRenderer renderer in GetRenderer())
                     {
-                        renderer.Render();
+                        renderer.RenderIMGUI();
                     }
 
                 }
@@ -486,7 +486,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return titleHeight + contentHeight + marginTop + marginBottom + 4;
         }
 
-        public void RenderPosition(Rect position)
+        public void RenderPositionIMGUI(Rect position)
         {
             float marginTop = _config.MarginTop >= 0 ? _config.MarginTop : 2;
             float marginBottom = _config.MarginBottom >= 0 ? _config.MarginBottom : 2;
@@ -733,7 +733,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             x = useRect.x + 2,
                             width = useRect.width - 4,
                         };
-                        renderer.RenderPosition(marginRect);
+                        renderer.RenderPositionIMGUI(marginRect);
                         accRect = leftRect;
                     }
 

@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, doTweenPlayAttribute));
         }
 
-        public void Render()
+        public void RenderIMGUI()
         {
             if (_iconButtonStyle == null)
             {
@@ -247,7 +247,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return EditorGUIUtility.singleLineHeight * (_doTweenMethods.Count + 1);
         }
 
-        public void RenderPosition(Rect position)
+        public void RenderPositionIMGUI(Rect position)
         {
             if (_iconButtonStyle == null)
             {

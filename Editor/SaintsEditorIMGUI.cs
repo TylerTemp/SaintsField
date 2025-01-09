@@ -95,7 +95,7 @@ namespace SaintsField.Editor
 
             foreach (ISaintsRenderer renderer in _renderers)
             {
-                renderer.Render();
+                renderer.RenderIMGUI();
             }
 
             serializedObject.ApplyModifiedProperties();

@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return FieldHeight(FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target), ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
         }
 
-        protected override void RenderPositionTarget(Rect position, PreCheckResult preCheckResult)
+        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             if (!_renderField)
             {
