@@ -419,6 +419,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             if (isImGui)
             {
                 refreshResources = EditorApplication.timeSinceStartup - target.UpdatedLastTime > SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI() / 1000f;
+                // ReSharper disable once ConvertIfToOrExpression
+                if (!refreshResources && target.CachedResults == null)
+                {
+                    refreshResources = true;
+                }
             }
 
             IReadOnlyList<object> expandedResults;
