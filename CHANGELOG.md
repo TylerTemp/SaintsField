@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.15.1 ##
+
+1. Better `Auto Runner` serialization and drawer
+2. IMGUI: Fix auto getters might fail when refreshing the resources
+3. IMGUI: All kind of buttons now support `IEnumerator` return type (same as UI Toolkit)
+4. IMGUI: `Auto Runner` is now supported in IMGUI
+5. IMGUI: `Layout` with border or foldout, can now indent a bit for array and generic type, to increase the readability
+6. IMGUI: `Layout` foldout icon is now in gray color instead of white
+
 ## 3.15.0 ##
 
 1.  UI Toolkit: Add `AddressableResource` for `AssetReference` inline editing

@@ -77,11 +77,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.15.0**
+**3.15.1**
 
-1.  UI Toolkit: Add `AddressableResource` for `AssetReference` inline editing
-2.  Using `Required` on addressable's `AssetReference` will check if the target asset is valid
-3.  UI Toolkit: `AutoRunner` now can specify if you want to skip the hidden fields (hidden by `ShowIf`, `HideIf`. Not work for `LayoutShowIf`, `LayoutHideIf`)
+1. Better `Auto Runner` serialization and drawer
+2. IMGUI: Fix auto getters might fail when refreshing the resources
+3. IMGUI: All kind of buttons now support `IEnumerator` return type (same as UI Toolkit)
+4. IMGUI: `Auto Runner` is now supported in IMGUI
+5. IMGUI: `Layout` with border or foldout, can now indent a bit for array and generic type, to increase the readability
+6. IMGUI: `Layout` foldout icon is now in gray color instead of white
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4988,8 +4991,6 @@ This tool allows you to check if some target has `Required` but not filled. You 
 It can also specify if you want to skip the hidden fields (hidden by `ShowIf`, `HideIf`. Not work for `LayoutShowIf`, `LayoutHideIf`)
 
 This tool is very simple, and will get more update in the future.
-
-This tool is only available for UI Toolkit at the moment.
 
 [![video](https://github.com/user-attachments/assets/bf5e7b7a-c15c-4fa4-92b9-53621d41ccb4)](https://github.com/user-attachments/assets/76683bc3-cfea-4952-9377-788e02d7e075)
 
