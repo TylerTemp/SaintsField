@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Playa.Renderer
     public class NonSerializedFieldRenderer: AbsRenderer
     {
         private readonly bool _renderField;
-        public NonSerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
+        public NonSerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             _renderField = fieldWithInfo.FieldInfo.GetCustomAttribute<ShowInInspectorAttribute>() != null;
         }

@@ -35,7 +35,8 @@ namespace SaintsField.Editor.Playa.Renderer
             public string RichLabelXml;
         }
 
-        protected AbsRenderer(SaintsFieldWithInfo fieldWithInfo)
+        // ReSharper disable once UnusedParameter.Local
+        protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             FieldWithInfo = fieldWithInfo;
             // SerializedObject = serializedObject;

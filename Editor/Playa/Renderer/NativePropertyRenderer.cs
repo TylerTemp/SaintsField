@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         private readonly bool _renderField;
 
-        public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
+        public NativePropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             _renderField = fieldWithInfo.PropertyInfo.GetCustomAttribute<ShowInInspectorAttribute>() != null;
         }

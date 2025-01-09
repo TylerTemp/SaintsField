@@ -323,8 +323,11 @@ namespace SaintsField.Editor.AutoRunner
 
         private bool IsFromFile()
         {
-            return EditorInspectingTarget != null &&
-                   !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(EditorInspectingTarget));
+            if(EditorInspectingTarget != null)
+            {
+                return !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(EditorInspectingTarget));
+            }
+            return AssetDatabase.GetAssetPath(this) != "";
         }
 
         [Ordered, Button("Save To Project"), PlayaHideIf(nameof(IsFromFile))]
@@ -357,7 +360,7 @@ namespace SaintsField.Editor.AutoRunner
         }
 
         // public AutoRunnerResult result = new AutoRunnerResult();
-        [Ordered] public List<AutoRunnerResult> results = new List<AutoRunnerResult>();
+        [Ordered, ShowInInspector] public List<AutoRunnerResult> results = new List<AutoRunnerResult>();
 
         public override void OnEditorEnable()
         {

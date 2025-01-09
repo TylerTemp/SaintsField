@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             if (fieldWithInfo.PlayaAttributes.Any(each => each is SaintsEditorWindow.WindowInlineEditorAttribute))
             {
                 // Debug.Log(fieldWithInfo);
-                return new WindowInlineEditorRenderer(fieldWithInfo);
+                return new WindowInlineEditorRenderer(so, fieldWithInfo);
             }
 
             // Debug.Log($"{fieldWithInfo.RenderType}/{fieldWithInfo.FieldInfo?.Name}/{string.Join(",", fieldWithInfo.PlayaAttributes)}");

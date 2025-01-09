@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         private readonly SerializedObject _serializedObject;
 
-        public MethodRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
+        public MethodRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             _serializedObject = serializedObject;
         }

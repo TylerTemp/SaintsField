@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public class SerializedFieldRenderer: AbsRenderer
     {
-        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(fieldWithInfo)
+        public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
         }
 
