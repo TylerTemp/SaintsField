@@ -4984,7 +4984,9 @@ Note: `csc.rsp` can override settings by Saints Menu.
 
 UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Runner`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
 
-This tool allows you to check if some target has `Required` but not filled. You can specify the targets as you want. Currently, it supports scenes, and folder searching.
+This tool allows you to check if some target has `Required` but not filled, or a auto getters (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you an button to fix it there. Note the fix function might be broken if the target is inside a prefab.
+
+You can specify the targets as you want. Currently, it supports scenes, and folder searching.
 
 It can also specify if you want to skip the hidden fields (hidden by `ShowIf`, `HideIf`. Not work for `LayoutShowIf`, `LayoutHideIf`)
 
