@@ -282,7 +282,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             return root;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));

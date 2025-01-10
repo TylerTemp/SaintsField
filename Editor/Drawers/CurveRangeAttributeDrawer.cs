@@ -119,6 +119,7 @@ namespace SaintsField.Editor.Drawers
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             container.Q<CurveField>(NameCurveField(property)).RegisterValueChangedCallback(v =>

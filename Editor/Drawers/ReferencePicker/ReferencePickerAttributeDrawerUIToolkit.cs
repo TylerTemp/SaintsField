@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
@@ -103,7 +104,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property));

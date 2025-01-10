@@ -1,6 +1,7 @@
 ﻿#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
@@ -13,7 +14,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 {
     public partial class GetByXPathAttributeDrawer
     {
-        private static string ClassArrayContainer(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath";
+        // private static string ClassArrayContainer(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath";
         private static string ClassContainer(SerializedProperty property) => $"{property.propertyPath}__GetByXPath";
         // private static string ClassAttributesContainer(SerializedProperty property) => $"{property.propertyPath}__GetByXPath_Attributes";
         private static string NameContainer(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath";
@@ -121,19 +122,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 },
                 name = NameHelpBox(property, index),
             };
+            // Debug.Log(helpBox.name);
             helpBox.AddToClassList(ClassAllowDisable);
             return helpBox;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             if (EditorApplication.isPlaying)
             {
-                ImGuiSharedCache.Clear();
+                SharedCache.Clear();
                 return;
             }
-
             string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
 
             // watch selection
@@ -146,11 +148,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                     Debug.Log($"#GetByXPath# CleanUp {arrayRemovedKey}");
 #endif
-                    ImGuiSharedCache.Remove(arrayRemovedKey);
+                    SharedCache.Remove(arrayRemovedKey);
                 }
             });
 
-            bool configExists = ImGuiSharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
+            bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
             bool needUpdate = !configExists;
             if (configExists)
             {
@@ -167,34 +169,43 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 if (genericCache == null)
                 {
-                    genericCache = new GetByXPathGenericCache();
+                    genericCache = new GetByXPathGenericCache
+                    {
+                        Error = "",
+                        GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
+                    };
                 }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
 #endif
                 UpdateSharedCache(genericCache, !configExists, property, info, false);
-                ImGuiSharedCache[arrayRemovedKey] = genericCache;
+                SharedCache[arrayRemovedKey] = genericCache;
             }
 
-            if (!ReferenceEquals(genericCache.GetByXPathAttributes[0], saintsAttribute))
+            GetByXPathAttribute firstGetByXPath = allAttributes.OfType<GetByXPathAttribute>().First();
+
+            if (!ReferenceEquals(firstGetByXPath, saintsAttribute))
             {
+                // Debug.Log($"not match, skip {saintsAttribute} @ {index}");
                 return;
             }
+            // Debug.Log($"match, use {firstGetByXPath} @ {index}");
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             PropertyCache propertyCache = genericCache.IndexToPropertyCache[propertyIndex];
 
-            VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
+            // VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
 
             if (propertyCache.Error != "")
             {
-                SetErrorMessage(propertyCache.Error, root, property, index);
+                Debug.Log(propertyCache.Error);
+                SetErrorMessage(propertyCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
                 return;
             }
 
-            Button refreshButton = root.Q<Button>(NameResignButton(property, index));
-            Button removeButton = root.Q<Button>(NameRemoveButton(property, index));
-            Button selectorButton = root.Q<Button>(NameSelectorButton(property, index));
+            Button refreshButton = container.Q<Button>(NameResignButton(property, index));
+            Button removeButton = container.Q<Button>(NameRemoveButton(property, index));
+            Button selectorButton = container.Q<Button>(NameSelectorButton(property, index));
 
             refreshButton.clicked += () =>
             {
@@ -236,6 +247,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         }, updatedParent);
                 };
             }
+
             IVisualElementScheduledItem task = container.schedule.Execute(() =>
             {
                 // ActualUpdateUIToolkit(property, index, container, onValueChangedCallback, info, true);
@@ -272,7 +284,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
 
-            bool configExists = ImGuiSharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
+            bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
             bool needUpdate = !configExists;
             if (configExists)
             {
@@ -295,17 +307,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
 #endif
                 UpdateSharedCache(genericCache, !configExists, property, info, false);
-                ImGuiSharedCache[arrayRemovedKey] = genericCache;
+                SharedCache[arrayRemovedKey] = genericCache;
             }
 
-            VisualElement firstRoot = container.Q<VisualElement>(NameContainer(property, index));
-            if (firstRoot == null)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"{property.propertyPath} no root");
-#endif
-                return;
-            }
+            // VisualElement firstRoot = container.Q<VisualElement>(NameContainer(property, index));
+//             if (firstRoot == null)
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+//                 Debug.Log($"{property.propertyPath} no root");
+// #endif
+//                 return;
+//             }
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             // update information for this property
@@ -352,16 +364,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 {
                     SetErrorMessage(
                         GetMismatchErrorMessage(propertyCache.OriginalValue, propertyCache.TargetValue, propertyCache.TargetIsNull),
-                        firstRoot,
+                        container.Q<HelpBox>(name: NameHelpBox(property, index)),
                         property,
                         index);
                 }
             }
             else
             {
+                // Debug.Log(container.Q<HelpBox>(name: NameHelpBox(property, index)));
                 SetErrorMessage(
                     "",
-                    firstRoot,
+                    container.Q<HelpBox>(name: NameHelpBox(property, index)),
                     property,
                     index);
                 if (removeButton.style.display != DisplayStyle.None)
@@ -386,66 +399,47 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             //     info, false);
         }
 
-        private static IEnumerable<(bool hasRoot, VisualElement root, bool hasValue, object value)> ZipTwoLongest(IEnumerable<VisualElement> left, IEnumerable<object> right)
+        // private static IEnumerable<(bool hasRoot, VisualElement root, bool hasValue, object value)> ZipTwoLongest(IEnumerable<VisualElement> left, IEnumerable<object> right)
+        // {
+        //
+        //     // IEnumerator<T> leftEnumerator = left.GetEnumerator();
+        //     // IEnumerator<T> rightEnumerator = right.GetEnumerator();
+        //
+        //     // ReSharper disable once ConvertToUsingDeclaration
+        //     using(IEnumerator<VisualElement> leftEnumerator = left.GetEnumerator())
+        //     using(IEnumerator<object> rightEnumerator = right.GetEnumerator())
+        //     {
+        //         bool hasLeft = leftEnumerator.MoveNext();
+        //         bool hasRight = rightEnumerator.MoveNext();
+        //
+        //         while (hasLeft || hasRight)
+        //         {
+        //             // ReSharper disable once ConvertIfStatementToSwitchStatement
+        //             if (hasLeft && hasRight)
+        //             {
+        //                 yield return (true, leftEnumerator.Current, true, rightEnumerator.Current);
+        //             }
+        //             else if (hasLeft)
+        //             {
+        //                 yield return (true, leftEnumerator.Current, false, null);
+        //             }
+        //             else
+        //             {
+        //                 yield return (false, null, true, rightEnumerator.Current);
+        //             }
+        //
+        //             hasLeft = leftEnumerator.MoveNext();
+        //             hasRight = rightEnumerator.MoveNext();
+        //         }
+        //     }
+        // }
+
+        private static void SetErrorMessage(string error, HelpBox helpBox, SerializedProperty property, int index)
         {
-
-            // IEnumerator<T> leftEnumerator = left.GetEnumerator();
-            // IEnumerator<T> rightEnumerator = right.GetEnumerator();
-
-            // ReSharper disable once ConvertToUsingDeclaration
-            using(IEnumerator<VisualElement> leftEnumerator = left.GetEnumerator())
-            using(IEnumerator<object> rightEnumerator = right.GetEnumerator())
-            {
-                bool hasLeft = leftEnumerator.MoveNext();
-                bool hasRight = rightEnumerator.MoveNext();
-
-                while (hasLeft || hasRight)
-                {
-                    // ReSharper disable once ConvertIfStatementToSwitchStatement
-                    if (hasLeft && hasRight)
-                    {
-                        yield return (true, leftEnumerator.Current, true, rightEnumerator.Current);
-                    }
-                    else if (hasLeft)
-                    {
-                        yield return (true, leftEnumerator.Current, false, default);
-                    }
-                    else
-                    {
-                        yield return (false, default, true, rightEnumerator.Current);
-                    }
-
-                    hasLeft = leftEnumerator.MoveNext();
-                    hasRight = rightEnumerator.MoveNext();
-                }
-            }
-        }
-
-        private static void UpdateErrorMessage(GetByXPathAttribute getByXPathAttribute, VisualElement root, CheckFieldResult checkFieldResult, SerializedProperty property, int index)
-        {
-            string error = checkFieldResult.Error;
-            // ReSharper disable once MergeIntoPattern
-            if(checkFieldResult.Error == "" && getByXPathAttribute.UseErrorMessage)
-            {
-                if(checkFieldResult.MisMatch)
-                {
-                    error = $"Expected {(Util.IsNull(checkFieldResult.TargetValue)? "nothing": checkFieldResult.TargetValue)}, but got {(Util.IsNull(checkFieldResult.OriginalValue)? "Null": checkFieldResult.OriginalValue)}";
-                }
-            }
-
-            HelpBox helpBox = root.Q<HelpBox>(NameHelpBox(property, index));
-            if (helpBox.text == error)
-            {
-                return;
-            }
-
-            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-            helpBox.text = error;
-        }
-
-        private static void SetErrorMessage(string error, VisualElement root, SerializedProperty property, int index)
-        {
-            HelpBox helpBox = root.Q<HelpBox>(NameHelpBox(property, index));
+            // HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property, index));
+            // Debug.Log(container.Q<HelpBox>(name: NameHelpBox(property, index)));
+            // Debug.Log(helpBox);
+            // Debug.Log(error);
             if (helpBox.text == error)
             {
                 return;

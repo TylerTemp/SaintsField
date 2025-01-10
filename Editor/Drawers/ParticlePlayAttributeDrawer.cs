@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -304,7 +305,8 @@ namespace SaintsField.Editor.Drawers
             return helpBox;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             VisualElement root = container.Q<VisualElement>(NameContainer(property));

@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
@@ -54,7 +55,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;

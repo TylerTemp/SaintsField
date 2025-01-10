@@ -290,7 +290,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);

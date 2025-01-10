@@ -360,7 +360,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
 
                 target.Parent = parent;
-                target.GetByXPathAttributes = attributes;
+                target.GetByXPathAttributes ??= attributes;
             }
 
             if (NothingSigner(target.GetByXPathAttributes[0]))
@@ -483,8 +483,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 //     };
                 // }
                 (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
+                // Debug.Log(propertyCacheKey);
                 PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
                 {
+                    Error = "",
                     MemberInfo = fieldOrProp.IsField? (MemberInfo)fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
                     Parent = fieldParent,
                     SerializedProperty = processingProperty,
@@ -593,7 +595,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 ArrayProperty = arrayProperty,
             };
 
-            if (ImGuiSharedCache.TryGetValue(key, out GetByXPathGenericCache exists))
+            if (SharedCache.TryGetValue(key, out GetByXPathGenericCache exists))
             {
                 target = exists;
             }
@@ -700,7 +702,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
 
-            ImGuiSharedCache[key] = target;
+            SharedCache[key] = target;
 
             return isImGui;
         }

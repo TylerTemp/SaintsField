@@ -7,5 +7,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.GetByXPathDocument.FilterE
     {
         // find the first main camera in the scene
         [GetByXPath("scene:://[@{tag} = MainCamera]")] public Camera mainCamera;
+        // [BelowInfoBox("InfoBox")] public string info;
     }
 }

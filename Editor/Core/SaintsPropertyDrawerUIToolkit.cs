@@ -44,7 +44,9 @@ namespace SaintsField.Editor.Core
                 name = $"{property.propertyPath}__SaintsFieldContainer",
             };
 
-            (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
+            (PropertyAttribute[] allAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+
+            ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
             Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);
 
             // IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
@@ -307,7 +309,12 @@ namespace SaintsField.Editor.Core
                 foreach (SaintsPropertyInfo saintsPropertyInfo in drawerInfo)
                 {
                     // belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
-                    groupByContainer.Add(saintsPropertyInfo.Drawer.CreateBelowUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent));
+                    VisualElement creatBelow = saintsPropertyInfo.Drawer.CreateBelowUIToolkit(property,
+                        saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent);
+                    if(creatBelow != null)
+                    {
+                        groupByContainer.Add(creatBelow);
+                    }
                 }
 
             }
@@ -326,7 +333,7 @@ namespace SaintsField.Editor.Core
             rootElement.Add(containerElement);
 
             rootElement.schedule.Execute(() =>
-                OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
+                OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, allAttributes));
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
@@ -469,7 +476,7 @@ namespace SaintsField.Editor.Core
         private static StyleSheet _noDecoratorDrawer;
 
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
-            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, IReadOnlyList<PropertyAttribute> allAttributes)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute.GetType().Name))}");
@@ -615,11 +622,11 @@ namespace SaintsField.Editor.Core
                         }
                     });
                 }
-                OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
+                OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers, allAttributes);
             }
             else
             {
-                OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers);
+                OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers, allAttributes);
             }
         }
 
@@ -784,7 +791,7 @@ namespace SaintsField.Editor.Core
         }
 
         private void OnAwakeReady(SerializedProperty property, VisualElement containerElement,
-            object parent,  Action<object> onValueChangedCallback, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+            object parent,  Action<object> onValueChangedCallback, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, IReadOnlyList<PropertyAttribute> allAttributes)
         {
 
             // Action<object> onValueChangedCallback = obj =>
@@ -819,7 +826,7 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, onValueChangedCallback, fieldInfo, parent);
+                saintsPropertyInfo.Drawer.OnAwakeUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, allAttributes, containerElement, onValueChangedCallback, fieldInfo, parent);
             }
 
             // foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
@@ -991,6 +998,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
         }

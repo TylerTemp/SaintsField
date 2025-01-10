@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -55,7 +56,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
             return helpBox;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(name: HelpBoxName(property));

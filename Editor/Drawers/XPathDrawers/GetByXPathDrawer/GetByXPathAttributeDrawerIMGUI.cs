@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public readonly Dictionary<int, PropertyCache> IndexToPropertyCache = new Dictionary<int, PropertyCache>();
         }
 
-        private static readonly Dictionary<string, GetByXPathGenericCache> ImGuiSharedCache = new Dictionary<string, GetByXPathGenericCache>();
+        private static readonly Dictionary<string, GetByXPathGenericCache> SharedCache = new Dictionary<string, GetByXPathGenericCache>();
 
 
 
@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                             Debug.Log($"#GetByXPath# CleanUp {removeKey}");
 #endif
-                            ImGuiSharedCache.Remove(removeKey);
+                            SharedCache.Remove(removeKey);
                         }
                     }
                     InspectingTargets.Remove(curInspectingTarget);
@@ -123,7 +123,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
             keySet.Add(arrayRemovedKey);
 
-            bool configExists = ImGuiSharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
+            bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
             if (!configExists)
             {
                 return 0;
@@ -192,7 +192,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return false;
             }
 
-            bool configExists = ImGuiSharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache);
+            bool configExists = SharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache);
             bool needUpdate = !configExists;
             bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0;
             // not sure why...
@@ -237,7 +237,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 // var propCache = genericCache.IndexToPropertyCache[SerializedUtils.PropertyPathIndex(property.propertyPath)];
                 // onGUIPayload.SetValue(property.objectReferenceValue);
                 // property.serializedObject.ApplyModifiedProperties();
-                ImGuiSharedCache[key] = genericCache;
+                SharedCache[key] = genericCache;
                 // Debug.Log(property.objectReferenceValue);
                 // return false;
             }
@@ -419,7 +419,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return "";
             }
 
-            if(!ImGuiSharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache))
+            if(!SharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache))
             {
                 return "";
             }
