@@ -54,6 +54,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.OldGetter
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             // Debug.Log($"init first open {_firstOpen}");
@@ -203,6 +204,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.OldGetter
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             GetComponentByPathAttribute getComponentByPathAttribute = (GetComponentByPathAttribute)saintsAttribute;

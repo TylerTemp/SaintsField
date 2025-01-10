@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using UnityEditor;
@@ -15,6 +16,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             object managedReferenceValue = property.managedReferenceValue;

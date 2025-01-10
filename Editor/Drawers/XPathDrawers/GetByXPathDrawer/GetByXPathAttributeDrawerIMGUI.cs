@@ -234,7 +234,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {key} ({property.propertyPath}), firstTime={firstTime}, renderCount={genericCache.ImGuiRenderCount}");
 #endif
-                UpdateSharedCache(genericCache, allAttributes, firstTime, property, info, true);
+                UpdateSharedCache(genericCache, firstTime, property, info, true);
                 // var propCache = genericCache.IndexToPropertyCache[SerializedUtils.PropertyPathIndex(property.propertyPath)];
                 // onGUIPayload.SetValue(property.objectReferenceValue);
                 // property.serializedObject.ApplyModifiedProperties();
