@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return null;
             }
 
-            (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(property, memberInfo, parent);
+            (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(property, memberInfo);
             if (typeError != "")
             {
                 return new AutoRunnerFixerResult
@@ -70,6 +70,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             object[] expandedResults = iterResults.Results.ToArray();
+            // Debug.Log($"#AUTO# {string.Join(",", expandedResults)}");
+            // Debug.Log($"#AUTO# {string.Join(",", getByXPathAttribute.XPathInfoAndList[0])}");
+            // Selection.activeObject = property.serializedObject.targetObject;
             int resultsLength = expandedResults.Length;
 
             // Debug.Log(property.propertyPath);
@@ -112,19 +115,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 target.ArrayProperty = arrProperty;
             }
 
+            object[] useResult = isArray ? expandedResults : new[] { expandedResults.FirstOrDefault() };
+
             // not directly array target
-            foreach ((object targetResult, int index) in expandedResults.WithIndex())
+            foreach ((object targetResult, int index) in useResult.WithIndex())
             {
                 SerializedProperty processingProperty = isArray
                     ? target.ArrayProperty.GetArrayElementAtIndex(index)
                     : property;
-                int propertyCacheKey = isArray
-                    ? index
-                    : -1;
-
                 (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
 
-                PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
+                PropertyCache propertyCache = new PropertyCache
                 {
                     Error = "",
                     // ReSharper disable once RedundantCast
@@ -151,7 +152,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 bool targetIsNull = Util.IsNull(targetResult);
                 propertyCache.TargetIsNull = targetIsNull;
 
-                propertyCache.MisMatch = !Util.GetIsEqual(originalValue, targetResult);
+                propertyCache.MisMatch = Mismatch(originalValue, targetResult);
 
                 if(propertyCache.MisMatch)
                 {
@@ -174,7 +175,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                             CanFix = true,
                             Callback = () =>
                             {
-                                DoSignPropertyCache(propertyCache);
+                                DoSignPropertyCache(propertyCache, true);
                             },
                         };
                     }

@@ -50,7 +50,7 @@ namespace SaintsField.Editor
         // private Dictionary<string, ISaintsRendererGroup> _layoutKeyToGroup;
         private IReadOnlyList<ISaintsRenderer> _renderers;
 
-        private static MonoScript GetMonoScript(UnityEngine.Object target)
+        public static MonoScript GetMonoScript(UnityEngine.Object target)
         {
             try
             {

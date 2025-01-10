@@ -25,11 +25,11 @@ namespace SaintsField.Utils
 
         [LayoutStart("./Bootstrap", ELayout.FoldoutBox, marginTop: 5, marginBottom: 5)]
 
-        [InfoBox("How much delay should a getter wait until the first resource check?\n0 means as soon as possible. (but not right now, it'll still use some delay)", EMessageType.None)]
-        [MinValue(0), AboveRichLabel("Delay (ms) <color=green><b>(UI Toolkit)"), RichLabel(null)]
-        public int getByXPathDelayMs;
-
-        [Space]
+        // [InfoBox("How much delay should a getter wait until the first resource check?\n0 means as soon as possible. (but not right now, it'll still use some delay)", EMessageType.None)]
+        // [MinValue(0), AboveRichLabel("Delay (ms) <color=green><b>(UI Toolkit)"), RichLabel(null)]
+        // public int getByXPathDelayMs;
+        //
+        // [Space]
 
         [InfoBox("How often should a getter check the resource changes?\n0 means never check it", EMessageType.None)]
         [Separator(5)]

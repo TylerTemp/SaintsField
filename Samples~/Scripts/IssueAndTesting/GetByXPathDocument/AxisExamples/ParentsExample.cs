@@ -9,6 +9,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.GetByXPathDocument.AxisExa
         [GetByXPath("ancestor:://Sub*")] public Transform ancestorStartsWithSub;
 
         // search object itself, and all it's parents, with letter `This`
-        [GetByXPath("ancestor-or-self::*This*")] public Transform[] parentsSelfWithLetter1;
+        // [GetByXPath("ancestor-or-self::*This*")] public Transform[] parentsSelfWithLetter1;
     }
 }

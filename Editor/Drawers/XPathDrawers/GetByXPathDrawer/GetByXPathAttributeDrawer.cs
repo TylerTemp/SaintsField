@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         }
 
         private static (string error, Type expectType, Type expectInterface) GetExpectedTypeOfProp(
-            SerializedProperty property, MemberInfo info, object parent)
+            SerializedProperty property, MemberInfo info)
         {
             Type rawType = ReflectUtils.GetElementType(info is FieldInfo fi? fi.FieldType: ((PropertyInfo) info).PropertyType);
             if (!typeof(IWrapProp).IsAssignableFrom(rawType))
@@ -93,37 +93,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return ("", rawType, GetInterface(rawType));
             }
 
-            Type wrapType = GetIWrapPropType(rawType);
+            // Debug.Log($"Raw Type: {rawType}");
+
+            Type wrapType = ReflectUtils.GetIWrapPropType(rawType);
             if (wrapType == null)
             {
                 return ($"Failed to get wrap type from {property.propertyPath}", null, null);
             }
 
             return ("", wrapType, GetInterface(rawType));
-        }
-
-        private static Type GetIWrapPropType(Type wrapPropType)
-        {
-            string prop = ReflectUtils.GetIWrapPropName(wrapPropType);
-            if (string.IsNullOrEmpty(prop))
-            {
-                return null;
-            }
-
-            string wrappedName = ReflectUtils.GetFieldStringValueFromType(wrapPropType, prop);
-            if (string.IsNullOrEmpty(wrappedName))
-            {
-                return null;
-            }
-
-            PropertyInfo wrapPropertyInfo = wrapPropType.GetProperty(wrappedName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-            if (wrapPropertyInfo != null)
-            {
-                return wrapPropertyInfo.PropertyType;
-            }
-            FieldInfo wrapFieldInfo = wrapPropType.GetField(wrappedName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-            Debug.Assert(wrapFieldInfo != null);
-            return wrapFieldInfo.FieldType;
         }
 
         private static Type GetInterface(Type rawType)
@@ -137,65 +115,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return null;
         }
 
-        private class CheckFieldResult
+        private static bool Mismatch(object originalValue, object targetValue)
         {
-            public string Error;
-            public bool MisMatch;
-            public object OriginalValue;
-            public object TargetValue;
-            public int Index;
-        }
-
-        private static CheckFieldResult CheckField(SerializedProperty property, FieldInfo info, object parent, object targetValue)
-        {
-            (string propError, int propIndex, object propValue) = Util.GetValue(property, info, parent);
-
-            if (propError != "")
+            bool equal = Util.GetIsEqual(originalValue, targetValue);
+            // ReSharper disable once InvertIf
+            if (!equal && originalValue is IWrapProp wrapProp)
             {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"Error {property.propertyPath}: {propError}");
-#endif
-                return new CheckFieldResult
-                {
-                    Error = propError,
-                    MisMatch = false,
-                    OriginalValue = propValue,
-                    TargetValue = targetValue,
-                    Index = propIndex,
-                };
+                object originalWrapValue = Util.GetWrapValue(wrapProp);
+                equal = Util.GetIsEqual(originalWrapValue, targetValue);
             }
 
-            if(propValue is IWrapProp wrapProp)
-            {
-                propValue = Util.GetWrapValue(wrapProp);
-            }
-
-            if (Util.GetIsEqual(propValue, targetValue))
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"Value Equal {property.propertyPath}: {propValue} == {targetValue}");
-#endif
-                return new CheckFieldResult
-                {
-                    Error = "",
-                    MisMatch = false,
-                    OriginalValue = propValue,
-                    TargetValue = targetValue,
-                    Index = propIndex,
-                };
-            }
-
-#if SAINTSFIELD_DEBUG_GET_BY_XPATH
-            Debug.Log($"Mismatch {property.propertyPath}: {propValue} != {targetValue}; {propValue is Object}/{targetValue is Object}");
-#endif
-            return new CheckFieldResult
-            {
-                Error = "",
-                MisMatch = true,
-                OriginalValue = propValue,
-                TargetValue = targetValue,
-                Index = propIndex,
-            };
+            return !equal;
         }
 
         private static void UpdateSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info, bool isImGui)
@@ -216,10 +146,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 target.GetByXPathAttributes ??= attributes;
             }
 
-            if (NothingSigner(target.GetByXPathAttributes[0]))
-            {
-                return;
-            }
+            // if (NothingSigner(target.GetByXPathAttributes[0]))
+            // {
+            //     return;
+            // }
 
             bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
 
@@ -257,9 +187,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             if (target.ExpectedType == null)
             {
-                (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(property, info, target.Parent);
+                (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(property, info);
                 if (typeError != "")
                 {
+                    // Debug.Log(typeError);
                     target.Error = typeError;
                     return;
                 }
@@ -279,33 +210,45 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }
 
+            bool nothingSigner = NothingSigner(target.GetByXPathAttributes[0]);
+
             IReadOnlyList<object> expandedResults;
             if(refreshResources)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# refresh resources for {property.propertyPath}");
 #endif
-                target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
-                GetXPathValuesResult iterResults = GetXPathValues(
-                    target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
-                    target.ExpectedType,
-                    target.ExpectedInterface,
-                    property,
-                    info,
-                    target.Parent);
+                if (nothingSigner)
+                {
+                    expandedResults
+                        = target.CachedResults
+                            = isArray ? new object[] { } : new object[] { null };
+                }
+                else
+                {
+                    target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
+                    GetXPathValuesResult iterResults = GetXPathValues(
+                        target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+                        target.ExpectedType,
+                        target.ExpectedInterface,
+                        property,
+                        info,
+                        target.Parent);
 
-                expandedResults
-                    = target.CachedResults
-                    = isArray
-                    ? iterResults.Results.ToArray()
-                    : new[] { iterResults.Results.FirstOrDefault() };
+                    expandedResults
+                        = target.CachedResults
+                            = isArray
+                                ? iterResults.Results.ToArray()
+                                : new[] { iterResults.Results.FirstOrDefault() };
+                }
             }
             else
             {
                 expandedResults = target.CachedResults;
             }
 
-            if(isArray && target.ArrayProperty.arraySize != expandedResults.Count)
+
+            if(!nothingSigner && isArray && target.ArrayProperty.arraySize != expandedResults.Count)
             {
                 target.ArrayProperty.arraySize = expandedResults.Count;
                 EnqueueSceneViewNotification($"Adjust array {target.ArrayProperty.displayName} to length {target.ArrayProperty.arraySize}");
@@ -316,6 +259,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             GetByXPathAttribute getByXPathAttribute = target.GetByXPathAttributes[0];
+
+            // Debug.Log($"expandedResults count = {expandedResults.Count}");
 
             foreach ((object targetResult, int index) in expandedResults.WithIndex())
             {
@@ -345,6 +290,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     SerializedProperty = processingProperty,
                 };
 
+                if (nothingSigner)
+                {
+                    continue;
+                }
+
+                // Debug.Log($"#GetByXPath# IndexToPropertyCache[{propertyCacheKey}] = {propertyCache}");
+
                 // propertyCache.SerializedProperty = processingProperty;
 
                 (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty, propertyCache.MemberInfo, propertyCache.Parent);
@@ -360,7 +312,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 bool targetIsNull = Util.IsNull(targetResult);
                 propertyCache.TargetIsNull = targetIsNull;
 
-                propertyCache.MisMatch = !Util.GetIsEqual(originalValue, targetResult);
+                propertyCache.MisMatch = Mismatch(originalValue, targetResult);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# mismatch={propertyCache.MisMatch}, {originalValue}, {targetResult}: {propertyCache.SerializedProperty.propertyPath}");
@@ -382,14 +334,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     if (resign)
                     {
-                        DoSignPropertyCache(propertyCache);
+                        DoSignPropertyCache(propertyCache, true);
                     }
                 }
             }
         }
 
         // no longer process with element remove, because we'll always adjust array size to correct size.
-        private static void DoSignPropertyCache(PropertyCache propertyCache)
+        private static void DoSignPropertyCache(PropertyCache propertyCache, bool notice)
         {
             try
             {
@@ -415,7 +367,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #endif
             propertyCache.MisMatch = false;
 
-            EnqueueSceneViewNotification($"Auto sign {(propertyCache.TargetIsNull? "null" : propertyCache.TargetValue)} to {propertyCache.SerializedProperty.displayName}");
+            if(notice)
+            {
+                EnqueueSceneViewNotification(
+                    $"Auto sign {(propertyCache.TargetIsNull ? "null" : propertyCache.TargetValue)} to {propertyCache.SerializedProperty.displayName}");
+            }
 
             ReflectUtils.SetValue(
                 propertyCache.SerializedProperty.propertyPath,
@@ -461,7 +417,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return false;
             }
 
-            (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(arrayProperty, info, parent);
+            (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(arrayProperty, info);
             if (typeError != "")
             {
                 return false;
@@ -544,7 +500,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                     Debug.Log($"#GetByXPath# Helper: Sign {propertyCache.SerializedProperty.propertyPath} from {propertyCache.OriginalValue} to {propertyCache.TargetValue}");
 #endif
-                    DoSignPropertyCache(propertyCache);
+                    DoSignPropertyCache(propertyCache, true);
                 }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH

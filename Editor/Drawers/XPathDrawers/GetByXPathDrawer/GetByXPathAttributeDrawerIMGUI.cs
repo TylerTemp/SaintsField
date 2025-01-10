@@ -303,7 +303,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     if (GUI.Button(actionButtonRect, _removeIcon))
                     {
-                        DoSignPropertyCache(propertyCache);
+                        DoSignPropertyCache(propertyCache, false);
                         onGUIPayload.SetValue(propertyCache.TargetValue);
                     }
                 }
@@ -316,7 +316,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     if (GUI.Button(actionButtonRect, _refreshIcon))
                     {
-                        DoSignPropertyCache(propertyCache);
+                        DoSignPropertyCache(propertyCache, false);
                         onGUIPayload.SetValue(null);
                     }
                 }
@@ -333,7 +333,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         newValue =>
                         {
                             propertyCache.TargetValue = newValue;
-                            DoSignPropertyCache(propertyCache);
+                            DoSignPropertyCache(propertyCache, false);
                             onGUIPayload.SetValue(newValue);
                         }, propertyCache.Parent);
                 }
@@ -357,7 +357,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     newValue =>
                     {
                         propertyCache.TargetValue = newValue;
-                        DoSignPropertyCache(propertyCache);
+                        DoSignPropertyCache(propertyCache, false);
                         onGUIPayload.SetValue(newValue);
                     }, propertyCache.Parent);
             }

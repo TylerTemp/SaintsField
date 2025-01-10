@@ -375,7 +375,7 @@ namespace SaintsField.Editor.Utils
 
             while (true)
             {
-                string name = GetFieldStringValueFromType(lastType, "EditorPropertyName");
+                string name = GetStaticFieldStringValueFromType(lastType, "EditorPropertyName");
                 if (!string.IsNullOrEmpty(name))
                 {
                     return name;
@@ -391,7 +391,7 @@ namespace SaintsField.Editor.Utils
 
         // public static string GetIWrapPropName(Type type) => GetFieldStringValueFromType(type, "EditorPropertyName");
 
-        public static string GetFieldStringValueFromType(Type type, string fieldName)
+        public static string GetStaticFieldStringValueFromType(Type type, string fieldName)
         {
             PropertyInfo r = type.GetProperty(fieldName,
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
@@ -409,7 +409,23 @@ namespace SaintsField.Editor.Utils
             return null;
         }
 
-
+        public static Type GetIWrapPropType(Type wrapPropType)
+        {
+            string prop = GetIWrapPropName(wrapPropType);
+            // Debug.Log($"prop:{prop}");
+            if (string.IsNullOrEmpty(prop))
+            {
+                return null;
+            }
+            PropertyInfo wrapPropertyInfo = wrapPropType.GetProperty(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            if (wrapPropertyInfo != null)
+            {
+                return wrapPropertyInfo.PropertyType;
+            }
+            FieldInfo wrapFieldInfo = wrapPropType.GetField(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            Debug.Assert(wrapFieldInfo != null);
+            return wrapFieldInfo.FieldType;
+        }
 
         public static Type GetDictionaryType(Type type)
         {

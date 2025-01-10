@@ -201,6 +201,21 @@ namespace SaintsField.Editor.AutoRunner
                     {
                         yield return null;
                     }
+
+                    // skip all Unity components
+                    Object targetObject = so.targetObject;
+                    MonoScript monoScript = SaintsEditor.GetMonoScript(targetObject);
+                    if (monoScript != null)
+                    {
+                        Type monoClass = monoScript.GetClass();
+                        if(monoClass != null && monoClass.Namespace != null && monoClass.Namespace.StartsWith("UnityEngine"))
+                        {
+                            so.Dispose();
+                            continue;
+                        }
+                    }
+
+
                     // Debug.Log($"#AutoRunner# Processing {so.targetObject}");
                     bool hasFixer = false;
 

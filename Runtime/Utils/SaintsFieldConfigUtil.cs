@@ -109,7 +109,7 @@ namespace SaintsField.Utils
         public static int ResizableTextAreaMinRow() => IsConfigLoaded? Config.resizableTextAreaMinRow: 3;
         public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => IsConfigLoaded && Config.disableOnValueChangedWatchArrayFieldUIToolkit;
 
-        public static int GetByXPathDelayMs() => IsConfigLoaded? Config.getByXPathDelayMs: 0;
+        // public static int GetByXPathDelayMs() => IsConfigLoaded? Config.getByXPathDelayMs: 0;
         public static int GetByXPathLoopIntervalMs() => IsConfigLoaded? Config.getByXPathLoopIntervalMs: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMs;
         public static int GetByXPathLoopIntervalMsIMGUI() => IsConfigLoaded? Config.getByXPathLoopIntervalMsIMGUI: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMsIMGUI;
         public static int GetByXPathFieldPassIMGUI() => IsConfigLoaded? Config.getByXPathFieldPassIMGUI: SaintsFieldConfig.GetByXPathDefaultFieldPassIMGUI;

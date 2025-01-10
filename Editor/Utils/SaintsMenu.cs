@@ -13,7 +13,11 @@ namespace SaintsField.Editor.Utils
 
         #region Config
 
+#if SAINTSFIELD_DEBUG
+        [MenuItem("Saints/Create or Edit SaintsField Config")]
+#else
         [MenuItem("Window/Saints/Create or Edit SaintsField Config")]
+#endif
         public static void CreateOrEditSaintsFieldConfig()
         {
             SaintsFieldConfig saintsFieldConfig;

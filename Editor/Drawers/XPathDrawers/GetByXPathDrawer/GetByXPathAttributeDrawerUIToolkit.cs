@@ -167,18 +167,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             if (needUpdate)
             {
-                if (genericCache == null)
+                genericCache ??= new GetByXPathGenericCache
                 {
-                    genericCache = new GetByXPathGenericCache
-                    {
-                        Error = "",
-                        GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
-                    };
-                }
+                    Error = "",
+                    GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
+                };
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
 #endif
                 UpdateSharedCache(genericCache, !configExists, property, info, false);
+                if (genericCache.Error != "")
+                {
+                    SetErrorMessage(genericCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
+                    return;
+                }
                 SharedCache[arrayRemovedKey] = genericCache;
             }
 
@@ -191,10 +193,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
             // Debug.Log($"match, use {firstGetByXPath} @ {index}");
 
+            // Debug.Log(property.propertyPath);
+
+            // ActualUpdateUIToolkit(property, index, container, onValueChangedCallback, info);
+
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             PropertyCache propertyCache = genericCache.IndexToPropertyCache[propertyIndex];
-
-            // VisualElement root = container.Q<VisualElement>(NameContainer(property, index));
 
             if (propertyCache.Error != "")
             {
@@ -209,7 +213,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             refreshButton.clicked += () =>
             {
-                DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex]);
+                DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex], false);
                 property.serializedObject.ApplyModifiedProperties();
                 refreshButton.style.display = DisplayStyle.None;
                 onValueChangedCallback.Invoke(genericCache.IndexToPropertyCache[propertyIndex].OriginalValue);
@@ -217,7 +221,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             removeButton.clicked += () =>
             {
-                DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex]);
+                DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex], false);
                 property.serializedObject.ApplyModifiedProperties();
                 removeButton.style.display = DisplayStyle.None;
                 onValueChangedCallback.Invoke(genericCache.IndexToPropertyCache[propertyIndex].OriginalValue);
@@ -241,33 +245,26 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         newValue =>
                         {
                             propertyCache.TargetValue = newValue;
-                            DoSignPropertyCache(propertyCache);
+                            DoSignPropertyCache(propertyCache, false);
                             property.serializedObject.ApplyModifiedProperties();
                             onValueChangedCallback.Invoke(newValue);
                         }, updatedParent);
                 };
+
+                if (!getByXPathAttribute.KeepOriginalPicker)
+                {
+                    StyleSheet noPickerUss = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
+                    VisualElement fieldTarget = container.Q<VisualElement>(className: ClassFieldUIToolkit(property));
+                    fieldTarget?.styleSheets.Add(noPickerUss);
+                }
             }
 
-            IVisualElementScheduledItem task = container.schedule.Execute(() =>
+            int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+            if (loop > 0)
             {
-                // ActualUpdateUIToolkit(property, index, container, onValueChangedCallback, info, true);
-                int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
-                if (loop > 0)
-                {
-                    container.schedule.Execute(() =>
-                        ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
-                            info)).Every(loop);
-                }
-                else
-                {
-                    ActualUpdateUIToolkit(property, index, container, onValueChangedCallback, info);
-                }
-            });
-            int delay = SaintsFieldConfigUtil.GetByXPathDelayMs();
-
-            if (delay > 0)
-            {
-                task.StartingIn(delay);
+                container.schedule.Execute(() =>
+                    ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
+                        info)).Every(loop);
             }
         }
 
@@ -296,6 +293,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
                 // }
             }
+
+            Debug.Log($"needUpdate={needUpdate}");
 
             if (needUpdate)
             {
