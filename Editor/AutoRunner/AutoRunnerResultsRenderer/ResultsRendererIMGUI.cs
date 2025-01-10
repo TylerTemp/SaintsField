@@ -11,7 +11,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
-            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResult>> subGroup) in FormatResults(_autoRunner.results))
+            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.results))
             {
 
                 string groupLabel;
@@ -33,7 +33,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
                 using(new EditorGUI.IndentLevelScope(1))
                 {
-                    foreach (IGrouping<Object, AutoRunnerResult> grouping in subGroup)
+                    foreach (IGrouping<Object, AutoRunnerResultInfo> grouping in subGroup)
                     {
                         if (grouping.Key == null)
                         {
@@ -45,28 +45,44 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
                         using(new EditorGUI.IndentLevelScope(1))
                         {
-                            foreach (AutoRunnerResult autoRunnerResult in grouping)
+                            foreach (AutoRunnerResultInfo autoRunnerResultInfo in grouping)
                             {
-                                EditorGUILayout.TextField("Field/Property", autoRunnerResult.propertyPath);
+                                EditorGUILayout.TextField("Field/Property", autoRunnerResultInfo.AutoRunnerResult.propertyPath);
 
-                                if (autoRunnerResult.FixerResult.ExecError != "")
+                                if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError != "")
                                 {
-                                    EditorGUILayout.HelpBox(autoRunnerResult.FixerResult.ExecError,
+                                    EditorGUILayout.HelpBox(autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError,
                                         MessageType.Warning);
                                 }
 
-                                if (autoRunnerResult.FixerResult.Error != "")
+                                if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.Error != "")
                                 {
-                                    EditorGUILayout.HelpBox(autoRunnerResult.FixerResult.Error,
+                                    EditorGUILayout.HelpBox(autoRunnerResultInfo.AutoRunnerResult.FixerResult.Error,
                                         MessageType.Error);
                                 }
 
                                 // ReSharper disable once InvertIf
-                                if (autoRunnerResult.FixerResult.CanFix)
+                                if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.CanFix)
                                 {
                                     if (GUILayout.Button("Fix"))
                                     {
-                                        autoRunnerResult.FixerResult.Callback();
+                                        bool errorFixed = false;
+                                        try
+                                        {
+                                            autoRunnerResultInfo.AutoRunnerResult.FixerResult.Callback();
+                                            errorFixed = true;
+                                        }
+                                        catch (System.Exception e)
+                                        {
+                                            Debug.LogError(e);
+                                            autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError = e.ToString();
+                                        }
+
+                                        if (errorFixed)
+                                        {
+                                            _autoRunner.results.RemoveAt(autoRunnerResultInfo.Index);
+                                        }
+
                                     }
                                 }
                             }

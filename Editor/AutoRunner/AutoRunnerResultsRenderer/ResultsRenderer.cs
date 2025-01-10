@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using Object = UnityEngine.Object;
 
@@ -39,19 +40,30 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
             }
         }
 
+        private struct AutoRunnerResultInfo
+        {
+            public AutoRunnerResult AutoRunnerResult;
+            public int Index;
+        }
 
-        private static IEnumerable<(MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResult>> subGroup)> FormatResults(IReadOnlyList<AutoRunnerResult> results)
+
+        private static IEnumerable<(MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup)> FormatResults(IReadOnlyList<AutoRunnerResult> results)
         {
             return results
-                .Where(each => each.FixerResult != null)
+                .Select((autoRunner, index) => new AutoRunnerResultInfo
+                {
+                    AutoRunnerResult = autoRunner,
+                    Index = index,
+                })
+                .Where(each => each.AutoRunnerResult.FixerResult != null)
                 .GroupBy(each => new MainTarget
                 {
-                    MainTargetString = each.mainTargetString,
-                    MainTargetIsAssetPath = each.mainTargetIsAssetPath,
+                    MainTargetString = each.AutoRunnerResult.mainTargetString,
+                    MainTargetIsAssetPath = each.AutoRunnerResult.mainTargetIsAssetPath,
                 })
                 .Select(each => (
                     each.Key,
-                    each.GroupBy(sub => sub.subTarget)
+                    each.GroupBy(sub => sub.AutoRunnerResult.subTarget)
                 ));
         }
     }

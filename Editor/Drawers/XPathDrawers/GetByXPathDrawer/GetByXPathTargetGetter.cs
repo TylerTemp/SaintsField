@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public IEnumerable<object> Results;
         }
 
-        private static GetXPathValuesResult GetXPathValues(IReadOnlyList<IReadOnlyList<GetByXPathAttribute.XPathInfo>> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, FieldInfo info, object parent)
+        private static GetXPathValuesResult GetXPathValues(IReadOnlyList<IReadOnlyList<GetByXPathAttribute.XPathInfo>> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
         {
             // Debug.Log($"andXPathInfoList Count={andXPathInfoList.Count}");
             bool anyResult = false;

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEngine;
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using UnityEngine.AddressableAssets;
 #endif
@@ -21,7 +23,9 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
                 : ("", string.IsNullOrEmpty(ValidateValue(curValue)));
         }
 
-        public AutoRunnerFixerResult AutoRunFix(SerializedProperty property, MemberInfo memberInfo, object parent)
+        public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
+            SerializedProperty property, MemberInfo memberInfo, object parent)
         {
             (string curError, int _, object curValue) = Util.GetValue(property, memberInfo, parent);
             if (curError != "")

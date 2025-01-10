@@ -1,10 +1,12 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using Object = UnityEngine.Object;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
@@ -22,9 +24,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
             return (_root, true);
         }
 
-
         protected override PreCheckResult OnUpdateUIToolKit()
-            // private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
 
@@ -36,7 +36,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
             _results = _autoRunner.results.ToArray();
             _root.Clear();
 
-            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResult>> subGroup) in FormatResults(_autoRunner.results))
+            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.results))
             {
                 // Debug.Log($"#AutoRunner# draw {mainTarget}");
                 Foldout group = new Foldout
@@ -52,6 +52,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                     Object obj = AssetDatabase.LoadAssetAtPath<Object>(mainTarget.MainTargetString);
                     if (obj == null)
                     {
+                        Debug.Log($"#AutoRunner# target is null: {mainTarget.MainTargetString}");
                         continue;
                     }
                     group.Add(new ObjectField
@@ -69,10 +70,11 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                     //     // backgroundColor = EColor.Aqua.GetColor(),
                     // },
                 };
-                foreach (IGrouping<Object,AutoRunnerResult> grouping in subGroup)
+                foreach (IGrouping<Object, AutoRunnerResultInfo> grouping in subGroup)
                 {
                     if (grouping.Key == null)
                     {
+                        Debug.Log($"#AutoRunner# skip null group for {mainTarget}");
                         continue;
                     }
 
@@ -84,30 +86,46 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                     {
                         value = grouping.Key,
                     });
-                    foreach (AutoRunnerResult autoRunnerResult in grouping)
+                    // Debug.Log($"#AutoRunner# draw {grouping.Key} for {mainTarget}");
+                    foreach (AutoRunnerResultInfo autoRunnerResultInfo in grouping)
                     {
                         VisualElement subGroupElementGroupElement = new VisualElement();
 
                         TextField serializedPropertyLabel = new TextField("Field/Property")
                         {
-                            value = autoRunnerResult.propertyPath,
+                            value = autoRunnerResultInfo.AutoRunnerResult.propertyPath,
                         };
                         // serializedPropertyLabel.SetEnabled(false);
                         subGroupElementGroupElement.Add(serializedPropertyLabel);
 
-                        if (autoRunnerResult.FixerResult.ExecError != "")
+                        if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError != "")
                         {
-                            subGroupElementGroupElement.Add(new HelpBox(autoRunnerResult.FixerResult.ExecError, HelpBoxMessageType.Warning));
+                            subGroupElementGroupElement.Add(new HelpBox(autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError, HelpBoxMessageType.Warning));
                         }
 
-                        if (autoRunnerResult.FixerResult.Error != "")
+                        if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.Error != "")
                         {
-                            subGroupElementGroupElement.Add(new HelpBox(autoRunnerResult.FixerResult.Error, HelpBoxMessageType.Error));
+                            subGroupElementGroupElement.Add(new HelpBox(autoRunnerResultInfo.AutoRunnerResult.FixerResult.Error, HelpBoxMessageType.Error));
                         }
 
-                        if (autoRunnerResult.FixerResult.CanFix)
+                        if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.CanFix)
                         {
-                            subGroupElementGroupElement.Add(new Button(() => autoRunnerResult.FixerResult.Callback())
+                            subGroupElementGroupElement.Add(new Button(() =>
+                            {
+                                try
+                                {
+                                    autoRunnerResultInfo.AutoRunnerResult.FixerResult.Callback();
+                                }
+                                catch (Exception e)
+                                {
+                                    autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError = e.Message;
+                                    OnUpdateUIToolKit();
+                                    return;
+                                }
+
+                                _autoRunner.results.RemoveAt(autoRunnerResultInfo.Index);
+                                OnUpdateUIToolKit();
+                            })
                             {
                                 text = "Fix",
                             });

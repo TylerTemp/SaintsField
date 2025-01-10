@@ -169,8 +169,8 @@ namespace SaintsField.Editor.AutoRunner
 
             foreach (string scenePath in scenePaths)
             {
-                Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
-                sceneSoIterations.Add((scene, GetSerializedObjectFromCurrentScene(scenePath)));
+                EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                sceneSoIterations.Add((AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath), GetSerializedObjectFromCurrentScene(scenePath)));
                 yield return null;
             }
 
@@ -221,8 +221,11 @@ namespace SaintsField.Editor.AutoRunner
                             ? (MemberInfo)info.fieldOrProp.FieldInfo
                             : info.fieldOrProp.PropertyInfo;
 
-                        PropertyAttribute[] saintsAttribute = memberInfo.GetCustomAttributes()
+                        PropertyAttribute[] allProperties = memberInfo.GetCustomAttributes()
                             .OfType<PropertyAttribute>()
+                            .ToArray();
+
+                        PropertyAttribute[] saintsAttribute = allProperties
                             .Where(each => each is ISaintsAttribute)
                             .ToArray();
 
@@ -260,13 +263,12 @@ namespace SaintsField.Editor.AutoRunner
                                     // Debug.Log($"{property.propertyPath}/{autoRunnerDrawer}");
                                     SerializedProperty prop = property.Copy();
                                     AutoRunnerFixerResult autoRunnerResult =
-                                        autoRunnerDrawer.AutoRunFix(prop, memberInfo, info.parent);
+                                        autoRunnerDrawer.AutoRunFix(saintsPropertyAttribute, allProperties, prop, memberInfo, info.parent);
                                     if(autoRunnerResult != null)
                                     {
                                         _processingMessage =
                                             $"Fixer found for {target}/{so.targetObject}: {autoRunnerResult}";
                                         Debug.Log($"#AutoRunner# {_processingMessage}");
-
 
                                         string mainTargetString;
                                         bool mainTargetIsAssetPath;
@@ -275,18 +277,22 @@ namespace SaintsField.Editor.AutoRunner
                                             mainTargetString = s;
                                             mainTargetIsAssetPath = false;
                                         }
-                                        else if (target is Scene scene)
-                                        {
-                                            mainTargetString = scene.path;
-                                            mainTargetIsAssetPath = true;
-                                        }
+                                        // else if (target is Scene scene)
+                                        // {
+                                        //     mainTargetString = scene.path;
+                                        //     mainTargetIsAssetPath = true;
+                                        // }
                                         else
                                         {
                                             mainTargetString = AssetDatabase.GetAssetPath((Object) target);
                                             mainTargetIsAssetPath = true;
                                         }
+                                        // Debug.Log(target.GetType());
+                                        // Debug.Log(target is Scene);
+                                        // Debug.Log(((Scene)target).path);
+                                        // Debug.Log(mainTargetString);
 
-                                        autoRunnerResults.Add(new AutoRunnerResult
+                                        AutoRunnerResult result = new AutoRunnerResult
                                         {
                                             FixerResult = autoRunnerResult,
                                             mainTargetString = mainTargetString,
@@ -295,7 +301,11 @@ namespace SaintsField.Editor.AutoRunner
                                             propertyPath = property.propertyPath,
                                             // SerializedProperty = prop,
                                             SerializedObject = so,
-                                        });
+                                        };
+
+                                        Debug.Log($"#AutoRunner# Add {result}");
+
+                                        autoRunnerResults.Add(result);
                                     }
                                 }
                             }
@@ -319,6 +329,7 @@ namespace SaintsField.Editor.AutoRunner
             // results = autoRunnerResults.ToArray();
             _processingMessage = $"All done, {results.Count} found";
             Debug.Log($"#AutoRunner# {_processingMessage}");
+            EditorRefreshTarget();
         }
 
         private bool IsFromFile()

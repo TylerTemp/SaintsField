@@ -31,6 +31,11 @@ namespace SaintsField.Editor.AutoRunner
             return Util.CombineHashCode(mainTargetString, mainTargetIsAssetPath, subTarget, propertyPath);
             // return HashCode.Combine(mainTarget, subTarget, propertyPath);
         }
+
+        public override string ToString()
+        {
+            return $"mainTargetString={mainTargetString}; mainTargetIsAssetPath={mainTargetIsAssetPath}; subTarget={subTarget}; propertyPath={propertyPath}; FixerResult={FixerResult}";
+        }
     }
 
     // [CustomPropertyDrawer(typeof(AutoRunnerResult))]
