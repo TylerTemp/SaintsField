@@ -307,7 +307,8 @@ namespace SaintsField.Editor.Core
 
             OnGUIPayload onGUIPayload = new OnGUIPayload();
 
-            (ISaintsAttribute[] iSaintsAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ISaintsAttribute>(property);
+            (PropertyAttribute[] allAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
 
             if (parent == null)
             {
@@ -659,6 +660,7 @@ namespace SaintsField.Editor.Core
                     drawer.DrawPostFieldImGui(eachRect, property, bugFixCopyLabel,
                         attributeWithIndex.SaintsAttribute,
                         attributeWithIndex.Index,
+                        allAttributes,
                         onGUIPayload,
                         fieldInfo,
                         parent);
@@ -839,7 +841,8 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             return false;
         }

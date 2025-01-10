@@ -36,7 +36,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
         private GUIStyle _imGuiButtonStyle;
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             RequireTypeAttribute requireTypeAttribute = (RequireTypeAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = requireTypeAttribute.RequiredTypes;

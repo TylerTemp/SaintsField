@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -221,7 +222,8 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             // if (_containerProperty == null)
             // {

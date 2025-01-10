@@ -128,14 +128,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return !equal;
         }
 
-        private static void UpdateSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info, bool isImGui)
+        private static void UpdateSharedCache(GetByXPathGenericCache target, IReadOnlyList<PropertyAttribute> allAttributes, bool isFirstTime, SerializedProperty property, FieldInfo info, bool isImGui)
         {
             target.UpdatedLastTime = EditorApplication.timeSinceStartup;
 
             target.Error = "";
             if (target.Parent == null || target.GetByXPathAttributes == null)
             {
-                (GetByXPathAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(property);
+                (GetByXPathAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<GetByXPathAttribute>(property);
                 if(parent == null)
                 {
                     target.Error = "Can not get parent for property";
@@ -143,7 +143,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
 
                 target.Parent = parent;
-                target.GetByXPathAttributes ??= attributes;
+            }
+
+            if(target.GetByXPathAttributes == null)
+            {
+                target.GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray();
             }
 
             // if (NothingSigner(target.GetByXPathAttributes[0]))

@@ -46,7 +46,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             // Debug.Log($"draw below {position}");
             // return Draw(position, property, label, saintsAttribute);

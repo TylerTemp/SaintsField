@@ -5,6 +5,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
@@ -101,7 +102,8 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             (string error, Renderer renderer) = GetRenderer(property, saintsAttribute, info, parent);
             _error = error;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -26,6 +27,7 @@ namespace SaintsField.Editor.Drawers
         protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             _error = BindButtonEvent(property, saintsAttribute, info, parent);
