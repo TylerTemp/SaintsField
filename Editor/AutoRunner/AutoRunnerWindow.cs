@@ -136,7 +136,7 @@ namespace SaintsField.Editor.AutoRunner
             }
         }
 
-        [Ordered, LeftToggle] public bool skipHiddenFields;
+        [Ordered, LeftToggle] public bool skipHiddenFields = true;
 
         private IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _typeToDrawer;
 
@@ -155,6 +155,14 @@ namespace SaintsField.Editor.AutoRunner
         // ReSharper disable once UnusedMember.Local
         private IEnumerator RunAutoRunners()
         {
+            if (SceneManager.GetActiveScene().isDirty)
+            {
+                EditorUtility.DisplayDialog("Save Scene", "Please save the scene before running AutoRunner", "OK");
+                yield break;
+            }
+
+            CleanUp();
+
             _processedItemCount = 0;
             processing = 0;
             string[] scenePaths = sceneList
@@ -208,8 +216,19 @@ namespace SaintsField.Editor.AutoRunner
                     if (monoScript != null)
                     {
                         Type monoClass = monoScript.GetClass();
-                        if(monoClass != null && monoClass.Namespace != null && monoClass.Namespace.StartsWith("UnityEngine"))
+                        // ReSharper disable once MergeIntoPattern
+                        if(monoClass?.Namespace != null &&
+                           (monoClass.Namespace.StartsWith("UnityEngine") || monoClass.Namespace.StartsWith("UnityEditor")))
                         {
+                            // Debug.Log($"#AutoRunner# Skip namespace {monoClass.Namespace}");
+                            so.Dispose();
+                            continue;
+                        }
+
+                        string assetPath = AssetDatabase.GetAssetPath(monoScript);
+                        if (!string.IsNullOrEmpty(assetPath) && assetPath.StartsWith("Packages"))
+                        {
+                            // Debug.Log($"#AutoRunner# Skip package {assetPath}");
                             so.Dispose();
                             continue;
                         }
@@ -402,6 +421,11 @@ namespace SaintsField.Editor.AutoRunner
             // Debug.Log(EditorInspectingTarget);
             // Debug.Log(((AutoRunnerWindow)EditorInspectingTarget).buildingScenes);
             // EditorUtility.SetDirty(EditorInspectingTarget);
+            CleanUp();
+        }
+
+        private void CleanUp()
+        {
             foreach (AutoRunnerResult autoRunnerResult in results)
             {
                 try

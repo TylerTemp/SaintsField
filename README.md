@@ -77,14 +77,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.15.1**
+**3.16.0**
 
-1. Better `Auto Runner` serialization and drawer
-2. IMGUI: Fix auto getters might fail when refreshing the resources
-3. IMGUI: All kind of buttons now support `IEnumerator` return type (same as UI Toolkit)
-4. IMGUI: `Auto Runner` is now supported in IMGUI
-5. IMGUI: `Layout` with border or foldout, can now indent a bit for array and generic type, to increase the readability
-6. IMGUI: `Layout` foldout icon is now in gray color instead of white
+1.  Auto runner now supports auto getters!
+2.  UI Toolkit: fix auto getters update loop won't get triggered
+3.  Fix auto getters can not process `SaintsInterface` correctly
+4.  Improve the performance of auto runner, also give a dialog message if the opening scene is dirty
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -294,14 +294,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 // }
             }
 
-            Debug.Log($"needUpdate={needUpdate}");
-
             if (needUpdate)
             {
-                if (genericCache == null)
+                genericCache ??= new GetByXPathGenericCache
                 {
-                    genericCache = new GetByXPathGenericCache();
-                }
+                    Error = "",
+                };
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
 #endif

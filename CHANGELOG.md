@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.16.0 ##
+
+1.  Auto runner now supports auto getters!
+2.  UI Toolkit: fix auto getters update loop won't get triggered
+3.  Fix auto getters can not process `SaintsInterface` correctly
+4.  Improve the performance of auto runner, also give a dialog message if the opening scene is dirty
+
 ## 3.15.1 ##
 
 1. Better `Auto Runner` serialization and drawer

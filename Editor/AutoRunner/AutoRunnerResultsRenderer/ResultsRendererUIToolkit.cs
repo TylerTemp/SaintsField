@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Editor.Linq;
 using UnityEditor;
 using Object = UnityEngine.Object;
 using UnityEditor.UIElements;
@@ -35,6 +36,51 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
             _results = _autoRunner.results.ToArray();
             _root.Clear();
+
+            (AutoRunnerResult value, int index)[] canFixWithIndex = _autoRunner.results
+                .WithIndex()
+                .Where(each => each.value.FixerResult.CanFix)
+                .Reverse()
+                .ToArray();
+            if (canFixWithIndex.Length > 0)
+            {
+                _root.Add(new Button(() =>
+                {
+                    List<int> toRemoveIndex = new List<int>();
+                    foreach ((AutoRunnerResult autoRunnerResult, int index) in canFixWithIndex)
+                    {
+                        bool errorFixed = false;
+                        try
+                        {
+                            autoRunnerResult.FixerResult.Callback();
+                            errorFixed = true;
+                        }
+                        catch (Exception e)
+                        {
+                            autoRunnerResult.FixerResult.ExecError = e.Message;
+                        }
+
+                        if (errorFixed)
+                        {
+                            toRemoveIndex.Add(index);
+                        }
+                    }
+
+                    // ReSharper disable once InvertIf
+                    if(toRemoveIndex.Count > 0)
+                    {
+                        foreach (int index in toRemoveIndex)
+                        {
+                            _autoRunner.results.RemoveAt(index);
+                        }
+
+                        OnUpdateUIToolKit();
+                    }
+                })
+                {
+                    text = "Fix All",
+                });
+            }
 
             foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.results))
             {
