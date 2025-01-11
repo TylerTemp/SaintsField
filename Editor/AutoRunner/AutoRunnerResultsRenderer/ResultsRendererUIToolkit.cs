@@ -29,6 +29,13 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
 
+            // if(_autoRunner.results == null)
+            // {
+            //     _results = new List<AutoRunnerResult>();
+            //     _root.Clear();
+            //     return preCheckResult;
+            // }
+
             if (_autoRunner.results.SequenceEqual(_results))
             {
                 return preCheckResult;
@@ -39,7 +46,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
             (AutoRunnerResult value, int index)[] canFixWithIndex = _autoRunner.results
                 .WithIndex()
-                .Where(each => each.value.FixerResult.CanFix)
+                .Where(each => each.value.FixerResult?.CanFix ?? false)
                 .Reverse()
                 .ToArray();
             if (canFixWithIndex.Length > 0)

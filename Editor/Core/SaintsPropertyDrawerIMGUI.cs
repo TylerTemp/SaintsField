@@ -10,6 +10,10 @@ namespace SaintsField.Editor.Core
 {
     public partial class SaintsPropertyDrawer
     {
+        protected virtual void OnDisposeIMGUI()
+        {
+        }
+
         #region IMGUI GC Issue
 
         private UnityEngine.Object _imGuiObject;

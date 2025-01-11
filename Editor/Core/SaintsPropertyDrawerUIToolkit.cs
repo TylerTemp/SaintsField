@@ -16,6 +16,11 @@ namespace SaintsField.Editor.Core
 {
     public partial class SaintsPropertyDrawer
     {
+        protected virtual void OnDisposeUIToolkit()
+        {
+
+        }
+
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
         public static string ClassLabelFieldUIToolkit = "saints-field--label-field";
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";

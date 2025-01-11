@@ -114,5 +114,8 @@ namespace SaintsField.Utils
         public static int GetByXPathLoopIntervalMsIMGUI() => IsConfigLoaded? Config.getByXPathLoopIntervalMsIMGUI: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMsIMGUI;
         public static int GetByXPathFieldPassIMGUI() => IsConfigLoaded? Config.getByXPathFieldPassIMGUI: SaintsFieldConfig.GetByXPathDefaultFieldPassIMGUI;
         public static int GetByXPathArrayPassIMGUI() => IsConfigLoaded? Config.getByXPathArrayPassIMGUI: SaintsFieldConfig.GetByXPathDefaultArrayPassIMGUI;
+
+        // ReSharper disable once SimplifyConditionalTernaryExpression
+        public static bool GetValidateInputLoopCheckUIToolkit() => IsConfigLoaded? Config.validateInputLoopCheckUIToolkit: SaintsFieldConfig.ValidateInputLoopCheckDefault;
     }
 }

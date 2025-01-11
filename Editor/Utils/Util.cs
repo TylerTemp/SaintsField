@@ -549,7 +549,7 @@ namespace SaintsField.Editor.Utils
             return ($"No field or method named `{by}` found on `{target}`", defaultValue);
         }
 
-        public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
+        public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
         {
             List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             types.Reverse();
@@ -557,7 +557,7 @@ namespace SaintsField.Editor.Utils
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            (string error, int arrayIndex, object curValue) = GetValue(property, fieldInfo, target);
+            (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, target);
             if (error != "")
             {
                 return (error, defaultValue);

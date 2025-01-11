@@ -16,6 +16,10 @@ namespace SaintsField.Utils
         [InfoBox("The minimum row of resizable text area", EMessageType.None)]
         [MinValue(1)] public int resizableTextAreaMinRow = 3;
 
+        [InfoBox("Should the ValidateInput use loop check? <color=green><b>(UI Toolkit)")]
+        public bool validateInputLoopCheckUIToolkit = ValidateInputLoopCheckDefault;
+        public const bool ValidateInputLoopCheckDefault = false;
+
         [Space]
 
         [InfoBox("UI Toolkit: Aggressive OnValueChanged watcher\n\nThis allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]

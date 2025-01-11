@@ -215,7 +215,8 @@ GameObject:
   m_Component:
   - component: {fileID: 29054847}
   - component: {fileID: 29054846}
-  - component: {fileID: 29054845}
+  - component: {fileID: 29054849}
+  - component: {fileID: 29054848}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -223,14 +224,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &29054845
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 29054844}
-  m_Enabled: 1
 --- !u!20 &29054846
 Camera:
   m_ObjectHideFlags: 0
@@ -297,6 +290,46 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &29054848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29054844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce92818c712eaf2479662905942921d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDefaultListener: 1
+  bOverrideScalingFactor: 0
+  scalingFactor: -1
+  listenerId: 0
+--- !u!114 &29054849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29054844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd7b7c660c25b641834b45bf20d9279, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 0
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!1 &30182316
 GameObject:
   m_ObjectHideFlags: 0
@@ -11285,8 +11318,8 @@ Transform:
   - {fileID: 621082614}
   - {fileID: 1373075612}
   - {fileID: 402994056}
-  - {fileID: 1047761954}
   - {fileID: 285461136}
+  - {fileID: 1047761954}
   - {fileID: 1772932195}
   - {fileID: 1830942042}
   m_Father: {fileID: 1486592967}
@@ -12443,7 +12476,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e347d5448f43334418c003bced817599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  validate: 8
+  validate: 132
 --- !u!1 &1049330991
 GameObject:
   m_ObjectHideFlags: 0
@@ -18653,6 +18686,63 @@ MonoBehaviour:
   d1: 
   d1And2: 
   d1Or2: 
+--- !u!1 &1808466642
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1808466644}
+  - component: {fileID: 1808466643}
+  m_Layer: 0
+  m_Name: WwiseGlobal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1808466643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808466642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f535381981f961458dc90594ffd0000, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InitializationSettings: {fileID: 11400000, guid: 9f5202af46b37f943b2374477f000754, type: 2}
+  basePath: 
+  language: 
+  defaultPoolSize: 0
+  lowerPoolSize: 0
+  streamingPoolSize: 0
+  memoryCutoffThreshold: 0
+  monitorPoolSize: 0
+  monitorQueuePoolSize: 0
+  callbackManagerBufferSize: 0
+  spatialAudioPoolSize: 0
+  maxSoundPropagationDepth: 0
+  engineLogging: 0
+--- !u!4 &1808466644
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808466642}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1815438673
 GameObject:
   m_ObjectHideFlags: 0
@@ -26239,3 +26329,4 @@ SceneRoots:
   - {fileID: 272774834}
   - {fileID: 2138214539}
   - {fileID: 807567367}
+  - {fileID: 1808466644}

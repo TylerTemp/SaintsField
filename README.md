@@ -77,12 +77,16 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.16.0**
+**3.17.0**
 
-1.  Auto runner now supports auto getters!
-2.  UI Toolkit: fix auto getters update loop won't get triggered
-3.  Fix auto getters can not process `SaintsInterface` correctly
-4.  Improve the performance of auto runner, also give a dialog message if the opening scene is dirty
+1.  `ValidateInput` is now supported by Auto Runner.
+2.  `AboveImage`, `BelowImage`, `AssetPreview` now works on Addressable `AssetReference` type.
+3.  UI Toolkit: `ValidateInput` now only run when:
+    1.  the inspecting target is changed
+    2.  the project is changed
+    3.  some assets are changed
+
+    instead of every 100 ms. You can still enable the loop checking in `SaintsConfig`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3812,7 +3816,7 @@ using SaintsField;
 
 #### `AssetPreview` ####
 
-Show an image preview for prefabs, Sprite, Texture2D, etc. (Internally use `AssetPreview.GetAssetPreview`)
+Show an image preview for prefabs, Sprite, Texture2D, Addressable `AssetReference`, etc. (Internally use `AssetPreview.GetAssetPreview`), or on  type.
 
 Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
 
@@ -3854,7 +3858,7 @@ Show an image above/below the field.
 
 *   `string image = null`
 
-    An image to display. This can be a property or a callback, which returns a `Sprite`, `Texture2D`, `SpriteRenderer`, `UI.Image`, `UI.RawImage` or `UI.Button`.
+    An image to display. This can be a property or a callback, which returns a `Sprite`, `Texture2D`, `SpriteRenderer`, `UI.Image`, `UI.RawImage`, `UI.Button`, or Addressable `AssetReference` type.
 
     If it's null, it'll try to get the image from the field itself.
 

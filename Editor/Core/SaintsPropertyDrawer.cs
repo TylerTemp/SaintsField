@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Core
     // above
     // pre, label, field, post
     // below-
-    public abstract partial class SaintsPropertyDrawer: PropertyDrawer
+    public abstract partial class SaintsPropertyDrawer: PropertyDrawer, IDisposable
     {
         protected const int LabelLeftSpace = 4;
         protected const int LabelBaseWidth = 120;
@@ -574,6 +574,14 @@ namespace SaintsField.Editor.Core
                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
             }
             // Debug.Log($"UnityDraw exit, isSub={isSubDrawer}");
+        }
+
+        public void Dispose()
+        {
+            OnDisposeIMGUI();
+#if UNITY_2021_3_OR_NEWER
+            OnDisposeUIToolkit();
+#endif
         }
     }
 }
