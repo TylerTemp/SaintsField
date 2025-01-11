@@ -239,7 +239,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 if (!_iconDown)
                 {
-                    _iconDown = Util.LoadResource<Texture2D>("classic-dropdown.png");
+                    _iconDown = Util.LoadResource<Texture2D>("classic-dropdown-gray.png");
                 }
                 GUI.DrawTexture(titleFoldRect, _iconDown);
             }
@@ -247,7 +247,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 if (!_iconRight)
                 {
-                    _iconRight = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
+                    _iconRight = Util.LoadResource<Texture2D>("classic-dropdown-right-gray.png");
                 }
                 GUI.DrawTexture(titleFoldRect, _iconRight);
                 return;

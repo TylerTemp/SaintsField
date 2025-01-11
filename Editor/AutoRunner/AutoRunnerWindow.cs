@@ -17,20 +17,22 @@ namespace SaintsField.Editor.AutoRunner
 {
     public class AutoRunnerWindow: SaintsEditorWindow
     {
-        private const string EditorResourcePath = "SaintsField/AutoRunner.asset";
+        // private const string EditorResourcePath = "SaintsField/AutoRunner.asset";
 
         public override Type EditorDrawerType => typeof(AutoRunnerEditor);
 
         // [Button]
-        public override Object GetTarget()
-        {
-            AutoRunnerWindow autoRunnerWindow = EditorGUIUtility.Load(EditorResourcePath) as AutoRunnerWindow;
-            Debug.Log($"load: {autoRunnerWindow}");
-            return autoRunnerWindow == null
-                ? this
-                : autoRunnerWindow;
-        }
-
+        // public override Object GetTarget()
+        // {
+        //     AutoRunnerWindow autoRunnerWindow = EditorGUIUtility.Load(EditorResourcePath) as AutoRunnerWindow;
+        //     Debug.Log($"load: {autoRunnerWindow}");
+        //     return autoRunnerWindow == null
+        //         ? this
+        //         : autoRunnerWindow;
+        // }
+#if !UNITY_2019_4_OR_NEWER
+        [ListDrawerSettings]
+#endif
         [Ordered, LeftToggle] public bool buildingScenes;
 
         [Ordered, ShowInInspector, PlayaShowIf(nameof(buildingScenes))]
@@ -39,6 +41,9 @@ namespace SaintsField.Editor.AutoRunner
             .Select(each => AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path))
             .ToArray();
 
+#if !UNITY_2019_4_OR_NEWER
+        [ListDrawerSettings]
+#endif
         [Ordered] public SceneAsset[] sceneList = {};
 
         [Serializable]
