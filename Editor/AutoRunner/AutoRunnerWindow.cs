@@ -19,17 +19,6 @@ namespace SaintsField.Editor.AutoRunner
     {
         private const string EditorResourcePath = "SaintsField/AutoRunner.asset";
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Auto Runner")]
-#else
-        [MenuItem("Window/Saints/Auto Runner")]
-#endif
-        public static void OpenWindow()
-        {
-            EditorWindow window = GetWindow<AutoRunnerWindow>(false, "SaintsField Auto Runner");
-            window.Show();
-        }
-
         public override Type EditorDrawerType => typeof(AutoRunnerEditor);
 
         // [Button]
@@ -177,7 +166,11 @@ namespace SaintsField.Editor.AutoRunner
 
             foreach (string scenePath in scenePaths)
             {
-                EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                Debug.Log($"#AutoRunner# opening scene {scenePath}");
+                if(SceneManager.GetActiveScene().path != scenePath)
+                {
+                    EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                }
                 sceneSoIterations.Add((AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath), GetSerializedObjectFromCurrentScene(scenePath)));
                 yield return null;
             }
@@ -375,34 +368,34 @@ namespace SaintsField.Editor.AutoRunner
             return AssetDatabase.GetAssetPath(this) != "";
         }
 
-        [Ordered, Button("Save To Project"), PlayaHideIf(nameof(IsFromFile))]
-        // ReSharper disable once UnusedMember.Local
-        private void SaveToProject()
-        {
-            if (!Directory.Exists("Assets/Editor Default Resources"))
-            {
-                Debug.Log($"Create folder: Assets/Editor Default Resources");
-                AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
-            }
-
-            if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
-            {
-                Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
-                AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
-            }
-
-            Debug.Log(
-                $"Create saintsFieldConfig: Assets/Editor Default Resources/{EditorResourcePath}");
-            AutoRunnerWindow copy = Instantiate(this);
-            copy.results = new List<AutoRunnerResult>();
-            AssetDatabase.CreateAsset(copy, $"Assets/Editor Default Resources/{EditorResourcePath}");
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-            Debug.Log($"Reset target to saved file");
-            EditorRefreshTarget();
-            Selection.activeObject = EditorInspectingTarget;
-        }
+        // [Ordered, Button("Save To Project"), PlayaHideIf(nameof(IsFromFile))]
+        // // ReSharper disable once UnusedMember.Local
+        // private void SaveToProject()
+        // {
+        //     if (!Directory.Exists("Assets/Editor Default Resources"))
+        //     {
+        //         Debug.Log($"Create folder: Assets/Editor Default Resources");
+        //         AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+        //     }
+        //
+        //     if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
+        //     {
+        //         Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
+        //         AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
+        //     }
+        //
+        //     Debug.Log(
+        //         $"Create saintsFieldConfig: Assets/Editor Default Resources/{EditorResourcePath}");
+        //     AutoRunnerWindow copy = Instantiate(this);
+        //     copy.results = new List<AutoRunnerResult>();
+        //     AssetDatabase.CreateAsset(copy, $"Assets/Editor Default Resources/{EditorResourcePath}");
+        //
+        //     AssetDatabase.SaveAssets();
+        //     AssetDatabase.Refresh();
+        //     Debug.Log($"Reset target to saved file");
+        //     EditorRefreshTarget();
+        //     Selection.activeObject = EditorInspectingTarget;
+        // }
 
         // public AutoRunnerResult result = new AutoRunnerResult();
         [Ordered, ShowInInspector] public List<AutoRunnerResult> results = new List<AutoRunnerResult>();

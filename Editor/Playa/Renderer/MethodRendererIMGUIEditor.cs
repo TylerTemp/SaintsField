@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,15 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
-            if(_imGuiEnumerator != null && !_imGuiEnumerator.MoveNext())
+            if(_imGuiEnumerator != null)
             {
-                _imGuiEnumerator = null;
+                bool moveNext = _imGuiEnumerator.MoveNext();
+                if (!moveNext)
+                {
+                    _imGuiEnumerator = null;
+                }
+
+                // Debug.Log($"moved {_imGuiEnumerator}");
             }
 
             object target = FieldWithInfo.Target;
@@ -73,19 +80,40 @@ namespace SaintsField.Editor.Playa.Renderer
                 return _imGuiParameterValues[index] = FieldLayout(_imGuiParameterValues[index], ObjectNames.NicifyVariableName(p.Name), p.ParameterType, false);
             }).ToArray();
 
-            if (GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
-                    GUILayout.ExpandWidth(true)))
+            bool clicked;
+            try
             {
-                object result = methodInfo.Invoke(target, invokeParams);
-                if (result is IEnumerator ie)
+                clicked = GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
+                    GUILayout.ExpandWidth(true));
+            }
+            catch (Exception e)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogException(e);
+#endif
+                if (parameters.Length > 0)
                 {
-                    _imGuiEnumerator = ie;
+                    GUILayout.EndVertical();
                 }
+
+                return;
             }
 
             if (parameters.Length > 0)
             {
                 GUILayout.EndVertical();
+            }
+
+            // ReSharper disable once InvertIf
+            if (clicked)
+            {
+                // Debug.Log($"Button Clicked: {buttonText}");
+                object result = methodInfo.Invoke(target, invokeParams);
+                // Debug.Log($"Button return: {result}/{result is IEnumerator}");
+                if (result is IEnumerator ie)
+                {
+                    _imGuiEnumerator = ie;
+                }
             }
         }
     }

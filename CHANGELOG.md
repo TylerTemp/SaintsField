@@ -10,6 +10,7 @@
     3.  some assets are changed
 
     instead of every 100 ms. You can still enable the loop checking in `SaintsConfig`
+4.  Change Auto Runner so you can have multiple config for different purposes.
 
 ## 3.16.0 ##
 

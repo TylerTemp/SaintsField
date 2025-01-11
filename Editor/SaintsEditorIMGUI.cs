@@ -45,21 +45,6 @@ namespace SaintsField.Editor
 #endif
         }
 
-#if UNITY_2019_2_OR_NEWER
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-#endif
-#if UNITY_2019_3_OR_NEWER
-        [InitializeOnEnterPlayMode]
-#endif
-        private void ResetRenderersImGui()
-        {
-            _renderers = null;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-            AliveInstances.Clear();
-            DOTweenEditorPreview.Stop();
-#endif
-        }
-
         public override void OnInspectorGUI()
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment

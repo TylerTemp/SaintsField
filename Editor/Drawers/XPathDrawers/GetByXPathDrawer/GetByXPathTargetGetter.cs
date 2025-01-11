@@ -132,7 +132,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                                 string assetPath = string.IsNullOrEmpty(each.FolderPath)
                                     ? (string)each.Resource
                                     : $"{each.FolderPath}/{each.Resource}";
-                                return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                                // Debug.Log(assetPath);
+                                try
+                                {
+                                    return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                                }
+                                catch (Exception e)
+                                {
+#if SAINTSFIELD_DEBUG
+                                    Debug.LogException(e);
+#endif
+                                    return null;
+                                }
                             }
 
                             return each.Resource;
