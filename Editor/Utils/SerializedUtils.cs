@@ -119,7 +119,7 @@ namespace SaintsField.Editor.Utils
             string[] paths = property.propertyPath.Split('.');
 
             (bool _, IEnumerable<string> propPathSegments) = TrimEndArray(paths);
-            return string.Join(".", propPathSegments);
+            return $"{property.serializedObject.targetObject.GetInstanceID()}_{string.Join(".", propPathSegments)}";
         }
 
         public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
