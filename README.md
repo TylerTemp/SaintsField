@@ -79,7 +79,7 @@ namespace: `SaintsField`
 
 **3.17.1**
 
-1.  Fix auto getters won't work if target uses the same field name for array/list
+1.  Fix auto getters won't work if multiple targets use the same field name for array/list
 2.  IMGUI: `AddressableResource` is not supported in IMGUI too
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
