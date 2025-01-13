@@ -45,6 +45,54 @@ namespace SaintsField.Editor.Core
             Selection.selectionChanged += ImGuiCheckChanged;
         }
 
+        private static readonly Dictionary<UnityEngine.Object, HashSet<Action>> _inspectingTargetCallback = new Dictionary<UnityEngine.Object, HashSet<Action>>();
+        private static bool _inspectingWatchingImGui;
+
+        private static void EnsureInsectingTargetDisposer()
+        {
+            if (_inspectingWatchingImGui)
+            {
+                return;
+            }
+
+            _inspectingWatchingImGui = true;
+            Selection.selectionChanged += OnInspectingChangedImGui;
+        }
+
+        private static void OnInspectingChangedImGui()
+        {
+            List<UnityEngine.Object> toRemove = new List<UnityEngine.Object>();
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (KeyValuePair<UnityEngine.Object, HashSet<Action>> inspectingKv in _inspectingTargetCallback)
+            {
+                // ReSharper disable once InvertIf
+                if(Array.IndexOf(Selection.objects, inspectingKv.Key) == -1)  // disposed
+                {
+                    foreach (Action action in inspectingKv.Value)
+                    {
+                        action();
+                    }
+                    toRemove.Add(inspectingKv.Key);
+                }
+            }
+
+            foreach (UnityEngine.Object each in toRemove)
+            {
+                _inspectingTargetCallback.Remove(each);
+            }
+        }
+
+        protected static void NoLongerInspectingWatch(UnityEngine.Object target, Action callback)
+        {
+            if (!_inspectingTargetCallback.TryGetValue(target, out HashSet<Action> callbacks))
+            {
+                _inspectingTargetCallback[target] = callbacks = new HashSet<Action>();
+            }
+
+            callbacks.Add(callback);
+            EnsureInsectingTargetDisposer();
+        }
+
         #endregion
 
         private bool GetVisibility(SerializedProperty property, IEnumerable<SaintsWithIndex> saintsAttributeWithIndexes, object parent)
@@ -767,7 +815,7 @@ namespace SaintsField.Editor.Core
                     {
                         foreach ((SaintsPropertyDrawer drawerInstance, SaintsWithIndex saintsWithIndex) in drawerInfo)
                         {
-                            belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
+                            belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, allAttributes, onGUIPayload,  fieldInfo, parent);
                         }
                     }
                     else
@@ -784,7 +832,7 @@ namespace SaintsField.Editor.Core
                                 width = eachWidth,
                             };
                             Rect leftRect =
-                                drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
+                                drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel, saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, allAttributes, onGUIPayload, fieldInfo, parent);
                             height = Mathf.Max(height, leftRect.y - eachRect.y);
                         }
 
@@ -885,7 +933,8 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual Rect DrawBelow(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+            GUIContent label, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             return position;
         }

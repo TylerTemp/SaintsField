@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -26,7 +27,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.BelowButtonDrawer
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             Rect leftRect = Draw(position, property, label, saintsAttribute, info, parent);
 

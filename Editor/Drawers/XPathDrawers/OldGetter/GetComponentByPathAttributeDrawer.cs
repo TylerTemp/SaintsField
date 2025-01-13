@@ -133,7 +133,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.OldGetter
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
-            int index,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
             return ImGuiHelpBox.Draw(position, _error, MessageType.Error);

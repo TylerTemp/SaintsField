@@ -8,7 +8,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 {
     public partial class DropdownAttributeDrawer
     {
-        #region IMGUI
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
         private static readonly Dictionary<string, object> AsyncChangedCache = new Dictionary<string, object>();
@@ -58,8 +57,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
             if (EditorGUI.DropdownButton(fieldRect, new GUIContent(curDisplay), FocusType.Keyboard))
             {
-
-
                 ShowGenericMenu(metaInfo, curDisplay, fieldRect, (_, item) =>
                 {
                     ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, item);
@@ -98,8 +95,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
-
-        #endregion
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
     }
 }

@@ -273,7 +273,7 @@ namespace SaintsField.Editor.Utils
 
         public static string GetUniqueId(SerializedProperty property)
         {
-            return $"{property.serializedObject.targetObject.GetInstanceID()}.{property.propertyPath}";
+            return $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
         }
 
         public static Object GetSerObject(SerializedProperty property, FieldInfo info, object parent)

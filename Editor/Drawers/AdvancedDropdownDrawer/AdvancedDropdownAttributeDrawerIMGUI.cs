@@ -62,27 +62,27 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     ? AdvancedDropdownAttribute.ItemHeight
                     : EditorGUIUtility.singleLineHeight;
                 float titleHeight = AdvancedDropdownAttribute.TitleHeight;
-                Vector2 size;
-                if (minHeight < 0)
-                {
-                    if(AdvancedDropdownAttribute.UseTotalItemCount)
-                    {
-                        float totalItemCount = GetValueItemCounts(metaInfo.DropdownListValue);
-                        // Debug.Log(totalItemCount);
-                        size = new Vector2(position.width, totalItemCount * itemHeight + titleHeight);
-                    }
-                    else
-                    {
-                        float maxChildCount = GetDropdownPageHeight(metaInfo.DropdownListValue, itemHeight, AdvancedDropdownAttribute.SepHeight).Max();
-                        size = new Vector2(position.width, maxChildCount + titleHeight);
-                    }
-                }
-                else
-                {
-                    size = new Vector2(position.width, minHeight);
-                }
+                // Vector2 size;
+                // if (minHeight < 0)
+                // {
+                //     if(AdvancedDropdownAttribute.UseTotalItemCount)
+                //     {
+                //         float totalItemCount = GetValueItemCounts(metaInfo.DropdownListValue);
+                //         // Debug.Log(totalItemCount);
+                //         size = new Vector2(position.width, totalItemCount * itemHeight + titleHeight);
+                //     }
+                //     else
+                //     {
+                //         float maxChildCount = AdvancedDropdownUtil.GetDropdownPageHeight(metaInfo.DropdownListValue, itemHeight, AdvancedDropdownAttribute.SepHeight).Max();
+                //         size = new Vector2(position.width, maxChildCount + titleHeight);
+                //     }
+                // }
+                // else
+                // {
+                //     size = new Vector2(position.width, minHeight);
+                // }
 
-                // Vector2 size = new Vector2(position.width, maxChildCount * EditorGUIUtility.singleLineHeight + 31f);
+                Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(metaInfo.DropdownListValue, position.width);
 
                 // OnGUIPayload targetPayload = onGUIPayload;
                 SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
@@ -108,26 +108,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             #endregion
-        }
-
-        private static IEnumerable<float> GetDropdownPageHeight(IAdvancedDropdownList dropdownList, float itemHeight, float sepHeight)
-        {
-            if (dropdownList.ChildCount() == 0)
-            {
-                // Debug.Log($"yield 0");
-                yield return 0;
-                yield break;
-            }
-
-            // Debug.Log($"yield {dropdownList.children.Count}");
-            yield return dropdownList.ChildCount() * itemHeight + dropdownList.SepCount() * sepHeight;
-            foreach (IEnumerable<float> eachChildHeight in dropdownList.children.Select(child => GetDropdownPageHeight(child, itemHeight, sepHeight)))
-            {
-                foreach (int i in eachChildHeight)
-                {
-                    yield return i;
-                }
-            }
         }
 
         private static int GetValueItemCounts(IAdvancedDropdownList dropdownList)
@@ -201,7 +181,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
     }
 }

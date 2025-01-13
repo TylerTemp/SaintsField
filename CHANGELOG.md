@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.17.1 ##
+
+1.  Fix auto getters won't work if target uses the same field name for array/list
+2.  IMGUI: `AddressableResource` is not supported in IMGUI too
+
 ## 3.17.0 ##
 
 1.  `ValidateInput` is now supported by Auto Runner.

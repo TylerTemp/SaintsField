@@ -396,9 +396,9 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             nameButton.clicked += () =>
             {
                 GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-                foreach (string nameType in new[]{"File Path", "File Name Base", "File Name", "GUID"})
+                foreach (NameType nameType in Enum.GetValues(typeof(NameType)).Cast<NameType>())
                 {
-                    genericDropdownMenu.AddItem(nameType, false, () =>
+                    genericDropdownMenu.AddItem(nameType.ToFriendlyString(), false, () =>
                     {
                         nameButton.userData = nameType;
                         Object curObj = objField.value;
@@ -420,7 +420,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 AddressableAssetEntry entry = settings.FindAssetEntry(AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(curObj)).ToString());
                 if(entry == null)
                 {
-                    nameInput.value = GetObjectName((string)nameButton.userData, curObj);
+                    nameInput.value = GetObjectName((NameType)nameButton.userData, curObj);
                     return;
                 }
 
@@ -506,9 +506,11 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 string curGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(curObj));
                 AddressableAssetEntry entry = settings.CreateOrMoveEntry(curGuid, group);
                 entry.address = nameInput.value;
-                foreach (string label in (IReadOnlyList<string>)labelDown.userData)
+
+                IReadOnlyList<string> useLabels = (IReadOnlyList<string>)labelDown.userData;
+                foreach (string eachLabel in settings.GetLabels())
                 {
-                    entry.SetLabel(label, true);
+                    entry.SetLabel(eachLabel, useLabels.Contains(eachLabel));
                 }
 
                 return (curGuid, curObj);
@@ -517,24 +519,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             void CloseActionArea()
             {
                 actionArea.style.display = DisplayStyle.None;
-            }
-        }
-
-        private static string GetObjectName(string nameType, Object curObj)
-        {
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (nameType)
-            {
-                case "File Path":
-                    return AssetDatabase.GetAssetPath(curObj);
-                case "File Name Base":
-                    return Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(curObj));
-                case "File Name":
-                    return Path.GetFileName(AssetDatabase.GetAssetPath(curObj));
-                case "GUID":
-                    return AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(curObj));
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(nameType), nameType, null);
             }
         }
 

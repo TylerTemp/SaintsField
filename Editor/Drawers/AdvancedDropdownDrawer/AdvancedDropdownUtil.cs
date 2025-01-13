@@ -4,6 +4,8 @@ using System.Linq;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
@@ -60,6 +62,35 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // Debug.Log($"GetSelected end in empty");
             // nothing selected
             return (Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), "");
+        }
+
+        private const float DefaultSepHeight = 4f;
+        private const float TitleHeight = AdvancedDropdownAttribute.TitleHeight;
+
+        public static Vector2 GetSizeIMGUI(IAdvancedDropdownList dropdownListValue, float positionWidth)
+        {
+            float maxChildCount = GetDropdownPageHeight(dropdownListValue, EditorGUIUtility.singleLineHeight, DefaultSepHeight).Max();
+            return new Vector2(positionWidth, maxChildCount + TitleHeight);
+        }
+
+        public static IEnumerable<float> GetDropdownPageHeight(IAdvancedDropdownList dropdownList, float itemHeight, float sepHeight)
+        {
+            if (dropdownList.ChildCount() == 0)
+            {
+                // Debug.Log($"yield 0");
+                yield return 0;
+                yield break;
+            }
+
+            // Debug.Log($"yield {dropdownList.children.Count}");
+            yield return dropdownList.ChildCount() * itemHeight + dropdownList.SepCount() * sepHeight;
+            foreach (IEnumerable<float> eachChildHeight in dropdownList.children.Select(child => GetDropdownPageHeight(child, itemHeight, sepHeight)))
+            {
+                foreach (int i in eachChildHeight)
+                {
+                    yield return i;
+                }
+            }
         }
     }
 }

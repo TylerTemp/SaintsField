@@ -77,17 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.17.0**
+**3.17.1**
 
-1.  `ValidateInput` is now supported by Auto Runner.
-2.  `AboveImage`, `BelowImage`, `AssetPreview` now works on Addressable `AssetReference` type.
-3.  UI Toolkit: `ValidateInput` now only run when:
-    1.  the inspecting target is changed
-    2.  the project is changed
-    3.  some assets are changed
-
-    instead of every 100 ms. You can still enable the loop checking in `SaintsConfig`
-4.  Change Auto Runner so you can have multiple config for different purposes.
+1.  Fix auto getters won't work if target uses the same field name for array/list
+2.  IMGUI: `AddressableResource` is not supported in IMGUI too
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

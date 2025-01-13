@@ -48,9 +48,9 @@ namespace SaintsField.Editor.Core
         // ReSharper disable once InconsistentNaming
         protected readonly string FieldControlName;
 
-        private static double SceneViewNotificationTime;
-        private static bool SceneViewNotificationListened;
-        private static HashSet<string> SceneViewNotifications = new HashSet<string>();
+        private static double _sceneViewNotificationTime;
+        private static bool _sceneViewNotificationListened;
+        private static readonly HashSet<string> SceneViewNotifications = new HashSet<string>();
 
         private struct SaintsWithIndex : IEquatable<SaintsWithIndex>
         {
@@ -122,16 +122,16 @@ namespace SaintsField.Editor.Core
         {
             if (SceneViewNotifications.Count == 0)
             {
-                SceneViewNotificationTime = EditorApplication.timeSinceStartup;
+                _sceneViewNotificationTime = EditorApplication.timeSinceStartup;
                 return;
             }
 
-            if(EditorApplication.timeSinceStartup - SceneViewNotificationTime < 0.5f)
+            if(EditorApplication.timeSinceStartup - _sceneViewNotificationTime < 0.5f)
             {
                 return;
             }
 
-            SceneViewNotificationTime = EditorApplication.timeSinceStartup;
+            _sceneViewNotificationTime = EditorApplication.timeSinceStartup;
             sv.ShowNotification(new GUIContent(string.Join("\n", SceneViewNotifications)));
             SceneViewNotifications.Clear();
             SceneView.RepaintAll();
@@ -139,10 +139,10 @@ namespace SaintsField.Editor.Core
 
         protected static void EnqueueSceneViewNotification(string message)
         {
-            if (!SceneViewNotificationListened)
+            if (!_sceneViewNotificationListened)
             {
-                SceneViewNotificationListened = true;
-                SceneViewNotificationTime = EditorApplication.timeSinceStartup;
+                _sceneViewNotificationListened = true;
+                _sceneViewNotificationTime = EditorApplication.timeSinceStartup;
                 SceneView.duringSceneGui += OnSceneViewNotification;
             }
 
