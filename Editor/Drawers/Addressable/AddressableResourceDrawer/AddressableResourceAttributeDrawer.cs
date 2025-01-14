@@ -43,14 +43,19 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
     {
         public static string ToFriendlyString(this AddressableResourceAttributeDrawer.NameType nameType)
         {
-            return nameType switch
+            switch(nameType)
             {
-                AddressableResourceAttributeDrawer.NameType.FilePath => "File Path",
-                AddressableResourceAttributeDrawer.NameType.FileNameBase => "File Name Base",
-                AddressableResourceAttributeDrawer.NameType.FileName => "File Name",
-                AddressableResourceAttributeDrawer.NameType.GUID => "GUID",
-                _ => throw new System.ArgumentOutOfRangeException(nameof(nameType), nameType, null),
-            };
+                case AddressableResourceAttributeDrawer.NameType.FilePath:
+                    return "File Path";
+                case AddressableResourceAttributeDrawer.NameType.FileNameBase:
+                    return "File Name Base";
+                case AddressableResourceAttributeDrawer.NameType.FileName:
+                    return "File Name";
+                case AddressableResourceAttributeDrawer.NameType.GUID:
+                    return "GUID";
+                default:
+                    throw new System.ArgumentOutOfRangeException(nameof(nameType), nameType, null);
+            }
         }
     }
 }

@@ -318,7 +318,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 Object inspectingTarget = cacheInfo.CurObject != null? cacheInfo.CurObject: currentObj;
                 inspectingTarget =
                     EditorGUI.ObjectField(resourceRow, new GUIContent("Resource"), inspectingTarget, cacheInfo.IsSprite ? typeof(Sprite) : typeof(Object), false);
-                entry = settings.FindAssetEntry(AssetDatabase.GUIDFromAssetPath(AssetDatabase.GetAssetPath(inspectingTarget)).ToString());
+                entry = settings.FindAssetEntry(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(inspectingTarget)));
                 if (changed.changed || onGuiPayload.changed)
                 {
                     cacheInfo.CurObject = inspectingTarget;
