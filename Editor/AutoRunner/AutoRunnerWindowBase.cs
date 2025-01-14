@@ -449,7 +449,7 @@ namespace SaintsField.Editor.AutoRunner
                                         mainTargetString = mainTargetString,
                                         mainTargetIsAssetPath = mainTargetIsAssetPath,
                                         subTarget = so.targetObject,
-                                        propertyPath = "OnValidate",
+                                        propertyPath = "OnValidate()",
                                         // SerializedProperty = prop,
                                         SerializedObject = so,
                                     };
