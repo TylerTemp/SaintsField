@@ -133,6 +133,11 @@ namespace SaintsField.Editor.AutoRunner
             public int GroupCurrent;
             public int ProcessCount;
             public string ProcessMessage;
+
+            public override string ToString()
+            {
+                return $"#AutoRunner# {GroupCurrent}/{GroupTotal}: {ProcessCount} - {ProcessMessage}";
+            }
         }
 
         private readonly List<Scene> _originalOpenedScenes = new List<Scene>();

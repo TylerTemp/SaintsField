@@ -11,12 +11,12 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 {
     public partial class ResultsRenderer: NativePropertyRenderer
     {
-        private readonly AutoRunnerWindow _autoRunner;
+        private readonly AutoRunnerWindowBase _autoRunner;
 
         public ResultsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             RenderField = true;
-            _autoRunner = (AutoRunnerWindow) serializedObject.targetObject;
+            _autoRunner = (AutoRunnerWindowBase) serializedObject.targetObject;
         }
 
         private struct MainTarget : IEquatable<MainTarget>
