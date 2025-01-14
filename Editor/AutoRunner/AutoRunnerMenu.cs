@@ -74,7 +74,7 @@ namespace SaintsField.Editor.AutoRunner
             return string.IsNullOrEmpty(AssetDatabase.GetAssetPath(editorInlineInspect));
         }
 
-        [Ordered, WindowInlineEditor]
+        [Ordered, WindowInlineEditor(typeof(AutoRunnerEditor))]
         public AutoRunnerWindow editorInlineInspect;
 
         private AdvancedDropdownList<AutoRunnerWindow> ShowDropdown()

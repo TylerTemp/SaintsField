@@ -20,28 +20,41 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             _container = new VisualElement();
             if(!Util.IsNull(_value))
             {
-                _container.Add(new InspectorElement(_value));
+                ReCreateEditor();
             }
             // Debug.Log($"created for {element}");
             return (_container, true);
         }
 
-
-        protected override PreCheckResult OnUpdateUIToolKit()
+        private void ReCreateEditor()
         {
-            PreCheckResult result = base.OnUpdateUIToolKit();
-            Object newV = GetValue();
-            if (!ReferenceEquals(_value, newV))
+            _container.Clear();
+            InspectorElement inspectorElement;
+            if (_editorType == null)
             {
-                _value = newV;
-                _container.Clear();
-                if(!Util.IsNull(_value))
-                {
-                    _container.Add(new InspectorElement(_value));
-                }
+                inspectorElement = new InspectorElement(_value);
             }
-            return result;
+            else
+            {
+                Debug.Log($"create editor for {_value} with {_editorType}");
+                inspectorElement = new InspectorElement(UnityEditor.Editor.CreateEditor(_value, _editorType));
+            }
+            _container.Add(inspectorElement);
         }
+
+
+        // protected override PreCheckResult OnUpdateUIToolKit()
+        // {
+        //     PreCheckResult result = HelperOnUpdateUIToolKitRawBase();
+        //     Object newV = GetValue();
+        //     if (!ReferenceEquals(_value, newV))
+        //     {
+        //         Debug.Log($"Recreate {_value} -> {newV}");
+        //         _value = newV;
+        //         ReCreateEditor();
+        //     }
+        //     return result;
+        // }
     }
 }
 #endif

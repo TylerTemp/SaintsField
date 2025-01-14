@@ -353,15 +353,30 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected virtual PreCheckResult OnUpdateUIToolKit()
         {
+            UpdateHelpBox();
+            return UpdatePreCheckUIToolkit();
+        }
+
+        protected PreCheckResult HelperOnUpdateUIToolKitRawBase()
+        {
+            UpdateHelpBox();
+            return UpdatePreCheckUIToolkit();
+        }
+
+        protected void UpdateHelpBox()
+        {
             foreach (HelpBox helpBox in _rootElement.Query<HelpBox>(className: ClassInfoBox).ToList())
             {
                 UpdateInfoBox(helpBox);
             }
-
-            return UpdatePreCheckUIToolkit(FieldWithInfo, _rootElement);
         }
 
-        protected PreCheckResult UpdatePreCheckUIToolkit(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
+        protected PreCheckResult UpdatePreCheckUIToolkit()
+        {
+            return UpdatePreCheckUIToolkitInternal(FieldWithInfo, _rootElement);
+        }
+
+        private PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo, false);
             if(result.enabledSelf != !preCheckResult.IsDisabled)

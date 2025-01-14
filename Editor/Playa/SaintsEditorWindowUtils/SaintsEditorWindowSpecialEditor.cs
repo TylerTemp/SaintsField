@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 #if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
             false
 #else
-            false
+            true
 #endif
         ;
 
@@ -28,10 +28,12 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
                 return null;
             }
 
-            if (fieldWithInfo.PlayaAttributes.Any(each => each is SaintsEditorWindow.WindowInlineEditorAttribute))
+            SaintsEditorWindow.WindowInlineEditorAttribute windowInlineEditorAttribute = fieldWithInfo.PlayaAttributes.OfType<SaintsEditorWindow.WindowInlineEditorAttribute>().FirstOrDefault();
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (windowInlineEditorAttribute != null)
             {
                 // Debug.Log(fieldWithInfo);
-                return new WindowInlineEditorRenderer(so, fieldWithInfo);
+                return new WindowInlineEditorRenderer(so, fieldWithInfo, windowInlineEditorAttribute.EditorType);
             }
 
             // Debug.Log($"{fieldWithInfo.RenderType}/{fieldWithInfo.FieldInfo?.Name}/{string.Join(",", fieldWithInfo.PlayaAttributes)}");

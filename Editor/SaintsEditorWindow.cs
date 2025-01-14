@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Playa.SaintsEditorWindowUtils;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.Events;
 
 
 namespace SaintsField.Editor
@@ -17,7 +16,11 @@ namespace SaintsField.Editor
         [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
         public class WindowInlineEditorAttribute : Attribute, IPlayaAttribute
         {
-
+            public readonly Type EditorType;
+            public WindowInlineEditorAttribute(Type editorType = null)
+            {
+                EditorType = editorType;
+            }
         }
 
         #endregion
@@ -103,17 +106,21 @@ namespace SaintsField.Editor
 
         private void EditorOnUpdateInternal()
          {
-             HashSet<IEnumerator> toRemove = new HashSet<IEnumerator>();
+             // HashSet<IEnumerator> toRemove = new HashSet<IEnumerator>();
+             // Debug.Log(_coroutines.Count);
              // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-             foreach (IEnumerator coroutine in _coroutines)
+             foreach (IEnumerator coroutine in _coroutines.ToArray())
              {
+                 // Debug.Log($"coroutine run={coroutine}");
                  if (!coroutine.MoveNext())
                  {
-                     toRemove.Add(coroutine);
+                     // Debug.Log($"coroutine will move={coroutine}");
+                     // toRemove.Add(coroutine);
+                     _coroutines.Remove(coroutine);
                  }
              }
 
-             _coroutines.ExceptWith(toRemove);
+             // _coroutines.ExceptWith(toRemove);
 
              OnEditorUpdate();
          }
@@ -129,6 +136,7 @@ namespace SaintsField.Editor
         public void StartEditorCoroutine(IEnumerator routine)
         {
             _coroutines.Add(routine);
+            // Debug.Log($"coroutine add={routine}, {_coroutines.Count}");
         }
 
         // ReSharper disable once MemberCanBeProtected.Global

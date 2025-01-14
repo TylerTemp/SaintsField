@@ -4,18 +4,18 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 {
-    public partial class ResultsRenderer: NonSerializedFieldRenderer
+    public partial class ResultsRenderer: NativePropertyRenderer
     {
         private readonly AutoRunnerWindow _autoRunner;
 
         public ResultsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
+            RenderField = true;
             _autoRunner = (AutoRunnerWindow) serializedObject.targetObject;
         }
 

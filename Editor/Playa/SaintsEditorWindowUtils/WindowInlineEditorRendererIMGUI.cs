@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 
             if (_editor == null)
             {
-                _editor = UnityEditor.Editor.CreateEditor(target);
+                _editor = UnityEditor.Editor.CreateEditor(target, _editorType);
             }
 
             try

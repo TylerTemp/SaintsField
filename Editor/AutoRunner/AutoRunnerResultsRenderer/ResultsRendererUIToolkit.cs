@@ -27,7 +27,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         protected override PreCheckResult OnUpdateUIToolKit()
         {
-            PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
+            PreCheckResult preCheckResult = HelperOnUpdateUIToolKitRawBase();
 
             // if(_autoRunner.results == null)
             // {
