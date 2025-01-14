@@ -1,3 +1,4 @@
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,10 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
+using UnityEngine.AddressableAssets;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
+
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
@@ -506,3 +508,4 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
         }
     }
 }
+#endif

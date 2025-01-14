@@ -1,12 +1,7 @@
-﻿using System.Reflection;
-using SaintsField.Playa;
+﻿using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Linq;
-using SaintsField.Editor.Utils;
-using UnityEngine.UIElements;
-#endif
 
 namespace SaintsField.Editor.Playa.Renderer
 {
@@ -28,6 +23,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
             if (!RenderField)
             {
                 return 0f;

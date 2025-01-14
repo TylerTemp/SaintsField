@@ -39,12 +39,15 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 }
 
 #else
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
+#endif
 
 namespace SaintsField.Editor.Drawers.HandleDrawers
 {
@@ -69,8 +72,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             return ImGuiHelpBox.GetHeight(ErrorMessage, width, MessageType.Error) + SingleLineHeight;
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property,
+            GUIContent label, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             Rect leftRect = ImGuiHelpBox.Draw(position, ErrorMessage, MessageType.Error);
             (Rect buttonRect, Rect emptyRect) = RectUtils.SplitHeightRect(leftRect, SingleLineHeight);

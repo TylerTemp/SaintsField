@@ -297,6 +297,11 @@ namespace SaintsField.Editor.Core
             return fieldInfo.GetCustomAttributes()
                 // ReSharper disable once UseNegatedPatternInIsExpression
                 .Where(each => !(each is ISaintsAttribute))
+
+
+
+
+
                 .Any(fieldAttribute => PropertyAttributeToPropertyDrawers.Keys.Any(checkType => checkType.IsInstanceOfType(fieldAttribute)));
         }
 
