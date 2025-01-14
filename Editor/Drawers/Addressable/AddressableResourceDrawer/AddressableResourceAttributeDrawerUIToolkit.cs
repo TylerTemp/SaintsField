@@ -392,7 +392,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             VisualElement nameInputContainer = container.Q<VisualElement>(NameInputContainerName(property));
             TextField nameInput = nameInputContainer.Q<TextField>(NameInputName(property));
             Button nameButton = nameInputContainer.Q<Button>(NameButtonName(property));
-            nameButton.userData = "File Path";
+            nameButton.userData = NameType.FilePath;
             nameButton.clicked += () =>
             {
                 GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();

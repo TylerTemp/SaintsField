@@ -121,10 +121,13 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                         Debug.Log($"#AutoRunner# target is null: {mainTarget.MainTargetString}");
                         continue;
                     }
-                    group.Add(new ObjectField
+
+                    ObjectField objField = new ObjectField(obj.name)
                     {
                         value = obj,
-                    });
+                    };
+                    objField.AddToClassList(ObjectField.alignedFieldUssClassName);
+                    group.Add(objField);
                     group.text = obj.name;
                 }
 

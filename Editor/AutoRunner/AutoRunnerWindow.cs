@@ -5,7 +5,9 @@ using System.Linq;
 using SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.AutoRunner
@@ -53,7 +55,7 @@ namespace SaintsField.Editor.AutoRunner
         [Ordered, PlayaRichLabel("Extra Resources")]
         public Object[] extraResources = Array.Empty<Object>();
 
-        protected override IEnumerable<Object> GetExtraResources() => extraResources;
+        protected override IEnumerable<Object> GetExtraAssets() => extraResources;
 
         [Ordered, LeftToggle] public bool skipHiddenFields = true;
 
@@ -68,41 +70,48 @@ namespace SaintsField.Editor.AutoRunner
 
         [Ordered, ShowInInspector, PlayaShowIf(nameof(_processedItemCount))] private int _processedItemCount;
 
-        protected override void UpdateProcessCount(int accCount)
-        {
-            _processedItemCount = accCount;
-        }
-
-        protected override IEnumerable<(object, IEnumerable<SerializedObject>)> StartToProcessGroup(IReadOnlyList<(object, IEnumerable<SerializedObject>)> allResources)
-        {
-            _resourceTotal = allResources.Count;
-            return base.StartToProcessGroup(allResources);
-        }
-        protected override void UpdateProcessGroup(int accCount) => processing = accCount;
-        protected override void UpdateProcessMessage(string message) => _processingMessage = message;
-
         // private IEnumerator _running;
+
+        [LayoutStart("Buttons", ELayout.Horizontal)]
 
         [Ordered, Button("Run!")]
         // ReSharper disable once UnusedMember.Local
-        private void Run()
+        private IEnumerator Run()
         {
+            Scene[] dirtyScenes = GetDirtyOpenedScene().ToArray();
+            if (dirtyScenes.Length > 0)
+            {
+                EditorUtility.DisplayDialog("Save Scene", $"Please save scene(s) before running AutoRunner: {string.Join(", ", dirtyScenes.Select(each => each.name))}", "OK");
+                yield break;
+            }
+
             Debug.Log("#AutoRunner# start to run auto runners");
             // StartEditorCoroutine();
-            // foreach (var _ in RunAutoRunners())
-            // {
-            //     yield return null;
-            // }
-            StartEditorCoroutine(R());
+            foreach (ProcessInfo info in RunAutoRunners())
+            {
+                _resourceTotal = info.GroupTotal;
+                processing = info.GroupCurrent;
+                _processingMessage = info.ProcessMessage;
+                _processedItemCount = info.ProcessCount;
+
+                if(_processedItemCount % 100 == 0)
+                {
+                    yield return null;
+                }
+
+                // yield return null;
+            }
+            // StartEditorCoroutine(R());
         }
 
-        private IEnumerator R()
+        [Ordered, PlayaShowIf(nameof(AllowToRestoreScene)), Button("Restore Scene")]
+        // ReSharper disable once UnusedMember.Local
+        private void RestoreScene()
         {
-            foreach (var _ in RunAutoRunners())
-            {
-                yield return null;
-            }
+            RestoreCachedScene();
         }
+
+        [LayoutEnd]
 
         // ReSharper disable once UnusedMember.Global
         [Ordered, AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;

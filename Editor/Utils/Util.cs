@@ -661,7 +661,15 @@ namespace SaintsField.Editor.Utils
                     }
                     else
                     {
-                        Component r = comp.GetComponent(fieldType);
+                        Component r;
+                        try
+                        {
+                            r = comp.GetComponent(fieldType);
+                        }
+                        catch (ArgumentException)
+                        {
+                            return null;
+                        }
                         if (r)  // life circle problem, need to check bool first
                         {
                             result = r;

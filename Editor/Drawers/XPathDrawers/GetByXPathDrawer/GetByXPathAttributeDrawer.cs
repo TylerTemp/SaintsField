@@ -73,6 +73,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 foreach (Component component in resultComponent.GetComponents<Component>())
                 {
+                    // Debug.Log($"{expectInterface}/{component}")
+                    if (component == null)  // some broken component
+                    {
+                        continue;
+                    }
                     if (expectInterface.IsAssignableFrom(component.GetType()))
                     {
                         return (true, component);
@@ -263,9 +268,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             foreach ((object targetResult, int index) in expandedResults.WithIndex())
             {
-                SerializedProperty processingProperty = isArray
-                    ? target.ArrayProperty.GetArrayElementAtIndex(index)
-                    : property;
+                SerializedProperty processingProperty;
+                if (isArray)
+                {
+                    if(index >= target.ArrayProperty.arraySize)
+                    {
+                        break;  // let the array target to deal with this
+                    }
+                    processingProperty = target.ArrayProperty.GetArrayElementAtIndex(index);
+                }
+                else
+                {
+                    processingProperty = property;
+                }
                 int propertyCacheKey = isArray
                     ? index
                     : -1;
@@ -284,6 +299,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
                 {
                     Error = "",
+                    // ReSharper disable once RedundantCast
                     MemberInfo = fieldOrProp.IsField? (MemberInfo)fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
                     Parent = fieldParent,
                     SerializedProperty = processingProperty,

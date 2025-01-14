@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -40,6 +39,7 @@ namespace SaintsField.Editor.AutoRunner
             ? $"Element {index}"
             : fs.ToString();
 
+        // ReSharper disable once MemberCanBePrivate.Global
         protected static IEnumerable<SerializedObject> GetSerializedObjectFromFolderSearch(FolderSearch folderSearch)
         {
             // var fullPath = Path.Join(Directory.GetCurrentDirectory(), folderSearch.path).Replace("/", "\\");
@@ -78,12 +78,13 @@ namespace SaintsField.Editor.AutoRunner
             }
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         protected static IEnumerable<SerializedObject> GetSerializedObjectFromCurrentScene(string scenePath)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
             Debug.Log($"#AutoRunner# Processing {scenePath}");
 #endif
-            Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+            Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
 
             GameObject[] rootGameObjects = scene.GetRootGameObjects();
             // Scene scene = SceneManager.GetActiveScene();
@@ -117,33 +118,54 @@ namespace SaintsField.Editor.AutoRunner
 
         private IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _typeToDrawer;
 
-        protected abstract void UpdateProcessGroup(int accCount);
-        protected abstract void UpdateProcessCount(int accCount);
-        protected abstract void UpdateProcessMessage(string message);
+        // protected abstract void UpdateProcessGroup(int accCount);
+        // protected abstract void UpdateProcessCount(int accCount);
+        // protected abstract void UpdateProcessMessage(string message);
 
         protected virtual IEnumerable<SceneAsset> GetSceneList() => Array.Empty<SceneAsset>();
         protected virtual IEnumerable<FolderSearch> GetFolderSearches() => Array.Empty<FolderSearch>();
-        protected virtual IEnumerable<Object> GetExtraResources() => Array.Empty<Object>();
+        protected virtual IEnumerable<Object> GetExtraAssets() => Array.Empty<Object>();
 
-        protected IEnumerable RunAutoRunners()
+        protected struct ProcessInfo
         {
+            public int GroupTotal;
+            public int GroupCurrent;
+            public int ProcessCount;
+            public string ProcessMessage;
+        }
+
+        private readonly List<Scene> _originalOpenedScenes = new List<Scene>();
+
+        protected IEnumerable<ProcessInfo> RunAutoRunners()
+        {
+
+            // var scenes = EditorSceneManager.GetAllScenes()
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_typeToDrawer == null)
             {
                 _typeToDrawer = SaintsPropertyDrawer.EnsureAndGetTypeToDrawers();
             }
 
-            if (SceneManager.GetActiveScene().isDirty)
-            {
-                EditorUtility.DisplayDialog("Save Scene", "Please save the scene before running AutoRunner", "OK");
-                yield break;
-            }
+            // if (SceneManager.GetActiveScene().isDirty)
+            // {
+            //     EditorUtility.DisplayDialog("Save Scene", "Please save the scene before running AutoRunner", "OK");
+            //     yield break;
+            // }
 
-            UpdateProcessCount(0);
+            // UpdateProcessCount(0);
 
             string[] scenePaths = GetSceneList()
                 .Select(AssetDatabase.GetAssetPath)
                 .ToArray();
+
+            if (scenePaths.Length > 0)
+            {
+                // cache user's scene
+                _originalOpenedScenes.Clear();
+                _originalOpenedScenes.AddRange(
+                    Enumerable.Range(0, SceneManager.sceneCount).Select(SceneManager.GetSceneAt)
+                );
+            }
 
             List<(object, IEnumerable<SerializedObject>)> sceneSoIterations =
                 new List<(object, IEnumerable<SerializedObject>)>();
@@ -153,12 +175,20 @@ namespace SaintsField.Editor.AutoRunner
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
                 Debug.Log($"#AutoRunner# opening scene {scenePath}");
 #endif
-                if(SceneManager.GetActiveScene().path != scenePath)
+                // if(SceneManager.GetActiveScene().path != scenePath)
+                // {
+                //     EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                // }
+                SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+                sceneSoIterations.Add((sceneAsset, GetSerializedObjectFromCurrentScene(scenePath)));
+
+                yield return new ProcessInfo
                 {
-                    EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
-                }
-                sceneSoIterations.Add((AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath), GetSerializedObjectFromCurrentScene(scenePath)));
-                yield return null;
+                    GroupTotal = sceneSoIterations.Count,
+                    GroupCurrent = 0,
+                    ProcessCount = 0,
+                    ProcessMessage = $"Processing scene {scenePath}",
+                };
             }
 
             List<(object, IEnumerable<SerializedObject>)> folderSoIterations =
@@ -166,12 +196,18 @@ namespace SaintsField.Editor.AutoRunner
             foreach (FolderSearch folderSearch in GetFolderSearches())
             {
                 folderSoIterations.Add(($"{folderSearch.path}:{folderSearch.searchPattern}:{folderSearch.searchOption}", GetSerializedObjectFromFolderSearch(folderSearch)));
-                yield return null;
+                yield return new ProcessInfo
+                {
+                    GroupTotal = sceneSoIterations.Count + folderSoIterations.Count,
+                    GroupCurrent = 0,
+                    ProcessCount = 0,
+                    ProcessMessage = $"Processing path {folderSearch}",
+                };
             }
 
             List<(object, IEnumerable<SerializedObject>)> extraSoIterations =
                 new List<(object, IEnumerable<SerializedObject>)>();
-            foreach (Object extraResource in GetExtraResources())
+            foreach (Object extraResource in GetExtraAssets())
             {
                 SerializedObject so;
                 try
@@ -180,10 +216,19 @@ namespace SaintsField.Editor.AutoRunner
                 }
                 catch (Exception e)
                 {
+#if SAINTSFIELD_DEBUG
                     Debug.Log($"#AutoRunner# Skip {extraResource} as it's not a valid object: {e}");
+#endif
                     continue;
                 }
                 extraSoIterations.Add((extraResource, new[] { so }));
+                yield return new ProcessInfo
+                {
+                    GroupTotal = sceneSoIterations.Count + folderSoIterations.Count + extraSoIterations.Count,
+                    GroupCurrent = 0,
+                    ProcessCount = 0,
+                    ProcessMessage = $"Processing asset {extraResource}",
+                };
             }
 
             bool skipHiddenFields = SkipHiddenFields();
@@ -192,19 +237,28 @@ namespace SaintsField.Editor.AutoRunner
 
             Results.Clear();
             (object, IEnumerable<SerializedObject>)[] allResources = sceneSoIterations.Concat(folderSoIterations).Concat(extraSoIterations).ToArray();
-            foreach (((object target, IEnumerable<SerializedObject> serializedObjects), int index) in StartToProcessGroup(allResources).WithIndex())
+            int totalCount = allResources.Length;
+            HashSet<Object> processed = new HashSet<Object>();
+            foreach (((object target, IEnumerable<SerializedObject> serializedObjects), int index) in allResources.WithIndex())
             {
                 foreach (SerializedObject so in serializedObjects)
                 {
                     processedItemCount++;
-                    if(processedItemCount % 100 == 0)
+                    yield return new ProcessInfo
                     {
-                        yield return null;
+                        GroupTotal = totalCount,
+                        GroupCurrent = index,
+                        ProcessCount = processedItemCount,
+                        ProcessMessage = $"Processing {so.targetObject}",
+                    };
+
+                    Object targetObject = so.targetObject;
+                    if (!processed.Add(targetObject))
+                    {
+                        continue;
                     }
-                    UpdateProcessCount(processedItemCount);
 
                     // skip all Unity components
-                    Object targetObject = so.targetObject;
                     MonoScript monoScript = SaintsEditor.GetMonoScript(targetObject);
                     if (monoScript != null)
                     {
@@ -298,7 +352,13 @@ namespace SaintsField.Editor.AutoRunner
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
                                         Debug.Log($"#AutoRunner# {fixerMessage}");
 #endif
-                                        UpdateProcessMessage(fixerMessage);
+                                        yield return new ProcessInfo
+                                        {
+                                            GroupTotal = totalCount,
+                                            GroupCurrent = index,
+                                            ProcessCount = processedItemCount,
+                                            ProcessMessage = fixerMessage,
+                                        };
 
                                         string mainTargetString;
                                         bool mainTargetIsAssetPath;
@@ -333,7 +393,7 @@ namespace SaintsField.Editor.AutoRunner
                                             SerializedObject = so,
                                         };
 
-                                        Debug.Log($"#AutoRunner# Add {result}");
+                                        // Debug.Log($"#AutoRunner# Add {result}");
 
                                         autoRunnerResults.Add(result);
                                     }
@@ -353,62 +413,77 @@ namespace SaintsField.Editor.AutoRunner
                     }
                 }
 
-                UpdateProcessGroup(index);
+                yield return new ProcessInfo
+                {
+                    GroupTotal = totalCount,
+                    GroupCurrent = index,
+                    ProcessCount = processedItemCount,
+                    ProcessMessage = $"Finished group {index}",
+                };
             }
-            UpdateProcessGroup(allResources.Length);
-            EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
-            // results = autoRunnerResults.ToArray();
+
+            // EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
+
             string msg = $"All done, {Results.Count} found";
-            UpdateProcessMessage(msg);
+            yield return new ProcessInfo
+            {
+                GroupTotal = totalCount,
+                GroupCurrent = totalCount,
+                ProcessCount = processedItemCount,
+                ProcessMessage = msg,
+            };
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
             Debug.Log($"#AutoRunner# {msg}");
+#endif
             // EditorRefreshTarget();
         }
 
-        protected virtual IEnumerable<(object, IEnumerable<SerializedObject>)> StartToProcessGroup(IReadOnlyList<(object, IEnumerable<SerializedObject>)> allResources)
+        protected bool AllowToRestoreScene()
         {
-            return allResources;
+            if (_originalOpenedScenes.Count == 0)
+            {
+                // Debug.Log("false");
+                return false;
+            }
+
+            int openedCount = SceneManager.sceneCount;
+            if (openedCount != _originalOpenedScenes.Count)
+            {
+                // Debug.Log("true");
+                return true;
+            }
+
+            for (int i = 0; i < openedCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (scene.path != _originalOpenedScenes[i].path)
+                {
+                    // Debug.Log("true");
+                    return true;
+                }
+            }
+
+            // Debug.Log("false");
+            return false;
         }
 
-        // private bool IsFromFile()
-        // {
-        //     if(EditorInspectingTarget != null)
-        //     {
-        //         return !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(EditorInspectingTarget));
-        //     }
-        //     return AssetDatabase.GetAssetPath(this) != "";
-        // }
+        protected static IEnumerable<Scene> GetDirtyOpenedScene()
+        {
+            return Enumerable.Range(0, SceneManager.sceneCount).Select(SceneManager.GetSceneAt).Where(each => each.isDirty);
+        }
 
-        // [Ordered, Button("Save To Project"), PlayaHideIf(nameof(IsFromFile))]
-        // // ReSharper disable once UnusedMember.Local
-        // private void SaveToProject()
-        // {
-        //     if (!Directory.Exists("Assets/Editor Default Resources"))
-        //     {
-        //         Debug.Log($"Create folder: Assets/Editor Default Resources");
-        //         AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
-        //     }
-        //
-        //     if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
-        //     {
-        //         Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
-        //         AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
-        //     }
-        //
-        //     Debug.Log(
-        //         $"Create saintsFieldConfig: Assets/Editor Default Resources/{EditorResourcePath}");
-        //     AutoRunnerWindow copy = Instantiate(this);
-        //     copy.results = new List<AutoRunnerResult>();
-        //     AssetDatabase.CreateAsset(copy, $"Assets/Editor Default Resources/{EditorResourcePath}");
-        //
-        //     AssetDatabase.SaveAssets();
-        //     AssetDatabase.Refresh();
-        //     Debug.Log($"Reset target to saved file");
-        //     EditorRefreshTarget();
-        //     Selection.activeObject = EditorInspectingTarget;
-        // }
+        protected void RestoreCachedScene()
+        {
+            Debug.Assert(_originalOpenedScenes.Count >= 1);
+            // ReSharper disable once AccessToStaticMemberViaDerivedType
+            EditorSceneManager.OpenScene(_originalOpenedScenes[0].path, OpenSceneMode.Single);
+            foreach (Scene addScene in _originalOpenedScenes.Skip(1))
+            {
+                // ReSharper disable once AccessToStaticMemberViaDerivedType
+                EditorSceneManager.OpenScene(addScene.path, OpenSceneMode.Additive);
+            }
+        }
 
-        // public AutoRunnerResult result = new AutoRunnerResult();
-        // [Ordered, NonSerialized, ShowInInspector]
         [NonSerialized]
         public readonly List<AutoRunnerResult> Results = new List<AutoRunnerResult>();
 

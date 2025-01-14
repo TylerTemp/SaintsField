@@ -120,9 +120,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // not directly array target
             foreach ((object targetResult, int index) in useResult.WithIndex())
             {
-                SerializedProperty processingProperty = isArray
-                    ? target.ArrayProperty.GetArrayElementAtIndex(index)
-                    : property;
+                SerializedProperty processingProperty;
+                if (isArray)
+                {
+                    if(index >= target.ArrayProperty.arraySize)
+                    {
+                        return null;  // let the array target to deal with this
+                    }
+                    processingProperty = target.ArrayProperty.GetArrayElementAtIndex(index);
+                }
+                else
+                {
+                    processingProperty = property;
+                }
                 (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
 
                 PropertyCache propertyCache = new PropertyCache
