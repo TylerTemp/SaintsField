@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.18.0 ##
+
+1.  Auto Runner now can check the `OnValidate` method, and will notice you if the method throw an error and/or make a `Debug.LogError`
+2.  Fix auto getters throw an error if the target asset doesn't match some required condition
+3.  Auto Runner no longer serialize the result into the file
+4.  Fix Auto Runner can not properly display the field because the scene gets close during the process
+5.  Auto Runner now will allow you restore your opened scenes after finished
+6.  Add an Auto Runner template so you can easily make a target assets group for validation
+
 ## 3.17.1 ##
 
 1.  Fix auto getters won't work if multiple targets use the same field name for array/list
