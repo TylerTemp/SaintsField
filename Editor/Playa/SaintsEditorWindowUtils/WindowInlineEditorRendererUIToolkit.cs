@@ -30,13 +30,14 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         {
             _container.Clear();
             InspectorElement inspectorElement;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (_editorType == null)
             {
                 inspectorElement = new InspectorElement(_value);
             }
             else
             {
-                Debug.Log($"create editor for {_value} with {_editorType}");
+                // Debug.Log($"create editor for {_value} with {_editorType}");
                 inspectorElement = new InspectorElement(UnityEditor.Editor.CreateEditor(_value, _editorType));
             }
             _container.Add(inspectorElement);

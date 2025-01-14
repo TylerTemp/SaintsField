@@ -180,6 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acda98a9b2fa0d141ad3b668778d2f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  info: This OnValidate will give you a log
 --- !u!1 &1528503821
 GameObject:
   m_ObjectHideFlags: 0
