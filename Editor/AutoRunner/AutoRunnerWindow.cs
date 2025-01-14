@@ -197,7 +197,7 @@ namespace SaintsField.Editor.AutoRunner
             // ));
 
             // List<AutoRunnerResult> autoRunnerResults = new List<AutoRunnerResult>();
-            results.Clear();
+            Results.Clear();
             foreach ((object target, IEnumerable<SerializedObject> serializedObjects) in sceneSoIterations.Concat(folderSoIterations))
             {
                 foreach (SerializedObject so in serializedObjects)
@@ -342,7 +342,7 @@ namespace SaintsField.Editor.AutoRunner
                                 }
                             }
                         }
-                        results.AddRange(autoRunnerResults);
+                        Results.AddRange(autoRunnerResults);
                         if (autoRunnerResults.Count > 0)
                         {
                             hasFixer = true;
@@ -359,19 +359,19 @@ namespace SaintsField.Editor.AutoRunner
             }
             EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
             // results = autoRunnerResults.ToArray();
-            _processingMessage = $"All done, {results.Count} found";
+            _processingMessage = $"All done, {Results.Count} found";
             Debug.Log($"#AutoRunner# {_processingMessage}");
             EditorRefreshTarget();
         }
 
-        private bool IsFromFile()
-        {
-            if(EditorInspectingTarget != null)
-            {
-                return !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(EditorInspectingTarget));
-            }
-            return AssetDatabase.GetAssetPath(this) != "";
-        }
+        // private bool IsFromFile()
+        // {
+        //     if(EditorInspectingTarget != null)
+        //     {
+        //         return !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(EditorInspectingTarget));
+        //     }
+        //     return AssetDatabase.GetAssetPath(this) != "";
+        // }
 
         // [Ordered, Button("Save To Project"), PlayaHideIf(nameof(IsFromFile))]
         // // ReSharper disable once UnusedMember.Local
@@ -403,7 +403,7 @@ namespace SaintsField.Editor.AutoRunner
         // }
 
         // public AutoRunnerResult result = new AutoRunnerResult();
-        [Ordered, ShowInInspector] public List<AutoRunnerResult> results = new List<AutoRunnerResult>();
+        [Ordered, NonSerialized, ShowInInspector] public List<AutoRunnerResult> Results = new List<AutoRunnerResult>();
 
         public override void OnEditorEnable()
         {
@@ -424,7 +424,7 @@ namespace SaintsField.Editor.AutoRunner
 
         private void CleanUp()
         {
-            foreach (AutoRunnerResult autoRunnerResult in results)
+            foreach (AutoRunnerResult autoRunnerResult in Results)
             {
                 try
                 {
@@ -436,7 +436,7 @@ namespace SaintsField.Editor.AutoRunner
                 }
             }
 
-            results = new List<AutoRunnerResult>();
+            Results = new List<AutoRunnerResult>();
         }
     }
 }

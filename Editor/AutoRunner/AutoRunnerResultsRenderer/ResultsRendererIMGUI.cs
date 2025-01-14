@@ -11,7 +11,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
-            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.results))
+            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.Results))
             {
 
                 string groupLabel;
@@ -80,7 +80,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
                                         if (errorFixed)
                                         {
-                                            _autoRunner.results.RemoveAt(autoRunnerResultInfo.Index);
+                                            _autoRunner.Results.RemoveAt(autoRunnerResultInfo.Index);
                                         }
 
                                     }

@@ -11,7 +11,7 @@ namespace SaintsField.Editor.AutoRunner
     {
         public override AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
-            if (fieldWithInfo.FieldInfo?.Name == "results")
+            if (fieldWithInfo.FieldInfo?.Name == "Results")
             {
                 return new ResultsRenderer(so, fieldWithInfo);
             }

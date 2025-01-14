@@ -36,15 +36,20 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
             //     return preCheckResult;
             // }
 
-            if (_autoRunner.results.SequenceEqual(_results))
+            if (_autoRunner.Results.SequenceEqual(_results))
             {
                 return preCheckResult;
             }
 
-            _results = _autoRunner.results.ToArray();
+            _results = _autoRunner.Results.ToArray();
             _root.Clear();
 
-            (AutoRunnerResult value, int index)[] canFixWithIndex = _autoRunner.results
+            if (_autoRunner.Results.Count == 0)
+            {
+                return preCheckResult;
+            }
+
+            (AutoRunnerResult value, int index)[] canFixWithIndex = _autoRunner.Results
                 .WithIndex()
                 .Where(each => each.value.FixerResult?.CanFix ?? false)
                 .Reverse()
@@ -78,7 +83,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                     {
                         foreach (int index in toRemoveIndex)
                         {
-                            _autoRunner.results.RemoveAt(index);
+                            _autoRunner.Results.RemoveAt(index);
                         }
 
                         OnUpdateUIToolKit();
@@ -89,7 +94,15 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                 });
             }
 
-            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.results))
+            (MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup)[] formatedResults = FormatResults(_autoRunner.Results).ToArray();
+
+            if (formatedResults.Length == 0)
+            {
+                Debug.Log($"#AutoRunner# no targets");
+                return preCheckResult;
+            }
+
+            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in formatedResults)
             {
                 // Debug.Log($"#AutoRunner# draw {mainTarget}");
                 Foldout group = new Foldout
@@ -176,7 +189,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                                     return;
                                 }
 
-                                _autoRunner.results.RemoveAt(autoRunnerResultInfo.Index);
+                                _autoRunner.Results.RemoveAt(autoRunnerResultInfo.Index);
                                 OnUpdateUIToolKit();
                             })
                             {
