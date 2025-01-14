@@ -77,10 +77,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.17.1**
+**3.18.0**
 
-1.  Fix auto getters won't work if multiple targets use the same field name for array/list
-2.  IMGUI: `AddressableResource` is not supported in IMGUI too
+1.  Auto Runner now can check the `OnValidate` method, and will notice you if the method throw an error and/or make a `Debug.LogError`
+2.  Fix auto getters throw an error if the target asset doesn't match some required condition
+3.  Auto Runner no longer serialize the result into the file
+4.  Fix Auto Runner can not properly display the field because the scene gets close during the process
+5.  Auto Runner now will allow you restore your opened scenes after finished
+6.  Add an [Auto Runner example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) so you can easily make a target assets group for validation
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4989,6 +4993,8 @@ You can specify the targets as you want. Currently, it supports scenes, and fold
 It can also specify if you want to skip the hidden fields (hidden by `ShowIf`, `HideIf`. Not work for `LayoutShowIf`, `LayoutHideIf`)
 
 This tool is very simple, and will get more update in the future.
+
+See [Auto Runner example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) to learn how to make a quick auto runner for a specific group of assets.
 
 [![video](https://github.com/user-attachments/assets/bf5e7b7a-c15c-4fa4-92b9-53621d41ccb4)](https://github.com/user-attachments/assets/76683bc3-cfea-4952-9377-788e02d7e075)
 

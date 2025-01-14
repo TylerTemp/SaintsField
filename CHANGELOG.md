@@ -7,7 +7,7 @@
 3.  Auto Runner no longer serialize the result into the file
 4.  Fix Auto Runner can not properly display the field because the scene gets close during the process
 5.  Auto Runner now will allow you restore your opened scenes after finished
-6.  Add an Auto Runner template so you can easily make a target assets group for validation
+6.  Add an [Auto Runner example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) so you can easily make a target assets group for validation
 
 ## 3.17.1 ##
 
