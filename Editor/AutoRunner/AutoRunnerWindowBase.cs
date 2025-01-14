@@ -115,6 +115,7 @@ namespace SaintsField.Editor.AutoRunner
         }
 
         protected abstract bool SkipHiddenFields();
+        protected abstract bool CheckOnValidate();
 
         private IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _typeToDrawer;
 
@@ -407,6 +408,95 @@ namespace SaintsField.Editor.AutoRunner
                         }
                     }
 
+                    // CheckOnValidate
+                    if (CheckOnValidate())
+                    {
+                        MethodInfo onValidateMethod = targetObject.GetType().GetMethod("OnValidate", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        if (onValidateMethod != null)
+                        {
+                            using(LogScoop logScoop = new LogScoop())
+                            {
+                                try
+                                {
+                                    onValidateMethod.Invoke(targetObject, Array.Empty<object>());
+                                }
+                                catch (Exception e)
+                                {
+                                    // Debug.Log($"#AutoRunner# OnValidate error: {e}");
+                                    // Debug.LogException(e.InnerException ?? e);
+                                    hasFixer = true;
+
+                                    string mainTargetString;
+                                    bool mainTargetIsAssetPath;
+                                    if (target is string s)
+                                    {
+                                        mainTargetString = s;
+                                        mainTargetIsAssetPath = false;
+                                    }
+                                    else
+                                    {
+                                        mainTargetString = AssetDatabase.GetAssetPath((Object)target);
+                                        mainTargetIsAssetPath = true;
+                                    }
+
+                                    AutoRunnerResult result = new AutoRunnerResult
+                                    {
+                                        FixerResult = new AutoRunnerFixerResult
+                                        {
+                                            Error = e.InnerException?.Message ?? e.Message,
+                                            ExecError = "",
+                                        },
+                                        mainTargetString = mainTargetString,
+                                        mainTargetIsAssetPath = mainTargetIsAssetPath,
+                                        subTarget = so.targetObject,
+                                        propertyPath = "OnValidate",
+                                        // SerializedProperty = prop,
+                                        SerializedObject = so,
+                                    };
+
+                                    Results.Add(result);
+                                }
+
+                                if (logScoop.ErrorLogs.Count > 0)
+                                {
+                                    hasFixer = true;
+
+                                    string mainTargetString;
+                                    bool mainTargetIsAssetPath;
+                                    if (target is string s)
+                                    {
+                                        mainTargetString = s;
+                                        mainTargetIsAssetPath = false;
+                                    }
+                                    else
+                                    {
+                                        mainTargetString = AssetDatabase.GetAssetPath((Object)target);
+                                        mainTargetIsAssetPath = true;
+                                    }
+
+                                    string errorMsg = string.Join("\n", logScoop.ErrorLogs.Select(each => each.Item1));
+
+                                    AutoRunnerResult result = new AutoRunnerResult
+                                    {
+                                        FixerResult = new AutoRunnerFixerResult
+                                        {
+                                            Error = errorMsg,
+                                            ExecError = "",
+                                        },
+                                        mainTargetString = mainTargetString,
+                                        mainTargetIsAssetPath = mainTargetIsAssetPath,
+                                        subTarget = so.targetObject,
+                                        propertyPath = "OnValidate()",
+                                        // SerializedProperty = prop,
+                                        SerializedObject = so,
+                                    };
+
+                                    Results.Add(result);
+                                }
+                            }
+                        }
+                    }
+
                     if (!hasFixer)
                     {
                         so.Dispose();
@@ -482,6 +572,7 @@ namespace SaintsField.Editor.AutoRunner
                 // ReSharper disable once AccessToStaticMemberViaDerivedType
                 EditorSceneManager.OpenScene(addScene.path, OpenSceneMode.Additive);
             }
+            _originalOpenedScenes.Clear();
         }
 
         [NonSerialized]

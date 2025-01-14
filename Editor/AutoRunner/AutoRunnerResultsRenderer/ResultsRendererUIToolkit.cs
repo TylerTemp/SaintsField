@@ -122,7 +122,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                         continue;
                     }
 
-                    ObjectField objField = new ObjectField(obj.name)
+                    ObjectField objField = new ObjectField
                     {
                         value = obj,
                     };

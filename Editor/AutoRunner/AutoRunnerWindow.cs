@@ -5,7 +5,6 @@ using System.Linq;
 using SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -20,6 +19,7 @@ namespace SaintsField.Editor.AutoRunner
         [Ordered, LeftToggle] public bool buildingScenes;
 
         [Ordered, ShowInInspector, PlayaShowIf(nameof(buildingScenes))]
+        // ReSharper disable once UnusedMember.Local
         private static SceneAsset[] InBuildScenes => EditorBuildSettings.scenes
             .Where(scene => scene.enabled)
             .Select(each => AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path))
@@ -60,6 +60,10 @@ namespace SaintsField.Editor.AutoRunner
         [Ordered, LeftToggle] public bool skipHiddenFields = true;
 
         protected override bool SkipHiddenFields() => skipHiddenFields;
+
+        [Ordered, LeftToggle] public bool checkOnValidate = true;
+
+        protected override bool CheckOnValidate() => checkOnValidate;
 
 
         [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), BelowInfoBox("$" + nameof(_processingMessage))] public int processing;
@@ -128,7 +132,5 @@ namespace SaintsField.Editor.AutoRunner
         {
             CleanUp();
         }
-
-
     }
 }
