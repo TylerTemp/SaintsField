@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
@@ -220,6 +221,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     {
                         ImGuiRenderCount = 1,
                         Error = "",
+                        GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
                     };
                 }
                 else
@@ -239,6 +241,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 SharedCache[key] = genericCache;
                 // Debug.Log(property.objectReferenceValue);
                 // return false;
+
+                try
+                {
+                    string _ = property.propertyPath;
+                }
+                catch (NullReferenceException)
+                {
+                    return false;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return false;
+                }
             }
 
             // Debug.Log(property.serializedObject.targetObject);
