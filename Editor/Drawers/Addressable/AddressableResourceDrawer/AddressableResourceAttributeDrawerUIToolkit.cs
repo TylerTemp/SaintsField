@@ -58,8 +58,27 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            Button button = new Button
+//             Button button = new Button
+//             {
+//                 style =
+//                 {
+//                     backgroundImage = Util.LoadResource<Texture2D>("pencil.png"),
+// #if UNITY_2022_2_OR_NEWER
+//                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+//                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+//                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+//                     backgroundSize  = new BackgroundSize(14, 14),
+// #else
+//                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+// #endif
+//                     paddingLeft = 8,
+//                     paddingRight = 8,
+//                 },
+//                 name = ToggleButtonName(property),
+//             };
+            ToolbarToggle toolbarToggle = new ToolbarToggle
             {
+                // text = "A",
                 style =
                 {
                     backgroundImage = Util.LoadResource<Texture2D>("pencil.png"),
@@ -76,7 +95,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 },
                 name = ToggleButtonName(property),
             };
-            return button;
+            return toolbarToggle;
         }
 
         private bool _isSprite;
@@ -287,7 +306,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
-            Button toggleButton = container.Q<Button>(ToggleButtonName(property));
+            ToolbarToggle toggleButton = container.Q<ToolbarToggle>(ToggleButtonName(property));
             if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
             {
                 helpBox.text = "No addressable config found. Please create one.";
@@ -297,7 +316,11 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             }
 
             VisualElement actionArea = container.Q<VisualElement>(ActionAreaName(property));
-            toggleButton.clicked += () => actionArea.style.display = actionArea.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None;
+            toggleButton.RegisterValueChangedCallback(evt =>
+            {
+                actionArea.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+            });
+            // toggleButton.clicked += () => actionArea.style.display = actionArea.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None;
 
             // Debug.Log(info.FieldType);
             ObjectField objField = container.Q<ObjectField>(ResourceObjectName(property));
@@ -518,7 +541,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
 
             void CloseActionArea()
             {
-                actionArea.style.display = DisplayStyle.None;
+                // actionArea.style.display = DisplayStyle.None;
+                toggleButton.value = false;
             }
         }
 
