@@ -12,7 +12,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 {
     public partial class PositionHandleAttributeDrawer
     {
-        #region UIToolkit
         private static string NamePositionHandle(SerializedProperty property) => $"{property.propertyPath}_PositionHandle";
 
         private PositionHandleInfo _positionHandleInfoUIToolkit;
@@ -102,8 +101,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
             }
         }
-        #endregion
-
     }
 }
 

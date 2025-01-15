@@ -1205,10 +1205,9 @@ namespace SaintsField.Editor.Utils
 
         public static TargetWorldPosInfo GetPropertyTargetWorldPosInfo(Space space, SerializedProperty property, FieldInfo info, object parent)
         {
-            SerializedPropertyType propertyType;
             try
             {
-                propertyType = property.propertyType;
+                SerializedPropertyType _ = property.propertyType;
             }
             catch (InvalidCastException)
             {

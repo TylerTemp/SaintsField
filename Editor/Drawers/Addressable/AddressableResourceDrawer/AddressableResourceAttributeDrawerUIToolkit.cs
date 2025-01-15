@@ -52,7 +52,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
 
         private static string CheckButtonName(SerializedProperty property) =>
             $"{property.propertyPath}__AddressableResource_CheckButton";
-        public static string CloseButtonName(SerializedProperty property) =>
+
+        private static string CloseButtonName(SerializedProperty property) =>
             $"{property.propertyPath}__AddressableResource_CloseButton";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
