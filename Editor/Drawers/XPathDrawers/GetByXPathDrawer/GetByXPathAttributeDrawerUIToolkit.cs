@@ -136,6 +136,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 SharedCache.Clear();
                 return;
             }
+
+            string propertyPath;
+            try
+            {
+                propertyPath = property.propertyPath;
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+            catch(NullReferenceException)
+            {
+                return;
+            }
+
             string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
 
             // watch selection
@@ -196,8 +211,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // Debug.Log(property.propertyPath);
 
             // ActualUpdateUIToolkit(property, index, container, onValueChangedCallback, info);
+            try
+            {
+                propertyPath = property.propertyPath;
+            }
+            catch (ObjectDisposedException) // The property can be disposed on `UpdateSharedCache`, so check it again
+            {
+                return;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
 
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            int propertyIndex = SerializedUtils.PropertyPathIndex(propertyPath);
+
             PropertyCache propertyCache = genericCache.IndexToPropertyCache[propertyIndex];
 
             if (propertyCache.Error != "")

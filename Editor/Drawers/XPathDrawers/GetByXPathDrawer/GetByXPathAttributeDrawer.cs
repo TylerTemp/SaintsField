@@ -491,8 +491,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 foreach ((object targetResult, int propertyCacheKey) in expandedResults.WithIndex())
                 {
-                    SerializedProperty processingProperty =
-                        target.ArrayProperty.GetArrayElementAtIndex(propertyCacheKey);
+                    SerializedProperty processingProperty;
+                    try
+                    {
+                        processingProperty =
+                            target.ArrayProperty.GetArrayElementAtIndex(propertyCacheKey);
+                    }
+                    catch (NullReferenceException e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogException(e);
+#endif
+
+                        return false;
+                    }
 
                     (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) =
                         SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
