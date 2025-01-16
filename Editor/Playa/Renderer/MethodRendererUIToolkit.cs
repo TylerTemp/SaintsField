@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -14,7 +15,15 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class MethodRenderer
     {
-        private static string ButtonName(SerializedProperty property) => $"{SerializedUtils.GetUniqueId(property)}__ButtonRenderer";
+        private static string ButtonName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonRenderer";
+
+        private class ButtonUserData
+        {
+            public string Xml;
+            public string Callback;
+            public bool UpdateOneMoreTime;
+            public RichTextDrawer RichTextDrawer;
+        }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
@@ -51,7 +60,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 
-            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
+            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) || buttonAttribute.IsCallback ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
             // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
             ParameterInfo[] parameters = methodInfo.GetParameters();
             bool hasParameters = parameters.Length > 0;
@@ -116,6 +125,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     {
                         // ReSharper disable once AccessToModifiedClosure
                         // ReSharper disable once PossibleNullReferenceException
+                        // ReSharper disable once InvertIf
                         if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
                         {
                             if (!bindEnumerator.MoveNext())
@@ -134,9 +144,29 @@ namespace SaintsField.Editor.Playa.Renderer
                 style =
                 {
                     flexGrow = 1,
+                    flexDirection = FlexDirection.Row,
+                    justifyContent = Justify.Center,
                 },
-                name = ButtonName(FieldWithInfo.SerializedProperty),
+                name = ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
+                userData = new ButtonUserData
+                {
+                    Xml = buttonText,
+                    Callback = buttonAttribute.Label,
+                    UpdateOneMoreTime = true,
+                },
             };
+
+            if (!string.IsNullOrEmpty(buttonAttribute.Label))
+            {
+                buttonElement.text = "";
+                buttonElement.Clear();
+                foreach (VisualElement element in (new RichTextDrawer()).DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
+                             FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target)))
+                {
+                    buttonElement.Add(element);
+                }
+            }
+
             bool needUpdate = buttonAttribute.IsCallback;
 
             if (!needUpdate)
@@ -158,25 +188,18 @@ namespace SaintsField.Editor.Playa.Renderer
             return (root, needUpdate);
         }
 
+        // private RichTextDrawer _richTextDrawer;
+
+        // private bool _stillUpdateOnce;
+
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
             PreCheckResult baseResult = base.OnUpdateUIToolKit(root);
 
-            ButtonAttribute buttonAttribute = FieldWithInfo.PlayaAttributes.OfType<ButtonAttribute>().FirstOrDefault();
-            if (buttonAttribute == null)
-            {
-                return baseResult;
-            }
-
-            if (!buttonAttribute.IsCallback)
-            {
-                return baseResult;
-            }
-
             Button buttonElement;
             try
             {
-                buttonElement = root.Q<Button>(name: ButtonName(FieldWithInfo.SerializedProperty));
+                buttonElement = root.Q<Button>(name: ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Target));
             }
             catch (NullReferenceException)
             {
@@ -187,8 +210,74 @@ namespace SaintsField.Editor.Playa.Renderer
                 return baseResult;
             }
 
-            string labelCallback = buttonAttribute.Label;
-            var r = Util.GetOf<string>(labelCallback);
+            if (buttonElement == null)
+            {
+                return baseResult;
+            }
+
+            ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
+
+            string labelCallback = buttonUserData.Callback;
+            (string error, string result) = Util.GetOf<string>(labelCallback, null, FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
+            // Debug.Log($"{error}/{result}");
+            if (error != "")
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(error);
+#endif
+                return baseResult;
+            }
+
+            bool noNeedUpdate;
+            if (buttonUserData.Xml == result)
+            {
+                if (buttonUserData.UpdateOneMoreTime)
+                {
+                    noNeedUpdate = false;
+                    buttonUserData.UpdateOneMoreTime = false;
+                }
+                else
+                {
+                    noNeedUpdate = true;
+                }
+            }
+            else
+            {
+                noNeedUpdate = true;
+                buttonUserData.Xml = result;
+                buttonUserData.UpdateOneMoreTime = true;
+            }
+
+            if (noNeedUpdate)
+            {
+                return baseResult;
+            }
+
+            buttonElement.text = "";
+            buttonElement.Clear();
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if(result == "")
+            {
+                buttonElement.Add(new Label(" "));
+                return baseResult;
+            }
+
+            if (result is null)
+            {
+                buttonElement.Add(new Label(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name)));
+                return baseResult;
+            }
+
+            buttonUserData.RichTextDrawer ??= new RichTextDrawer();
+
+            IEnumerable<VisualElement> chunks = buttonUserData.RichTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(result,
+                FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target));
+
+            foreach (VisualElement chunk in chunks)
+            {
+                buttonElement.Add(chunk);
+            }
 
             return baseResult;
         }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.18.1 ##
+
+1.  `Button` label now support rich text, and also support dynamic callback text
+2.  Fix auto getters gives errors when the list/array need to reduce the size
+
 ## 3.18.0 ##
 
 1.  Auto Runner now can check the `OnValidate` method, and will notice you if the method throw an error and/or make a `Debug.LogError`

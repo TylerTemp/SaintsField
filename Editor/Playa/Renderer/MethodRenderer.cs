@@ -216,6 +216,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override void OnDestroy()
         {
+            OnDestroyIMGUI();
         }
 
         public override string ToString()

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -83,7 +85,7 @@ namespace SaintsField.Editor.Playa.Renderer
             bool clicked;
             try
             {
-                clicked = GUILayout.Button(buttonText, new GUIStyle(GUI.skin.button) { richText = true },
+                clicked = GUILayout.Button(" ", new GUIStyle(GUI.skin.button) { richText = true },
                     GUILayout.ExpandWidth(true));
             }
             catch (Exception e)
@@ -98,6 +100,16 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 return;
             }
+
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = GetRichIMGUI(buttonAttribute, methodInfo);
+            GUIContent oldLabel = new GUIContent(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name));
+            Rect lastRect = GUILayoutUtility.GetLastRect();
+            float drawNeedWidth = _richTextDrawer.GetWidth(oldLabel, lastRect.height, richTextChunks);
+            Rect drawRect = drawNeedWidth > lastRect.width
+                ? lastRect
+                // center it
+                : new Rect(lastRect.x + (lastRect.width - drawNeedWidth) / 2, lastRect.y, drawNeedWidth, lastRect.height);
+            _richTextDrawer.DrawChunks(drawRect, oldLabel, richTextChunks);
 
             if (parameters.Length > 0)
             {

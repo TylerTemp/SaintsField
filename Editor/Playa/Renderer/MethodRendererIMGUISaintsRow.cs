@@ -109,10 +109,6 @@ namespace SaintsField.Editor.Playa.Renderer
 
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
-                string buttonText = string.IsNullOrEmpty(buttonAttribute.Label)
-                    ? ObjectNames.NicifyVariableName(methodInfo.Name)
-                    : buttonAttribute.Label;
-
                 Rect buttonRect = new Rect(position)
                 {
                     y = yAcc,
@@ -120,7 +116,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 };
 
                 // ReSharper disable once InvertIf
-                if (GUI.Button(buttonRect, buttonText, new GUIStyle(GUI.skin.button) { richText = true }))
+                if (GUI.Button(buttonRect, " ", new GUIStyle(GUI.skin.button) { richText = true }))
                 {
                     // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
                     object result = methodInfo.Invoke(target, _imGuiParameterValues);
@@ -129,6 +125,16 @@ namespace SaintsField.Editor.Playa.Renderer
                         _imGuiEnumerator = ie;
                     }
                 }
+
+                IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = GetRichIMGUI(buttonAttribute, methodInfo);
+                GUIContent oldLabel = new GUIContent(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name));
+                Rect lastRect = buttonRect;
+                float drawNeedWidth = _richTextDrawer.GetWidth(oldLabel, lastRect.height, richTextChunks);
+                Rect drawRect = drawNeedWidth > lastRect.width
+                    ? lastRect
+                    // center it
+                    : new Rect(lastRect.x + (lastRect.width - drawNeedWidth) / 2, lastRect.y, drawNeedWidth, lastRect.height);
+                _richTextDrawer.DrawChunks(drawRect, oldLabel, richTextChunks);
             }
         }
     }

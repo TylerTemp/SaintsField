@@ -16,6 +16,7 @@ namespace SaintsField.Playa
             (string content, bool isCallback) = RuntimeUtil.ParseCallback(label);
             Label = content;
             IsCallback = isCallback;
+            // Debug.Log($"{IsCallback}/{content}");
         }
     }
 }

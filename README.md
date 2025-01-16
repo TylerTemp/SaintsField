@@ -692,26 +692,36 @@ private void Toggle() => _errorOut = !_errorOut;
 
 Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments.
 
-*   `string buttonLabel = null` the button label. If null, it'll use the function name.
+*   `string buttonLabel = null` the button label. If null, it'll use the function name. If it starts with `$`, use a callback or field value as the label.
+    Rich text is supported.
+
+**Known Issue**: Using dynamic label in `SaintsRow`, the label will not update in real time. This is because a `Serializable` class/struc
+field value will be cached by Unity, and reflection can not get an updated value. This issue can not be solved unless
+there is a way to reflect the actual value from a cached container.
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
-[Button]
-private void EditorButton()
+public string dynamicLabel;
+
+[Button("$" + nameof(dynamicLabel))]
+private void ButtonWithDynamicLabel()
 {
-    Debug.Log("EditorButton");
 }
 
-[Button("Label")]
-private void EditorLabeledButton()
+[Button("Normal <icon=star.png/>Button Label")]
+private void ButtonWithNormalLabel()
 {
-    Debug.Log("EditorLabeledButton");
+}
+
+[Button]
+private void ButtonWithoutLabel()
+{
 }
 ```
 
-![button](https://github.com/TylerTemp/SaintsField/assets/6391063/2f32336d-ca8b-46e0-9ac8-7bc44aada54b)
+![image](https://github.com/user-attachments/assets/54c4d9c1-9309-4a1d-b5e3-f9f69be88305)
 
 Example with arguments:
 
