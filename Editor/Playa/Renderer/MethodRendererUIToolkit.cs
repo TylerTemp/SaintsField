@@ -1,7 +1,9 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -12,6 +14,8 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class MethodRenderer
     {
+        private static string ButtonName(SerializedProperty property) => $"{SerializedUtils.GetUniqueId(property)}__ButtonRenderer";
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
             object target = FieldWithInfo.Target;
@@ -102,14 +106,22 @@ namespace SaintsField.Editor.Playa.Renderer
                 // ReSharper disable once InvertIf
                 if (returnValue is System.Collections.IEnumerator enumerator)
                 {
+                    // ReSharper disable once AccessToModifiedClosure
+                    // ReSharper disable once PossibleNullReferenceException
                     buttonElement.userData = enumerator;
                     buttonTask?.Pause();
+                    // ReSharper disable once AccessToModifiedClosure
+                    // ReSharper disable once PossibleNullReferenceException
                     buttonTask = buttonElement.schedule.Execute(() =>
                     {
+                        // ReSharper disable once AccessToModifiedClosure
+                        // ReSharper disable once PossibleNullReferenceException
                         if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
                         {
                             if (!bindEnumerator.MoveNext())
                             {
+                                // ReSharper disable once AccessToModifiedClosure
+                                // ReSharper disable once PossibleNullReferenceException
                                 buttonTask?.Pause();
                             }
                         }
@@ -123,15 +135,17 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     flexGrow = 1,
                 },
+                name = ButtonName(FieldWithInfo.SerializedProperty),
             };
-            bool needUpdate = FieldWithInfo.PlayaAttributes.Count(each =>
-                each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
-                each is PlayaDisableIfAttribute) > 0;
+            bool needUpdate = buttonAttribute.IsCallback;
 
-            // if ()
-            // {
-            //     buttonElement.RegisterCallback<AttachToPanelEvent>(_ => buttonElement.schedule.Execute(() => UpdatePreCheckUIToolkit(FieldWithInfo, buttonElement, true)).Every(100));
-            // }
+            if (!needUpdate)
+            {
+                needUpdate = FieldWithInfo.PlayaAttributes.Count(each =>
+                    // ReSharper disable once MergeIntoLogicalPattern
+                    each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
+                    each is PlayaDisableIfAttribute) > 0;
+            }
 
             if (!hasParameters)
             {
@@ -144,7 +158,40 @@ namespace SaintsField.Editor.Playa.Renderer
             return (root, needUpdate);
         }
 
+        protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
+        {
+            PreCheckResult baseResult = base.OnUpdateUIToolKit(root);
 
+            ButtonAttribute buttonAttribute = FieldWithInfo.PlayaAttributes.OfType<ButtonAttribute>().FirstOrDefault();
+            if (buttonAttribute == null)
+            {
+                return baseResult;
+            }
+
+            if (!buttonAttribute.IsCallback)
+            {
+                return baseResult;
+            }
+
+            Button buttonElement;
+            try
+            {
+                buttonElement = root.Q<Button>(name: ButtonName(FieldWithInfo.SerializedProperty));
+            }
+            catch (NullReferenceException)
+            {
+                return baseResult;
+            }
+            catch (ObjectDisposedException)
+            {
+                return baseResult;
+            }
+
+            string labelCallback = buttonAttribute.Label;
+            var r = Util.GetOf<string>(labelCallback);
+
+            return baseResult;
+        }
     }
 }
 #endif

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using SaintsField.Utils;
 
 namespace SaintsField.Playa
 {
@@ -7,13 +8,14 @@ namespace SaintsField.Playa
     [AttributeUsage(AttributeTargets.Method)]
     public class ButtonAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute
     {
-        // public readonly string FuncName;
         public readonly string Label;
+        public readonly bool IsCallback;
 
         public ButtonAttribute(string label = null)
         {
-            // FuncName = funcName;
-            Label = label;
+            (string content, bool isCallback) = RuntimeUtil.ParseCallback(label);
+            Label = content;
+            IsCallback = isCallback;
         }
     }
 }

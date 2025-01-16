@@ -36,10 +36,10 @@ namespace SaintsField.Editor.Playa.Renderer
             return (_fieldElement = container, true);
         }
 
-        protected override PreCheckResult OnUpdateUIToolKit()
+        protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
             // private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo,  VisualElement container, bool callUpdate)
         {
-            PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
+            PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
             if (!RenderField)
             {
                 return preCheckResult;

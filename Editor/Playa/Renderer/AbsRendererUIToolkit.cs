@@ -5,10 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.XPathDrawers;
-using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
 using SaintsField.Editor.Linq;
-using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -73,8 +70,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 root.RegisterCallback<AttachToPanelEvent>(_ =>
                 {
                     // OnUpdateUIToolKit();
-                    root.schedule.Execute(() => OnUpdateUIToolKit());
-                    root.schedule.Execute(() => OnUpdateUIToolKit()).Every(100);
+                    root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement));
+                    root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement)).Every(100);
                 });
             }
             if(anyNeedUpdate || hasAnyChildren)
@@ -351,7 +348,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        protected virtual PreCheckResult OnUpdateUIToolKit()
+        protected virtual PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
             UpdateHelpBox();
             return UpdatePreCheckUIToolkit();
@@ -363,7 +360,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return UpdatePreCheckUIToolkit();
         }
 
-        protected void UpdateHelpBox()
+        private void UpdateHelpBox()
         {
             foreach (HelpBox helpBox in _rootElement.Query<HelpBox>(className: ClassInfoBox).ToList())
             {

@@ -25,7 +25,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
             return (_root, true);
         }
 
-        protected override PreCheckResult OnUpdateUIToolKit()
+        protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
             PreCheckResult preCheckResult = HelperOnUpdateUIToolKitRawBase();
 
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                             _autoRunner.Results.RemoveAt(index);
                         }
 
-                        OnUpdateUIToolKit();
+                        OnUpdateUIToolKit(root);
                     }
                 })
                 {
@@ -188,12 +188,12 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                                 catch (Exception e)
                                 {
                                     autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError = e.Message;
-                                    OnUpdateUIToolKit();
+                                    OnUpdateUIToolKit(root);
                                     return;
                                 }
 
                                 _autoRunner.Results.RemoveAt(autoRunnerResultInfo.Index);
-                                OnUpdateUIToolKit();
+                                OnUpdateUIToolKit(root);
                             })
                             {
                                 text = "Fix",

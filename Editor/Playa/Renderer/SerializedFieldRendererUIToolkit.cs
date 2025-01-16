@@ -6,12 +6,8 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 using System.Reflection;
-
-using System.Collections;
-using SaintsField.Editor.Drawers;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
@@ -460,10 +456,10 @@ namespace SaintsField.Editor.Playa.Renderer
             return listView;
         }
 
-        protected override PreCheckResult OnUpdateUIToolKit()
+        protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         // private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
         {
-            PreCheckResult preCheckResult = base.OnUpdateUIToolKit();
+            PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
 
             if(_arraySizeCondition)
             {
