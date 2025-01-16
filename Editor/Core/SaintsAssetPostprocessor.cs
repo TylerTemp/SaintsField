@@ -17,7 +17,6 @@ namespace SaintsField.Editor.Core
             return material;
         }
 
-
         public class OnPostprocessAllAssetsEventClass: UnityEvent<string[], string[], string[], string[]>{}
         public static readonly OnPostprocessAllAssetsEventClass OnPostprocessAllAssetsEvent = new OnPostprocessAllAssetsEventClass();
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
