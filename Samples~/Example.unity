@@ -12156,14 +12156,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saints:
-    rid: -2
+    rid: 6221196619392745502
   inline:
-    rid: -2
+    rid: 6221196619392745500
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 6221196619392745500
+      type: {class: Issue80/ClassSub2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub2: 
+    - rid: 6221196619392745502
+      type: {class: Issue80/ClassSub2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub2: 
 --- !u!1 &1001589381
 GameObject:
   m_ObjectHideFlags: 0
@@ -12283,7 +12291,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7561d6b21375501429535dfd862febb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mPoints: []
+  mPoints:
+  - {fileID: 482348125}
+  - {fileID: 682673173}
+  - {fileID: 771243898}
+  - {fileID: 1470035494}
+  - {fileID: 1171136840}
+  - {fileID: 336739298}
+  - {fileID: 1625509857}
 --- !u!1 &1025258025
 GameObject:
   m_ObjectHideFlags: 0
@@ -13130,12 +13145,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fruit:
-    rid: -2
+    rid: 6221196619392745512
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 6221196619392745512
+      type: {class: ReferencePickerBase/Base1Fruit, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
 --- !u!114 &1098124222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17512,18 +17529,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item:
-    rid: -2
+    rid: 6221196619392745490
   structImpl:
-    rid: -2
+    rid: 6221196619392745491
   myInterface:
-    rid: -2
+    rid: 6221196619392745494
   myInterfaceDisabled:
     rid: 8149752992130400267
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 6221196619392745490
+      type: {class: ReferenceExample/Base2Fruit, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
+        base2: 0
+    - rid: 6221196619392745491
+      type: {class: ReferenceExample/ClassDirect, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+    - rid: 6221196619392745494
+      type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub2: 
     - rid: 8149752992130400267
       type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:
