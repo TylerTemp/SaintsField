@@ -352,7 +352,7 @@ namespace SaintsField.Editor.Core
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            if (hasOtherAttributeDrawer(fieldInfo))
+            if (GetOtherAttributeDrawerType(fieldInfo) != null)
             {
                 return PropertyFieldFallbackUIToolkit(property);
             }
