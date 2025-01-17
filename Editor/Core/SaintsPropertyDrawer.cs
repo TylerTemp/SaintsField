@@ -352,7 +352,7 @@ namespace SaintsField.Editor.Core
             //     });
         }
 
-        private static Type FindOtherPropertyDrawer(FieldInfo fieldInfo)
+        private static Type FindTypeDrawer(FieldInfo fieldInfo)
         {
             List<Type> lookingForType = new List<Type>
             {

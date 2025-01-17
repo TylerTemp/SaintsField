@@ -348,36 +348,53 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static VisualElement UnityFallbackUIToolkit(FieldInfo fieldInfo, SerializedProperty property, VisualElement containerElement, IEnumerable<SaintsPropertyInfo> saintsPropertyDrawers)
+        private static VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
+            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
             if (attributeDrawerType != null)
             {
-                return PropertyFieldFallbackUIToolkit(property);
+                PropertyDrawer drawer = MakePropertyDrawer(attributeDrawerType, info, attributeInstance);
+                VisualElement drawResult = DrawUsingDrawerInstance(attributeDrawerType, drawer, property, info,
+                    saintsPropertyDrawers, containerElement);
+
+                VisualElement attrResult = drawResult ?? PropertyFieldFallbackUIToolkit(property);
+                attrResult.AddToClassList(ClassAllowDisable);
+                return attrResult;
             }
 
-            Type foundDrawer = FindOtherPropertyDrawer(fieldInfo);
+            Type typeDrawerType = FindTypeDrawer(info);
 
-            if (foundDrawer == null)
+            if (typeDrawerType == null)
             {
                 return PropertyFieldFallbackUIToolkit(property);
             }
 
-            MethodInfo uiToolkitMethod = foundDrawer.GetMethod("CreatePropertyGUI");
-            // Debug.Assert(uiToolkitMethod != null, foundDrawer);
-            // Debug.Log($"uiToolkitMethod: {uiToolkitMethod}");
-            // if (uiToolkitMethod == null)
-            // {
-            //     return PropertyFieldFallbackUIToolkit(property);
-            // }
+            PropertyDrawer typeDrawerInstance = MakePropertyDrawer(typeDrawerType, info, null);
+            VisualElement typeDrawResult = DrawUsingDrawerInstance(typeDrawerType, typeDrawerInstance, property, info,
+                saintsPropertyDrawers, containerElement);
 
-            if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType != foundDrawer)  // null: old Unity || did not override
+            VisualElement typeResult = typeDrawResult ?? PropertyFieldFallbackUIToolkit(property);
+            typeResult.AddToClassList(ClassAllowDisable);
+            return typeResult;
+        }
+
+        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
+        {
+            Debug.Assert(drawerType != null);
+            if (drawerInstance == null)
             {
-                PropertyDrawer imGuiDrawer = MakePropertyDrawer(foundDrawer, fieldInfo, null);
-                MethodInfo imGuiGetPropertyHeightMethod = foundDrawer.GetMethod("GetPropertyHeight");
-                MethodInfo imGuiOnGUIMethodInfo = foundDrawer.GetMethod("OnGUI");
+                return null;
+            }
+
+            MethodInfo uiToolkitMethod = drawerType.GetMethod("CreatePropertyGUI");
+
+            if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType != drawerType)  // null: old Unity || did not override
+            {
+                PropertyDrawer imGuiDrawer = drawerInstance;
+                MethodInfo imGuiGetPropertyHeightMethod = drawerType.GetMethod("GetPropertyHeight");
+                MethodInfo imGuiOnGUIMethodInfo = drawerType.GetMethod("OnGUI");
                 Debug.Assert(imGuiGetPropertyHeightMethod != null);
                 Debug.Assert(imGuiOnGUIMethodInfo != null);
 
@@ -395,7 +412,7 @@ namespace SaintsField.Editor.Core
                     {
                         saintsPropertyInfo.Drawer.OnValueChanged(
                             property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement,
-                            fieldInfo, newFetchParent,
+                            info, newFetchParent,
                             onValueChangedCallback,
                             value);
                     }
@@ -431,7 +448,7 @@ namespace SaintsField.Editor.Core
                                 return;
                             }
 
-                            (string error, int _, object value) = Util.GetValue(property, fieldInfo, newFetchParent);
+                            (string error, int _, object value) = Util.GetValue(property, info, newFetchParent);
                             if (error == "")
                             {
                                 onValueChangedCallback(value);
@@ -452,31 +469,13 @@ namespace SaintsField.Editor.Core
                 return imGuiContainer;
             }
 
-            // Debug.Log("Yes");
-            PropertyDrawer propertyDrawer = MakePropertyDrawer(foundDrawer, fieldInfo, null);
-            if (propertyDrawer == null)
+            VisualElement attrCreateReturnElement = drawerInstance.CreatePropertyGUI(property);
+            if (attrCreateReturnElement == null)
             {
-                return PropertyFieldFallbackUIToolkit(property);
+                return null;
             }
-
-            VisualElement result;
-            try
-            {
-                result = propertyDrawer.CreatePropertyGUI(property);
-            }
-            catch (Exception)
-            {
-                return PropertyFieldFallbackUIToolkit(property);
-            }
-            if (result == null)
-            {
-                return PropertyFieldFallbackUIToolkit(property);
-            }
-
-            result.style.flexGrow = 1;
-            result.AddToClassList(ClassAllowDisable);
-            return result;
-
+            attrCreateReturnElement.style.flexGrow = 1;
+            return attrCreateReturnElement;
         }
 
         private static StyleSheet _noDecoratorDrawer;
@@ -638,7 +637,6 @@ namespace SaintsField.Editor.Core
 
         private static VisualElement BindWatchUIToolkit(SerializedProperty property, Action<object> onValueChangedCallback, bool isReference, PropertyField propertyField, FieldInfo fieldInfo, object parent)
         {
-            // PropertyField fallbackField = propertyField.Q<PropertyField>(name: UIToolkitFallbackName(property));
             VisualElement trackerMain = propertyField.Q<VisualElement>(name: UIToolkitOnChangedTrackerName(property));
             if (trackerMain != null)
             {
