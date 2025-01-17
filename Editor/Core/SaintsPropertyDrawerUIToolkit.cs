@@ -352,32 +352,22 @@ namespace SaintsField.Editor.Core
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
+            (Attribute _, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
             if (attributeDrawerType != null)
-            {
-                PropertyDrawer drawer = MakePropertyDrawer(attributeDrawerType, info, attributeInstance);
-                VisualElement drawResult = DrawUsingDrawerInstance(attributeDrawerType, drawer, property, info,
-                    saintsPropertyDrawers, containerElement);
-
-                VisualElement attrResult = drawResult ?? PropertyFieldFallbackUIToolkit(property);
-                attrResult.AddToClassList(ClassAllowDisable);
-                return attrResult;
-            }
-
-            Type typeDrawerType = FindTypeDrawer(info);
-
-            if (typeDrawerType == null)
             {
                 return PropertyFieldFallbackUIToolkit(property);
             }
 
-            PropertyDrawer typeDrawerInstance = MakePropertyDrawer(typeDrawerType, info, null);
-            VisualElement typeDrawResult = DrawUsingDrawerInstance(typeDrawerType, typeDrawerInstance, property, info,
-                saintsPropertyDrawers, containerElement);
+            Type foundDrawer = FindTypeDrawer(info);
 
-            VisualElement typeResult = typeDrawResult ?? PropertyFieldFallbackUIToolkit(property);
-            typeResult.AddToClassList(ClassAllowDisable);
-            return typeResult;
+            if (foundDrawer == null)
+            {
+                return PropertyFieldFallbackUIToolkit(property);
+            }
+
+            PropertyDrawer typeDrawer = MakePropertyDrawer(foundDrawer, info, null);
+            VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, saintsPropertyDrawers, containerElement);
+            return element ?? PropertyFieldFallbackUIToolkit(property);
         }
 
         private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)

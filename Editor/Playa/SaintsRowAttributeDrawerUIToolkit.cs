@@ -15,21 +15,21 @@ namespace SaintsField.Editor.Playa
             VisualElement root = new VisualElement();
             FillElement(root, property);
 
-            if (property.propertyType == SerializedPropertyType.ManagedReference)
-            {
-                var curId = property.managedReferenceId;
-                root.schedule.Execute(() =>
-                {
-                    if (curId != property.managedReferenceId)
-                    {
-                        curId = property.managedReferenceId;
-                        root.Clear();
-                        FillElement(root, property.Copy());
-                    }
-                    // Debug.Log(property.managedReferenceId);
-                })
-                .Every(100);
-            }
+            // if (property.propertyType == SerializedPropertyType.ManagedReference)
+            // {
+            //     var curId = property.managedReferenceId;
+            //     root.schedule.Execute(() =>
+            //     {
+            //         if (curId != property.managedReferenceId)
+            //         {
+            //             curId = property.managedReferenceId;
+            //             root.Clear();
+            //             FillElement(root, property.Copy());
+            //         }
+            //         // Debug.Log(property.managedReferenceId);
+            //     })
+            //     .Every(100);
+            // }
             return root;
         }
 
