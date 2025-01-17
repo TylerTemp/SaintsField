@@ -518,10 +518,17 @@ namespace SaintsField.Editor.Core
                 // containerElement.visible = true;
 
                 List<VisualElement> parentRoots = UIToolkitUtils.FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
+                // Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
 #endif
-                if (parentRoots.Count != saintsPropertyDrawers.Count)
+                int saintsPropCount = allAttributes.TakeWhile(each => each is ISaintsAttribute).Count();
+                // Debug.Log(saintsPropCount);
+                // Debug.Log(string.Join(",", allAttributes));
+                // Debug.Log(parentRoots.Count);
+
+                if (parentRoots.Count != saintsPropCount)
+                // if (parentRoots.Count != saintsPropertyDrawers.Count)
                 {
                     return;
                 }
