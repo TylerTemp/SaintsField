@@ -352,7 +352,8 @@ namespace SaintsField.Editor.Core
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            if (GetOtherAttributeDrawerType(fieldInfo) != null)
+            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
+            if (attributeDrawerType != null)
             {
                 return PropertyFieldFallbackUIToolkit(property);
             }
@@ -374,14 +375,14 @@ namespace SaintsField.Editor.Core
 
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType != foundDrawer)  // null: old Unity || did not override
             {
-                PropertyDrawer imGuiDrawer = MakePropertyDrawer(foundDrawer, fieldInfo);
+                PropertyDrawer imGuiDrawer = MakePropertyDrawer(foundDrawer, fieldInfo, null);
                 MethodInfo imGuiGetPropertyHeightMethod = foundDrawer.GetMethod("GetPropertyHeight");
                 MethodInfo imGuiOnGUIMethodInfo = foundDrawer.GetMethod("OnGUI");
                 Debug.Assert(imGuiGetPropertyHeightMethod != null);
                 Debug.Assert(imGuiOnGUIMethodInfo != null);
 
                 Action<object> onValueChangedCallback = null;
-                onValueChangedCallback = (object value) =>
+                onValueChangedCallback = value =>
                 {
                     object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                     if (newFetchParent == null)
@@ -452,7 +453,7 @@ namespace SaintsField.Editor.Core
             }
 
             // Debug.Log("Yes");
-            PropertyDrawer propertyDrawer = MakePropertyDrawer(foundDrawer, fieldInfo);
+            PropertyDrawer propertyDrawer = MakePropertyDrawer(foundDrawer, fieldInfo, null);
             if (propertyDrawer == null)
             {
                 return PropertyFieldFallbackUIToolkit(property);
