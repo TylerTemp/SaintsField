@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.19.0 ##
+
+1.  UI Toolkit: Add `ColorPalette` to pick a color from a list of colors (IMGUI support will be added later)
+2.  IMGUI: Fix drawer fallback issue [#119](https://github.com/TylerTemp/SaintsField/issues/119)
+3.  UI Toolkit: Fix drawer can not fall back if a third party attribute is in the middle of attributes
+4.  Fix `Button` gives errors when using non-dynamic label with some `Playa*` attributes
+
 ## 3.18.1 ##
 
 1.  `Button` label now support rich text, and also support dynamic callback text

@@ -4081,11 +4081,30 @@ public class CustomEventExample : SaintsMonoBehaviour
 }
 ```
 
+#### `ColorPalette` ####
+
+A simple color palette tool to select a color from a list of colors. This is only supported in UI Toolkit right now. IMGUI will be added soon.
+
+**Parameters**:
+
+*   `string[] names`: the display name of the palette. If null, it'll use all the palette in the project. If it starts with `$`, then a property/callback will be invoked,
+    which should either returns a string for the display name, or the `SaintsField.ColorPalette` instance.
+*   Allow Multiple: No
+
+```csharp
+[ColorPalette] public Color allPalette;
+[ColorPalette("TestPalette")] public Color fromOnePalette;
+```
+
+[![video](https://github.com/user-attachments/assets/737e1f93-5860-433c-8add-09b4128f4854)](https://github.com/user-attachments/assets/47f0aebd-aa61-49a9-b4e6-fd1bf3ce31f8)
+
+You can add/modify/remove color palette in the `Window/Saints/Color Palette` menu.
+
 ## Data Types ##
 
 ### `SaintsArray`/`SaintsList` ###
 
-Unity does not allow to serialize two dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
+Unity does not allow to serialize two-dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
 
 ```csharp
 using SaintsField;

@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             {
                 dropdownListValue.Add("All", allColorPalette);
             }
-            dropdownListValue.Add("Config...", null);
+            dropdownListValue.Add("Edit...", null);
             dropdownListValue.AddSeparator();
 
             IReadOnlyList<IReadOnlyList<SaintsField.ColorPalette>> curValues = Array.Empty<IReadOnlyList<SaintsField.ColorPalette>>();

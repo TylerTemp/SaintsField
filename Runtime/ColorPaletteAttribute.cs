@@ -30,7 +30,7 @@ namespace SaintsField
                     return new ColorPaletteSource
                     {
                         Name = content,
-                        IsCallback = isCallback
+                        IsCallback = isCallback,
                     };
                 })
                 .ToArray();
