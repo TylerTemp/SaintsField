@@ -182,7 +182,7 @@ namespace SaintsField.Editor.Playa.Utils
                             }
                         }
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE || true
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
                         Debug.Log(
                             $"enable={enable}, count={toggleCheckInfo.BoolResults.Count}, values={string.Join(",", toggleCheckInfo.BoolResults)}");
 #endif

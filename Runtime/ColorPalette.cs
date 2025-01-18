@@ -9,6 +9,7 @@ namespace SaintsField
 #endif
     public class ColorPalette: ScriptableObject
     {
+        [Required]
         public string displayName = "";
 
         [Serializable]
@@ -18,6 +19,7 @@ namespace SaintsField
             public string displayName;
         }
 
+        [ArraySize(min: 1)]
         public List<ColorEntry> colors = new List<ColorEntry>();
     }
 }

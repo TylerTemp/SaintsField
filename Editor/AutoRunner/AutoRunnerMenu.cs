@@ -106,7 +106,10 @@ namespace SaintsField.Editor.AutoRunner
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 AutoRunnerWindow autoRunner = AssetDatabase.LoadAssetAtPath<AutoRunnerWindow>(path);
-                yield return autoRunner;
+                if(autoRunner != null)
+                {
+                    yield return autoRunner;
+                }
             }
         }
 

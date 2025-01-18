@@ -151,7 +151,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 userData = new ButtonUserData
                 {
                     Xml = buttonText,
-                    Callback = buttonAttribute.Label,
+                    Callback = buttonAttribute.IsCallback? buttonAttribute.Label: "",
                     UpdateOneMoreTime = true,
                 },
             };
@@ -218,65 +218,73 @@ namespace SaintsField.Editor.Playa.Renderer
             ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
 
             string labelCallback = buttonUserData.Callback;
-            (string error, string result) = Util.GetOf<string>(labelCallback, null, FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
-            // Debug.Log($"{error}/{result}");
-            if (error != "")
+            // ReSharper disable once InvertIf
+            if(!string.IsNullOrEmpty(labelCallback))
             {
-#if SAINTSFIELD_DEBUG
-                Debug.LogError(error);
-#endif
-                return baseResult;
-            }
-
-            bool noNeedUpdate;
-            if (buttonUserData.Xml == result)
-            {
-                if (buttonUserData.UpdateOneMoreTime)
+                (string error, string result) = Util.GetOf<string>(labelCallback, null,
+                    FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
+                // Debug.Log($"{error}/{result}");
+                if (error != "")
                 {
-                    noNeedUpdate = false;
-                    buttonUserData.UpdateOneMoreTime = false;
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
+                    return baseResult;
+                }
+
+                bool noNeedUpdate;
+                if (buttonUserData.Xml == result)
+                {
+                    if (buttonUserData.UpdateOneMoreTime)
+                    {
+                        noNeedUpdate = false;
+                        buttonUserData.UpdateOneMoreTime = false;
+                    }
+                    else
+                    {
+                        noNeedUpdate = true;
+                    }
                 }
                 else
                 {
                     noNeedUpdate = true;
+                    buttonUserData.Xml = result;
+                    buttonUserData.UpdateOneMoreTime = true;
                 }
-            }
-            else
-            {
-                noNeedUpdate = true;
-                buttonUserData.Xml = result;
-                buttonUserData.UpdateOneMoreTime = true;
-            }
 
-            if (noNeedUpdate)
-            {
+                if (noNeedUpdate)
+                {
+                    return baseResult;
+                }
+
+                buttonElement.text = "";
+                buttonElement.Clear();
+
+                // ReSharper disable once ConvertIfStatementToSwitchStatement
+                if (result == "")
+                {
+                    buttonElement.Add(new Label(" "));
+                    return baseResult;
+                }
+
+                if (result is null)
+                {
+                    buttonElement.Add(new Label(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name)));
+                    return baseResult;
+                }
+
+                buttonUserData.RichTextDrawer ??= new RichTextDrawer();
+
+                IEnumerable<VisualElement> chunks = buttonUserData.RichTextDrawer.DrawChunksUIToolKit(
+                    RichTextDrawer.ParseRichXml(result,
+                        FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target));
+
+                foreach (VisualElement chunk in chunks)
+                {
+                    buttonElement.Add(chunk);
+                }
+
                 return baseResult;
-            }
-
-            buttonElement.text = "";
-            buttonElement.Clear();
-
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if(result == "")
-            {
-                buttonElement.Add(new Label(" "));
-                return baseResult;
-            }
-
-            if (result is null)
-            {
-                buttonElement.Add(new Label(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name)));
-                return baseResult;
-            }
-
-            buttonUserData.RichTextDrawer ??= new RichTextDrawer();
-
-            IEnumerable<VisualElement> chunks = buttonUserData.RichTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(result,
-                FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target));
-
-            foreach (VisualElement chunk in chunks)
-            {
-                buttonElement.Add(chunk);
             }
 
             return baseResult;
