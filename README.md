@@ -77,14 +77,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.18.0**
+**3.19.0**
 
-1.  Auto Runner now can check the `OnValidate` method, and will notice you if the method throw an error and/or make a `Debug.LogError`
-2.  Fix auto getters throw an error if the target asset doesn't match some required condition
-3.  Auto Runner no longer serialize the result into the file
-4.  Fix Auto Runner can not properly display the field because the scene gets close during the process
-5.  Auto Runner now will allow you restore your opened scenes after finished
-6.  Add an [Auto Runner example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) so you can easily make a target assets group for validation
+1.  UI Toolkit: Add `ColorPalette` to pick a color from a list of colors (IMGUI support will be added later)
+2.  IMGUI: Fix drawer fallback issue [#119](https://github.com/TylerTemp/SaintsField/issues/119)
+3.  UI Toolkit: Fix drawer can not fall back if a third party attribute is in the middle of attributes
+4.  Fix `Button` gives errors when using non-dynamic label with some `Playa*` attributes
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
