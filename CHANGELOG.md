@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.19.3 ##
+
+1.  UI Toolkit: if the color is not in the `ColorPalette`, it will give a warning icon.
+2.  `ColorPalette` now supported by auto runner validation.
+3.  Fix auto runner extra resources won't work with GameObject type.
+4.  UI Toolkit: fix `Button` IEnumerator broken
+
+## 3.19.2 ##
+
+UI Toolkit: fix button Enumerator
+
+## 3.19.1 ##
+
+UI Toolkit: fix fallback drawer with decorator attribute(s).
+
 ## 3.19.0 ##
 
 1.  UI Toolkit: Add `ColorPalette` to pick a color from a list of colors (IMGUI support will be added later)
