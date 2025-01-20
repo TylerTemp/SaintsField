@@ -25,10 +25,10 @@ namespace SaintsField.Editor.Core
 
         private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
-#if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
+// #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
         private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
             new Dictionary<Type, IReadOnlyList<Type>>();
-#endif
+// #endif
 
         // [MenuItem("Saints/Debug")]
         // private static void SaintsDebug() => PropertyAttributeToPropertyDrawers.Clear();
@@ -157,10 +157,8 @@ namespace SaintsField.Editor.Core
             }
 
             Dictionary<Type, HashSet<Type>> attrToDrawers = new Dictionary<Type, HashSet<Type>>();
-#if UNITY_2022_1_OR_NEWER
             Dictionary<Type, List<Type>> attrToDecoratorDrawers =
                 new Dictionary<Type, List<Type>>();
-#endif
 
             foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -207,7 +205,6 @@ namespace SaintsField.Editor.Core
                     }
                 }
 
-#if UNITY_2022_1_OR_NEWER
                 List<Type> allSubDecoratorDrawers = allTypes
                     .Where(type => type.IsSubclassOf(typeof(DecoratorDrawer)))
                     .ToList();
@@ -236,8 +233,6 @@ namespace SaintsField.Editor.Core
                     }
                 }
 
-#endif
-
             }
 
             foreach (KeyValuePair<Type, HashSet<Type>> kv in attrToDrawers)
@@ -250,9 +245,9 @@ namespace SaintsField.Editor.Core
 // #endif
             }
 
-#if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
+// #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
             _propertyAttributeToDecoratorDrawers = attrToDecoratorDrawers.ToDictionary(each => each.Key, each => (IReadOnlyList<Type>)each.Value);
-#endif
+// #endif
 
             return PropertyAttributeToPropertyDrawers;
         }
@@ -293,6 +288,7 @@ namespace SaintsField.Editor.Core
 
         private static (Attribute attributeInstance, Type attributeDrawerType) GetOtherAttributeDrawerType(MemberInfo fieldInfo)
         {
+            // ReSharper disable once UseNegatedPatternInIsExpression
             foreach (Attribute fieldAttribute in fieldInfo.GetCustomAttributes().Where(each => !(each is ISaintsAttribute)))
             {
                 foreach (KeyValuePair<Type,IReadOnlyList<(bool isSaints, Type drawerType)>> kv in PropertyAttributeToPropertyDrawers)

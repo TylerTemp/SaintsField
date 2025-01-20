@@ -522,9 +522,39 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
 #endif
-                int saintsPropCount = allAttributes.TakeWhile(each => each is ISaintsAttribute).Count();
+
+                int saintsPropCount = 0;
+                foreach (PropertyAttribute propertyAttribute in allAttributes)
+                {
+                    bool isSaintsProperty = propertyAttribute is ISaintsAttribute;
+                    // Debug.Log($"{propertyAttribute}: {propertyAttribute is ISaintsAttribute}");
+                    if (PropertyIsDecoratorDrawer(propertyAttribute))
+                    {
+                        continue;
+                    }
+                    if (isSaintsProperty)
+                    {
+                        saintsPropCount++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                // int saintsPropCount = allAttributes.TakeWhile(each =>
+                //     each is ISaintsAttribute
+                //     // || PropertyIsDecoratorDrawer(each)
+                //     ).Count();
                 // Debug.Log(saintsPropCount);
+                // Debug.Log(saintsPropertyDrawers.Count);
                 // Debug.Log(string.Join(",", allAttributes));
+                // Debug.Log(string.Join(",", allAttributes.TakeWhile(each =>
+                //     each is ISaintsAttribute
+                //     // || PropertyIsDecoratorDrawer(each)
+                // )));
+                // Debug.Log(string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute)));
+
                 // Debug.Log(parentRoots.Count);
 
                 if (parentRoots.Count != saintsPropCount)
@@ -632,9 +662,31 @@ namespace SaintsField.Editor.Core
             }
         }
 
+        private static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (!_propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
+                    out IReadOnlyList<Type> eachDrawer))
+            {
+                // Debug.Log(propertyAttribute.GetType());
+                // foreach (Type key in PropertyAttributeToPropertyDrawers.Keys)
+                // {
+                //     if ($"{key}".Contains("SepTitle"))
+                //     {
+                //         Debug.Log(key);
+                //     }
+                // }
+                // not found
+                return false;
+            }
+
+            return eachDrawer.Any(drawerType => drawerType.IsSubclassOf(typeof(DecoratorDrawer)));
+        }
+
         private static VisualElement BindWatchUIToolkit(SerializedProperty property, Action<object> onValueChangedCallback, bool isReference, PropertyField propertyField, FieldInfo fieldInfo, object parent)
         {
             VisualElement trackerMain = propertyField.Q<VisualElement>(name: UIToolkitOnChangedTrackerName(property));
+            // ReSharper disable once UseNullPropagation
             if (trackerMain != null)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
