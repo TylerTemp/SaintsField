@@ -22,14 +22,19 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         private static string SearchInputName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_SearchInput";
         private static string ColorButtonsName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_ColorButtons";
 
+        private static Texture2D _colorPaletteIcon;
+        private static Texture2D _colorPaletteWarningIcon;
+
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
+            _colorPaletteIcon = Util.LoadResource<Texture2D>("color-palette.png");
+            _colorPaletteWarningIcon = Util.LoadResource<Texture2D>("color-palette-warning.png");
             return new ToolbarToggle
             {
                 style =
                 {
-                    backgroundImage = Util.LoadResource<Texture2D>("color-palette.png"),
+                    backgroundImage = _colorPaletteIcon,
 #if UNITY_2022_2_OR_NEWER
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
@@ -340,6 +345,15 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     },
                 };
                 colorsContainer.Add(button);
+            }
+
+            bool anySelected = paletteSelectorInfo.AllPalettes.Any(eachPalettes =>
+                eachPalettes.colors.Any(eachColorEntry => eachColorEntry.color == selectedColor));
+            ToolbarToggle toggleButton = container.Q<ToolbarToggle>(name: ToggleButtonName(property));
+            Texture2D icon = anySelected? _colorPaletteIcon: _colorPaletteWarningIcon;
+            if (toggleButton.style.backgroundImage != icon)
+            {
+                toggleButton.style.backgroundImage = icon;
             }
         }
 
