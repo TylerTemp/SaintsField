@@ -4084,7 +4084,7 @@ public class CustomEventExample : SaintsMonoBehaviour
 
 #### `ColorPalette` ####
 
-A simple color palette tool to select a color from a list of colors. This is only supported in UI Toolkit right now. IMGUI will be added soon.
+A simple color palette tool to select a color from a list of colors.
 
 **Parameters**:
 
