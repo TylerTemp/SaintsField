@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -23,6 +24,8 @@ namespace SaintsField.Editor.Playa.Renderer
             public string Callback;
             public bool UpdateOneMoreTime;
             public RichTextDrawer RichTextDrawer;
+
+            public IEnumerator Enumerator;
         }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
@@ -106,6 +109,12 @@ namespace SaintsField.Editor.Playa.Renderer
 
             }
 
+            ButtonUserData buttonUserData = new ButtonUserData
+            {
+                Xml = buttonText,
+                Callback = buttonAttribute.IsCallback ? buttonAttribute.Label : "",
+                UpdateOneMoreTime = true,
+            };
             Button buttonElement = null;
             IVisualElementScheduledItem buttonTask = null;
             buttonElement = new Button(() =>
@@ -113,11 +122,12 @@ namespace SaintsField.Editor.Playa.Renderer
                 object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
                 object returnValue = methodInfo.Invoke(target, paraValues);
                 // ReSharper disable once InvertIf
-                if (returnValue is System.Collections.IEnumerator enumerator)
+                if (returnValue is IEnumerator enumerator)
                 {
+                    // ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
                     // ReSharper disable once AccessToModifiedClosure
                     // ReSharper disable once PossibleNullReferenceException
-                    buttonElement.userData = enumerator;
+                    buttonUserData.Enumerator = enumerator;
                     buttonTask?.Pause();
                     // ReSharper disable once AccessToModifiedClosure
                     // ReSharper disable once PossibleNullReferenceException
@@ -126,7 +136,8 @@ namespace SaintsField.Editor.Playa.Renderer
                         // ReSharper disable once AccessToModifiedClosure
                         // ReSharper disable once PossibleNullReferenceException
                         // ReSharper disable once InvertIf
-                        if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
+                        // ReSharper disable once ConvertTypeCheckPatternToNullCheck
+                        if (buttonUserData.Enumerator is IEnumerator bindEnumerator)
                         {
                             if (!bindEnumerator.MoveNext())
                             {
@@ -148,12 +159,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     justifyContent = Justify.Center,
                 },
                 name = ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
-                userData = new ButtonUserData
-                {
-                    Xml = buttonText,
-                    Callback = buttonAttribute.IsCallback? buttonAttribute.Label: "",
-                    UpdateOneMoreTime = true,
-                },
+                userData = buttonUserData,
             };
 
             if (!string.IsNullOrEmpty(buttonAttribute.Label))
