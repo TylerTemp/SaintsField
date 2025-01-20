@@ -6,7 +6,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class AnimatorParamAttribute : PropertyAttribute, ISaintsAttribute
+    public class AnimatorParamAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
@@ -24,6 +24,12 @@ namespace SaintsField
         {
             AnimatorName = animatorName;
             AnimatorParamType = null;
+        }
+
+        public AnimatorParamAttribute(AnimatorControllerParameterType animatorParamType)
+        {
+            AnimatorName = null;
+            AnimatorParamType = animatorParamType;
         }
 
         public AnimatorParamAttribute(string animatorName, AnimatorControllerParameterType animatorParamType)
