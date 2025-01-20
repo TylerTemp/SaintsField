@@ -11,17 +11,17 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
         {
-            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.Results))
+            foreach ((object mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.Results))
             {
 
                 string groupLabel;
-                if (!mainTarget.MainTargetIsAssetPath)
+                if (mainTarget is string mainTargetString)
                 {
-                    groupLabel = mainTarget.MainTargetString;
+                    groupLabel = mainTargetString;
                 }
                 else
                 {
-                    Object obj = AssetDatabase.LoadAssetAtPath<Object>(mainTarget.MainTargetString);
+                    Object obj = mainTarget as Object;
                     if (obj == null)
                     {
                         continue;

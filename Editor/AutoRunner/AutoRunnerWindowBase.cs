@@ -215,26 +215,55 @@ namespace SaintsField.Editor.AutoRunner
                 new List<(object, IEnumerable<SerializedObject>)>();
             foreach (Object extraResource in GetExtraAssets())
             {
-                SerializedObject so;
-                try
+                Object[] serializeObjects;
+                // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+                switch (extraResource)
                 {
-                    so = new SerializedObject(extraResource);
+                    case GameObject go:
+                        serializeObjects = go.GetComponents<Component>().Cast<Object>().ToArray();
+                        break;
+                    case ScriptableObject scriptableObject:
+                        serializeObjects = new Object[] { scriptableObject };
+                        break;
+                    case Component component:
+                        serializeObjects = new Object[] { component };
+                        break;
+                    default:
+                        serializeObjects = Array.Empty<Object>();
+                        break;
                 }
-                catch (Exception e)
+
+                List<SerializedObject> serializedObjects = new List<SerializedObject>();
+
+                foreach (Object extra in serializeObjects)
                 {
+                    SerializedObject so;
+                    try
+                    {
+                        so = new SerializedObject(extra);
+                    }
+                    catch (Exception e)
+                    {
 #if SAINTSFIELD_DEBUG
-                    Debug.Log($"#AutoRunner# Skip {extraResource} as it's not a valid object: {e}");
+                        Debug.Log($"#AutoRunner# Skip {extra} as it's not a valid object: {e}");
 #endif
-                    continue;
+                        continue;
+                    }
+                    serializedObjects.Add(so);
+                    // extraSoIterations.Add((extraResource, new[] { so }));
+                    yield return new ProcessInfo
+                    {
+                        GroupTotal = sceneSoIterations.Count + folderSoIterations.Count + extraSoIterations.Count,
+                        GroupCurrent = 0,
+                        ProcessCount = 0,
+                        ProcessMessage = $"Processing asset {extraResource}",
+                    };
                 }
-                extraSoIterations.Add((extraResource, new[] { so }));
-                yield return new ProcessInfo
+
+                if (serializeObjects.Length > 0)
                 {
-                    GroupTotal = sceneSoIterations.Count + folderSoIterations.Count + extraSoIterations.Count,
-                    GroupCurrent = 0,
-                    ProcessCount = 0,
-                    ProcessMessage = $"Processing asset {extraResource}",
-                };
+                    extraSoIterations.Add((extraResource, serializedObjects));
+                }
             }
 
             bool skipHiddenFields = SkipHiddenFields();
@@ -366,23 +395,26 @@ namespace SaintsField.Editor.AutoRunner
                                             ProcessMessage = fixerMessage,
                                         };
 
-                                        string mainTargetString;
-                                        bool mainTargetIsAssetPath;
-                                        if(target is string s)
-                                        {
-                                            mainTargetString = s;
-                                            mainTargetIsAssetPath = false;
-                                        }
+                                        // string mainTargetString;
+                                        // bool mainTargetIsAssetPath;
+                                        // object mainTarget;
+                                        // if(target is string s)
+                                        // {
+                                        //     // mainTargetString = s;
+                                        //     mainTarget = s;
+                                        // }
                                         // else if (target is Scene scene)
                                         // {
-                                        //     mainTargetString = scene.path;
-                                        //     mainTargetIsAssetPath = true;
+                                        //     // mainTargetString = scene.path;
+                                        //     // mainTargetIsAssetPath = true;
+                                        //     mainTarget = AssetDatabase.LoadAssetAtPath<SceneAsset>(scene.path);
                                         // }
-                                        else
-                                        {
-                                            mainTargetString = AssetDatabase.GetAssetPath((Object) target);
-                                            mainTargetIsAssetPath = true;
-                                        }
+                                        // else
+                                        // {
+                                        //     // mainTargetString = AssetDatabase.GetAssetPath((Object) target);
+                                        //     // mainTargetIsAssetPath = true;
+                                        //     mainTarget = target;
+                                        // }
                                         // Debug.Log(target.GetType());
                                         // Debug.Log(target is Scene);
                                         // Debug.Log(((Scene)target).path);
@@ -391,8 +423,8 @@ namespace SaintsField.Editor.AutoRunner
                                         AutoRunnerResult result = new AutoRunnerResult
                                         {
                                             FixerResult = autoRunnerResult,
-                                            mainTargetString = mainTargetString,
-                                            mainTargetIsAssetPath = mainTargetIsAssetPath,
+                                            mainTarget = ConvertMainTarget(target),
+                                            // mainTargetIsAssetPath = mainTargetIsAssetPath,
                                             subTarget = so.targetObject,
                                             propertyPath = property.propertyPath,
                                             // SerializedProperty = prop,
@@ -419,6 +451,7 @@ namespace SaintsField.Editor.AutoRunner
                         MethodInfo onValidateMethod = targetObject.GetType().GetMethod("OnValidate", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                         if (onValidateMethod != null)
                         {
+                            // ReSharper disable once ConvertToUsingDeclaration
                             using(LogScoop logScoop = new LogScoop())
                             {
                                 try
@@ -431,18 +464,18 @@ namespace SaintsField.Editor.AutoRunner
                                     // Debug.LogException(e.InnerException ?? e);
                                     hasFixer = true;
 
-                                    string mainTargetString;
-                                    bool mainTargetIsAssetPath;
-                                    if (target is string s)
-                                    {
-                                        mainTargetString = s;
-                                        mainTargetIsAssetPath = false;
-                                    }
-                                    else
-                                    {
-                                        mainTargetString = AssetDatabase.GetAssetPath((Object)target);
-                                        mainTargetIsAssetPath = true;
-                                    }
+                                    // string mainTargetString;
+                                    // bool mainTargetIsAssetPath;
+                                    // if (target is string s)
+                                    // {
+                                    //     mainTargetString = s;
+                                    //     mainTargetIsAssetPath = false;
+                                    // }
+                                    // else
+                                    // {
+                                    //     mainTargetString = AssetDatabase.GetAssetPath((Object)target);
+                                    //     mainTargetIsAssetPath = true;
+                                    // }
 
                                     AutoRunnerResult result = new AutoRunnerResult
                                     {
@@ -451,8 +484,9 @@ namespace SaintsField.Editor.AutoRunner
                                             Error = e.InnerException?.Message ?? e.Message,
                                             ExecError = "",
                                         },
-                                        mainTargetString = mainTargetString,
-                                        mainTargetIsAssetPath = mainTargetIsAssetPath,
+                                        // mainTargetString = mainTargetString,
+                                        // mainTargetIsAssetPath = mainTargetIsAssetPath,
+                                        mainTarget = ConvertMainTarget(target),
                                         subTarget = so.targetObject,
                                         propertyPath = "OnValidate()",
                                         // SerializedProperty = prop,
@@ -466,18 +500,18 @@ namespace SaintsField.Editor.AutoRunner
                                 {
                                     hasFixer = true;
 
-                                    string mainTargetString;
-                                    bool mainTargetIsAssetPath;
-                                    if (target is string s)
-                                    {
-                                        mainTargetString = s;
-                                        mainTargetIsAssetPath = false;
-                                    }
-                                    else
-                                    {
-                                        mainTargetString = AssetDatabase.GetAssetPath((Object)target);
-                                        mainTargetIsAssetPath = true;
-                                    }
+                                    // string mainTargetString;
+                                    // bool mainTargetIsAssetPath;
+                                    // if (target is string s)
+                                    // {
+                                    //     mainTargetString = s;
+                                    //     mainTargetIsAssetPath = false;
+                                    // }
+                                    // else
+                                    // {
+                                    //     mainTargetString = AssetDatabase.GetAssetPath((Object)target);
+                                    //     mainTargetIsAssetPath = true;
+                                    // }
 
                                     string errorMsg = string.Join("\n", logScoop.ErrorLogs.Select(each => each.Item1));
 
@@ -488,8 +522,9 @@ namespace SaintsField.Editor.AutoRunner
                                             Error = errorMsg,
                                             ExecError = "",
                                         },
-                                        mainTargetString = mainTargetString,
-                                        mainTargetIsAssetPath = mainTargetIsAssetPath,
+                                        // mainTargetString = mainTargetString,
+                                        // mainTargetIsAssetPath = mainTargetIsAssetPath,
+                                        mainTarget = ConvertMainTarget(target),
                                         subTarget = so.targetObject,
                                         propertyPath = "OnValidate()",
                                         // SerializedProperty = prop,
@@ -560,6 +595,27 @@ namespace SaintsField.Editor.AutoRunner
 
             // Debug.Log("false");
             return false;
+        }
+
+        private static object ConvertMainTarget(object target)
+        {
+            if(target is string s)
+            {
+                // mainTargetString = s;
+                return s;
+            }
+            else if (target is Scene scene)
+            {
+                // mainTargetString = scene.path;
+                // mainTargetIsAssetPath = true;
+                return AssetDatabase.LoadAssetAtPath<SceneAsset>(scene.path);
+            }
+            else
+            {
+                // mainTargetString = AssetDatabase.GetAssetPath((Object) target);
+                // mainTargetIsAssetPath = true;
+                return target;
+            }
         }
 
         protected static IEnumerable<Scene> GetDirtyOpenedScene()

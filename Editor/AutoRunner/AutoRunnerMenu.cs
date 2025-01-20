@@ -118,6 +118,7 @@ namespace SaintsField.Editor.AutoRunner
             Debug.Log($"changed to {so}");
             editorInlineInspect = so == null? CreateInstance<AutoRunnerWindow>(): so;
             titleContent = new GUIContent(so == null? "Pick or Create Auto Runner": $"Auto Runner: {so.name}");
+            EditorRefreshTarget();
         }
 
         public override Type EditorDrawerType => typeof(AutoRunnerEditor);

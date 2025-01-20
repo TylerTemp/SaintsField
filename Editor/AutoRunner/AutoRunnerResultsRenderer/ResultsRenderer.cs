@@ -47,7 +47,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
         }
 
 
-        private static IEnumerable<(MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup)> FormatResults(IReadOnlyList<AutoRunnerResult> results)
+        private static IEnumerable<(object mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup)> FormatResults(IReadOnlyList<AutoRunnerResult> results)
         {
             return results
                 .Select((autoRunner, index) => new AutoRunnerResultInfo
@@ -56,11 +56,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                     Index = index,
                 })
                 .Where(each => each.AutoRunnerResult.FixerResult != null)
-                .GroupBy(each => new MainTarget
-                {
-                    MainTargetString = each.AutoRunnerResult.mainTargetString,
-                    MainTargetIsAssetPath = each.AutoRunnerResult.mainTargetIsAssetPath,
-                })
+                .GroupBy(each => each.AutoRunnerResult.mainTarget)
                 .Select(each => (
                     each.Key,
                     each.GroupBy(sub => sub.AutoRunnerResult.subTarget)

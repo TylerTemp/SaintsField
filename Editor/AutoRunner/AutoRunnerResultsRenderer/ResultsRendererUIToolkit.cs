@@ -94,7 +94,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                 });
             }
 
-            (MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup)[] formatedResults = FormatResults(_autoRunner.Results).ToArray();
+            (object mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup)[] formatedResults = FormatResults(_autoRunner.Results).ToArray();
 
             if (formatedResults.Length == 0)
             {
@@ -102,23 +102,23 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                 return preCheckResult;
             }
 
-            foreach ((MainTarget mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in formatedResults)
+            foreach ((object mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in formatedResults)
             {
                 // Debug.Log($"#AutoRunner# draw {mainTarget}");
                 Foldout group = new Foldout
                 {
                     // text = mainTarget as string ?? mainTarget.ToString(),
                 };
-                if (!mainTarget.MainTargetIsAssetPath)
+                if (mainTarget is string mainTargetString)
                 {
-                    group.text = mainTarget.MainTargetString;
+                    group.text = mainTargetString;
                 }
                 else
                 {
-                    Object obj = AssetDatabase.LoadAssetAtPath<Object>(mainTarget.MainTargetString);
+                    Object obj = mainTarget as Object;
                     if (obj == null)
                     {
-                        Debug.Log($"#AutoRunner# target is null: {mainTarget.MainTargetString}");
+                        Debug.Log($"#AutoRunner# target is null: {mainTarget}");
                         continue;
                     }
 
