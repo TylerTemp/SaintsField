@@ -77,12 +77,15 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.19.0**
+**3.19.3**
 
-1.  UI Toolkit: Add `ColorPalette` to pick a color from a list of colors (IMGUI support will be added later)
-2.  IMGUI: Fix drawer fallback issue [#119](https://github.com/TylerTemp/SaintsField/issues/119)
-3.  UI Toolkit: Fix drawer can not fall back if a third party attribute is in the middle of attributes
-4.  Fix `Button` gives errors when using non-dynamic label with some `Playa*` attributes
+1.  UI Toolkit: if the color is not in the `ColorPalette`, it will give a warning icon.
+2.  `ColorPalette` now supported by auto runner validation.
+3.  Fix auto runner extra resources won't work with GameObject type.
+4.  UI Toolkit: fix `Button` IEnumerator broken
+5.  IMGUI: `ColorPalette` is now supported in IMGUI
+6.  UI Toolkit: fix button Enumerator
+7.  UI Toolkit: fix fallback drawer with decorator attribute(s).
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

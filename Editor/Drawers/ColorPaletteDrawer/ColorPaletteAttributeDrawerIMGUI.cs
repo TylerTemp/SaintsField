@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             {
                 ImGuiCache[key] = paletteSelectorInfo = new PaletteSelectorInfoImGui
                 {
-                    Expanded = true,
+                    Expanded = false,
                     SelectedPalettes = new List<SaintsField.ColorPalette>(),
                     AllPalettes = new List<SaintsField.ColorPalette>(),
                     SearchText = "",
@@ -261,10 +261,10 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             DisplayColorEntry[] displayColorEntries = GetDisplayColorEntries(property.colorValue, paletteSelectorInfo.SearchText,
                 paletteSelectorInfo.SelectedPalettes).ToArray();
             float useWidth = colorPickerRect.width;
-            int buttonWidthSpace = ButtonPaddding * 2 + ColorButtonSize;
+            const int buttonWidthSpace = ButtonPaddding * 2 + ColorButtonSize;
             int buttonRowCount = Mathf.FloorToInt(useWidth / buttonWidthSpace);
-            float buttonHeight = ColorButtonSize + ButtonPaddding;
-            float buttonWidth = ColorButtonSize + ButtonPaddding;
+            const float buttonHeight = ColorButtonSize + ButtonPaddding;
+            const float buttonWidth = ColorButtonSize + ButtonPaddding;
             for (int colorIndex = 0; colorIndex < displayColorEntries.Length; colorIndex++)
             {
                 int row = colorIndex / buttonRowCount;
@@ -310,6 +310,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     }, GUIStyle.none))
                 {
                     property.colorValue = displayColorEntry.ColorEntry.color;
+                    onGuiPayload.SetValue(property.colorValue);
                 }
             }
 

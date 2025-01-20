@@ -6,6 +6,7 @@
 2.  `ColorPalette` now supported by auto runner validation.
 3.  Fix auto runner extra resources won't work with GameObject type.
 4.  UI Toolkit: fix `Button` IEnumerator broken
+5.  IMGUI: `ColorPalette` is now supported in IMGUI
 
 ## 3.19.2 ##
 
