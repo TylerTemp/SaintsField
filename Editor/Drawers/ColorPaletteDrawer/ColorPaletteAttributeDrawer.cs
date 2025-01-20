@@ -15,11 +15,15 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
     [CustomPropertyDrawer(typeof(ColorPaletteAttribute))]
     public partial class ColorPaletteAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
+        private static Texture2D _colorPaletteIcon;
+        private static Texture2D _colorPaletteWarningIcon;
+        private const int ColorButtonSize = 20;
+
         private static AdvancedDropdownMetaInfo GetMetaInfo(IReadOnlyList<SaintsField.ColorPalette> curSelect,
-            IReadOnlyList<SaintsField.ColorPalette> allColorPalette)
+            IReadOnlyList<SaintsField.ColorPalette> allColorPalette, bool isImGui)
         {
             AdvancedDropdownList<IReadOnlyList<SaintsField.ColorPalette>> dropdownListValue =
-                new AdvancedDropdownList<IReadOnlyList<SaintsField.ColorPalette>>();
+                new AdvancedDropdownList<IReadOnlyList<SaintsField.ColorPalette>>(isImGui? "Select Palette": "");
             if (allColorPalette.Count > 1)
             {
                 dropdownListValue.Add("All", allColorPalette);
@@ -147,6 +151,36 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             return changed;
         }
 
+        private struct DisplayColorEntry
+        {
+            public SaintsField.ColorPalette.ColorEntry ColorEntry;
+            public bool IsSelected;
+            public Color ReversedColor;
+        }
+
+        private static IEnumerable<DisplayColorEntry> GetDisplayColorEntries(Color selectedColor, string searchContent, IReadOnlyList<SaintsField.ColorPalette> selectedPalettes)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (SaintsField.ColorPalette.ColorEntry colorEntry in selectedPalettes.SelectMany(each => each.colors).Where(each => string.IsNullOrEmpty(searchContent) || each.displayName.Contains(searchContent)))
+            {
+                Color reverseColor = ReverseColor(colorEntry.color);
+                bool isSelected = selectedColor == colorEntry.color;
+                yield return new DisplayColorEntry
+                {
+                    ColorEntry = colorEntry,
+                    IsSelected = isSelected,
+                    ReversedColor = reverseColor,
+                };
+            }
+        }
+
+        private static Color ReverseColor(Color oriColor)
+        {
+            Color.RGBToHSV(oriColor, out float h, out float s, out float v);
+            float negativeH = (h + 0.5f) % 1f;
+            return Color.HSVToRGB(negativeH, s, v);
+        }
+
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             SerializedProperty property, MemberInfo memberInfo, object parent)
@@ -161,7 +195,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 };
             }
 
-            ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute) propertyAttribute;
+            ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute)propertyAttribute;
             List<SaintsField.ColorPalette> allPalettes = new List<SaintsField.ColorPalette>();
             FillColorPalettes(allPalettes, colorPaletteAttribute.ColorPaletteSources, property, memberInfo, parent);
             Color selectedColor = property.colorValue;
@@ -171,7 +205,8 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 ? null
                 : new AutoRunnerFixerResult
                 {
-                    Error = $"Color not found in any of the selected ColorPalettes: {string.Join(", ", allPalettes.Select(each => each.displayName))}",
+                    Error =
+                        $"Color not found in any of the selected ColorPalettes: {string.Join(", ", allPalettes.Select(each => each.displayName))}",
                     ExecError = "",
                 };
         }

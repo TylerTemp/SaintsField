@@ -22,9 +22,6 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         private static string SearchInputName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_SearchInput";
         private static string ColorButtonsName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_ColorButtons";
 
-        private static Texture2D _colorPaletteIcon;
-        private static Texture2D _colorPaletteWarningIcon;
-
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
@@ -164,7 +161,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 
             dropdownButton.ButtonElement.clicked += () =>
             {
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(colorPaletteInfo.SelectedPalettes, colorPaletteInfo.AllPalettes);
+                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(colorPaletteInfo.SelectedPalettes, colorPaletteInfo.AllPalettes, false);
 
                 float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
                 Rect worldBound = dropdownButton.worldBound;
@@ -248,10 +245,11 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 
             Color selectedColor = property.colorValue;
 
-            foreach (SaintsField.ColorPalette.ColorEntry colorEntry in paletteSelectorInfo.SelectedPalettes.SelectMany(each => each.colors).Where(each => string.IsNullOrEmpty(searchContent) || each.displayName.Contains(searchContent)))
+            foreach (DisplayColorEntry displayColorEntry in GetDisplayColorEntries(selectedColor, searchContent, paletteSelectorInfo.SelectedPalettes))
             {
-                Color reverseColor = ReverseColor(colorEntry.color);
-                bool isSelected = selectedColor == colorEntry.color;
+                SaintsField.ColorPalette.ColorEntry colorEntry = displayColorEntry.ColorEntry;
+                Color reverseColor = displayColorEntry.ReversedColor;
+                bool isSelected = displayColorEntry.IsSelected;
                 Button button = new Button(() =>
                 {
                     property.colorValue = colorEntry.color;
@@ -263,8 +261,8 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     style =
                     {
                         backgroundColor = colorEntry.color,
-                        width = 20,
-                        height = 20,
+                        width = ColorButtonSize,
+                        height = ColorButtonSize,
                         borderTopWidth = isSelected? 1: 0,
                         borderBottomWidth = isSelected? 1: 0,
                         borderLeftWidth = isSelected? 1: 0,
@@ -286,13 +284,6 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             {
                 toggleButton.style.backgroundImage = icon;
             }
-        }
-
-        private static Color ReverseColor(Color oriColor)
-        {
-            Color.RGBToHSV(oriColor, out float h, out float s, out float v);
-            float negativeH = (h + 0.5f) % 1f;
-            return Color.HSVToRGB(negativeH, s, v);
         }
     }
 }

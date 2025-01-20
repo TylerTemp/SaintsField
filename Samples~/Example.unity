@@ -4431,7 +4431,7 @@ GameObject:
   - component: {fileID: 656789067}
   - component: {fileID: 656789066}
   m_Layer: 0
-  m_Name: ColorPallet
+  m_Name: ColorPalette
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10265,7 +10265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea8af4808a5bfb4ba17624ff74bc6a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: 117
+  value: 999
 --- !u!4 &807567367
 Transform:
   m_ObjectHideFlags: 0

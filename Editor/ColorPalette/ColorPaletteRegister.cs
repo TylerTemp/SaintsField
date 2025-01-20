@@ -15,18 +15,29 @@ namespace SaintsField.Editor.ColorPalette
             string[] movedAssets,
             string[] movedFromAssetPaths)
         {
-            ColorPalettes.Clear();
-            RegisterColorPalettes();
+            if (CheckColorPalettes())
+            {
+                OnColorPalettesChanged.Invoke();
+            }
         }
 
         [InitializeOnLoadMethod]
-        private static void RegisterColorPalettes()
+        private static void InitializeOnLoadMethodCheck()
         {
             if (ColorPalettes.Count != 0)
             {
                 return;
             }
 
+            if(CheckColorPalettes())
+            {
+                OnColorPalettesChanged.Invoke();
+            }
+        }
+
+        private static bool CheckColorPalettes()
+        {
+            List<SaintsField.ColorPalette> nowColorPalettes = new List<SaintsField.ColorPalette>();
             string[] guids = AssetDatabase.FindAssets("t:" + nameof(SaintsField.ColorPalette));
             foreach (string guid in guids)
             {
@@ -34,14 +45,36 @@ namespace SaintsField.Editor.ColorPalette
                 SaintsField.ColorPalette colorPalette = AssetDatabase.LoadAssetAtPath<SaintsField.ColorPalette>(path);
                 if(colorPalette != null)
                 {
-                    ColorPalettes.Add(colorPalette);
+                    nowColorPalettes.Add(colorPalette);
                 }
             }
-#if SAINTSFIELD_DEBUG
-            Debug.Log($"Found color palettes: {string.Join(", ", ColorPalettes.Select(each => $"{each.displayName}:{each.colors.Count}"))}");
-#endif
 
-            OnColorPalettesChanged.Invoke();
+            bool changed = false;
+
+            foreach (SaintsField.ColorPalette nowColorPalette in nowColorPalettes
+                         .Where(nowColorPalette => !ColorPalettes.Contains(nowColorPalette)))
+            {
+                changed = true;
+                ColorPalettes.Add(nowColorPalette);
+#if SAINTSFIELD_DEBUG
+                Debug.Log($"Add color palettes: {nowColorPalette.displayName}:{ColorPalettes.Count}");
+#endif
+            }
+
+            foreach (SaintsField.ColorPalette oldColorPalette in ColorPalettes.ToArray())
+            {
+                // ReSharper disable once InvertIf
+                if(!nowColorPalettes.Contains(oldColorPalette))
+                {
+                    changed = true;
+                    ColorPalettes.Remove(oldColorPalette);
+#if SAINTSFIELD_DEBUG
+                    Debug.Log($"Remove color palettes: {oldColorPalette.displayName}:{ColorPalettes.Count}");
+#endif
+                }
+            }
+
+            return changed;
         }
     }
 }
