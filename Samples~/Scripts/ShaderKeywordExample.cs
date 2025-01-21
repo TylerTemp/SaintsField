@@ -4,6 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ShaderKeywordExample : MonoBehaviour
     {
+#if UNITY_2019_3_OR_NEWER
         [ShaderKeyword] public string shaderKeywordString;
         [ShaderKeyword(0)] public string shaderKeywordIndex;
 
@@ -20,5 +21,6 @@ namespace SaintsField.Samples.Scripts
 
         [ReadOnly, RichLabel("<icon=star.png/><label/>"), ShaderKeyword]
         public string readOnlyField;
+#endif
     }
 }

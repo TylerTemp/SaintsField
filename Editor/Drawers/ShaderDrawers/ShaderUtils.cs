@@ -1,3 +1,4 @@
+#if UNITY_2019_3_OR_NEWER
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -82,3 +83,4 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
         }
     }
 }
+#endif

@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ShaderParamExample : MonoBehaviour
     {
+#if UNITY_2019_3_OR_NEWER
         [ShaderParam] public string shaderParamString;
         [ShaderParam(0)] public int shaderParamInt;
         [ShaderParam(ShaderPropertyType.Texture)] public int shaderParamFilter;
@@ -22,5 +23,6 @@ namespace SaintsField.Samples.Scripts
 
         [ReadOnly, RichLabel("<icon=star.png/><label/>"), ShaderParam]
         public string readOnlyField;
+#endif
     }
 }

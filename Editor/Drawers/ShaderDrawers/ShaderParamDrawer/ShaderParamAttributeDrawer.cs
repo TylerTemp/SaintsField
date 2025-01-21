@@ -1,3 +1,4 @@
+#if UNITY_2019_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -180,3 +181,4 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         }
     }
 }
+#endif

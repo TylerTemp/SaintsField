@@ -1,3 +1,4 @@
+#if UNITY_2019_3_OR_NEWER
 using System;
 using System.Diagnostics;
 using SaintsField.Utils;
@@ -41,3 +42,4 @@ namespace SaintsField
         }
     }
 }
+#endif
