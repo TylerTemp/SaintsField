@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     return;
                 }
 
-                ShaderInfo[] shaderInfos = GetShaderInfo(material).ToArray();
+                ShaderInfo[] shaderInfos = GetShaderInfo(material, shaderParamAttribute.PropertyType).ToArray();
                 (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, shaderInfos);
                 AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(foundShaderInfo, selectedShaderInfo, shaderInfos, false);
 
@@ -109,6 +109,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
+            // Debug.Log(newValue);
             UpdateDisplay(container, (ShaderParamAttribute) saintsAttribute, property, info, parent);
         }
 
@@ -132,7 +133,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return;
             }
 
-            (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, GetShaderInfo(material));
+            (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, GetShaderInfo(material, shaderParamAttribute.PropertyType));
 
             if(!foundShaderInfo)
             {
@@ -165,6 +166,12 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     helpBox.style.display = DisplayStyle.Flex;
                 }
                 return;
+            }
+
+            if(helpBox.text != "")
+            {
+                helpBox.text = "";
+                helpBox.style.display = DisplayStyle.None;
             }
 
             // dropdownButton.SetEnabled(true);

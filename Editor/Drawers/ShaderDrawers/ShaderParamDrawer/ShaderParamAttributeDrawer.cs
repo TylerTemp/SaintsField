@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         {
             if (string.IsNullOrEmpty(callback))  // find on target
             {
-                Renderer directRenderer = null;
+                Renderer directRenderer;
                 Object obj = property.serializedObject.targetObject;
                 switch (obj)
                 {
@@ -38,6 +38,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             (string error, Object uObj) = Util.GetOf<Object>(callback, null, property, info, parent);
             if (error != "")
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(error);
+#endif
                 return (error, null);
             }
 
@@ -81,20 +84,45 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         private struct ShaderInfo
         {
             public string PropertyName;
+            public string PropertyDescription;
             public ShaderPropertyType PropertyType;
             public int PropertyID;
 
-            public override string ToString() => $"{PropertyName}  : {PropertyID} [{PropertyType}]";
+            public override string ToString()
+            {
+                // Debug.Log($"{PropertyName.Replace("_", "")} -> {PropertyDescription?.Replace("_", "").Replace(" ", "")}");
+                string properyName;
+                if (string.Equals(PropertyName.Replace("_", ""), PropertyDescription?.Replace("_", "").Replace(" ", ""),
+                        StringComparison.CurrentCultureIgnoreCase))
+                {
+                    properyName = PropertyDescription;
+                }
+                else if (string.IsNullOrEmpty(PropertyDescription))
+                {
+                    properyName = PropertyName;
+                }
+                else
+                {
+                    properyName = $"{PropertyDescription}: {PropertyName}";
+                }
+                return $"{properyName} [{PropertyType}]";
+            }
         }
 
-        private static IEnumerable<ShaderInfo> GetShaderInfo(Material material)
+        private static IEnumerable<ShaderInfo> GetShaderInfo(Material material, ShaderPropertyType? filterPropertyType)
         {
             Shader shader = material.shader;
 
             foreach (int index in Enumerable.Range(0, shader.GetPropertyCount()))
             {
                 string propertyName = shader.GetPropertyName(index);
+                string propertyDescription = shader.GetPropertyDescription(index);
                 ShaderPropertyType propertyType = shader.GetPropertyType(index);
+
+                if(filterPropertyType != null && propertyType != (ShaderPropertyType)filterPropertyType)
+                {
+                    continue;
+                }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SHADER_PARAM
                 Debug.Log($"#ShaderParam# Property Name: {propertyName}, Property Type: {propertyType}");
@@ -102,6 +130,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 yield return new ShaderInfo
                 {
                     PropertyName = propertyName,
+                    PropertyDescription = propertyDescription,
                     PropertyType = propertyType,
                     PropertyID = Shader.PropertyToID(propertyName),
                 };
