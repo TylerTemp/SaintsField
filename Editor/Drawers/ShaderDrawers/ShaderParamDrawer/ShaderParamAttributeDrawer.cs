@@ -90,12 +90,13 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
             public override string ToString()
             {
+                // Debug.Log(ObjectNames.NicifyVariableName("_dstA"));
                 // Debug.Log($"{PropertyName.Replace("_", "")} -> {PropertyDescription?.Replace("_", "").Replace(" ", "")}");
                 string properyName;
                 if (string.Equals(PropertyName.Replace("_", ""), PropertyDescription?.Replace("_", "").Replace(" ", ""),
                         StringComparison.CurrentCultureIgnoreCase))
                 {
-                    properyName = PropertyDescription;
+                    properyName = ObjectNames.NicifyVariableName(PropertyDescription);
                 }
                 else if (string.IsNullOrEmpty(PropertyDescription))
                 {
@@ -103,7 +104,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 }
                 else
                 {
-                    properyName = $"{PropertyDescription}: {PropertyName}";
+                    properyName = $"{ObjectNames.NicifyVariableName(PropertyDescription)}: {PropertyName}";
                 }
                 return $"{properyName} [{PropertyType}]";
             }
