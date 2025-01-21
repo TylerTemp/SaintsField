@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.20.0 ##
+
+1.  Add `ShaderParam` to select a shader parameter from a `shader`, `material` or `renderer`
+2.  Add `ShaderKeyword` to select a shader keyword from a `shader`, `material` or `renderer`
+
 ## 3.19.3 ##
 
 1.  UI Toolkit: if the color is not in the `ColorPalette`, it will give a warning icon.

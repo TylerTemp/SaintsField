@@ -77,15 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.19.3**
+**3.20.0**
 
-1.  UI Toolkit: if the color is not in the `ColorPalette`, it will give a warning icon.
-2.  `ColorPalette` now supported by auto runner validation.
-3.  Fix auto runner extra resources won't work with GameObject type.
-4.  UI Toolkit: fix `Button` IEnumerator broken
-5.  IMGUI: `ColorPalette` is now supported in IMGUI
-6.  UI Toolkit: fix button Enumerator
-7.  UI Toolkit: fix fallback drawer with decorator attribute(s).
+1.  Add `ShaderParam` to select a shader parameter from a `shader`, `material` or `renderer`
+2.  Add `ShaderKeyword` to select a shader keyword from a `shader`, `material` or `renderer`
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -818,6 +813,64 @@ using SaintsField;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/68dc47d9-7211-48df-bbd1-c11faa536bd1)
+
+#### `ShaderParam` ####
+
+Select a shader parameter from a `shader`, `material` or `renderer`.
+
+**Parameters**:
+
+*   [Optional] `string name`: the target. Be a property or a callback that returns a `shader`, `material` or `renderer`.
+    When omitted, it will try to get the `Renderer` component from the current component.
+*   [Optional] `ShaderPropertyType propertyType`: filter the shader parameters by type. Omitted to show all types.
+*   [Optional] `int index=0`: which material index to use when the target is a `Renderer`.
+
+```csharp
+[ShaderParam] public string shaderParamString;
+[ShaderParam(0)] public int shaderParamInt;
+[ShaderParam(ShaderPropertyType.Texture)] public int shaderParamFilter;
+
+[Separator("By Target")]
+[GetComponent] public Renderer targetRenderer;
+
+[ShaderParam(nameof(targetRenderer))] public int shaderParamRenderer;
+
+private Material GetMat() => targetRenderer.sharedMaterial;
+[ShaderParam(nameof(GetMat))] public int shaderParamMat;
+
+private Shader GetShader() => targetRenderer.sharedMaterial.shader;
+[ShaderParam(nameof(GetShader))] public int shaderParamShader;
+```
+
+![image](https://github.com/user-attachments/assets/c16ebc4b-434d-4e6c-afd8-4a714c842a06)
+
+#### `ShaderKeyword` ####
+
+Select a shader keyword from a `shader`, `material` or `renderer`.
+
+**Parameters**:
+
+*   [Optional] `string name`: the target. Be a property or a callback that returns a `shader`, `material` or `renderer`.
+    When omitted, it will try to get the `Renderer` component from the current component.
+*   [Optional] `int index=0`: which material index to use when the target is a `Renderer`.
+
+```csharp
+[ShaderKeyword] public string shaderKeywordString;
+[ShaderKeyword(0)] public string shaderKeywordIndex;
+
+[Separator("By Target")]
+[GetComponent] public Renderer targetRenderer;
+
+[ShaderKeyword(nameof(targetRenderer))] public string shaderKeywordRenderer;
+
+private Material GetMat() => targetRenderer.sharedMaterial;
+[ShaderKeyword(nameof(GetMat))] public string shaderKeywordMat;
+
+private Shader GetShader() => targetRenderer.sharedMaterial.shader;
+[ShaderKeyword(nameof(GetShader))] public string shaderKeywordShader;
+```
+
+![image](https://github.com/user-attachments/assets/aff67ea7-1dbc-4f8c-8eaa-572456b7dd07)
 
 ### Toggle & Switch ###
 

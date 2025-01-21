@@ -26,71 +26,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             return "";
         }
 
-        private static (string error, Material material) GetMaterial(string callback, int index, SerializedProperty property, MemberInfo info, object parent)
-        {
-            if (string.IsNullOrEmpty(callback))  // find on target
-            {
-                Renderer directRenderer;
-                Object obj = property.serializedObject.targetObject;
-                switch (obj)
-                {
-                    case Component comp:
-                        directRenderer = comp.GetComponent<Renderer>();
-                        break;
-                    case GameObject go:
-                        directRenderer = go.GetComponent<Renderer>();
-                        break;
-                    default:
-                        return ($"{obj} is not a valid target", null);
-                }
-                return GetMaterialFromRenderer(directRenderer, index);
-            }
 
-            (string error, Object uObj) = Util.GetOf<Object>(callback, null, property, info, parent);
-            if (error != "")
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogError(error);
-#endif
-                return (error, null);
-            }
-
-            if (Util.IsNull(uObj))
-            {
-                return ($"Target `{callback}` is null", null);
-            }
-
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (uObj)
-            {
-                case Material material:
-                    return ("", material);
-                case Renderer renderer:
-                    return GetMaterialFromRenderer(renderer, index);
-                case Component comp:
-                    return GetMaterialFromRenderer(comp.GetComponent<Renderer>(), index);
-                case GameObject go:
-                    return GetMaterialFromRenderer(go.GetComponent<Renderer>(), index);
-                default:
-                    return ($"Target `{callback}` is not a valid target: {uObj} ({uObj.GetType()})", null);
-            }
-        }
-
-        private static (string error, Material material) GetMaterialFromRenderer(Renderer renderer, int index)
-        {
-            if (renderer == null)
-            {
-                return ($"No renderer found on target", null);
-            }
-
-            Material[] targetMaterials = renderer.sharedMaterials;
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (index >= targetMaterials.Length)
-            {
-                return ($"Index {index} out of range ({targetMaterials.Length})", null);
-            }
-            return ("", targetMaterials[index]);
-        }
 
         private struct ShaderInfo
         {
@@ -121,10 +57,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             }
         }
 
-        private static IEnumerable<ShaderInfo> GetShaderInfo(Material material, ShaderPropertyType? filterPropertyType)
+        private static IEnumerable<ShaderInfo> GetShaderInfo(Shader shader, ShaderPropertyType? filterPropertyType)
         {
-            Shader shader = material.shader;
-
             foreach (int index in Enumerable.Range(0, shader.GetPropertyCount()))
             {
                 string propertyName = shader.GetPropertyName(index);
@@ -220,7 +154,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             }
 
             ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)propertyAttribute;
-            (string error, Material material) = GetMaterial(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, memberInfo, parent);
+            (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, memberInfo, parent);
             if(error != "")
             {
                 return new AutoRunnerFixerResult
@@ -230,14 +164,14 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 };
             }
 
-            ShaderInfo[] shaderInfos = GetShaderInfo(material, shaderParamAttribute.PropertyType).ToArray();
+            ShaderInfo[] shaderInfos = GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
             (bool foundShaderInfo, ShaderInfo _) = GetSelectedShaderInfo(property, shaderInfos);
             if (!foundShaderInfo)
             {
                 return new AutoRunnerFixerResult
                 {
                     Error =
-                        $"No shader params found for {(property.propertyType == SerializedPropertyType.String ? property.stringValue : property.intValue.ToString())} in {material.shader.name}",
+                        $"No shader params found for {(property.propertyType == SerializedPropertyType.String ? property.stringValue : property.intValue.ToString())} in {shader.name}",
                     ExecError = "",
                 };
             }

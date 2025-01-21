@@ -12,10 +12,13 @@ namespace SaintsField.Samples.Scripts
         [Separator("By Target")]
         [GetComponent] public Renderer targetRenderer;
 
-        [ShaderParam("$" + nameof(targetRenderer))] public int shaderParamRenderer;
+        [ShaderParam(nameof(targetRenderer))] public int shaderParamRenderer;
 
         private Material GetMat() => targetRenderer.sharedMaterial;
-        [ShaderParam("$" + nameof(GetMat))] public int shaderParamMat;
+        [ShaderParam(nameof(GetMat))] public int shaderParamMat;
+
+        private Shader GetShader() => targetRenderer.sharedMaterial.shader;
+        [ShaderParam(nameof(GetShader))] public int shaderParamShader;
 
         [ReadOnly, RichLabel("<icon=star.png/><label/>"), ShaderParam]
         public string readOnlyField;

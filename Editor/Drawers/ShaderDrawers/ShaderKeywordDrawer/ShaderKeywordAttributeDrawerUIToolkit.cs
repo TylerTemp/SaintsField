@@ -10,12 +10,12 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
+namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
 {
-    public partial class ShaderParamAttributeDrawer
+    public partial class ShaderKeywordAttributeDrawer
     {
-        private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_DropdownButton";
-        private static string HelpBoxName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_HelpBox";
+        private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__ShaderKeyword_DropdownButton";
+        private static string HelpBoxName(SerializedProperty property) => $"{property.propertyPath}__ShaderKeyword_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, FieldInfo info, object parent)
@@ -56,26 +56,28 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return;
             }
 
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute) saintsAttribute;
+            ShaderKeywordAttribute shaderKeywordAttribute = (ShaderKeywordAttribute) saintsAttribute;
 
-            UpdateDisplay(container, shaderParamAttribute, property, info, parent);
+            UpdateDisplay(container, shaderKeywordAttribute, property, info, parent);
 
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
             dropdownButton.ButtonElement.clicked += () =>
             {
-                (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
+                (string error, Shader shader) = ShaderUtils.GetShader(shaderKeywordAttribute.TargetName, shaderKeywordAttribute.Index, property, info, parent);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogError(error);
 #endif
-                    UpdateDisplay(container, shaderParamAttribute, property, info, parent);
+                    UpdateDisplay(container, shaderKeywordAttribute, property, info, parent);
                     return;
                 }
 
-                ShaderInfo[] shaderInfos = GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
-                (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, shaderInfos);
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(foundShaderInfo, selectedShaderInfo, shaderInfos, false);
+                string[] shaderKeywords = GetShaderKeywords(shader).ToArray();
+                string selectedShaderKeyword = property.stringValue;
+                int selectedIndex = Array.IndexOf(shaderKeywords, selectedShaderKeyword);
+
+                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(selectedIndex, shaderKeywords, false);
 
                 float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
                 Rect worldBound = dropdownButton.worldBound;
@@ -92,20 +94,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     false,
                     (_, curItem) =>
                     {
-                        ShaderInfo shaderInfo = (ShaderInfo) curItem;
-                        // ReSharper disable once ConvertIfStatementToSwitchStatement
-                        if (property.propertyType == SerializedPropertyType.String)
-                        {
-                            property.stringValue = shaderInfo.PropertyName;
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback(shaderInfo.PropertyName);
-                        }
-                        else if (property.propertyType == SerializedPropertyType.Integer)
-                        {
-                            property.intValue = shaderInfo.PropertyID;
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback(shaderInfo.PropertyID);
-                        }
+                        string shaderKeyword = (string) curItem;
+                        property.stringValue = shaderKeyword;
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback(shaderKeyword);
                     }
                 ));
             };
@@ -114,8 +106,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            // Debug.Log(newValue);
-            UpdateDisplay(container, (ShaderParamAttribute) saintsAttribute, property, info, parent);
+            UpdateDisplay(container, (ShaderKeywordAttribute) saintsAttribute, property, info, parent);
         }
 
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -126,12 +117,18 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
         }
 
-        private static void UpdateDisplay(VisualElement container, ShaderParamAttribute shaderParamAttribute, SerializedProperty property, FieldInfo info, object parent)
+        private static void UpdateDisplay(VisualElement container, ShaderKeywordAttribute shaderKeywordAttribute, SerializedProperty property, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
 
-            (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
+            string useLabel = string.IsNullOrEmpty(property.stringValue)? "-": property.stringValue;
+            if (dropdownButton.ButtonLabelElement.text != useLabel)
+            {
+                dropdownButton.ButtonLabelElement.text = useLabel;
+            }
+
+            (string error, Shader shader) = ShaderUtils.GetShader(shaderKeywordAttribute.TargetName, shaderKeywordAttribute.Index, property, info, parent);
             if (error != "")
             {
                 // dropdownButton.SetEnabled(false);
@@ -146,32 +143,26 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return;
             }
 
-            (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, GetShaderInfo(shader, shaderParamAttribute.PropertyType));
+            string selectedShaderKeyword = property.stringValue;
+            string[] shaderKeywords = GetShaderKeywords(shader).ToArray();
+            int selectedIndex = Array.IndexOf(shaderKeywords, selectedShaderKeyword);
 
-            if(!foundShaderInfo)
+            if(selectedIndex == -1)
             {
                 // dropdownButton.SetEnabled(true);
-                string notFoundError;
-                if (property.propertyType == SerializedPropertyType.String)
+                string stringValue = property.stringValue;
+                if (string.IsNullOrEmpty(stringValue))
                 {
-                    string stringValue = property.stringValue;
-                    if (string.IsNullOrEmpty(stringValue))
+                    // ReSharper disable once InvertIf
+                    if(helpBox.style.display != DisplayStyle.None)
                     {
-                        // ReSharper disable once InvertIf
-                        if(helpBox.style.display != DisplayStyle.None)
-                        {
-                            helpBox.text = "";
-                            helpBox.style.display = DisplayStyle.None;
-                        }
-                        return;
+                        helpBox.text = "";
+                        helpBox.style.display = DisplayStyle.None;
                     }
+                    return;
+                }
 
-                    notFoundError = $"{stringValue} not found in shader";
-                }
-                else
-                {
-                    notFoundError = $"{property.intValue} not found in shader";
-                }
+                string notFoundError = $"{stringValue} not found in shader";
                 // ReSharper disable once InvertIf
                 if(helpBox.text != notFoundError)
                 {
@@ -185,13 +176,6 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             {
                 helpBox.text = "";
                 helpBox.style.display = DisplayStyle.None;
-            }
-
-            // dropdownButton.SetEnabled(true);
-            string label = selectedShaderInfo.ToString();
-            if (dropdownButton.ButtonLabelElement.text != label)
-            {
-                dropdownButton.ButtonLabelElement.text = label;
             }
         }
     }

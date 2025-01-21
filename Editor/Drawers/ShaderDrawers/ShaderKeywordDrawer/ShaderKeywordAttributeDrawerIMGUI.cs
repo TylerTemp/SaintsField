@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,18 +8,18 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
+namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
 {
-    public partial class ShaderParamAttributeDrawer
+    public partial class ShaderKeywordAttributeDrawer
     {
-        private class ShaderParamInfoIMGUI
+        private class ShaderKeywordInfoIMGUI
         {
             public string Error;
             public bool Changed;
-            public object ChangedValue;
+            public string ChangedValue;
         }
 
-        private static readonly Dictionary<string, ShaderParamInfoIMGUI> CachedIMGUI = new Dictionary<string, ShaderParamInfoIMGUI>();
+        private static readonly Dictionary<string, ShaderKeywordInfoIMGUI> CachedIMGUI = new Dictionary<string, ShaderKeywordInfoIMGUI>();
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
@@ -28,7 +29,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             string key = SerializedUtils.GetUniqueId(property);
             if (!CachedIMGUI.ContainsKey(key))
             {
-                CachedIMGUI[key] = new ShaderParamInfoIMGUI
+                CachedIMGUI[key] = new ShaderKeywordInfoIMGUI
                 {
                     Error = "",
                 };
@@ -45,13 +46,12 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI))
+            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderKeywordInfoIMGUI infoIMGUI))
             {
                 return;
             }
 
-            if(property.propertyType != SerializedPropertyType.String &&
-               property.propertyType != SerializedPropertyType.Integer)
+            if(property.propertyType != SerializedPropertyType.String)
             {
                 DefaultDrawer(position, property, label, info);
                 return;
@@ -63,8 +63,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 infoIMGUI.Changed = false;
             }
 
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute) saintsAttribute;
-            (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
+            ShaderKeywordAttribute shaderKeywordAttribute = (ShaderKeywordAttribute) saintsAttribute;
+            (string error, Shader shader) = ShaderUtils.GetShader(shaderKeywordAttribute.TargetName, shaderKeywordAttribute.Index, property, info, parent);
             infoIMGUI.Error = error;
             if (error != "")
             {
@@ -72,13 +72,13 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return;
             }
 
-            ShaderInfo[] shaderInfos = GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
-            (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, GetShaderInfo(shader, shaderParamAttribute.PropertyType));
-
+            string[] shaderKeywords = GetShaderKeywords(shader).ToArray();
+            int selectedIndex = Array.IndexOf(shaderKeywords, property.stringValue);
             Rect dropdownButtonRect = EditorGUI.PrefixLabel(position, label);
-            if(EditorGUI.DropdownButton(dropdownButtonRect, new GUIContent(foundShaderInfo? selectedShaderInfo.ToString(): "-"), FocusType.Keyboard))
+            // ReSharper disable once InvertIf
+            if(EditorGUI.DropdownButton(dropdownButtonRect, new GUIContent(selectedIndex >= 0? shaderKeywords[selectedIndex]: "-"), FocusType.Keyboard))
             {
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(foundShaderInfo, selectedShaderInfo, shaderInfos, true);
+                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(selectedIndex, shaderKeywords, true);
                 Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(dropdownMetaInfo.DropdownListValue, position.width);
                 SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
                     dropdownMetaInfo.DropdownListValue,
@@ -87,22 +87,12 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     new AdvancedDropdownState(),
                     curItem =>
                     {
-                        ShaderInfo shaderInfo = (ShaderInfo) curItem;
+                        string shaderKeyword = (string) curItem;
                         // ReSharper disable once ConvertIfStatementToSwitchStatement
-                        if (property.propertyType == SerializedPropertyType.String)
-                        {
-                            property.stringValue = shaderInfo.PropertyName;
-                            property.serializedObject.ApplyModifiedProperties();
-                            infoIMGUI.Changed = true;
-                            infoIMGUI.ChangedValue = shaderInfo.PropertyName;
-                        }
-                        else if (property.propertyType == SerializedPropertyType.Integer)
-                        {
-                            property.intValue = shaderInfo.PropertyID;
-                            property.serializedObject.ApplyModifiedProperties();
-                            infoIMGUI.Changed = true;
-                            infoIMGUI.ChangedValue = shaderInfo.PropertyID;
-                        }
+                        property.stringValue = shaderKeyword;
+                        property.serializedObject.ApplyModifiedProperties();
+                        infoIMGUI.Changed = true;
+                        infoIMGUI.ChangedValue = shaderKeyword;
                     },
                     _ => null);
                 dropdown.Show(position);
@@ -119,7 +109,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return true;
             }
 
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI))
+            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderKeywordInfoIMGUI infoIMGUI))
             {
                 return false;
             }
@@ -136,7 +126,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
             }
 
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI) || infoIMGUI.Error == "")
+            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderKeywordInfoIMGUI infoIMGUI) || infoIMGUI.Error == "")
             {
                 return 0;
             }
@@ -153,7 +143,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return ImGuiHelpBox.Draw(position, error, MessageType.Error);
             }
 
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI) || infoIMGUI.Error == "")
+            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderKeywordInfoIMGUI infoIMGUI) || infoIMGUI.Error == "")
             {
                 return position;
             }
