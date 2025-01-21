@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
-        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+        private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
         private static readonly Dictionary<string, object> AsyncChangedCache = new Dictionary<string, object>();
 

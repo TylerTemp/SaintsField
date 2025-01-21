@@ -15,6 +15,16 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
     [CustomPropertyDrawer(typeof(ShaderParamAttribute))]
     public partial class ShaderParamAttributeDrawer: SaintsPropertyDrawer
     {
+        private static string GetTypeMismatchError(SerializedProperty property)
+        {
+            if(property.propertyType != SerializedPropertyType.String &&
+               property.propertyType != SerializedPropertyType.Integer)
+            {
+                return $"{property.propertyType} is not supported";
+            }
+            return "";
+        }
+
         private static (string error, Material material) GetMaterial(string callback, int index, SerializedProperty property, MemberInfo info, object parent)
         {
             if (string.IsNullOrEmpty(callback))  // find on target
@@ -72,7 +82,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return ($"No renderer found on target", null);
             }
 
-            Material[] targetMaterials = EditorApplication.isPlaying ? renderer.materials : renderer.sharedMaterials;
+            Material[] targetMaterials = renderer.sharedMaterials;
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (index >= targetMaterials.Length)
             {

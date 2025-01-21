@@ -14,7 +14,10 @@ namespace SaintsField.Samples.Scripts
 
         [ShaderParam("$" + nameof(targetRenderer))] public int shaderParamRenderer;
 
-        private Material GetMat() => targetRenderer.material;
+        private Material GetMat() => targetRenderer.sharedMaterial;
         [ShaderParam("$" + nameof(GetMat))] public int shaderParamMat;
+
+        [ReadOnly, RichLabel("<icon=star.png/><label/>"), ShaderParam]
+        public string readOnlyField;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -14,7 +15,6 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
     {
         private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_DropdownButton";
         private static string HelpBoxName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_HelpBox";
-
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, FieldInfo info, object parent)
@@ -43,11 +43,14 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         {
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
 
-            if (property.propertyType != SerializedPropertyType.String &&
-                property.propertyType != SerializedPropertyType.Integer)
+            string typeMismatchError = GetTypeMismatchError(property);
+            if (typeMismatchError != "")
             {
-                helpBox.text = $"{property.propertyType} is not supported";
-                helpBox.style.display = DisplayStyle.Flex;
+                if(helpBox.text != typeMismatchError)
+                {
+                    helpBox.text = typeMismatchError;
+                    helpBox.style.display = DisplayStyle.Flex;
+                }
                 return;
             }
 
@@ -111,6 +114,14 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         {
             // Debug.Log(newValue);
             UpdateDisplay(container, (ShaderParamAttribute) saintsAttribute, property, info, parent);
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull, IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried,
+            RichTextDrawer richTextDrawer)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
+            UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
         }
 
         private static void UpdateDisplay(VisualElement container, ShaderParamAttribute shaderParamAttribute, SerializedProperty property, FieldInfo info, object parent)
