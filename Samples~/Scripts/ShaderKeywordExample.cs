@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ShaderKeywordExample : MonoBehaviour
     {
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2021_2_OR_NEWER
         [ShaderKeyword] public string shaderKeywordString;
         [ShaderKeyword(0)] public string shaderKeywordIndex;
 

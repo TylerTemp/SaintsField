@@ -816,7 +816,7 @@ using SaintsField;
 
 #### `ShaderParam` ####
 
-Select a shader parameter from a `shader`, `material` or `renderer`. (Requires Unity 2019.3+)
+Select a shader parameter from a `shader`, `material` or `renderer`. (Requires Unity 2021.2+)
 
 **Parameters**:
 
@@ -846,7 +846,7 @@ private Shader GetShader() => targetRenderer.sharedMaterial.shader;
 
 #### `ShaderKeyword` ####
 
-Select a shader keyword from a `shader`, `material` or `renderer`. (Requires Unity 2019.3+)
+Select a shader keyword from a `shader`, `material` or `renderer`. (Requires Unity 2021.2+)
 
 **Parameters**:
 
