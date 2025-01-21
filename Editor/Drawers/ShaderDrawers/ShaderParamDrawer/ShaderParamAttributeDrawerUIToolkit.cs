@@ -186,7 +186,11 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             }
 
             // dropdownButton.SetEnabled(true);
-            dropdownButton.ButtonLabelElement.text = selectedShaderInfo.ToString();
+            string label = selectedShaderInfo.ToString();
+            if (dropdownButton.ButtonLabelElement.text != label)
+            {
+                dropdownButton.ButtonLabelElement.text = label;
+            }
         }
     }
 }
