@@ -82,11 +82,16 @@ namespace SaintsField.Editor.AutoRunner
         // ReSharper disable once UnusedMember.Local
         private IEnumerator Run()
         {
-            Scene[] dirtyScenes = GetDirtyOpenedScene().ToArray();
-            if (dirtyScenes.Length > 0)
+            if (GetSceneList().Any())
             {
-                EditorUtility.DisplayDialog("Save Scene", $"Please save scene(s) before running AutoRunner: {string.Join(", ", dirtyScenes.Select(each => each.name))}", "OK");
-                yield break;
+                Scene[] dirtyScenes = GetDirtyOpenedScene().ToArray();
+                if(dirtyScenes.Length > 0)
+                {
+                    EditorUtility.DisplayDialog("Save Scene",
+                        $"Please save scene(s) before running AutoRunner: {string.Join(", ", dirtyScenes.Select(each => each.name))}",
+                        "OK");
+                    yield break;
+                }
             }
 
             Debug.Log("#AutoRunner# start to run auto runners");

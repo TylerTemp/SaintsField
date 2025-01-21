@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
@@ -13,7 +14,7 @@ using Object = UnityEngine.Object;
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
     [CustomPropertyDrawer(typeof(ShaderParamAttribute))]
-    public partial class ShaderParamAttributeDrawer: SaintsPropertyDrawer
+    public partial class ShaderParamAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static string GetTypeMismatchError(SerializedProperty property)
         {
@@ -203,6 +204,45 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 DropdownListValue = dropdownListValue,
                 SelectStacks = curSelected,
             };
+        }
+
+        public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            SerializedProperty property, MemberInfo memberInfo, object parent)
+        {
+            string mismatchError = GetTypeMismatchError(property);
+            if (mismatchError != "")
+            {
+                return new AutoRunnerFixerResult
+                {
+                    Error = mismatchError,
+                    ExecError = "",
+                };
+            }
+
+            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)propertyAttribute;
+            (string error, Material material) = GetMaterial(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, memberInfo, parent);
+            if(error != "")
+            {
+                return new AutoRunnerFixerResult
+                {
+                    Error = "",
+                    ExecError = error,
+                };
+            }
+
+            ShaderInfo[] shaderInfos = GetShaderInfo(material, shaderParamAttribute.PropertyType).ToArray();
+            (bool foundShaderInfo, ShaderInfo _) = GetSelectedShaderInfo(property, shaderInfos);
+            if (!foundShaderInfo)
+            {
+                return new AutoRunnerFixerResult
+                {
+                    Error =
+                        $"No shader params found for {(property.propertyType == SerializedPropertyType.String ? property.stringValue : property.intValue.ToString())} in {material.shader.name}",
+                    ExecError = "",
+                };
+            }
+
+            return null;
         }
     }
 }
