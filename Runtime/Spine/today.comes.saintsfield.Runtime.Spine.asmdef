@@ -1,0 +1,24 @@
+{
+    "name": "today.comes.saintsfield.Runtime.Spine",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9b261077c7a2ac34886513ec1345f8e0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_SPINE_CSHARP"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.esotericsoftware.spine.spine-csharp",
+            "expression": "",
+            "define": "SAINTSFIELD_SPINE_CSHARP"
+        }
+    ],
+    "noEngineReferences": false
+}

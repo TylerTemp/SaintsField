@@ -1,0 +1,27 @@
+{
+    "name": "today.comes.saintsfield.Editor.Spine",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178",
+        "GUID:8fe65b11b7a93604a98cc78ef9aed695",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0",
+        "GUID:68765d262e2128e4ab49c983f3411946"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_SPINE_CSHARP"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.esotericsoftware.spine.spine-csharp",
+            "expression": "",
+            "define": "SAINTSFIELD_SPINE_CSHARP"
+        }
+    ],
+    "noEngineReferences": false
+}
