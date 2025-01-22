@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Core
             (PropertyAttribute[] allAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
 
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
-            Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);
+            // Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);
 
             // IReadOnlyList<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
             //     .Select((each, index) => new SaintsWithIndex
@@ -61,17 +61,26 @@ namespace SaintsField.Editor.Core
             //         Index = index,
             //     })
             //     .ToArray();
-            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers = iSaintsAttributes
+            List<SaintsPropertyInfo> saintsPropertyDrawers = iSaintsAttributes
                 .WithIndex()
                 .Select(each => new SaintsPropertyInfo
-            {
-                Drawer = GetOrCreateSaintsDrawerByAttr(each.value),
-                Attribute = each.value,
-                Index = each.index,
-            }).ToArray();
+                {
+                    Drawer = GetOrCreateSaintsDrawerByAttr(each.value),
+                    Attribute = each.value,
+                    Index = each.index,
+                })
+                .ToList();
 
-            // SaintsPropertyInfo labelAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Label);
+            // for type drawer that is in SaintsField, use this to draw with a fake property attribute
             SaintsPropertyInfo fieldAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
+            if(fieldAttributeWithIndex.Attribute == null)
+            {
+                fieldAttributeWithIndex = CheckSaintsPropertyInfoInject(property, allAttributes, fieldInfo, saintsPropertyDrawers.Count);
+                if (fieldAttributeWithIndex.Drawer != null)
+                {
+                    saintsPropertyDrawers.Add(fieldAttributeWithIndex);
+                }
+            }
 
             #region Above
 
@@ -198,11 +207,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log("fallback field drawer");
 #endif
-                // _saintsFieldFallback.RegisterCallback<AttachToPanelEvent>(evt =>
-                // {
-                //     Debug.Log($"fallback field attached {property.propertyPath}: {evt.target}");
-                // });
-                VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, saintsPropertyDrawers);
+                VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, allAttributes, saintsPropertyDrawers, parent);
                 fallback.AddToClassList(ClassFieldUIToolkit(property));
                 fieldContainer.Add(fallback);
                 containerElement.visible = false;
@@ -348,7 +353,33 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+        private static readonly List<Func<SerializedProperty, FieldInfo,IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)>> _saintsPropertyInfoInjects = new List<Func<SerializedProperty, FieldInfo, IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)>>();
+
+        private static SaintsPropertyInfo CheckSaintsPropertyInfoInject(SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, int length)
+        {
+            foreach (Func<SerializedProperty, FieldInfo,IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)> func in _saintsPropertyInfoInjects)
+            {
+                (ISaintsAttribute fakeAttribute, Type drawerType) = func(property, info, allAttributes);
+                if (drawerType != null)
+                {
+                    return new SaintsPropertyInfo
+                    {
+                        Drawer = (SaintsPropertyDrawer)MakePropertyDrawer(drawerType, info, (PropertyAttribute)fakeAttribute),
+                        Attribute = fakeAttribute,
+                        Index = length,
+                    };
+                }
+            }
+
+            return default;
+        }
+
+        protected static void AddSaintsPropertyInfoInject(Func<SerializedProperty, FieldInfo, IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)> func)
+        {
+            _saintsPropertyInfoInjects.Add(func);
+        }
+
+        private static VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
@@ -359,6 +390,7 @@ namespace SaintsField.Editor.Core
             }
 
             Type foundDrawer = FindTypeDrawer(info);
+            // Debug.LogWarning(foundDrawer);
 
             if (foundDrawer == null)
             {
@@ -366,11 +398,12 @@ namespace SaintsField.Editor.Core
             }
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(foundDrawer, info, null);
-            VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, saintsPropertyDrawers, containerElement);
+            VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, allAttributes, saintsPropertyDrawers, containerElement, parent);
+            // return element ?? PropertyFieldFallbackUIToolkit(property);
             return element ?? PropertyFieldFallbackUIToolkit(property);
         }
 
-        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
+        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement, object parent)
         {
             Debug.Assert(drawerType != null);
             if (drawerInstance == null)
@@ -468,10 +501,9 @@ namespace SaintsField.Editor.Core
             return attrCreateReturnElement;
         }
 
-        private static StyleSheet _noDecoratorDrawer;
-
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
-            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, IReadOnlyList<PropertyAttribute> allAttributes)
+            object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers,
+            IReadOnlyList<PropertyAttribute> allAttributes)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute.GetType().Name))}");
@@ -558,7 +590,7 @@ namespace SaintsField.Editor.Core
                 // Debug.Log(parentRoots.Count);
 
                 if (parentRoots.Count != saintsPropCount)
-                // if (parentRoots.Count != saintsPropertyDrawers.Count)
+                    // if (parentRoots.Count != saintsPropertyDrawers.Count)
                 {
                     return;
                 }
@@ -654,6 +686,7 @@ namespace SaintsField.Editor.Core
                         }
                     });
                 }
+
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers, allAttributes);
             }
             else
@@ -661,6 +694,8 @@ namespace SaintsField.Editor.Core
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers, allAttributes);
             }
         }
+
+        private static StyleSheet _noDecoratorDrawer;
 
         private static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
         {

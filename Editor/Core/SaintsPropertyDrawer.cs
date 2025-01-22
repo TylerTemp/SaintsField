@@ -277,7 +277,7 @@ namespace SaintsField.Editor.Core
         }
 
 
-        private struct SaintsPropertyInfo
+        protected struct SaintsPropertyInfo
         {
             // ReSharper disable InconsistentNaming
             public SaintsPropertyDrawer Drawer;
@@ -365,7 +365,7 @@ namespace SaintsField.Editor.Core
             {
                 bool isGenericType = fieldType.IsGenericType;
     #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"FindOtherPropertyDrawer for {fieldType}, isGenericType={isGenericType}");
+                Debug.Log($"FindTypeDrawer for {fieldType}, isGenericType={isGenericType}");
     #endif
 
                 // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
@@ -390,6 +390,9 @@ namespace SaintsField.Editor.Core
                     else
                     {
                         matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                        Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.drawerType))}");
+#endif
                         if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
                         {
                             matched = ReflectUtils.IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldType);
@@ -402,10 +405,13 @@ namespace SaintsField.Editor.Core
                     // ReSharper disable once InvertIf
                     if (matched)
                     {
-                        Type foundDrawer = propertyAttributeToPropertyDrawer.Value.FirstOrDefault(each => !each.isSaints).drawerType;
-    #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+                        Type foundDrawer = propertyAttributeToPropertyDrawer.Value
+                            .FirstOrDefault(each => !each.isSaints)
+                            // [0]
+                            .drawerType;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                         Debug.Log($"foundDrawer={foundDrawer} for {fieldType}");
-    #endif
+#endif
                         if(foundDrawer != null)
                         {
                             return foundDrawer;
@@ -417,7 +423,7 @@ namespace SaintsField.Editor.Core
             return null;
         }
 
-        private static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo, Attribute attribute)
+        protected static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo, Attribute attribute)
         {
             PropertyDrawer propertyDrawer;
             try
