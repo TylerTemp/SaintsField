@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
@@ -9,12 +10,13 @@ using SaintsField.Spine;
 using Spine;
 using Spine.Unity;
 using UnityEditor;
+using UnityEngine;
 using Animation = Spine.Animation;
 
 namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 {
     [CustomPropertyDrawer(typeof(SpineAnimationPickerAttribute))]
-    public partial class SpineAnimationPickerAttributeDrawer: SaintsPropertyDrawer
+    public partial class SpineAnimationPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private const string IconPath = "Spine/icon-animation.png";
 
@@ -38,62 +40,29 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             }
         }
 
-        private struct SpineAnimationInfo: IEquatable<SpineAnimationInfo>
+        private static bool GetSelectedAnimation(SerializedProperty property, SkeletonDataAsset skeletonDataAsset)
         {
-            public SkeletonDataAsset SkeletonDataAsset;
-            public string AnimationName;
-
-            public bool Equals(SpineAnimationInfo other)
-            {
-                return ReferenceEquals(SkeletonDataAsset, other.SkeletonDataAsset) && AnimationName == other.AnimationName;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return obj is SpineAnimationInfo other && Equals(other);
-            }
-
-            public override int GetHashCode()
-            {
-                return Util.CombineHashCode(SkeletonDataAsset, AnimationName);
-            }
-
-            public override string ToString()
-            {
-                return $"{AnimationName} ({SkeletonDataAsset.name})";
-            }
-        }
-
-        private static (bool found, SpineAnimationInfo selectedSpineAnimationInfo) GetSelectedAnimation(SerializedProperty property, SkeletonDataAsset skeletonDataAsset, ExposedList<Animation> animations)
-        {
+            ExposedList<Animation> animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
             if(property.propertyType == SerializedPropertyType.String)
             {
                 if(animations.Any(each => each.Name == property.stringValue))
                 {
-                    return (true, new SpineAnimationInfo
-                    {
-                        SkeletonDataAsset = skeletonDataAsset,
-                        AnimationName = property.stringValue,
-                    });
+                    return true;
                 }
-                return (false, default);
+                return false;
             }
 
             AnimationReferenceAsset animationReferenceAsset = property.objectReferenceValue as AnimationReferenceAsset;
             if(animationReferenceAsset == null)
             {
-                return (false, default);
+                return false;
             }
 
             if(animations.Any(each => each.Name == animationReferenceAsset.Animation.Name && ReferenceEquals(skeletonDataAsset, animationReferenceAsset.SkeletonDataAsset)))
             {
-                return (true, new SpineAnimationInfo
-                {
-                    SkeletonDataAsset = skeletonDataAsset,
-                    AnimationName = animationReferenceAsset.Animation.Name,
-                });
+                return true;
             }
-            return (false, default);
+            return false;
         }
 
         private static AdvancedDropdownMetaInfo GetMetaInfoString(string selectedSpineAnimationInfo, SkeletonDataAsset skeletonDataAsset)
@@ -177,6 +146,33 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                 DropdownListValue = dropdownListValue,
                 SelectStacks = curSelected,
             };
+        }
+
+        public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            SerializedProperty property, MemberInfo memberInfo, object parent)
+        {
+            SpineAnimationPickerAttribute spineAnimationPickerAttribute = (SpineAnimationPickerAttribute)propertyAttribute;
+            (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineAnimationPickerAttribute.SkeletonTarget, property, memberInfo, parent);
+            if (error != "")
+            {
+                return new AutoRunnerFixerResult
+                {
+                    ExecError = error,
+                    Error = "",
+                };
+            }
+
+            bool found = GetSelectedAnimation(property, skeletonDataAsset);
+            if (!found)
+            {
+                return new AutoRunnerFixerResult
+                {
+                    ExecError = "",
+                    Error = $"Animation {(property.propertyType == SerializedPropertyType.String ? property.stringValue: property.objectReferenceValue)} not found in {skeletonDataAsset.name}",
+                };
+            }
+
+            return null;
         }
     }
 }

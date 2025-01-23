@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.21.0 ##
+
+1.  Add `SpineAnimationPicker` to pick a spine animation.
+
+    [`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`,
+    but it has some limit, e.g. it can not be used on string, it can not report an error if the target is changed, mismatch with skeleton or missing etc.
+
+    `SainsField`'s spine attributes allow more robust references, and are supported by `Auto Validator` tool, with searching supported.
+2.  Rename `Auto Runner` to `Auto Validator`
+3.  Add `Scene` validation in `Auto Validator`
+
 ## 3.20.0 ##
 
 1.  Add `ShaderParam` to select a shader parameter from a `shader`, `material` or `renderer`

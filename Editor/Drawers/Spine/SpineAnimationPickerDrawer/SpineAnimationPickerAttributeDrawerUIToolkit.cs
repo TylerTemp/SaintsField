@@ -90,7 +90,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
             dropdownButton.clicked += () =>
             {
-                (string error, SkeletonRenderer skeletonRenderer) = SpineUtils.GetSkeletonRenderer(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
+                (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -99,9 +99,6 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                     UpdateDisplay(container, spineAnimationPickerAttribute, property, info, parent);
                     return;
                 }
-
-                SkeletonDataAsset skeletonDataAsset = skeletonRenderer.SkeletonDataAsset;
-                // ExposedList<Animation> animations = ;
 
                 float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
                 // Rect worldBound = dropdownButton.worldBound;
@@ -155,7 +152,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             // UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
 
-            (string error, SkeletonRenderer skeletonRenderer) = SpineUtils.GetSkeletonRenderer(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
+            (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
             if (error != "")
             {
                 // dropdownButton.SetEnabled(false);
@@ -170,11 +167,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                 return;
             }
 
-            SkeletonDataAsset skeletonDataAsset = skeletonRenderer.SkeletonDataAsset;
-
-            ExposedList<Animation> animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
-
-            (bool found, SpineAnimationInfo _) = GetSelectedAnimation(property, skeletonDataAsset, animations);
+            bool found = GetSelectedAnimation(property, skeletonDataAsset);
 
             if(!found)
             {

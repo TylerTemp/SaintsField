@@ -11,9 +11,9 @@ namespace SaintsField.Editor.AutoRunner
     public class AutoRunnerMenu: SaintsEditorWindow
     {
 #if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Auto Runner")]
+        [MenuItem("Saints/Auto Validator...")]
 #else
-        [MenuItem("Window/Saints/Auto Runner")]
+        [MenuItem("Window/Saints/Validator...")]
 #endif
         public static void OpenWindow()
         {

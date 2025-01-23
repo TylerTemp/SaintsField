@@ -4429,6 +4429,40 @@ public int areaName;
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
 
+## Spine ##
+
+[`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`, 
+but it has some limit, e.g. it can not be used on string, it can not report an error if the target is changed, mismatch with skeleton or missing etc.
+
+`SainsField`'s spine attributes allow more robust references, and are supported by `Auto Validator` tool, with searching supported.
+
+These tools are there only if you have `Spine` installed.
+
+Namespace: `SaintsField.Spine`
+
+### `SpineAnimationPicker` ###
+
+Pick a spine animation from a spine skeleton renderer, to a string field or a `AnimationReferenceAsset` field.
+
+(Only supported in UI Toolkit yet. IMGUI support will be added later)
+
+**Parameters**
+
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+
+// get on current target
+[SpineAnimationPicker] private string animationName;
+
+// get from other field or callback
+public SkeletonAnimation _spine;
+[SpineAnimationPicker(nameof(_spine))] private AnimationReferenceAsset animationRef;
+```
+
+[![video](https://github.com/user-attachments/assets/16c41cfe-3b27-474b-a0c0-40fad4a12c39)](https://github.com/user-attachments/assets/521232ff-6718-40bb-a72e-373fba835e90)
 
 ## DOTween ##
 
@@ -5065,9 +5099,9 @@ Note: `csc.rsp` can override settings by Saints Menu.
 
 `Edit` - `Project Settings` - `Player`, find your platform, then go `Other Settings` - `Script Compliation` - `Scripting Define Symbols` to add your marcos. Don't forget to click `Apply` before closing the window.
 
-### Auto Runner ###
+### Auto Validator ###
 
-UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Runner`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
+UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Validator`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
 
 This tool allows you to check if some target has `Required` but not filled, or a auto getters (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you an button to fix it there. Note the fix function might be broken if the target is inside a prefab.
 
@@ -5077,7 +5111,7 @@ It can also specify if you want to skip the hidden fields (hidden by `ShowIf`, `
 
 This tool is very simple, and will get more update in the future.
 
-See [Auto Runner example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) to learn how to make a quick auto runner for a specific group of assets.
+See [Auto Validator example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) to learn how to make a quick auto runner for a specific group of assets.
 
 [![video](https://github.com/user-attachments/assets/bf5e7b7a-c15c-4fa4-92b9-53621d41ccb4)](https://github.com/user-attachments/assets/76683bc3-cfea-4952-9377-788e02d7e075)
 

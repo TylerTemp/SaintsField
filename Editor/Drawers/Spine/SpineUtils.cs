@@ -8,7 +8,7 @@ namespace SaintsField.Editor.Drawers.Spine
 {
     public static class SpineUtils
     {
-        public static (string error, SkeletonRenderer skeletonRenderer) GetSkeletonRenderer(string callback, SerializedProperty property, FieldInfo info, object parent)
+        public static (string error, SkeletonDataAsset skeletonDataAsset) GetSkeletonDataAsset(string callback, SerializedProperty property, MemberInfo info, object parent)
         {
             if (string.IsNullOrEmpty(callback))  // find on target
             {
@@ -17,9 +17,9 @@ namespace SaintsField.Editor.Drawers.Spine
                 switch (obj)
                 {
                     case Component comp:
-                        return SkeletonRendererOrNull(comp.GetComponent<SkeletonRenderer>());
+                        return SkeletonDataOrNull(comp.GetComponent<SkeletonRenderer>());
                     case GameObject go:
-                        return SkeletonRendererOrNull(go.GetComponent<SkeletonRenderer>());
+                        return SkeletonDataOrNull(go.GetComponent<SkeletonRenderer>());
                     default:
                         return ($"{obj} is not a valid target", null);
                 }
@@ -37,23 +37,25 @@ namespace SaintsField.Editor.Drawers.Spine
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (uObj)
             {
+                case SkeletonDataAsset skeletonDataAsset:
+                    return ("", skeletonDataAsset);
                 case SkeletonRenderer skeletonRenderer:
-                    return ("", skeletonRenderer);
+                    return ("", skeletonRenderer.skeletonDataAsset);
                 case Component comp:
-                    return SkeletonRendererOrNull(comp.GetComponent<SkeletonRenderer>());
+                    return SkeletonDataOrNull(comp.GetComponent<SkeletonRenderer>());
                 case GameObject go:
-                    return SkeletonRendererOrNull(go.GetComponent<SkeletonRenderer>());
+                    return SkeletonDataOrNull(go.GetComponent<SkeletonRenderer>());
                 default:
                     return ($"Target `{callback}` is not a valid target: {uObj} ({uObj.GetType()})", null);
             }
         }
 
-        private static (string error, SkeletonRenderer skeletonRenderer) SkeletonRendererOrNull(
+        private static (string error, SkeletonDataAsset skeletonDataAsset) SkeletonDataOrNull(
             SkeletonRenderer skeletonRenderer)
         {
             return skeletonRenderer == null
                 ? ($"SkeletonRenderer not found", null)
-                : ("", skeletonRenderer);
+                : ("", skeletonRenderer.skeletonDataAsset);
         }
     }
 }
