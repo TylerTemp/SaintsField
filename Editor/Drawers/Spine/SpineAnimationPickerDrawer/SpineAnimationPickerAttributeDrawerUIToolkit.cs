@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.ShaderDrawers;
 using SaintsField.Editor.Utils;
 using SaintsField.Spine;
+using Spine;
 using Spine.Unity;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Animation = Spine.Animation;
 
 namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 {
@@ -18,13 +19,36 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
         private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__SpineAnimationPicker_DropdownButton";
         private static string HelpBoxName(SerializedProperty property) => $"{property.propertyPath}__SpineAnimationPicker_HelpBox";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, FieldInfo info, object parent)
+        // protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        //     VisualElement container, FieldInfo info, object parent)
+        // {
+        //     UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+        //     dropdownButton.name = DropdownButtonName(property);
+        //     dropdownButton.AddToClassList(ClassAllowDisable);
+        //     return dropdownButton;
+        // }
+
+        private Texture2D _icon;
+
+        public Texture2D Icon => _icon ??= Util.LoadResource<Texture2D>(IconPath);
+
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
-            dropdownButton.name = DropdownButtonName(property);
-            dropdownButton.AddToClassList(ClassAllowDisable);
-            return dropdownButton;
+            return new Button
+            {
+                style =
+                {
+                    backgroundImage = Icon,
+                    width = EditorGUIUtility.singleLineHeight,
+                    // height = EditorGUIUtility.singleLineHeight,
+                },
+                name = DropdownButtonName(property),
+            };
+            // UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            // dropdownButton.name = DropdownButtonName(property);
+            // dropdownButton.AddToClassList(ClassAllowDisable);
+            // return dropdownButton;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -46,7 +70,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
         {
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
 
-            string typeMismatchError = GetTypeMismatchError(property);
+            string typeMismatchError = GetTypeMismatchError(property, info);
             if (typeMismatchError != "")
             {
                 if(helpBox.text != typeMismatchError)
@@ -57,64 +81,78 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                 return;
             }
 
-            SpineAnimationPickerAttribute spineAnimationPicker = (SpineAnimationPickerAttribute) saintsAttribute;
+            SpineAnimationPickerAttribute spineAnimationPickerAttribute = (SpineAnimationPickerAttribute) saintsAttribute;
 
-            UpdateDisplay(container, spineAnimationPicker, property, info, parent);
+            UpdateDisplay(container, spineAnimationPickerAttribute, property, info, parent);
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
-            dropdownButton.ButtonElement.clicked += () =>
+            Button dropdownButton = container.Q<Button>(DropdownButtonName(property));
+            VisualElement fieldContainer = container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property));
+
+            dropdownButton.clicked += () =>
             {
-                (string error, Shader shader) = ShaderUtils.GetShader(spineAnimationPicker.TargetName, spineAnimationPicker.Index, property, info, parent);
+                (string error, SkeletonRenderer skeletonRenderer) = SpineUtils.GetSkeletonRenderer(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogError(error);
 #endif
-                    UpdateDisplay(container, spineAnimationPicker, property, info, parent);
+                    UpdateDisplay(container, spineAnimationPickerAttribute, property, info, parent);
                     return;
                 }
 
-                ShaderInfo[] shaderInfos = GetShaderInfo(shader, spineAnimationPicker.PropertyType).ToArray();
-                (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, shaderInfos);
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(foundShaderInfo, selectedShaderInfo, shaderInfos, false);
+                SkeletonDataAsset skeletonDataAsset = skeletonRenderer.SkeletonDataAsset;
+                // ExposedList<Animation> animations = ;
 
                 float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
-                Rect worldBound = dropdownButton.worldBound;
+                // Rect worldBound = dropdownButton.worldBound;
+                Rect worldBound = fieldContainer.worldBound;
                 if (maxHeight < 100)
                 {
                     worldBound.y -= 100 + worldBound.height;
                     maxHeight = 100;
                 }
 
+                AdvancedDropdownMetaInfo dropdownMetaInfo = property.propertyType == SerializedPropertyType.String
+                    ? GetMetaInfoString(property.stringValue, skeletonDataAsset)
+                    : GetMetaInfoAsset(property.objectReferenceValue as AnimationReferenceAsset, skeletonDataAsset);
+
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
                     dropdownMetaInfo,
-                    dropdownButton.worldBound.width,
+                    worldBound.width,
                     maxHeight,
                     false,
                     (_, curItem) =>
                     {
-                        ShaderInfo shaderInfo = (ShaderInfo) curItem;
                         // ReSharper disable once ConvertIfStatementToSwitchStatement
                         if (property.propertyType == SerializedPropertyType.String)
                         {
-                            property.stringValue = shaderInfo.PropertyName;
+                            string curValue = (string)curItem;
+                            property.stringValue = curValue;
                             property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback(shaderInfo.PropertyName);
+                            onValueChangedCallback(curValue);
                         }
-                        else if (property.propertyType == SerializedPropertyType.Integer)
+                        else
                         {
-                            property.intValue = shaderInfo.PropertyID;
+                            AnimationReferenceAsset curValue = (AnimationReferenceAsset)curItem;
+                            property.objectReferenceValue = curValue;
                             property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback(shaderInfo.PropertyID);
+                            onValueChangedCallback(curValue);
                         }
                     }
                 ));
             };
         }
 
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
+        {
+            // Debug.Log(newValue);
+            UpdateDisplay(container, (SpineAnimationPickerAttribute) saintsAttribute, property, info, parent);
+        }
+
         private static void UpdateDisplay(VisualElement container, SpineAnimationPickerAttribute spineAnimationPickerAttribute, SerializedProperty property, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
+            // UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
 
             (string error, SkeletonRenderer skeletonRenderer) = SpineUtils.GetSkeletonRenderer(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
@@ -132,11 +170,13 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                 return;
             }
 
-            var animations = skeletonRenderer
+            SkeletonDataAsset skeletonDataAsset = skeletonRenderer.SkeletonDataAsset;
 
-            (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, GetShaderInfo(skeletonRenderer, spineAnimationPickerAttribute.PropertyType));
+            ExposedList<Animation> animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
 
-            if(!foundShaderInfo)
+            (bool found, SpineAnimationInfo _) = GetSelectedAnimation(property, skeletonDataAsset, animations);
+
+            if(!found)
             {
                 // dropdownButton.SetEnabled(true);
                 string notFoundError;
@@ -154,11 +194,21 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                         return;
                     }
 
-                    notFoundError = $"{stringValue} not found in shader";
+                    notFoundError = $"{stringValue} not found in animations of {skeletonDataAsset}";
                 }
                 else
                 {
-                    notFoundError = $"{property.intValue} not found in shader";
+                    if (property.objectReferenceValue == null)
+                    {
+                        // ReSharper disable once InvertIf
+                        if(helpBox.style.display != DisplayStyle.None)
+                        {
+                            helpBox.text = "";
+                            helpBox.style.display = DisplayStyle.None;
+                        }
+                        return;
+                    }
+                    notFoundError = $"{property.objectReferenceValue} not found in animations of {skeletonDataAsset}";
                 }
                 // ReSharper disable once InvertIf
                 if(helpBox.text != notFoundError)
@@ -176,11 +226,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             }
 
             // dropdownButton.SetEnabled(true);
-            string label = selectedShaderInfo.ToString();
-            if (dropdownButton.ButtonLabelElement.text != label)
-            {
-                dropdownButton.ButtonLabelElement.text = label;
-            }
+            // string label = selectedSpineAnimationInfo.ToString();
+            // if (dropdownButton.ButtonLabelElement.text != label)
+            // {
+            //     dropdownButton.ButtonLabelElement.text = label;
+            // }
         }
     }
 }

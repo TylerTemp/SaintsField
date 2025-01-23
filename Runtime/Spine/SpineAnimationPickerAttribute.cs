@@ -8,8 +8,8 @@ namespace SaintsField.Spine
     [Conditional("UNITY_EDITOR")]
     public class SpineAnimationPickerAttribute: PropertyAttribute, ISaintsAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string GroupBy => "__LABEL_FIELD__";
+        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
+        public string GroupBy => "";
 
         public readonly string SkeletonTarget;
 

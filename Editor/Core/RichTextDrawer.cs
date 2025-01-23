@@ -149,11 +149,11 @@ namespace SaintsField.Editor.Core
 
         public struct RichTextChunk
         {
-            // ReSharper disable InconsistentNaming
+            public string RawContent;
+
             public bool IsIcon;
             public string Content;
             public string IconColor;
-            // ReSharper enable InconsistentNaming
 
             public override string ToString() => IsIcon
                 ? $"<ICON={Content} COLOR={IconColor}/>"
