@@ -5,12 +5,10 @@ using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Spine;
-using Spine;
 using Spine.Unity;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Animation = Spine.Animation;
 
 namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 {

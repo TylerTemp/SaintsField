@@ -16,7 +16,8 @@
     "autoReferenced": true,
     "defineConstraints": [
         "SAINTSFIELD_SPINE_CSHARP",
-        "SAINTSFIELD_SPINE_UNITY"
+        "SAINTSFIELD_SPINE_UNITY",
+        "!SAINTSFIELD_SPINE_DISABLE"
     ],
     "versionDefines": [
         {
