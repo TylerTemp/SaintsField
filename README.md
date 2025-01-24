@@ -4468,7 +4468,7 @@ public SkeletonAnimation _spine;
 [SpineAnimationPicker(nameof(_spine))] private AnimationReferenceAsset animationRef;
 ```
 
-[![video](https://github.com/user-attachments/assets/16c41cfe-3b27-474b-a0c0-40fad4a12c39)](https://github.com/user-attachments/assets/521232ff-6718-40bb-a72e-373fba835e90)
+[![video](https://github.com/user-attachments/assets/16c41cfe-3b27-474b-a0c0-40fad4a12c39)](https://github.com/user-attachments/assets/a26a2417-5b22-4a03-b17c-bd1883c65de2)
 
 ## DOTween ##
 
