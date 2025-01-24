@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -12,7 +13,7 @@ using Object = UnityEngine.Object;
 namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 {
     [CustomPropertyDrawer(typeof(AnimatorStateAttribute))]
-    public partial class AnimatorStateAttributeDrawer : SaintsPropertyDrawer
+    public partial class AnimatorStateAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private bool _onEnableChecked;
         private string _errorMsg = "";
@@ -20,19 +21,17 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 
         private struct MetaInfo
         {
-            // ReSharper disable InconsistentNaming
             public RuntimeAnimatorController RuntimeAnimatorController;
             public IReadOnlyList<AnimatorStateChanged> AnimatorStates;
             public string Error;
-            // ReSharper enable InconsistentNaming
         }
 
-        private static (string error, RuntimeAnimatorController animator) GetRuntimeAnimatorController(string animatorName, SerializedProperty property, FieldInfo fieldInfo, object parent)
+        private static (string error, RuntimeAnimatorController animator) GetRuntimeAnimatorController(string animatorName, SerializedProperty property, MemberInfo info, object parent)
         {
             if (animatorName != null)
             {
                 // search parent first
-                (string error, object result) = Util.GetOf<object>(animatorName, null, property, fieldInfo, parent);
+                (string error, object result) = Util.GetOf<object>(animatorName, null, property, info, parent);
                 if (error != "")
                 {
                     return (error, null);
@@ -167,12 +166,12 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
             return changed;
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, string animFieldName, FieldInfo fieldInfo, object parent)
+        private static MetaInfo GetMetaInfo(SerializedProperty property, string animFieldName, MemberInfo info, object parent)
         {
             // AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute) saintsAttribute;
             // string animFieldName = animatorStateAttribute.AnimFieldName;
 
-            (string error, RuntimeAnimatorController runtimeAnimatorController) = GetRuntimeAnimatorController(animFieldName, property, fieldInfo, parent);
+            (string error, RuntimeAnimatorController runtimeAnimatorController) = GetRuntimeAnimatorController(animFieldName, property, info, parent);
             if (error != "")
             {
                 return new MetaInfo
@@ -295,5 +294,55 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 
         private static string FormatStateLabel(AnimatorStateChanged animatorStateInfo, string sep) => $"{animatorStateInfo.state.name}{(animatorStateInfo.animationClip == null ? "" : $" ({animatorStateInfo.animationClip.name})")}: {animatorStateInfo.layer.name}{(animatorStateInfo.subStateMachineNameChain.Count == 0 ? "" : $"{sep}{string.Join(sep, animatorStateInfo.subStateMachineNameChain)}")}";
 
+        public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            SerializedProperty property, MemberInfo memberInfo, object parent)
+        {
+            AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute)propertyAttribute;
+            MetaInfo metaInfo = GetMetaInfo(property, animatorStateAttribute.AnimFieldName, memberInfo, parent);
+            if (metaInfo.Error != "")
+            {
+                return new AutoRunnerFixerResult
+                {
+                    ExecError = metaInfo.Error,
+                    Error = "",
+                };
+            }
+
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.String when string.IsNullOrEmpty(property.stringValue):
+                    return null;  // we don't care about empty string, user need to add a `Required`
+                case SerializedPropertyType.String:
+                {
+                    if (metaInfo.AnimatorStates.Any(animatorControllerParameter => animatorControllerParameter.state.name == property.stringValue))
+                    {
+                        return null;
+                    }
+
+                    return new AutoRunnerFixerResult
+                    {
+                        ExecError = "",
+                        Error = $"State {property.stringValue} not found in {metaInfo.RuntimeAnimatorController.name}",
+                    };
+                }
+                case SerializedPropertyType.Generic:
+                {
+                    int curIndex = Util.ListIndexOfAction(metaInfo.AnimatorStates,
+                            eachStateInfo => EqualAnimatorState(eachStateInfo, property));
+                    if (curIndex == -1)
+                    {
+                        return new AutoRunnerFixerResult
+                        {
+                            ExecError = "",
+                            Error = $"State not found in {metaInfo.RuntimeAnimatorController.name}",
+                        };
+                    }
+
+                    return null;
+                }
+                default:
+                    return null;
+            }
+        }
     }
 }
