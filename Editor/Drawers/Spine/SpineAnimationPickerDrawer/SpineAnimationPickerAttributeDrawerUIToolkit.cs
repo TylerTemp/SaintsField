@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
         private Texture2D _icon;
 
-        public Texture2D Icon => _icon ??= Util.LoadResource<Texture2D>(IconDropdownPath);
+        private Texture2D Icon => _icon ??= Util.LoadResource<Texture2D>(IconDropdownPath);
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
