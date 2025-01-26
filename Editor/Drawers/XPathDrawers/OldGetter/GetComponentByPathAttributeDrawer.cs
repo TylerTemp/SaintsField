@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.OldGetter
         // private bool _firstOpen = true;
         private readonly Dictionary<string, bool> _drawerAlreadyOpenedOnceCache = new Dictionary<string, bool>();
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
             IReadOnlyList<PropertyAttribute> allAttributes,
