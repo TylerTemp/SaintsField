@@ -35,7 +35,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
         private GUIStyle _imGuiButtonStyle;
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {

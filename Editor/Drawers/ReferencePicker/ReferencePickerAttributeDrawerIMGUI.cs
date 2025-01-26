@@ -13,7 +13,8 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
     {
         private const float ImGuiButtonWidth = 20f;
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
             IReadOnlyList<PropertyAttribute> allAttributes,

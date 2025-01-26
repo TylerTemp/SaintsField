@@ -32,6 +32,16 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
         private static string NameSubStateMachineNameChain(SerializedProperty property) =>
             $"{property.propertyPath}__AnimatorState_SubStateMachineNameChain";
 
+        private static readonly Type[] InterfaceTypes = {
+            // typeof(IAnimationClip),
+            typeof(ILayerIndex),
+            typeof(IStateNameHash),
+            typeof(IStateName),
+            typeof(IStateSpeed),
+            typeof(IStateTag),
+            typeof(ISubStateMachineNameChain),
+        };
+
         [InitializeOnLoadMethod]
         private static void AddSaintsPropertyInfoInjectAnimatorState()
         {
@@ -47,17 +57,9 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
                     return (null, null);
                 }
                 Type infoType = ReflectUtils.GetElementType(info.FieldType);
-                Type[] interfaceTypes = {
-                    // typeof(IAnimationClip),
-                    typeof(ILayerIndex),
-                    typeof(IStateNameHash),
-                    typeof(IStateName),
-                    typeof(IStateSpeed),
-                    typeof(IStateTag),
-                    typeof(ISubStateMachineNameChain),
-                };
 
-                if (!interfaceTypes.All(interfaceType => interfaceType.IsAssignableFrom(infoType)))
+
+                if (!InterfaceTypes.All(interfaceType => interfaceType.IsAssignableFrom(infoType)))
                 {
                     return (null, null);
                 }

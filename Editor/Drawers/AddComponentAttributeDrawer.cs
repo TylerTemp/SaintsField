@@ -15,7 +15,8 @@ namespace SaintsField.Editor.Drawers
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent) => 0;
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
             IReadOnlyList<PropertyAttribute> allAttributes,

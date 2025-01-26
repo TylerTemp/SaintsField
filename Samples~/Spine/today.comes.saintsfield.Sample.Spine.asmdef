@@ -1,0 +1,35 @@
+{
+    "name": "today.comes.saintsfield.Sample.Spine",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178",
+        "GUID:8fe65b11b7a93604a98cc78ef9aed695",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0",
+        "GUID:68765d262e2128e4ab49c983f3411946",
+        "GUID:72d1fea872bd7a449bf3818f2b0a6708"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_SPINE_CSHARP",
+        "SAINTSFIELD_SPINE_UNITY",
+        "!SAINTSFIELD_SPINE_DISABLE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.esotericsoftware.spine.spine-csharp",
+            "expression": "",
+            "define": "SAINTSFIELD_SPINE_CSHARP"
+        },
+        {
+            "name": "com.esotericsoftware.spine.spine-unity",
+            "expression": "",
+            "define": "SAINTSFIELD_SPINE_UNITY"
+        }
+    ],
+    "noEngineReferences": false
+}

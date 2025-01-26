@@ -23,15 +23,29 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
         private static readonly Dictionary<string, CachedInfo> CachedInfoIMGUI = new Dictionary<string, CachedInfo>();
 
-        private static Texture2D _iconIMGUI;
+        private static Texture2D _iconDropdownIMGUI;
 
+        private static Texture2D IconDropdownIMGUI
+        {
+            get
+            {
+                if(_iconDropdownIMGUI == null)
+                {
+                    _iconDropdownIMGUI = Util.LoadResource<Texture2D>(IconDropdownPath);
+                }
+
+                return _iconDropdownIMGUI;
+            }
+        }
+
+        private static Texture2D _iconIMGUI;
         private static Texture2D IconIMGUI
         {
             get
             {
                 if(_iconIMGUI == null)
                 {
-                    _iconIMGUI = EditorGUIUtility.Load("Spine/icon-animation.png") as Texture2D;
+                    _iconIMGUI = Util.LoadResource<Texture2D>(IconPath);
                 }
 
                 return _iconIMGUI;
@@ -44,12 +58,32 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        private static GUIStyle _buttonStyle;
+        private static GUIStyle ButtonStyle
+        {
+            get
+            {
+                // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
+                if (_buttonStyle == null)
+                {
+                    _buttonStyle = new GUIStyle(EditorStyles.miniButton)
+                    {
+                        padding = new RectOffset(3, 3, 3, 3),
+                    };
+                }
+
+                return _buttonStyle;
+            }
+        }
+
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            if(!CachedInfoIMGUI.TryGetValue(property.propertyPath, out CachedInfo cachedInfo))
+            if(!CachedInfoIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out CachedInfo cachedInfo))
             {
+
                 return false;
             }
 
@@ -59,7 +93,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                 cachedInfo.Changed = false;
             }
 
-            if(GUI.Button(position, IconIMGUI, EditorStyles.miniButton))
+            if(GUI.Button(position, IconDropdownIMGUI, ButtonStyle))
             {
                 SpineAnimationPickerAttribute spineAnimationPickerAttribute = (SpineAnimationPickerAttribute)saintsAttribute;
                 (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
@@ -76,13 +110,13 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                     ? GetMetaInfoString(property.stringValue, skeletonDataAsset)
                     : GetMetaInfoAsset(property.objectReferenceValue as AnimationReferenceAsset, skeletonDataAsset);
 
-                Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(dropdownMetaInfo.DropdownListValue, position.width);
+                Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(dropdownMetaInfo.DropdownListValue, fullRect.width);
 
                 // OnGUIPayload targetPayload = onGUIPayload;
                 SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
                     dropdownMetaInfo.DropdownListValue,
                     size,
-                    position,
+                    fullRect,
                     new AdvancedDropdownState(),
                     curItem =>
                     {
@@ -107,7 +141,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                         }
                     },
                     _ => IconIMGUI);
-                dropdown.Show(position);
+                dropdown.Show(fullRect);
                 dropdown.BindWindowPosition();
             }
             return true;
@@ -118,13 +152,14 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             FieldInfo info,
             object parent)
         {
-            if(!CachedInfoIMGUI.TryGetValue(property.propertyPath, out CachedInfo cachedInfo))
+            string key = SerializedUtils.GetUniqueId(property);
+            if(!CachedInfoIMGUI.TryGetValue(key, out CachedInfo cachedInfo))
             {
-                string dismatchError = GetTypeMismatchError(property, info);
-                string key = SerializedUtils.GetUniqueId(property);
+                string mismatchError = GetTypeMismatchError(property, info);
+
                 CachedInfoIMGUI[key] = cachedInfo = new CachedInfo
                 {
-                    Error = dismatchError,
+                    Error = mismatchError,
                 };
 
                 NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
@@ -139,7 +174,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            if(!CachedInfoIMGUI.TryGetValue(property.propertyPath, out CachedInfo cachedInfo) || cachedInfo.Error == "")
+            if(!CachedInfoIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out CachedInfo cachedInfo) || cachedInfo.Error == "")
             {
                 return 0f;
             }
@@ -151,7 +186,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
-            if(!CachedInfoIMGUI.TryGetValue(property.propertyPath, out CachedInfo cachedInfo) || cachedInfo.Error == "")
+            if(!CachedInfoIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out CachedInfo cachedInfo) || cachedInfo.Error == "")
             {
                 return position;
             }

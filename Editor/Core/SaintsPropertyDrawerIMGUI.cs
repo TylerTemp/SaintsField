@@ -741,7 +741,7 @@ namespace SaintsField.Editor.Core
                     postFieldAccWidth += width;
 
                     // Debug.Log($"DrawPostField, valueChange={_valueChange}");
-                    drawer.DrawPostFieldImGui(eachRect, property, bugFixCopyLabel,
+                    drawer.DrawPostFieldImGui(eachRect, fieldUseRectWithPost, property, bugFixCopyLabel,
                         attributeWithIndex.SaintsAttribute,
                         attributeWithIndex.Index,
                         allAttributes,
@@ -931,7 +931,8 @@ namespace SaintsField.Editor.Core
             return 0;
         }
 
-        protected virtual bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        protected virtual bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {

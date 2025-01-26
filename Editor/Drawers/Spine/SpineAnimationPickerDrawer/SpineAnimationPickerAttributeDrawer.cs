@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
     [CustomPropertyDrawer(typeof(SpineAnimationPickerAttribute))]
     public partial class SpineAnimationPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
+        private const string IconDropdownPath = "Spine/icon-animation-dropdown.png";
         private const string IconPath = "Spine/icon-animation.png";
 
         private static string GetTypeMismatchError(SerializedProperty property, FieldInfo info)

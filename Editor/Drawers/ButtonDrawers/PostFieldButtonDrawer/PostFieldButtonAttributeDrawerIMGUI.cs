@@ -45,7 +45,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
                 Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, richChunks)));
         }
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {

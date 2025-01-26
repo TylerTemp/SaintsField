@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
         private Texture2D _icon;
 
-        public Texture2D Icon => _icon ??= Util.LoadResource<Texture2D>(IconPath);
+        public Texture2D Icon => _icon ??= Util.LoadResource<Texture2D>(IconDropdownPath);
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
@@ -39,6 +39,17 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                 {
                     backgroundImage = Icon,
                     width = EditorGUIUtility.singleLineHeight,
+                    height = EditorGUIUtility.singleLineHeight,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(EditorGUIUtility.singleLineHeight - 5, EditorGUIUtility.singleLineHeight - 5),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                    // paddingTop = 2,
+                    // paddingBottom = 2,
                     // height = EditorGUIUtility.singleLineHeight,
                 },
                 name = DropdownButtonName(property),

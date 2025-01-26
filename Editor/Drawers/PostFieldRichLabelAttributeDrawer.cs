@@ -47,7 +47,8 @@ namespace SaintsField.Editor.Drawers
             return _richTextDrawer.GetWidth(label, position.height, _payloads) + targetAttribute.Padding;
         }
 
-        protected override bool DrawPostFieldImGui(Rect position, SerializedProperty property, GUIContent label,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
