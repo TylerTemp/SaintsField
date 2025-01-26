@@ -77,16 +77,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.21.0**
+**3.21.1**
 
-1.  Add `SpineAnimationPicker` to pick a spine animation.
-
-    [`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`,
-    but it has some limit, e.g. it can not be used on string, it can not report an error if the target is changed, mismatch with skeleton or missing etc.
-
-    `SainsField`'s spine attributes allow more robust references, and are supported by `Auto Validator` tool, with searching supported.
-2.  Rename `Auto Runner` to `Auto Validator`
-3.  Add `Scene` validation in `Auto Validator`
+1.  IMGUI: `SpineAnimationPicker` is now supported in IMGUI too.
+2.  Modify the icon of `SpineAnimationPicker` to be more clear.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4437,7 +4431,7 @@ public int areaName;
 
 ## Spine ##
 
-[`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`, 
+[`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`,
 but it has some limit, e.g. it can not be used on string, it can not report an error if the target is changed, mismatch with skeleton or missing etc.
 
 `SainsField`'s spine attributes allow more robust references, and are supported by `Auto Validator` tool, with searching supported.

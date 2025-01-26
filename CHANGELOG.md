@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.1 ##
+
+1.  IMGUI: `SpineAnimationPicker` is now supported in IMGUI too.
+2.  Modify the icon of `SpineAnimationPicker` to be more clear.
+
 ## 3.21.0 ##
 
 1.  Add `SpineAnimationPicker` to pick a spine animation.
