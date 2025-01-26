@@ -4444,8 +4444,6 @@ Namespace: `SaintsField.Spine`
 
 Pick a spine animation from a spine skeleton renderer, to a string field or a `AnimationReferenceAsset` field.
 
-(Only supported in UI Toolkit yet. IMGUI support will be added later)
-
 **Parameters**
 
 *   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
