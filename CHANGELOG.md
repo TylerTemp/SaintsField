@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.22.0 ##
+
+1.  Add `Table` to show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you like) as a table
+2.  Add `Window/Saints/Troubleshoot` to quickly check why some attributes not working.
+3.  UI Toolkit: Fix `AdvancedDropdown` won't update the label when the value is changed externally.
+4.  Fix `SpineAnimationPicker` made the project unable to build.
+
 ## 3.21.1 ##
 
 1.  IMGUI: `SpineAnimationPicker` is now supported in IMGUI too.
