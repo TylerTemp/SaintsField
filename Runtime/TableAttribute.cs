@@ -1,4 +1,5 @@
-﻿using System;
+﻿// #if UNITY_2022_2_OR_NEWER || SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Diagnostics;
 using SaintsField.Playa;
 using UnityEngine;
@@ -13,3 +14,4 @@ namespace SaintsField
         public string GroupBy => "__LABEL_FIELD__";
     }
 }
+// #endif

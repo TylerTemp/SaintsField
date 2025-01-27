@@ -1271,6 +1271,32 @@ public MyData[] myDataArr;
 
 The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
 
+#### `Table` ####
+
+Show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you like) as a table.
+
+Note: 
+1.  It's highly recommended to enable `SaintsEditor`, otherwise the outside `list` will always be visible with some empty rows.
+2.  for UI Toolkit user: it requires Unity 2022.2+, otherwise it'll fall back to IMGUI.
+
+```csharp
+using SaintsField;
+
+[Table]
+public Scriptable[] scriptableArray;
+
+[Serializable]
+public struct MyStruct
+{
+    public int myInt;
+    public string myString;
+    public GameObject myObject;
+}
+
+[Table]
+public MyStruct[] myStructs;
+```
+
 #### `ShowInInspector` ####
 
 > [!IMPORTANT]
@@ -4985,7 +5011,7 @@ can be directly executed on the target.
 *   `@{rectTransform}`: Get the `RectTransform`. This is just a shortcut of`GetComponent(RectTransform)`
 *   `@{activeSelf}`/`@{gameObject.activeSelf}`
 *   `@{GetComponent(MyScript)}`/`@{GetComponents(MyScript)[2]}` Get a component from the target.
-    You can continuously chaining the calling like: `@{GetComponents(MyComponent)[-1].MyFunction().someField['key']}`.
+    You can continuously chain the calling like: `@{GetComponents(MyComponent)[-1].MyFunction().someField['key']}`.
 
     Please note: this is not an actual code executing, and with these limits:
 
