@@ -105,11 +105,13 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
                 showBorder = true,
-#if UNITY_6000_0_OR_NEWER
-                sortingMode = ColumnSortingMode.Default,
+
+                // this has some issue because we bind order with renderer. Sort is not possible
+// #if UNITY_6000_0_OR_NEWER
+//                 sortingMode = ColumnSortingMode.Default,
 // #else
 //                 sortingEnabled = true,
-#endif
+// #endif
             };
 
             IntegerField integerField = new IntegerField
@@ -176,7 +178,13 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 foreach (SerializedProperty serializedProperty in SerializedUtils.GetAllField(serializedObject))
                 {
                     string propName = serializedProperty.name;
-                    multiColumnListView.columns.Add(new Column { name = serializedProperty.propertyPath, title = serializedProperty.displayName, stretchable = true });
+                    multiColumnListView.columns.Add(new Column
+                    {
+                        name = serializedProperty.propertyPath,
+                        title = serializedProperty.displayName,
+                        stretchable = true,
+                        // comparison = (a, b) => CompareProp((SerializedProperty) multiColumnListView.itemsSource[a], (SerializedProperty) multiColumnListView.itemsSource[(int)b]),
+                    });
                     multiColumnListView.columns[serializedProperty.propertyPath].makeCell = () =>
                     {
                         VisualElement itemContainer = new VisualElement();
