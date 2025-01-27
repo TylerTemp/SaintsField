@@ -1,4 +1,4 @@
-﻿#if UNITY_2021_3_OR_NEWER
+﻿#if UNITY_2022_2_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,6 +105,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
                 showBorder = true,
+#if UNITY_6000_0_OR_NEWER
+                sortingMode = ColumnSortingMode.Default,
+// #else
+//                 sortingEnabled = true,
+#endif
             };
 
             IntegerField integerField = new IntegerField
