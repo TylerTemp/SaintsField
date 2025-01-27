@@ -1025,6 +1025,10 @@ namespace SaintsField.Editor.Utils
             {
                 return (e.Message, -1, null);
             }
+            catch (ObjectDisposedException e)
+            {
+                return (e.Message, -1, null);
+            }
 
             return GetValueAtIndex(arrayIndex, fieldInfo, parent);
         }

@@ -5,10 +5,10 @@ namespace SaintsField.Samples.Scripts
     public class TableExampleSo : SaintsMonoBehaviour
     {
         [Table]
-        [GetScriptableObject]
+        // [GetScriptableObject]
         public Scriptable[] scriptableArray;
 
-        [GetScriptableObject, Expandable]
-        public Scriptable[] rawScriptableArray;
+        // [GetScriptableObject, Expandable]
+        // public Scriptable[] rawScriptableArray;
     }
 }

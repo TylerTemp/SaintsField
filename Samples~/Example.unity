@@ -10576,6 +10576,7 @@ GameObject:
   m_Component:
   - component: {fileID: 833747049}
   - component: {fileID: 833747050}
+  - component: {fileID: 833747051}
   m_Layer: 0
   m_Name: Table
   m_TagString: Untagged
@@ -10607,6 +10608,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 833747048}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a45b7b38fd6ffe43a58bf76e130f4f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptableArray:
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+--- !u!114 &833747051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833747048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c058a3fd06b56c41a48e46e10ef4d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -10614,19 +10630,10 @@ MonoBehaviour:
   - myInt: 0
     myString: 
     myObject: {fileID: 0}
-  - myInt: 321
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 32
+  - myInt: 1
     myString: 
     myObject: {fileID: 0}
   - myInt: 3
-    myString: 
-    myObject: {fileID: 833747048}
-  - myInt: 2
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 1
     myString: 
     myObject: {fileID: 0}
 --- !u!1 &836531683

@@ -10,8 +10,6 @@ namespace SaintsField.Editor
 {
     public partial class SaintsEditor
     {
-        #region IMGUI
-
         public override bool RequiresConstantRepaint() => true;
 
         public virtual void OnEnable()
@@ -85,6 +83,5 @@ namespace SaintsField.Editor
 
             serializedObject.ApplyModifiedProperties();
         }
-        #endregion
     }
 }

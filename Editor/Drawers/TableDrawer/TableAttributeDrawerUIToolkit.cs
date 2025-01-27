@@ -126,26 +126,13 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             {
                 int newValue = evt.newValue;
                 int oldValue = arrayProp.arraySize;
-                if (newValue == oldValue)
+                int changedValue = ChangeArraySize(newValue, arrayProp);
+                if (changedValue == oldValue)
                 {
                     return;
                 }
 
-                arrayProp.arraySize = newValue;
                 _preArraySize = newValue;
-
-                if (newValue > oldValue)  // add
-                {
-                    if (itemIsObject)
-                    {
-                        foreach (int index in Enumerable.Range(oldValue, newValue - oldValue))
-                        {
-                            arrayProp.GetArrayElementAtIndex(index).objectReferenceValue = null;
-                        }
-                    }
-                }
-
-                arrayProp.serializedObject.ApplyModifiedProperties();
                 multiColumnListView.itemsSource = MakeSource(arrayProp);
                 multiColumnListView.Rebuild();
             });
@@ -154,14 +141,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             Toolbar toolbar = new Toolbar();
             ToolbarButton addButton = new ToolbarButton(() =>
             {
-                arrayProp.arraySize++;
-                if (itemIsObject)
-                {
-                    arrayProp.GetArrayElementAtIndex(arrayProp.arraySize - 1).objectReferenceValue = null;
-                }
-                arrayProp.serializedObject.ApplyModifiedProperties();
-                integerField.SetValueWithoutNotify(arrayProp.arraySize);
-                _preArraySize = arrayProp.arraySize;
+                int oldValue = arrayProp.arraySize;
+                int changedValue = ChangeArraySize(oldValue + 1, arrayProp);
+
+                integerField.SetValueWithoutNotify(changedValue);
+                _preArraySize = changedValue;
                 multiColumnListView.itemsSource = MakeSource(arrayProp);
                 multiColumnListView.Rebuild();
             })
@@ -171,16 +155,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             toolbar.Add(addButton);
             ToolbarButton removeButton = new ToolbarButton(() =>
             {
-                int selected = multiColumnListView.selectedIndex;
-                if (selected == -1)
-                {
-                    arrayProp.arraySize--;
-                }
-                else
-                {
-                    arrayProp.DeleteArrayElementAtIndex(selected);
-                }
-                arrayProp.serializedObject.ApplyModifiedProperties();
+                DeleteArrayElement(arrayProp, multiColumnListView.selectedIndices);
                 _preArraySize = arrayProp.arraySize;
                 integerField.SetValueWithoutNotify(arrayProp.arraySize);
                 multiColumnListView.itemsSource = MakeSource(arrayProp);
