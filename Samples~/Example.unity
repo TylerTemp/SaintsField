@@ -10575,8 +10575,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 833747049}
-  - component: {fileID: 833747050}
   - component: {fileID: 833747051}
+  - component: {fileID: 833747050}
   m_Layer: 0
   m_Name: Table
   m_TagString: Untagged
@@ -10629,13 +10629,13 @@ MonoBehaviour:
   myStructs:
   - myInt: 0
     myString: 
-    myObject: {fileID: 0}
+    myObject: {fileID: 833747048}
   - myInt: 1
     myString: 
-    myObject: {fileID: 0}
-  - myInt: 3
+    myObject: {fileID: 2138214537}
+  - myInt: 2
     myString: 
-    myObject: {fileID: 0}
+    myObject: {fileID: 272774832}
 --- !u!1 &836531683
 GameObject:
   m_ObjectHideFlags: 0

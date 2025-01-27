@@ -73,6 +73,10 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 *   Copy files from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
     If you're using a file browser instead of Unity's project tab to copy files, you may want to exclude the `.meta` file to avoid GUID conflict.
 
+**Troubleshoot**
+
+After installed, you can use `Window` - `Saints` - `Troubleshoot` to check if some attributes do not work.
+
 namespace: `SaintsField`
 
 ### Change Log ###
@@ -1275,9 +1279,12 @@ The first input is where you can search. The next input can adjust how many item
 
 Show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you like) as a table.
 
+It allows to resize the rows, hide rows.
+
 Note: 
 1.  It's highly recommended to enable `SaintsEditor`, otherwise the outside `list` will always be visible with some empty rows.
 2.  for UI Toolkit user: it requires Unity 2022.2+, otherwise it'll fall back to IMGUI.
+3.  IMGUI: complex field might not resize properly even I've set up the height function as Unity's document said. Drag component like `Range` sometimes will get triggered even out of the drawing area. This can not be fixed unless Unity gives a guild of how to resolve it.
 
 ```csharp
 using SaintsField;
@@ -1296,6 +1303,8 @@ public struct MyStruct
 [Table]
 public MyStruct[] myStructs;
 ```
+
+[![video](https://github.com/user-attachments/assets/82193a57-c051-4188-950d-9e7a9ee6e08d)](https://github.com/user-attachments/assets/1c574c0c-56e0-4912-8e00-49fb7e29d80c)
 
 #### `ShowInInspector` ####
 
