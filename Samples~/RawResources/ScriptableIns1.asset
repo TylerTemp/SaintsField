@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fda37f049d31d4f48a28c8bb3da27cdb, type: 3}
   m_Name: ScriptableIns1
   m_EditorClassIdentifier: 
-  _intRange: 29
-  normalRange: 36
+  _intRange: 96
+  normalRange: 51
   publicValue: -18
   noLabel: TheInt Second
+  myStruct:
+    structContent: 0
+  myStructs: []

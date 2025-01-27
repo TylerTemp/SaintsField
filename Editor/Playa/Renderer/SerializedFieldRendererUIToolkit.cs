@@ -23,11 +23,19 @@ namespace SaintsField.Editor.Playa.Renderer
             public Label Label;
             public string FriendlyName;
             public RichTextDrawer RichTextDrawer;
+
+            public bool TableHasSize;
         }
 
         private VisualElement _fieldElement;
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
+        private bool _tableCondition;
+
+        private static string NameTableContainer(SerializedProperty property)
+        {
+            return $"saints-table-container-{property.propertyPath}";
+        }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
@@ -37,27 +45,47 @@ namespace SaintsField.Editor.Playa.Renderer
             };
 
             ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
+            TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().FirstOrDefault();
             ArraySizeAttribute arraySizeAttribute =
                 FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
 
-            VisualElement result = listDrawerSettingsAttribute == null
-                ? new PropertyField(FieldWithInfo.SerializedProperty)
+            VisualElement result;
+            if (listDrawerSettingsAttribute != null)
+            {
+                result = MakeListDrawerSettingsField(listDrawerSettingsAttribute, arraySizeAttribute?.Min ?? -1,
+                    arraySizeAttribute?.Max ?? -1);
+            }
+            else if(tableAttribute != null)
+            {
+                bool hasSize = FieldWithInfo.SerializedProperty.arraySize > 0;
+                userDataPayload.TableHasSize = hasSize;
+                result = new VisualElement
+                {
+                    name = NameTableContainer(FieldWithInfo.SerializedProperty),
+                };
+                FillTable(FieldWithInfo.SerializedProperty, result);
+
+                _tableCondition = true;
+            }
+            else
+            {
+                result = new PropertyField(FieldWithInfo.SerializedProperty)
                 {
                     style =
                     {
                         flexGrow = 1,
                     },
                     name = FieldWithInfo.SerializedProperty.propertyPath,
-                }
-                : MakeListDrawerSettingsField(listDrawerSettingsAttribute, arraySizeAttribute?.Min ?? -1, arraySizeAttribute?.Max ?? -1);
+                };
+            }
+
+            result.userData = userDataPayload;
 
             OnArraySizeChangedAttribute onArraySizeChangedAttribute = FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
             if (onArraySizeChangedAttribute != null)
             {
                 OnArraySizeChangedUIToolkit(onArraySizeChangedAttribute.Callback, result, FieldWithInfo.SerializedProperty, (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
             }
-
-            result.userData = userDataPayload;
 
             // disable/enable/show/hide
             bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute
@@ -72,9 +100,42 @@ namespace SaintsField.Editor.Playa.Renderer
                 $"SerField: {FieldWithInfo.SerializedProperty.displayName}({FieldWithInfo.SerializedProperty.propertyPath}); if={ifCondition}; arraySize={_arraySizeCondition}, richLabel={_richLabelCondition}");
 #endif
 
-            bool needUpdate = ifCondition || _arraySizeCondition || _richLabelCondition;
+            bool needUpdate = ifCondition || _arraySizeCondition || _richLabelCondition || _tableCondition;
 
             return (_fieldElement = result, needUpdate);
+        }
+
+        private static void FillTable(SerializedProperty arrayProperty, VisualElement result)
+        {
+            bool hasSize = arrayProperty.arraySize > 0;
+            SerializedProperty targetProperty = hasSize
+                ? arrayProperty.GetArrayElementAtIndex(0)
+                : arrayProperty;
+
+            PropertyField propField = new PropertyField(targetProperty)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            propField.Bind(arrayProperty.serializedObject);
+
+            if (hasSize)
+            {
+                Foldout foldout = new Foldout
+                {
+                    value = true,
+                    text = arrayProperty.displayName,
+                    style = { flexGrow = 1 },
+                };
+                foldout.Add(propField);
+                result.Add(foldout);
+            }
+            else
+            {
+                result.Add(propField);
+            }
         }
 
         private static void OnArraySizeChangedUIToolkit(string callback, VisualElement result, SerializedProperty property, MemberInfo memberInfo)
@@ -513,6 +574,21 @@ namespace SaintsField.Editor.Playa.Renderer
                         userDataPayload.XML = xml;
                         UIToolkitUtils.SetLabel(userDataPayload.Label, RichTextDrawer.ParseRichXml(xml, userDataPayload.FriendlyName, GetMemberInfo(FieldWithInfo), FieldWithInfo.Target), userDataPayload.RichTextDrawer);
                     }
+                }
+            }
+
+            if (_tableCondition)
+            {
+                SerializedProperty prop = FieldWithInfo.SerializedProperty;
+                VisualElement tableContainer = root.Q<VisualElement>(name: NameTableContainer(prop));
+                UserDataPayload userDataPayload = (UserDataPayload)tableContainer.userData;
+                bool hasSize = prop.arraySize > 0;
+                if (userDataPayload.TableHasSize != hasSize)
+                {
+                    userDataPayload.TableHasSize = hasSize;
+                    Debug.Log(tableContainer);
+                    tableContainer.Clear();
+                    FillTable(prop, tableContainer);
                 }
             }
 

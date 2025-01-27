@@ -23,6 +23,9 @@ namespace SaintsField.Editor.Core
 
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
         public static string ClassLabelFieldUIToolkit = "saints-field--label-field";
+
+        public static string ClassNoRichLabelUpdate = "saints-field-no-rich-label-update";
+
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
         public const string ClassAllowDisable = "saints-field-allow-disable";
@@ -696,27 +699,6 @@ namespace SaintsField.Editor.Core
         }
 
         private static StyleSheet _noDecoratorDrawer;
-
-        private static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (!_propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-                    out IReadOnlyList<Type> eachDrawer))
-            {
-                // Debug.Log(propertyAttribute.GetType());
-                // foreach (Type key in PropertyAttributeToPropertyDrawers.Keys)
-                // {
-                //     if ($"{key}".Contains("SepTitle"))
-                //     {
-                //         Debug.Log(key);
-                //     }
-                // }
-                // not found
-                return false;
-            }
-
-            return eachDrawer.Any(drawerType => drawerType.IsSubclassOf(typeof(DecoratorDrawer)));
-        }
 
         private static VisualElement BindWatchUIToolkit(SerializedProperty property, Action<object> onValueChangedCallback, bool isReference, PropertyField propertyField, FieldInfo fieldInfo, object parent)
         {

@@ -51,12 +51,6 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
             return helpBoxElement;
         }
 
-        private static bool ParamNameEquals(AnimatorControllerParameter param, SerializedProperty prop) =>
-            param.name == prop.stringValue;
-
-        private static bool ParamHashEquals(AnimatorControllerParameter param, SerializedProperty prop) =>
-            param.nameHash == prop.intValue;
-
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             IReadOnlyList<PropertyAttribute> allAttributes,

@@ -74,8 +74,33 @@ namespace SaintsField.Editor.Playa.Renderer
                                                                              SerializedPropertyType.Generic);
                 using(new EditorGUI.IndentLevelScope(needIndent? 1: 0))
                 {
-                    EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent,
-                        GUILayout.ExpandWidth(true));
+                    TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().FirstOrDefault();
+                    if (tableAttribute == null)
+                    {
+                        EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent,
+                            GUILayout.ExpandWidth(true));
+                    }
+                    else
+                    {
+                        arraySize = FieldWithInfo.SerializedProperty.arraySize;
+                        if (arraySize == 0)
+                        {
+                            EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent,
+                                GUILayout.ExpandWidth(true));
+                        }
+                        else
+                        {
+                            FieldWithInfo.SerializedProperty.isExpanded =
+                                EditorGUILayout.Foldout(FieldWithInfo.SerializedProperty.isExpanded, useGUIContent);
+                            if(FieldWithInfo.SerializedProperty.isExpanded)
+                            {
+                                EditorGUILayout.PropertyField(
+                                    FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), useGUIContent,
+                                    GUILayout.ExpandWidth(true));
+                            }
+                        }
+                    }
+
                 }
 
                 if(changed.changed && isArray && onArraySizeChangedAttribute != null &&

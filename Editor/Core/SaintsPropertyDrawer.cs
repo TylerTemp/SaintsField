@@ -252,6 +252,26 @@ namespace SaintsField.Editor.Core
             return PropertyAttributeToPropertyDrawers;
         }
 
+        public static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (!_propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
+                    out IReadOnlyList<Type> eachDrawer))
+            {
+                // Debug.Log(propertyAttribute.GetType());
+                // foreach (Type key in PropertyAttributeToPropertyDrawers.Keys)
+                // {
+                //     if ($"{key}".Contains("SepTitle"))
+                //     {
+                //         Debug.Log(key);
+                //     }
+                // }
+                // not found
+                return false;
+            }
+
+            return eachDrawer.Any(drawerType => drawerType.IsSubclassOf(typeof(DecoratorDrawer)));
+        }
         // ~SaintsPropertyDrawer()
         // {
         //     Debug.Log($"[{this}] Stop listening changed");

@@ -104,11 +104,35 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             };
         }
 
-        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-        //     VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        // {
-        //
-        // }
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                return;
+            }
+
+            string display =
+                GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent));
+            if(dropdownButton.ButtonLabelElement.text != display)
+            {
+                dropdownButton.ButtonLabelElement.text = display;
+            }
+        }
+
+        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
+            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
+            string display =
+                GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent));
+            if(dropdownButton.ButtonLabelElement.text != display)
+            {
+                dropdownButton.ButtonLabelElement.text = display;
+            }
+        }
     }
 }
 #endif

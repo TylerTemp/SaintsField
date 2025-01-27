@@ -121,6 +121,11 @@ namespace SaintsField.Editor.Utils
                 return;
             }
 
+            if (label.ClassListContains(SaintsPropertyDrawer.ClassNoRichLabelUpdate))
+            {
+                return;
+            }
+
             label.Clear();
             label.text = "";
             label.style.flexDirection = FlexDirection.Row;
