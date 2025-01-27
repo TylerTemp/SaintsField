@@ -23,6 +23,9 @@ namespace SaintsField.Editor.Core
 
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
         public static string ClassLabelFieldUIToolkit = "saints-field--label-field";
+
+        public static string ClassNoRichLabelUpdate = "saints-field-no-rich-label-update";
+
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
         public const string ClassAllowDisable = "saints-field-allow-disable";

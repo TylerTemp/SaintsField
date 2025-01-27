@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: ScriptableIns1
   m_EditorClassIdentifier: 
   _intRange: 29
-  normalRange: 36
+  normalRange: 51
   publicValue: -18
   noLabel: TheInt Second
+  myStruct:
+    structContent: 0
+  myStructs: []

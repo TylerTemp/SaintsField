@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: ScriptableIns
   m_EditorClassIdentifier: 
   _intRange: 22
-  normalRange: 34
+  normalRange: 16
   publicValue: 45
   noLabel: 
+  myStruct:
+    structContent: 0
   myStructs:
   - structContent: 52
