@@ -28,6 +28,12 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
             // ReSharper enable InconsistentNaming
         }
 
+        private static bool ParamNameEquals(AnimatorControllerParameter param, SerializedProperty prop) =>
+            param.name == prop.stringValue;
+
+        private static bool ParamHashEquals(AnimatorControllerParameter param, SerializedProperty prop) =>
+            param.nameHash == prop.intValue;
+
         private static (string error, Animator animator) GetAnimator(string animatorName, SerializedProperty property, MemberInfo info, object parent)
         {
             if (animatorName != null)
