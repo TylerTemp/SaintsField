@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Playa.Renderer
         private ReorderableList _imGuiReorderableList;
         private ImGuiListInfo _imGuiListInfo;
 
-                private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute, bool delayed)
+        private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute, bool delayed)
         {
             Rect usePosition = new Rect(position)
             {
