@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.22.1 ##
+
+1.  Fix `ListDrawerSettings` can not detect a size change and update display [#123](https://github.com/TylerTemp/SaintsField/issues/123)
+2.  Fix UI Toolkit code leak to IMGUI version [#124](https://github.com/TylerTemp/SaintsField/issues/124)
+
 ## 3.22.0 ##
 
 1.  Add `Table` to show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you like) as a table

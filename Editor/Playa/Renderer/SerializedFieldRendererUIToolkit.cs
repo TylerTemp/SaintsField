@@ -395,6 +395,35 @@ namespace SaintsField.Editor.Playa.Renderer
                 UpdateAddRemoveButtons();
             }
 
+            int arraySize = property.arraySize;
+            // don't use TrackPropertyValue because if you remove anything from list, it gives error
+            // this is Unity's fault
+            // result.TrackPropertyValue(property, p =>
+            listView.TrackSerializedObjectValue(property.serializedObject, _ =>
+            {
+                int newSize;
+                try
+                {
+                    newSize = property.arraySize;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    return;
+                }
+
+                if (newSize == arraySize)
+                {
+                    return;
+                }
+
+                arraySize = newSize;
+                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+            });
+
             void UpdateAddRemoveButtons()
             {
                 int curSize = property.arraySize;

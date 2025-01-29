@@ -81,12 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.22.0**
+**3.22.1**
 
-1.  Add `Table` to show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you like) as a table
-2.  Add `Window/Saints/Troubleshoot` to quickly check why some attributes not working.
-3.  UI Toolkit: Fix `AdvancedDropdown` won't update the label when the value is changed externally.
-4.  Fix `SpineAnimationPicker` made the project unable to build.
+1.  Fix `ListDrawerSettings` can not detect a size change and update display [#123](https://github.com/TylerTemp/SaintsField/issues/123)
+2.  Fix UI Toolkit code leak to IMGUI version [#124](https://github.com/TylerTemp/SaintsField/issues/124)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
