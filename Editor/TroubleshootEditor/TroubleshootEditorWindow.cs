@@ -40,7 +40,7 @@ namespace SaintsField.Editor.TroubleshootEditor
             public string drawerType;
         }
 
-        [Ordered, Table, ReadOnly]
+        [Ordered, ListDrawerSettings(searchable: true, numberOfItemsPerPage: 20, delayedSearch: true)]
         [SerializeField]
         private List<PropertyTypeToDrawer> _propertyTypeToDrawers = new List<PropertyTypeToDrawer>();
 
@@ -103,7 +103,7 @@ namespace SaintsField.Editor.TroubleshootEditor
                         {
                             _propertyTypeToDrawers.Add(new PropertyTypeToDrawer
                             {
-                                propertyType = v.Name,
+                                propertyType = $"{v.Name} ({v.Assembly.GetName().Name})",
                                 drawerType = $"{eachEditorType.Name} ({eachEditorType.Assembly.GetName().Name})",
                             });
                         }

@@ -421,6 +421,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
 
                 arraySize = newSize;
+                numberOfItemsTotalField.SetValueWithoutNotify(arraySize);
                 UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
             });
 
