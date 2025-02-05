@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
+using SaintsField.Editor.Playa;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
+using PropertyAttribute = UnityEngine.PropertyAttribute;
 
 namespace SaintsField.Editor.TroubleshootEditor
 {
@@ -28,8 +29,20 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         private bool _inProgress;
 
+        [DebugTool.WhichFramework]
         [Ordered, RichLabel("Checking..."), ShowIf(nameof(_inProgress)), ReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
         public int progress;
+
+        [Serializable]
+        private struct PropertyTypeToDrawer
+        {
+            public string propertyType;
+            public string drawerType;
+        }
+
+        [Ordered, Table, ReadOnly]
+        [SerializeField]
+        private List<PropertyTypeToDrawer> _propertyTypeToDrawers = new List<PropertyTypeToDrawer>();
 
         private int _maxCount = 1;
 
@@ -55,8 +68,7 @@ namespace SaintsField.Editor.TroubleshootEditor
             bool uMonoFound = false;
             bool uScriptableObjectFound = false;
 
-            Dictionary<Type, List<Type>> attrToDecoratorDrawers =
-                new Dictionary<Type, List<Type>>();
+            _propertyTypeToDrawers.Clear();
 
             foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -86,7 +98,15 @@ namespace SaintsField.Editor.TroubleshootEditor
                                 BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                 BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy)
                             ?.GetValue(customEditor);
-                        Debug.Log($"Found editor: {eachEditorType} -> {v}");
+                        // Debug.Log($"Found editor: {eachEditorType} -> {v}");
+                        if(v != null)
+                        {
+                            _propertyTypeToDrawers.Add(new PropertyTypeToDrawer
+                            {
+                                propertyType = v.Name,
+                                drawerType = $"{eachEditorType.Name} ({eachEditorType.Assembly.GetName().Name})",
+                            });
+                        }
                         // if()
                         if (v == typeof(Object))
                         {
@@ -130,17 +150,18 @@ namespace SaintsField.Editor.TroubleshootEditor
 
             _inProgress = false;
 
-            if (!uObjectFound && (!uCompFound || !uMonoFound))
-            {
-                _uObjectMessage = (EMessageType.Warning, "Your UnityEditor.Object is drawn by Unity default inspector, some attributes might not work.");
-            }
-            else if(!uCompFound)
+
+            if(!uObjectFound && !uCompFound)
             {
                 _uComp = (EMessageType.Warning, "Your Component is drawn by Unity default inspector, some attributes might not work.");
             }
-            else if(!uMonoFound)
+            else if(!uObjectFound && !uMonoFound)
             {
                 _uMono = (EMessageType.Warning, "Your MonoBehaviour is drawn by Unity default inspector, some attributes might not work.");
+            }
+            else if (!uObjectFound)
+            {
+                _uObjectMessage = (EMessageType.Warning, "Your UnityEditor.Object is drawn by Unity default inspector, some attributes might not work.");
             }
 
             if(!uObjectFound && !uScriptableObjectFound)
@@ -154,18 +175,51 @@ namespace SaintsField.Editor.TroubleshootEditor
         private static bool TypeIsSaintsEditor(Type editorType) =>
             editorType.IsSubclassOf(typeof(SaintsEditor)) || editorType == typeof(SaintsEditor);
 
-        [Ordered, Separator(5), Separator, Separator(5), Required("Pick a target to troubleshoot"), OnValueChanged(nameof(TroubleShootTargetChanged))]
+        [Ordered, Separator(5), Separator, Separator(5),
+         Required("Pick a target to troubleshoot"),
+         OnValueChanged(nameof(TroubleShootTargetChanged)),
+         BelowInfoBox("$" + nameof(GetDrawerInfo)),
+        ]
         public Object troubleshootTarget;
+
+        // private (EMessageType, string) _troubleshootTargetEditorMessage = default;
 
         private void TroubleShootTargetChanged()
         {
             troubleshootComponent = null;
-            fieldName = null;
+            field = -1;
             _targetMessage = default;
             _fieldMessage = default;
+
+
         }
 
-        [Ordered, ShowIf(nameof(NeedPickComponent)), AdvancedDropdown(nameof(PickComponent)), OnValueChanged(nameof(TroubleshootComponentChanged))]
+        private static (EMessageType, string) GetDrawerInfo(Object target)
+        {
+            if (target == null)
+            {
+                return default;
+            }
+
+            if(target is GameObject)
+            {
+                return (EMessageType.Info, "GameObject is selected, pick a component to troubleshoot.");
+            }
+
+            UnityEditor.Editor editor = UnityEditor.Editor.CreateEditor(target);
+            Type editorType = editor.GetType();
+            DestroyImmediate(editor);
+            return TypeIsSaintsEditor(editorType)
+                ? (EMessageType.None, "Your target is drawn by Saints Editor. Nice.")
+                : (EMessageType.Warning, $"Your target is drawn by {editorType}, some attributes might not work.");
+        }
+
+        [Ordered,
+         ShowIf(nameof(NeedPickComponent)),
+         AdvancedDropdown(nameof(PickComponent)),
+         OnValueChanged(nameof(TroubleshootComponentChanged)),
+         BelowInfoBox("$" + nameof(GetDrawerInfo)),
+        ]
         public Component troubleshootComponent;
 
         private AdvancedDropdownList<Component> PickComponent()
@@ -189,10 +243,14 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         private bool NeedPickComponent() => PickComponent().Any();
 
-        private void TroubleshootComponentChanged() => fieldName = null;
+        private void TroubleshootComponentChanged() => field = -1;
 
-        [Ordered, AdvancedDropdown(nameof(PickFieldName)), ShowIf(nameof(GetTroubleshootSerTarget))]
-        public string fieldName;
+        [Ordered,
+         AdvancedDropdown(nameof(PickFieldName)),
+         ShowIf(nameof(GetTroubleshootSerTarget)), DisableIf(nameof(_inProgress)),
+         OnValueChanged(nameof(RunTargetChecker)),
+         BelowInfoBox("$" + nameof(_targetMessage)), BelowInfoBox("$" + nameof(_fieldMessage))]
+        public int field;
 
         private Object GetTroubleshootSerTarget()
         {
@@ -205,21 +263,64 @@ namespace SaintsField.Editor.TroubleshootEditor
             return target == null ? null : target;
         }
 
-        private AdvancedDropdownList<string> PickFieldName()
+        private readonly List<MemberInfo> _pickFieldMemberInfos = new List<MemberInfo>();
+
+        private AdvancedDropdownList<int> PickFieldName()
         {
-            AdvancedDropdownList<string> result = new AdvancedDropdownList<string>();
+            _pickFieldMemberInfos.Clear();
+
+            AdvancedDropdownList<int> result = new AdvancedDropdownList<int>();
             Object inspectTarget = GetTroubleshootSerTarget();
             if (inspectTarget == null)
             {
                 return result;
             }
 
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (SerializedObject so = new SerializedObject(inspectTarget))
+            Dictionary<string, SerializedProperty> serializedPropertyDict;
+            using (SerializedObject serializedObject = new SerializedObject(inspectTarget))
             {
-                foreach (SerializedProperty serializedProperty in SerializedUtils.GetAllField(so).Where(each => each != null))
+                string[] serializableFields = SaintsEditor.GetSerializedProperties(serializedObject).ToArray();
+                // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
+                serializedPropertyDict = serializableFields
+                    .ToDictionary(each => each, serializedObject.FindProperty);
+            }
+
+            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedPropertyDict, inspectTarget))
+            {
+                // Debug.Log(saintsFieldWithInfo.RenderType);
+                if (saintsFieldWithInfo.RenderType == SaintsRenderType.SerializedField)
                 {
-                    result.Add(serializedProperty.displayName, serializedProperty.name);
+                    // ReSharper disable once InvertIf
+                    if(saintsFieldWithInfo.FieldInfo != null)
+                    {
+                        result.Add(saintsFieldWithInfo.FieldInfo.Name, _pickFieldMemberInfos.Count);
+                        _pickFieldMemberInfos.Add(saintsFieldWithInfo.FieldInfo);
+                    }
+                }
+                else
+                {
+                    if (saintsFieldWithInfo.PlayaAttributes.Count > 0)
+                    {
+                        switch (saintsFieldWithInfo.RenderType)
+                        {
+                            case SaintsRenderType.Method:
+                                result.Add($"[Method] {saintsFieldWithInfo.MethodInfo.Name}", _pickFieldMemberInfos.Count);
+                                _pickFieldMemberInfos.Add(saintsFieldWithInfo.MethodInfo);
+                                break;
+                            case SaintsRenderType.NativeProperty:
+                                result.Add($"[Property] {saintsFieldWithInfo.PropertyInfo.Name}", _pickFieldMemberInfos.Count);
+                                _pickFieldMemberInfos.Add(saintsFieldWithInfo.PropertyInfo);
+                                break;
+                            case SaintsRenderType.NonSerializedField:
+                                result.Add($"[NonSerialized] {saintsFieldWithInfo.FieldInfo.Name}", _pickFieldMemberInfos.Count);
+                                _pickFieldMemberInfos.Add(saintsFieldWithInfo.FieldInfo);
+                                break;
+                            case SaintsRenderType.SerializedField:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(saintsFieldWithInfo.RenderType), saintsFieldWithInfo.RenderType, null);
+                        }
+                    }
                 }
             }
 
@@ -229,9 +330,8 @@ namespace SaintsField.Editor.TroubleshootEditor
         private (EMessageType, string) _targetMessage = (EMessageType.Warning, null);
         private (EMessageType, string) _fieldMessage = (EMessageType.Warning, null);
 
-
-        [Ordered, PlayaDisableIf(nameof(_inProgress)), Button("Check"), PlayaInfoBox("$" + nameof(_targetMessage)), PlayaInfoBox("$" + nameof(_fieldMessage))]
-        private void RunTargetChecker()
+        // [Ordered, ]
+        private void RunTargetChecker(int index)
         {
             Object inspectTarget = GetTroubleshootSerTarget();
             if (inspectTarget == null)
@@ -239,10 +339,15 @@ namespace SaintsField.Editor.TroubleshootEditor
                 return;
             }
 
-            if (string.IsNullOrEmpty(fieldName))
+            _targetMessage = default;
+            _fieldMessage = default;
+
+            if(index < 0 || index >= _pickFieldMemberInfos.Count)
             {
                 return;
             }
+
+            MemberInfo memberInfo = _pickFieldMemberInfos[index];
 
             UnityEditor.Editor inspectEditor = UnityEditor.Editor.CreateEditor(inspectTarget);
             bool isSaintsEditor = TypeIsSaintsEditor(inspectEditor.GetType());
@@ -251,71 +356,60 @@ namespace SaintsField.Editor.TroubleshootEditor
             //     : (EMessageType.Warning, $"Your target {inspectTarget} is drawn by {inspectEditor.GetType()}, some attributes might not work.");
             // Debug.Log(_targetMessage);
 
-            using (SerializedObject so = new SerializedObject(inspectTarget))
+            string error = "";
+            List<Attribute> playaAttributes = new List<Attribute>();
+
+            Attribute[] allBaseAttributes = memberInfo.GetCustomAttributes().ToArray();
+            if (!isSaintsEditor)
             {
-                SerializedProperty prop = so.FindProperty(fieldName) ?? SerializedUtils.FindPropertyByAutoPropertyName(so, fieldName);
-                if (prop == null)
+                playaAttributes.AddRange(allBaseAttributes.Where(each => each is IPlayaAttribute));
+            }
+
+            bool hitSaintsAlready = false;
+            foreach (PropertyAttribute propertyAttribute in allBaseAttributes.OfType<PropertyAttribute>())
+            {
+                bool isSaintsProperty = propertyAttribute is ISaintsAttribute;
+
+                // Debug.Log($"{propertyAttribute}: {propertyAttribute is ISaintsAttribute}");
+                if (SaintsPropertyDrawer.PropertyIsDecoratorDrawer(propertyAttribute))
                 {
-                    _fieldMessage = (EMessageType.Error, $"Field {fieldName} not found.");
+                    continue;
                 }
-                else
+                if (isSaintsProperty)
                 {
-                    string error = "";
-                    List<Attribute> playaAttributes = new List<Attribute>();
+                    hitSaintsAlready = true;
+                    continue;
+                }
 
-                    (Attribute[] allBaseAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<Attribute>(prop);
-                    if (!isSaintsEditor)
-                    {
-                        playaAttributes.AddRange(allBaseAttributes.Where(each => each is IPlayaAttribute));
-                    }
-
-                    bool hitSaintsAlready = false;
-                    foreach (PropertyAttribute propertyAttribute in allBaseAttributes.OfType<PropertyAttribute>())
-                    {
-                        bool isSaintsProperty = propertyAttribute is ISaintsAttribute;
-
-                        // Debug.Log($"{propertyAttribute}: {propertyAttribute is ISaintsAttribute}");
-                        if (SaintsPropertyDrawer.PropertyIsDecoratorDrawer(propertyAttribute))
-                        {
-                            continue;
-                        }
-                        if (isSaintsProperty)
-                        {
-                            hitSaintsAlready = true;
-                            continue;
-                        }
-
-                        if (!hitSaintsAlready)
-                        {
-                            error = $"Attribute {propertyAttribute} is before any SaintsField attribute, which might block the fallback process.";
-                        }
-                    }
-
-                    if (playaAttributes.Count > 0)
-                    {
-                        _targetMessage =
-                            (EMessageType.Warning, $"Attribute(s) might need Saints Editor to work: {string.Join(", ", playaAttributes)}");
-                    }
-
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        _fieldMessage = (EMessageType.Error, error);
-                    }
-                    else
-                    {
-                        _fieldMessage = (EMessageType.None, $"No issue found for field {fieldName}");
-                    }
-
+                if (!hitSaintsAlready)
+                {
+                    error = $"Attribute {propertyAttribute} is before any SaintsField attribute, which might block the fallback process.";
                 }
             }
 
-            EditorRefreshTarget();
+            if (playaAttributes.Count > 0)
+            {
+                _targetMessage =
+                    (EMessageType.Warning, $"Attribute(s) might need Saints Editor to work: {string.Join(", ", playaAttributes)}");
+            }
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                _fieldMessage = (EMessageType.Error, error);
+            }
+            else
+            {
+                _fieldMessage = (EMessageType.None, $"No issue found for {memberInfo.Name}");
+            }
+
+            // EditorRefreshTarget();
         }
 
         public override void OnEditorEnable()
         {
             _targetMessage = default;
             _fieldMessage = default;
+            field = -1;
             SaintsPropertyDrawer.EnsureAndGetTypeToDrawers();
             StartEditorCoroutine(Check());
         }

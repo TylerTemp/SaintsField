@@ -79,9 +79,8 @@ namespace SaintsField.Editor
             return HelperGetRenderers(serializedPropertyDict, serializedObject, this, target);
         }
 
-        public static IReadOnlyList<ISaintsRenderer> HelperGetRenderers(
-            IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject,
-            IMakeRenderer makeRenderer,
+        public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
+            IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
             object target)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
@@ -106,6 +105,7 @@ namespace SaintsField.Editor
                                          BindingFlags.Public | BindingFlags.DeclaredOnly)
                              .OrderBy(memberInfo => memberInfo.MetadataToken))  // this is still not the correct order, but... a bit better
                 {
+                    // Debug.Log(memberInfo.Name);
                     IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfo
                         .GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
                     switch (memberInfo)
@@ -256,14 +256,20 @@ namespace SaintsField.Editor
                 }
             }
 
-            List<SaintsFieldWithInfo> fieldWithInfosSorted = fieldWithInfos
+            return fieldWithInfos
                 .WithIndex()
                 .OrderBy(each => each.value.InherentDepth)
                 .ThenBy(each => each.value.Order)
                 .ThenBy(each => each.index)
-                .Select(each => each.value)
-                .ToList();
+                .Select(each => each.value);
+        }
 
+        public static IReadOnlyList<ISaintsRenderer> HelperGetRenderers(
+            IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject,
+            IMakeRenderer makeRenderer,
+            object target)
+        {
+            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, target).ToArray();
             IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted);
             return HelperFlattenRendererGroupInfoIntoRenderers(chainedGroups, serializedObject, makeRenderer, target).Select(each => each.saintsRenderer).ToArray();
         }
@@ -339,7 +345,7 @@ namespace SaintsField.Editor
             public SaintsFieldWithInfo FieldWithInfo;
         }
 
-        private static IReadOnlyList<RendererGroupInfo> ChainSaintsFieldWithInfo(List<SaintsFieldWithInfo> fieldWithInfosSorted)
+        private static IReadOnlyList<RendererGroupInfo> ChainSaintsFieldWithInfo(IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted)
         {
             List<RendererGroupInfo> rendererGroupInfos = new List<RendererGroupInfo>();
             Dictionary<string, RendererGroupInfo> rootToRendererGroupInfo =
@@ -674,7 +680,7 @@ namespace SaintsField.Editor
             }
         }
 
-        private static IEnumerable<string> GetSerializedProperties(SerializedObject serializedObject)
+        public static IEnumerable<string> GetSerializedProperties(SerializedObject serializedObject)
         {
             // outSerializedProperties.Clear();
             // ReSharper disable once ConvertToUsingDeclaration
