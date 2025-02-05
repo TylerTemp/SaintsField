@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue292
 {
-    [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Issue/Sub", order = 0)]
+    // [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Issue/Sub", order = 0)]
     public class Sub : Parent
     {
         [Button]
