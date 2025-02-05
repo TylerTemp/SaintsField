@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.ValidateInputDrawer
             }
 
             string validateResult = CallValidateMethod(callback, property.displayName, property, info, parent);
-            Debug.Log($"call validate input {validateResult}");
+            // Debug.Log($"call validate input {validateResult}");
 
             // ReSharper disable once InvertIf
             if (helpBox.text != validateResult)
