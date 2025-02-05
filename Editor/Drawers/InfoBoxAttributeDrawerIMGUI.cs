@@ -26,6 +26,7 @@ namespace SaintsField.Editor.Drawers
 
             // (string error, bool willDraw) = WillDraw(infoboxAttribute, parent);
             _error = metaInfo.Error;
+
             return metaInfo.WillDrawBox;
         }
 
@@ -43,6 +44,13 @@ namespace SaintsField.Editor.Drawers
             {
                 return 0;
             }
+
+            if (!metaInfo.WillDrawBox)
+            {
+                return 0;
+            }
+
+            // Debug.Log($"above {metaInfo.Content}");
 
             return ImGuiHelpBox.GetHeight(metaInfo.Content, width, metaInfo.MessageType);
         }
@@ -95,6 +103,7 @@ namespace SaintsField.Editor.Drawers
             }
 
             float errorHeight = _error != "" ? ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error) : 0f;
+            // Debug.Log($"below {boxHeight} + {errorHeight}");
             return boxHeight + errorHeight;
         }
 
