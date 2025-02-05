@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.22.2 ##
+
+1.  UI Toolkit: Fix `ListDrawerSettings` didn't update the total count when size is changed externally [#123](https://github.com/TylerTemp/SaintsField/issues/123)
+2.  UI Toolkit: Fix `ValidateInput` has debug log [#134](https://github.com/TylerTemp/SaintsField/issues/134)
+3.  Improve the logic of `Troubleshoot` so it can detect method etc.
+4.  IMGUI: Fix `InfoBox` show extra space when hidden [#126](https://github.com/TylerTemp/SaintsField/issues/126)
+
 ## 3.22.1 ##
 
 1.  Fix `ListDrawerSettings` can not detect a size change and update display [#123](https://github.com/TylerTemp/SaintsField/issues/123)

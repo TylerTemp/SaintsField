@@ -81,10 +81,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.22.1**
+**3.22.2**
 
-1.  Fix `ListDrawerSettings` can not detect a size change and update display [#123](https://github.com/TylerTemp/SaintsField/issues/123)
-2.  Fix UI Toolkit code leak to IMGUI version [#124](https://github.com/TylerTemp/SaintsField/issues/124)
+1.  UI Toolkit: Fix `ListDrawerSettings` didn't update the total count when size is changed externally [#123](https://github.com/TylerTemp/SaintsField/issues/123)
+2.  UI Toolkit: Fix `ValidateInput` has debug log [#134](https://github.com/TylerTemp/SaintsField/issues/134)
+3.  Improve the logic of `Troubleshoot` so it can detect method etc.
+4.  IMGUI: Fix `InfoBox` show extra space when hidden [#126](https://github.com/TylerTemp/SaintsField/issues/126)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1279,7 +1281,7 @@ Show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you li
 
 It allows to resize the rows, hide rows.
 
-Note: 
+Note:
 1.  It's highly recommended to enable `SaintsEditor`, otherwise the outside `list` will always be visible with some empty rows.
 2.  for UI Toolkit user: it requires Unity 2022.2+, otherwise it'll fall back to IMGUI.
 3.  IMGUI: complex field might not resize properly even I've set up the height function as Unity's document said. Drag component like `Range` sometimes will get triggered even out of the drawing area. This can not be fixed unless Unity gives a guild of how to resolve it.
