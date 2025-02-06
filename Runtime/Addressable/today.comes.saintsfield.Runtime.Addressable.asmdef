@@ -12,7 +12,7 @@
     "autoReferenced": true,
     "defineConstraints": [
         "SAINTSFIELD_ADDRESSABLE",
-        "!SAINTSFIELD_ADDRESSABLE_DISABLED"
+        "!SAINTSFIELD_ADDRESSABLE_DISABLE"
     ],
     "versionDefines": [
         {
