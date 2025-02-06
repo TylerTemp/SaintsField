@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace SaintsField.Addressable
 {
-#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLED
     public class AddressableAddressAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
@@ -44,5 +43,4 @@ namespace SaintsField.Addressable
                 .ToArray();
         }
     }
-#endif
 }

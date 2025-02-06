@@ -1,4 +1,3 @@
-#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -509,4 +508,3 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
         }
     }
 }
-#endif

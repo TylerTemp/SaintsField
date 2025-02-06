@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Core;
@@ -11,19 +10,21 @@ using UnityEditor.AddressableAssets;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
-namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
+namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 {
-    public partial class AddressableLabelAttributeDrawer
+    public partial class AddressableAddressAttributeDrawer
     {
+        private static string NameDropdownField(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableAddress_DropdownField";
 
-        private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__AddressableLabel_DropdownField";
-        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AddressableLabel_HelpBox";
+        private static string NameHelpBox(SerializedProperty property) =>
+            $"{property.propertyPath}__AddressableAddress_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButtonField = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownButtonField =
+                UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButtonField.name = NameDropdownField(property);
             dropdownButtonField.userData = Array.Empty<string>();
             // ReSharper disable once MergeConditionalExpression
@@ -55,37 +56,42 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
-            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            AddressableLabelAttribute addressableLabelAttribute = (AddressableLabelAttribute) saintsAttribute;
-            dropdownField.ButtonElement.clicked += () => ShowDropdown(property, addressableLabelAttribute, dropdownField, helpBoxElement, info, parent, onValueChangedCallback);
+            // HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
+            UIToolkitUtils.DropdownButtonField dropdownField =
+                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+
+            AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
+            dropdownField.ButtonElement.clicked += () =>
+                ShowDropdown(property, addressableAddressAttribute, dropdownField, onValueChangedCallback);
         }
 
-        private static void ShowDropdown(SerializedProperty property, AddressableLabelAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField, HelpBox helpBox, FieldInfo info, object parent, Action<object> onValueChangedCallback)
+        private static void ShowDropdown(SerializedProperty property,
+            AddressableAddressAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField,
+            Action<object> onValueChangedCallback)
         {
-
-            // ReSharper disable once Unity.NoNullPropagation
-            List<string> labels = AddressableAssetSettingsDefaultObject.Settings?.GetLabels() ?? new List<string>();
+            (string _, IReadOnlyList<string> keys) = SetupAssetGroup(addressableAddressAttribute);
 
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-            foreach (string addressableLabel in labels)
+            foreach (string key in keys)
             {
-                string thisAddressableLabel = addressableLabel;
-                genericDropdownMenu.AddItem(addressableLabel, property.stringValue == thisAddressableLabel, () =>
+                string thisKey = key;
+                genericDropdownMenu.AddItem(key, property.stringValue == thisKey, () =>
                 {
-                    dropdownField.ButtonLabelElement.text = thisAddressableLabel;
-                    property.stringValue = thisAddressableLabel;
+                    // dropdownField.buttonLabelElement.text = thisKey;
+                    dropdownField.ButtonLabelElement.text = thisKey;
+                    property.stringValue = thisKey;
                     property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(thisAddressableLabel);
+                    onValueChangedCallback.Invoke(thisKey);
                 });
             }
 
-            if (labels.Count > 0)
+            if (keys.Count > 0)
             {
                 genericDropdownMenu.AddSeparator("");
             }
 
-            genericDropdownMenu.AddItem("Edit Labels...", false, AddressableUtil.OpenLabelEditor);
+            genericDropdownMenu.AddItem("Edit Addressable Group...", false,
+                () => { EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups"); });
 
             genericDropdownMenu.DropDown(dropdownField.ButtonElement.worldBound, dropdownField, true);
         }
@@ -111,7 +117,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
                 return;
             }
 
-            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            UIToolkitUtils.DropdownButtonField dropdownField =
+                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
             if (dropdownField.ButtonLabelElement.text != property.stringValue)
             {
                 // ReSharper disable once MergeConditionalExpression
@@ -123,7 +130,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
             ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
             IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
         {
-            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
+            UIToolkitUtils.DropdownButtonField dropdownField =
+                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
             UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
         }
     }

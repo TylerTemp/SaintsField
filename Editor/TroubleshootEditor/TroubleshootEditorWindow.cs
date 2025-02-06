@@ -30,7 +30,7 @@ namespace SaintsField.Editor.TroubleshootEditor
         private bool _inProgress;
 
         [DebugTool.WhichFramework]
-        [Ordered, RichLabel("Checking..."), ShowIf(nameof(_inProgress)), ReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
+        [Ordered, RichLabel("Checking..."), ReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
         public int progress;
 
         [Serializable]
@@ -175,7 +175,12 @@ namespace SaintsField.Editor.TroubleshootEditor
         private static bool TypeIsSaintsEditor(Type editorType) =>
             editorType.IsSubclassOf(typeof(SaintsEditor)) || editorType == typeof(SaintsEditor);
 
+        private bool NotInProcess => !_inProgress;
+
         [Ordered, Separator(5), Separator, Separator(5),
+
+         InfoBox("Please wait the checking process to finish", show: nameof(NotInProcess)),
+
          Required("Pick a target to troubleshoot"),
          OnValueChanged(nameof(TroubleShootTargetChanged)),
          BelowInfoBox("$" + nameof(GetDrawerInfo)),
