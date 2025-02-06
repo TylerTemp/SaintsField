@@ -16,7 +16,9 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "SAINTSFIELD_ADDRESSABLE"
+    ],
     "versionDefines": [
         {
             "name": "com.unity.addressables",
