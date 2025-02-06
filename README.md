@@ -81,12 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.22.2**
+**3.23.0**
 
-1.  UI Toolkit: Fix `ListDrawerSettings` didn't update the total count when size is changed externally [#123](https://github.com/TylerTemp/SaintsField/issues/123)
-2.  UI Toolkit: Fix `ValidateInput` has debug log [#134](https://github.com/TylerTemp/SaintsField/issues/134)
-3.  Improve the logic of `Troubleshoot` so it can detect method etc.
-4.  IMGUI: Fix `InfoBox` show extra space when hidden [#126](https://github.com/TylerTemp/SaintsField/issues/126)
+1.  Add `AddressableScene` to pick a scene from `Addressable` assets
+2.  Move `Addressable` related function to a separated `asmdef` for a better code organization
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

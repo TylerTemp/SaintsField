@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.23.0 ##
+
+1.  Add `AddressableScene` to pick a scene from `Addressable` assets
+2.  Move `Addressable` related function to a separated `asmdef` for a better code organization
+
 ## 3.22.2 ##
 
 1.  UI Toolkit: Fix `ListDrawerSettings` didn't update the total count when size is changed externally [#123](https://github.com/TylerTemp/SaintsField/issues/123)
