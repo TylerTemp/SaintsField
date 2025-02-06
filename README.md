@@ -4439,7 +4439,7 @@ A picker to select an addressable scene into a string field.
 [AddressableScene(false, "Scenes", "Battle", "Profile")] public string sceneKeySep;
 ```
 
-[![video](https://github.com/user-attachments/assets/743def95-8b60-4453-9b1d-1a2f263165a1)](https://github.com/user-attachments/assets/465b92a2-fb6d-4407-a464-c8f40a4f34ed)
+[![video](https://github.com/user-attachments/assets/743def95-8b60-4453-9b1d-1a2f263165a1)](https://github.com/user-attachments/assets/e2718c8d-6372-4e16-bbdc-3b5fb331ce5e)
 
 ## AI Navigation ##
 
