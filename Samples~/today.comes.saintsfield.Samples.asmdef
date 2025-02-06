@@ -7,7 +7,8 @@
         "Unity.Addressables",
         "DOTween.Modules",
         "AYellowpaper.SerializedCollections",
-        "NaughtyAttributes.Core"
+        "NaughtyAttributes.Core",
+        "today.comes.saintsfield.Runtime.Addressable"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

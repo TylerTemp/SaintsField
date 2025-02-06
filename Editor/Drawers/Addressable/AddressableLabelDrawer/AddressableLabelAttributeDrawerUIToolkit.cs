@@ -1,9 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using SaintsField.Addressable;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -55,13 +53,11 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            AddressableLabelAttribute addressableLabelAttribute = (AddressableLabelAttribute) saintsAttribute;
-            dropdownField.ButtonElement.clicked += () => ShowDropdown(property, addressableLabelAttribute, dropdownField, helpBoxElement, info, parent, onValueChangedCallback);
+            dropdownField.ButtonElement.clicked += () => ShowDropdown(property, dropdownField, onValueChangedCallback);
         }
 
-        private static void ShowDropdown(SerializedProperty property, AddressableLabelAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField, HelpBox helpBox, FieldInfo info, object parent, Action<object> onValueChangedCallback)
+        private static void ShowDropdown(SerializedProperty property, UIToolkitUtils.DropdownButtonField dropdownField, Action<object> onValueChangedCallback)
         {
 
             // ReSharper disable once Unity.NoNullPropagation

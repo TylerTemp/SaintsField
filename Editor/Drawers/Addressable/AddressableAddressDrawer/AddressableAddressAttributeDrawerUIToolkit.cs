@@ -1,12 +1,14 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -56,7 +58,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            // HelpBox helpBoxElement = container.Q<HelpBox>(NameHelpBox(property));
             UIToolkitUtils.DropdownButtonField dropdownField =
                 container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
 
@@ -69,7 +70,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             AddressableAddressAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField,
             Action<object> onValueChangedCallback)
         {
-            (string _, IReadOnlyList<string> keys) = SetupAssetGroup(addressableAddressAttribute);
+            (string _, IEnumerable<AddressableAssetEntry> entries) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
+            string[] keys = entries.Select(each => each.address).ToArray();
 
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
             foreach (string key in keys)
@@ -85,13 +87,12 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 });
             }
 
-            if (keys.Count > 0)
+            if (keys.Length > 0)
             {
                 genericDropdownMenu.AddSeparator("");
             }
 
-            genericDropdownMenu.AddItem("Edit Addressable Group...", false,
-                () => { EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups"); });
+            genericDropdownMenu.AddItem("Edit Addressable Group...", false, AddressableUtil.OpenGroupEditor);
 
             genericDropdownMenu.DropDown(dropdownField.ButtonElement.worldBound, dropdownField, true);
         }
@@ -113,7 +114,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
         {
             if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
             {
-                UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), AddressableUtil.ErrorNoSettings);
+                UpdateHelpBox(container.Q<HelpBox>(name: NameHelpBox(property)), AddressableUtil.ErrorNoSettings);
                 return;
             }
 

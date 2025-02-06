@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
 
-            (string error, IReadOnlyList<string> keys) = SetupAssetGroup(addressableAddressAttribute);
+            (string error, IEnumerable<AddressableAssetEntry> entries) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
 
             _error = error;
             // _targetKeys = keys;
@@ -35,6 +35,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 DefaultDrawer(position, property, label, info);
                 return;
             }
+
+            string[] keys = entries.Select(each => each.address).ToArray();
 
             int index = Util.ListIndexOfAction(keys, each => each == property.stringValue);
 
@@ -54,13 +56,13 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
-                    if (newIndex < keys.Count)
+                    if (newIndex < keys.Length)
                     {
                         property.stringValue = keys[newIndex];
                     }
                     else
                     {
-                        EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
+                        AddressableUtil.OpenGroupEditor();
                     }
                 }
             }
@@ -72,7 +74,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
-            (string error, IReadOnlyList<string> _) = SetupAssetGroup(addressableAddressAttribute);
+            (string error, IEnumerable<AddressableAssetEntry> _) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
             _error = error;
             return _error != "";
         }
@@ -82,7 +84,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
-            (string error, IReadOnlyList<string> _) = SetupAssetGroup(addressableAddressAttribute);
+            (string error, IEnumerable<AddressableAssetEntry> _) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
             _error = error;
 
             return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
@@ -92,41 +94,5 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
             _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
-
-        private static (string error, IReadOnlyList<string> assetGroups) SetupAssetGroup(
-            AddressableAddressAttribute addressableAddressAttribute)
-        {
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
-            if (settings == null)
-            {
-                return (AddressableUtil.ErrorNoSettings, Array.Empty<string>());
-            }
-
-            // AddressableAssetGroup[] targetGroups;
-            IReadOnlyList<AddressableAssetGroup> assetGroups = string.IsNullOrEmpty(addressableAddressAttribute.Group)
-                ? settings.groups.ToArray()
-                : settings.groups.Where(each => each.name == addressableAddressAttribute.Group).ToArray();
-
-            string[][] labelFilters = addressableAddressAttribute.LabelFilters;
-
-            IEnumerable<AddressableAssetEntry> entries = assetGroups.SelectMany(each => each.entries);
-
-            // ReSharper disable once MergeIntoPattern
-            if (labelFilters != null && labelFilters.Length > 0)
-            {
-                entries = entries.Where(eachName =>
-                {
-                    HashSet<string> labels = eachName.labels;
-                    return labelFilters.Any(eachOr => eachOr.All(eachAnd => labels.Contains(eachAnd)));
-                    // Debug.Log($"{eachName.address} {match}: {string.Join(",", labels)}");
-                });
-            }
-
-            IReadOnlyList<string> keys = entries
-                .Select(each => each.address)
-                .ToList();
-
-            return ("", keys);
-        }
     }
 }

@@ -292,7 +292,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             {
                 helpBox.text = "No addressable config found. Please create one.";
                 toggleButton.SetEnabled(false);
-                // EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
                 return;
             }
 
