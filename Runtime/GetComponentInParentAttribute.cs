@@ -10,8 +10,10 @@ using SaintsField.SaintsXPathParser;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class GetComponentInParentAttribute: GetByXPathAttribute
+    public class GetComponentInParentAttribute: GetComponentInParentsAttribute
     {
+        public override int Limit => 1;
+
         public override string GroupBy { get; }
 
         public GetComponentInParentAttribute(Type compType = null, bool excludeSelf = false, string groupBy = "")
@@ -19,6 +21,10 @@ namespace SaintsField
             ParseOptions(SaintsFieldConfigUtil.GetComponentInParentExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseArguments(compType, excludeSelf);
             GroupBy = groupBy;
+
+            IncludeInactive = true;
+            CompType = compType;
+            ExcludeSelf = excludeSelf;
         }
 
         public GetComponentInParentAttribute(EXP config, Type compType = null, bool excludeSelf = false, string groupBy = "")
@@ -26,6 +32,10 @@ namespace SaintsField
             ParseOptions(config);
             ParseArguments(compType, excludeSelf);
             GroupBy = groupBy;
+
+            IncludeInactive = true;
+            CompType = compType;
+            ExcludeSelf = excludeSelf;
         }
 
         private void ParseArguments(Type compType, bool excludeSelf)

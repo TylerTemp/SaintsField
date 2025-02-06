@@ -12,6 +12,12 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetComponentInParentsAttribute: GetByXPathAttribute
     {
+        public virtual int Limit => 0;
+
+        public bool IncludeInactive;
+        public Type CompType;
+        public bool ExcludeSelf;
+
         public override string GroupBy { get; }
 
         public GetComponentInParentsAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
@@ -19,6 +25,10 @@ namespace SaintsField
             ParseOptions(SaintsFieldConfigUtil.GetComponentInParentsExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseArguments(includeInactive, compType, excludeSelf);
             GroupBy = groupBy;
+
+            IncludeInactive = includeInactive;
+            CompType = compType;
+            ExcludeSelf = excludeSelf;
         }
 
         public GetComponentInParentsAttribute(EXP config, bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
@@ -26,6 +36,10 @@ namespace SaintsField
             ParseOptions(config);
             ParseArguments(includeInactive, compType, excludeSelf);
             GroupBy = groupBy;
+
+            IncludeInactive = includeInactive;
+            CompType = compType;
+            ExcludeSelf = excludeSelf;
         }
 
         private void ParseArguments(bool includeInactive, Type compType, bool excludeSelf)
