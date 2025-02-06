@@ -10,7 +10,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 {
     public partial class FieldTypeAttributeDrawer
     {
-        #region IMGUI
         private string _error = "";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
@@ -116,6 +115,5 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGuiPayload, FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, _error, MessageType.Error);
-        #endregion
     }
 }

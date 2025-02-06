@@ -19,8 +19,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
     {
         private class LabelPopupWindow: PopupWindowContent
         {
-            private IReadOnlyList<string> _options;
-            private Action<IReadOnlyList<string>> _onOk;
+            private readonly IReadOnlyList<string> _options;
+            private readonly Action<IReadOnlyList<string>> _onOk;
 
             private List<string> _curSelected;
 

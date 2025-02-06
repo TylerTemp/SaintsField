@@ -101,31 +101,18 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             ObjectField objectField = container.Q<ObjectField>(name: NameObjectField(property));
             objectField.RegisterValueChangedCallback(newObj =>
             {
-                if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
-                {
-                    UpdateHelpBox(helpBoxElement, AddressableUtil.ErrorNoSettings);
-                    return;
-                }
-                SceneAsset sceneAsset = (SceneAsset)newObj.newValue;
-
-                (string error, IEnumerable<AddressableAssetEntry> assetGroups) = AddressableUtil.GetAllEntries(addressableSceneAttribute.Group, addressableSceneAttribute.LabelFilters);
+                (string error, AddressableAssetEntry sceneEntry) = GetSceneEntryFromSceneAsset(newObj.newValue, addressableSceneAttribute);
                 if (error != "")
                 {
                     UpdateHelpBox(helpBoxElement, error);
                     return;
                 }
 
-                AddressableAssetEntry assetEntry = assetGroups.FirstOrDefault(each => ReferenceEquals(each.MainAsset, sceneAsset));
-                if(assetEntry == null)
-                {
-                    UpdateHelpBox(helpBoxElement, $"Scene `{sceneAsset.name}` is not in target Addressable group.");
-                    return;
-                }
-
                 UpdateHelpBox(helpBoxElement, "");
-                property.stringValue = assetEntry.address;
+                string newValue = sceneEntry == null ? "" : sceneEntry.address;
+                property.stringValue = newValue;
                 property.serializedObject.ApplyModifiedProperties();
-                onValueChangedCallback.Invoke(assetEntry.address);
+                onValueChangedCallback.Invoke(newValue);
             });
 
             Button selectorButton = container.Q<Button>(name: NameSelectorButton(property));
@@ -138,7 +125,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                     return;
                 }
 
-                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, assetGroups.Where(each => each.MainAsset is SceneAsset), addressableSceneAttribute.SepAsSub);
+                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, assetGroups.Where(each => each.MainAsset is SceneAsset), addressableSceneAttribute.SepAsSub, false);
                 Rect worldBound = new Rect(objectField.worldBound)
                 {
                     width = objectField.worldBound.width + selectorButton.worldBound.width,
@@ -218,39 +205,16 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         private static void UpdateFieldAndErrorMessage(ObjectField objectField, HelpBox helpBox, string value, AddressableSceneAttribute addressableSceneAttribute)
         {
-            if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
-            {
-                UpdateHelpBox(helpBox, AddressableUtil.ErrorNoSettings);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(value))
-            {
-                UpdateHelpBox(helpBox, "");
-                objectField.userData = "";
-                return;
-            }
-
-            (string error, IEnumerable<AddressableAssetEntry> assetGroups) = AddressableUtil.GetAllEntries(addressableSceneAttribute.Group, addressableSceneAttribute.LabelFilters);
+            (string error, AddressableAssetEntry sceneEntry) = GetSceneEntry(value, addressableSceneAttribute);
             if (error != "")
             {
                 UpdateHelpBox(helpBox, error);
                 return;
             }
 
-            AddressableAssetEntry assetEntry = assetGroups
-                .Where(each => each.MainAsset is SceneAsset)
-                .FirstOrDefault(each => each.address == value);
-
-            if(assetEntry == null)
-            {
-                UpdateHelpBox(helpBox, $"Scene `{value}` is not in target Addressable group.");
-                return;
-            }
-
             UpdateHelpBox(helpBox, "");
             objectField.userData = value;
-            objectField.SetValueWithoutNotify(assetEntry.MainAsset);
+            objectField.SetValueWithoutNotify(sceneEntry.MainAsset);
         }
 
         // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,

@@ -14883,7 +14883,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142339351076478d999c809bf8f02511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneKey: 
+  sceneKey: Assets/SaintsField/Samples/SaintsEditorExample.unity
+  sceneKeySep: Assets/SaintsField/Samples/TroubleshootTest.unity
 --- !u!4 &1239531929
 Transform:
   m_ObjectHideFlags: 0
