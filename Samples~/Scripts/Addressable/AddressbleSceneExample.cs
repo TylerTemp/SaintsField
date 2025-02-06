@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.Addressable
     {
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
         [AddressableScene] public string sceneKey;
-        [AddressableScene(sepAsSub: false)] public string sceneKeySep;
+        [AddressableScene(false, "Scenes", "Battle", "Profile")] public string sceneKeySep;
 #endif
     }
 }

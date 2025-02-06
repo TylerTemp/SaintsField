@@ -4417,6 +4417,30 @@ public AssetReferenceSprite spriteRef;
 
 [![video](https://github.com/user-attachments/assets/7cd6d490-6551-4a51-b1e8-0fbff41ac519)](https://github.com/user-attachments/assets/48601cc1-85c5-487f-b87e-94531517f849)
 
+### `AddressableScene` ###
+
+A picker to select an addressable scene into a string field.
+
+**Parameters**:
+
+*   [Optional] `bool sepAsSub = true`: if true, use `/` as a seperator as sub-list
+*   `string group = null`: the Addressable group name. `null` for all groups
+*   `params string[] orLabels`: the addressable label names to filter. Only `entries` with this label will be shown. `null` for no filter.
+
+    If it requires multiple labels, use `A && B`, then only entries with both labels will be shown.
+
+    If it requires any of the labels, just pass them separately, then entries with either label will be shown. For example, pass `"A && B", "C"` will show entries with both `A` and `B` label, or with `C` label.
+
+```csharp
+[AddressableScene] public string sceneKey;
+// don't use nested list when picking
+// only use scenes from `Scenes` group
+// with label `Battle`, or `Profile`
+[AddressableScene(false, "Scenes", "Battle", "Profile")] public string sceneKeySep;
+```
+
+[![video](https://github.com/user-attachments/assets/743def95-8b60-4453-9b1d-1a2f263165a1)](https://github.com/user-attachments/assets/465b92a2-fb6d-4407-a464-c8f40a4f34ed)
+
 ## AI Navigation ##
 
 These tools are for [Unity AI Navigation](https://docs.unity3d.com/Packages/com.unity.ai.navigation@2.0/manual/) (`NavMesh`). It's there only if you have `AI Navigation` installed.

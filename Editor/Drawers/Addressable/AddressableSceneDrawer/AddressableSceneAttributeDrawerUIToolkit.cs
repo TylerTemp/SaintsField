@@ -214,7 +214,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
             UpdateHelpBox(helpBox, "");
             objectField.userData = value;
-            objectField.SetValueWithoutNotify(sceneEntry.MainAsset);
+            objectField.SetValueWithoutNotify(sceneEntry?.MainAsset);
         }
 
         // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
