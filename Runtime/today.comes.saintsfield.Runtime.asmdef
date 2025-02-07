@@ -1,7 +1,9 @@
 {
     "name": "today.comes.saintsfield.Runtime",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:1491147abca9d7d4bb7105af628b223e"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -19,6 +21,11 @@
             "name": "com.unity.ai.navigation",
             "expression": "",
             "define": "SAINTSFIELD_AI_NAVIGATION"
+        },
+        {
+            "name": "com.unity.netcode.gameobjects",
+            "expression": "",
+            "define": "SAINTSFIELD_NETCODE_GAMEOBJECTS"
         }
     ],
     "noEngineReferences": false

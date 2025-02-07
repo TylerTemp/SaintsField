@@ -8,7 +8,8 @@
         "DOTween.Modules",
         "AYellowpaper.SerializedCollections",
         "NaughtyAttributes.Core",
-        "today.comes.saintsfield.Runtime.Addressable"
+        "today.comes.saintsfield.Runtime.Addressable",
+        "Unity.Netcode.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -35,6 +36,11 @@
             "name": "com.unity.ai.navigation",
             "expression": "",
             "define": "SAINTSFIELD_AI_NAVIGATION"
+        },
+        {
+            "name": "com.unity.netcode.gameobjects",
+            "expression": "",
+            "define": "SAINTSFIELD_NETCODE_GAMEOBJECTS"
         }
     ],
     "noEngineReferences": false

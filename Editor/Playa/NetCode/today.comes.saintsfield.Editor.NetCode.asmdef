@@ -1,0 +1,30 @@
+{
+    "name": "today.comes.saintsfield.Editor.NetCode",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9f4f5bf029cebb64f983b7bdc29f62a1",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0",
+        "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_NETCODE_GAMEOBJECTS",
+        "!SAINTSFIELD_NETCODE_GAMEOBJECTS_DISABLED"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.netcode.gameobjects",
+            "expression": "",
+            "define": "SAINTSFIELD_NETCODE_GAMEOBJECTS"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -69,14 +69,16 @@ namespace SaintsField.Editor
             }
         }
 
-        private IReadOnlyList<ISaintsRenderer> Setup()
+        public static IReadOnlyList<ISaintsRenderer> Setup(ICollection<string> skipSerializedFields, SerializedObject serializedObject, IMakeRenderer makeRenderer,
+            object target)
         {
             string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
             // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
             Dictionary<string, SerializedProperty> serializedPropertyDict = serializableFields
+                .Where(each => !skipSerializedFields.Contains(each))
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
-            return HelperGetRenderers(serializedPropertyDict, serializedObject, this, target);
+            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
         }
 
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(

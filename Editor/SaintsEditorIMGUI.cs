@@ -1,10 +1,6 @@
 using System;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-using DG.DOTweenEditor;
-#endif
 using SaintsField.Editor.Playa;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor
 {
@@ -17,7 +13,7 @@ namespace SaintsField.Editor
             // Debug.Log($"OnEnable");
             try
             {
-                _renderers = Setup();
+                _renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
             }
             catch (Exception)
             {
@@ -48,7 +44,7 @@ namespace SaintsField.Editor
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_renderers == null)
             {
-                _renderers = Setup();
+                _renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
             }
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             AliveInstances.Add(this);

@@ -12,12 +12,8 @@ namespace SaintsField.Editor
     public partial class SaintsEditor
     {
 
-        #region UIToolkit
-
         [Obsolete("No longer needed")]
         protected virtual bool TryFixUIToolkit => false;
-
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -52,7 +48,7 @@ namespace SaintsField.Editor
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            IReadOnlyList<ISaintsRenderer> renderers = Setup();
+            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
             foreach (ISaintsRenderer saintsRenderer in renderers)
@@ -73,9 +69,6 @@ namespace SaintsField.Editor
 #endif
             return root;
         }
-
-#endif
-        #endregion
 
     }
 }
