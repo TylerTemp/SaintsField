@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.24.0 ##
+
+Add `SaintsField.Playa.SaintsNetworkBehaviour` to allow rendering `Button` etc. inside Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) behavior.
+
 ## 3.23.0 ##
 
 1.  Add `AddressableScene` to pick a scene from `Addressable` assets

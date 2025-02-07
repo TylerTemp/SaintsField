@@ -81,10 +81,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.23.0**
+**3.24.0**
 
-1.  Add `AddressableScene` to pick a scene from `Addressable` assets
-2.  Move `Addressable` related function to a separated `asmdef` for a better code organization
+Add `SaintsField.Playa.SaintsNetworkBehaviour` to allow rendering `Button` etc. inside Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) behavior.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -5254,3 +5253,49 @@ My (not full) test about compatibility:
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
 *   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
 *   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good when it's inside Odin's own serializer.
+
+#### Netcode for Game Objects ####
+
+Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) uses a custom editor that
+`SaintsEditor` can not be applied to.
+
+To use ability from `SaintsEditor`, the most simple way is to inherent from `SaintsField.Playa.SaintsNetworkBehaviour`
+
+```csharp
+using SaintsField.Playa;
+using Unity.Netcode;
+using UnityEngine;
+
+public class RpcTestSaints : SaintsNetworkBehaviour  // inherent this one
+{
+    [PlayaInfoBox("Saints Info Box for Array")]  // SaintsEditor specific decorator
+    public int[] normalIntArrays;
+
+    [LayoutStart("SaintsLayout", ELayout.FoldoutBox)]  // SaintsEditor specific decorator
+    public string normalString;
+
+    [ResizableTextArea]
+    public string content;
+
+    public NetworkVariable<int> testVar = new NetworkVariable<int>(0);
+    public NetworkList<bool> TestList = new NetworkList<bool>();
+
+    [Button]  // SaintsEditor specific decorator
+    private void TestRpc()
+    {
+        Debug.Log("Button Invoked");
+    }
+}
+```
+
+Result using `SaintsNetworkBehaviour`:
+
+![image](https://github.com/user-attachments/assets/1ee1cf4e-8f3f-49d8-94c3-c37449246cdc)
+
+Result using default one:
+
+![image](https://github.com/user-attachments/assets/74952ea4-60f1-4327-8f17-4db6c06b820d)
+
+The drawer is called `SaintsField.Editor.Playa.NetCode.SaintsNetworkBehaviourEditor`, in case if you want to apply it manually.
+
+Please note: `NetworkVariable` and `NetworkList` will always be rendered at the top, just like Unity's default behavior. Putting it under `Layout` will not change this order and will have no effect.
