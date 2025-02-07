@@ -7,12 +7,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.NetCode
 {
     public class RpcTestSaints : SaintsNetworkBehaviour
     {
+        [PlayaInfoBox("Saints Info Box for Array")]
         public int[] normalIntArrays;
 
         [LayoutStart("SaintsLayout", ELayout.FoldoutBox)]
         public string normalString;
 
-        [ResizableTextArea, InfoBox("SainsField")]
+        [ResizableTextArea]
         public string content;
 
         public NetworkVariable<int> testVar = new NetworkVariable<int>(0);
