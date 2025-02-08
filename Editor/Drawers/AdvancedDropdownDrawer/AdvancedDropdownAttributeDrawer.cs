@@ -275,10 +275,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             foreach (IAdvancedDropdownList child in children)
             {
-                if (child.Count > 0)
+                if (child.ChildCount() > 0)
                 {
                     // List<(string, object, List<object>, bool, string, bool)> grandChildren = child.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) grandChild in FlattenChild(stackDisplays, child.children))
+                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) grandChild in FlattenChild(Prefix(stackDisplays, child.displayName), child.children.Where(each => !each.isSeparator)))
                     {
                         yield return grandChild;
                     }
@@ -290,21 +290,21 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        public static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> Flatten(IReadOnlyList<string> stackDisplays, IAdvancedDropdownList roots)
+        public static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> Flatten(IAdvancedDropdownList roots)
         {
             foreach (IAdvancedDropdownList root in roots)
             {
-                if (root.Count > 0)
+                if (root.ChildCount() > 0)
                 {
                     // IAdvancedDropdownList children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) child in FlattenChild(Prefix(stackDisplays, root.displayName), root.children))
+                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) child in FlattenChild(new[]{root.displayName}, root.children.Where(each => !each.isSeparator)))
                     {
                         yield return child;
                     }
                 }
                 else
                 {
-                    yield return (Prefix(stackDisplays, root.displayName), root.displayName, root.icon, root.disabled, root.value);
+                    yield return (new []{root.displayName}, root.displayName, root.icon, root.disabled, root.value);
                 }
             }
         }

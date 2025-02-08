@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.25.0 ##
+
+1.  Add `LocalizedStringPicker` for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
+2.  UI Toolkit: fix `ResiziableTextArea` didn't update the display when the value is changed by external code.
+3.  UI Toolkit: fix `AdvancedDropdown` search might miss some results when multiple value uses the same last name.
+4.  UI Toolkit: now `AdvancedDropdown` support search for paths too (previously only support value search). This is only avaiable for UI Toolkit because IMGUI uses Unity's built-in version and lack of this ability.
+5.  UI Toolkit: now `AdvancedDropdown` search will display its parent path.
+
 ## 3.24.0 ##
 
 Add `SaintsField.Playa.SaintsNetworkBehaviour` to allow rendering `Button` etc. inside Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) behavior.

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
@@ -138,7 +139,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             // search
             ToolbarSearchField toolbarSearchField = root.Q<ToolbarSearchField>();
-            IReadOnlyList<(IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(Array.Empty<string>(), _metaInfo.DropdownListValue).ToArray();
+            IReadOnlyList<(IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(_metaInfo.DropdownListValue).ToArray();
             Dictionary<string, VisualElement> stackDisplayToElement = new Dictionary<string, VisualElement>();
             toolbarSearchField.RegisterValueChangedCallback(evt =>
             {
@@ -169,6 +170,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 (IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)[] matchedValueOptions = flattenOptions.Where(each =>
                 {
+                    Debug.Log($"{string.Join("/", each.stackDisplay)}: {each.display}");
                     string lowerDisplay = each.display.ToLower();
                     return searchFragments.All(fragment => lowerDisplay.Contains(fragment));
                 }).ToArray();
@@ -182,63 +184,63 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 scrollView.Clear();
                 foreach ((IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value) in matchedValueOptions)
                 {
-                    string stackDisplay = string.Join("/", stackDisplays);
-                    if (!stackDisplayToElement.TryGetValue(stackDisplay, out VisualElement elementItem))
+                    string stackDisplay = string.Join("/", stackDisplays.SkipLast(1));
+
+                    TemplateContainer elementItem = itemAsset.CloneTree();
+
+                    Button itemContainer =
+                        elementItem.Q<Button>(className: "saintsfield-advanced-dropdown-item");
+
+                    Image selectImage = itemContainer.Q<Image>("item-checked-image");
+                    selectImage.image = check;
+
+                    string labelText = stackDisplay.Length == 0
+                        ? display
+                        : $"{display} <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>({stackDisplay})</color>";
+
+                    itemContainer.Q<Label>("item-content").text = labelText;
+
+                    // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
+                    bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
+                    Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
+#endif
+
+                    if(!string.IsNullOrEmpty(icon))
                     {
-                        stackDisplayToElement[stackDisplay] = elementItem = itemAsset.CloneTree();
+                        itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(icon);
+                    }
 
-                        Button itemContainer =
-                            elementItem.Q<Button>(className: "saintsfield-advanced-dropdown-item");
+                    if (curSelect)
+                    {
+                        selectImage.visible = true;
+                    }
 
-                        Image selectImage = itemContainer.Q<Image>("item-checked-image");
-                        selectImage.image = check;
-
-                        itemContainer.Q<Label>("item-content").text = display;
-
-                        // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
-                        bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                        Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
-#endif
-
-                        if(!string.IsNullOrEmpty(icon))
+                    if (disabled)
+                    {
+                        itemContainer.SetEnabled(false);
+                        itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
+                        itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                    }
+                    else  // not disabled (no not-enabled appearance)
+                    {
+                        if (curSelect && !_allowUnSelect)
                         {
-                            itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(icon);
-                        }
-
-                        if (curSelect)
-                        {
-                            selectImage.visible = true;
-                        }
-
-                        if (disabled)
-                        {
-                            itemContainer.SetEnabled(false);
-                            itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
                             itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-                        }
-                        else  // not disabled (no not-enabled appearance)
-                        {
-                            if (curSelect && !_allowUnSelect)
-                            {
-                                itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                                Debug.Log($"cur selected: {value}");
+                            Debug.Log($"cur selected: {value}");
 #endif
 
-                                itemContainer.pickingMode = PickingMode.Ignore;
-                            }
-                            else
-                            {
-                                itemContainer.clicked += () =>
-                                {
-                                    _setValue(stackDisplay, value);
-                                    editorWindow.Close();
-                                };
-                            }
+                            itemContainer.pickingMode = PickingMode.Ignore;
                         }
-
-
+                        else
+                        {
+                            itemContainer.clicked += () =>
+                            {
+                                _setValue(stackDisplay, value);
+                                editorWindow.Close();
+                            };
+                        }
                     }
 
                     scrollView.Add(elementItem);
@@ -263,7 +265,18 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     Image selectImage = itemContainer.Q<Image>("item-checked-image");
                     selectImage.image = check;
 
-                    itemContainer.Q<Label>("item-content").text = pathStack.SelectStacks.Last().Display;
+                    AdvancedDropdownAttributeDrawer.SelectStack lastStack = pathStack.SelectStacks[^1];
+                    AdvancedDropdownAttributeDrawer.SelectStack[] preStacks = pathStack.SelectStacks.Take(pathStack.SelectStacks.Count - 1).ToArray();
+
+                    StringBuilder sb = new StringBuilder(lastStack.Display);
+                    if (preStacks.Length > 0)
+                    {
+                        sb.Append($" <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>(");
+                        sb.Append(string.Join("/", preStacks.Select(each => each.Display)));
+                        sb.Append(")</color>");
+                    }
+
+                    itemContainer.Q<Label>("item-content").text = sb.ToString();
 
                     // bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN

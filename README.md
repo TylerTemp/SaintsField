@@ -81,9 +81,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.24.0**
+**3.25.0**
 
-Add `SaintsField.Playa.SaintsNetworkBehaviour` to allow rendering `Button` etc. inside Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) behavior.
+1.  Add `LocalizedStringPicker` for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
+2.  UI Toolkit: fix `ResiziableTextArea` didn't update the display when the value is changed by external code.
+3.  UI Toolkit: fix `AdvancedDropdown` search might miss some results when multiple value uses the same last name.
+4.  UI Toolkit: now `AdvancedDropdown` support search for paths too (previously only support value search). This is only avaiable for UI Toolkit because IMGUI uses Unity's built-in version and lack of this ability.
+5.  UI Toolkit: now `AdvancedDropdown` search will display its parent path.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3437,6 +3441,8 @@ If you want a searchable dropdown, see `AdvancedDropdown`.
 
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
+
+If you're using UI Toolkit, the search box can also search the path too (rather than just the value).
 
 **Example**
 

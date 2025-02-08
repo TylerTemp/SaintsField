@@ -44,8 +44,8 @@ namespace SaintsField.Editor.I2Setup
         // ReSharper disable once UnusedMember.Local
         private void CopyI2LocAsmdef()
         {
-            File.Copy(i2LocAsmdefPath, $"{i2LocFolder}/{i2LocAsdmefName}");
-            File.Copy(i2LocAsmdefMetaPath, $"{i2LocFolder}/{i2LocAsdmefName}.meta");
+            File.Copy(i2LocAsmdefPath, $"{i2LocFolder}/{i2LocAsdmefName}", true);
+            File.Copy(i2LocAsmdefMetaPath, $"{i2LocFolder}/{i2LocAsdmefName}.meta", true);
             AssetDatabase.Refresh();
             SaintsMenu.AddCompileDefine("SAINTSFIELD_I2_LOC");
             Close();

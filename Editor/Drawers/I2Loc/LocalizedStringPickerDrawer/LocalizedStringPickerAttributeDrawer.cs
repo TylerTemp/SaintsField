@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using I2.Loc;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Utils;
-using SaintsField.Runtime.I2Loc;
+using SaintsField.I2Loc;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 {

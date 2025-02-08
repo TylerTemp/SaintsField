@@ -13866,7 +13866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ff1162fe387fd3408ee8c17c002ea6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _short: 
+  shortValue: 
   _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
     10 wrap 11 wrap 12
 
@@ -17838,7 +17838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68afe09f91630194098c998576f4abfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectIt: 3
+  selectIt: 1
 --- !u!1 &1578091333
 GameObject:
   m_ObjectHideFlags: 0
