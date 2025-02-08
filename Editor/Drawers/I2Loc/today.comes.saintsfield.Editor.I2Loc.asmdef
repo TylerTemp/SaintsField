@@ -1,0 +1,21 @@
+{
+    "name": "today.comes.saintsfield.Editor.I2Loc",
+    "rootNamespace": "",
+    "references": [
+        "today.comes.saintsfield.Runtime",
+        "today.comes.saintsfield.Editor",
+        "today.comes.saintsfield.Runtime.I2Loc",
+        "com.inter-illusion.i2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_I2_LOC"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

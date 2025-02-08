@@ -18,9 +18,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 {
     public partial class AddressableSceneAttributeDrawer
     {
-        private static string NameDropdownField(SerializedProperty property) =>
-            $"{property.propertyPath}__AddressableAddress_DropdownField";
-
         private static string NameHelpBox(SerializedProperty property) =>
             $"{property.propertyPath}__AddressableAddress_HelpBox";
 

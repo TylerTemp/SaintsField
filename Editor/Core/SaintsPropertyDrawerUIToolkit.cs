@@ -448,10 +448,11 @@ namespace SaintsField.Editor.Core
 
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
+                    property.serializedObject.Update();
+
                     GUIContent label = imguiLabelHelper.NoLabel
                         ? GUIContent.none
                         : new GUIContent(imguiLabelHelper.RichLabel);
-
 
                     using(new ImGuiFoldoutStyleRichTextScoop())
                     using(new ImGuiLabelStyleRichTextScoop())
@@ -467,6 +468,8 @@ namespace SaintsField.Editor.Core
                         // ReSharper disable once InvertIf
                         if (changed.changed)
                         {
+                            property.serializedObject.ApplyModifiedProperties();
+
                             object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                             if (newFetchParent == null)
                             {

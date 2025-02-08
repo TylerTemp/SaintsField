@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SaintsField.Editor.I2Setup;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -175,6 +176,18 @@ namespace SaintsField.Editor.Utils
         [MenuItem("Window/Saints/AI Navigation Not Installed", true)]
         public static bool AiNavigationNotInstalledEnabled() => false;
 #endif  // SAINTSFIELD_AI_NAVIGATION
+
+        #endregion
+
+        #region I2Loc
+
+#if SAINTSFIELD_I2_LOC
+        [MenuItem("Window/Saints/Disable I2 Localization Support")]
+        public static void I2Localization() => RemoveCompileDefine("SAINTSFIELD_I2_LOC");
+#else
+        [MenuItem("Window/Saints/Enable I2 Localization Support")]
+        public static void I2Localization() => I2SetupWindow.OpenWindow();
+#endif
 
         #endregion
 

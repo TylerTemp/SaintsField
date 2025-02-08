@@ -40,6 +40,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             {
                 return Util.CombineHashCode(Index, Display);
             }
+
+            public override string ToString()
+            {
+                return $"[{Index}]{Display}";
+            }
         }
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj)
@@ -266,45 +271,49 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         }
 
 
-        private static IEnumerable<(string stackDisplay, string display, string icon, bool disabled, object value)> FlattenChild(string prefix, IEnumerable<IAdvancedDropdownList> children)
+        private static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IAdvancedDropdownList> children)
         {
             foreach (IAdvancedDropdownList child in children)
             {
                 if (child.Count > 0)
                 {
                     // List<(string, object, List<object>, bool, string, bool)> grandChildren = child.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((string, string, string, bool, object) grandChild in FlattenChild(prefix, child.children))
+                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) grandChild in FlattenChild(stackDisplays, child.children))
                     {
                         yield return grandChild;
                     }
                 }
                 else
                 {
-                    yield return (Prefix(prefix, child.displayName), child.displayName, child.icon, child.disabled, child.value);
+                    yield return (Prefix(stackDisplays, child.displayName), child.displayName, child.icon, child.disabled, child.value);
                 }
             }
         }
 
-        public static IEnumerable<(string stackDisplay, string display, string icon, bool disabled, object value)> Flatten(string prefix, IAdvancedDropdownList roots)
+        public static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> Flatten(IReadOnlyList<string> stackDisplays, IAdvancedDropdownList roots)
         {
             foreach (IAdvancedDropdownList root in roots)
             {
                 if (root.Count > 0)
                 {
                     // IAdvancedDropdownList children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((string, string, string, bool, object) child in FlattenChild(Prefix(prefix, root.displayName), root.children))
+                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) child in FlattenChild(Prefix(stackDisplays, root.displayName), root.children))
                     {
                         yield return child;
                     }
                 }
                 else
                 {
-                    yield return (Prefix(prefix, root.displayName), root.displayName, root.icon, root.disabled, root.value);
+                    yield return (Prefix(stackDisplays, root.displayName), root.displayName, root.icon, root.disabled, root.value);
                 }
             }
         }
 
-        private static string Prefix(string prefix, string value) => string.IsNullOrEmpty(prefix)? value : $"{prefix}/{value}";
+        private static IReadOnlyList<string> Prefix(IReadOnlyList<string> stackDisplays, string value)
+        {
+            return stackDisplays == null ? new[] { value } : stackDisplays.Append(value).ToArray();
+        }
+
         #endregion
 
     }

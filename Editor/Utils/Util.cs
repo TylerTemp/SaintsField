@@ -14,15 +14,16 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
+        public static readonly string[] ResourceSearchFolder = {
+            "Assets/Editor Default Resources/SaintsField",
+            "Assets/SaintsField/Editor/Editor Default Resources/SaintsField",  // unitypackage
+            // this is readonly, put it to last so user  can easily override it
+            "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField", // Unity UPM
+        };
+
         public static T LoadResource<T>(string resourcePath) where T: UnityEngine.Object
         {
-            string[] resourceSearchFolder = {
-                "Assets/Editor Default Resources/SaintsField",
-                "Assets/SaintsField/Editor/Editor Default Resources/SaintsField",  // unitypackage
-                // this is readonly, put it to last so user  can easily override it
-                "Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField", // Unity UPM
-            };
-            foreach (T each in resourceSearchFolder
+            foreach (T each in ResourceSearchFolder
                          .Select(resourceFolder => AssetDatabase.LoadAssetAtPath<T>($"{resourceFolder}/{resourcePath}")))
             {
                 // ReSharper disable once Unity.PerformanceCriticalCodeNullComparison
@@ -33,7 +34,7 @@ namespace SaintsField.Editor.Utils
             }
 
             T result = (T)EditorGUIUtility.Load(resourcePath);
-            Debug.Assert(result != null, $"{resourcePath} not found in {string.Join(", ", resourceSearchFolder)}");
+            Debug.Assert(result != null, $"{resourcePath} not found in {string.Join(", ", ResourceSearchFolder)}");
             return result;
         }
 

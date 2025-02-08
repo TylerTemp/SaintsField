@@ -1,0 +1,19 @@
+{
+    "name": "today.comes.saintsfield.Runtime.I2Loc",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9b261077c7a2ac34886513ec1345f8e0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_I2_LOC"
+    ],
+    "versionDefines": [
+    ],
+    "noEngineReferences": false
+}
