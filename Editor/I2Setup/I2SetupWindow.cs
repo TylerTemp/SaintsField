@@ -41,6 +41,7 @@ namespace SaintsField.Editor.I2Setup
 
         [PlayaEnableIf(nameof(i2LocAsmdefPath), nameof(i2LocAsmdefMetaPath))]
         [Button("Copy I2 Asmdef")]
+        // ReSharper disable once UnusedMember.Local
         private void CopyI2LocAsmdef()
         {
             File.Copy(i2LocAsmdefPath, $"{i2LocFolder}/{i2LocAsdmefName}");
@@ -56,7 +57,7 @@ namespace SaintsField.Editor.I2Setup
             foreach (string folder in Util.ResourceSearchFolder)
             {
                 string asmdefPath = $"{folder}/I2/I2AsmDef.asmdef.txt";
-                Debug.LogError(asmdefPath);
+                // Debug.LogError(asmdefPath);
                 string asmdefMetaPath = $"{folder}/I2/I2AsmDef.asmdef.meta.txt";
 
                 if (File.Exists(asmdefPath))
