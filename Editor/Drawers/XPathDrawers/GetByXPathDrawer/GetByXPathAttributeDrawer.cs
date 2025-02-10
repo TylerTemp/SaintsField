@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -232,7 +233,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 {
                     target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
                     GetXPathValuesResult iterResults = GetXPathValues(
-                        target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+                        target.GetByXPathAttributes
+                            .Select(xPathAttribute => new XPathResourceInfo
+                            {
+                                OptimizationPayload = xPathAttribute.OptimizationPayload,
+                                OrXPathInfoList = xPathAttribute.XPathInfoAndList.SelectMany(each => each).ToArray(),
+                            })
+                            .ToArray(),
                         target.ExpectedType,
                         target.ExpectedInterface,
                         property,
@@ -456,7 +463,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #endif
 
                 GetXPathValuesResult iterResults = GetXPathValues(
-                    target.GetByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+                    target.GetByXPathAttributes
+                        .Select(xPathAttribute => new XPathResourceInfo
+                        {
+                            OptimizationPayload = xPathAttribute.OptimizationPayload,
+                            OrXPathInfoList = xPathAttribute.XPathInfoAndList.SelectMany(each => each).ToArray(),
+                        })
+                        .ToArray(),
                     target.ExpectedType,
                     target.ExpectedInterface,
                     arrayProperty,

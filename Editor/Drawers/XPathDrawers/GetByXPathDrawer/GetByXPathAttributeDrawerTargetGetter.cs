@@ -7,6 +7,7 @@ using System.Reflection;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.SaintsXPathParser;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
 using UnityEditor;
@@ -58,7 +59,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public IEnumerable<object> Results;
         }
 
-        private static GetXPathValuesResult GetXPathValues(IReadOnlyList<IReadOnlyList<GetByXPathAttribute.XPathInfo>> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
+        private struct XPathResourceInfo
+        {
+            public OptimizationPayload OptimizationPayload;
+            public IReadOnlyList<GetByXPathAttribute.XPathInfo> OrXPathInfoList;
+        }
+
+        private static GetXPathValuesResult GetXPathValues(IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
         {
             // Debug.Log($"andXPathInfoList Count={andXPathInfoList.Count}");
             bool anyResult = false;
@@ -66,10 +73,25 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // IEnumerable<object> finalResults = Array.Empty<object>();
             List<IEnumerable<object>> finalResultsCollected = new List<IEnumerable<object>>();
 
-            foreach (IReadOnlyList<GetByXPathAttribute.XPathInfo> orXPathInfoList in andXPathInfoList)
+            foreach (XPathResourceInfo orXPathInfoList in andXPathInfoList)
             {
+                if (orXPathInfoList.OptimizationPayload != null)
+                {
+                    (string error, bool hasElement, IEnumerable<object> optimizedResult) = GetXPathByOptimized(orXPathInfoList.OptimizationPayload, property, info);
+                    if (error != "")
+                    {
+                        if(hasElement)
+                        {
+                            anyResult = true;
+                            finalResultsCollected.Add(optimizedResult);
+                        }
+
+                        continue;
+                    }
+                }
+
                 // Debug.Log($"loop andXPathInfoList");
-                foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList)
+                foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList.OrXPathInfoList)
                 {
                     IEnumerable<ResourceInfo> accValues = new []
                     {

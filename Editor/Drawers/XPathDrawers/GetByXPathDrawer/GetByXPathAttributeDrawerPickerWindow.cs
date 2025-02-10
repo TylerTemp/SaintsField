@@ -104,7 +104,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return;
             }
 
-            GetXPathValuesResult r = GetXPathValues(getByXPathAttributes.SelectMany(each => each.XPathInfoAndList).ToArray(),
+            GetXPathValuesResult r = GetXPathValues(getByXPathAttributes
+                    .Select(xPathAttribute => new XPathResourceInfo
+                    {
+                        OptimizationPayload = xPathAttribute.OptimizationPayload,
+                        OrXPathInfoList = xPathAttribute.XPathInfoAndList.SelectMany(each => each).ToArray(),
+                    })
+                    .ToArray(),
                 expectedType, interfaceType, property, info, updatedParent);
             if (r.XPathError != "")
             {

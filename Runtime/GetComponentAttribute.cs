@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
@@ -20,6 +21,8 @@ namespace SaintsField
             ParseOptions(SaintsFieldConfigUtil.GetComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseXPath(compType);
             GroupBy = groupBy;
+
+            OptimizationPayload = new GetComponentPayload(compType);
         }
 
         public GetComponentAttribute(EXP exp, Type compType = null, string groupBy = "")
@@ -28,6 +31,8 @@ namespace SaintsField
             ParseXPath(compType);
             CompType = compType;
             GroupBy = groupBy;
+
+            OptimizationPayload = new GetComponentPayload(compType);
         }
 
         private void ParseXPath(Type compType)
@@ -45,7 +50,7 @@ namespace SaintsField
                         XPathSteps = XPathParser.Parse(toParse).ToArray(),
 #endif
                     },
-                }
+                },
             };
         }
     }

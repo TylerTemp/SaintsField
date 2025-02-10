@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SaintsField.Playa;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
 #endif
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace SaintsField
 {
@@ -26,6 +26,8 @@ namespace SaintsField
         public bool UsePickerButton;
         public bool UseErrorMessage;
         public bool KeepOriginalPicker;
+
+        public OptimizationPayload OptimizationPayload { get; protected set; }
 
         public struct XPathInfo
         {

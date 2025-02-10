@@ -678,21 +678,13 @@ namespace SaintsField.Editor.Utils
                     }
                     break;
 
-                // Unity Build-in Object
-                // case Texture:
-                // case Sprite:
-                // case Material:
-                // case Mesh:
-                // case Motion:
-                // case AudioClip:
-                //     result = fieldResult;
-                //     break;
                 case Texture2D _:
                 {
                     if (fieldType == typeof(Sprite) || fieldType.IsSubclassOf(typeof(Sprite)))
                     {
                         string assetPath = AssetDatabase.GetAssetPath(fieldResult);
-                        if(assetPath != "") {
+                        if(assetPath != "")
+                        {
                             result = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
                         }
 
@@ -721,6 +713,108 @@ namespace SaintsField.Editor.Utils
             }
 
             return result;
+        }
+
+        public static IReadOnlyList<UnityEngine.Object> GetTargetsTypeFromObj(UnityEngine.Object fieldResult, Type fieldType)
+        {
+            // UnityEngine.Object result = null;
+            switch (fieldResult)
+            {
+                case null:
+                    // property.objectReferenceValue = null;
+                    break;
+                case ScriptableObject so:
+                    // result = fieldType.IsSubclassOf(typeof())
+                {
+                    if (fieldType.IsInstanceOfType(so))
+                    {
+                        return new[] { so };
+                    }
+                }
+                    break;
+                case GameObject go:
+                    // ReSharper disable once RedundantCast
+                    if (fieldType == typeof(GameObject) || fieldType.IsInstanceOfType(go))
+                    {
+                        return new[] { go };
+                    }
+
+                {
+                    Component[] r = Array.Empty<Component>();
+                    try
+                    {
+                        r = go.GetComponents(fieldType);
+                    }
+                    catch (ArgumentException)
+                    {
+                        // ignore
+                    }
+
+                    if (r.Length > 0)
+                    {
+                        return r;
+                    }
+                }
+
+                    // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
+                    break;
+                case Component comp:
+                    {
+                        if (fieldType == typeof(GameObject) || fieldType.IsSubclassOf(typeof(GameObject)))
+                        {
+                            return new[] { comp.gameObject };
+                        }
+                        Component[] r = Array.Empty<Component>();
+                        try
+                        {
+                            r = comp.GetComponents(fieldType);
+                        }
+                        catch (ArgumentException)
+                        {
+                            return null;
+                        }
+                        if (r.Length > 0)  // life circle problem, need to check bool first
+                        {
+                            return r;
+                        }
+                    }
+                    break;
+
+                case Texture2D _:
+                {
+                    if (fieldType == typeof(Sprite) || fieldType.IsSubclassOf(typeof(Sprite)))
+                    {
+                        string assetPath = AssetDatabase.GetAssetPath(fieldResult);
+                        if(assetPath != "")
+                        {
+                            Sprite result = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                            if (result != null)
+                            {
+                                return new[] { result };
+                            }
+                            goto default;
+                        }
+                    }
+                    else
+                    {
+                        goto default;
+                    }
+                }
+                    break;
+
+                default:
+                    // Debug.Log($"{fieldType}/{fieldResult}: {fieldType.IsInstanceOfType(fieldResult)}");
+                    if (fieldType.IsInstanceOfType(fieldResult))
+                    {
+                        return new[] { fieldResult };
+                    }
+
+                    break;
+                //     Debug.Log(fieldResult.GetType());
+                //     break;
+            }
+
+            return Array.Empty<UnityEngine.Object>();
         }
 
         private static bool ConditionEditModeChecker(EMode editorMode)
