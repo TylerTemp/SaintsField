@@ -473,7 +473,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     target.ExpectedType,
                     target.ExpectedInterface,
                     arrayProperty,
-                    null,
+                    info,
                     parent);
 
                 expandedResults = iterResults.Results.ToArray();
