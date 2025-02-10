@@ -110,6 +110,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return ($"Target need to be a in-scene object, get {obj}", false, null);
             }
 
+            if (!scene.IsValid())
+            {
+                scene = SceneManager.GetActiveScene();
+            }
+
             List<object> results = new List<object>();
 
             foreach (GameObject rootGameObject in scene.GetRootGameObjects())
