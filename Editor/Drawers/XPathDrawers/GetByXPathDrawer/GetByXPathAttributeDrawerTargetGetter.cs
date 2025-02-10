@@ -61,6 +61,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private struct XPathResourceInfo
         {
+            // ReSharper disable once NotAccessedField.Local
             public OptimizationPayload OptimizationPayload;
             public IReadOnlyList<GetByXPathAttribute.XPathInfo> OrXPathInfoList;
         }
@@ -75,6 +76,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             foreach (XPathResourceInfo orXPathInfoList in andXPathInfoList)
             {
+#if SAINTSFIELD_AUTO_GETTER_RESOURCE_OPTIMIZE
                 if (orXPathInfoList.OptimizationPayload != null)
                 {
                     (string error, bool hasElement, IEnumerable<object> optimizedResult) = GetXPathByOptimized(orXPathInfoList.OptimizationPayload, property, info);
@@ -89,6 +91,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         continue;
                     }
                 }
+#endif
 
                 // Debug.Log($"loop andXPathInfoList");
                 foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList.OrXPathInfoList)
@@ -159,7 +162,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                                 {
                                     return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
                                 }
+#pragma warning disable CS0168 // Variable is declared but never used
                                 catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                                 {
 #if SAINTSFIELD_DEBUG
                                     Debug.LogException(e);

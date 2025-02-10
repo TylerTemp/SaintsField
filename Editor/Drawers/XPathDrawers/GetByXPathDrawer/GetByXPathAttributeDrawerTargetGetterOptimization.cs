@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Utils;
 using SaintsField.SaintsXPathParser.Optimization;
 using UnityEditor;
 using UnityEngine;
@@ -15,6 +14,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     {
         private static (string error, bool hasElement, IEnumerable<object> results) GetXPathByOptimized(OptimizationPayload optimizationPayload, SerializedProperty property, MemberInfo info)
         {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (optimizationPayload)
             {
                 case GetComponentPayload getComponentPayload:
@@ -395,7 +395,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     // componentInParent = interfaceType == null
                     //     ? curCheckingTrans.GetComponent(type)
                     //     : curCheckingTrans.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
-                    Debug.Log($"{type}: {curCheckingTrans}");
+                    // Debug.Log($"{type}: {curCheckingTrans}");
                     componentsInParents.AddRange(interfaceType == null
                         ? curCheckingTrans.GetComponents(type)
                         : curCheckingTrans.GetComponents(type).Where(interfaceType.IsInstanceOfType).ToArray()

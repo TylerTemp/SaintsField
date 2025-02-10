@@ -81,14 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.25.0**
+**3.25.1**
 
-1.  UI Toolkit: Add `LocalizedStringPicker` for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
-2.  UI Toolkit: fix data didn't get saved if the fallback drawer is a IMGUI drawer
-3.  UI Toolkit: fix `ResiziableTextArea` didn't update the display when the value is changed by external code.
-4.  UI Toolkit: fix `AdvancedDropdown` search might miss some results when multiple value uses the same last name.
-5.  UI Toolkit: now `AdvancedDropdown` support search for paths too (previously only support value search). This is only avaiable for UI Toolkit because IMGUI uses Unity's built-in version and lack of this ability.
-6.  UI Toolkit: now `AdvancedDropdown` search will display its parent path.
+1.  IMGUI: `LocalizedStringPicker` is now supported in IMGUI too.
+2.  (Experimental): Optimize auto getters. This feature is disabled by default. Add `SAINTSFIELD_AUTO_GETTER_RESOURCE_OPTIMIZE` to try. This feature will be enabled by default when it's stable.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.25.1 ##
+
+1.  IMGUI: `LocalizedStringPicker` is now supported in IMGUI too.
+2.  (Experimental): Optimize auto getters. This feature is disabled by default. Add `SAINTSFIELD_AUTO_GETTER_RESOURCE_OPTIMIZE` to try. This feature will be enabled by default when it's stable.
+
 ## 3.25.0 ##
 
 1.  UI Toolkit: Add `LocalizedStringPicker` for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
