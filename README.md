@@ -83,11 +83,12 @@ namespace: `SaintsField`
 
 **3.25.0**
 
-1.  Add `LocalizedStringPicker` for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
-2.  UI Toolkit: fix `ResiziableTextArea` didn't update the display when the value is changed by external code.
-3.  UI Toolkit: fix `AdvancedDropdown` search might miss some results when multiple value uses the same last name.
-4.  UI Toolkit: now `AdvancedDropdown` support search for paths too (previously only support value search). This is only avaiable for UI Toolkit because IMGUI uses Unity's built-in version and lack of this ability.
-5.  UI Toolkit: now `AdvancedDropdown` search will display its parent path.
+1.  UI Toolkit: Add `LocalizedStringPicker` for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
+2.  UI Toolkit: fix data didn't get saved if the fallback drawer is a IMGUI drawer
+3.  UI Toolkit: fix `ResiziableTextArea` didn't update the display when the value is changed by external code.
+4.  UI Toolkit: fix `AdvancedDropdown` search might miss some results when multiple value uses the same last name.
+5.  UI Toolkit: now `AdvancedDropdown` support search for paths too (previously only support value search). This is only avaiable for UI Toolkit because IMGUI uses Unity's built-in version and lack of this ability.
+6.  UI Toolkit: now `AdvancedDropdown` search will display its parent path.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4493,6 +4494,52 @@ public int areaName;
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
 
+## Netcode for Game Objects ##
+
+Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) uses a custom editor that
+`SaintsEditor` can not be applied to.
+
+To use ability from `SaintsEditor`, the most simple way is to inherent from `SaintsField.Playa.SaintsNetworkBehaviour`
+
+```csharp
+using SaintsField.Playa;
+using Unity.Netcode;
+using UnityEngine;
+
+public class RpcTestSaints : SaintsNetworkBehaviour  // inherent this one
+{
+    [PlayaInfoBox("Saints Info Box for Array")]  // SaintsEditor specific decorator
+    public int[] normalIntArrays;
+
+    [LayoutStart("SaintsLayout", ELayout.FoldoutBox)]  // SaintsEditor specific decorator
+    public string normalString;
+
+    [ResizableTextArea]
+    public string content;
+
+    public NetworkVariable<int> testVar = new NetworkVariable<int>(0);
+    public NetworkList<bool> TestList = new NetworkList<bool>();
+
+    [Button]  // SaintsEditor specific decorator
+    private void TestRpc()
+    {
+        Debug.Log("Button Invoked");
+    }
+}
+```
+
+Result using `SaintsNetworkBehaviour`:
+
+![image](https://github.com/user-attachments/assets/1ee1cf4e-8f3f-49d8-94c3-c37449246cdc)
+
+Result using default one:
+
+![image](https://github.com/user-attachments/assets/74952ea4-60f1-4327-8f17-4db6c06b820d)
+
+The drawer is called `SaintsField.Editor.Playa.NetCode.SaintsNetworkBehaviourEditor`, in case if you want to apply it manually.
+
+Please note: `NetworkVariable` and `NetworkList` will always be rendered at the top, just like Unity's default behavior. Putting it under `Layout` will not change this order and will have no effect.
+
 ## Spine ##
 
 [`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`,
@@ -4633,6 +4680,23 @@ public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be a
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
+
+## I2 Localization ##
+
+Tools for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
+
+NameSpace: `SaintsField.I2Loc`
+
+### `LocalizedStringPicker` ###
+
+Pick a term from `I2 Localization` to a string field or a `LocalizedString` field. Support search so you don't need to deal with I2's default painful picker.
+
+```csharp
+using SaintsField.I2Loc;
+
+[LocalizedStringPicker] public LocalizedString displayNameTerm;
+[LocalizedStringPicker] public string descriptionTerm;
+```
 
 ## SaintsEditor ##
 
@@ -5259,49 +5323,3 @@ My (not full) test about compatibility:
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
 *   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
 *   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good when it's inside Odin's own serializer.
-
-#### Netcode for Game Objects ####
-
-Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) uses a custom editor that
-`SaintsEditor` can not be applied to.
-
-To use ability from `SaintsEditor`, the most simple way is to inherent from `SaintsField.Playa.SaintsNetworkBehaviour`
-
-```csharp
-using SaintsField.Playa;
-using Unity.Netcode;
-using UnityEngine;
-
-public class RpcTestSaints : SaintsNetworkBehaviour  // inherent this one
-{
-    [PlayaInfoBox("Saints Info Box for Array")]  // SaintsEditor specific decorator
-    public int[] normalIntArrays;
-
-    [LayoutStart("SaintsLayout", ELayout.FoldoutBox)]  // SaintsEditor specific decorator
-    public string normalString;
-
-    [ResizableTextArea]
-    public string content;
-
-    public NetworkVariable<int> testVar = new NetworkVariable<int>(0);
-    public NetworkList<bool> TestList = new NetworkList<bool>();
-
-    [Button]  // SaintsEditor specific decorator
-    private void TestRpc()
-    {
-        Debug.Log("Button Invoked");
-    }
-}
-```
-
-Result using `SaintsNetworkBehaviour`:
-
-![image](https://github.com/user-attachments/assets/1ee1cf4e-8f3f-49d8-94c3-c37449246cdc)
-
-Result using default one:
-
-![image](https://github.com/user-attachments/assets/74952ea4-60f1-4327-8f17-4db6c06b820d)
-
-The drawer is called `SaintsField.Editor.Playa.NetCode.SaintsNetworkBehaviourEditor`, in case if you want to apply it manually.
-
-Please note: `NetworkVariable` and `NetworkList` will always be rendered at the top, just like Unity's default behavior. Putting it under `Layout` will not change this order and will have no effect.
