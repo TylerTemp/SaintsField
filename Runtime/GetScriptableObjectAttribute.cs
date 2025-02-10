@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
@@ -13,6 +14,7 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public readonly string PathSuffix;
 
         public GetScriptableObjectAttribute(string pathSuffix=null, string groupBy="")
@@ -22,6 +24,8 @@ namespace SaintsField
             ParseOptions(SaintsFieldConfigUtil.GetScriptableObjectExp(EXP.NoPicker | EXP.NoAutoResignToNull));
             ParseXPath(pathSuffix);
             GroupBy = groupBy;
+
+            OptimizationPayload = new GetScriptableObjectPayload(PathSuffix);
         }
 
         public GetScriptableObjectAttribute(EXP config, string pathSuffix=null, string groupBy="")
@@ -29,6 +33,8 @@ namespace SaintsField
             ParseOptions(config);
             ParseXPath(pathSuffix);
             GroupBy = groupBy;
+
+            OptimizationPayload = new GetScriptableObjectPayload(null);
         }
 
         private void ParseXPath(string pathSuffix)

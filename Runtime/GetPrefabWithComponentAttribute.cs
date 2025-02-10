@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
@@ -13,6 +14,7 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
+        // ReSharper disable once NotAccessedField.Global
         public readonly Type CompType;
 
         public GetPrefabWithComponentAttribute(Type compType = null, string groupBy = "")
@@ -22,6 +24,8 @@ namespace SaintsField
             GroupBy = groupBy;
 
             CompType = compType;
+
+            OptimizationPayload = new GetPrefabWithComponentPayload(compType);
         }
 
         public GetPrefabWithComponentAttribute(EXP config, Type compType = null, string groupBy = "")
@@ -29,6 +33,8 @@ namespace SaintsField
             ParseOptions(config);
             ParseXPath(compType);
             GroupBy = groupBy;
+
+            OptimizationPayload = new GetPrefabWithComponentPayload(compType);
         }
 
         private void ParseXPath(Type compType)

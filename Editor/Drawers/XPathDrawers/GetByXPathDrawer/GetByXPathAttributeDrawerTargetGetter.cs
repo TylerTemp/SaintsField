@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 if (orXPathInfoList.OptimizationPayload != null)
                 {
                     (string error, bool hasElement, IEnumerable<object> optimizedResult) = GetXPathByOptimized(orXPathInfoList.OptimizationPayload, property, info);
-                    if (error != "")
+                    if (error == "")
                     {
                         if(hasElement)
                         {

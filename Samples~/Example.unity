@@ -9609,8 +9609,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eba59f5cd9bb4c5bb64507a216fd5d97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  directParent: {fileID: 579857408}
-  directParentDifferentType: {fileID: 579857407}
+  directParent: {fileID: 0}
+  directParentDifferentType: {fileID: 0}
   directNoSuch: {fileID: 0}
   searchParent: {fileID: 579857408}
   searchParentDifferentType: {fileID: 579857407}
@@ -10098,7 +10098,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 746735700}
-  - component: {fileID: 746735699}
+  - component: {fileID: 746735701}
   m_Layer: 0
   m_Name: GetComponentInScene
   m_TagString: Untagged
@@ -10106,24 +10106,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &746735699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 746735698}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cd68cd23c614bcab6f5007c1c403a17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myDummy: {fileID: 1271404094}
-  myDummyTrans: {fileID: 1271404091}
-  myDummyGo: {fileID: 1271404088}
-  myDummyXPath: {fileID: 1271404094}
-  myDummyTransXPath: {fileID: 1271404091}
-  myDummyGoXPath: {fileID: 1271404088}
 --- !u!4 &746735700
 Transform:
   m_ObjectHideFlags: 0
@@ -10139,6 +10121,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &746735701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746735698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cd68cd23c614bcab6f5007c1c403a17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myDummy: {fileID: 1271404094}
+  myDummyTrans: {fileID: 1271404091}
+  myDummyGo: {fileID: 1271404088}
+  myDummyXPath: {fileID: 0}
+  myDummyTransXPath: {fileID: 0}
+  myDummyGoXPath: {fileID: 0}
 --- !u!1 &768079759
 GameObject:
   m_ObjectHideFlags: 0

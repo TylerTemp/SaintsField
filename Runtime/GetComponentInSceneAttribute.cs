@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
@@ -13,7 +14,9 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
+        // ReSharper disable once NotAccessedField.Global
         public readonly Type CompType;
+        // ReSharper disable once NotAccessedField.Global
         public readonly bool IncludeInactive;
 
         public GetComponentInSceneAttribute(bool includeInactive = false, Type compType = null, string groupBy = "")
@@ -24,6 +27,8 @@ namespace SaintsField
 
             CompType = compType;
             IncludeInactive = includeInactive;
+
+            OptimizationPayload = new GetComponentInScenePayload(includeInactive, compType);
         }
 
         private void ParseArguments(bool includeInactive, Type compType)

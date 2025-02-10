@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
@@ -29,6 +30,8 @@ namespace SaintsField
             IncludeInactive = includeInactive;
             CompType = compType;
             ExcludeSelf = excludeSelf;
+
+            OptimizationPayload = new GetComponentInParentsPayload(IncludeInactive, CompType, ExcludeSelf, 0);
         }
 
         public GetComponentInParentsAttribute(EXP config, bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
@@ -40,6 +43,8 @@ namespace SaintsField
             IncludeInactive = includeInactive;
             CompType = compType;
             ExcludeSelf = excludeSelf;
+
+            OptimizationPayload = new GetComponentInParentsPayload(IncludeInactive, CompType, ExcludeSelf, 0);
         }
 
         private void ParseArguments(bool includeInactive, Type compType, bool excludeSelf)
