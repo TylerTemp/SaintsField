@@ -1,4 +1,4 @@
-﻿#if SAINTSFIELD_DEBUG_IMGUI_DEBUGGER
+﻿#if SAINTSFIELD_DEBUG
 using System;
 using UnityEditor;
 

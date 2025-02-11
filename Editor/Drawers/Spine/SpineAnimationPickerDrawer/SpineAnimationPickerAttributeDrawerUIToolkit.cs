@@ -133,6 +133,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                         if (property.propertyType == SerializedPropertyType.String)
                         {
                             string curValue = (string)curItem;
+                            curValue ??= "";
                             property.stringValue = curValue;
                             property.serializedObject.ApplyModifiedProperties();
                             onValueChangedCallback(curValue);

@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         Debug.Log($"processing xpath {xPathStep}");
     #endif
 
-                        IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.Axis, xPathStep.NodeTest, accValues);
+                        IEnumerable<ResourceInfo> sepResources = GetValuesFromSep(xPathStep.SepCount, xPathStep.Axis, xPathStep.NodeTest, accValues, property);
                         // IEnumerable<ResourceInfo> axisResources = GetValuesFromAxis(xPathStep.Axis, sepResources);
 
                         IEnumerable<ResourceInfo> nodeTestResources = GetValuesFromNodeTest(xPathStep.NodeTest, sepResources);
@@ -234,7 +234,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
         }
 
-        private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, Axis axis, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues)
+        private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, Axis axis, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues, SerializedProperty property)
         {
             switch (axis)
             {
@@ -320,7 +320,23 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 case Axis.Scene:
                 {
-                    Scene scene = SceneManager.GetActiveScene();
+                    Scene scene = default;
+                    Object obj = property.serializedObject.targetObject;
+                    // ReSharper disable once ConvertIfStatementToSwitchStatement
+                    if(obj is GameObject go)
+                    {
+                        scene = go.scene;
+                    }
+                    else if (obj is Component comp)
+                    {
+                        scene = comp.gameObject.scene;
+                    }
+
+                    if (!scene.IsValid())
+                    {
+                        scene = SceneManager.GetActiveScene();
+                    }
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                     Debug.Log($"Axis return scene {scene}");
 #endif

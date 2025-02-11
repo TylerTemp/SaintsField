@@ -1,0 +1,57 @@
+{
+"skeleton": {
+	"hash": "5imLZOPNln0",
+	"spine": "4.2.39",
+	"x": -6,
+	"y": -129,
+	"width": 1,
+	"height": 1,
+	"images": "./images/",
+	"audio": "./audio"
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "bone", "parent": "root", "length": 86.68, "rotation": -39.38, "x": 1.5, "y": -1.5 },
+	{ "name": "bone2", "parent": "bone", "length": 103.25, "rotation": -96.4, "x": 86.68 },
+	{ "name": "bone3", "parent": "bone2", "length": 80.62, "rotation": 89.78, "x": 103.25 }
+],
+"slots": [
+	{ "name": "White1", "bone": "bone3", "attachment": "White1" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"White1": {
+				"White1": { "rotation": 46.01, "width": 1, "height": 1 }
+			}
+		}
+	},
+	{ "name": "Basic" },
+	{ "name": "Holiday" }
+],
+"animations": {
+	"Idle": {
+		"bones": {
+			"bone": {
+				"rotate": [
+					{},
+					{ "time": 0.3, "value": 11.88 },
+					{ "time": 0.6667 }
+				]
+			}
+		}
+	},
+	"Run": {
+		"bones": {
+			"bone3": {
+				"rotate": [
+					{},
+					{ "time": 0.2667, "value": 33.2 },
+					{ "time": 0.3333 }
+				]
+			}
+		}
+	}
+}
+}
