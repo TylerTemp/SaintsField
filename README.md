@@ -4593,7 +4593,7 @@ public SkeletonAnimation _spine;
 [SpineSkinPicker(nameof(_spine))] private string skinNameFromTarget;
 ```
 
-
+![spine_skin](https://github.com/user-attachments/assets/d5832ffb-ebc1-4482-897b-6126998db285)
 
 ## DOTween ##
 
