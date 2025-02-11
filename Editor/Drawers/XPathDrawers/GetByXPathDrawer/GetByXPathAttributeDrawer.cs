@@ -134,10 +134,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return !equal;
         }
 
-        private static void UpdateSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info, bool isImGui)
+        private static void UpdateSharedCacheBase(GetByXPathGenericCache target, SerializedProperty property, FieldInfo info)
         {
-            target.UpdatedLastTime = EditorApplication.timeSinceStartup;
-
             target.Error = "";
             if (target.Parent == null || target.GetByXPathAttributes == null)
             {
@@ -150,11 +148,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 target.Parent = parent;
             }
-
-            // if (NothingSigner(target.GetByXPathAttributes[0]))
-            // {
-            //     return;
-            // }
 
             bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
 
@@ -183,6 +176,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     if (arrError != "")
                     {
                         target.Error = arrError;
+                        target.ArrayProperty = null;
                         return;
                     }
 
@@ -203,61 +197,44 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 target.ExpectedType = expectType;
                 target.ExpectedInterface = expectInterface;
             }
+        }
 
-            bool refreshResources = true;
-            if (isImGui)
+        private static void UpdateSharedCacheSource(GetByXPathGenericCache target, SerializedProperty property, FieldInfo info)
+        {
+            target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
+            GetXPathValuesResult iterResults = GetXPathValues(
+                target.GetByXPathAttributes
+                    .Select(xPathAttribute => new XPathResourceInfo
+                    {
+                        OptimizationPayload = xPathAttribute.OptimizationPayload,
+                        OrXPathInfoList = xPathAttribute.XPathInfoAndList.SelectMany(each => each).ToArray(),
+                    })
+                    .ToArray(),
+                target.ExpectedType,
+                target.ExpectedInterface,
+                property,
+                info,
+                target.Parent);
+
+            bool isArray = target.ArrayProperty != null;
+
+            target.CachedResults
+                = isArray
+                    ? iterResults.Results.ToArray()
+                    : new[] { iterResults.Results.FirstOrDefault() };
+        }
+
+        private static void UpdateSharedCacheSetValue(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info)
+        {
+            if (target.Error != "")
             {
-                refreshResources = EditorApplication.timeSinceStartup - target.UpdatedLastTime > SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI() / 1000f;
-                // ReSharper disable once ConvertIfToOrExpression
-                if (!refreshResources && target.CachedResults == null)
-                {
-                    refreshResources = true;
-                }
+                return;
             }
+
+            IReadOnlyList<object> expandedResults = target.CachedResults;
+            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
 
             bool nothingSigner = NothingSigner(target.GetByXPathAttributes[0]);
-
-            IReadOnlyList<object> expandedResults;
-            if(refreshResources)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"#GetByXPath# refresh resources for {property.propertyPath}");
-#endif
-                if (nothingSigner)
-                {
-                    expandedResults
-                        = target.CachedResults
-                            = isArray ? new object[] { } : new object[] { null };
-                }
-                else
-                {
-                    target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
-                    GetXPathValuesResult iterResults = GetXPathValues(
-                        target.GetByXPathAttributes
-                            .Select(xPathAttribute => new XPathResourceInfo
-                            {
-                                OptimizationPayload = xPathAttribute.OptimizationPayload,
-                                OrXPathInfoList = xPathAttribute.XPathInfoAndList.SelectMany(each => each).ToArray(),
-                            })
-                            .ToArray(),
-                        target.ExpectedType,
-                        target.ExpectedInterface,
-                        property,
-                        info,
-                        target.Parent);
-
-                    expandedResults
-                        = target.CachedResults
-                            = isArray
-                                ? iterResults.Results.ToArray()
-                                : new[] { iterResults.Results.FirstOrDefault() };
-                }
-            }
-            else
-            {
-                expandedResults = target.CachedResults;
-            }
-
 
             if(!nothingSigner && isArray && target.ArrayProperty.arraySize != expandedResults.Count)
             {
@@ -291,16 +268,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 int propertyCacheKey = isArray
                     ? index
                     : -1;
-                // if(!target.IndexToPropertyCache.TryGetValue(propertyCacheKey, out PropertyCache propertyCache))
-                // {
-                //     (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
-                //     propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
-                //     {
-                //         MemberInfo = fieldOrProp.IsField? fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
-                //         Parent = fieldParent,
-                //         SerializedProperty = processingProperty,
-                //     };
-                // }
+
                 (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
                 // Debug.Log(propertyCacheKey);
                 PropertyCache propertyCache = target.IndexToPropertyCache[propertyCacheKey] = new PropertyCache
@@ -319,7 +287,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 // Debug.Log($"#GetByXPath# IndexToPropertyCache[{propertyCacheKey}] = {propertyCache}");
 
-                // propertyCache.SerializedProperty = processingProperty;
 
                 (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty, propertyCache.MemberInfo, propertyCache.Parent);
                 if (originalValueError != "")
@@ -361,6 +328,45 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }
         }
+
+//         private static void UpdateSharedCache(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info, bool isImGui)
+//         {
+//             target.UpdatedLastTime = EditorApplication.timeSinceStartup;
+//
+//             UpdateSharedCacheBase(target, isFirstTime, property, info, isImGui);
+//
+//             if (target.Error != "")
+//             {
+//                 return;
+//             }
+//
+//             bool refreshResources = true;
+//             if (isImGui)
+//             {
+//                 refreshResources = EditorApplication.timeSinceStartup - target.UpdatedLastTime > SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI() / 1000f;
+//                 // ReSharper disable once ConvertIfToOrExpression
+//                 if (!refreshResources && target.CachedResults == null)
+//                 {
+//                     refreshResources = true;
+//                 }
+//             }
+//
+//             bool nothingSigner = NothingSigner(target.GetByXPathAttributes[0]);
+//
+//             if(refreshResources)
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+//                 Debug.Log($"#GetByXPath# refresh resources for {property.propertyPath}");
+// #endif
+//                 if (!nothingSigner)
+//                 {
+//                     target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
+//                     UpdateSharedCacheSource(target, isFirstTime, property, info, isImGui);
+//                 }
+//             }
+//
+//             UpdateSharedCacheSetValue(target, isFirstTime, property, info, isImGui);
+//         }
 
         // no longer process with element remove, because we'll always adjust array size to correct size.
         private static void DoSignPropertyCache(PropertyCache propertyCache, bool notice)

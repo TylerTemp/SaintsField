@@ -7,7 +7,9 @@
         "today.comes.saintsfield.Runtime.I2Loc",
         "com.inter-illusion.i2"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

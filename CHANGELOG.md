@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.26.0 ##
+
+1.  Add `SpineSkinPicker` to pick a spine skin from a spine skeleton.
+2.  Improve auto getters how they find the scene for `scene::` selector.
+3.  Fix `I2Loc` package compile error on build.
+
 ## 3.25.1 ##
 
 1.  IMGUI: `LocalizedStringPicker` is now supported in IMGUI too.

@@ -505,7 +505,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d25a8773865d82e40ab41a8f7f6a6f1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skinPicked: 
+  skin: 
+  skinPicked: default
 --- !u!114 &1671930997
 MonoBehaviour:
   m_ObjectHideFlags: 0

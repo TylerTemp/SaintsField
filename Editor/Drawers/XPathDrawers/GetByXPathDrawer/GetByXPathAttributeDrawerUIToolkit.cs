@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
@@ -140,6 +141,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             string propertyPath;
             try
             {
+                // ReSharper disable once RedundantAssignment
                 propertyPath = property.propertyPath;
             }
             catch (ObjectDisposedException)
@@ -168,35 +170,74 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             });
 
             bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
-            bool needUpdate = !configExists;
-            if (configExists)
-            {
-                double curTime = EditorApplication.timeSinceStartup;
-                double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
-                needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
-                // if(needUpdate)
-                // {
-                //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
-                // }
-            }
 
-            if (needUpdate)
+            if (!configExists)
             {
-                genericCache ??= new GetByXPathGenericCache
+                SharedCache[arrayRemovedKey] = genericCache = new GetByXPathGenericCache
                 {
                     Error = "",
                     GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
+                    UpdateResourceAfterTime = double.MinValue,
                 };
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
-#endif
-                UpdateSharedCache(genericCache, !configExists, property, info, false);
-                if (genericCache.Error != "")
+
+                void ProjectChangedHandler()
                 {
-                    SetErrorMessage(genericCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
-                    return;
+                    if(SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache cache))
+                    {
+                        double curTime = EditorApplication.timeSinceStartup;
+                        if (cache.UpdateResourceAfterTime <= curTime)
+                        {
+                            // update resources after 0.5s
+                            cache.UpdateResourceAfterTime = EditorApplication.timeSinceStartup + 0.5;
+                        }
+
+                    }
                 }
-                SharedCache[arrayRemovedKey] = genericCache;
+
+                SaintsEditorApplicationChanged.OnProjectChangedEvent.AddListener(ProjectChangedHandler);
+
+                NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+                {
+                    SaintsEditorApplicationChanged.OnProjectChangedEvent.RemoveListener(ProjectChangedHandler);
+                    SharedCache.Remove(arrayRemovedKey);
+                });
+            }
+
+//             bool needUpdate = !configExists;
+//             if (configExists)
+//             {
+//                 double curTime = EditorApplication.timeSinceStartup;
+//                 double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+//                 needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
+//                 // if(needUpdate)
+//                 // {
+//                 //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
+//                 // }
+//             }
+//
+//             if (needUpdate)
+//             {
+//                 genericCache ??= new GetByXPathGenericCache
+//                 {
+//                     Error = "",
+//                     GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
+//                 };
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+//                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
+// #endif
+//                 UpdateSharedCache(genericCache, !configExists, property, info, false);
+//                 if (genericCache.Error != "")
+//                 {
+//                     SetErrorMessage(genericCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
+//                     return;
+//                 }
+//                 SharedCache[arrayRemovedKey] = genericCache;
+//             }
+
+            if (genericCache.Error != "")
+            {
+                SetErrorMessage(genericCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
+                return;
             }
 
             GetByXPathAttribute firstGetByXPath = allAttributes.OfType<GetByXPathAttribute>().First();
@@ -223,6 +264,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 return;
             }
+
+            UpdateSharedCacheBase(genericCache, property, info);
+            UpdateSharedCacheSource(genericCache, property, info);
+            UpdateSharedCacheSetValue(genericCache, true, property, info);
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(propertyPath);
 
@@ -287,131 +332,150 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }
 
-            int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
-            if (loop > 0)
+            // int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
+            // if (loop > 0)
+            // {
+            //     container.schedule.Execute(() =>
+            //         ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
+            //             info)).Every(loop);
+            // }
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        {
+            string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
+            if (!SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache target))
             {
-                container.schedule.Execute(() =>
-                    ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
-                        info)).Every(loop);
+                return;
+            }
+
+            // timeout, update now
+            if(target.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
+            {
+                UpdateSharedCacheBase(target, property, info);
+                UpdateSharedCacheSource(target, property, info);
+                target.UpdateResourceAfterTime = double.MinValue;
+                UpdateSharedCacheSetValue(target, false, property, info);
             }
         }
 
         // private string _toastInfoUIToolkit = "";
         // private static readonly HashSet<string> ToastInfoUIToolkit = new HashSet<string>();
 
-        private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        {
-            if (EditorApplication.isPlaying)
-            {
-                return;
-            }
-
-            string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
-
-            bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
-            bool needUpdate = !configExists;
-            if (configExists)
-            {
-                double curTime = EditorApplication.timeSinceStartup;
-                double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI();
-                needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
-                // if(needUpdate)
-                // {
-                //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
-                // }
-            }
-
-            if (needUpdate)
-            {
-                genericCache ??= new GetByXPathGenericCache
-                {
-                    Error = "",
-                };
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
-#endif
-                UpdateSharedCache(genericCache, !configExists, property, info, false);
-                SharedCache[arrayRemovedKey] = genericCache;
-            }
-
-            // VisualElement firstRoot = container.Q<VisualElement>(NameContainer(property, index));
-//             if (firstRoot == null)
+//         private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
+//             VisualElement container, Action<object> onValueChanged, FieldInfo info)
+//         {
+//             if (EditorApplication.isPlaying)
 //             {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-//                 Debug.Log($"{property.propertyPath} no root");
-// #endif
 //                 return;
 //             }
-
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            // update information for this property
-            if (!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
-            {
-                return;
-            }
-            GetByXPathAttribute firstAttribute = genericCache.GetByXPathAttributes[0];
-            Button refreshButton = container.Q<Button>(NameResignButton(property, index));
-            Button removeButton = container.Q<Button>(NameRemoveButton(property, index));
-            if (propertyCache.MisMatch)
-            {
-                if (firstAttribute.UseResignButton)
-                {
-
-
-                    bool targetIsNull = propertyCache.TargetIsNull;
-                    if (targetIsNull)
-                    {
-                        if (removeButton.style.display != DisplayStyle.Flex)
-                        {
-                            removeButton.style.display = DisplayStyle.Flex;
-                        }
-
-                        if (refreshButton.style.display != DisplayStyle.None)
-                        {
-                            refreshButton.style.display = DisplayStyle.None;
-                        }
-                    }
-                    else
-                    {
-                        if (removeButton.style.display != DisplayStyle.None)
-                        {
-                            removeButton.style.display = DisplayStyle.None;
-                        }
-
-                        if (refreshButton.style.display != DisplayStyle.Flex)
-                        {
-                            refreshButton.style.display = DisplayStyle.Flex;
-                        }
-                    }
-                }
-                else if (firstAttribute.UseErrorMessage)
-                {
-                    SetErrorMessage(
-                        GetMismatchErrorMessage(propertyCache.OriginalValue, propertyCache.TargetValue, propertyCache.TargetIsNull),
-                        container.Q<HelpBox>(name: NameHelpBox(property, index)),
-                        property,
-                        index);
-                }
-            }
-            else
-            {
-                // Debug.Log(container.Q<HelpBox>(name: NameHelpBox(property, index)));
-                SetErrorMessage(
-                    "",
-                    container.Q<HelpBox>(name: NameHelpBox(property, index)),
-                    property,
-                    index);
-                if (removeButton.style.display != DisplayStyle.None)
-                {
-                    removeButton.style.display = DisplayStyle.None;
-                }
-                if (refreshButton.style.display != DisplayStyle.None)
-                {
-                    refreshButton.style.display = DisplayStyle.None;
-                }
-            }
-        }
+//
+//             string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
+//
+//             bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
+//             bool needUpdate = !configExists;
+//             if (configExists)
+//             {
+//                 double curTime = EditorApplication.timeSinceStartup;
+//                 double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI();
+//                 needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
+//                 // if(needUpdate)
+//                 // {
+//                 //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
+//                 // }
+//             }
+//
+//             if (needUpdate)
+//             {
+//                 genericCache ??= new GetByXPathGenericCache
+//                 {
+//                     Error = "",
+//                 };
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+//                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
+// #endif
+//                 UpdateSharedCache(genericCache, !configExists, property, info, false);
+//                 SharedCache[arrayRemovedKey] = genericCache;
+//             }
+//
+//             // VisualElement firstRoot = container.Q<VisualElement>(NameContainer(property, index));
+// //             if (firstRoot == null)
+// //             {
+// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+// //                 Debug.Log($"{property.propertyPath} no root");
+// // #endif
+// //                 return;
+// //             }
+//
+//             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+//             // update information for this property
+//             if (!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
+//             {
+//                 return;
+//             }
+//             GetByXPathAttribute firstAttribute = genericCache.GetByXPathAttributes[0];
+//             Button refreshButton = container.Q<Button>(NameResignButton(property, index));
+//             Button removeButton = container.Q<Button>(NameRemoveButton(property, index));
+//             if (propertyCache.MisMatch)
+//             {
+//                 if (firstAttribute.UseResignButton)
+//                 {
+//
+//
+//                     bool targetIsNull = propertyCache.TargetIsNull;
+//                     if (targetIsNull)
+//                     {
+//                         if (removeButton.style.display != DisplayStyle.Flex)
+//                         {
+//                             removeButton.style.display = DisplayStyle.Flex;
+//                         }
+//
+//                         if (refreshButton.style.display != DisplayStyle.None)
+//                         {
+//                             refreshButton.style.display = DisplayStyle.None;
+//                         }
+//                     }
+//                     else
+//                     {
+//                         if (removeButton.style.display != DisplayStyle.None)
+//                         {
+//                             removeButton.style.display = DisplayStyle.None;
+//                         }
+//
+//                         if (refreshButton.style.display != DisplayStyle.Flex)
+//                         {
+//                             refreshButton.style.display = DisplayStyle.Flex;
+//                         }
+//                     }
+//                 }
+//                 else if (firstAttribute.UseErrorMessage)
+//                 {
+//                     SetErrorMessage(
+//                         GetMismatchErrorMessage(propertyCache.OriginalValue, propertyCache.TargetValue, propertyCache.TargetIsNull),
+//                         container.Q<HelpBox>(name: NameHelpBox(property, index)),
+//                         property,
+//                         index);
+//                 }
+//             }
+//             else
+//             {
+//                 // Debug.Log(container.Q<HelpBox>(name: NameHelpBox(property, index)));
+//                 SetErrorMessage(
+//                     "",
+//                     container.Q<HelpBox>(name: NameHelpBox(property, index)),
+//                     property,
+//                     index);
+//                 if (removeButton.style.display != DisplayStyle.None)
+//                 {
+//                     removeButton.style.display = DisplayStyle.None;
+//                 }
+//                 if (refreshButton.style.display != DisplayStyle.None)
+//                 {
+//                     refreshButton.style.display = DisplayStyle.None;
+//                 }
+//             }
+//         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container,
