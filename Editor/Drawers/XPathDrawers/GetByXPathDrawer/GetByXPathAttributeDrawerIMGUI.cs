@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,12 +30,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private class GetByXPathGenericCache
         {
-            public int ImGuiRenderCount;  // IMGUI fix
-            public double ImGuiResourcesLastTime;  // IMGUI fix
+            // public int ImGuiRenderCount;  // IMGUI fix
+            // public double ImGuiResourcesLastTime;  // IMGUI fix
 
             public double UpdateResourceAfterTime;
 
-            public double UpdatedLastTime;
+            // public double UpdatedLastTime;
             public string Error;
 
             // public Texture2D RefreshIcon;
@@ -56,7 +55,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static readonly Dictionary<string, GetByXPathGenericCache> SharedCache = new Dictionary<string, GetByXPathGenericCache>();
 
-        private static readonly Dictionary<UnityEngine.Object, HashSet<string>> InspectingTargets = new Dictionary<UnityEngine.Object, HashSet<string>>();
+        // private static readonly Dictionary<UnityEngine.Object, HashSet<string>> InspectingTargets = new Dictionary<UnityEngine.Object, HashSet<string>>();
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
@@ -90,37 +89,37 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return 0;
             }
 
-            UnityEngine.Object curInspectingTarget = property.serializedObject.targetObject;
-            if (!InspectingTargets.TryGetValue(curInspectingTarget, out HashSet<string> keySet))
-            {
-                InspectingTargets[curInspectingTarget] = keySet = new HashSet<string>();
-
-                void OnSelectionChangedIMGUI()
-                {
-                    bool stillSelected = Array.IndexOf(Selection.objects, curInspectingTarget) != -1;
-                    // Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
-                    if (stillSelected)
-                    {
-                        return;
-                    }
-
-                    Selection.selectionChanged -= OnSelectionChangedIMGUI;
-                    if (InspectingTargets.TryGetValue(curInspectingTarget, out HashSet<string> set))
-                    {
-                        foreach (string removeKey in set)
-                        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                            Debug.Log($"#GetByXPath# CleanUp {removeKey}");
-#endif
-                            SharedCache.Remove(removeKey);
-                        }
-                    }
-                    InspectingTargets.Remove(curInspectingTarget);
-                }
-
-                Selection.selectionChanged += OnSelectionChangedIMGUI;
-            }
-            keySet.Add(arrayRemovedKey);
+//             UnityEngine.Object curInspectingTarget = property.serializedObject.targetObject;
+//             if (!InspectingTargets.TryGetValue(curInspectingTarget, out HashSet<string> keySet))
+//             {
+//                 InspectingTargets[curInspectingTarget] = keySet = new HashSet<string>();
+//
+//                 void OnSelectionChangedIMGUI()
+//                 {
+//                     bool stillSelected = Array.IndexOf(Selection.objects, curInspectingTarget) != -1;
+//                     // Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
+//                     if (stillSelected)
+//                     {
+//                         return;
+//                     }
+//
+//                     Selection.selectionChanged -= OnSelectionChangedIMGUI;
+//                     if (InspectingTargets.TryGetValue(curInspectingTarget, out HashSet<string> set))
+//                     {
+//                         foreach (string removeKey in set)
+//                         {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+//                             Debug.Log($"#GetByXPath# CleanUp {removeKey}");
+// #endif
+//                             SharedCache.Remove(removeKey);
+//                         }
+//                     }
+//                     InspectingTargets.Remove(curInspectingTarget);
+//                 }
+//
+//                 Selection.selectionChanged += OnSelectionChangedIMGUI;
+//             }
+//             keySet.Add(arrayRemovedKey);
 
             bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
             if (!configExists)
@@ -140,7 +139,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             if (NothingSigner(genericCache.GetByXPathAttributes[0]))
             {
-                return firstAttribute.UsePickerButton ? SingleLineHeight : 0;;
+                return firstAttribute.UsePickerButton ? SingleLineHeight : 0;
             }
 
             float useWidth = firstAttribute.UsePickerButton ? SingleLineHeight : 0;
@@ -227,7 +226,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             // bool needUpdate = !configExists;
-            bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0;
+            // bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0;
             // not sure why...
             // the first pass will just fall. And the old version need 2 pass. This new version need 4 pass.
 //             int requiredCounter = isArray? SaintsFieldConfigUtil.GetByXPathArrayPassIMGUI(): SaintsFieldConfigUtil.GetByXPathFieldPassIMGUI();

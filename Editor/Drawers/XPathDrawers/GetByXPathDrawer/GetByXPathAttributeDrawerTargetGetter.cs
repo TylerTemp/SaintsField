@@ -76,7 +76,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             foreach (XPathResourceInfo orXPathInfoList in andXPathInfoList)
             {
-#if SAINTSFIELD_AUTO_GETTER_RESOURCE_OPTIMIZE
+// #if SAINTSFIELD_AUTO_GETTER_RESOURCE_OPTIMIZE
                 if (orXPathInfoList.OptimizationPayload != null)
                 {
                     (string error, bool hasElement, IEnumerable<object> optimizedResult) = GetXPathByOptimized(orXPathInfoList.OptimizationPayload, property, info);
@@ -91,7 +91,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         continue;
                     }
                 }
-#endif
+// #endif
 
                 // Debug.Log($"loop andXPathInfoList");
                 foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList.OrXPathInfoList)

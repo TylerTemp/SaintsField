@@ -10,7 +10,7 @@ namespace SaintsField.Utils
 
 #if UNITY_EDITOR
     [InitializeOnLoad]
-    public class SaintsFieldConfigDeleteWatcher : UnityEditor.AssetModificationProcessor
+    public class SaintsFieldConfigDeleteWatcher : AssetModificationProcessor
     {
         // ReSharper disable once EmptyConstructor
         static SaintsFieldConfigDeleteWatcher()
@@ -41,7 +41,6 @@ namespace SaintsField.Utils
         public static SaintsFieldConfig Config;
         public static string ConfigAssetPath = "";
         public static bool IsConfigLoaded;
-
 
 #if UNITY_EDITOR
 // #if UNITY_2019_2_OR_NEWER
@@ -110,10 +109,10 @@ namespace SaintsField.Utils
         public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => IsConfigLoaded && Config.disableOnValueChangedWatchArrayFieldUIToolkit;
 
         // public static int GetByXPathDelayMs() => IsConfigLoaded? Config.getByXPathDelayMs: 0;
-        public static int GetByXPathLoopIntervalMs() => IsConfigLoaded? Config.getByXPathLoopIntervalMs: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMs;
-        public static int GetByXPathLoopIntervalMsIMGUI() => IsConfigLoaded? Config.getByXPathLoopIntervalMsIMGUI: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMsIMGUI;
-        public static int GetByXPathFieldPassIMGUI() => IsConfigLoaded? Config.getByXPathFieldPassIMGUI: SaintsFieldConfig.GetByXPathDefaultFieldPassIMGUI;
-        public static int GetByXPathArrayPassIMGUI() => IsConfigLoaded? Config.getByXPathArrayPassIMGUI: SaintsFieldConfig.GetByXPathDefaultArrayPassIMGUI;
+        // public static int GetByXPathLoopIntervalMs() => IsConfigLoaded? Config.getByXPathLoopIntervalMs: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMs;
+        // public static int GetByXPathLoopIntervalMsIMGUI() => IsConfigLoaded? Config.getByXPathLoopIntervalMsIMGUI: SaintsFieldConfig.GetByXPathLoopIntervalDefaultMsIMGUI;
+        // public static int GetByXPathFieldPassIMGUI() => IsConfigLoaded? Config.getByXPathFieldPassIMGUI: SaintsFieldConfig.GetByXPathDefaultFieldPassIMGUI;
+        // public static int GetByXPathArrayPassIMGUI() => IsConfigLoaded? Config.getByXPathArrayPassIMGUI: SaintsFieldConfig.GetByXPathDefaultArrayPassIMGUI;
 
         // ReSharper disable once SimplifyConditionalTernaryExpression
         public static bool GetValidateInputLoopCheckUIToolkit() => IsConfigLoaded? Config.validateInputLoopCheckUIToolkit: SaintsFieldConfig.ValidateInputLoopCheckDefault;

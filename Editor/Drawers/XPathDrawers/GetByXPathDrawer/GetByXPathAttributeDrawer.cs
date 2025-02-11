@@ -201,7 +201,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static void UpdateSharedCacheSource(GetByXPathGenericCache target, SerializedProperty property, FieldInfo info)
         {
-            target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
+            // target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
             GetXPathValuesResult iterResults = GetXPathValues(
                 target.GetByXPathAttributes
                     .Select(xPathAttribute => new XPathResourceInfo
@@ -426,7 +426,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             GetByXPathGenericCache target = new GetByXPathGenericCache
             {
-                ImGuiRenderCount = 1,
+                // ImGuiRenderCount = 1,
                 Error = "",
                 // GetByXPathAttributes = attributes,
                 ArrayProperty = arrayProperty,
@@ -454,14 +454,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             target.ExpectedType = expectType;
             target.ExpectedInterface = expectInterface;
 
-            bool refreshResources = true;
-            if (isImGui)
-            {
-                refreshResources = EditorApplication.timeSinceStartup - target.ImGuiResourcesLastTime > SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI() / 1000f;
-            }
+            // bool refreshResources = true;
+            // if (isImGui)
+            // {
+            //     refreshResources = EditorApplication.timeSinceStartup - target.ImGuiResourcesLastTime > SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI() / 1000f;
+            // }
 
             IReadOnlyList<object> expandedResults;
-            if(refreshResources)
+            // if(true)
             {
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
@@ -484,13 +484,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 expandedResults = iterResults.Results.ToArray();
                 target.CachedResults = expandedResults;
-                target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
+                // target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
             }
-            else
-            {
-                expandedResults = target.CachedResults;
-                Debug.Assert(expandedResults != null);
-            }
+            // else
+            // {
+            //     expandedResults = target.CachedResults;
+            //     Debug.Assert(expandedResults != null);
+            // }
 
             if (expandedResults.Count == 0)
             {

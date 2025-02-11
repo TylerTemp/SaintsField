@@ -2,9 +2,12 @@
 
 ## 3.26.0 ##
 
-1.  Add `SpineSkinPicker` to pick a spine skin from a spine skeleton.
-2.  Improve auto getters how they find the scene for `scene::` selector.
-3.  Fix `I2Loc` package compile error on build.
+1.  Optimize auto getters. Some auto getters now will use Unity's built-in API first which is way faster than the `XPath` logic.
+
+    They'll also only refresh the hitting resources when you have changes in project (rather than inside a fixed loop)
+2.  Add `SpineSkinPicker` to pick a spine skin from a spine skeleton.
+3.  Improve auto getters how they find the scene for `scene::` selector.
+4.  Fix `I2Loc` package compile error on build.
 
 ## 3.25.1 ##
 

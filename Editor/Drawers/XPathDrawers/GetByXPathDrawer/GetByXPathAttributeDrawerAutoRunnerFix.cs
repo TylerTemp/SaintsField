@@ -47,7 +47,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             GetByXPathGenericCache target = new GetByXPathGenericCache
             {
-                ImGuiRenderCount = 1,
+                // ImGuiRenderCount = 1,
                 Error = "",
                 ExpectedType = expectType,
                 ExpectedInterface = expectInterface,

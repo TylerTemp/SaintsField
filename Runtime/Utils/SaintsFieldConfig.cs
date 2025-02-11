@@ -35,27 +35,27 @@ namespace SaintsField.Utils
         //
         // [Space]
 
-        [InfoBox("How often should a getter check the resource changes?\n0 means never check it", EMessageType.None)]
-        [Separator(5)]
-        [MinValue(0), AboveRichLabel("Update Interval (ms) <color=green><b>(UI Toolkit)"), RichLabel(null)]
-        [InfoBox("Update Loop Disabled <color=green>(UI Toolkit)", show: nameof(GetByXPathDelayMsDisabled), below: true)]
-        public int getByXPathLoopIntervalMs = GetByXPathLoopIntervalDefaultMs;
-        public const int GetByXPathLoopIntervalDefaultMs = 1000;
+        // [InfoBox("How often should a getter check the resource changes?\n0 means never check it", EMessageType.None)]
+        // [Separator(5)]
+        // [MinValue(0), AboveRichLabel("Update Interval (ms) <color=green><b>(UI Toolkit)"), RichLabel(null)]
+        // [InfoBox("Update Loop Disabled <color=green>(UI Toolkit)", show: nameof(GetByXPathDelayMsDisabled), below: true)]
+        // public int getByXPathLoopIntervalMs = GetByXPathLoopIntervalDefaultMs;
+        // public const int GetByXPathLoopIntervalDefaultMs = 1000;
 
-        [MinValue(0), AboveRichLabel("Update Interval (ms) <color=brown><b>(IMGUI)"), RichLabel(null)]
-        [InfoBox("Update Loop Disabled <color=red>(IMGUI)</color>", show: nameof(GetByXPathDelayMsDisabled), below: true)]
-        public int getByXPathLoopIntervalMsIMGUI = GetByXPathLoopIntervalDefaultMsIMGUI;
-        public const int GetByXPathLoopIntervalDefaultMsIMGUI = 2500;
+        // [MinValue(0), AboveRichLabel("Update Interval (ms) <color=brown><b>(IMGUI)"), RichLabel(null)]
+        // [InfoBox("Update Loop Disabled <color=red>(IMGUI)</color>", show: nameof(GetByXPathDelayMsDisabled), below: true)]
+        // public int getByXPathLoopIntervalMsIMGUI = GetByXPathLoopIntervalDefaultMsIMGUI;
+        // public const int GetByXPathLoopIntervalDefaultMsIMGUI = 2500;
 
-        private bool GetByXPathDelayMsDisabled(int v) => v <= 0;
+        // private bool GetByXPathDelayMsDisabled(int v) => v <= 0;
 
-        [InfoBox("Init Update Pass. Unity can failed on setting/getting values in IMGUI, this helps to re-sign the value with some loops. Please don't set it less than 4.<color=red><b>(IMGUI)</b></color>")]
-        [MinValue(1), AboveRichLabel("Field Pass Count<color=brown><b>(IMGUI)"), RichLabel(null)]
-        public int getByXPathFieldPassIMGUI = GetByXPathDefaultFieldPassIMGUI;
-        public const int GetByXPathDefaultFieldPassIMGUI = 20;
-        [MinValue(1), AboveRichLabel("Array Pass Count<color=brown><b>(IMGUI)"), RichLabel(null)]
-        public int getByXPathArrayPassIMGUI = GetByXPathDefaultArrayPassIMGUI;
-        public const int GetByXPathDefaultArrayPassIMGUI = 10;
+        // [InfoBox("Init Update Pass. Unity can failed on setting/getting values in IMGUI, this helps to re-sign the value with some loops. Please don't set it less than 4.<color=red><b>(IMGUI)</b></color>")]
+        // [MinValue(1), AboveRichLabel("Field Pass Count<color=brown><b>(IMGUI)"), RichLabel(null)]
+        // public int getByXPathFieldPassIMGUI = GetByXPathDefaultFieldPassIMGUI;
+        // public const int GetByXPathDefaultFieldPassIMGUI = 20;
+        // [MinValue(1), AboveRichLabel("Array Pass Count<color=brown><b>(IMGUI)"), RichLabel(null)]
+        // public int getByXPathArrayPassIMGUI = GetByXPathDefaultArrayPassIMGUI;
+        // public const int GetByXPathDefaultArrayPassIMGUI = 10;
 
         [LayoutEnd(".")]
 

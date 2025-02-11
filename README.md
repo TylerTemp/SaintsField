@@ -81,10 +81,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.25.1**
+**3.26.1**
 
-1.  IMGUI: `LocalizedStringPicker` is now supported in IMGUI too.
-2.  (Experimental): Optimize auto getters. This feature is disabled by default. Add `SAINTSFIELD_AUTO_GETTER_RESOURCE_OPTIMIZE` to try. This feature will be enabled by default when it's stable.
+1.  Optimize auto getters. Some auto getters now will use Unity's built-in API first which is way faster than the `XPath` logic.
+
+    They'll also only refresh the hitting resources when you have changes in project (rather than inside a fixed loop)
+2.  Add `SpineSkinPicker` to pick a spine skin from a spine skeleton.
+3.  Improve auto getters how they find the scene for `scene::` selector.
+4.  Fix `I2Loc` package compile error on build.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4568,6 +4572,28 @@ public SkeletonAnimation _spine;
 ```
 
 [![video](https://github.com/user-attachments/assets/16c41cfe-3b27-474b-a0c0-40fad4a12c39)](https://github.com/user-attachments/assets/a26a2417-5b22-4a03-b17c-bd1883c65de2)
+
+### `SpineSkinPicker` ###
+
+Pick a spine skin from a spine skeleton renderer, into a string field.
+
+**Parameters**
+
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+
+// get on current target
+[SpineSkinPicker] private string skinName;
+
+// get from other field or callback
+public SkeletonAnimation _spine;
+[SpineSkinPicker(nameof(_spine))] private string skinNameFromTarget;
+```
+
+
 
 ## DOTween ##
 
