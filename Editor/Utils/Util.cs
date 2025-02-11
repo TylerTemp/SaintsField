@@ -111,6 +111,7 @@ namespace SaintsField.Editor.Utils
                         SerializedProperty wrapProperty = property.FindPropertyRelative(propName) ??
                                                           SerializedUtils.FindPropertyByAutoPropertyName(property,
                                                               propName);
+                        // Debug.Log($"set wrap value {wrapProperty.propertyPath} to {newValue}");
                         SignPropertyValue(wrapProperty, fieldInfo, parent, newValue);
                     }
                     else

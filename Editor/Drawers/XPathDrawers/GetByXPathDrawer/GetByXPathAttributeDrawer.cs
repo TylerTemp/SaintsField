@@ -250,6 +250,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             // Debug.Log($"expandedResults count = {expandedResults.Count}");
 
+            // property.serializedObject.Update();
+
             foreach ((object targetResult, int index) in expandedResults.WithIndex())
             {
                 SerializedProperty processingProperty;
@@ -295,6 +297,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     return;
                 }
 
+                if (originalValue is IWrapProp wrapProp)
+                {
+                    originalValue = Util.GetWrapValue(wrapProp);
+                }
+
                 propertyCache.OriginalValue = originalValue;
                 bool fieldIsNull = Util.IsNull(originalValue);
                 propertyCache.TargetValue = targetResult;
@@ -302,6 +309,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 propertyCache.TargetIsNull = targetIsNull;
 
                 propertyCache.MisMatch = Mismatch(originalValue, targetResult);
+
+                // Debug.Log($"#GetByXPath# o={originalValue}({processingProperty.propertyPath}), t={targetResult}, mismatch={propertyCache.MisMatch}");
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# mismatch={propertyCache.MisMatch}, {originalValue}, {targetResult}: {propertyCache.SerializedProperty.propertyPath}");
@@ -408,6 +417,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 propertyCache.Parent,
                 propertyCache.TargetValue);
             Util.SignPropertyValue(propertyCache.SerializedProperty, propertyCache.MemberInfo, propertyCache.Parent, propertyCache.TargetValue);
+            // propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
         }
 
         public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info, bool isImGui)

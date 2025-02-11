@@ -194,6 +194,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     }
                 }
 
+                UpdateSharedCacheBase(genericCache, property, info);
+                UpdateSharedCacheSource(genericCache, property, info);
+                UpdateSharedCacheSetValue(genericCache, true, property, info);
+
                 SaintsEditorApplicationChanged.OnProjectChangedEvent.AddListener(ProjectChangedHandler);
 
                 NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
@@ -264,10 +268,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 return;
             }
-
-            UpdateSharedCacheBase(genericCache, property, info);
-            UpdateSharedCacheSource(genericCache, property, info);
-            UpdateSharedCacheSetValue(genericCache, true, property, info);
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(propertyPath);
 
@@ -358,6 +358,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 target.UpdateResourceAfterTime = double.MinValue;
                 UpdateSharedCacheSetValue(target, false, property, info);
             }
+
+            // UpdateSharedCacheSetValue(target, false, property, info);
         }
 
         // private string _toastInfoUIToolkit = "";

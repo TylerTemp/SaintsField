@@ -5,13 +5,19 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
     public class GetComponentArray : SaintsMonoBehaviour
     {
+        [Serializable]
+        public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy>
+        {
+            public override string ToString()
+            {
+                return I?.GetComment() ?? "NULL";
+            }
+        }
+
         [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentArray;
         [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentList;
 
-        [Serializable]
-        public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
-
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        [GetComponent, PostFieldRichLabel(nameof(DummyNumberI))]
         public GeneralInterface[] getComponentIArray;
 
         [GetComponent, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
@@ -24,12 +30,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 
         private string DummyNumberI(GeneralInterface dummyInter)
         {
-            return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
+            return $"{dummyInter.I?.GetComment()}";
         }
 
         private string DummyNumberG(SaintsInterface<UnityEngine.Object, IDummy> dummyInter)
         {
-            return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
+            return $"{dummyInter}";
         }
     }
 }

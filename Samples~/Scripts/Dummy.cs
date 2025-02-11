@@ -11,5 +11,10 @@ namespace SaintsField.Samples.Scripts
         private Transform targetTransform;
 
         private Transform GetTargetTransform() => targetTransform;
+
+        public override string ToString()
+        {
+            return $"<Dummy {comment}/>";
+        }
     }
 }

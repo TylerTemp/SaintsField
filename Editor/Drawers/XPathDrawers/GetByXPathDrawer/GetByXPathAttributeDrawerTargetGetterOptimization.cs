@@ -63,16 +63,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     return ("GetComponent can only be used on Component or GameObject", false, null);
             }
 
+            // Debug.Log($"{type}/{interfaceType}");
+
             Component[] componentsOnSelf = transform.GetComponents(type);
             if (componentsOnSelf.Length == 0)
             {
                 return ("", false, Array.Empty<object>());
             }
 
-            Component[] results = interfaceType == null? componentsOnSelf: componentsOnSelf.Where(interfaceType.IsInstanceOfType).ToArray();
+            Component[] results = interfaceType == null
+                ? componentsOnSelf
+                : componentsOnSelf.Where(interfaceType.IsInstanceOfType).ToArray();
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-            Debug.Log($"#GetByXPath# GetComponentOptimized: {results.Length} valid values found");
+            Debug.Log($"#GetByXPath# GetComponentOptimized: {results.Length} valid values found: {string.Join<Object>(", ", results)}");
 #endif
 
             return ("", results.Length > 0, results);
