@@ -1,19 +1,19 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEngine;
-using System.Reflection;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
+
 
 namespace SaintsField.Editor.Playa.Renderer
 {
-    public partial class SerializedFieldRenderer
+    public partial class SerializedFieldBaseRenderer
     {
         private PropertyField _result;
 
@@ -30,23 +30,89 @@ namespace SaintsField.Editor.Playa.Renderer
         private VisualElement _fieldElement;
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
+        private bool _tableCondition;
 
         private static string NameTableContainer(SerializedProperty property)
         {
             return $"saints-table-container-{property.propertyPath}";
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
-            VisualElement result = new PropertyField(FieldWithInfo.SerializedProperty)
+            UserDataPayload userDataPayload = new UserDataPayload
             {
-                style =
-                {
-                    flexGrow = 1,
-                },
-                name = FieldWithInfo.SerializedProperty.propertyPath,
+                FriendlyName = FieldWithInfo.SerializedProperty.displayName,
             };
-            return (result, false);
+
+            (VisualElement result, bool serializedUpdate) = CreateSerializedUIToolkit();
+
+            if(result != null)
+            {
+                result.userData = userDataPayload;
+            }
+
+            OnArraySizeChangedAttribute onArraySizeChangedAttribute = FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
+            if (onArraySizeChangedAttribute != null)
+            {
+                OnArraySizeChangedUIToolkit(onArraySizeChangedAttribute.Callback, result, FieldWithInfo.SerializedProperty, (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+            }
+
+            // disable/enable/show/hide
+            bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute
+                                                                           // ReSharper disable once MergeIntoLogicalPattern
+                                                                           || each is PlayaEnableIfAttribute
+                                                                           // ReSharper disable once MergeIntoLogicalPattern
+                                                                           || each is PlayaDisableIfAttribute) > 0;
+            _arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is IPlayaArraySizeAttribute);
+            _richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaRichLabelAttribute);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+            Debug.Log(
+                $"SerField: {FieldWithInfo.SerializedProperty.displayName}({FieldWithInfo.SerializedProperty.propertyPath}); if={ifCondition}; arraySize={_arraySizeCondition}, richLabel={_richLabelCondition}");
+#endif
+
+            bool needUpdate = serializedUpdate || ifCondition || _arraySizeCondition || _richLabelCondition || _tableCondition;
+
+            return (_fieldElement = result, needUpdate);
+        }
+
+        protected abstract (VisualElement target, bool needUpdate) CreateSerializedUIToolkit();
+
+        private static void OnArraySizeChangedUIToolkit(string callback, VisualElement result, SerializedProperty property, MemberInfo memberInfo)
+        {
+            if (!property.isArray)
+            {
+                Debug.LogWarning($"{property.propertyPath} is no an array/list");
+                return;
+            }
+
+            int arraySize = property.arraySize;
+            // don't use TrackPropertyValue because if you remove anything from list, it gives error
+            // this is Unity's fault
+            // result.TrackPropertyValue(property, p =>
+            result.TrackSerializedObjectValue(property.serializedObject, _ =>
+            {
+                int newSize;
+                try
+                {
+                    newSize = property.arraySize;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    return;
+                }
+
+                if (newSize == arraySize)
+                {
+                    return;
+                }
+
+                arraySize = newSize;
+                InvokeArraySizeCallback(callback, property, memberInfo);
+            });
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)

@@ -265,7 +265,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
-  searchDelayScriptable: []
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  searchDelayScriptable:
+  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
 --- !u!1 &75259799
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,10 +715,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f9a3337a83b42641994e526b4065c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  getComponentArray: []
+  getComponentList: []
   getComponentIArray:
   - <V>k__BackingField: {fileID: 282662869}
   - <V>k__BackingField: {fileID: 282662869}
   - <V>k__BackingField: {fileID: 282662869}
+  getComponentIList: []
 --- !u!1 &412778987
 GameObject:
   m_ObjectHideFlags: 0

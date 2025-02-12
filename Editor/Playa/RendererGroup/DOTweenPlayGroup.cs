@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, doTweenPlayAttribute));
         }
 
-        public void RenderIMGUI()
+        public void RenderIMGUI(float width)
         {
             if (_iconButtonStyle == null)
             {

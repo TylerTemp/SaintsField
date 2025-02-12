@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         private object[] _imGuiParameterValues;
 
-        protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
+        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
             if(_imGuiEnumerator != null)
             {

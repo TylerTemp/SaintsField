@@ -17,7 +17,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
-    public partial class SerializedFieldRenderer: AbsRenderer
+    public partial class SerializedFieldRenderer: SerializedFieldBaseRenderer
     {
         public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {

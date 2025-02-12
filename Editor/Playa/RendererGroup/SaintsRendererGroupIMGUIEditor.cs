@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 {
     public partial class SaintsRendererGroup
     {
-        public void RenderIMGUI()
+        public void RenderIMGUI(float width)
         {
             bool show = true;
             bool disable = false;
@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         foreach (ISaintsRenderer renderer in GetRenderer())
                         {
-                            renderer.RenderIMGUI();
+                            renderer.RenderIMGUI(width);
                         }
                     }
 

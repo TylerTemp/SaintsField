@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public abstract partial class AbsRenderer
     {
-        public virtual void RenderIMGUI()
+        public virtual void RenderIMGUI(float width)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
             if (!preCheckResult.IsShown)
@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
                 RenderAboveIMGUI();
-                RenderTargetIMGUI(preCheckResult);
+                RenderTargetIMGUI(width, preCheckResult);
                 RenderBelowIMGUI();
             }
         }
@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Playa.Renderer
             return (helpBoxType, xmlContent);
         }
 
-        protected abstract void RenderTargetIMGUI(PreCheckResult preCheckResult);
+        protected abstract void RenderTargetIMGUI(float width, PreCheckResult preCheckResult);
 
         protected virtual void RenderBelowIMGUI()
         {

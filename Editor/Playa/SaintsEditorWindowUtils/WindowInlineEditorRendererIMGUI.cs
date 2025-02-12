@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         private UnityEditor.Editor _editor;
         private Object _curTarget;
 
-        protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
+        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
             // if (Event.current.type != EventType.Layout)
             // {

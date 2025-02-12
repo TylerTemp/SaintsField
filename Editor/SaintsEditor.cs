@@ -6,6 +6,8 @@ using System.Reflection;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
+using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
+using SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -738,6 +740,16 @@ namespace SaintsField.Editor
             switch (fieldWithInfo.RenderType)
             {
                 case SaintsRenderType.SerializedField:
+                    foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
+                    {
+                        switch (playaAttribute)
+                        {
+                            case TableAttribute:
+                                return new TableRenderer(serializedObject, fieldWithInfo);
+                            case ListDrawerSettingsAttribute:
+                                return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
+                        }
+                    }
                     return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.NonSerializedField:
                     return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo);

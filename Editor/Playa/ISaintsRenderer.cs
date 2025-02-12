@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Playa
         public VisualElement CreateVisualElement();
 #endif
 
-        void RenderIMGUI();
+        void RenderIMGUI(float width);
 
         float GetHeightIMGUI(float width);
 

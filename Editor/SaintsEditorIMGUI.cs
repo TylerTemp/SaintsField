@@ -1,6 +1,7 @@
 using System;
 using SaintsField.Editor.Playa;
 using UnityEditor;
+using UnityEngine.Device;
 
 namespace SaintsField.Editor
 {
@@ -74,7 +75,7 @@ namespace SaintsField.Editor
 
             foreach (ISaintsRenderer renderer in _renderers)
             {
-                renderer.RenderIMGUI();
+                renderer.RenderIMGUI(Screen.width);
             }
 
             serializedObject.ApplyModifiedProperties();

@@ -9,7 +9,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
     public partial class ResultsRenderer
     {
 
-        protected override void RenderTargetIMGUI(PreCheckResult preCheckResult)
+        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
             foreach ((object mainTarget, IEnumerable<IGrouping<Object, AutoRunnerResultInfo>> subGroup) in FormatResults(_autoRunner.Results))
             {
