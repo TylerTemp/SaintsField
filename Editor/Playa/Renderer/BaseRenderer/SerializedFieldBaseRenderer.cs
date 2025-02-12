@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -12,6 +13,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         protected SerializedFieldBaseRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
         }
+
+        protected static IEnumerable<UnityEngine.Object> CanDrop(IEnumerable<UnityEngine.Object> targets, Type elementType) => targets.Where(each => Util.GetTypeFromObj(each, elementType));
 
         private static void InvokeCallback(string callback, object newValue, object parent)
         {

@@ -31,11 +31,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private bool _richLabelCondition;
         private bool _tableCondition;
 
-        private static string NameTableContainer(SerializedProperty property)
-        {
-            return $"saints-table-container-{property.propertyPath}";
-        }
-
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
             UserDataPayload userDataPayload = new UserDataPayload
@@ -175,6 +170,28 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             return preCheckResult;
+        }
+
+        protected static bool DropUIToolkit(Type elementType, SerializedProperty property)
+        {
+            DragAndDrop.AcceptDrag();
+
+            UnityEngine.Object[] acceptItems = CanDrop(DragAndDrop.objectReferences, elementType).ToArray();
+            if (acceptItems.Length == 0)
+            {
+                return false;
+            }
+
+            int startIndex = property.arraySize;
+            int totalCount = acceptItems.Length;
+            property.arraySize += totalCount;
+            foreach ((SerializedProperty prop, UnityEngine.Object obj) in Enumerable.Range(startIndex, totalCount).Select(property.GetArrayElementAtIndex).Zip(acceptItems, (prop, obj) =>
+                         (prop, obj)))
+            {
+                prop.objectReferenceValue = obj;
+            }
+
+            return true;
         }
     }
 }

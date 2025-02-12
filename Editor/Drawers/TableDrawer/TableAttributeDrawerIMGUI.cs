@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 TreeViewItem item = args.item;
                 for (int i = 0; i < args.GetNumVisibleColumns(); i++)
                 {
-                    CellGUI(args.GetCellRect(i), item, args.GetColumn(i), ref args);
+                    CellGUI(args.GetCellRect(i), item, args.GetColumn(i));
                     // CellGUI(args.GetCellRect(i), item, (args.GetColumn(i) as MultiColumnHeaderState.Column).headerContent.text, ref args);
                 }
             }
@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 return allHeight.Max();
             }
 
-            private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn, ref RowGUIArgs args)
+            private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn)
             {
                 SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
                 string propName = _headerToPropName[getColumn];
@@ -215,6 +215,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         private string _error;
         private bool _isObjectReference;
 
+        private int _curSize;
+
         protected override void OnDisposeIMGUI()
         {
             // ReSharper disable once InvertIf
@@ -256,6 +258,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         return SingleLineHeight;
                     }
 
+                    // ReSharper disable once ConvertToUsingDeclaration
                     using (SerializedObject serializedObject = new SerializedObject(obj0))
                     {
                         foreach ((SerializedProperty serializedProperty, int index) in SerializedUtils
@@ -304,6 +307,12 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     headerToPropName,
                     ReflectUtils.GetElementType(info.FieldType)
                 );
+            }
+
+            if (_curSize != arrayProp.arraySize)
+            {
+                _curSize = arrayProp.arraySize;
+                _saintsTable.Reload();
             }
 
             return Mathf.Max(_saintsTable.totalHeight, EditorGUIUtility.singleLineHeight * (arrayProp.arraySize + 1)) + SingleLineHeight;

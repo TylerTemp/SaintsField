@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
         private static void DeleteArrayElement(SerializedProperty arrayProp, IEnumerable<int> selectedIndices)
         {
-            List<int> indexes = selectedIndices.OrderByDescending(each => each).ToList();
+            List<int> indexes = selectedIndices.OrderByDescending(each => each).Where(each => each < arrayProp.arraySize).ToList();
             if (indexes.Count == 0)
             {
                 indexes.Add(arrayProp.arraySize - 1);

@@ -1,9 +1,8 @@
-using System.Linq;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
 {
@@ -13,7 +12,10 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
         {
             int arraySize = FieldWithInfo.SerializedProperty.arraySize;
             if (arraySize == 0)
-                return EditorGUIUtility.singleLineHeight * 2;
+            {
+                return SaintsPropertyDrawer.SingleLineHeight * 3;
+            }
+
             return FieldWithInfo.SerializedProperty.isExpanded
                 ? EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), true)
                 : EditorGUIUtility.singleLineHeight;
@@ -43,14 +45,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                 {
                     (Rect foldout, Rect left) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
-                    FieldWithInfo.SerializedProperty.isExpanded =
+                    bool expanded = FieldWithInfo.SerializedProperty.isExpanded =
                         EditorGUI.Foldout(foldout, FieldWithInfo.SerializedProperty.isExpanded, useGUIContent);
-                    if(FieldWithInfo.SerializedProperty.isExpanded)
+                    if(expanded)
                     {
                         EditorGUI.PropertyField(
                             left,
                             FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), useGUIContent);
                     }
+
+                    // Rect dropArea = expanded
+                    //     ? new Rect(foldout)
+                    //     {
+                    //         height = EditorGUIUtility.singleLineHeight,
+                    //     }
+                    //     : foldout;
+
+                    DragAndDropImGui(foldout, ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType), FieldWithInfo.SerializedProperty);
                 }
             }
         }

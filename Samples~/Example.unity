@@ -10681,6 +10681,7 @@ GameObject:
   m_Component:
   - component: {fileID: 833747049}
   - component: {fileID: 833747051}
+  - component: {fileID: 833747052}
   m_Layer: 0
   m_Name: Table
   m_TagString: Untagged
@@ -10731,6 +10732,38 @@ MonoBehaviour:
   - myInt: 52
     myString: 
     myObject: {fileID: 0}
+  - myInt: 17
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 15
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 30
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 70
+    myString: 
+    myObject: {fileID: 0}
+--- !u!114 &833747052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833747048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a45b7b38fd6ffe43a58bf76e130f4f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptableArray:
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
 --- !u!1 &836531683
 GameObject:
   m_ObjectHideFlags: 0

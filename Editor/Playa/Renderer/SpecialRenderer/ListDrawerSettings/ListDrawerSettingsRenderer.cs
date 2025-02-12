@@ -17,10 +17,5 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
         public ListDrawerSettingsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
         }
-
-        private static IEnumerable<Object> CanDrop(IEnumerable<Object> targets, Type elementType)
-        {
-            return targets.Where(each => Util.GetTypeFromObj(each, elementType));
-        }
     }
 }

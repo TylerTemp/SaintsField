@@ -1,5 +1,7 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Linq;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -23,12 +25,17 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
             {
                 name = NameTableContainer(FieldWithInfo.SerializedProperty),
             };
-            FillTable(FieldWithInfo.SerializedProperty, result);
+
+            Type elementType =
+                ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+                                            FieldWithInfo.PropertyInfo.PropertyType);
+
+            FillTable(FieldWithInfo.SerializedProperty, result, elementType, FieldWithInfo.SerializedProperty);
 
             return (result, true);
         }
 
-        private static void FillTable(SerializedProperty arrayProperty, VisualElement result)
+        private static void FillTable(SerializedProperty arrayProperty, VisualElement result, Type elementType, SerializedProperty property)
         {
             bool hasSize = arrayProperty.arraySize > 0;
             SerializedProperty targetProperty = hasSize
@@ -54,6 +61,41 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                 };
                 foldout.Add(propField);
                 result.Add(foldout);
+
+                #region Drag
+                VisualElement foldoutInput = foldout.Q<VisualElement>(classes: "unity-foldout__input");
+
+                foldoutInput.RegisterCallback<DragEnterEvent>(_ =>
+                {
+                    // Debug.Log($"Drag Enter {evt}");
+                    DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences, elementType).Any()
+                        ? DragAndDropVisualMode.Copy
+                        : DragAndDropVisualMode.Rejected;
+                });
+                foldoutInput.RegisterCallback<DragLeaveEvent>(_ =>
+                {
+                    // Debug.Log($"Drag Leave {evt}");
+                    DragAndDrop.visualMode = DragAndDropVisualMode.None;
+                });
+                foldoutInput.RegisterCallback<DragUpdatedEvent>(_ =>
+                {
+                    // Debug.Log($"Drag Update {evt}");
+                    // DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                    DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences, elementType).Any()
+                        ? DragAndDropVisualMode.Copy
+                        : DragAndDropVisualMode.Rejected;
+                });
+                foldoutInput.RegisterCallback<DragPerformEvent>(_ =>
+                {
+                    // Debug.Log($"Drag Perform {evt}");
+                    if (!DropUIToolkit(elementType, property))
+                    {
+                        return;
+                    }
+
+                    property.serializedObject.ApplyModifiedProperties();
+                });
+                #endregion
             }
             else
             {

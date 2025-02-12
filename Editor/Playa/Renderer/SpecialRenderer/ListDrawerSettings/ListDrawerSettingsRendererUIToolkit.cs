@@ -415,31 +415,13 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             foldoutInput.RegisterCallback<DragPerformEvent>(_ =>
             {
                 // Debug.Log($"Drag Perform {evt}");
-
-                DragAndDrop.AcceptDrag();
-
-                Object[] acceptItems = CanDrop(DragAndDrop.objectReferences, elementType).ToArray();
-                if (acceptItems.Length == 0)
+                if (!DropUIToolkit(elementType, property))
                 {
                     return;
                 }
 
-                int startIndex = property.arraySize;
-                int totalCount = acceptItems.Length;
-                property.arraySize += totalCount;
-                foreach ((SerializedProperty prop, Object obj) in Enumerable.Range(startIndex, totalCount).Select(property.GetArrayElementAtIndex).Zip(acceptItems, (prop, obj) =>
-                             (prop, obj)))
-                {
-                    prop.objectReferenceValue = obj;
-                }
-
                 property.serializedObject.ApplyModifiedProperties();
-                // property.serializedObject.Update();
                 UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
-                // foreach (Object obj in DragAndDrop.objectReferences)
-                // {
-                //     Debug.Log("Dropped object: " + obj.name);
-                // }
             });
             #endregion
 
