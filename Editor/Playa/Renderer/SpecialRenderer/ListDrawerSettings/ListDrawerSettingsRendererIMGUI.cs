@@ -8,6 +8,7 @@ using SaintsField.Playa;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 {
@@ -97,7 +98,10 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     height = usePosition.height - 2,
                     width = usePosition.width - 12,
                 };
-                DrawListDrawerHeader(paddingTitle, delayed);
+
+                Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
+
+                DrawListDrawerHeader(paddingTitle, delayed, elementType, property);
                 return;
             }
 
@@ -115,7 +119,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     {
                         headerHeight = SaintsPropertyDrawer.SingleLineHeight * ((_imGuiListInfo.HasPaging || _imGuiListInfo.HasSearch)? 2: 1),
                     };
-                _imGuiReorderableList.drawHeaderCallback += v => DrawListDrawerHeader(v, delayed);
+
+                Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
+                _imGuiReorderableList.drawHeaderCallback += v => DrawListDrawerHeader(v, delayed, elementType, property);
                 _imGuiReorderableList.elementHeightCallback += DrawListDrawerItemHeight;
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
 
@@ -164,8 +170,10 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
         private Texture2D _iconLeft;
         private Texture2D _iconRight;
 
-        private void DrawListDrawerHeader(Rect rect, bool delayed)
+        private void DrawListDrawerHeader(Rect rect, bool delayed, Type elementType, SerializedProperty property)
         {
+            DragAndDropImGui(rect, elementType, property);
+
             // const float twoNumberInputWidth = 20;
             const float inputWidth = 30;
             // const float itemsLabelWidth = 75;
@@ -394,6 +402,61 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     }
                 }
             }
+        }
+
+        private void DragAndDropImGui(Rect rect, Type elementType, SerializedProperty property)
+        {
+            Event evt = Event.current;
+            if (evt.type != EventType.DragUpdated && evt.type !=  EventType.DragPerform)
+            {
+                return;
+            }
+
+            if (!rect.Contains(evt.mousePosition))
+            {
+                return;
+            }
+
+
+
+
+
+            if (evt.type == EventType.DragPerform)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.None;
+
+                DragAndDrop.AcceptDrag();
+
+                Object[] acceptItems = CanDrop(DragAndDrop.objectReferences, elementType).ToArray();
+                if (acceptItems.Length == 0)
+                {
+                    return;
+                }
+
+                int startIndex = property.arraySize;
+                int totalCount = acceptItems.Length;
+                property.arraySize += totalCount;
+                foreach ((SerializedProperty prop, Object obj) in Enumerable.Range(startIndex, totalCount).Select(property.GetArrayElementAtIndex).Zip(acceptItems, (prop, obj) =>
+                             (prop, obj)))
+                {
+                    prop.objectReferenceValue = obj;
+                }
+
+                // foreach (UnityEngine.Object draggedObject in DragAndDrop.objectReferences)
+                // {
+                //     Debug.Log("Dropped object: " + draggedObject.name);
+                // }
+
+                property.serializedObject.ApplyModifiedProperties();
+            }
+            else
+            {
+                DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences, elementType).Any()
+                    ? DragAndDropVisualMode.Copy
+                    : DragAndDropVisualMode.Rejected;
+            }
+
+            Event.current.Use();
         }
 
         private float DrawListDrawerItemHeight(int index)
@@ -637,22 +700,10 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
-            ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
-            if(listDrawerSettingsAttribute is null)
-            {
-                return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
-            }
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().First();
 
             bool hasSearch = listDrawerSettingsAttribute.Searchable;
             bool hasPaging = listDrawerSettingsAttribute.NumberOfItemsPerPage > 0;
-            // ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
-            //
-            // if(!hasSearch && !hasPaging && arraySizeAttribute == null)
-            // {
-            //     Debug.Log($"No IMGUIListInfo");
-            //     _imGuiListInfo = null;
-            //     return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
-            // }
 
             if (_imGuiListInfo == null)
             {
@@ -678,6 +729,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             if (!FieldWithInfo.SerializedProperty.isExpanded)
             {
+                // return SaintsPropertyDrawer.SingleLineHeight;
                 return SaintsPropertyDrawer.SingleLineHeight;
             }
 
@@ -713,8 +765,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
 #endif
 
-                ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
-                if(_imGuiListInfo != null && listDrawerSettingsAttribute != null)
+                ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().First();
+                if(_imGuiListInfo != null)
                 {
                     _imGuiListInfo.PreCheckResult = preCheckResult;
                     ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
@@ -722,6 +774,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                     {
                         DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute, listDrawerSettingsAttribute.Delayed);
+                        // ReSharper disable once InvertIf
                         if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
                            arraySize != FieldWithInfo.SerializedProperty.arraySize)
                         {
@@ -731,27 +784,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                                 (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
                         }
                     }
-                    return;
-                }
-
-                GUIContent useGUIContent = preCheckResult.HasRichLabel
-                    ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length), tooltip: FieldWithInfo.SerializedProperty.tooltip)
-                    : new GUIContent(FieldWithInfo.SerializedProperty.displayName, tooltip: FieldWithInfo.SerializedProperty.tooltip);
-
-                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                {
-                    EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, useGUIContent, true);
-                    if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
-                       arraySize != FieldWithInfo.SerializedProperty.arraySize)
-                    {
-                        FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                        InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
-                            FieldWithInfo.SerializedProperty,
-                            (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
-                    }
                 }
             }
-            // EditorGUI.DrawRect(position, Color.blue);
         }
 
         protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)

@@ -16,6 +16,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 {
     public partial class ListDrawerSettingsRenderer
     {
+        private PropertyField _result;
+        private VisualElement _fieldElement;
+
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
             ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
@@ -457,11 +460,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             UpdateAddRemoveButtons();
 
             return listView;
-        }
-
-        private static IEnumerable<Object> CanDrop(IEnumerable<Object> targets, Type elementType)
-        {
-            return targets.Where(each => Util.GetTypeFromObj(each, elementType));
         }
     }
 }
