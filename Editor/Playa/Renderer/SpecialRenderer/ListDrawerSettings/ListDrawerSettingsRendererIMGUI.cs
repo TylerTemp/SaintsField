@@ -68,6 +68,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
         private ReorderableList _imGuiReorderableList;
         private ImGuiListInfo _imGuiListInfo;
 
+        private string _curXml;
+        private RichTextDrawer.RichTextChunk[] _curXmlChunks;
+
         private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute, bool delayed)
         {
             Rect usePosition = new Rect(position)
@@ -220,6 +223,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             PreCheckResult preCheckResult = _imGuiListInfo.PreCheckResult;
             if (preCheckResult.HasRichLabel)
             {
+                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                 if(_richTextDrawer == null)
                 {
                     _richTextDrawer = new RichTextDrawer();
@@ -746,36 +750,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                             (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
                     }
                 }
-
-                #region RichLabel
-                if (preCheckResult.HasRichLabel)
-                {
-                    Rect richRect = new Rect(position)
-                    {
-                        height = SaintsPropertyDrawer.SingleLineHeight,
-                    };
-
-                    // EditorGUI.DrawRect(richRect, Color.blue);
-                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-                    if(_richTextDrawer == null)
-                    {
-                        _richTextDrawer = new RichTextDrawer();
-                    }
-
-                    // Debug.Log(preCheckResult.RichLabelXml);
-                    if (_curXml != preCheckResult.RichLabelXml)
-                    {
-                        _curXmlChunks =
-                            RichTextDrawer
-                                .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
-                                .ToArray();
-                    }
-
-                    _curXml = preCheckResult.RichLabelXml;
-
-                    _richTextDrawer.DrawChunks(richRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
-                }
-                #endregion
             }
             // EditorGUI.DrawRect(position, Color.blue);
         }

@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Linq;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 
 namespace SaintsField.Editor.Playa.Renderer
 {

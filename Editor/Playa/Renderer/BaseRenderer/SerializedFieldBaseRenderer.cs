@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Playa.Renderer
+namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public abstract partial class SerializedFieldBaseRenderer: AbsRenderer
     {
@@ -87,9 +85,6 @@ namespace SaintsField.Editor.Playa.Renderer
 
             InvokeCallback(callback, newValue, parent);
         }
-
-        protected string _curXml;
-        protected RichTextDrawer.RichTextChunk[] _curXmlChunks;
 
         public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo?.Name ?? FieldWithInfo.SerializedProperty.displayName}>";
     }

@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.XPathDrawers;
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Playa.Renderer
+namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public abstract partial class AbsRenderer: ISaintsRenderer
     {

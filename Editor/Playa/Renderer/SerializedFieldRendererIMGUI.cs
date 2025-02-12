@@ -1,9 +1,4 @@
-using System;
-using System.Linq;
-using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -37,10 +32,6 @@ namespace SaintsField.Editor.Playa.Renderer
             Rect rect = GUILayoutUtility.GetRect(width, height, GUILayout.ExpandWidth(true));
             RenderPositionTargetIMGUI(rect, preCheckResult);
 
-        }
-
-        public override void OnDestroy()
-        {
         }
     }
 }

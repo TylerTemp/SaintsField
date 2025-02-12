@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SaintsField.Editor.Playa.Renderer
+namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public partial class SerializedFieldBaseRenderer
     {
