@@ -1,7 +1,9 @@
 using System.Linq;
 using SaintsField.Editor.Playa.RendererGroup;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
 {
@@ -10,9 +12,11 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             int arraySize = FieldWithInfo.SerializedProperty.arraySize;
-            return arraySize == 0
-                ? EditorGUIUtility.singleLineHeight * 2
-                : EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), true);
+            if (arraySize == 0)
+                return EditorGUIUtility.singleLineHeight * 2;
+            return FieldWithInfo.SerializedProperty.isExpanded
+                ? EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), true)
+                : EditorGUIUtility.singleLineHeight;
         }
 
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
@@ -33,18 +37,19 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                 int arraySize = FieldWithInfo.SerializedProperty.arraySize;
                 if (arraySize == 0)
                 {
-                    EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, useGUIContent,
-                        GUILayout.ExpandWidth(true));
+                    EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, useGUIContent);
                 }
                 else
                 {
+                    (Rect foldout, Rect left) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+
                     FieldWithInfo.SerializedProperty.isExpanded =
-                        EditorGUILayout.Foldout(FieldWithInfo.SerializedProperty.isExpanded, useGUIContent);
+                        EditorGUI.Foldout(foldout, FieldWithInfo.SerializedProperty.isExpanded, useGUIContent);
                     if(FieldWithInfo.SerializedProperty.isExpanded)
                     {
-                        EditorGUILayout.PropertyField(
-                            FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), useGUIContent,
-                            GUILayout.ExpandWidth(true));
+                        EditorGUI.PropertyField(
+                            left,
+                            FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), useGUIContent);
                     }
                 }
             }
@@ -57,7 +62,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
         protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
             float height = GetFieldHeightIMGUI(width, preCheckResult);
-            Rect position = GUILayoutUtility.GetRect(width, height, GUILayout.ExpandWidth(true));
+            Rect position = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
             RenderPositionTargetIMGUI(position, preCheckResult);
         }
     }

@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Playa.Renderer
         protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
             float height = GetFieldHeightIMGUI(width, preCheckResult);
-            Rect rect = GUILayoutUtility.GetRect(width, height, GUILayout.ExpandWidth(true));
+            Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
             RenderPositionTargetIMGUI(rect, preCheckResult);
 
         }

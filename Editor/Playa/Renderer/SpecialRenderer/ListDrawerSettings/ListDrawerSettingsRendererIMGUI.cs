@@ -758,7 +758,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
         {
 
             float height = GetFieldHeightIMGUI(width, preCheckResult);
-            Rect position = GUILayoutUtility.GetRect(width, height, GUILayout.ExpandWidth(true));
+            Rect position = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
             RenderPositionTargetIMGUI(position, preCheckResult);
         }
     }

@@ -2,12 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 {
@@ -68,7 +71,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 },
             };
 
-            VisualElement foldoutContent = listView.Q<VisualElement>(className: "unity-foldout__content");
+            Foldout foldoutElement = listView.Q<Foldout>();
+
+            VisualElement foldoutContent = foldoutElement.Q<VisualElement>(className: "unity-foldout__content");
 
             VisualElement preContent = new VisualElement
             {
@@ -378,6 +383,63 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             #endregion
 
+            #region Drag
+            VisualElement foldoutInput = foldoutElement.Q<VisualElement>(classes: "unity-foldout__input");
+
+            Type elementType =
+                ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+                                            FieldWithInfo.PropertyInfo.PropertyType);
+            foldoutInput.RegisterCallback<DragEnterEvent>(_ =>
+            {
+                // Debug.Log($"Drag Enter {evt}");
+                DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences, elementType).Any()
+                    ? DragAndDropVisualMode.Copy
+                    : DragAndDropVisualMode.Rejected;
+            });
+            foldoutInput.RegisterCallback<DragLeaveEvent>(_ =>
+            {
+                // Debug.Log($"Drag Leave {evt}");
+                DragAndDrop.visualMode = DragAndDropVisualMode.None;
+            });
+            foldoutInput.RegisterCallback<DragUpdatedEvent>(_ =>
+            {
+                // Debug.Log($"Drag Update {evt}");
+                // DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences, elementType).Any()
+                    ? DragAndDropVisualMode.Copy
+                    : DragAndDropVisualMode.Rejected;
+            });
+            foldoutInput.RegisterCallback<DragPerformEvent>(_ =>
+            {
+                // Debug.Log($"Drag Perform {evt}");
+
+                DragAndDrop.AcceptDrag();
+
+                Object[] acceptItems = CanDrop(DragAndDrop.objectReferences, elementType).ToArray();
+                if (acceptItems.Length == 0)
+                {
+                    return;
+                }
+
+                int startIndex = property.arraySize;
+                int totalCount = acceptItems.Length;
+                property.arraySize += totalCount;
+                foreach ((SerializedProperty prop, Object obj) in Enumerable.Range(startIndex, totalCount).Select(property.GetArrayElementAtIndex).Zip(acceptItems, (prop, obj) =>
+                             (prop, obj)))
+                {
+                    prop.objectReferenceValue = obj;
+                }
+
+                property.serializedObject.ApplyModifiedProperties();
+                // property.serializedObject.Update();
+                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                // foreach (Object obj in DragAndDrop.objectReferences)
+                // {
+                //     Debug.Log("Dropped object: " + obj.name);
+                // }
+            });
+            #endregion
+
             listView.itemIndexChanged += (first, second) =>
             {
                 int fromPropIndex = itemIndexToPropertyIndex[first];
@@ -395,6 +457,11 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             UpdateAddRemoveButtons();
 
             return listView;
+        }
+
+        private static IEnumerable<Object> CanDrop(IEnumerable<Object> targets, Type elementType)
+        {
+            return targets.Where(each => Util.GetTypeFromObj(each, elementType));
         }
     }
 }
