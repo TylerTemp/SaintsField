@@ -81,7 +81,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.27.0**
+**3.26.1**
 
 1.  IMGUI: fix `Table` didn't update when size is changed externally
 2.  Fix `Table` drag and drop
