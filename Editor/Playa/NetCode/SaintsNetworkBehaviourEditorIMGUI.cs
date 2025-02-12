@@ -5,6 +5,7 @@ using System.Reflection;
 using Unity.Netcode;
 using Unity.Netcode.Editor;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Playa.NetCode
 {
@@ -19,6 +20,7 @@ namespace SaintsField.Editor.Playa.NetCode
             }
             // When we first add a NetworkBehaviour this editor will be enabled
             // so we go ahead and check for an already existing NetworkObject here
+            // ReSharper disable once PossibleNullReferenceException
             CheckForNetworkObject((target as NetworkBehaviour).gameObject);
 
             try
@@ -61,7 +63,7 @@ namespace SaintsField.Editor.Playa.NetCode
             }
             foreach (ISaintsRenderer renderer in _renderers)
             {
-                renderer.RenderIMGUI();
+                renderer.RenderIMGUI(Screen.width);
             }
 
             serializedObject.ApplyModifiedProperties();
