@@ -505,7 +505,14 @@ namespace SaintsField.Editor.Core
 
         private static SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(ISaintsAttribute saintsAttribute)
         {
-            Type drawerType = PropertyAttributeToPropertyDrawers[saintsAttribute.GetType()].First(each => each.isSaints).drawerType;
+            Type attributeType = saintsAttribute.GetType();
+            if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
+                out IReadOnlyList<(bool isSaints, Type drawerType)> eachDrawer))
+            {
+                throw new Exception($"No drawer found for {saintsAttribute}");
+            }
+
+            Type drawerType = eachDrawer.First(each => each.isSaints).drawerType;
             return (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
         }
 

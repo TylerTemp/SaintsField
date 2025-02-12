@@ -1,7 +1,7 @@
 using System;
 using SaintsField.Editor.Playa;
 using UnityEditor;
-using UnityEngine.Device;
+using UnityEngine;
 
 namespace SaintsField.Editor
 {

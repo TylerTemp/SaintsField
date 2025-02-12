@@ -745,9 +745,9 @@ namespace SaintsField.Editor
                     {
                         switch (playaAttribute)
                         {
-                            case TableAttribute:
+                            case TableAttribute _:
                                 return new TableRenderer(serializedObject, fieldWithInfo);
-                            case ListDrawerSettingsAttribute:
+                            case ListDrawerSettingsAttribute _:
                                 return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
                         }
                     }
