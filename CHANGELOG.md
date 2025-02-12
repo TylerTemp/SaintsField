@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.27.0 ##
+
+1.  IMGUI: fix `Table` didn't update when size is changed externally
+2.  Fix `Table` drag and drop
+3.  Fix `ListDrawerSettings` drag and drop [#127](https://github.com/TylerTemp/SaintsField/issues/127)
+
 ## 3.26.0 ##
 
 1.  Optimize auto getters. Some auto getters now will use Unity's built-in API first which is way faster than the `XPath` logic.

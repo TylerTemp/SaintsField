@@ -81,14 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.26.1**
+**3.27.0**
 
-1.  Optimize auto getters. Some auto getters now will use Unity's built-in API first which is way faster than the `XPath` logic.
-
-    They'll also only refresh the hitting resources when you have changes in project (rather than inside a fixed loop)
-2.  Add `SpineSkinPicker` to pick a spine skin from a spine skeleton.
-3.  Improve auto getters how they find the scene for `scene::` selector.
-4.  Fix `I2Loc` package compile error on build.
+1.  IMGUI: fix `Table` didn't update when size is changed externally
+2.  Fix `Table` drag and drop
+3.  Fix `ListDrawerSettings` drag and drop [#127](https://github.com/TylerTemp/SaintsField/issues/127)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
