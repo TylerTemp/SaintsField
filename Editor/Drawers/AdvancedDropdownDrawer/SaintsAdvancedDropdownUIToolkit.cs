@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 (IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)[] matchedValueOptions = flattenOptions.Where(each =>
                 {
-                    Debug.Log($"{string.Join("/", each.stackDisplay)}: {each.display}");
+                    // Debug.Log($"{string.Join("/", each.stackDisplay)}: {each.display}");
                     string lowerDisplay = each.display.ToLower();
                     return searchFragments.All(fragment => lowerDisplay.Contains(fragment));
                 }).ToArray();
