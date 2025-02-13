@@ -140,7 +140,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // search
             ToolbarSearchField toolbarSearchField = root.Q<ToolbarSearchField>();
             IReadOnlyList<(IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(_metaInfo.DropdownListValue).ToArray();
-            Dictionary<string, VisualElement> stackDisplayToElement = new Dictionary<string, VisualElement>();
+            // Dictionary<string, VisualElement> stackDisplayToElement = new Dictionary<string, VisualElement>();
             toolbarSearchField.RegisterValueChangedCallback(evt =>
             {
                 // Debug.Log($"search {evt.newValue}");
@@ -362,7 +362,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private struct SearchPathStack
         {
             public IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> SelectStacks;
-            public IReadOnlyList<string> ParentDisplays;
             public IAdvancedDropdownList Target;
 
             public override string ToString()
@@ -408,7 +407,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     yield return new SearchPathStack
                     {
                         SelectStacks = stackNew,
-                        ParentDisplays = parentDisplays,
                         Target = child,
                     };
                 }
