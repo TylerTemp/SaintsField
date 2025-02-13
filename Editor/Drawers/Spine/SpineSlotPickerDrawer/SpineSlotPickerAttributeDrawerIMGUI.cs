@@ -8,9 +8,9 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
+namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 {
-    public partial class SpineSkinPickerAttributeDrawer
+    public partial class SpineSlotPickerAttributeDrawer
     {
         private class CachedImGui
         {
@@ -20,18 +20,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             public string ChangedValue;
         }
 
-        private static readonly Dictionary<string, CachedImGui> _cachedImGui = new Dictionary<string, CachedImGui>();
+        private static readonly Dictionary<string, CachedImGui> CachedImGuiDictionary = new Dictionary<string, CachedImGui>();
 
-        private CachedImGui EnsureCache(SerializedProperty property)
+        private static CachedImGui EnsureCache(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
             // ReSharper disable once InvertIf
-            if(!_cachedImGui.TryGetValue(key, out CachedImGui cachedImGui))
+            if(!CachedImGuiDictionary.TryGetValue(key, out CachedImGui cachedImGui))
             {
-                _cachedImGui[key] = cachedImGui = new CachedImGui();
+                CachedImGuiDictionary[key] = cachedImGui = new CachedImGui();
                 NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
                 {
-                    _cachedImGui.Remove(key);
+                    CachedImGuiDictionary.Remove(key);
                 });
             }
 
@@ -73,16 +73,16 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                     image = string.IsNullOrEmpty(property.stringValue)? null: _iconSkin,
                 }, FocusType.Keyboard))
             {
-                SpineSkinPickerAttribute spineSkinPickerAttribute = (SpineSkinPickerAttribute) saintsAttribute;
+                SpineSlotPickerAttribute spineSlotPickerAttribute = (SpineSlotPickerAttribute) saintsAttribute;
 
-                (string error, ExposedList<Skin> skins) = GetSkins(spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
+                (string error, IReadOnlyList<SlotInfo> slots) = GetSlots(spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
                 if (error != "")
                 {
                     cached.Error = error;
                     return;
                 }
 
-                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, skins, true);
+                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, slots, true);
 
                 Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(metaInfo.DropdownListValue, position.width);
 
@@ -94,13 +94,14 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                     new AdvancedDropdownState(),
                     curItem =>
                     {
-                        string newValue = (string)curItem;
-                        if (property.stringValue != newValue)
+                        SlotData newValue = (SlotData)curItem;
+                        string newString = newValue?.Name;
+                        if (property.stringValue != newString)
                         {
-                            property.stringValue = newValue;
+                            property.stringValue = newString;
                             property.serializedObject.ApplyModifiedProperties();
                             cached.Changed = true;
-                            cached.ChangedValue = newValue;
+                            cached.ChangedValue = newString;
                         }
 
                         cached.Error = "";

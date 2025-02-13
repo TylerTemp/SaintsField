@@ -10732,16 +10732,10 @@ MonoBehaviour:
   - myInt: 52
     myString: 
     myObject: {fileID: 0}
-  - myInt: 17
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 15
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 30
-    myString: 
-    myObject: {fileID: 0}
   - myInt: 70
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 97
     myString: 
     myObject: {fileID: 0}
 --- !u!114 &833747052

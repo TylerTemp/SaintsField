@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -29,6 +30,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
 
         [ListDrawerSettings(searchable: true), Expandable] public Scriptable[] searchScriptable;
-        [ListDrawerSettings(searchable: true, delayedSearch: true), Expandable] public Scriptable[] searchDelayScriptable;
+
+
+        [ListDrawerSettings(searchable: true, delayedSearch: true), Expandable]
+        [OnArraySizeChanged(nameof(SizeChanged))]
+        public Scriptable[] searchDelayScriptable;
+
+        private void SizeChanged(IReadOnlyList<Scriptable> scripts) => Debug.Log(scripts.Count);
     }
 }

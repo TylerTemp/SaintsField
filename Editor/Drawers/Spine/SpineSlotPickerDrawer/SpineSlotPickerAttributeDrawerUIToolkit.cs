@@ -1,4 +1,3 @@
-#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -12,12 +11,13 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
+#if UNITY_2021_3_OR_NEWER
+namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 {
-    public partial class SpineSkinPickerAttributeDrawer
+    public partial class SpineSlotPickerAttributeDrawer
     {
-        private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__SpineSkin_SelectorButton";
-        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SpineSkin_HelpBox";
+        private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__SpineSlot_SelectorButton";
+        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SpineSlot_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
@@ -51,26 +51,26 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
         {
             UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(name: NameDropdownField(property));
 
-            SpineSkinPickerAttribute spineSkinPickerAttribute = (SpineSkinPickerAttribute)saintsAttribute;
+            SpineSlotPickerAttribute spineSlotPickerAttribute = (SpineSlotPickerAttribute)saintsAttribute;
 
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
-            ValidateUIToolkit(helpBox, spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
+            ValidateUIToolkit(helpBox, spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
 
             dropdownField.TrackPropertyValue(property, _ =>
             {
                 SetDropdownLabel(dropdownField.ButtonLabelElement, property.stringValue);
-                ValidateUIToolkit(helpBox, spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
+                ValidateUIToolkit(helpBox, spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
             });
 
             dropdownField.ButtonElement.clicked += () =>
             {
-                (string error, ExposedList<Skin> skins) = GetSkins(spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
+                (string error, IReadOnlyList<SlotInfo> slots) = GetSlots(spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
                 if (error != "")
                 {
                     UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), error);
                 }
 
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.stringValue, skins, false);
+                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.stringValue, slots, false);
 
                 float maxHeight = Screen.currentResolution.height - dropdownField.worldBound.y - dropdownField.worldBound.height - 100;
                 // Rect worldBound = dropdownButton.worldBound;
@@ -88,12 +88,13 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                     false,
                     (_, curItem) =>
                     {
-                        string newValue = (string)curItem;
-                        if (property.stringValue != newValue)
+                        SlotData newValue = (SlotData)curItem;
+                        string newString = newValue?.Name;
+                        if (property.stringValue != newString)
                         {
-                            property.stringValue = newValue;
+                            property.stringValue = newString;
                             property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke(newValue);
+                            onValueChangedCallback.Invoke(newString);
                         }
                     }
                 ));
@@ -109,9 +110,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
         }
 
-        private static void ValidateUIToolkit(HelpBox helpBox, string callback, SerializedProperty property, MemberInfo info, object parent)
+        private static void ValidateUIToolkit(HelpBox helpBox, bool containsBoundingBoxes,  string callback, SerializedProperty property, MemberInfo info, object parent)
         {
-            string error = Validate(callback, property, info, parent);
+            string error = Validate(containsBoundingBoxes, callback, property, info, parent);
             UpdateHelpBox(helpBox, error);
         }
 

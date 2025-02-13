@@ -274,7 +274,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
-  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
 --- !u!1 &75259799
 GameObject:
   m_ObjectHideFlags: 0
@@ -1793,7 +1792,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _intEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1056404279}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          today.comes.saintsfield.Samples
+        m_MethodName: OnChildInt
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1014307404
 GameObject:
   m_ObjectHideFlags: 0
@@ -1874,10 +1886,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   intIntEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1056404279}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          today.comes.saintsfield.Samples
+        m_MethodName: OnInt1
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1056404279}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          today.comes.saintsfield.Samples
+        m_MethodName: OnInt2
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   intEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1056404279}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          today.comes.saintsfield.Samples
+        m_MethodName: OnInt1
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   _child: {fileID: 993888195}
 --- !u!4 &1056404280
 Transform:

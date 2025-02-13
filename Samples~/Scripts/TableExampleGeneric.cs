@@ -17,6 +17,7 @@ namespace SaintsField.Samples.Scripts
         }
 
         [Table]
+        [OnArraySizeChanged(nameof(SizeChanged))]
         public List<MyStruct> myStructs;
 
         [Button]
@@ -27,5 +28,7 @@ namespace SaintsField.Samples.Scripts
                 myInt = UnityEngine.Random.Range(0, 100),
             });
         }
+
+        private void SizeChanged(List<MyStruct> newLis) => Debug.Log(newLis.Count);
     }
 }

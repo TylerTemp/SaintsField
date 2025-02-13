@@ -81,11 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.26.1**
+**3.27.0**
 
-1.  IMGUI: fix `Table` didn't update when size is changed externally
-2.  Fix `Table` drag and drop
-3.  Fix `ListDrawerSettings` drag and drop [#127](https://github.com/TylerTemp/SaintsField/issues/127)
+1.  Add `SpineSlotPicker`
+2.  UI Toolkit: `AdvancedDropdown` remove logs when searching
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -4591,6 +4590,27 @@ public SkeletonAnimation _spine;
 ```
 
 ![spine_skin](https://github.com/user-attachments/assets/d5832ffb-ebc1-4482-897b-6126998db285)
+
+### `SpineSlotPicker` ###
+
+Pick a spine slot from a spine skeleton renderer, into a string field.
+
+**Parameters**
+
+*   `bool containsBoundingBoxes = false`: Disables popup results that don't contain bounding box attachments when true.
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+
+// get on current target
+[SpineSlotPicker] private string slotName;
+
+// get from other field or callback
+public SkeletonAnimation _spine;
+[SpineSlotPicker(nameof(_spine))] private string slotNameFromTarget;
+```
 
 ## DOTween ##
 

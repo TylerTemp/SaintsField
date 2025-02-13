@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.27.0 ##
+
+1.  Add `SpineSlotPicker`
+2.  UI Toolkit: `AdvancedDropdown` remove logs when searching
+
 ## 3.26.1 ##
 
 1.  IMGUI: fix `Table` didn't update when size is changed externally
