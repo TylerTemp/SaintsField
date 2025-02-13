@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Core
         {
             OnAssignMaterialModelEvent.Invoke(material, renderer);
             OnAnyEvent.Invoke();
-            return material;
+            return null;
         }
 
         public class OnPostprocessAllAssetsEventClass: UnityEvent<string[], string[], string[], string[]>{}
