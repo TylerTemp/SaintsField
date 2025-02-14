@@ -14,7 +14,10 @@ using UnityEditor.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(OverlayRichLabelAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(OverlayRichLabelAttribute), true)]
     public class OverlayRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

@@ -3,19 +3,20 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-#if UNITY_2021_3_OR_NEWER
 using System;
-using System.ComponentModel;
+#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(MinMaxSliderAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(MinMaxSliderAttribute), true)]
     public class MinMaxSliderAttributeDrawer : SaintsPropertyDrawer
     {
         #region IMGUI

@@ -18,7 +18,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue46
         ENEMY
     }
 
-    [CreateAssetMenu]
+    // [CreateAssetMenu]
     public class MCTeam : SaintsScriptableObject
     {
         [Tooltip("for physics raycast, <everything> is fine but setting it can help optimize")]

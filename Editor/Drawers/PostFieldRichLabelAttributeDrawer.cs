@@ -12,7 +12,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(PostFieldRichLabelAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(PostFieldRichLabelAttribute), true)]
     public class PostFieldRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

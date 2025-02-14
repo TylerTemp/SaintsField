@@ -11,7 +11,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(ParticlePlayAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ParticlePlayAttribute), true)]
     public class ParticlePlayAttributeDrawer: SaintsPropertyDrawer
     {
         private enum PlayState

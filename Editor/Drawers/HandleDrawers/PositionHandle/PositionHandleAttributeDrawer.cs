@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -7,7 +6,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 {
-    [CustomPropertyDrawer(typeof(PositionHandleAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(PositionHandleAttribute), true)]
     public partial class PositionHandleAttributeDrawer: SaintsPropertyDrawer
     {
         private static void SetValue(Vector3 newTargetPosition, Space space, SerializedProperty property, FieldInfo info, object parent)

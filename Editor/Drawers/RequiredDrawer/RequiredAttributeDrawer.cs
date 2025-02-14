@@ -12,7 +12,10 @@ using UnityEngine.AddressableAssets;
 
 namespace SaintsField.Editor.Drawers.RequiredDrawer
 {
-    [CustomPropertyDrawer(typeof(RequiredAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(RequiredAttribute), true)]
     public partial class RequiredAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static (string error, bool result) Truly(SerializedProperty property, MemberInfo field, object target)

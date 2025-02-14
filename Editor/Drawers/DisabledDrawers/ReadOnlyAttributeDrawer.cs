@@ -10,8 +10,11 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.DisabledDrawers
 {
-    [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
-    [CustomPropertyDrawer(typeof(DisableIfAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ReadOnlyAttribute), true)]
+    [CustomPropertyDrawer(typeof(DisableIfAttribute), true)]
     public class ReadOnlyAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

@@ -9,7 +9,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(AddComponentAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(AddComponentAttribute), true)]
     public class AddComponentAttributeDrawer: SaintsPropertyDrawer
     {
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,

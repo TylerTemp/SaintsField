@@ -12,7 +12,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 {
-    [CustomPropertyDrawer(typeof(ColorPaletteAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ColorPaletteAttribute), true)]
     public partial class ColorPaletteAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static Texture2D _colorPaletteIcon;

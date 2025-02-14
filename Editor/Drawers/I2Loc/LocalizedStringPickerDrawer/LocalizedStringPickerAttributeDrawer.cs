@@ -8,7 +8,10 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 {
-    [CustomPropertyDrawer(typeof(LocalizedStringPickerAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(LocalizedStringPickerAttribute), true)]
     public partial class LocalizedStringPickerAttributeDrawer: SaintsPropertyDrawer
     {
         private static string MismatchError(SerializedProperty property)

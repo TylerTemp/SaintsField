@@ -12,7 +12,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(CurveRangeAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(CurveRangeAttribute), true)]
     public class CurveRangeAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

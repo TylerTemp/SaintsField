@@ -4,20 +4,17 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
-    [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute))]
+
+
+    [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute), true)]
     public partial class AdvancedDropdownAttributeDrawer: SaintsPropertyDrawer
     {
 
-        #region Util
 
         public struct SelectStack : IEquatable<SelectStack>
         {
@@ -313,8 +310,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             return stackDisplays == null ? new[] { value } : stackDisplays.Append(value).ToArray();
         }
-
-        #endregion
 
     }
 }

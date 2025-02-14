@@ -10,9 +10,12 @@ using UnityEngine.AddressableAssets;
 
 namespace SaintsField.Editor.Drawers.ShowImageDrawer
 {
-    [CustomPropertyDrawer(typeof(ShowImageAttribute))]
-    [CustomPropertyDrawer(typeof(AboveImageAttribute))]
-    [CustomPropertyDrawer(typeof(BelowImageAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ShowImageAttribute), true)]
+    [CustomPropertyDrawer(typeof(AboveImageAttribute), true)]
+    [CustomPropertyDrawer(typeof(BelowImageAttribute), true)]
     public partial class ShowImageAttributeDrawer: SaintsPropertyDrawer
     {
         private static (string error, Texture2D image) GetImage(SerializedProperty property, string name, FieldInfo info, object target)

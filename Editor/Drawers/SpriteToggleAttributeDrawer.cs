@@ -12,7 +12,10 @@ using Image = UnityEngine.UI.Image;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(SpriteToggleAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SpriteToggleAttribute), true)]
     public class SpriteToggleAttributeDrawer: SaintsPropertyDrawer
     {
         private const string SelectedStr = "●";

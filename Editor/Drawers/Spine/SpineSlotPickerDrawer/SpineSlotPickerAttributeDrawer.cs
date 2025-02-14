@@ -13,7 +13,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 {
-    [CustomPropertyDrawer(typeof(SpineSlotPickerAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SpineSlotPickerAttribute), true)]
     public partial class SpineSlotPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private const string IconPath = "Spine/icon-slot.png";

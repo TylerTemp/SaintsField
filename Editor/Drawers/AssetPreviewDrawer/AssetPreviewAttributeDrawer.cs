@@ -11,7 +11,10 @@ using UnityEngine.AddressableAssets;
 
 namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 {
-    [CustomPropertyDrawer(typeof(AssetPreviewAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(AssetPreviewAttribute), true)]
     public partial class AssetPreviewAttributeDrawer : SaintsPropertyDrawer
     {
         private Texture2D GetPreview(Object target)

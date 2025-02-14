@@ -14,6 +14,9 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
     [CustomPropertyDrawer(typeof(SaintsInterface<,>), true)]
     public class SaintsInterfaceDrawer: PropertyDrawer
     {

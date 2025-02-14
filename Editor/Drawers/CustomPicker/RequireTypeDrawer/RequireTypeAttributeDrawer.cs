@@ -10,7 +10,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 {
-    [CustomPropertyDrawer(typeof(RequireTypeAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(RequireTypeAttribute), true)]
     public partial class RequireTypeAttributeDrawer: SaintsPropertyDrawer
     {
         private class FieldInterfaceSelectWindow : ObjectSelectWindow

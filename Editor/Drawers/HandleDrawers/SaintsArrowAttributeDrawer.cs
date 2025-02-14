@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers
 {
-    [CustomPropertyDrawer(typeof(SaintsArrowAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SaintsArrowAttribute), true)]
     public class SaintsArrowAttributeDrawer: OneDirectionHandleBase
     {
         protected override void OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd)

@@ -12,7 +12,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 {
-    [CustomPropertyDrawer(typeof(AnimatorStateAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(AnimatorStateAttribute), true)]
     public partial class AnimatorStateAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private bool _onEnableChecked;

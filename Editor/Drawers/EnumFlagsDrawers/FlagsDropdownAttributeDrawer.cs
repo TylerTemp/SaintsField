@@ -7,7 +7,10 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
-    [CustomPropertyDrawer(typeof(FlagsDropdownAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(FlagsDropdownAttribute), true)]
     public partial class FlagsDropdownAttributeDrawer: SaintsPropertyDrawer
     {
         private static string GetSelectedNames(IReadOnlyDictionary<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName, int selectedInt)

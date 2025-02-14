@@ -13,7 +13,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.DropdownDrawer
 {
-    [CustomPropertyDrawer(typeof(DropdownAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(DropdownAttribute), true)]
     public partial class DropdownAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";

@@ -9,7 +9,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.ValidateInputDrawer
 {
-    [CustomPropertyDrawer(typeof(ValidateInputAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ValidateInputAttribute), true)]
     public partial class ValidateInputAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static string CallValidateMethod(string callback, string label, SerializedProperty property, MemberInfo fieldInfo, object parent)

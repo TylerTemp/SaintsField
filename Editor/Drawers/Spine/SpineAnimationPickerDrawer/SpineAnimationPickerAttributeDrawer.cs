@@ -15,7 +15,10 @@ using Animation = Spine.Animation;
 
 namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 {
-    [CustomPropertyDrawer(typeof(SpineAnimationPickerAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SpineAnimationPickerAttribute), true)]
     public partial class SpineAnimationPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private const string IconDropdownPath = "Spine/icon-animation-dropdown.png";

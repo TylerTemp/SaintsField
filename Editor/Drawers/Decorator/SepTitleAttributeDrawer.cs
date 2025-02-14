@@ -1,11 +1,12 @@
-﻿using System.Linq;
-using SaintsField.Editor.Core;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.Decorator
 {
-    [CustomPropertyDrawer(typeof(SepTitleAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SepTitleAttribute), true)]
     public class SepTitleAttributeDrawer : DecoratorDrawer
     {
         // public static int drawCounter = 0;

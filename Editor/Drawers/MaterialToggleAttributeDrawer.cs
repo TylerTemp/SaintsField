@@ -13,7 +13,10 @@ using Component = UnityEngine.Component;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(MaterialToggleAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(MaterialToggleAttribute), true)]
     public class MaterialToggleAttributeDrawer: SaintsPropertyDrawer
     {
         private const string SelectedStr = "●";

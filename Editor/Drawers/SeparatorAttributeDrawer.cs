@@ -12,8 +12,11 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(SeparatorAttribute))]
-    [CustomPropertyDrawer(typeof(BelowSeparatorAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SeparatorAttribute), true)]
+    [CustomPropertyDrawer(typeof(BelowSeparatorAttribute), true)]
     public class SeparatorAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();

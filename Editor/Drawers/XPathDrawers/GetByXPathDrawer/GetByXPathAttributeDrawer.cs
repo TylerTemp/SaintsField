@@ -5,23 +5,15 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
-using SaintsField.SaintsXPathParser.Optimization;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 {
-    // Note about this drawer in UI Toolkit:
-    // if the list/array is not drawn by a ListView, the 1st item the drawer will fail to deliver the correct message to the rest of the items
-    // and if the list is drawn by a custom drawer, then the 1st item will not even get drawn
-    // the correct way is to think is that there is no way to correctly store the cached data -> use a static
-    // it's not granted that the 1st element will get drawn -> use any drawn element
-    // because some config just update the data, some config will only update the UI, and some both -> the responsible drawer should only update the data, and any drawn element just fetch the cached data to update it's own UI accordingly
-
-    // ATM: we just think the 1st element will always be drawn, and there is always a listView parent
-    // and use the _selfChange to prevent loop calling on element dragging
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
     [CustomPropertyDrawer(typeof(GetByXPathAttribute))]
 #if !SAINTSFIELD_OLD_GETTER
     [CustomPropertyDrawer(typeof(GetComponentAttribute))]

@@ -1,18 +1,16 @@
 ﻿#if UNITY_2021_3_OR_NEWER
 #endif
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
-    [CustomPropertyDrawer(typeof(EnumFlagsAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(EnumFlagsAttribute), true)]
     public partial class EnumFlagsAttributeDrawer: SaintsPropertyDrawer
     {
         private Texture2D _checkboxCheckedTexture2D;

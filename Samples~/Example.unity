@@ -15177,7 +15177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   comment: 
-  targetTransform: {fileID: 0}
+  targetTransform: {fileID: 1271404091}
 --- !u!1 &1299589590
 GameObject:
   m_ObjectHideFlags: 0

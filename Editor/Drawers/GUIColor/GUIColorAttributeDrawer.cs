@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.GUIColor
 {
-    [CustomPropertyDrawer(typeof(GUIColorAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(GUIColorAttribute), true)]
     public partial class GUIColorAttributeDrawer: SaintsPropertyDrawer
     {
         private static (string error, Color color) GetColor(GUIColorAttribute guiColorAttribute, SerializedProperty property, FieldInfo info, object target)

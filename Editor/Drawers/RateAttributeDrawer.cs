@@ -11,7 +11,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(RateAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(RateAttribute), true)]
     public class RateAttributeDrawer: SaintsPropertyDrawer
     {
         private Texture2D _star;

@@ -12,7 +12,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(TagAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(TagAttribute), true)]
     public class TagAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

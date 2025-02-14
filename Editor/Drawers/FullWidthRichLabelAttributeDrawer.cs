@@ -12,9 +12,12 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(AboveRichLabelAttribute))]
-    [CustomPropertyDrawer(typeof(BelowRichLabelAttribute))]
-    [CustomPropertyDrawer(typeof(FullWidthRichLabelAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(AboveRichLabelAttribute), true)]
+    [CustomPropertyDrawer(typeof(BelowRichLabelAttribute), true)]
+    [CustomPropertyDrawer(typeof(FullWidthRichLabelAttribute), true)]
     public class FullWidthRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

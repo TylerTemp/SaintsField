@@ -14,7 +14,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
-    [CustomPropertyDrawer(typeof(ShaderParamAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ShaderParamAttribute), true)]
     public partial class ShaderParamAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static string GetTypeMismatchError(SerializedProperty property)

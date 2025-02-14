@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.TableDrawer
 {
-    [CustomPropertyDrawer(typeof(TableAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(TableAttribute), true)]
     public partial class TableAttributeDrawer: SaintsPropertyDrawer
     {
 

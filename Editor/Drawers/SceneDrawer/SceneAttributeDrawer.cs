@@ -10,8 +10,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.SceneDrawer
 {
-
-    [CustomPropertyDrawer(typeof(SceneAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SceneAttribute), true)]
     public partial class SceneAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         /// <summary>

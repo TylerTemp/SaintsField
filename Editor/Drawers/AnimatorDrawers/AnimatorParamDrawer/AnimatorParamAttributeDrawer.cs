@@ -13,7 +13,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
 {
-    [CustomPropertyDrawer(typeof(AnimatorParamAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(AnimatorParamAttribute), true)]
     public partial class AnimatorParamAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         // private const string InvalidAnimatorControllerWarningMessage = "Target animator controller is null";

@@ -31,7 +31,10 @@ namespace SaintsField.Editor.Drawers
         }
     }
 
-    [CustomPropertyDrawer(typeof(ExpandableAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ExpandableAttribute), true)]
     public class ExpandableAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

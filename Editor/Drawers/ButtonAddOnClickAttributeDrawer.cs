@@ -16,7 +16,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(ButtonAddOnClickAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ButtonAddOnClickAttribute), true)]
     public class ButtonAddOnClickAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";

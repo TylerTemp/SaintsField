@@ -13,7 +13,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
 {
-    [CustomPropertyDrawer(typeof(SpineSkinPickerAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SpineSkinPickerAttribute), true)]
     public partial class SpineSkinPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private const string IconPath = "Spine/icon-skin.png";

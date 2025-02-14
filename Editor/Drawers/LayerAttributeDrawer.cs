@@ -13,7 +13,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(LayerAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(LayerAttribute), true)]
     public class LayerAttributeDrawer: SaintsPropertyDrawer
     {
         #region IMGUI

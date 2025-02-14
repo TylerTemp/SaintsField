@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -8,6 +9,7 @@ namespace SaintsField.Samples.Scripts
         public string GetComment() => comment;
 
         [SerializeField]
+        [BelowButton(nameof(ReadCopy))]
         private Transform targetTransform;
 
         private Transform GetTargetTransform() => targetTransform;
@@ -15,6 +17,12 @@ namespace SaintsField.Samples.Scripts
         public override string ToString()
         {
             return $"<Dummy {comment}/>";
+        }
+
+        private void ReadCopy()
+        {
+            string clipboardData = EditorGUIUtility.systemCopyBuffer;
+            Debug.Log("Clipboard Data: " + clipboardData);
         }
     }
 }

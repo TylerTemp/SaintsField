@@ -117,7 +117,7 @@ namespace SaintsField.Editor.AutoRunner
         protected abstract bool SkipHiddenFields();
         protected abstract bool CheckOnValidate();
 
-        private IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> _typeToDrawer;
+        private IReadOnlyDictionary<Type, IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo>> _typeToDrawer;
 
         // protected abstract void UpdateProcessGroup(int accCount);
         // protected abstract void UpdateProcessCount(int accCount);
@@ -354,12 +354,12 @@ namespace SaintsField.Editor.AutoRunner
                                 break;
                             }
 
-                            if (!_typeToDrawer.TryGetValue(saintsPropertyAttribute.GetType(), out IReadOnlyList<(bool isSaints, Type drawerType)> drawers))
+                            if (!_typeToDrawer.TryGetValue(saintsPropertyAttribute.GetType(), out IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo> drawers))
                             {
                                 continue;
                             }
 
-                            foreach (Type drawerType in drawers.Where(each => each.isSaints).Select(each => each.drawerType))
+                            foreach (Type drawerType in drawers.Where(each => each.IsSaints).Select(each => each.DrawerType))
                             {
                                 SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
 

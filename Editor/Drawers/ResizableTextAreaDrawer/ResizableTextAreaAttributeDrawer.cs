@@ -3,7 +3,10 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
 {
-    [CustomPropertyDrawer(typeof(ResizableTextAreaAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ResizableTextAreaAttribute), true)]
     public partial class ResizableTextAreaAttributeDrawer: SaintsPropertyDrawer
     {
         // private float _width = -1;

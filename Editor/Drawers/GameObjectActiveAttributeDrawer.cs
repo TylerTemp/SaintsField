@@ -11,7 +11,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(GameObjectActiveAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(GameObjectActiveAttribute), true)]
     public class GameObjectActiveAttributeDrawer: DecToggleAttributeDrawer
     {
         #region IMGUI

@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 {
-    [CustomPropertyDrawer(typeof(ResourceFolderAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ResourceFolderAttribute), true)]
     public partial class ResourceFolderAttributeDrawer: FolderDrawerBase
     {
         protected override (string error, string actualFolder) ValidateFolder(string folderValue)

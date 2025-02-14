@@ -3,10 +3,14 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-namespace SaintsField.Editor.Drawers
+
+namespace SaintsField.Editor.Drawers.InfoBoxDrawer
 {
-    [CustomPropertyDrawer(typeof(InfoBoxAttribute))]
-    [CustomPropertyDrawer(typeof(BelowInfoBoxAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(InfoBoxAttribute), true)]
+    [CustomPropertyDrawer(typeof(BelowInfoBoxAttribute), true)]
     public partial class InfoBoxAttributeDrawer: SaintsPropertyDrawer
     {
         // private bool _overrideMessageType;

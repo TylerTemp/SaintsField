@@ -12,7 +12,10 @@ using UnityEditor.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(PropRangeAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(PropRangeAttribute), true)]
     public class PropRangeAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";

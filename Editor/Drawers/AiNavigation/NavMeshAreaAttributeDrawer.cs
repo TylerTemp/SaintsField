@@ -1,5 +1,4 @@
-﻿#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,12 +14,15 @@ using UnityEngine;
 using UnityEngine.UIElements;
 #endif  // UNITY_2021_3_OR_NEWER
 
-#endif  // SAINTSFIELD_AI_NAVIGATION
 
 namespace SaintsField.Editor.Drawers.AiNavigation
 {
-#if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
-    [CustomPropertyDrawer(typeof(NavMeshAreaAttribute))]
+
+
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(NavMeshAreaAttribute), true)]
     public class NavMeshAreaAttributeDrawer: SaintsPropertyDrawer
     {
         private enum ValueType
@@ -259,5 +261,4 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
 #endif
     }
-#endif  // SAINTSFIELD_AI_NAVIGATION
 }

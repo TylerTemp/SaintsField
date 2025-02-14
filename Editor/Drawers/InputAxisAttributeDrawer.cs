@@ -13,7 +13,10 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(InputAxisAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(InputAxisAttribute), true)]
     public class InputAxisAttributeDrawer: SaintsPropertyDrawer
     {
         private static IReadOnlyList<string> GetAxisNames()

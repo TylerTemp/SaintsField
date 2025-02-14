@@ -9,8 +9,11 @@ using UnityEditor.UIElements;
 
 namespace SaintsField.Editor.Drawers.TypeDrawers
 {
-    [CustomPropertyDrawer(typeof(SaintsList<>))]
-    [CustomPropertyDrawer(typeof(SaintsArray<>))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SaintsList<>), true)]
+    [CustomPropertyDrawer(typeof(SaintsArray<>), true)]
     public class SaintsArrayDrawer: PropertyDrawer
     {
         private static (string error, string propName, int index) GetSerName(SerializedProperty property, FieldInfo fieldInfo)

@@ -1,7 +1,6 @@
 using System.IO;
 using SaintsField.Editor.Core;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers
 {

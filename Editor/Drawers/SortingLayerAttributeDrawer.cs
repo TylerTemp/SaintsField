@@ -12,7 +12,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(SortingLayerAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SortingLayerAttribute), true)]
     public class SortingLayerAttributeDrawer: SaintsPropertyDrawer
     {
         private static string[] GetLayers()

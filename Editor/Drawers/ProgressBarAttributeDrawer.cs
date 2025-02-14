@@ -12,7 +12,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(ProgressBarAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ProgressBarAttribute), true)]
     public class ProgressBarAttributeDrawer: SaintsPropertyDrawer
     {
         private struct MetaInfo

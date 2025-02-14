@@ -5,7 +5,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.InfoBoxDrawer
 {
     public partial class InfoBoxAttributeDrawer
     {

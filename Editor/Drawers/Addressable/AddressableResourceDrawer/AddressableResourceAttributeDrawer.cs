@@ -6,7 +6,10 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
 {
-    [CustomPropertyDrawer(typeof(AddressableResourceAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(AddressableResourceAttribute), true)]
     public partial class AddressableResourceAttributeDrawer: SaintsPropertyDrawer
     {
 

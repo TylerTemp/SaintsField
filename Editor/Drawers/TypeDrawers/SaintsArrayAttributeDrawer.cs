@@ -9,7 +9,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.TypeDrawers
 {
-    [CustomPropertyDrawer(typeof(SaintsArrayAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(SaintsArrayAttribute), true)]
     public class SaintsArrayAttributeDrawer: SaintsPropertyDrawer
     {
         private static (string error, string propName, int index) GetSerName(SerializedProperty property, SaintsArrayAttribute saintsArrayAttribute, FieldInfo fieldInfo, object parent)

@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 {
-    [CustomPropertyDrawer(typeof(DrawLabelAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(DrawLabelAttribute), true)]
     public partial class DrawLabelAttributeDrawer: SaintsPropertyDrawer
     {
         private class LabelInfo

@@ -8,7 +8,10 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.VisibilityDrawers
 {
-    [CustomPropertyDrawer(typeof(ShowIfAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ShowIfAttribute), true)]
     public class ShowIfAttributeDrawer: VisibilityAttributeDrawer
     {
         // protected override (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)

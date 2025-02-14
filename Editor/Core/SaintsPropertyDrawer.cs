@@ -23,8 +23,15 @@ namespace SaintsField.Editor.Core
         private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubDrawCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
         private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubGetHeightCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
 
-        private static readonly Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> PropertyAttributeToPropertyDrawers =
-            new Dictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>>();
+        public struct PropertyDrawerInfo
+        {
+            public bool IsSaints;
+            public Type DrawerType;
+            public bool UseForChildren;
+        }
+
+        private static readonly Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>> PropertyAttributeToPropertyDrawers =
+            new Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>>();
 // #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
         private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
             new Dictionary<Type, IReadOnlyList<Type>>();
@@ -149,7 +156,7 @@ namespace SaintsField.Editor.Core
             SceneViewNotifications.Add(message);
         }
 
-        public static IReadOnlyDictionary<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> EnsureAndGetTypeToDrawers()
+        public static IReadOnlyDictionary<Type, IReadOnlyList<PropertyDrawerInfo>> EnsureAndGetTypeToDrawers()
         {
             if (PropertyAttributeToPropertyDrawers.Count != 0)
             {
@@ -238,7 +245,15 @@ namespace SaintsField.Editor.Core
             foreach (KeyValuePair<Type, HashSet<Type>> kv in attrToDrawers)
             {
                 PropertyAttributeToPropertyDrawers[kv.Key] = kv.Value
-                    .Select(each => (each.IsSubclassOf(typeof(SaintsPropertyDrawer)), each))
+                    .Select(each => new PropertyDrawerInfo
+                        {
+                            IsSaints = each.IsSubclassOf(typeof(SaintsPropertyDrawer)),
+                            DrawerType = each,
+                            UseForChildren = each.GetCustomAttributes<CustomPropertyDrawer>(true)
+                                .Any(instance => typeof(CustomPropertyDrawer)
+                                    .GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance)
+                                    ?.GetValue(instance) is bool useForChildren && useForChildren)
+                        })
                     .ToArray();
 // #if EXT_INSPECTOR_LOG
 //                     Debug.Log($"attr {kv.Key} has drawer(s) {string.Join(",", kv.Value)}");
@@ -311,11 +326,12 @@ namespace SaintsField.Editor.Core
             // ReSharper disable once UseNegatedPatternInIsExpression
             foreach (Attribute fieldAttribute in fieldInfo.GetCustomAttributes().Where(each => !(each is ISaintsAttribute)))
             {
-                foreach (KeyValuePair<Type,IReadOnlyList<(bool isSaints, Type drawerType)>> kv in PropertyAttributeToPropertyDrawers)
+                foreach (KeyValuePair<Type,IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
                 {
                     Type canDrawType = kv.Key;
                     // Debug.Log($"{fieldAttribute}:{kv.Key}:--");
-                    foreach ((bool isSaints, Type drawerType) in kv.Value.Where(each => !each.isSaints))
+                    // foreach ((bool isSaints, Type drawerType) in kv.Value.Where(each => !each.isSaints))
+                    foreach (var info in kv.Value.Where(each => !each.IsSaints))
                     {
                         // if ($"{drawerType}" == "UnityEditor.RangeDrawer")
                         // {
@@ -323,7 +339,7 @@ namespace SaintsField.Editor.Core
                         // }
                         if (canDrawType.IsInstanceOfType(fieldAttribute))
                         {
-                            return (fieldAttribute, drawerType);
+                            return (fieldAttribute, info.DrawerType);
                         }
                         // Debug.Log($"--{drawerType}:{drawerType.IsInstanceOfType(fieldAttribute)}");
                     }
@@ -389,7 +405,7 @@ namespace SaintsField.Editor.Core
     #endif
 
                 // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-                foreach (KeyValuePair<Type, IReadOnlyList<(bool isSaints, Type drawerType)>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
+                foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
                 {
                     bool matched;
                     if (isGenericType)
@@ -426,9 +442,9 @@ namespace SaintsField.Editor.Core
                     if (matched)
                     {
                         Type foundDrawer = propertyAttributeToPropertyDrawer.Value
-                            .FirstOrDefault(each => !each.isSaints)
+                            .FirstOrDefault(each => !each.IsSaints)
                             // [0]
-                            .drawerType;
+                            .DrawerType;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                         Debug.Log($"foundDrawer={foundDrawer} for {fieldType}");
 #endif
@@ -480,15 +496,15 @@ namespace SaintsField.Editor.Core
             // Debug.Log(string.Join(",", _propertyAttributeToDrawers.Keys));
 
             if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
-                    out IReadOnlyList<(bool isSaints, Type drawerType)> eachDrawer))
+                    out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
             {
                 return null;
             }
             // Debug.Log($"{attributeType}/{eachDrawer.Count}");
 
-            (bool isSaints, Type drawerType) = eachDrawer.FirstOrDefault(each => each.isSaints);
+            PropertyDrawerInfo drawerInfo = eachDrawer.FirstOrDefault(each => each.IsSaints);
 
-            return isSaints ? drawerType : null;
+            return drawerInfo.IsSaints ? drawerInfo.DrawerType : null;
         }
 
         private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SaintsWithIndex saintsAttributeWithIndex)
@@ -507,12 +523,23 @@ namespace SaintsField.Editor.Core
         {
             Type attributeType = saintsAttribute.GetType();
             if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
-                out IReadOnlyList<(bool isSaints, Type drawerType)> eachDrawer))
+                out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
             {
-                throw new Exception($"No drawer found for {saintsAttribute}");
+                foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
+                {
+                    if(attributeType.IsSubclassOf(kv.Key))
+                    {
+                        eachDrawer = kv.Value.Where(each => each.UseForChildren).ToArray();
+                        break;
+                    }
+                }
+                if(eachDrawer == null || eachDrawer.Count == 0)
+                {
+                    throw new Exception($"No drawer found for {saintsAttribute}");
+                }
             }
 
-            Type drawerType = eachDrawer.First(each => each.isSaints).drawerType;
+            Type drawerType = eachDrawer.First(each => each.IsSaints).DrawerType;
             return (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
         }
 

@@ -4,11 +4,13 @@ using System.Reflection;
 using SaintsField.Condition;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.VisibilityDrawers
 {
-    [CustomPropertyDrawer(typeof(HideIfAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(HideIfAttribute), true)]
     public class HideIfAttributeDrawer: ShowIfAttributeDrawer
     {
         // protected override (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)

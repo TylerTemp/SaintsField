@@ -13,7 +13,10 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 {
-    [CustomPropertyDrawer(typeof(AddressableSceneAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(AddressableSceneAttribute), true)]
     public partial class AddressableSceneAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static (string error, AddressableAssetEntry sceneEntry) GetSceneEntry(string value, AddressableSceneAttribute addressableSceneAttribute)

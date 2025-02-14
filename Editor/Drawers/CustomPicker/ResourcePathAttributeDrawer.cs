@@ -16,7 +16,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.CustomPicker
 {
-    [CustomPropertyDrawer(typeof(ResourcePathAttribute))]
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+#endif
+    [CustomPropertyDrawer(typeof(ResourcePathAttribute), true)]
     public class ResourcePathAttributeDrawer: RequireTypeAttributeDrawer
     {
         private class FieldResourcesSelectWindow : ObjectSelectWindow
