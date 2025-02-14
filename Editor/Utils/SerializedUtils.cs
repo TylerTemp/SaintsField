@@ -276,7 +276,7 @@ namespace SaintsField.Editor.Utils
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
         }
 
-        public static Object GetSerObject(SerializedProperty property, FieldInfo info, object parent)
+        public static Object GetSerObject(SerializedProperty property, MemberInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.Generic)
             {

@@ -196,7 +196,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 UpdateSharedCacheBase(genericCache, property, info);
                 UpdateSharedCacheSource(genericCache, property, info);
-                UpdateSharedCacheSetValue(genericCache, true, property, info);
+                UpdateSharedCacheSetValue(genericCache, true, property);
 
                 SaintsEditorApplicationChanged.OnProjectChangedEvent.AddListener(ProjectChangedHandler);
 
@@ -356,7 +356,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 UpdateSharedCacheBase(target, property, info);
                 UpdateSharedCacheSource(target, property, info);
                 target.UpdateResourceAfterTime = double.MinValue;
-                UpdateSharedCacheSetValue(target, false, property, info);
+                UpdateSharedCacheSetValue(target, false, property);
             }
 
             // UpdateSharedCacheSetValue(target, false, property, info);

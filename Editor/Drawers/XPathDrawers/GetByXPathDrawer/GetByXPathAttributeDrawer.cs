@@ -216,7 +216,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     : new[] { iterResults.Results.FirstOrDefault() };
         }
 
-        private static void UpdateSharedCacheSetValue(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property, FieldInfo info)
+        private static void UpdateSharedCacheSetValue(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property)
         {
             if (target.Error != "")
             {
@@ -319,7 +319,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     }
                     if (!resign)
                     {
-                        resign = isFirstTime && getByXPathAttribute.InitSign && fieldIsNull;
+                        resign = isFirstTime && getByXPathAttribute.InitSign && fieldIsNull && !targetIsNull;
                     }
 
                     if (resign)
@@ -533,6 +533,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         = target.IndexToPropertyCache[propertyCacheKey]
                             = new PropertyCache
                             {
+                                // ReSharper disable once RedundantCast
                                 MemberInfo = fieldOrProp.IsField ? (MemberInfo)fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo,
                                 Parent = fieldParent,
                                 SerializedProperty = processingProperty,

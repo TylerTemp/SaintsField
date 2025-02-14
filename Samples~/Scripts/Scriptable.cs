@@ -14,19 +14,19 @@ namespace SaintsField.Samples.Scripts
 
         [Range(0, 100)] public int normalRange;
 
-        public int publicValue;
-
-        [RichLabel(null)]
-        public string noLabel;
-
-        [Serializable]
-        public struct MyStruct
-        {
-            public int structContent;
-        }
-
-        public MyStruct myStruct;
-
-        public MyStruct[] myStructs;
+        // public int publicValue;
+        //
+        // [RichLabel(null)]
+        // public string noLabel;
+        //
+        // [Serializable]
+        // public struct MyStruct
+        // {
+        //     public int structContent;
+        // }
+        //
+        // public MyStruct myStruct;
+        //
+        // public MyStruct[] myStructs;
     }
 }

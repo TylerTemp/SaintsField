@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.ExpandableDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;

@@ -1,0 +1,126 @@
+#if UNITY_2019_2_OR_NEWER
+using System;
+using System.Reflection;
+using SaintsField.Editor.Utils;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
+
+namespace SaintsField.Editor.Drawers.ExpandableDrawer
+{
+    public partial class ExpandableAttributeDrawer
+    {
+
+        private static string NameFoldout(SerializedProperty property) =>
+            $"{property.propertyPath}__ExpandableAttributeDrawer_Foldout";
+
+        private static string NameProps(SerializedProperty property) =>
+            $"{property.propertyPath}__ExpandableAttributeDrawer_Props";
+
+        protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, object parent)
+        {
+            Foldout foldOut = new Foldout
+            {
+                style =
+                {
+                    // backgroundColor = Color.green,
+                    // left = -5,
+                    position = Position.Absolute,
+                    width = LabelBaseWidth - IndentWidth,
+                },
+                name = NameFoldout(property),
+                value = false,
+            };
+
+            foldOut.RegisterValueChangedCallback(v =>
+            {
+                container.Q<VisualElement>(NameProps(property)).style.display =
+                    v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+            });
+
+            return foldOut;
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
+        {
+            VisualElement visualElement = new VisualElement
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                    backgroundColor = EColor.EditorEmphasized.GetColor(),
+                },
+                name = NameProps(property),
+                userData = null,
+            };
+
+            visualElement.AddToClassList(ClassAllowDisable);
+
+            return visualElement;
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
+        {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                return;
+            }
+
+            Foldout foldOut = container.Q<Foldout>(NameFoldout(property));
+            if (!foldOut.value)
+            {
+                return;
+            }
+
+            VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
+            Object curObject = (Object)propsElement.userData;
+
+            Object serObject = SerializedUtils.GetSerObject(property, info, parent);
+
+            if (ReferenceEquals(serObject, curObject))
+            {
+                return;
+            }
+
+            DisplayStyle foldoutDisplay = serObject == null ? DisplayStyle.None : DisplayStyle.Flex;
+            if (foldOut.style.display != foldoutDisplay)
+            {
+                foldOut.style.display = foldoutDisplay;
+            }
+
+            propsElement.userData = serObject;
+            propsElement.Clear();
+            if (serObject == null)
+            {
+                return;
+            }
+
+            InspectorElement inspectorElement = new InspectorElement(serObject)
+            {
+                // style =
+                // {
+                //     width = Length.Percent(100),
+                // },
+            };
+
+            propsElement.Add(inspectorElement);
+
+            // foreach (PropertyField propertyField in GetPropertyFields(property, property.objectReferenceValue))
+            // {
+            //     propsElement.Add(propertyField);
+            // }
+        }
+
+    }
+}
+#endif

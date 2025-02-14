@@ -319,16 +319,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
             UpdateSharedCacheBase(genericCache, property, info);
-            if(!configExists)
+            if(!configExists || genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
             {
+                genericCache.UpdateResourceAfterTime = double.MinValue;
                 UpdateSharedCacheSource(genericCache, property, info);
             }
 
-            if(genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
-            {
-                genericCache.UpdateResourceAfterTime = double.MinValue;
-                UpdateSharedCacheSetValue(genericCache, false, property, info);
-            }
+            UpdateSharedCacheSetValue(genericCache, !configExists, property);
 
             if(!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
             {
