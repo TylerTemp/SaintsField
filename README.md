@@ -81,10 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.27.0**
+**3.27.1**
 
-1.  Add `SpineSlotPicker`
-2.  UI Toolkit: `AdvancedDropdown` remove logs when searching
+1.  IMGUI: `Expandable` now internally uses `SaintsRow` for a better renderring result [#142](https://github.com/TylerTemp/SaintsField/issues/142)
+2.  IMGUI: Fix a bug that when you select an object, then select nothing, then select back, some attribute might get broken with disposed target error
+3.  IMGUI: Fix a protential bug in auto getters
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -998,16 +999,19 @@ using SaintsField;
 
 Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
-Known issue:
-1.  IMGUI: if the target itself has a custom drawer, the drawer will not be used, because `PropertyDrawer` is not allowed to create an `Editor` class, thus it'll just iterate and draw all fields in the object.
+Known issues:
+1.  IMGUI: if the target itself has a custom editor drawer, the drawer will not be used, because `PropertyDrawer` is not allowed to create an `Editor` class. Instead, it will use `SaintsEditor` regardless whatever the actual editor is.
 
     For more information about why this is impossible under IMGUI, see [Issue 25](https://github.com/TylerTemp/SaintsField/issues/25)
 
 2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
+
+    If you see unexpected space or overlap between foldout and label, use `Window` - `Saints` - `Create or Edit SaintsField Config` to change the config.
+
 3.  UI Toolkit: `ReadOnly` (and `DisableIf`, `EnableIf`) can NOT disable the expanded fields. This is because `InspectorElement` does not work with `SetEnable(false)`, neither with `pickingMode=Ignore`. This can not be fixed unless Unity fixes it.
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;

@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.27.1 ##
+
+1.  IMGUI: `Expandable` now internally uses `SaintsRow` for a better renderring result [#142](https://github.com/TylerTemp/SaintsField/issues/142)
+2.  IMGUI: Fix a bug that when you select an object, then select nothing, then select back, some attribute might get broken with disposed target error
+3.  IMGUI: Fix a protential bug in auto getters
+
 ## 3.27.0 ##
 
 1.  Add `SpineSlotPicker`
