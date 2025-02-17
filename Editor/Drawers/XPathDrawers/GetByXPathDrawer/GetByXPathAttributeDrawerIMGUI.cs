@@ -218,7 +218,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 SaintsEditorApplicationChanged.OnProjectChangedEvent.AddListener(ProjectChangedHandler);
 
-                NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
                     SaintsEditorApplicationChanged.OnProjectChangedEvent.RemoveListener(ProjectChangedHandler);
                     SharedCache.Remove(key);

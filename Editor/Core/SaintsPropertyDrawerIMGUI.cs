@@ -45,8 +45,8 @@ namespace SaintsField.Editor.Core
             Selection.selectionChanged += ImGuiCheckChanged;
         }
 
-        private static readonly Dictionary<UnityEngine.Object, HashSet<Action>> _inspectingTargetCallback =
-            new Dictionary<UnityEngine.Object, HashSet<Action>>();
+        private static readonly Dictionary<UnityEngine.Object, Dictionary<string, Action>> InspectingTargetCallback =
+            new Dictionary<UnityEngine.Object, Dictionary<string, Action>>();
 
         private static bool _inspectingWatchingImGui;
 
@@ -65,14 +65,14 @@ namespace SaintsField.Editor.Core
         {
             List<UnityEngine.Object> toRemove = new List<UnityEngine.Object>();
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (KeyValuePair<UnityEngine.Object, HashSet<Action>> inspectingKv in _inspectingTargetCallback)
+            foreach (KeyValuePair<UnityEngine.Object, Dictionary<string, Action>> inspectingKv in InspectingTargetCallback)
             {
                 // ReSharper disable once InvertIf
                 if (Array.IndexOf(Selection.objects, inspectingKv.Key) == -1) // disposed
                 {
-                    foreach (Action action in inspectingKv.Value)
+                    foreach (KeyValuePair<string, Action> r in inspectingKv.Value)
                     {
-                        action();
+                        r.Value.Invoke();
                     }
 
                     toRemove.Add(inspectingKv.Key);
@@ -81,18 +81,23 @@ namespace SaintsField.Editor.Core
 
             foreach (UnityEngine.Object each in toRemove)
             {
-                _inspectingTargetCallback.Remove(each);
+                // Debug.Log($"Remove callback for {each}");
+                InspectingTargetCallback.Remove(each);
             }
         }
 
-        protected static void NoLongerInspectingWatch(UnityEngine.Object target, Action callback)
+        protected static void NoLongerInspectingWatch(UnityEngine.Object target, string callbackKey, Action callback)
         {
-            if (!_inspectingTargetCallback.TryGetValue(target, out HashSet<Action> callbacks))
+            if (!InspectingTargetCallback.TryGetValue(target, out Dictionary<string, Action> callbacks))
             {
-                _inspectingTargetCallback[target] = callbacks = new HashSet<Action>();
+                // Debug.Log($"Add callback set for {target}");
+
+                InspectingTargetCallback[target] = callbacks = new Dictionary<string, Action>();
             }
 
-            callbacks.Add(callback);
+            // Debug.Log($"Add callback for {target}: {callback}");
+
+            callbacks[callbackKey] = callback;
             EnsureInsectingTargetDisposer();
         }
 

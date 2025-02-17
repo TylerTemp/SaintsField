@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 
                 ColorPaletteRegister.OnColorPalettesChanged.AddListener(FillColorPalettesParamless);
 
-                NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
                     ColorPaletteRegister.OnColorPalettesChanged.RemoveListener(FillColorPalettesParamless);
                     ImGuiCache.Remove(key);

@@ -25,6 +25,11 @@ namespace SaintsField.Utils
         [InfoBox("UI Toolkit: Aggressive OnValueChanged watcher\n\nThis allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]
         [LeftToggle] public bool disableOnValueChangedWatchArrayFieldUIToolkit;
 
+        [Space]
+        [InfoBox("IMGUI: Space for foldout. If you see overlap in expandable, set this value to 13, otherwise 0")]
+        [MinValue(0)] public int foldoutSpaceImGui = FoldoutSpaceImGuiDefault;
+        public const int FoldoutSpaceImGuiDefault = 13;
+
         [LayoutStart("Auto Getters Configs", ELayout.FoldoutBox, marginTop: 10)]
 
         [LayoutStart("./Bootstrap", ELayout.FoldoutBox, marginTop: 5, marginBottom: 5)]

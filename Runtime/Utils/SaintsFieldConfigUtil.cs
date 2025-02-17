@@ -92,6 +92,7 @@ namespace SaintsField.Utils
         }
 #endif
 
+        public static int GetFoldoutSpaceImGui() => IsConfigLoaded? Config.foldoutSpaceImGui: SaintsFieldConfig.FoldoutSpaceImGuiDefault;
 
         public static EXP GetComponentExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentExp: defaultValue;
 

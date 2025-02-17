@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             if(!_cachedImGui.TryGetValue(key, out CachedImGui cachedImGui))
             {
                 _cachedImGui[key] = cachedImGui = new CachedImGui();
-                NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
                     _cachedImGui.Remove(key);
                 });

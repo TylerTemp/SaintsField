@@ -3057,8 +3057,14 @@ MonoBehaviour:
   getComponent: {fileID: 454510170}
   getComponentArray:
   - {fileID: 454510170}
+  - {fileID: 454510169}
+  - {fileID: 454510172}
+  - {fileID: 454510173}
   getComponentList:
   - {fileID: 454510170}
+  - {fileID: 454510169}
+  - {fileID: 454510172}
+  - {fileID: 454510173}
   getComponentArrayXPath:
   - {fileID: 454510170}
   - {fileID: 454510169}
@@ -18047,12 +18053,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16b93420e64dc4344bb5175e401a2a00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
-  _dropdownExample: {fileID: 90550607}
-  _spriteR: {fileID: 0}
-  _spriteRenderers:
-  - {fileID: 4273993127172390034}
-  _scriptables: []
+  _scriptable: {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
 --- !u!1 &1625509856
 GameObject:
   m_ObjectHideFlags: 0
@@ -19237,7 +19238,7 @@ GameObject:
   - component: {fileID: 1767385720}
   - component: {fileID: 1767385719}
   m_Layer: 0
-  m_Name: Issue136
+  m_Name: Issue136_Expandable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19271,10 +19272,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levels:
-  - price: 123
+  - price: 1112321
     change: 0
     indicator: {fileID: 0}
-  - price: 0
+  - price: 132312
     change: 0
     indicator: {fileID: 0}
 --- !u!114 &1767385720
@@ -19662,14 +19663,14 @@ MonoBehaviour:
   slash2Sth: {fileID: 1540778734}
   slash3Sth: {fileID: 1540778734}
   directSubMultiDisabled: {fileID: 1957647119}
-  dummyXPath: {fileID: 0}
+  dummyXPath: {fileID: 632590878}
   direct1XPath: {fileID: 1671624918}
   directPosTg1XPath: {fileID: 1957647119}
   directLastXPath: {fileID: 1112995838}
   directSubMultiXPath: {fileID: 1957647119}
   notExistsXPath: {fileID: 0}
-  slashSthXPath: {fileID: 0}
-  slash2SthXPath: {fileID: 0}
+  slashSthXPath: {fileID: 575593403}
+  slash2SthXPath: {fileID: 1540778734}
 --- !u!4 &1830778825
 Transform:
   m_ObjectHideFlags: 0

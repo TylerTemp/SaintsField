@@ -216,7 +216,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
             {
                 InfoCacheImGui.Remove(key);
             });

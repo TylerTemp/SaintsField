@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
             if(!AsyncChangedCache.TryGetValue(key, out CachedImGui cachedValue))
             {
                 cachedValue = AsyncChangedCache[key] = new CachedImGui();
-                NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
                     AsyncChangedCache.Remove(key);
                 });

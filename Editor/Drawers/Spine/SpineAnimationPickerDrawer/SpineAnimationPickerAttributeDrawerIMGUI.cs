@@ -160,7 +160,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                     Error = mismatchError,
                 };
 
-                NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
                     CachedInfoIMGUI.Remove(key);
                 });

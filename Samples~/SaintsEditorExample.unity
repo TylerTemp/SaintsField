@@ -718,13 +718,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f9a3337a83b42641994e526b4065c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  getComponentArray: []
-  getComponentList: []
+  getComponentArray:
+  - {fileID: 282662869}
+  - {fileID: 282662868}
+  - {fileID: 282662863}
+  getComponentList:
+  - {fileID: 282662869}
+  - {fileID: 282662868}
+  - {fileID: 282662863}
   getComponentIArray:
   - <V>k__BackingField: {fileID: 282662869}
   - <V>k__BackingField: {fileID: 282662869}
   - <V>k__BackingField: {fileID: 282662869}
-  getComponentIList: []
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 282662869}
+  - <V>k__BackingField: {fileID: 282662869}
+  - <V>k__BackingField: {fileID: 282662869}
 --- !u!1 &412778987
 GameObject:
   m_ObjectHideFlags: 0
@@ -2986,20 +2995,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   getComponentInParentArray:
-  - {fileID: 282662869}
-  - {fileID: 282662868}
-  - {fileID: 282662863}
+  - {fileID: 1872824174}
+  - {fileID: 1872824171}
   getComponentInParentsList:
+  - {fileID: 1872824174}
+  - {fileID: 1872824171}
   - {fileID: 282662869}
   - {fileID: 282662868}
   - {fileID: 282662863}
   - {fileID: 1704623437}
   - {fileID: 1704623436}
   getComponentIArray:
+  - <V>k__BackingField: {fileID: 1872824174}
+  - <V>k__BackingField: {fileID: 1872824174}
+  getComponentIList:
+  - <V>k__BackingField: {fileID: 1872824174}
+  - <V>k__BackingField: {fileID: 1872824174}
   - <V>k__BackingField: {fileID: 282662869}
-  - <V>k__BackingField: {fileID: 282662868}
-  - <V>k__BackingField: {fileID: 282662863}
-  getComponentIList: []
+  - <V>k__BackingField: {fileID: 282662869}
+  - <V>k__BackingField: {fileID: 282662869}
+  - <V>k__BackingField: {fileID: 1704623437}
+  - <V>k__BackingField: {fileID: 1704623437}
 --- !u!1 &1918609952
 GameObject:
   m_ObjectHideFlags: 0

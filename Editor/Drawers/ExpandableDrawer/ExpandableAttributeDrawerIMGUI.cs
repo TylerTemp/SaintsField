@@ -6,6 +6,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -35,6 +36,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         private class ExpandableInfo
         {
             public string Error;
+            public Object TargetObject;
             public SerializedObject SerializedObject;
             public IReadOnlyList<ISaintsRenderer> Renderers;
         }
@@ -114,35 +116,61 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         {
             string key = SerializedUtils.GetUniqueId(property);
 
-            if (IdToInfo.TryGetValue(key, out ExpandableInfo expandableInfo))
+            Object serObject = SerializedUtils.GetSerObject(property, info, parent);
+
+            bool hasKey = IdToInfo.TryGetValue(key, out ExpandableInfo expandableInfo);
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if(!hasKey)
+            {
+                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+                {
+                    // ReSharper disable once InvertIf
+                    if (IdToInfo.TryGetValue(key, out ExpandableInfo value))
+                    {
+                        // ReSharper disable once UseNullPropagation
+                        if (value.SerializedObject != null)
+                        {
+                            // Debug.Log($"dispose {key}");
+                            value.SerializedObject.Dispose();
+                        }
+
+                        IdToInfo.Remove(key);
+                    }
+                });
+            }
+
+            if (hasKey && ReferenceEquals(serObject, expandableInfo.TargetObject))
             {
                 return expandableInfo;
             }
 
-            NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
-            {
-                // ReSharper disable once InvertIf
-                if (IdToInfo.TryGetValue(key, out ExpandableInfo value))
-                {
-                    // ReSharper disable once UseNullPropagation
-                    if (value.SerializedObject != null)
-                    {
-                        value.SerializedObject.Dispose();
-                    }
-
-                    IdToInfo.Remove(key);
-                }
-            });
-
-            Object serObject = SerializedUtils.GetSerObject(property, info, parent);
             if (serObject == null)
             {
+                // if (property.isExpanded)
+                // {
+                //     property.isExpanded = false;
+                // }
+
                 return new ExpandableInfo
                 {
                     Error = "",
+                    TargetObject = null,
                     SerializedObject = null,
                     Renderers = Array.Empty<ISaintsRenderer>(),
                 };
+            }
+
+            if(hasKey && expandableInfo.SerializedObject != null)
+            {
+                // Debug.Log($"dispose {key}");
+                try
+                {
+                    expandableInfo.SerializedObject.Dispose();
+                }
+                catch (Exception)
+                {
+                    // do nothing
+                }
             }
 
             SerializedObject ser = new SerializedObject(serObject);
@@ -151,9 +179,12 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
             // Debug.Log(serObject);
 
+            // Debug.Log($"create {key}");
+
             return IdToInfo[key] = new ExpandableInfo
             {
                 Error = "",
+                TargetObject = serObject,
                 SerializedObject = ser,
                 Renderers = renderers,
             };
@@ -186,7 +217,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 }
             }
 
-            return 13;
+            return SaintsFieldConfigUtil.GetFoldoutSpaceImGui();
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -304,7 +335,22 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                     //     y = childRect.y + 1,
                     //     height = childRect.height - 2,
                     // }, iterator, true);
-                    saintsRenderer.RenderPositionIMGUI(childRect);
+                    try
+                    {
+                        saintsRenderer.RenderPositionIMGUI(childRect);
+                    }
+                    catch (NullReferenceException)
+                    {
+                        CleanAndRemove(property);
+                        return expandabledRect;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        CleanAndRemove(property);
+                        return expandabledRect;
+                    }
+
+
                 }
 
                 serInfo.SerializedObject.ApplyModifiedProperties();
@@ -316,6 +362,30 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             //     height = leftRect.height - usedHeight,
             // };
             return expandabledRect;
+        }
+
+        private static void CleanAndRemove(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (!IdToInfo.TryGetValue(key, out ExpandableInfo info))
+            {
+                return;
+            }
+
+            if (info.SerializedObject != null)
+            {
+                // Debug.Log($"Disposed on error {key}");
+                try
+                {
+                    info.SerializedObject.Dispose();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+
+            IdToInfo.Remove(key);
         }
 
         public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)

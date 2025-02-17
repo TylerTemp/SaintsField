@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                 return ensureInfo;
             }
 
-            NoLongerInspectingWatch(property.serializedObject.targetObject, () =>
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
             {
                 InfoCacheImGui.Remove(key);
             });
