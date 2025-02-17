@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
@@ -24,6 +25,23 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         {
             Button buttonElement = null;
             IVisualElementScheduledItem buttonTask = null;
+            Image buttonRotator = new Image
+            {
+                image = Util.LoadResource<Texture2D>("refresh.png"),
+                style =
+                {
+                    position = Position.Absolute,
+                    width = EditorGUIUtility.singleLineHeight - 2,
+                    height = EditorGUIUtility.singleLineHeight - 2,
+                    left = 1,
+                    top = 1,
+                    opacity = 0.3f,
+                    display = DisplayStyle.None,
+                },
+                tintColor = EColor.Lime.GetColor(),
+                // name = ButtonRotatorName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
+            };
+            UIToolkitUtils.KeepRotate(buttonRotator);
             buttonElement = new Button(() =>
             {
                 (string buttonError, object buttonResult) = CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent);
@@ -36,13 +54,22 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 {
                     buttonElement.userData = enumerator;
                     buttonTask?.Pause();
+                    UIToolkitUtils.TriggerRotate(buttonRotator);
                     buttonTask = buttonElement.schedule.Execute(() =>
                     {
                         if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
                         {
+                            bool show = true;
                             if (!bindEnumerator.MoveNext())
                             {
+                                show = false;
                                 buttonTask?.Pause();
+                            }
+
+                            DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
+                            if(buttonRotator.style.display != style)
+                            {
+                                buttonRotator.style.display = style;
                             }
                         }
                     }).Every(1);
@@ -55,6 +82,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                     flexGrow = 1,
                 },
             };
+
+            buttonElement.Add(buttonRotator);
 
             VisualElement labelContainer = new VisualElement
             {

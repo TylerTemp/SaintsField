@@ -17,6 +17,8 @@ namespace SaintsField.Editor.Playa.Renderer
     public partial class MethodRenderer
     {
         private static string ButtonName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonRenderer";
+        private static string ButtonLabelContainerName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonLabelContainer";
+        // private static string ButtonRotatorName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonLabelContainer";
 
         private class ButtonUserData
         {
@@ -117,6 +119,22 @@ namespace SaintsField.Editor.Playa.Renderer
             };
             Button buttonElement = null;
             IVisualElementScheduledItem buttonTask = null;
+            Image buttonRotator = new Image
+            {
+                image = Util.LoadResource<Texture2D>("refresh.png"),
+                style =
+                {
+                    position = Position.Absolute,
+                    width = EditorGUIUtility.singleLineHeight - 2,
+                    height = EditorGUIUtility.singleLineHeight - 2,
+                    left = 1,
+                    top = 1,
+                    opacity = 0.3f,
+                    display = DisplayStyle.None,
+                },
+                tintColor = EColor.Lime.GetColor(),
+                // name = ButtonRotatorName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
+            };
             buttonElement = new Button(() =>
             {
                 object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
@@ -129,6 +147,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     // ReSharper disable once PossibleNullReferenceException
                     buttonUserData.Enumerator = enumerator;
                     buttonTask?.Pause();
+                    UIToolkitUtils.TriggerRotate(buttonRotator);
                     // ReSharper disable once AccessToModifiedClosure
                     // ReSharper disable once PossibleNullReferenceException
                     buttonTask = buttonElement.schedule.Execute(() =>
@@ -139,39 +158,75 @@ namespace SaintsField.Editor.Playa.Renderer
                         // ReSharper disable once ConvertTypeCheckPatternToNullCheck
                         if (buttonUserData.Enumerator is IEnumerator bindEnumerator)
                         {
+                            bool show = true;
                             if (!bindEnumerator.MoveNext())
                             {
+                                show = false;
                                 // ReSharper disable once AccessToModifiedClosure
                                 // ReSharper disable once PossibleNullReferenceException
                                 buttonTask?.Pause();
+                            }
+
+                            DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
+                            if(buttonRotator.style.display != style)
+                            {
+                                buttonRotator.style.display = style;
                             }
                         }
                     }).Every(1);
                 }
             })
             {
-                text = buttonText,
+                text = "",
                 enableRichText = true,
                 style =
                 {
                     flexGrow = 1,
                     flexDirection = FlexDirection.Row,
                     justifyContent = Justify.Center,
+                    position = Position.Relative,
                 },
                 name = ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
                 userData = buttonUserData,
             };
 
-            if (!string.IsNullOrEmpty(buttonAttribute.Label))
+            // if (!string.IsNullOrEmpty(buttonAttribute.Label))
+            // {
+            //     buttonElement.text = "";
+            //     buttonElement.Clear();
+            //     foreach (VisualElement element in (new RichTextDrawer()).DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
+            //                  FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target)))
+            //     {
+            //         buttonElement.Add(element);
+            //     }
+            // }
+
+            buttonElement.Clear();
+            VisualElement buttonLabelContainer = new VisualElement
             {
-                buttonElement.text = "";
-                buttonElement.Clear();
-                foreach (VisualElement element in (new RichTextDrawer()).DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
-                             FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target)))
+                style =
                 {
-                    buttonElement.Add(element);
-                }
+                    flexGrow = 1,
+                    flexDirection = FlexDirection.Row,
+                    justifyContent = Justify.Center,
+                },
+                name = ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
+            };
+            buttonElement.Add(buttonLabelContainer);
+            foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
+                         FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target)))
+            {
+                buttonLabelContainer.Add(element);
             }
+
+            UIToolkitUtils.KeepRotate(buttonRotator);
+            // buttonLabelContainer.RegisterCallback<AttachToPanelEvent>(_ =>
+            //     UIToolkitUtils.TriggerRotate(buttonLabelContainer));
+            // UIToolkitUtils.TriggerRotate(buttonLabelContainer);
+            // buttonRotator.transform.rotation = Quaternion.Euler(0, 0, 180);
+            // buttonRotator.AddToClassList("saints-rotate-360");
+
+            buttonElement.Add(buttonRotator);
 
             bool needUpdate = buttonAttribute.IsCallback;
 
@@ -263,19 +318,21 @@ namespace SaintsField.Editor.Playa.Renderer
                     return baseResult;
                 }
 
-                buttonElement.text = "";
-                buttonElement.Clear();
+                // buttonElement.text = "";
+                // buttonElement.Clear();
+                VisualElement buttonLabelContainer = root.Q<VisualElement>(name: ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Target));
+                buttonLabelContainer.Clear();
 
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (result == "")
                 {
-                    buttonElement.Add(new Label(" "));
+                    // buttonElement.Add(new Label(" "));
                     return baseResult;
                 }
 
                 if (result is null)
                 {
-                    buttonElement.Add(new Label(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name)));
+                    buttonLabelContainer.Add(new Label(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name)));
                     return baseResult;
                 }
 
@@ -287,7 +344,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 foreach (VisualElement chunk in chunks)
                 {
-                    buttonElement.Add(chunk);
+                    buttonLabelContainer.Add(chunk);
                 }
 
                 return baseResult;

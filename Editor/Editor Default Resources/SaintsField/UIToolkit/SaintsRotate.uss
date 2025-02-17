@@ -1,0 +1,13 @@
+.saints-rotate {
+    /*rotate: 180deg;*/
+    transition-duration: 0.7s;
+    /*transition-timing-function: ease-in-out;*/
+    transition-timing-function: linear;
+    /*transition-property: transform;*/
+    transition-property: rotate;
+    transition-delay: 0s;
+}
+
+.saints-rotate-360 {
+    rotate: 360deg;
+}

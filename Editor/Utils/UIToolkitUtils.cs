@@ -21,6 +21,52 @@ namespace SaintsField.Editor.Utils
             label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
         }
 
+        public static void KeepRotate(VisualElement element)
+        {
+            StyleSheet rotateUss = Util.LoadResource<StyleSheet>("UIToolkit/SaintsRotate.uss");
+            element.styleSheets.Add(rotateUss);
+            element.AddToClassList("saints-rotate");
+            element.RegisterCallback<TransitionEndEvent>(e =>
+            {
+                // Debug.Log(buttonRotator.style.rotate);
+                element.RemoveFromClassList("saints-rotate");
+
+                StyleRotate rotateReset = element.style.rotate;
+                rotateReset.value = new Rotate(0);
+                element.style.rotate = rotateReset;
+                // Debug.Log(buttonRotator.style.rotate);
+
+                element.schedule.Execute(() =>
+                {
+                    element.AddToClassList("saints-rotate");
+                    element.schedule.Execute(() =>
+                    {
+                        TriggerRotate(element);
+                        // StyleRotate rotate = element.style.rotate;
+                        // rotate.value = new Rotate(360);
+                        // element.style.rotate = rotate;
+                        // Debug.Log($"restart to {buttonRotator.style.rotate}");
+                    });
+                });
+
+                // Debug.Log(e);
+            });
+
+            // element.schedule.Execute(() =>
+            // {
+            //     StyleRotate rotate = element.style.rotate;
+            //     rotate.value = new Rotate(360);
+            //     element.style.rotate = rotate;
+            // });
+        }
+
+        public static void TriggerRotate(VisualElement element)
+        {
+            StyleRotate rotate = element.style.rotate;
+            rotate.value = new Rotate(360);
+            element.style.rotate = rotate;
+        }
+
         // ReSharper disable once SuggestBaseTypeForParameter
         public static void FixLabelWidthUIToolkit(Label label)
         {

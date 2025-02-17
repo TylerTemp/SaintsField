@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [Button]
         private IEnumerator IncrValue()
         {
-            foreach (int num in Enumerable.Range(0, 1000))
+            foreach (int num in Enumerable.Range(0, 200))
             {
                 value = num;
                 yield return null;
