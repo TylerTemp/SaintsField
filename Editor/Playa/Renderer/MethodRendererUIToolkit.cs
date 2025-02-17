@@ -135,6 +135,9 @@ namespace SaintsField.Editor.Playa.Renderer
                 tintColor = EColor.Lime.GetColor(),
                 // name = ButtonRotatorName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
             };
+            UIToolkitUtils.KeepRotate(buttonRotator);
+            buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator));
+
             buttonElement = new Button(() =>
             {
                 object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
@@ -147,7 +150,6 @@ namespace SaintsField.Editor.Playa.Renderer
                     // ReSharper disable once PossibleNullReferenceException
                     buttonUserData.Enumerator = enumerator;
                     buttonTask?.Pause();
-                    UIToolkitUtils.TriggerRotate(buttonRotator);
                     // ReSharper disable once AccessToModifiedClosure
                     // ReSharper disable once PossibleNullReferenceException
                     buttonTask = buttonElement.schedule.Execute(() =>
@@ -219,7 +221,6 @@ namespace SaintsField.Editor.Playa.Renderer
                 buttonLabelContainer.Add(element);
             }
 
-            UIToolkitUtils.KeepRotate(buttonRotator);
             // buttonLabelContainer.RegisterCallback<AttachToPanelEvent>(_ =>
             //     UIToolkitUtils.TriggerRotate(buttonLabelContainer));
             // UIToolkitUtils.TriggerRotate(buttonLabelContainer);

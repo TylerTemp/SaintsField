@@ -19,6 +19,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         private static string ClassLabelContainer(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__LabelContainer";
         private static string ClassLabelError(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__LabelError";
         private static string ClassExecError(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ExecError";
+        private static string NameButtonRotator(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ButtonRatator";
 
         protected static VisualElement DrawUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent, VisualElement container)
@@ -39,9 +40,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                     display = DisplayStyle.None,
                 },
                 tintColor = EColor.Lime.GetColor(),
-                // name = ButtonRotatorName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
+                name = NameButtonRotator(property, index),
             };
-            UIToolkitUtils.KeepRotate(buttonRotator);
             buttonElement = new Button(() =>
             {
                 (string buttonError, object buttonResult) = CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent);
@@ -54,7 +54,6 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 {
                     buttonElement.userData = enumerator;
                     buttonTask?.Pause();
-                    UIToolkitUtils.TriggerRotate(buttonRotator);
                     buttonTask = buttonElement.schedule.Execute(() =>
                     {
                         if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
@@ -103,6 +102,16 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             // button.AddToClassList();
             buttonElement.AddToClassList(ClassAllowDisable);
             return buttonElement;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            Image buttonRotator = container.Q<Image>(name: NameButtonRotator(property, index));
+            // UIToolkitUtils.TriggerRotate(buttonRotator);
+            UIToolkitUtils.KeepRotate(buttonRotator);
+            buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator));
+            // Debug.Log("TriggerRotate");
         }
 
         protected static HelpBox DrawLabelError(SerializedProperty property, int index) => DrawError(ClassLabelError(property, index));
