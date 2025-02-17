@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     height = EditorGUIUtility.singleLineHeight - 2,
                     left = 1,
                     top = 1,
-                    opacity = 0.3f,
+                    opacity = 0.5f,
                     display = DisplayStyle.None,
                 },
                 tintColor = EColor.Lime.GetColor(),
