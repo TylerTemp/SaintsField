@@ -525,7 +525,6 @@ MonoBehaviour:
   m_Size: {x: 10, y: 10, z: 10}
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
-    serializedVersion: 2
     m_Bits: 4294967295
   m_UseGeometry: 0
   m_DefaultArea: 0
@@ -539,6 +538,8 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
+  m_LastPosition: {x: 0, y: 0, z: 0}
+  m_LastRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!4 &69899267
 Transform:
   m_ObjectHideFlags: 0
@@ -14143,23 +14144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c1ba246bcd61f142bc0ba4f5edb3440, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialHealth: 100
-  _currentHealth: 0
-  _head: {fileID: 0}
-  panda: {fileID: 0}
-  anim: {fileID: 0}
-  _team: {fileID: 0}
-  targetOffset: {fileID: 0}
-  kickback: 1
-  rigid: {fileID: 0}
-  blinkRenderers: []
-  destroyOnDeath: 1
-  deathDelay: 1
-  explosionPrefab: {fileID: 0}
-  corpsePrefab: {fileID: 0}
-  _parent: {fileID: 557706425}
-  _parentOverride: {fileID: 0}
-  damageRatio: 1
 --- !u!1 &1157478911
 GameObject:
   m_ObjectHideFlags: 0
