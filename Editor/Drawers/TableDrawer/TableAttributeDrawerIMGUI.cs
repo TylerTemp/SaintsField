@@ -117,7 +117,9 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         // SerializedObject serObj = new SerializedObject(obj);
                         float height = propNames
                             .Select(propName => serObj.FindProperty(propName))
-                            .Select(prop => EditorGUI.GetPropertyHeight(prop, GUIContent.none, true))
+                            .Select(prop => EditorGUI.GetPropertyHeight(prop, prop.propertyType == SerializedPropertyType.Generic
+                                ? new GUIContent(prop.displayName)
+                                : GUIContent.none, true))
                             .Sum();
                         allHeight.Add(height);
                     }
@@ -125,7 +127,9 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     {
                         float height = propNames
                             .Select(propName => arrayItemProp.FindPropertyRelative(propName))
-                            .Select(prop => EditorGUI.GetPropertyHeight(prop, GUIContent.none, true))
+                            .Select(prop => EditorGUI.GetPropertyHeight(prop, prop.propertyType == SerializedPropertyType.Generic
+                                ? new GUIContent(prop.displayName)
+                                : GUIContent.none, true))
                             .Sum();
                         // SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
                         allHeight.Add(height);
@@ -174,10 +178,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         if (propNames.Count == 1)
                         {
                             SerializedProperty prop = serObj.FindProperty(propNames[0]);
+                            GUIContent guiContent = prop.propertyType == SerializedPropertyType.Generic
+                                ? new GUIContent(prop.displayName)
+                                : GUIContent.none;
                             EditorGUI.PropertyField(getCellRect, prop,
-                                prop.propertyType == SerializedPropertyType.Generic
-                                    ? new GUIContent(prop.displayName)
-                                    : GUIContent.none);
+                                guiContent);
                         }
                         else
                         {
@@ -185,13 +190,16 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             foreach (string propName in propNames)
                             {
                                 SerializedProperty prop = serObj.FindProperty(propName);
-                                float height = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
+
+                                GUIContent guiContent = prop.propertyType == SerializedPropertyType.Generic
+                                    ? new GUIContent(prop.displayName)
+                                    : GUIContent.none;
+
+                                float height = EditorGUI.GetPropertyHeight(prop, guiContent, true);
                                 (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
                                 leftRect = belowRect;
                                 EditorGUI.PropertyField(useRect, prop,
-                                    prop.propertyType == SerializedPropertyType.Generic
-                                        ? new GUIContent(prop.displayName)
-                                        : GUIContent.none);
+                                    guiContent);
 
                             }
                         }
@@ -202,10 +210,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     if(propNames.Count == 1)
                     {
                         SerializedProperty prop = arrayItemProp.FindPropertyRelative(propNames[0]);
+                        GUIContent guiContent = prop.propertyType == SerializedPropertyType.Generic
+                            ? new GUIContent(prop.displayName)
+                            : GUIContent.none;
                         EditorGUI.PropertyField(getCellRect, prop,
-                            prop.propertyType == SerializedPropertyType.Generic
-                                ? new GUIContent(prop.displayName)
-                                : GUIContent.none);
+                            guiContent);
                     }
                     else
                     {
@@ -213,13 +222,14 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         foreach (string propName in propNames)
                         {
                             SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
-                            float height = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
-                            (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
-                            leftRect = belowRect;
-                            EditorGUI.PropertyField(useRect, prop,
+                            GUIContent guiContent =
                                 prop.propertyType == SerializedPropertyType.Generic
                                     ? new GUIContent(prop.displayName)
-                                    : GUIContent.none);
+                                    : GUIContent.none;
+                            float height = EditorGUI.GetPropertyHeight(prop, guiContent, true);
+                            (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
+                            leftRect = belowRect;
+                            EditorGUI.PropertyField(useRect, prop, guiContent);
                         }
                     }
                 }
