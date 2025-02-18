@@ -1400,6 +1400,169 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfoSpace(string space, SerializedProperty property, FieldInfo info, object parent)
+        {
+            try
+            {
+                SerializedPropertyType _ = property.propertyType;
+            }
+            catch (InvalidCastException)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = $"Property disposed",
+                };
+            }
+            catch (NullReferenceException)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = $"Property disposed",
+                };
+            }
+            catch (ObjectDisposedException)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = $"Property disposed",
+                };
+            }
+
+
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Generic:
+                {
+                    (string error, int _, object propertyValue) = GetValue(property, info, parent);
+
+                    if (error == "" && propertyValue is IWrapProp wrapProp)
+                    {
+                        object propWrapValue = GetWrapValue(wrapProp);
+                        switch (propWrapValue)
+                        {
+                            case null:
+                                return new TargetWorldPosInfo { Error = "Target is null" };
+                            case GameObject wrapGo:
+                                return new TargetWorldPosInfo
+                                {
+                                    Error = "",
+                                    IsTransform = true,
+                                    Transform = wrapGo.transform,
+                                };
+                            case Component wrapComp:
+                                return new TargetWorldPosInfo
+                                {
+                                    Error = "",
+                                    IsTransform = true,
+                                    Transform = wrapComp.transform,
+                                };
+                            default:
+                                return new TargetWorldPosInfo
+                                {
+                                    Error = $"{propWrapValue} is not GameObject or Component",
+                                };
+                        }
+                    }
+
+                    return new TargetWorldPosInfo
+                    {
+                        Error = $"{property.propertyType} is not supported",
+                    };
+                }
+                case SerializedPropertyType.ObjectReference when property.objectReferenceValue is GameObject isGo:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = "",
+                        IsTransform = true,
+                        Transform = isGo.transform,
+                    };
+                case SerializedPropertyType.ObjectReference when property.objectReferenceValue is Component comp:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = "",
+                        IsTransform = true,
+                        Transform = comp.transform,
+                    };
+                    // return ("", comp.transform);
+                    // go = ((Component) property.objectReferenceValue)?.gameObject;
+                case SerializedPropertyType.Vector2:
+                    return GetValueFromVectorSpace(space, property, info, parent, property.vector2Value);
+                case SerializedPropertyType.Vector3:
+                    return GetValueFromVectorSpace(space, property, info, parent, property.vector3Value);
+                default:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = $"{property.propertyType} is not supported",
+                    };
+            }
+        }
+
+        public static TargetWorldPosInfo GetValueFromVectorSpace(string space, SerializedProperty property,
+            MemberInfo info, object parent,
+            Vector3 v3Value)
+        {
+            if (space is null)
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = "",
+                    IsTransform = false,
+                    WorldPos = v3Value,
+                };
+            }
+
+            if(space == "this")
+            {
+                (string error, Transform container) = GetContainingTransform(property);
+                if (error != "")
+                {
+                    return new TargetWorldPosInfo
+                    {
+                        Error = error,
+                    };
+                }
+
+                return new TargetWorldPosInfo
+                {
+                    Error = "",
+                    IsTransform = false,
+                    WorldPos = container.TransformPoint(v3Value),
+                };
+            }
+
+            (string callbackError, int _, object value) = GetValue(property, info, parent);
+            if (callbackError != "")
+            {
+                return new TargetWorldPosInfo
+                {
+                    Error = callbackError,
+                };
+            }
+
+            switch (value)
+            {
+                case GameObject go:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = "",
+                        IsTransform = false,
+                        WorldPos = go.transform.TransformPoint(v3Value),
+                    };
+                case Component comp:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = "",
+                        IsTransform = false,
+                        WorldPos = comp.transform.TransformPoint(v3Value),
+                    };
+                default:
+                    return new TargetWorldPosInfo
+                    {
+                        Error = $"{value} is not GameObject or Component",
+                    };
+            }
+        }
+
         public static TargetWorldPosInfo GetValueFromVector(Space space, SerializedProperty property,
             Vector3 v3Value)
         {

@@ -11,7 +11,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 {
     public partial class DrawLabelAttributeDrawer
     {
-        #region UIToolkit
         private static string NameDrawLabel(SerializedProperty property) => $"{property.propertyPath}_DrawLabel";
 
         private LabelInfo _labelInfoUIToolkit;
@@ -89,15 +88,12 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             }
         }
 
-        private GUIStyle _guiStyleUIToolkit;
+        // private GUIStyle _guiStyleUIToolkit;
 
         private void OnSceneGUIUIToolkit(SceneView sceneView)
         {
             OnSceneGUIInternal(sceneView, _labelInfoUIToolkit);
         }
-        #endregion
-
-
     }
 }
 #endif

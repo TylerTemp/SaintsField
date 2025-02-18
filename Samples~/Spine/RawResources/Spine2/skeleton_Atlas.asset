@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
+  m_Script: {fileID: 0}
   m_Name: skeleton_Atlas
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: spine-unity:Spine.Unity:SpineAtlasAsset
   textureLoadingMode: 0
   onDemandTextureLoader: {fileID: 0}
   atlasFile: {fileID: 4900000, guid: 35f077d7be0521f4abcea63aa9b480e4, type: 3}

@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 // name = ButtonRotatorName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
             };
             UIToolkitUtils.KeepRotate(buttonRotator);
-            buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator));
+            buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator)).StartingIn(200);
 
             buttonElement = new Button(() =>
             {

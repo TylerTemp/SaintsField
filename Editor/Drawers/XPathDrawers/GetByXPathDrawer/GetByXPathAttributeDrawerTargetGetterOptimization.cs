@@ -285,6 +285,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             Type type = compType ?? fieldType;
+            // Debug.Log($"{compType}/{fieldType}");
+            bool typeIsGameObject = type == typeof(GameObject) || type.IsSubclassOf(typeof(GameObject));
+            bool typeIsComponent = type == typeof(Component) || type.IsSubclassOf(typeof(Component));
 
             Transform transform;
             switch (property.serializedObject.targetObject)
@@ -303,21 +306,38 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             IEnumerable<Transform> searchTargets = excludeSelf
                 ? transform.Cast<Transform>()
-                : new[]{ transform };
+                : new[] { transform };
 
-            foreach (Transform directChildTrans in searchTargets)
+            if (typeIsComponent)
             {
-                IEnumerable<Component> components =
-                    directChildTrans.GetComponentsInChildren(type, includeInactive);
-                if (interfaceType != null)
+                foreach (Transform directChildTrans in searchTargets)
                 {
-                    components = components.Where(interfaceType.IsInstanceOfType);
-                }
+                    IEnumerable<Component> components = directChildTrans.GetComponentsInChildren(type, includeInactive);
+                    if (interfaceType != null)
+                    {
+                        components = components.Where(interfaceType.IsInstanceOfType);
+                    }
 
-                results.AddRange(components.SelectMany(each => GetInChildrenFilterComponent(each, type, fieldType)));
+                    results.AddRange(components.SelectMany(each => GetInChildrenFilterComponent(each, type, fieldType)));
+                }
+                return ("", results.Count > 0, results);
             }
 
-            return ("", results.Count > 0, results);
+            if (typeIsGameObject)
+            {
+                if (interfaceType != null)
+                {
+                    return ("", false, Array.Empty<object>());
+                }
+
+                results.AddRange(searchTargets
+                    .Where(each => includeInactive || each.gameObject.activeInHierarchy)
+                    .Select(each => each.gameObject));
+
+                return ("", results.Count > 0, results);
+            }
+
+            return ("", false, Array.Empty<object>());
         }
 
         private static IEnumerable<Object> GetInChildrenFilterComponent(Component component, Type type, Type fieldType)
