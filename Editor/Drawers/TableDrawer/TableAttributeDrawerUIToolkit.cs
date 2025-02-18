@@ -523,7 +523,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         GetFieldHeight(property, label, saintsAttribute, info, true, parent);
                     Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
 
-                    DrawField(rect, property, label, saintsAttribute, new OnGUIPayload(), info, parent);
+                    DrawField(rect, property, label, saintsAttribute, allAttributes, new OnGUIPayload(), info, parent);
                     // ReSharper disable once InvertIf
                     // if (changed.changed)
                     // {
