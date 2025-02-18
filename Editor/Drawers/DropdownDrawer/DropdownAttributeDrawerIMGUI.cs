@@ -20,7 +20,8 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            FieldInfo info, object parent)
         {
             string key = GetKey(property);
             if (AsyncChangedCache.TryGetValue(key, out object changedValue))

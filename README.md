@@ -81,12 +81,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.27.1**
+**3.28.0**
 
-1.  IMGUI: `Expandable` now internally uses `SaintsRow` for a better rendering result [#142](https://github.com/TylerTemp/SaintsField/issues/142)
-2.  IMGUI: Fix a bug that when you select an object, then select nothing, then select back, some attribute might get broken with disposed target error
-3.  IMGUI: Fix a potential bug in auto getters
-4.  Fix `Troubleshoot` didn't display a completed status
+1.  Add `TableColumn` to merge multiple columns into one
+2.  UI Toolkit: all buttons that returns `IEnumerator` now will display a loading icon when the coroutine is running
+3.  fix `Table` can not disable related buttons when using with `ArraySize`
+4.  IMGUI: fix multiple target editing gives error when table sizes are not equal, [#140](https://github.com/TylerTemp/SaintsField/issues/140)
+5.  Auto getters on lists/array now no longer force the target to be ordered as what the resources are found, [#145](https://github.com/TylerTemp/SaintsField/issues/145)
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -1311,6 +1312,28 @@ public MyStruct[] myStructs;
 ```
 
 [![video](https://github.com/user-attachments/assets/82193a57-c051-4188-950d-9e7a9ee6e08d)](https://github.com/user-attachments/assets/1c574c0c-56e0-4912-8e00-49fb7e29d80c)
+
+**`TableColumn`**
+
+`TableColumn` allows you to merge multiple fields into one column.
+
+```csharp
+[Serializable]
+public struct MyStruct
+{
+    public int myInt;
+
+    [TableColumn("Value"), AboveRichLabel]
+    public string myString;
+    [TableColumn("Value"), AboveRichLabel]
+    public GameObject myObject;
+}
+
+[Table]
+public List<MyStruct> myStructs;
+```
+
+![image](https://github.com/user-attachments/assets/53a20670-c281-49e1-a034-c11d96d270bc)
 
 #### `ShowInInspector` ####
 

@@ -44,7 +44,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            FieldInfo info, object parent)
         {
             AddressableSceneAttribute addressableSceneAttribute = (AddressableSceneAttribute)saintsAttribute;
             (string error, AddressableAssetEntry sceneEntry) = GetSceneEntry(property.stringValue, addressableSceneAttribute);

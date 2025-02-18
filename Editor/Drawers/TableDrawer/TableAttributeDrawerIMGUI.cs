@@ -422,7 +422,9 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             return Mathf.Max(_saintsTable.totalHeight, EditorGUIUtility.singleLineHeight * (arrayProp.arraySize + 1)) + SingleLineHeight;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -446,7 +448,19 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 height = controlRect.height -2,
             }, controlRect.width - rightWidth);
 
+            ArraySizeAttribute arraySizeAttribute = allAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
+            int min = 0;
+            int max = int.MaxValue;
+            if (arraySizeAttribute != null)
+            {
+                min = arraySizeAttribute.Min;
+                max = arraySizeAttribute.Max;
+                // Debug.Log($"{min} ~ {max}");
+            }
+
             (Rect numberRect, Rect controlsRect) = RectUtils.SplitWidthRect(rightRect, arraySizeWidth);
+
+            using(new EditorGUI.DisabledScope(min == max))
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 int newSize = EditorGUI.DelayedIntField(numberRect, _saintsTable.ArrayProp.arraySize);
@@ -458,15 +472,21 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
 
             (Rect plusButton, Rect minusButton) = RectUtils.SplitWidthRect(controlsRect, EditorGUIUtility.singleLineHeight);
-            if(GUI.Button(plusButton, "+"))
+            using(new EditorGUI.DisabledScope(_saintsTable.ArrayProp.arraySize >= max))
             {
-                ChangeArraySize(_saintsTable.ArrayProp.arraySize + 1, _saintsTable.ArrayProp);
-                _saintsTable.Reload();
+                if (GUI.Button(plusButton, "+"))
+                {
+                    ChangeArraySize(_saintsTable.ArrayProp.arraySize + 1, _saintsTable.ArrayProp);
+                    _saintsTable.Reload();
+                }
             }
-            if(GUI.Button(minusButton, "-"))
+            using(new EditorGUI.DisabledScope(_saintsTable.ArrayProp.arraySize <= min))
             {
-                DeleteArrayElement(_saintsTable.ArrayProp, _saintsTable.GetSelection());
-                _saintsTable.Reload();
+                if (GUI.Button(minusButton, "-"))
+                {
+                    DeleteArrayElement(_saintsTable.ArrayProp, _saintsTable.GetSelection());
+                    _saintsTable.Reload();
+                }
             }
 
             _saintsTable.OnGUI(tableRect);

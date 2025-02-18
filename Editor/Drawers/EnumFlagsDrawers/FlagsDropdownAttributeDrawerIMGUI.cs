@@ -31,7 +31,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            FieldInfo info, object parent)
         {
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
             AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);

@@ -106,7 +106,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            FieldInfo info, object parent)
         {
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute)saintsAttribute;
             if (!_initExpandState)

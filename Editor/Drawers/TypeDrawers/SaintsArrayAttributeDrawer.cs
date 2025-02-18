@@ -44,7 +44,9 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
             return EditorGUI.GetPropertyHeight(arrProperty, label, true);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             if(_imGuiPropRawName == "")

@@ -10732,18 +10732,6 @@ MonoBehaviour:
   - myInt: 2
     myString: 
     myObject: {fileID: 272774832}
-  - myInt: 98
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 52
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 23
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 51
-    myString: 
-    myObject: {fileID: 0}
 --- !u!114 &833747052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25885,12 +25873,6 @@ MonoBehaviour:
     myString: 
     myObject: {fileID: 0}
   min1Max3:
-  - myInt: 0
-    myString: 
-    myObject: {fileID: 0}
-  - myInt: 0
-    myString: 
-    myObject: {fileID: 0}
   - myInt: 0
     myString: 
     myObject: {fileID: 0}

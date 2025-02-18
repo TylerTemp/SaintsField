@@ -18,7 +18,8 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
             if (metaInfo.Error != "")

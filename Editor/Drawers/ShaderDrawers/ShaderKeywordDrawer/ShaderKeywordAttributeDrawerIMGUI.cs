@@ -44,7 +44,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderKeywordInfoIMGUI infoIMGUI))

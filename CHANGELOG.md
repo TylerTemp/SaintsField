@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.28.0 ##
+
+1.  Add `TableColumn` to merge multiple columns into one
+2.  UI Toolkit: all buttons that returns `IEnumerator` now will display a loading icon when the coroutine is running
+3.  fix `Table` can not disable related buttons when using with `ArraySize`
+4.  IMGUI: fix multiple target editing gives error when table sizes are not equal, [#140](https://github.com/TylerTemp/SaintsField/issues/140)
+5.  Auto getters on lists/array now no longer force the target to be ordered as what the resources are found, [#145](https://github.com/TylerTemp/SaintsField/issues/145)
+
 ## 3.27.1 ##
 
 1.  IMGUI: `Expandable` now internally uses `SaintsRow` for a better rendering result [#142](https://github.com/TylerTemp/SaintsField/issues/142)

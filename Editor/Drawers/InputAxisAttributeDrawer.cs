@@ -48,7 +48,8 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            FieldInfo info, object parent)
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_axisNames == null)

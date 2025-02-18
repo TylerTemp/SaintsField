@@ -706,7 +706,7 @@ namespace SaintsField.Editor.Core
                         // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                         // GUI.SetNextControlName(_fieldControlName);
                         fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            fieldAttributeWithIndex.SaintsAttribute, onGUIPayload, fieldInfo, parent);
+                            fieldAttributeWithIndex.SaintsAttribute, allAttributes, onGUIPayload, fieldInfo, parent);
                         // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
                         // UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
@@ -958,7 +958,8 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            FieldInfo info, object parent)
         {
         }
 
