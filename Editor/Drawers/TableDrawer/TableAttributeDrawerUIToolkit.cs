@@ -64,17 +64,17 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         root.Clear();
                         property.objectReferenceValue = evt.newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        root.Add(BuildContent(arraySizeAttribute, root, property, info, parent));
+                        root.Add(BuildContent(arraySizeAttribute, root, property, info));
                     });
                     return root;
                 }
             }
 
-            BuildContent(arraySizeAttribute, root, property, info, parent);
+            BuildContent(arraySizeAttribute, root, property, info);
             return root;
         }
 
-        private VisualElement BuildContent(ArraySizeAttribute arraySizeAttribute, VisualElement root, SerializedProperty property, FieldInfo info, object parent)
+        private VisualElement BuildContent(ArraySizeAttribute arraySizeAttribute, VisualElement root, SerializedProperty property, FieldInfo info)
         {
             int min = 0;
             int max = int.MaxValue;
@@ -82,7 +82,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             {
                 min = arraySizeAttribute.Min;
                 max = arraySizeAttribute.Max;
-                Debug.Log($"{min} ~ {max}");
+                // Debug.Log($"{min} ~ {max}");
             }
 
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;

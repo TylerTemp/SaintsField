@@ -216,6 +216,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     : new[] { iterResults.Results.FirstOrDefault() };
         }
 
+        private struct ProcessPropertyInfo
+        {
+            public SerializedProperty Property;
+            public object Value;
+            public PropertyCache PropertyCache;
+        }
+
         private static void UpdateSharedCacheSetValue(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property)
         {
             if (target.Error != "")
@@ -243,6 +250,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // Debug.Log($"expandedResults count = {expandedResults.Count}");
 
             // property.serializedObject.Update();
+            List<object> processingTargets = new List<object>();
+            List<ProcessPropertyInfo> processingProperties = new List<ProcessPropertyInfo>();
 
             foreach ((object targetResult, int index) in expandedResults.WithIndex())
             {
@@ -281,7 +290,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 // Debug.Log($"#GetByXPath# IndexToPropertyCache[{propertyCacheKey}] = {propertyCache}");
 
-
                 (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty, propertyCache.MemberInfo, propertyCache.Parent);
                 if (originalValueError != "")
                 {
@@ -294,13 +302,40 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     originalValue = Util.GetWrapValue(wrapProp);
                 }
 
-                propertyCache.OriginalValue = originalValue;
-                bool fieldIsNull = Util.IsNull(originalValue);
-                propertyCache.TargetValue = targetResult;
-                bool targetIsNull = Util.IsNull(targetResult);
-                propertyCache.TargetIsNull = targetIsNull;
+                processingTargets.Add(targetResult);
+                processingProperties.Add(new ProcessPropertyInfo
+                {
+                    Property = processingProperty,
+                    Value = originalValue,
+                    PropertyCache = propertyCache,
+                });
+            }
 
-                propertyCache.MisMatch = Mismatch(originalValue, targetResult);
+            if (nothingSigner)
+            {
+                return;
+            }
+
+            foreach ((object processingTarget, int processingTargetIndex) in processingTargets.WithIndex().Reverse().ToArray())
+            {
+                int processingPropertyMatchedIndex = processingProperties.FindIndex(each => each.Value == processingTarget);
+                if (processingPropertyMatchedIndex >= 0)
+                {
+                    processingTargets.RemoveAt(processingTargetIndex);
+                    processingProperties.RemoveAt(processingPropertyMatchedIndex);
+                }
+            }
+
+            // now check dismatched
+            foreach ((object targetResult, ProcessPropertyInfo propertyInfo) in processingTargets.Zip(processingProperties, (targetResult, propertyInfo) => (targetResult, propertyInfo)))
+            {
+                propertyInfo.PropertyCache.OriginalValue = propertyInfo.Value;
+                bool fieldIsNull = Util.IsNull(propertyInfo.Value);
+                propertyInfo.PropertyCache.TargetValue = targetResult;
+                bool targetIsNull = Util.IsNull(targetResult);
+                propertyInfo.PropertyCache.TargetIsNull = targetIsNull;
+
+                propertyInfo.PropertyCache.MisMatch = Mismatch(propertyInfo.Value, targetResult);
 
                 // Debug.Log($"#GetByXPath# o={originalValue}({processingProperty.propertyPath}), t={targetResult}, mismatch={propertyCache.MisMatch}");
 
@@ -310,7 +345,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 // Debug.Log(Event.current);
 #endif
 
-                if(propertyCache.MisMatch)
+                if(propertyInfo.PropertyCache.MisMatch)
                 {
                     bool resign = getByXPathAttribute.AutoResignToValue && !targetIsNull;
                     if (!resign)
@@ -324,7 +359,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     if (resign)
                     {
-                        DoSignPropertyCache(propertyCache, true);
+                        DoSignPropertyCache(propertyInfo.PropertyCache, true);
                     }
                 }
             }

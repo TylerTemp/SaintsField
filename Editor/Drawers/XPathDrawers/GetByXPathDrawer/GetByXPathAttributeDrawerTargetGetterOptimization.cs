@@ -332,7 +332,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 results.AddRange(searchTargets
                     .Where(each => includeInactive || each.gameObject.activeInHierarchy)
-                    .Select(each => each.gameObject));
+                    .SelectMany(each => each.GetComponentsInChildren<Transform>(includeInactive))
+                    .Select(each => each.gameObject)
+                    .Distinct()
+                );
 
                 return ("", results.Count > 0, results);
             }
