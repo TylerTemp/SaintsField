@@ -22,6 +22,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;

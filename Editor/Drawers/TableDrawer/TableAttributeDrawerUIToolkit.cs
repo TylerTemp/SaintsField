@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -14,11 +15,15 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 {
     public partial class TableAttributeDrawer
     {
-        private static string NameArraySize(SerializedProperty property) => $"{property.propertyPath}__Table_arraySize";
+        private static string NameArraySize(SerializedProperty property) => $"{property.propertyPath}__Table_ArraySize";
+        private static string NameAddButton(SerializedProperty property) => $"{property.propertyPath}__Table_AddButton";
+        private static string NameRemoveButton(SerializedProperty property) => $"{property.propertyPath}__Table_RemoveButton";
 
         private int _preArraySize;
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -34,6 +39,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
 
             VisualElement root = new VisualElement();
+
+            ArraySizeAttribute arraySizeAttribute = allAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
 
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
             if(itemIsObject)
@@ -57,19 +64,27 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         root.Clear();
                         property.objectReferenceValue = evt.newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        root.Add(BuildContent(root, property, saintsAttribute, container, info, parent));
+                        root.Add(BuildContent(arraySizeAttribute, root, property, info, parent));
                     });
                     return root;
                 }
             }
 
-            BuildContent(root, property, saintsAttribute, container, info, parent);
+            BuildContent(arraySizeAttribute, root, property, info, parent);
             return root;
         }
 
-        private VisualElement BuildContent(VisualElement root, SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, FieldInfo info, object parent)
+        private VisualElement BuildContent(ArraySizeAttribute arraySizeAttribute, VisualElement root, SerializedProperty property, FieldInfo info, object parent)
         {
+            int min = 0;
+            int max = int.MaxValue;
+            if (arraySizeAttribute != null)
+            {
+                min = arraySizeAttribute.Min;
+                max = arraySizeAttribute.Max;
+                Debug.Log($"{min} ~ {max}");
+            }
+
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -114,7 +129,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 // #endif
             };
 
-            IntegerField integerField = new IntegerField
+            IntegerField arraySizeField = new IntegerField
             {
                 value = arrayProp.arraySize,
                 isDelayed = true,
@@ -124,7 +139,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 },
                 name = NameArraySize(property),
             };
-            integerField.RegisterValueChangedCallback(evt =>
+            arraySizeField.RegisterValueChangedCallback(evt =>
             {
                 int newValue = evt.newValue;
                 int oldValue = arrayProp.arraySize;
@@ -138,33 +153,35 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 multiColumnListView.itemsSource = MakeSource(arrayProp);
                 multiColumnListView.Rebuild();
             });
-            controls.Add(integerField);
+            controls.Add(arraySizeField);
 
             Toolbar toolbar = new Toolbar();
             ToolbarButton addButton = new ToolbarButton(() =>
             {
                 int oldValue = arrayProp.arraySize;
-                int changedValue = ChangeArraySize(oldValue + 1, arrayProp);
+                ChangeArraySize(oldValue + 1, arrayProp);
 
-                integerField.SetValueWithoutNotify(changedValue);
-                _preArraySize = changedValue;
-                multiColumnListView.itemsSource = MakeSource(arrayProp);
-                multiColumnListView.Rebuild();
+                // arraySizeField.SetValueWithoutNotify(changedValue);
+                // _preArraySize = changedValue;
+                // multiColumnListView.itemsSource = MakeSource(arrayProp);
+                // multiColumnListView.Rebuild();
             })
             {
                 text = "+",
+                name = NameAddButton(property),
             };
             toolbar.Add(addButton);
             ToolbarButton removeButton = new ToolbarButton(() =>
             {
                 DeleteArrayElement(arrayProp, multiColumnListView.selectedIndices);
-                _preArraySize = arrayProp.arraySize;
-                integerField.SetValueWithoutNotify(arrayProp.arraySize);
-                multiColumnListView.itemsSource = MakeSource(arrayProp);
-                multiColumnListView.Rebuild();
+                // _preArraySize = arrayProp.arraySize;
+                // arraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
+                // multiColumnListView.itemsSource = MakeSource(arrayProp);
+                // multiColumnListView.Rebuild();
             })
             {
                 text = "-",
+                name = NameRemoveButton(property),
             };
             toolbar.Add(removeButton);
             controls.Add(toolbar);
@@ -282,6 +299,38 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
             root.Add(multiColumnListView);
 
+            multiColumnListView.TrackPropertyValue(arrayProp, _ =>
+            {
+                // ReSharper disable once InvertIf
+                if (_preArraySize != arrayProp.arraySize)
+                {
+                    _preArraySize = arrayProp.arraySize;
+                    // MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>();
+                    multiColumnListView.itemsSource = MakeSource(arrayProp);
+                    multiColumnListView.Rebuild();
+                    arraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
+                    // container.Q<IntegerField>(name: NameArraySize(property)).SetValueWithoutNotify(arrayProp.arraySize);
+
+                    if (arraySizeAttribute != null)
+                    {
+                        // Debug.Log($"{arrayProp.arraySize}: {min} ~ {max}");
+                        addButton.SetEnabled(arrayProp.arraySize < max);
+                        removeButton.SetEnabled(arrayProp.arraySize > min);
+                    }
+                }
+            });
+
+            if (arraySizeAttribute != null)
+            {
+                addButton.SetEnabled(arrayProp.arraySize < max);
+                removeButton.SetEnabled(arrayProp.arraySize > min);
+
+                if (arraySizeAttribute.Min == arraySizeAttribute.Max)
+                {
+                    arraySizeField.SetEnabled(false);
+                }
+            }
+
             return root;
         }
 
@@ -312,30 +361,30 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         //     }
         // }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        {
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            if (propertyIndex != 0)
-            {
-                return;
-            }
-
-            (string error, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
-            if (error != "")
-            {
-                return;
-            }
-
-            if (_preArraySize != arrayProp.arraySize)
-            {
-                _preArraySize = arrayProp.arraySize;
-                MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>();
-                multiColumnListView.itemsSource = MakeSource(arrayProp);
-                multiColumnListView.Rebuild();
-                container.Q<IntegerField>(name: NameArraySize(property)).SetValueWithoutNotify(arrayProp.arraySize);
-            }
-        }
+        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        //     VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        // {
+        //     int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+        //     if (propertyIndex != 0)
+        //     {
+        //         return;
+        //     }
+        //
+        //     (string error, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
+        //     if (error != "")
+        //     {
+        //         return;
+        //     }
+        //
+        //     if (_preArraySize != arrayProp.arraySize)
+        //     {
+        //         _preArraySize = arrayProp.arraySize;
+        //         MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>();
+        //         multiColumnListView.itemsSource = MakeSource(arrayProp);
+        //         multiColumnListView.Rebuild();
+        //         container.Q<IntegerField>(name: NameArraySize(property)).SetValueWithoutNotify(arrayProp.arraySize);
+        //     }
+        // }
 
         private static List<SerializedProperty> MakeSource(SerializedProperty arrayProp)
         {
@@ -346,6 +395,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 }
 #elif UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -357,6 +407,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
     public partial class TableAttributeDrawer
     {
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);

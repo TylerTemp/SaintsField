@@ -20,6 +20,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement();

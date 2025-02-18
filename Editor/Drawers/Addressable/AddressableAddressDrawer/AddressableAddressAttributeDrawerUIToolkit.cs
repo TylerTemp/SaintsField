@@ -23,7 +23,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             $"{property.propertyPath}__AddressableAddress_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
+            FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButtonField =
                 UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);

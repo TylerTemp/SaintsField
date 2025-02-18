@@ -494,7 +494,8 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.Vector2 &&
                 property.propertyType != SerializedPropertyType.Vector2Int)

@@ -25,7 +25,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         private static string NameSelectorButton(SerializedProperty property) => $"{property.propertyPath}__AddressableScene_SelectorButton";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
+            FieldInfo info, object parent)
         {
             ObjectField objectField = new ObjectField(property.displayName)
             {

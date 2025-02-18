@@ -55,6 +55,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             LoadIcons();

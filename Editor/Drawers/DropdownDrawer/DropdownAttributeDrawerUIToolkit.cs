@@ -17,7 +17,8 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Dropdown_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);

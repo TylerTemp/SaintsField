@@ -17,7 +17,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
         private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__ShaderKeyword_DropdownButton";
         private static string HelpBoxName(SerializedProperty property) => $"{property.propertyPath}__ShaderKeyword_HelpBox";
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);

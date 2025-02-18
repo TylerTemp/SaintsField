@@ -19,7 +19,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AddressableLabel_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container1, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
+            FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButtonField = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButtonField.name = NameDropdownField(property);

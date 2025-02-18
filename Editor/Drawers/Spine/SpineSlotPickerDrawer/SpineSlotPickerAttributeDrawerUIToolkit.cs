@@ -21,6 +21,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownField = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);

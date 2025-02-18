@@ -64,7 +64,8 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
         private static string NamePropertyField(SerializedProperty property) => $"{property.propertyPath}_SaintsArray";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            FieldInfo info, object parent)
         {
             (string error, string propName, int index) = GetSerName(property, (SaintsArrayAttribute) saintsAttribute, info, parent);
             if (error != "")

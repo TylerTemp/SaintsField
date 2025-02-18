@@ -20,7 +20,8 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
             $"{property.propertyPath}__AnimatorParam_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 

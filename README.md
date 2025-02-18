@@ -1133,8 +1133,7 @@ Parameters:
 Special Note:
 
 1.  After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
-2.  IMGUI: `ELayout.Horizontal` does not work here
-3.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
+2.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
 
 ```csharp
 using SaintsField;

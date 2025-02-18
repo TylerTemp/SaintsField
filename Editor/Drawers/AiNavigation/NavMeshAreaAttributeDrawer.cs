@@ -128,6 +128,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute) saintsAttribute;
