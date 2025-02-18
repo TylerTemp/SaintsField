@@ -258,6 +258,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                         foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
                         {
+                            if (propIndex >= propNames.Count)
+                            {
+                                break;
+                            }
+
                             string propName = propNames[propIndex];
                             SerializedProperty itemProp = itemObject.FindProperty(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(itemObject, propName);
                             propField.BindProperty(itemProp);
@@ -337,6 +342,10 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                         foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
                         {
+                            if (propIndex >= propNames.Count)
+                            {
+                                break;
+                            }
                             string propName = propNames[propIndex];
                             SerializedProperty itemProp = sp.FindPropertyRelative(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(sp, propName);
                             propField.BindProperty(itemProp);
