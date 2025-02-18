@@ -75,12 +75,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             return root;
         }
 
-        private struct SerializedPropertyInfo
-        {
-            public string Name;
-            public string PropertyPath;
-        }
-
         private VisualElement BuildContent(ArraySizeAttribute arraySizeAttribute, VisualElement root, SerializedProperty property, FieldInfo info)
         {
             int min = 0;

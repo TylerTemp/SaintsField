@@ -11,6 +11,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
     [CustomPropertyDrawer(typeof(TableAttribute), true)]
     public partial class TableAttributeDrawer: SaintsPropertyDrawer
     {
+        private struct SerializedPropertyInfo
+        {
+            public string Name;
+            public string PropertyPath;
+        }
 
         private static int ChangeArraySize(int newValue, SerializedProperty arrayProp)
         {

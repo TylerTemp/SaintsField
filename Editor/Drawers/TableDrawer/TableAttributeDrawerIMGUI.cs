@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         private class SaintsTable : TreeView
         {
             public readonly SerializedProperty ArrayProp;
-            private readonly IReadOnlyDictionary<int, string> _headerToPropName;
+            private readonly IReadOnlyDictionary<int, IReadOnlyList<string>> _headerToPropNames;
             private readonly Type _elementType;
 
             // public SaintsTable(TreeViewState state) : base(state)
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             //     Reload();
             // }
 
-            public SaintsTable(TreeViewState state, MultiColumnHeader multiColumnHeader, SerializedProperty arrayProp, IReadOnlyDictionary<int, string> headerToPropName, Type elementType) : base(state, multiColumnHeader)
+            public SaintsTable(TreeViewState state, MultiColumnHeader multiColumnHeader, SerializedProperty arrayProp, IReadOnlyDictionary<int, IReadOnlyList<string>> headerToPropNames, Type elementType) : base(state, multiColumnHeader)
             {
                 // Custom setup
                 rowHeight = 20;
@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 // extraSpaceBeforeIconAndLabel = kToggleWidth;
                 // multiColumnHeader.sortingChanged += OnSortingChanged;
                 ArrayProp = arrayProp;
-                _headerToPropName = headerToPropName;
+                _headerToPropNames = headerToPropNames;
                 _elementType = elementType;
 
                 Reload();
@@ -99,7 +99,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 }
                 List<float> allHeight = new List<float>();
 
-                foreach (string propName in _headerToPropName.Values)
+                foreach (IReadOnlyList<string> propNames in _headerToPropNames.Values)
                 {
                     if(arrayItemProp.propertyType == SerializedPropertyType.ObjectReference)
                     {
@@ -115,13 +115,20 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             _serializedObjects[item.id] = serObj;
                         }
                         // SerializedObject serObj = new SerializedObject(obj);
-                        SerializedProperty prop = serObj.FindProperty(propName);
-                        allHeight.Add(EditorGUI.GetPropertyHeight(prop, GUIContent.none, true));
+                        float height = propNames
+                            .Select(propName => serObj.FindProperty(propName))
+                            .Select(prop => EditorGUI.GetPropertyHeight(prop, GUIContent.none, true))
+                            .Sum();
+                        allHeight.Add(height);
                     }
                     else  // generic type
                     {
-                        SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
-                        allHeight.Add(EditorGUI.GetPropertyHeight(prop, GUIContent.none, true));
+                        float height = propNames
+                            .Select(propName => arrayItemProp.FindPropertyRelative(propName))
+                            .Select(prop => EditorGUI.GetPropertyHeight(prop, GUIContent.none, true))
+                            .Sum();
+                        // SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
+                        allHeight.Add(height);
                     }
                 }
 
@@ -131,7 +138,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn)
             {
                 SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
-                string propName = _headerToPropName[getColumn];
+                IReadOnlyList<string> propNames = _headerToPropNames[getColumn];
 
                 if (string.IsNullOrEmpty(arrayItemProp.propertyPath))
                 {
@@ -164,20 +171,57 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             _serializedObjects[item.id] = serObj;
                         }
                         // SerializedObject serObj = new SerializedObject(obj);
-                        SerializedProperty prop = serObj.FindProperty(propName);
+                        if (propNames.Count == 1)
+                        {
+                            SerializedProperty prop = serObj.FindProperty(propNames[0]);
+                            EditorGUI.PropertyField(getCellRect, prop,
+                                prop.propertyType == SerializedPropertyType.Generic
+                                    ? new GUIContent(prop.displayName)
+                                    : GUIContent.none);
+                        }
+                        else
+                        {
+                            Rect leftRect = getCellRect;
+                            foreach (string propName in propNames)
+                            {
+                                SerializedProperty prop = serObj.FindProperty(propName);
+                                float height = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
+                                (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
+                                leftRect = belowRect;
+                                EditorGUI.PropertyField(useRect, prop,
+                                    prop.propertyType == SerializedPropertyType.Generic
+                                        ? new GUIContent(prop.displayName)
+                                        : GUIContent.none);
+
+                            }
+                        }
+                    }
+                }
+                else  // generic type
+                {
+                    if(propNames.Count == 1)
+                    {
+                        SerializedProperty prop = arrayItemProp.FindPropertyRelative(propNames[0]);
                         EditorGUI.PropertyField(getCellRect, prop,
                             prop.propertyType == SerializedPropertyType.Generic
                                 ? new GUIContent(prop.displayName)
                                 : GUIContent.none);
                     }
-                }
-                else  // generic type
-                {
-                    SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
-                    EditorGUI.PropertyField(getCellRect, prop,
-                        prop.propertyType == SerializedPropertyType.Generic
-                            ? new GUIContent(prop.displayName)
-                            : GUIContent.none);
+                    else
+                    {
+                        Rect leftRect = getCellRect;
+                        foreach (string propName in propNames)
+                        {
+                            SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
+                            float height = EditorGUI.GetPropertyHeight(prop, GUIContent.none, true);
+                            (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
+                            leftRect = belowRect;
+                            EditorGUI.PropertyField(useRect, prop,
+                                prop.propertyType == SerializedPropertyType.Generic
+                                    ? new GUIContent(prop.displayName)
+                                    : GUIContent.none);
+                        }
+                    }
                 }
             }
 
@@ -262,7 +306,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             if (_saintsTable == null)
             {
-                Dictionary<int, string> headerToPropName = new Dictionary<int, string>();
+                Dictionary<int, IReadOnlyList<string>> headerToPropNames = new Dictionary<int, IReadOnlyList<string>>();
 
                 _isObjectReference = arrayProp.GetArrayElementAtIndex(0).propertyType == SerializedPropertyType.ObjectReference;
                 List<MultiColumnHeaderState.Column> columns = new List<MultiColumnHeaderState.Column>();
@@ -278,34 +322,76 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     // ReSharper disable once ConvertToUsingDeclaration
                     using (SerializedObject serializedObject = new SerializedObject(obj0))
                     {
-                        foreach ((SerializedProperty serializedProperty, int index) in SerializedUtils
-                                     .GetAllField(serializedObject).WithIndex())
+                        Dictionary<string, List<SerializedPropertyInfo>> columnToProperties = new Dictionary<string, List<SerializedPropertyInfo>>();
+                        foreach (SerializedProperty serializedProperty in SerializedUtils.GetAllField(serializedObject))
                         {
+                            (TableColumnAttribute[] tableColumnAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<TableColumnAttribute>(serializedProperty);
+                            string columnName = tableColumnAttributes.Length > 0? tableColumnAttributes[0].Title: serializedProperty.displayName;
+                            if(!columnToProperties.TryGetValue(columnName, out List<SerializedPropertyInfo> list))
+                            {
+                                columnToProperties[columnName] = list = new List<SerializedPropertyInfo>();
+                            }
+                            list.Add(new SerializedPropertyInfo
+                            {
+                                Name = serializedProperty.name,
+                                PropertyPath = serializedProperty.propertyPath,
+                            });
+                        }
+
+                        // ReSharper disable once UseDeconstruction
+                        foreach ((KeyValuePair<string, List<SerializedPropertyInfo>> columnKv, int index) in columnToProperties.WithIndex())
+                        {
+                            string columnName = columnKv.Key;
+                            List<SerializedPropertyInfo> properties = columnKv.Value;
+
                             columns.Add(new MultiColumnHeaderState.Column
                             {
-                                headerContent = new GUIContent(serializedProperty.displayName),
+                                headerContent = new GUIContent(columnName),
                                 headerTextAlignment = TextAlignment.Left,
                                 sortedAscending = true,
                                 sortingArrowAlignment = TextAlignment.Right,
                                 width = 100,
                                 minWidth = 60,
                                 autoResize = true,
-                                allowToggleVisibility = true
+                                allowToggleVisibility = true,
                             });
-                            headerToPropName[index] = serializedProperty.name;
+                            headerToPropNames[index] = properties.Select(each => each.Name).ToArray();
                         }
                     }
                 }
                 else
                 {
                     SerializedProperty firstProp = arrayProp.GetArrayElementAtIndex(0);
-                    foreach ((SerializedProperty serializedProperty, int index) in SerializedUtils.GetPropertyChildren(firstProp)
-                                 .Where(each => each != null).WithIndex())
+
+                    Dictionary<string, List<SerializedPropertyInfo>> columnToProperties = new Dictionary<string, List<SerializedPropertyInfo>>();
+
+                    foreach (SerializedProperty serializedProperty in SerializedUtils.GetPropertyChildren(firstProp)
+                                 .Where(each => each != null))
                     {
-                        string propName = serializedProperty.name;
+                        (TableColumnAttribute[] tableColumnAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<TableColumnAttribute>(serializedProperty);
+                        string columnName = tableColumnAttributes.Length > 0? tableColumnAttributes[0].Title: serializedProperty.displayName;
+                        if(!columnToProperties.TryGetValue(columnName, out List<SerializedPropertyInfo> list))
+                        {
+                            columnToProperties[columnName] = list = new List<SerializedPropertyInfo>();
+                        }
+                        list.Add(new SerializedPropertyInfo
+                        {
+                            Name = serializedProperty.name,
+                            PropertyPath = serializedProperty.propertyPath,
+                        });
+                    }
+
+                    // ReSharper disable once UseDeconstruction
+                    foreach ((KeyValuePair<string, List<SerializedPropertyInfo>> columnKv, int index) in columnToProperties.WithIndex())
+                    {
+                        string columnName = columnKv.Key;
+                        List<SerializedPropertyInfo> properties = columnKv.Value;
+                        IReadOnlyList<string> propNames = properties.Select(each => each.Name).ToArray();
+
+                        // string id = string.Join(";", properties.Select(each => each.PropertyPath));
                         columns.Add(new MultiColumnHeaderState.Column
                         {
-                            headerContent = new GUIContent(propName),
+                            headerContent = new GUIContent(columnName),
                             headerTextAlignment = TextAlignment.Left,
                             sortedAscending = true,
                             sortingArrowAlignment = TextAlignment.Right,
@@ -314,14 +400,15 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             autoResize = true,
                             allowToggleVisibility = true,
                         });
-                        headerToPropName[index] = propName;
+                        headerToPropNames[index] = propNames;
                     }
+
                 }
                 _saintsTable = new SaintsTable(
                     new TreeViewState(),
                     new MultiColumnHeader(new MultiColumnHeaderState(columns.ToArray())),
                     arrayProp,
-                    headerToPropName,
+                    headerToPropNames,
                     ReflectUtils.GetElementType(info.FieldType)
                 );
             }

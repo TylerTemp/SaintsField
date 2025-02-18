@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts
 
         [Range(0, 100)] public int normalRange;
 
-        [TableColumn("Basic!")]
+        [TableColumn("Basic!"), AboveRichLabel]
         public int publicValue;
 
         [NoLabel]
