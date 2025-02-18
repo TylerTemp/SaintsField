@@ -10863,7 +10863,7 @@ MonoBehaviour:
   shaderParamString: 
   shaderParamInt: 0
   shaderParamFilter: 0
-  targetRenderer: {fileID: 0}
+  targetRenderer: {fileID: 836531684}
   shaderParamRenderer: 0
   shaderParamMat: 0
   shaderParamShader: 0
@@ -17113,7 +17113,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   go:
+  - {fileID: 1740970937}
   - {fileID: 1495021542}
+  - {fileID: 1736963157}
 --- !u!1 &1499312251
 GameObject:
   m_ObjectHideFlags: 0

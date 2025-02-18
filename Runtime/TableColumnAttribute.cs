@@ -1,4 +1,3 @@
-﻿// #if UNITY_2022_2_OR_NEWER || SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Diagnostics;
 using SaintsField.Playa;
@@ -8,10 +7,16 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class TableAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute
+    public class TableColumnAttribute: PropertyAttribute, ISaintsAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
+        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "__LABEL_FIELD__";
+
+        public readonly string Title;
+
+        public TableColumnAttribute(string title)
+        {
+            Title = title;
+        }
     }
 }
-// #endif

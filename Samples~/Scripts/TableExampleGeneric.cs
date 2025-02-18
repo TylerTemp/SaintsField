@@ -12,7 +12,10 @@ namespace SaintsField.Samples.Scripts
         public struct MyStruct
         {
             public int myInt;
+
+            [TableColumn("Value"), AboveRichLabel]
             public string myString;
+            [TableColumn("Value"), AboveRichLabel]
             public GameObject myObject;
         }
 

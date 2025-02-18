@@ -94,7 +94,7 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
 ### Label & Text ###
 
-#### `RichLabel` ####
+#### `RichLabel`/`NoLabel` ####
 
 *   `string|null richTextXml` the content of the label, supported tag:
 
@@ -140,6 +140,10 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     This is override to be `true` when `richLabelXml` starts with `$`
 
 *   AllowMultiple: No. A field can only have one `RichLabel`
+
+`[NoLabel]` is a shortcut for `[RichLabel(null)]`
+
+```csharp
 
 Special Note:
 
