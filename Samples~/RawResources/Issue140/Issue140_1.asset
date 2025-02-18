@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a1eed0d9c945f644bbe4aa6109a0974, type: 3}
   m_Name: Issue140_1
   m_EditorClassIdentifier: 
-  myStructs: []
+  myStructs:
+  - myInt: 0
+  - myInt: 2

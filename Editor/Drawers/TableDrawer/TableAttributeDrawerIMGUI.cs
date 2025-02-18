@@ -84,7 +84,19 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             protected override float GetCustomRowHeight(int row, TreeViewItem item)
             {
+                // int elementIndex = item.id;
+                // int arraySize = ArrayProp.arraySize;
+                // if (elementIndex >= arraySize)
+                // {
+                //     return 0;
+                // }
+
                 SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
+                // Debug.Log(arrayItemProp.propertyPath);
+                if (string.IsNullOrEmpty(arrayItemProp.propertyPath))
+                {
+                    return 0;
+                }
                 List<float> allHeight = new List<float>();
 
                 foreach (string propName in _headerToPropName.Values)
@@ -120,6 +132,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             {
                 SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
                 string propName = _headerToPropName[getColumn];
+
+                if (string.IsNullOrEmpty(arrayItemProp.propertyPath))
+                {
+                    return;
+                }
 
                 if(arrayItemProp.propertyType == SerializedPropertyType.ObjectReference)
                 {
