@@ -72,9 +72,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                     case SerializedPropertyType.Float:
                         wireDiscInfo.Radius = wireDiscInfo.SerializedProperty.floatValue;
                         break;
+#if UNITY_2021_2_OR_NEWER
                     case SerializedPropertyType.Enum:
                         wireDiscInfo.Radius = wireDiscInfo.SerializedProperty.enumValueFlag;
                         break;
+#endif
                     default:
                         throw new ArgumentOutOfRangeException(nameof(wireDiscInfo.SerializedProperty.propertyType), wireDiscInfo.SerializedProperty.propertyType, null);
                 }
