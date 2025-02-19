@@ -1,8 +1,10 @@
+using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 {
@@ -44,22 +46,52 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             // Handles.DrawWireDisc(pos, Vector3.up, wireDiscInfo.Radius);
             using(new HandleColorScoop(wireDiscInfo.Color))
             {
+                // Debug.Log(wireDiscInfo.Radius);
+                // Debug.Log(wireDiscInfo.SpaceTransform.name);
+                // Debug.Log(wireDiscInfo.Center);
                 Handles.DrawWireDisc(wireDiscInfo.Center, wireDiscInfo.Normal, wireDiscInfo.Radius);
             }
         }
 
         private static void UpdateWireDiscInfo(WireDiscInfo wireDiscInfo)
         {
-            if(!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.RadiusCallback))
+            Type fieldType = ReflectUtils.GetElementType(wireDiscInfo.MemberInfo is FieldInfo fi
+                ? fi.FieldType
+                : ((PropertyInfo)wireDiscInfo.MemberInfo).PropertyType);
+            bool filedIsNumber = fieldType == typeof(float) || fieldType == typeof(double) || fieldType == typeof(int) || fieldType == typeof(long) || fieldType == typeof(short);
+
+            if(filedIsNumber)
+            {
+                // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+                // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+                switch (wireDiscInfo.SerializedProperty.propertyType)
+                {
+                    case SerializedPropertyType.Integer:
+                        wireDiscInfo.Radius = wireDiscInfo.SerializedProperty.intValue;
+                        break;
+                    case SerializedPropertyType.Float:
+                        wireDiscInfo.Radius = wireDiscInfo.SerializedProperty.floatValue;
+                        break;
+                    case SerializedPropertyType.Enum:
+                        wireDiscInfo.Radius = wireDiscInfo.SerializedProperty.enumValueFlag;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(wireDiscInfo.SerializedProperty.propertyType), wireDiscInfo.SerializedProperty.propertyType, null);
+                }
+
+            }
+            else if(!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.RadiusCallback))
             {
                 (string error, float result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.RadiusCallback, wireDiscInfo.DrawWireDiscAttribute.Radius, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
                 if (error != "")
                 {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
                     wireDiscInfo.Error = error;
                     return;
                 }
 
-                wireDiscInfo.Error = "";
                 wireDiscInfo.Radius = result;
             }
 
@@ -68,6 +100,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 (string error, Color result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.ColorCallback, wireDiscInfo.DrawWireDiscAttribute.Color, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
                 if (error != "")
                 {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
                     wireDiscInfo.Error = error;
                     return;
                 }
@@ -78,9 +113,43 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 
             if (!wireDiscInfo.TargetWorldPosInfo.IsTransform)
             {
-                wireDiscInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(wireDiscInfo.DrawWireDiscAttribute.Space, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
+                if(filedIsNumber)
+                {
+                    UpdateWireDiscInfoSpaceTrans(wireDiscInfo);
+                    if (wireDiscInfo.Error != "")
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogError(wireDiscInfo.Error);
+#endif
+                        return;
+                    }
+
+                    wireDiscInfo.TargetWorldPosInfo = new Util.TargetWorldPosInfo
+                    {
+                        Error = "",
+                        IsTransform = true,
+                        Transform = wireDiscInfo.SpaceTransform,
+                        WorldPos = wireDiscInfo.SpaceTransform.position,
+                    };
+                }
+                else
+                {
+                    wireDiscInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(
+                        wireDiscInfo.DrawWireDiscAttribute.Space, wireDiscInfo.SerializedProperty,
+                        wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
+                    if (wireDiscInfo.TargetWorldPosInfo.Error != "")
+                    {
+                        // Debug.Log(wireDiscInfo.TargetWorldPosInfo.Error);
+                        wireDiscInfo.Error = wireDiscInfo.TargetWorldPosInfo.Error;
+#if SAINTSFIELD_DEBUG
+                        Debug.LogError(wireDiscInfo.Error);
+#endif
+                        return;
+                    }
+                }
             }
 
+            // Debug.Log(wireDiscInfo.TargetWorldPosInfo.IsTransform);
             Vector3 center = wireDiscInfo.TargetWorldPosInfo.IsTransform
                 ? wireDiscInfo.TargetWorldPosInfo.Transform.position
                 : wireDiscInfo.TargetWorldPosInfo.WorldPos;
@@ -91,6 +160,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 (string error, Vector3 result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.PosOffsetCallback, positionOffset, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
                 if (error != "")
                 {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
                     wireDiscInfo.Error = error;
                     return;
                 }
@@ -111,6 +183,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                     UpdateWireDiscInfoSpaceTrans(wireDiscInfo);
                     if (wireDiscInfo.Error != "")
                     {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogError(wireDiscInfo.Error);
+#endif
                         return;
                     }
                     scale = GetLocalToWorldScale(wireDiscInfo.SpaceTransform);
@@ -125,6 +200,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 (string error, Vector3 result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.NormalCallback, wireDiscInfo.DrawWireDiscAttribute.Normal, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
                 if (error != "")
                 {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
                     wireDiscInfo.Error = error;
                     return;
                 }
@@ -138,6 +216,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 (string error, Quaternion result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.RotCallback, wireDiscInfo.DrawWireDiscAttribute.Rot, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
                 if (error != "")
                 {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
                     wireDiscInfo.Error = error;
                     return;
                 }
@@ -175,13 +256,15 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
         {
             WireDiscInfo wireDiscInfo = new WireDiscInfo
             {
+                Error = "",
+
                 DrawWireDiscAttribute = drawWireDiscAttribute,
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
                 Radius = drawWireDiscAttribute.Radius,
                 Color = drawWireDiscAttribute.Color,
-                TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),
+                // TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),
             };
             return wireDiscInfo;
         }

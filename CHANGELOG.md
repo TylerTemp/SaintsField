@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.29.0 ##
+
+1.  Add `DrawWireDisc` to trace an object in the scene drawing a disc.
+2.  `AdvancedDropdown` now will use all the static value from the type when you omit `funcName`.
+
 ## 3.28.0 ##
 
 1.  Add `TableColumn` to merge multiple columns into one

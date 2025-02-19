@@ -81,13 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.28.0**
+**3.29.0**
 
-1.  Add `TableColumn` to merge multiple columns into one
-2.  UI Toolkit: all buttons that returns `IEnumerator` now will display a loading icon when the coroutine is running
-3.  fix `Table` can not disable related buttons when using with `ArraySize`
-4.  IMGUI: fix multiple target editing gives error when table sizes are not equal, [#140](https://github.com/TylerTemp/SaintsField/issues/140)
-5.  Auto getters on lists/array now no longer force the target to be ordered as what the resources are found, [#145](https://github.com/TylerTemp/SaintsField/issues/145)
+1.  Add `DrawWireDisc` to trace an object in the scene drawing a disc.
+2.  `AdvancedDropdown` now will use all the static value from the type when you omit `funcName`.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -3453,6 +3450,107 @@ private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
 
 ![image](https://github.com/user-attachments/assets/ebb83a0b-2f1d-49c9-9897-9e900db4e471)
 
+#### `DrawWireDisc` ####
+
+Like Unity's [`DrawWireDisc`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Handles.DrawWireDisc.html)， this attributes allows you to draw a disc in the scene.
+
+The field can be a `GameObject`, a `Component`, a `Vector2`(2D game), a `Vector3` (3D game), or a number.
+
+You can specify which parent you want the circle be, the rotate/offset/facing of the circle, and color of course.
+
+Parameters:
+
+*   `float radius = 1f`: radis of the disk. If the target field is a number, use the field's value instead
+*   `string radisCallback = null`: use a callback or a field value as the radius. If the target field is a number, use the field's value instead
+*   `string space = "this"`: the containing space of the disc. `this` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `float norX = 0f, float norY = 0f, float norZ = 1f`: `Vector3` direction for the `normal` (facing) of the disc. It's facing forward by default
+*   `string norCallback = null`: use a callback or a field value as the normal direction, the value must be a `Vector3`
+*   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the disc related to the `space`
+*   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
+*   `float rotX = 0f, float rotY = 0f, float rotZ = 0f`: rotation of the disc related to `space`
+*   `string rotCallback = null`: use a callback or a field value as the rotation. The value must be a `Quaternion`
+*   `EColor eColor = EColor.White`: line color of the disc
+*   `string colorCallback = null`: If it's starting with `#`, use a html color for the line. Otherwise, use a callback or a field value as the color. The value must be a `Color`
+
+```csharp
+using SaintsField;
+
+// Draw a circle for my character
+[DrawWireDisc(radis: 0.2f, EColor.Yellow)] public MyCharacter character2D;
+
+// Draw a circle on the ground for my character (disc facing upward)
+// the hight from center to the ground is 0.5f
+[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -0.5f)] public MyCharacter character3D;
+
+// Make a struct to let it follow
+[Serializable]
+public struct PlayerWeapon
+{
+    [PositionHandle(Space.Self)]
+    [DrawWireDisc]
+    public Vector3 firePointOffset;
+
+    // your other fields
+}
+```
+
+[![video](https://github.com/user-attachments/assets/0627d463-5f29-4cba-ac2c-b8a7b1f1106a)](https://github.com/user-attachments/assets/37e48f8a-906b-407c-8d95-6faa5210517c)
+
+A simple example to show debugging a player's alert/idle range:
+
+```csharp
+[GetComponent]
+[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, colorCallback: nameof(curColor), radisCallback: nameof(curRadius))]
+[DrawLabel(EColor.Brown, "$" + nameof(curStatus))]
+public Transform player;
+
+[Range(1f, 1.5f)] public float initRadius;
+[Range(1f, 1.5f)] public float alertRadius;
+
+[AdvancedDropdown] public Color initColor;
+[AdvancedDropdown] public Color alertColor;
+
+public Transform enemy;
+
+[InputAxis] public string horizontalAxis;
+[InputAxis] public string verticalAxis;
+
+[ShowInInspector]
+private Color curColor;
+
+[ShowInInspector] private float curRadius = 0.5f;
+[ShowInInspector] private string curStatus = "Idle";
+
+private void Awake()
+{
+    curColor = initColor;
+    curRadius = initRadius;
+}
+
+public void Update()
+{
+    Vector3 playerPos = player.position;
+    Vector3 enemyPos = enemy.position;
+
+    float distance = Vector3.Distance(playerPos, enemyPos);
+
+    float nowRadius = distance < alertRadius ? alertRadius : initRadius;
+    Color nowColor = distance < alertRadius ? alertColor : initColor;
+    curStatus = distance < alertRadius ? "Alert" : "Idle";
+
+    curRadius = Mathf.Lerp(curRadius, nowRadius, Time.deltaTime * 10);
+    curColor = Color.Lerp(curColor, nowColor, Time.deltaTime * 10);
+
+    float horizontal = Input.GetAxis(horizontalAxis);
+    float vertical = Input.GetAxis(verticalAxis);
+
+    Vector3 move = new Vector3(horizontal, 0, vertical);
+    player.Translate(move * Time.deltaTime * 3);
+}
+```
+
+[![video](https://github.com/user-attachments/assets/ce94f758-7a72-442e-9ced-a972cd0783a9)](https://github.com/user-attachments/assets/2d12f926-bc66-4c41-8dfd-92bdf81ba55d)
+
 ### Miscellaneous ###
 
 #### `Dropdown` ####
@@ -3465,7 +3563,7 @@ If you want a searchable dropdown, see `AdvancedDropdown`.
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
 *   `bool slashAsSub=true` treat `/` as a sub item.
 
-    Note: In `IMGUI`, this just replace `/` to unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
+    Note: In `IMGUI`, this just replace `/` to Unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
 
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
@@ -3592,6 +3690,7 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 
 *   `string funcName=null` callback function. Must return a `AdvancedDropdownList<T>`.
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
+    When omited, it will try to find all the static values from the field type.
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
@@ -3727,6 +3826,16 @@ public enum MyEnum
 ```
 
 ![image](https://github.com/user-attachments/assets/ebc2e2f7-3534-4ff7-8710-29a990f5dea4)
+
+Also, using on a type like `Color` to pick a pre-defined static value:
+
+```csharp
+[AdvancedDropdown] public Color builtInColor;
+[AdvancedDropdown] public Vector2 builtInV2;
+[AdvancedDropdown] public Vector3Int builtInV3Int;
+```
+
+![image](https://github.com/user-attachments/assets/404d4cd6-b4bf-4521-b633-2dd745ec4de1)
 
 #### `EnumFlags` ####
 

@@ -14,6 +14,24 @@ namespace SaintsField.Samples.Scripts.HandleExamples
         )]
         public GameObject curObj;
 
+        [DrawWireDisc(
+            radisCallback: nameof(radius),
+            colorCallback: nameof(color),
+            posOffsetCallback: nameof(positionOffset),
+            norCallback: nameof(normal),
+            rotCallback: nameof(rotation)
+        )]
+        public Vector3 curV3;
+
+        [DrawWireDisc(
+            // radisCallback: nameof(radius),
+            colorCallback: nameof(color),
+            posOffsetCallback: nameof(positionOffset),
+            norCallback: nameof(normal),
+            rotCallback: nameof(rotation)
+        )]
+        public float drawRadius;
+
         [MinValue(0.1f)] public float radius;
 
         public Color color;
@@ -25,13 +43,6 @@ namespace SaintsField.Samples.Scripts.HandleExamples
         // [AdvancedDropdown]
         public Quaternion rotation;
 
-        [DrawWireDisc(
-            radisCallback: nameof(radius),
-            colorCallback: nameof(color),
-            posOffsetCallback: nameof(positionOffset),
-            norCallback: nameof(normal),
-            rotCallback: nameof(rotation)
-        )]
-        public Vector3 curV3;
+        [DrawWireDisc(space: null, radius: 0.1f, eColor: EColor.Black)] public Vector2 worldDisc;
     }
 }
