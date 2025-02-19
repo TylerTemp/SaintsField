@@ -9,10 +9,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 {
     public partial class DrawLabelAttributeDrawer
     {
-        #region IMGUI
 
         private readonly Dictionary<string, LabelInfo> _idToLabelInfo = new Dictionary<string, LabelInfo>();
-        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+        private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -146,6 +145,5 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             }
         }
 
-        #endregion
     }
 }

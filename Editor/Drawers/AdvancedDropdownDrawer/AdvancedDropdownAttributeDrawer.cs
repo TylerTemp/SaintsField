@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj)
+        private static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
@@ -52,14 +52,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             IAdvancedDropdownList dropdownListValue = null;
             if (funcName is null)
             {
-                Type enumType = ReflectUtils.GetElementType(field.FieldType);
-                if(enumType.IsEnum)
+                Type elementType = ReflectUtils.GetElementType(field.FieldType);
+                if(elementType.IsEnum)
                 {
-                    Array enumValues = Enum.GetValues(enumType);
-                    AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>();
+                    Array enumValues = Enum.GetValues(elementType);
+                    AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "");
                     foreach (object enumValue in enumValues)
                     {
-                        enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(enumType, enumValue).value, enumValue);
+                        enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(elementType, enumValue).value, enumValue);
                     }
 
                     error = "";
@@ -67,7 +67,61 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
                 else
                 {
-                    error = $"{property.displayName}({enumType}) is not a enum";
+                    AdvancedDropdownList<object> staticDropdown = new AdvancedDropdownList<object>(isImGui? $"Pick a {elementType.Name}": "");
+
+                    Dictionary<object, List<string>> valueToNames = new Dictionary<object, List<string>>();
+
+                    // Get static fields
+                    FieldInfo[] staticFields = elementType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (FieldInfo eachField in staticFields)
+                    {
+                        object value = eachField.GetValue(null);
+                        if (value != null && elementType.IsAssignableFrom(value.GetType()))
+                        {
+                            if (!valueToNames.TryGetValue(value, out List<string> names))
+                            {
+                                valueToNames[value] = names = new List<string>();
+                            }
+                            names.Add(eachField.Name);
+                        }
+                    }
+
+                    // Get static properties
+                    PropertyInfo[] staticProperties = elementType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (PropertyInfo eachProp in staticProperties)
+                    {
+                        object value = eachProp.GetValue(null);
+                        if (elementType.IsAssignableFrom(value.GetType()))
+                        {
+                            if (!valueToNames.TryGetValue(value, out List<string> names))
+                            {
+                                valueToNames[value] = names = new List<string>();
+                            }
+                            names.Add(eachProp.Name);
+                        }
+                    }
+
+                    foreach (KeyValuePair<object,List<string>> kv in valueToNames)
+                    {
+                        object value = kv.Key;
+                        List<string> names = kv.Value;
+                        names.Sort();
+                        string displayName;
+                        if (isImGui)
+                        {
+                            displayName = names[0] + (names.Count <= 1? "": $" ({string.Join(",", names.Skip(1))})");
+                        }
+                        else
+                        {
+                            displayName = names[0] + (names.Count <= 1? "": $" <color=#808080ff>({string.Join(",", names.Skip(1))})</color>");
+                        }
+
+                        staticDropdown.Add(new AdvancedDropdownList<object>(displayName, value));
+                    }
+
+                    error = "";
+                    dropdownListValue = staticDropdown;
+                    // error = $"{property.displayName}({elementType}) is not a enum";
                 }
             }
             else

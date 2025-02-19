@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute)saintsAttribute;
-            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, advancedDropdownAttribute, info, parent);
+            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, advancedDropdownAttribute, info, parent, true);
             _error = metaInfo.Error;
 
             #region Dropdown

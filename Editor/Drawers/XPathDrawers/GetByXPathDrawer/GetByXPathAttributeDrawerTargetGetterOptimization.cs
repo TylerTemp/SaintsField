@@ -49,6 +49,20 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             Type type = compType ?? fieldType;
 
+            if(type == typeof(GameObject) || type.IsSubclassOf(typeof(GameObject)))
+            {
+                if (interfaceType != null)
+                {
+                    return ($"GameObject can not have interface type {interfaceType}", false, null);
+                }
+                if(property.serializedObject.targetObject is Component comp)
+                {
+                    // Debug.Log($"return go {go}");
+                    return ("", true, new[] { comp.gameObject });
+                }
+                return ("", false, Array.Empty<object>());
+            }
+
             Transform transform;
             switch (property.serializedObject.targetObject)
             {

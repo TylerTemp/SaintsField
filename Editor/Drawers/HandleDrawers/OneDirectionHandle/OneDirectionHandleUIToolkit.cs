@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
         {
             OneDirectionConstInfo oneDirectionConstInfo = new OneDirectionConstInfo
             {
-                OneDirectionAttribute = (SaintsArrowAttribute) saintsAttribute,
+                OneDirectionAttribute = (OneDirectionBaseAttribute) saintsAttribute,
                 Property = property,
                 Info = info,
                 Parent = parent,

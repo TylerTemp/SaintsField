@@ -25,8 +25,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             public GUIStyle GUIStyle;
         }
 
-
-
         private static void OnSceneGUIInternal(SceneView _, LabelInfo labelInfo)
         {
             // ReSharper disable once ReplaceWithStringIsNullOrEmpty

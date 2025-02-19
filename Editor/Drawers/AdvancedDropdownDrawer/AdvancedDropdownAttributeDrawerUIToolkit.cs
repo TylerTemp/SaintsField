@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             FieldInfo info,
             object parent)
         {
-            AdvancedDropdownMetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
+            AdvancedDropdownMetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false);
 
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButton.style.flexGrow = 1;
@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
             dropdownButton.ButtonElement.clicked += () =>
             {
-                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
+                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false);
                 // Debug.Log(root.worldBound);
                 // Debug.Log(Screen.height);
                 // float maxHeight = Mathf.Max(400, Screen.height - root.worldBound.y - root.worldBound.height - 200);
@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             string display =
-                GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent));
+                GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false));
             if(dropdownButton.ButtonLabelElement.text != display)
             {
                 dropdownButton.ButtonLabelElement.text = display;
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
             string display =
-                GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent));
+                GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false));
             if(dropdownButton.ButtonLabelElement.text != display)
             {
                 dropdownButton.ButtonLabelElement.text = display;

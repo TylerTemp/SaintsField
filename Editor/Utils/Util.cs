@@ -1400,7 +1400,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfoSpace(string space, SerializedProperty property, FieldInfo info, object parent)
+        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfoSpace(string space, SerializedProperty property, MemberInfo info, object parent)
         {
             try
             {
@@ -1589,6 +1589,7 @@ namespace SaintsField.Editor.Utils
             {
                 Error = "",
                 IsTransform = false,
+                Transform = container,
                 WorldPos = container.TransformPoint(v3Value),
             };
         }
