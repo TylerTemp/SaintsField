@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SAINTSDRAW || SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE
+#if SAINTSFIELD_SAINTSDRAW || SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE && false
 
 using SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle;
 using UnityEditor;
@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             float sqrMagnitude = (worldPosStart - worldPosEnd).sqrMagnitude;
 
             SaintsArrowAttribute saintsArrowAttribute =
-                (SaintsArrowAttribute)oneDirectionInfo.OneDirectionConstInfo.OneDirectionAttribute;
+                (SaintsArrowAttribute)oneDirectionInfo.OneDirectionAttribute;
 
             float headLength = saintsArrowAttribute.HeadLength;
             if(headLength * 2f * headLength * 2f > sqrMagnitude)
@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 arrowHeadLength: headLength,
                 arrowHeadAngle: saintsArrowAttribute.HeadAngle);
 
-            using (new HandleColorScoop(oneDirectionInfo.OneDirectionConstInfo.OneDirectionAttribute.EColor.GetColor() * new Color(1, 1, 1, oneDirectionInfo.OneDirectionConstInfo.OneDirectionAttribute.ColorAlpha)))
+            using (new HandleColorScoop(oneDirectionInfo.Color))
             {
                 Handles.DrawLine(head, tail);
                 Handles.DrawLine(head, arrowheadLeft);

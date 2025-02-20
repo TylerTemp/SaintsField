@@ -13,124 +13,136 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 {
     public abstract partial class OneDirectionHandleBase: SaintsPropertyDrawer
     {
-        protected struct OneDirectionConstInfo
-        {
-            public OneDirectionBaseAttribute OneDirectionAttribute;
-            public SerializedProperty Property;
-            public FieldInfo Info;
-            public object Parent;
-        }
-
         protected class OneDirectionInfo
         {
-            public OneDirectionConstInfo OneDirectionConstInfo;
+            public OneDirectionBaseAttribute OneDirectionAttribute;
+            public SerializedProperty SerializedProperty;
+            public MemberInfo MemberInfo;
+            public object Parent;
+
             public string Error;
+            public bool Skip;
             public Util.TargetWorldPosInfo StartTargetWorldPosInfo;
             public Util.TargetWorldPosInfo EndTargetWorldPosInfo;
+            public Color Color;
         }
 
-        private static OneDirectionInfo GetArrowInfo(OneDirectionConstInfo oneDirectionConstInfo)
+        private static void UpdateOneDirectionInfo(OneDirectionInfo oneDirectionConstInfo)
         {
+            oneDirectionConstInfo.Skip = false;
+
+            if (!string.IsNullOrEmpty(oneDirectionConstInfo.OneDirectionAttribute.ColorCallback))
+            {
+                (string error, Color result) = Util.GetOf(oneDirectionConstInfo.OneDirectionAttribute.ColorCallback, oneDirectionConstInfo.OneDirectionAttribute.Color, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
+                if (error != "")
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
+                    oneDirectionConstInfo.Error = error;
+                    return;
+                }
+
+                // wireDiscInfo.Error = "";
+                oneDirectionConstInfo.Color = result;
+            }
+
             bool isArrayConnecting = oneDirectionConstInfo.OneDirectionAttribute.Start == null
                                      && oneDirectionConstInfo.OneDirectionAttribute.End == null
                                      && oneDirectionConstInfo.OneDirectionAttribute.StartIndex == oneDirectionConstInfo.OneDirectionAttribute.EndIndex;
 
             if (isArrayConnecting)
             {
-                (SerializedProperty arrayProperty, int index, string error) = Util.GetArrayProperty(oneDirectionConstInfo.Property, oneDirectionConstInfo.Info, oneDirectionConstInfo.Parent);
+                (SerializedProperty arrayProperty, int index, string error) = Util.GetArrayProperty(oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
                 if (error != "")
                 {
-                    return new OneDirectionInfo
-                    {
-                        OneDirectionConstInfo = oneDirectionConstInfo,
-                        Error = error,
-                    };
+#if SAINTSFIELD_DEBUG
+                    Debug.Log(error);
+#endif
+                    oneDirectionConstInfo.Error = error;
+                    return;
                 }
                 int arraySize = arrayProperty.arraySize;
                 // 2 -> 1, 1 -> 0; first element do nothing
                 if (index == 0)  // first element
                 {
-                    return null;
+                    oneDirectionConstInfo.Skip = true;
+                    return;
                 }
 
                 if (arraySize <= 1)
                 {
-                    return null;
+                    oneDirectionConstInfo.Skip = true;
+                    return;
                 }
 
                 SerializedProperty preProperty = arrayProperty.GetArrayElementAtIndex(index - 1);
-                Util.TargetWorldPosInfo arrayStartTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, preProperty, oneDirectionConstInfo.Info, oneDirectionConstInfo.Parent);
+                Util.TargetWorldPosInfo arrayStartTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, preProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
                 if(arrayStartTargetWorldPosInfo.Error != "")
                 {
+#if SAINTSFIELD_DEBUG
                     Debug.LogError(arrayStartTargetWorldPosInfo.Error);
-                    return new OneDirectionInfo
-                    {
-                        OneDirectionConstInfo = oneDirectionConstInfo,
-                        Error = arrayStartTargetWorldPosInfo.Error,
-                    };
+#endif
+                    oneDirectionConstInfo.Error = arrayStartTargetWorldPosInfo.Error;
+                    return;
                 }
-                Util.TargetWorldPosInfo arrayEndTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, oneDirectionConstInfo.Property, oneDirectionConstInfo.Info, oneDirectionConstInfo.Parent);
+
+                Util.TargetWorldPosInfo arrayEndTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
                 if (arrayEndTargetWorldPosInfo.Error != "")
                 {
-                    return new OneDirectionInfo
-                    {
-                        OneDirectionConstInfo = oneDirectionConstInfo,
-                        Error = arrayEndTargetWorldPosInfo.Error,
-                    };
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(arrayStartTargetWorldPosInfo.Error);
+#endif
+                    oneDirectionConstInfo.Error = arrayEndTargetWorldPosInfo.Error;
+
+                    return;
                 }
 
                 // Debug.Log($"{arrayStartTargetWorldPosInfo} -> {arrayEndTargetWorldPosInfo}");
 
-                return new OneDirectionInfo
-                {
-                    Error = "",
-                    OneDirectionConstInfo = oneDirectionConstInfo,
-                    StartTargetWorldPosInfo = arrayStartTargetWorldPosInfo,
-                    EndTargetWorldPosInfo = arrayEndTargetWorldPosInfo,
-                };
+                oneDirectionConstInfo.StartTargetWorldPosInfo = arrayStartTargetWorldPosInfo;
+                oneDirectionConstInfo.EndTargetWorldPosInfo = arrayEndTargetWorldPosInfo;
+                oneDirectionConstInfo.Error = "";
+                return;
             }
 
             // normal connection
-            Util.TargetWorldPosInfo startTargetWorldPosInfo = GetTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.Start, oneDirectionConstInfo.OneDirectionAttribute.StartIndex, oneDirectionConstInfo.OneDirectionAttribute.StartSpace, oneDirectionConstInfo.Property, oneDirectionConstInfo.Info, oneDirectionConstInfo.Parent);
+            Util.TargetWorldPosInfo startTargetWorldPosInfo = GetTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.Start, oneDirectionConstInfo.OneDirectionAttribute.StartIndex, oneDirectionConstInfo.OneDirectionAttribute.StartSpace, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_CONNECT
 //             Debug.Log($"normal connect {arrowConstInfo.Property.propertyPath} start {startTargetWorldPosInfo}");
 // #endif
             if (startTargetWorldPosInfo.Error != "")
             {
-                return new OneDirectionInfo
-                {
-                    OneDirectionConstInfo = oneDirectionConstInfo,
-                    Error = startTargetWorldPosInfo.Error,
-                };
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(startTargetWorldPosInfo.Error);
+#endif
+                oneDirectionConstInfo.Error = startTargetWorldPosInfo.Error;
+                return;
             }
-            Util.TargetWorldPosInfo endTargetWorldPosInfo = GetTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.End, oneDirectionConstInfo.OneDirectionAttribute.EndIndex, oneDirectionConstInfo.OneDirectionAttribute.EndSpace, oneDirectionConstInfo.Property, oneDirectionConstInfo.Info, oneDirectionConstInfo.Parent);
+            Util.TargetWorldPosInfo endTargetWorldPosInfo = GetTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.End, oneDirectionConstInfo.OneDirectionAttribute.EndIndex, oneDirectionConstInfo.OneDirectionAttribute.EndSpace, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_CONNECT
 //             Debug.Log($"normal connect {arrowConstInfo.Property.propertyPath} end {endTargetWorldPosInfo}");
 // #endif
             if (endTargetWorldPosInfo.Error != "")
             {
-                return new OneDirectionInfo
-                {
-                    OneDirectionConstInfo = oneDirectionConstInfo,
-                    Error = endTargetWorldPosInfo.Error,
-                };
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(endTargetWorldPosInfo.Error);
+#endif
+                oneDirectionConstInfo.Error = endTargetWorldPosInfo.Error;
+                return;
             }
 
-            return new OneDirectionInfo
-            {
-                Error = "",
-                OneDirectionConstInfo = oneDirectionConstInfo,
-                StartTargetWorldPosInfo = startTargetWorldPosInfo,
-                EndTargetWorldPosInfo = endTargetWorldPosInfo,
-            };
+            oneDirectionConstInfo.StartTargetWorldPosInfo = startTargetWorldPosInfo;
+            oneDirectionConstInfo.EndTargetWorldPosInfo = endTargetWorldPosInfo;
+            oneDirectionConstInfo.Error = "";
         }
 
-        private static Util.TargetWorldPosInfo GetTargetWorldPosInfo(string target, int targetIndex, Space space, SerializedProperty property, FieldInfo info, object parent)
+        private static Util.TargetWorldPosInfo GetTargetWorldPosInfo(string target, int targetIndex, string space, SerializedProperty property, MemberInfo info, object parent)
         {
             // use on the field itself
             if (string.IsNullOrEmpty(target))
             {
-                return Util.GetPropertyTargetWorldPosInfo(space, property, info, parent);
+                return Util.GetPropertyTargetWorldPosInfoSpace(space, property, info, parent);
             }
 
             // it's either another field, or it's a callback
@@ -295,6 +307,13 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
         protected bool OnSceneGUIInternal(SceneView sceneView, OneDirectionInfo oneDirectionInfo)
         {
+            UpdateOneDirectionInfo(oneDirectionInfo);
+
+            if (oneDirectionInfo.Skip)
+            {
+                return true;
+            }
+
             if (oneDirectionInfo.Error != "")
             {
                 return false;

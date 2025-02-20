@@ -6,14 +6,14 @@ namespace SaintsField.Samples.Scripts.HandleExamples
     {
         [SerializeField, GetComponent, DrawLabel("Entrance"),
          // connect this to worldPos[0]
-         ArrowHandleCap(end: nameof(worldPos), endIndex: 0, endSpace: Space.Self),
+         ArrowHandleCap(end: nameof(worldPos), endIndex: 0),
         ] private GameObject entrance;
 
         [
             // connect every element in the list
-            ArrowHandleCap(color: EColor.Green, startSpace: Space.Self),
+            ArrowHandleCap(eColor: EColor.Green),
             // connect every element to the `centerPoint`
-            ArrowHandleCap(end: nameof(centerPoint), color: EColor.Red, startSpace: Space.Self, endSpace: Space.Self, colorAlpha: 0.4f),
+            ArrowHandleCap(end: nameof(centerPoint), eColor: EColor.Red),
 
             // PositionHandle(space: Space.Self),
             DrawLabel("$" + nameof(PosIndexLabel)),
@@ -27,7 +27,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
         [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
          // PositionHandle,
          // connect worldPos[0] to this
-         ArrowHandleCap(start: nameof(worldPos), startIndex: -1, startSpace: Space.Self),
+         ArrowHandleCap(start: nameof(worldPos), startIndex: -1),
         ] public Transform exit;
 
         private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";

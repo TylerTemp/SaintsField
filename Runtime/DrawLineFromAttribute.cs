@@ -9,10 +9,10 @@ namespace SaintsField
     public class DrawLineFromAttribute: DrawLineAttribute
     {
         public DrawLineFromAttribute(
-            string target = null, int targetIndex = 0, Space targetSpace = Space.World,
-            Space space = Space.World,
-            EColor color = EColor.White, float colorAlpha = 1f
-        ) : base(target, targetIndex, targetSpace, null, 0, space, color, colorAlpha)
+            string target = null, int targetIndex = 0, string targetSpace = "this",
+            string space = "this",
+            EColor eColor = EColor.White, string colorCallback = null
+        ) : base(target, targetIndex, targetSpace, null, 0, space, eColor, colorCallback)
         {
         }
     }

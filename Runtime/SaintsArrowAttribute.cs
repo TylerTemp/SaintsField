@@ -12,12 +12,12 @@ namespace SaintsField
         public readonly float HeadAngle;
 
         public SaintsArrowAttribute(
-            string start = null, int startIndex = 0, Space startSpace = Space.World,
-            string end = null, int endIndex = 0, Space endSpace = Space.World,
-            EColor color = EColor.White, float colorAlpha = 1f,
+            string start = null, int startIndex = 0, string startSpace = "this",
+            string end = null, int endIndex = 0, string endSpace = "this",
+            EColor eColor = EColor.White, string colorCallback = null,
             float headLength = 0.5f,
             float headAngle = 20.0f
-        ): base(start, startIndex, startSpace, end, endIndex, endSpace, color, colorAlpha)
+        ): base(start, startIndex, startSpace, end, endIndex, endSpace, eColor, colorCallback)
         {
             HeadLength = headLength;
             HeadAngle = headAngle;

@@ -18,51 +18,34 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            OneDirectionConstInfo oneDirectionConstInfo = new OneDirectionConstInfo
+            OneDirectionBaseAttribute oneDirectionBaseAttribute = (OneDirectionBaseAttribute)saintsAttribute;
+            _oneDirectionInfoUIToolkit = new OneDirectionInfo
             {
-                OneDirectionAttribute = (OneDirectionBaseAttribute) saintsAttribute,
-                Property = property,
-                Info = info,
-                Parent = parent,
-            };
+                Error = "",
 
-            _oneDirectionInfoUIToolkit = GetArrowInfo(oneDirectionConstInfo);
+                OneDirectionAttribute = oneDirectionBaseAttribute,
+                SerializedProperty = property,
+                MemberInfo = info,
+                Parent = parent,
+
+                Color = oneDirectionBaseAttribute.Color,
+            };
 
             VisualElement child = new VisualElement
             {
                 name = NameSaintsArrow(property),
             };
-            child.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUIUIToolkit);
+            child.RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                SceneView.duringSceneGui += OnSceneGUIUIToolkit;
+                SceneView.RepaintAll();
+            });
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
             container.Add(child);
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        private void OnSceneGUIUIToolkit(SceneView sceneView)
         {
-            // ReSharper disable once MergeIntoNegatedPattern
-            if (_oneDirectionInfoUIToolkit == null || _oneDirectionInfoUIToolkit.Error != "")
-            {
-                return;
-            }
-
-            if (!_oneDirectionInfoUIToolkit.StartTargetWorldPosInfo.IsTransform || !_oneDirectionInfoUIToolkit.EndTargetWorldPosInfo.IsTransform)
-            {
-                _oneDirectionInfoUIToolkit = GetArrowInfo(_oneDirectionInfoUIToolkit.OneDirectionConstInfo);
-            }
-        }
-
-        private GUIStyle _guiStyleUIToolkit;
-
-        protected void OnSceneGUIUIToolkit(SceneView sceneView)
-        {
-            if (_oneDirectionInfoUIToolkit is null)
-            {
-                // Debug.Log($"no config");
-                return;
-            }
-
             // Debug.Log($"render {_arrowInfoUIToolkit}");
 
             // ReSharper disable once InvertIf

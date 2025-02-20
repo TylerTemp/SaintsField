@@ -1,3 +1,5 @@
+using System;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -9,19 +11,17 @@ namespace SaintsField
 
         public readonly string Start;
         public readonly int StartIndex;
-        public readonly Space StartSpace;
+        public readonly string StartSpace;
         public readonly string End;
         public readonly int EndIndex;
-        public readonly Space EndSpace;
-        public readonly EColor EColor;
-        public readonly float ColorAlpha;
+        public readonly string EndSpace;
+        public readonly Color Color;
+        public readonly string ColorCallback;
 
-        public OneDirectionBaseAttribute(
-            string start = null, int startIndex = 0, Space startSpace = Space.World,
-            string end = null, int endIndex = 0, Space endSpace = Space.World,
-            EColor color = EColor.White, float colorAlpha = 1f,
-            float headLength = 0.5f,
-            float headAngle = 20.0f
+        protected OneDirectionBaseAttribute(
+            string start = null, int startIndex = 0, string startSpace = "this",
+            string end = null, int endIndex = 0, string endSpace = "this",
+            EColor eColor = EColor.White, string colorCallback = null
         )
         {
             Start = start;
@@ -31,8 +31,27 @@ namespace SaintsField
             EndIndex = endIndex;
             EndSpace = endSpace;
 
-            EColor = color;
-            ColorAlpha = colorAlpha;
+            Color = eColor.GetColor();
+
+            bool colorIsString = !string.IsNullOrEmpty(colorCallback);
+            ColorCallback = null;
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if(colorIsString && colorCallback.StartsWith("#"))
+            {
+                bool isColor = ColorUtility.TryParseHtmlString(colorCallback, out Color color);
+                if (!isColor)
+                {
+                    throw new Exception($"Color {colorCallback} is not a valid color");
+                }
+                Color = color;
+            }
+            else if(colorIsString)
+            {
+                (string colorContent, bool _) = RuntimeUtil.ParseCallback(colorCallback);
+                // ColorIsCallback = true;
+                ColorCallback = colorContent;
+            }
         }
     }
 }

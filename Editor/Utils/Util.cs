@@ -1303,7 +1303,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfo(Space space, SerializedProperty property, MemberInfo info, object parent)
+        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfo(string space, SerializedProperty property, MemberInfo info, object parent)
         {
             try
             {
@@ -1497,7 +1497,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static TargetWorldPosInfo GetValueFromVectorSpace(string space, SerializedProperty property,
+        private static TargetWorldPosInfo GetValueFromVectorSpace(string space, SerializedProperty property,
             MemberInfo info, object parent,
             Vector3 v3Value)
         {
@@ -1563,10 +1563,10 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static TargetWorldPosInfo GetValueFromVector(Space space, SerializedProperty property,
+        public static TargetWorldPosInfo GetValueFromVector(string space, SerializedProperty property,
             Vector3 v3Value)
         {
-            if (space == Space.World)
+            if (space == null)
             {
                 return new TargetWorldPosInfo
                 {

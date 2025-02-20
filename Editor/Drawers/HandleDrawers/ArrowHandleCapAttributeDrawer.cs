@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
     {
         protected override void OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd)
         {
-            using (new HandleColorScoop(oneDirectionInfo.OneDirectionConstInfo.OneDirectionAttribute.EColor.GetColor() * new Color(1, 1, 1, oneDirectionInfo.OneDirectionConstInfo.OneDirectionAttribute.ColorAlpha)))
+            using (new HandleColorScoop(oneDirectionInfo.Color))
             {
                 // Handles.DrawLine(worldPosStart, worldPosEnd);
                 Handles.ArrowHandleCap(
