@@ -3293,10 +3293,10 @@ Parameters:
 
 *   `string start = null`: where does the line start. `null` for the current field.
 *   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
-*   `Space startSpace = Space.World`: if the start is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `string startSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `string end = null`: where does the line end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
-*   `Space endSpace = Space.World`: if the end is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `EColor color = EColor.White`: the color of the line.
 *   `float colorAlpha = 1f`: the alpha of the color.
 
@@ -3304,8 +3304,8 @@ And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field wit
 
 *   `string target = null`: target point of the line from current field
 *   `int targetIndex = 0`: if the target is a list/array, specify the index of the target.
-*   `Space targetSpace = Space.World`: if the target is a `Vector3`/`Vector2`, should it be in world space or local space.
-*   `Space space = Space.World`: if current field is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `string targetSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `string space = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `EColor color = EColor.White`: the color of the line.
 *   `float colorAlpha = 1f`: the alpha of the color.
 
@@ -3349,10 +3349,10 @@ Parameters:
 
 *   `string start = null`: where does the arrow start. `null` for the current field.
 *   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
-*   `Space startSpace = Space.World`: if the start is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `string startSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `string end = null`: where does the arrow end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
-*   `Space endSpace = Space.World`: if the end is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `EColor color = EColor.White`: the color of the arrow.
 *   `float colorAlpha = 1f`: the alpha of the color.
 *   `float headLength = 0.5f`: the length of the arrow head.
