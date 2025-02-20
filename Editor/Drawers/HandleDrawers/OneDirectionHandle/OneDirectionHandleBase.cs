@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                 }
 
                 SerializedProperty preProperty = arrayProperty.GetArrayElementAtIndex(index - 1);
-                Util.TargetWorldPosInfo arrayStartTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, preProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
+                Util.TargetWorldPosInfo arrayStartTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, preProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
                 if(arrayStartTargetWorldPosInfo.Error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -87,7 +87,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                     return;
                 }
 
-                Util.TargetWorldPosInfo arrayEndTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
+                Util.TargetWorldPosInfo arrayEndTargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(oneDirectionConstInfo.OneDirectionAttribute.StartSpace, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
                 if (arrayEndTargetWorldPosInfo.Error != "")
                 {
 #if SAINTSFIELD_DEBUG

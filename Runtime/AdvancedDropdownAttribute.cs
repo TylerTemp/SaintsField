@@ -41,7 +41,7 @@ namespace SaintsField
 
         public AdvancedDropdownAttribute(string funcName = null, EUnique unique = EUnique.None)
         {
-            FuncName = RuntimeUtil.ParseCallback(funcName, false).content;
+            FuncName = RuntimeUtil.ParseCallback(funcName).content;
             EUnique = unique;
         }
 

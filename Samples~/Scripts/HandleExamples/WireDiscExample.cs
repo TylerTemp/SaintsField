@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
         [GetComponent]
         [DrawWireDisc(
             radisCallback: nameof(radius),
-            colorCallback: nameof(color),
+            color: nameof(color),
             posOffsetCallback: nameof(positionOffset),
             norCallback: nameof(normal),
             rotCallback: nameof(rotation)
@@ -16,7 +16,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
 
         [DrawWireDisc(
             radisCallback: nameof(radius),
-            colorCallback: nameof(color),
+            color: nameof(color),
             posOffsetCallback: nameof(positionOffset),
             norCallback: nameof(normal),
             rotCallback: nameof(rotation)
@@ -25,7 +25,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
 
         [DrawWireDisc(
             // radisCallback: nameof(radius),
-            colorCallback: nameof(color),
+            color: nameof(color),
             posOffsetCallback: nameof(positionOffset),
             norCallback: nameof(normal),
             rotCallback: nameof(rotation)

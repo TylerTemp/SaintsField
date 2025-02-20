@@ -6,9 +6,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
+namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 {
-    public partial class DrawSphereAttributeDrawer
+    public partial class SphereHandleCapAttributeDrawer
     {
         private static string NameDrawWireDisc(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc";
         private static string NameDrawWireDiscHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc_HelpBox";
@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
             {
                 name = NameDrawWireDisc(property, index),
             };
-            _sphereInfo = CreateSphereInfo((DrawSphereAttribute) saintsAttribute, property, info, parent);
+            _sphereInfo = CreateSphereInfo((SphereHandleCapAttribute) saintsAttribute, property, info, parent);
             child.RegisterCallback<AttachToPanelEvent>(_ =>
             {
                 SceneView.duringSceneGui += OnSceneGUIUIToolkit;

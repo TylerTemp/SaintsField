@@ -36,7 +36,7 @@ namespace SaintsField
             float norX = 0f, float norY = 0f, float norZ = 1f, string norCallback = null,
             float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f, string posOffsetCallback = null,
             float rotX = 0f, float rotY = 0f, float rotZ = 0f, string rotCallback = null,
-            EColor eColor = EColor.White, string colorCallback = null
+            EColor eColor = EColor.White, string color = null
         )
         {
             Radius = radius;
@@ -51,22 +51,22 @@ namespace SaintsField
 
             Color = eColor.GetColor();
 
-            bool colorIsString = !string.IsNullOrEmpty(colorCallback);
+            bool colorIsString = !string.IsNullOrEmpty(color);
             ColorCallback = null;
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if(colorIsString && colorCallback.StartsWith("#"))
+            if(colorIsString && color.StartsWith("#"))
             {
-                bool isColor = ColorUtility.TryParseHtmlString(colorCallback, out Color color);
+                bool isColor = ColorUtility.TryParseHtmlString(color, out Color colorObj);
                 if (!isColor)
                 {
-                    throw new Exception($"Color {colorCallback} is not a valid color");
+                    throw new Exception($"Color {color} is not a valid color");
                 }
-                Color = color;
+                Color = colorObj;
             }
             else if(colorIsString)
             {
-                (string colorContent, bool _) = RuntimeUtil.ParseCallback(colorCallback);
+                (string colorContent, bool _) = RuntimeUtil.ParseCallback(color);
                 // ColorIsCallback = true;
                 ColorCallback = colorContent;
             }

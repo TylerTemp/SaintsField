@@ -4,21 +4,21 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
+namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 {
-    public partial class DrawSphereAttributeDrawer
+    public partial class SphereHandleCapAttributeDrawer
     {
         private readonly Dictionary<string, SphereInfo> _idToSphereInfo = new Dictionary<string, SphereInfo>();
         private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
-        private SphereInfo EnsureWireDiscInfo(DrawSphereAttribute drawSphereAttribute,
+        private SphereInfo EnsureWireDiscInfo(SphereHandleCapAttribute sphereHandleCapAttribute,
             SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
         {
             string key = GetKey(serializedProperty);
             if (!_idToSphereInfo.TryGetValue(key, out SphereInfo sphereInfo))
             {
                 _idToSphereInfo[key] = sphereInfo =
-                    CreateSphereInfo(drawSphereAttribute, serializedProperty, memberInfo, parent);
+                    CreateSphereInfo(sphereHandleCapAttribute, serializedProperty, memberInfo, parent);
 
                 // ReSharper disable once InconsistentNaming
                 void OnSceneGUIIMGUI(SceneView sceneView)
@@ -51,14 +51,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
             FieldInfo info,
             object parent)
         {
-            return EnsureWireDiscInfo((DrawSphereAttribute)saintsAttribute, property, info, parent).Error != "";
+            return EnsureWireDiscInfo((SphereHandleCapAttribute)saintsAttribute, property, info, parent).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            string error = EnsureWireDiscInfo((DrawSphereAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureWireDiscInfo((SphereHandleCapAttribute)saintsAttribute, property, info, parent).Error;
             return error == ""
                 ? 0
                 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
-            string error = EnsureWireDiscInfo((DrawSphereAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureWireDiscInfo((SphereHandleCapAttribute)saintsAttribute, property, info, parent).Error;
 
             return error == ""
                 ? position

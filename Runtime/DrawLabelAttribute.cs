@@ -19,7 +19,7 @@ namespace SaintsField
 
         public readonly string Space;
 
-        public DrawLabelAttribute(EColor eColor, string content = null, string space = "this", string colorCallback = null)
+        public DrawLabelAttribute(EColor eColor, string content = null, string space = "this", string color = null)
         {
             (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(content);
             Content = parsedContent;
@@ -29,25 +29,25 @@ namespace SaintsField
             Color = eColor.GetColor();
             ColorCallback = null;
 
-            bool colorIsString = !string.IsNullOrEmpty(colorCallback);
+            bool colorIsString = !string.IsNullOrEmpty(color);
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if(colorIsString && colorCallback.StartsWith("#"))
+            if(colorIsString && color.StartsWith("#"))
             {
-                bool isColor = ColorUtility.TryParseHtmlString(colorCallback, out Color color);
+                bool isColor = ColorUtility.TryParseHtmlString(color, out Color colorObj);
                 if (!isColor)
                 {
-                    throw new Exception($"Color {colorCallback} is not a valid color");
+                    throw new Exception($"Color {color} is not a valid color");
                 }
-                Color = color;
+                Color = colorObj;
             }
             else if(colorIsString)
             {
-                (string colorContent, bool _) = RuntimeUtil.ParseCallback(colorCallback);
+                (string colorContent, bool _) = RuntimeUtil.ParseCallback(color);
                 ColorCallback = colorContent;
             }
         }
 
-        public DrawLabelAttribute(string content = null, string space = "this", string colorCallback = null): this(EColor.White, content, space, colorCallback)
+        public DrawLabelAttribute(string content = null, string space = "this", string color = null): this(EColor.White, content, space, color)
         {
         }
     }

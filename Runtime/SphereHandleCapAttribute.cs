@@ -7,7 +7,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
-    public class DrawSphereAttribute: PropertyAttribute, ISaintsAttribute
+    public class SphereHandleCapAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
@@ -23,11 +23,11 @@ namespace SaintsField
         public readonly Color Color;
         public readonly string ColorCallback;
 
-        public DrawSphereAttribute(
+        public SphereHandleCapAttribute(
             float radius = 1f, string radisCallback = null,
             string space = "this",
             float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f, string posOffsetCallback = null,
-            EColor eColor = EColor.White, string colorCallback = null
+            EColor eColor = EColor.White, string color = null
         )
         {
             Radius = radius;
@@ -38,22 +38,22 @@ namespace SaintsField
 
             Color = eColor.GetColor();
 
-            bool colorIsString = !string.IsNullOrEmpty(colorCallback);
+            bool colorIsString = !string.IsNullOrEmpty(color);
             ColorCallback = null;
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if(colorIsString && colorCallback.StartsWith("#"))
+            if(colorIsString && color.StartsWith("#"))
             {
-                bool isColor = ColorUtility.TryParseHtmlString(colorCallback, out Color color);
+                bool isColor = ColorUtility.TryParseHtmlString(color, out Color colorObj);
                 if (!isColor)
                 {
-                    throw new Exception($"Color {colorCallback} is not a valid color");
+                    throw new Exception($"Color {color} is not a valid color");
                 }
-                Color = color;
+                Color = colorObj;
             }
             else if(colorIsString)
             {
-                (string colorContent, bool _) = RuntimeUtil.ParseCallback(colorCallback);
+                (string colorContent, bool _) = RuntimeUtil.ParseCallback(color);
                 // ColorIsCallback = true;
                 ColorCallback = colorContent;
             }

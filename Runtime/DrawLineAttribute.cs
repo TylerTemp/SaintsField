@@ -11,8 +11,8 @@ namespace SaintsField
         public DrawLineAttribute(
             string start = null, int startIndex = 0, string startSpace = "this",
             string end = null, int endIndex = 0, string endSpace = "this",
-            EColor eColor = EColor.White, string colorCallback = null
-        ): base(start, startIndex, startSpace, end, endIndex, endSpace, eColor, colorCallback)
+            EColor eColor = EColor.White, string color = null
+        ): base(start, startIndex, startSpace, end, endIndex, endSpace, eColor, color)
         {
         }
     }

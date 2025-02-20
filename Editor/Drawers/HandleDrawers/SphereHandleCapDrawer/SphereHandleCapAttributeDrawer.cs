@@ -5,17 +5,17 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
+namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(DrawSphereAttribute), true)]
-    public partial class DrawSphereAttributeDrawer: SaintsPropertyDrawer
+    [CustomPropertyDrawer(typeof(SphereHandleCapAttribute), true)]
+    public partial class SphereHandleCapAttributeDrawer: SaintsPropertyDrawer
     {
         private class SphereInfo
         {
-            public DrawSphereAttribute DrawSphereAttribute;
+            public SphereHandleCapAttribute SphereHandleCapAttribute;
             public SerializedProperty SerializedProperty;
             public MemberInfo MemberInfo;
             public object Parent;
@@ -29,18 +29,18 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
             public Vector3 Center;
         }
 
-        private static SphereInfo CreateSphereInfo(DrawSphereAttribute drawSphereAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
+        private static SphereInfo CreateSphereInfo(SphereHandleCapAttribute sphereHandleCapAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
         {
             return new SphereInfo
             {
                 Error = "",
 
-                DrawSphereAttribute = drawSphereAttribute,
+                SphereHandleCapAttribute = sphereHandleCapAttribute,
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
-                Radius = drawSphereAttribute.Radius,
-                Color = drawSphereAttribute.Color,
+                Radius = sphereHandleCapAttribute.Radius,
+                Color = sphereHandleCapAttribute.Color,
                 // TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),
             };
         }
@@ -54,9 +54,20 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
                 return;
             }
 
-            using(new GiamosColorScoop(sphereInfo.Color))
+            // using(new GiamosColorScoop(sphereInfo.Color))
+            // {
+            //     Gizmos.DrawSphere(sphereInfo.Center, sphereInfo.Radius);
+            // }
+            // Handles.Draw
+            using(new HandleColorScoop(sphereInfo.Color))
             {
-                Gizmos.DrawSphere(sphereInfo.Center, sphereInfo.Radius);
+                Handles.SphereHandleCap(
+                    0,
+                    sphereInfo.Center,
+                    Quaternion.identity,
+                    sphereInfo.Radius,
+                    EventType.Repaint
+                );
             }
         }
 
@@ -89,9 +100,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
                 }
 
             }
-            else if(!string.IsNullOrEmpty(sphereInfo.DrawSphereAttribute.RadiusCallback))
+            else if(!string.IsNullOrEmpty(sphereInfo.SphereHandleCapAttribute.RadiusCallback))
             {
-                (string error, float result) = Util.GetOf(sphereInfo.DrawSphereAttribute.RadiusCallback, sphereInfo.DrawSphereAttribute.Radius, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent);
+                (string error, float result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.RadiusCallback, sphereInfo.SphereHandleCapAttribute.Radius, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -104,9 +115,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
                 sphereInfo.Radius = result;
             }
 
-            if (!string.IsNullOrEmpty(sphereInfo.DrawSphereAttribute.ColorCallback))
+            if (!string.IsNullOrEmpty(sphereInfo.SphereHandleCapAttribute.ColorCallback))
             {
-                (string error, Color result) = Util.GetOf(sphereInfo.DrawSphereAttribute.ColorCallback, sphereInfo.DrawSphereAttribute.Color, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent);
+                (string error, Color result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.ColorCallback, sphereInfo.SphereHandleCapAttribute.Color, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -144,7 +155,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
                 else
                 {
                     sphereInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(
-                        sphereInfo.DrawSphereAttribute.Space, sphereInfo.SerializedProperty,
+                        sphereInfo.SphereHandleCapAttribute.Space, sphereInfo.SerializedProperty,
                         sphereInfo.MemberInfo, sphereInfo.Parent);
                     if (sphereInfo.TargetWorldPosInfo.Error != "")
                     {
@@ -163,10 +174,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
                 ? sphereInfo.TargetWorldPosInfo.Transform.position
                 : sphereInfo.TargetWorldPosInfo.WorldPos;
 
-            Vector3 positionOffset = sphereInfo.DrawSphereAttribute.PosOffset;
-            if (!string.IsNullOrEmpty(sphereInfo.DrawSphereAttribute.PosOffsetCallback))
+            Vector3 positionOffset = sphereInfo.SphereHandleCapAttribute.PosOffset;
+            if (!string.IsNullOrEmpty(sphereInfo.SphereHandleCapAttribute.PosOffsetCallback))
             {
-                (string error, Vector3 result) = Util.GetOf(sphereInfo.DrawSphereAttribute.PosOffsetCallback, positionOffset, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent);
+                (string error, Vector3 result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.PosOffsetCallback, positionOffset, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -181,7 +192,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
             }
 
             Vector3 scale = Vector3.one;
-            if(sphereInfo.DrawSphereAttribute.Space != null && positionOffset.sqrMagnitude > Mathf.Epsilon)
+            if(sphereInfo.SphereHandleCapAttribute.Space != null && positionOffset.sqrMagnitude > Mathf.Epsilon)
             {
                 if (sphereInfo.TargetWorldPosInfo.IsTransform)
                 {
@@ -213,7 +224,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawSphereDrawer
             }
 
             (string error, Transform trans) = HandleUtils.GetSpaceTransform(sphereInfo.TargetWorldPosInfo,
-                sphereInfo.DrawSphereAttribute.Space, sphereInfo.SerializedProperty, sphereInfo.MemberInfo,
+                sphereInfo.SphereHandleCapAttribute.Space, sphereInfo.SerializedProperty, sphereInfo.MemberInfo,
                 sphereInfo.Parent);
 
             if (error != "")

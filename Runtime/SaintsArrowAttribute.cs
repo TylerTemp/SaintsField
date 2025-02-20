@@ -14,10 +14,10 @@ namespace SaintsField
         public SaintsArrowAttribute(
             string start = null, int startIndex = 0, string startSpace = "this",
             string end = null, int endIndex = 0, string endSpace = "this",
-            EColor eColor = EColor.White, string colorCallback = null,
+            EColor eColor = EColor.White, string color = null,
             float headLength = 0.5f,
             float headAngle = 20.0f
-        ): base(start, startIndex, startSpace, end, endIndex, endSpace, eColor, colorCallback)
+        ): base(start, startIndex, startSpace, end, endIndex, endSpace, eColor, color)
         {
             HeadLength = headLength;
             HeadAngle = headAngle;

@@ -18,11 +18,11 @@ namespace SaintsField.Samples.Scripts.HandleExamples
 
         public MonsterState monsterState;
 
-        [DrawLabel("$" + nameof(monsterState), colorCallback: nameof(color))]
+        [DrawLabel("$" + nameof(monsterState), color: nameof(color))]
         public GameObject child;
 
         public Color color;
 
-        [GetComponentInChildren, DrawLabel(colorCallback: nameof(color))] public Transform[] getChildren;
+        [GetComponentInChildren, DrawLabel(color: nameof(color))] public Transform[] getChildren;
     }
 }

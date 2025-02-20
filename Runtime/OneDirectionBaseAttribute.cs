@@ -21,7 +21,7 @@ namespace SaintsField
         protected OneDirectionBaseAttribute(
             string start = null, int startIndex = 0, string startSpace = "this",
             string end = null, int endIndex = 0, string endSpace = "this",
-            EColor eColor = EColor.White, string colorCallback = null
+            EColor eColor = EColor.White, string color = null
         )
         {
             Start = start;
@@ -33,22 +33,22 @@ namespace SaintsField
 
             Color = eColor.GetColor();
 
-            bool colorIsString = !string.IsNullOrEmpty(colorCallback);
+            bool colorIsString = !string.IsNullOrEmpty(color);
             ColorCallback = null;
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if(colorIsString && colorCallback.StartsWith("#"))
+            if(colorIsString && color.StartsWith("#"))
             {
-                bool isColor = ColorUtility.TryParseHtmlString(colorCallback, out Color color);
+                bool isColor = ColorUtility.TryParseHtmlString(color, out Color colorObj);
                 if (!isColor)
                 {
-                    throw new Exception($"Color {colorCallback} is not a valid color");
+                    throw new Exception($"Color {color} is not a valid color");
                 }
-                Color = color;
+                Color = colorObj;
             }
             else if(colorIsString)
             {
-                (string colorContent, bool _) = RuntimeUtil.ParseCallback(colorCallback);
+                (string colorContent, bool _) = RuntimeUtil.ParseCallback(color);
                 // ColorIsCallback = true;
                 ColorCallback = colorContent;
             }
