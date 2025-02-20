@@ -3224,9 +3224,9 @@ This is useful if you want to track an object's state (e.g. a character's basic 
 Parameters:
 
 *   [Optional] `EColor eColor`: color of the label. Default is white.
-*   `string content`: the label text to show. Starting with `$` to make it an attribute/callback
-*   `bool isCallback = false`: make the content an attribute/callback. The callback can receive the value of the field, and the index if it's in an array/list.
-*   `Space space = Space.World`: when using on a `Vector3` or `Vector2`, should it be in world space or local space.
+*   `string content = null`: the label text to show. Starting with `$` to make it an attribute/callback. `null` means using the field's name.
+*   `string space = "this"`: when using on a `Vector3` or `Vector2`, `"this"` means using current object as the space container, null means world space, otherwise use the space from this callback/field value.
+*   `string colorCallback = null`: use a html color if this starts with `#`, otherwise use a callback/field value as the color.
 
 ```csharp
 using SaintsField;

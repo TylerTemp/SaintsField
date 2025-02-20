@@ -97,7 +97,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 wireDiscInfo.Radius = result;
             }
 
-            if (wireDiscInfo.DrawWireDiscAttribute.ColorIsCallback)
+            if (!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.ColorCallback))
             {
                 (string error, Color result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.ColorCallback, wireDiscInfo.DrawWireDiscAttribute.Color, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
                 if (error != "")

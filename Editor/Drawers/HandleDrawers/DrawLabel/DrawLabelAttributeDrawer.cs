@@ -1,4 +1,6 @@
-﻿using SaintsField.Editor.Core;
+﻿using System;
+using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -13,13 +15,16 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
     {
         private class LabelInfo
         {
-            public Space Space;
+            public DrawLabelAttribute DrawLabelAttribute;
+            public SerializedProperty SerializedProperty;
+            public MemberInfo MemberInfo;
+            public object Parent;
 
+            public string Error;
+
+            public Vector3 Center;
             public string Content;
-            public bool IsCallback;
-            public string ActualContent;
-            public EColor EColor;
-
+            public Color Color;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
 
             public GUIStyle GUIStyle;
@@ -27,45 +32,113 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 
         private static void OnSceneGUIInternal(SceneView _, LabelInfo labelInfo)
         {
-            // ReSharper disable once ReplaceWithStringIsNullOrEmpty
-            // ReSharper disable once MergeIntoLogicalPattern
-            if (labelInfo.ActualContent == null || labelInfo.ActualContent == "")
+            UpdateLabelInfo(labelInfo);
+
+            if (!string.IsNullOrEmpty(labelInfo.Error))
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(labelInfo.Error);
+#endif
                 return;
             }
 
-            if (!string.IsNullOrEmpty(labelInfo.TargetWorldPosInfo.Error))
+            if (string.IsNullOrEmpty(labelInfo.Content))
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning("Empty content");
+#endif
                 return;
             }
 
             if(labelInfo.GUIStyle == null)
             {
-                if (labelInfo.EColor == EColor.White)
+                labelInfo.GUIStyle = new GUIStyle
                 {
-                    labelInfo.GUIStyle = GUI.skin.label;
-                }
-                else
-                {
-                    labelInfo.GUIStyle = new GUIStyle
-                    {
-                        normal = { textColor = labelInfo.EColor.GetColor() },
-                    };
-                }
+                    normal = { textColor = labelInfo.Color },
+                };
+            }
+            else
+            {
+                labelInfo.GUIStyle.normal.textColor = labelInfo.Color;
             }
 
-            Vector3 pos = labelInfo.TargetWorldPosInfo.IsTransform
-                ? labelInfo.TargetWorldPosInfo.Transform.position
-                : labelInfo.TargetWorldPosInfo.WorldPos;
-            Handles.Label(pos, labelInfo.ActualContent, labelInfo.GUIStyle);
+            Handles.Label(labelInfo.Center, labelInfo.Content, labelInfo.GUIStyle);
         }
 
-        ~DrawLabelAttributeDrawer()
+        private static void UpdateLabelInfo(LabelInfo labelInfo)
         {
-            // SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-#if UNITY_2021_3_OR_NEWER
-            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+            string propertyPath;
+            try
+            {
+                propertyPath = labelInfo.SerializedProperty.propertyPath;
+            }
+            catch (NullReferenceException)
+            {
+                labelInfo.Error = "Property disposed";
+                return;
+            }
+            catch (ObjectDisposedException)
+            {
+                labelInfo.Error = "Property disposed";
+                return;
+            }
+
+            if (labelInfo.DrawLabelAttribute.IsCallback)
+            {
+                (string error, object value) =
+                    Util.GetOf<object>(labelInfo.DrawLabelAttribute.Content, null, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent);
+
+                if (error != "")
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
 #endif
+                    labelInfo.Error = error;
+                    return;
+                }
+
+                if (value is IWrapProp wrapProp)
+                {
+                    value = Util.GetWrapValue(wrapProp);
+                }
+
+                labelInfo.Content = $"{value}";
+            }
+            else if (labelInfo.DrawLabelAttribute.Content is null)  // use field name
+            {
+                string fieldName = labelInfo.SerializedProperty.displayName;
+                int propIndex = SerializedUtils.PropertyPathIndex(propertyPath);
+                labelInfo.Content = propIndex <= 0
+                    ? fieldName
+                    : $"{fieldName}[{propIndex}]";
+            }
+
+            if (!string.IsNullOrEmpty(labelInfo.DrawLabelAttribute.ColorCallback))
+            {
+                (string error, Color result) = Util.GetOf(labelInfo.DrawLabelAttribute.ColorCallback, labelInfo.DrawLabelAttribute.Color, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent);
+                if (error != "")
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(error);
+#endif
+                    labelInfo.Error = error;
+                    return;
+                }
+
+                // wireDiscInfo.Error = "";
+                labelInfo.Color = result;
+            }
+
+            if (!labelInfo.TargetWorldPosInfo.IsTransform)
+            {
+                labelInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(labelInfo.DrawLabelAttribute.Space, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent);
+            }
+
+            labelInfo.Center = labelInfo.TargetWorldPosInfo.IsTransform
+                ? labelInfo.TargetWorldPosInfo.Transform.position
+                : labelInfo.TargetWorldPosInfo.WorldPos;
+
+            labelInfo.Error = "";
         }
     }
 }

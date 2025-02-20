@@ -16,11 +16,11 @@ namespace SaintsField.Samples.Scripts.HandleExamples
             DrawLineTo(space: Space.Self, target: nameof(centerPoint), targetSpace: Space.Self, color: EColor.Red, colorAlpha: 0.4f),
 
             // PositionHandle(space: Space.Self),
-            DrawLabel("$" + nameof(PosIndexLabel), space: Space.Self),
+            DrawLabel("$" + nameof(PosIndexLabel)),
         ]
         public Vector3[] localPos;
 
-        [DrawLabel("Center", space: Space.Self),
+        [DrawLabel("Center"),
          // PositionHandle(space: Space.Self)
         ] public Vector3 centerPoint;
 

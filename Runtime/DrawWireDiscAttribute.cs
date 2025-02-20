@@ -26,7 +26,7 @@ namespace SaintsField
         public readonly Quaternion Rot;
         public readonly string RotCallback;
 
-        public readonly bool ColorIsCallback;
+        // public readonly bool ColorIsCallback;
         public readonly Color Color;
         public readonly string ColorCallback;
 
@@ -52,6 +52,7 @@ namespace SaintsField
             Color = eColor.GetColor();
 
             bool colorIsString = !string.IsNullOrEmpty(colorCallback);
+            ColorCallback = null;
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if(colorIsString && colorCallback.StartsWith("#"))
@@ -66,7 +67,7 @@ namespace SaintsField
             else if(colorIsString)
             {
                 (string colorContent, bool _) = RuntimeUtil.ParseCallback(colorCallback);
-                ColorIsCallback = true;
+                // ColorIsCallback = true;
                 ColorCallback = colorContent;
             }
         }

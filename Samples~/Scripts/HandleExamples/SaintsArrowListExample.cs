@@ -16,11 +16,11 @@ namespace SaintsField.Samples.Scripts.HandleExamples
             SaintsArrow(start: nameof(centerPoint), color: EColor.Red, startSpace: Space.Self, endSpace: Space.Self, headLength: 0.1f, colorAlpha: 0.4f),
 
             PositionHandle,
-            DrawLabel("$" + nameof(PosIndexLabel), space: Space.Self),
+            DrawLabel("$" + nameof(PosIndexLabel)),
         ]
         public Vector3[] worldPos;
 
-        [DrawLabel("Center", space: Space.Self), PositionHandle] public Vector3 centerPoint;
+        [DrawLabel("Center"), PositionHandle] public Vector3 centerPoint;
 
         [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true), PositionHandle,
          // connect worldPos[0] to this
