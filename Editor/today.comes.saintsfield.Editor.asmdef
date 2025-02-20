@@ -40,7 +40,7 @@
         },
         {
             "name": "today.comes.saintsdraw",
-            "expression": "[1.0.4,2.0.0]",
+            "expression": "1.0.4",
             "define": "SAINTSFIELD_SAINTSDRAW"
         },
         {

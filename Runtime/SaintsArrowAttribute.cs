@@ -1,6 +1,6 @@
+#if SAINTSFIELD_SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE
 using System;
 using System.Diagnostics;
-using UnityEngine;
 
 namespace SaintsField
 {
@@ -24,3 +24,4 @@ namespace SaintsField
         }
     }
 }
+#endif

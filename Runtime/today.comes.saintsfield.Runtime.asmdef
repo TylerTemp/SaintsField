@@ -26,6 +26,11 @@
             "name": "com.unity.netcode.gameobjects",
             "expression": "",
             "define": "SAINTSFIELD_NETCODE_GAMEOBJECTS"
+        },
+        {
+            "name": "today.comes.saintsdraw",
+            "expression": "1.0.4",
+            "define": "SAINTSFIELD_SAINTSDRAW"
         }
     ],
     "noEngineReferences": false
