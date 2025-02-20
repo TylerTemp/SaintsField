@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -5,14 +6,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-#if UNITY_2021_3_OR_NEWER
-
 namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 {
     public abstract partial class OneDirectionHandleBase
     {
-
-        #region UIToolkit
         private static string NameSaintsArrow(SerializedProperty property) => $"{property.propertyPath}_OneDirectionHandle";
 
         private OneDirectionInfo _oneDirectionInfoUIToolkit;
@@ -75,9 +72,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                 SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
             }
         }
-
-        #endregion
-
     }
 }
 

@@ -11,9 +11,9 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        public readonly Space Space;
+        public readonly string Space;
 
-        public PositionHandleAttribute(Space space=Space.World)
+        public PositionHandleAttribute(string space="this")
         {
             Space = space;
         }

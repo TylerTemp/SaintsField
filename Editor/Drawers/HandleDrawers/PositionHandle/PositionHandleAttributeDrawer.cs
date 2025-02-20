@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -12,7 +13,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
     [CustomPropertyDrawer(typeof(PositionHandleAttribute), true)]
     public partial class PositionHandleAttributeDrawer: SaintsPropertyDrawer
     {
-        private static void SetValue(Vector3 newTargetPosition, Space space, SerializedProperty property, FieldInfo info, object parent)
+        private static void SetValue(Vector3 newTargetPosition, string space, SerializedProperty property, MemberInfo info, object parent)
         {
             // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
             switch (property.propertyType)
@@ -60,12 +61,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             }
 
             Vector3 rawValue = newTargetPosition;
-            if (space == Space.Self)  // world to self
+            if (space != null)  // world to self
             {
                 (string error, Transform container) = GetContainingTransform(property);
                 if (error != "")
                 {
+#if SAINTSFIELD_DEBUG
                     Debug.LogError(error);
+#endif
                     return;
                 }
 
@@ -98,51 +101,82 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
         private class PositionHandleInfo
         {
-            public SerializedProperty Property;
-            public FieldInfo Info;
+            public SerializedProperty SerializedProperty;
+            public MemberInfo MemberInfo;
             public object Parent;
-            public Space Space;
+            public string Space;
 
+            public string Error;
+            public Vector3 Center;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
         }
 
-        private static bool OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
+        private static void OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
         {
-            Vector3 worldPos;
-            if (positionHandleInfo.TargetWorldPosInfo.IsTransform)
+            UpdatePositionHandleInfo(positionHandleInfo);
+            if (positionHandleInfo.Error != "")
             {
-                Transform trans = positionHandleInfo.TargetWorldPosInfo.Transform;
-                if (trans == null)
-                {
-                    return false;
-                }
-                worldPos = trans.position;
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(positionHandleInfo.Error);
+#endif
+                return;
             }
-            else
-            {
-                worldPos = positionHandleInfo.TargetWorldPosInfo.WorldPos;
-            }
+
+            Vector3 worldPos = positionHandleInfo.Center;
 
             // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
+                // Debug.Log(worldPos);
                 Vector3 newTargetPosition = Handles.PositionHandle(worldPos, Quaternion.identity);
+                // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
-                    SetValue(newTargetPosition, positionHandleInfo.Space, positionHandleInfo.Property, positionHandleInfo.Info, positionHandleInfo.Parent);
-                    positionHandleInfo.Property.serializedObject.ApplyModifiedProperties();
+                    SetValue(newTargetPosition, positionHandleInfo.Space, positionHandleInfo.SerializedProperty, positionHandleInfo.MemberInfo, positionHandleInfo.Parent);
+                    positionHandleInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
                 }
             }
-
-            return true;
         }
 
-        ~PositionHandleAttributeDrawer()
+        private static void UpdatePositionHandleInfo(PositionHandleInfo positionHandleInfo)
         {
-            // SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-#if UNITY_2021_3_OR_NEWER
-            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+            try
+            {
+                string _ = positionHandleInfo.SerializedProperty.propertyPath;
+            }
+            catch (NullReferenceException)
+            {
+                positionHandleInfo.Error = "Property disposed";
+                return;
+            }
+            catch (ObjectDisposedException)
+            {
+                positionHandleInfo.Error = "Property disposed";
+                return;
+            }
+
+            if (positionHandleInfo.TargetWorldPosInfo.IsTransform)
+            {
+                positionHandleInfo.Center = positionHandleInfo.TargetWorldPosInfo.Transform.position;
+                // Debug.Log(positionHandleInfo.Center);
+                positionHandleInfo.Error = "";
+                return;
+            }
+
+            positionHandleInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(positionHandleInfo.Space, positionHandleInfo.SerializedProperty, positionHandleInfo.MemberInfo, positionHandleInfo.Parent);
+            if (positionHandleInfo.TargetWorldPosInfo.Error != "")
+            {
+                positionHandleInfo.Error = positionHandleInfo.TargetWorldPosInfo.Error;
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(positionHandleInfo.Error);
 #endif
+                return;
+            }
+
+            positionHandleInfo.Center = positionHandleInfo.TargetWorldPosInfo.WorldPos;
+
+            // Debug.Log(positionHandleInfo.Center);
+            positionHandleInfo.Error = "";
         }
     }
 }

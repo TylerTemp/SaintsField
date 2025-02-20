@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
@@ -9,135 +8,71 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 {
     public partial class PositionHandleAttributeDrawer
     {
-        #region IMGUI
-
         private readonly Dictionary<string, PositionHandleInfo> _idToInfoImGui = new Dictionary<string, PositionHandleInfo>();
-        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
-        // private string _cacheKey;
+        private PositionHandleInfo EnsureKey(SerializedProperty property, PositionHandleAttribute positionHandleAttribute,
+            MemberInfo info,
+            object parent)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (!_idToInfoImGui.TryGetValue(key, out PositionHandleInfo positionHandleInfo))
+            {
+                _idToInfoImGui[key] = positionHandleInfo = new PositionHandleInfo
+                {
+                    SerializedProperty = property,
+                    MemberInfo = info,
+                    Parent = parent,
+                    Space = positionHandleAttribute.Space,
+                };
 
-        // protected override void ImGuiOnDispose()
-        // {
-        //     base.ImGuiOnDispose();
-        //     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-        //     _idToInfoImGui.Remove(_cacheKey);
-        // }
+                // ReSharper disable once InconsistentNaming
+                void OnSceneGUIIMGUI(SceneView sceneView)
+                {
+                    if (!_idToInfoImGui.TryGetValue(key, out PositionHandleInfo innerPositionHandle))
+                    {
+                        return;
+                    }
+                    OnSceneGUIInternal(sceneView, innerPositionHandle);
+                }
+
+                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+                {
+                    _idToInfoImGui.Remove(key);
+                    SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                });
+                SceneView.duringSceneGui += OnSceneGUIIMGUI;
+                SceneView.RepaintAll();
+            }
+
+            return positionHandleInfo;
+        }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
         {
-            return true;
+            return EnsureKey(property, (PositionHandleAttribute) saintsAttribute, info, parent).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            return 0;
+            string error = EnsureKey(property, (PositionHandleAttribute)saintsAttribute, info, parent).Error;
+            return error == ""
+                ? 0
+                : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
-            string key = GetKey(property);
-            // ReSharper disable once InvertIf
-            if (!_idToInfoImGui.TryGetValue(key, out PositionHandleInfo positionHandleInfo))
-            {
-                PositionHandleAttribute positionHandleAttribute = (PositionHandleAttribute)saintsAttribute;
-
-                Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(positionHandleAttribute.Space, property, info, parent);
-                if (targetWorldPosInfo.Error != "")
-                {
-                    Debug.LogError(targetWorldPosInfo.Error);
-                    return position;
-                }
-
-                positionHandleInfo = new PositionHandleInfo
-                {
-                    Property = property,
-                    Info = info,
-                    Parent = parent,
-                    Space = positionHandleAttribute.Space,
-                    TargetWorldPosInfo = targetWorldPosInfo,
-                };
-                _idToInfoImGui[key] = positionHandleInfo;
-
-                SceneView.duringSceneGui += OnSceneGUIIMGUI;
-                SceneView.RepaintAll();
-
-                Selection.selectionChanged += OnSelectionChanged;
-
-                return position;
-
-                void OnSelectionChanged()
-                {
-                    bool remove = false;
-                    UnityEngine.Object oriObject = null;
-                    try
-                    {
-                        oriObject = property.serializedObject.targetObject;
-                    }
-                    catch (Exception)
-                    {
-                        remove = true;
-                    }
-
-                    if (!remove)
-                    {
-                        if (oriObject == null)
-                        {
-                            remove = true;
-                        }
-                        else
-                        {
-                            remove = Array.IndexOf(Selection.objects, oriObject) == -1;
-                        }
-                    }
-
-                    if (remove)
-                    {
-                        Unsub();
-                    }
-                }
-            }
-
-            return position;
-
-            // ReSharper disable once InconsistentNaming
-            void OnSceneGUIIMGUI(SceneView sceneView)
-            {
-                if (_idToInfoImGui.TryGetValue(key, out PositionHandleInfo cachedInfo))
-                {
-                    positionHandleInfo.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(positionHandleInfo.Space, property, info, parent);
-                    if (!OnSceneGUIInternal(sceneView, cachedInfo))
-                    {
-                        Unsub();
-                    }
-                }
-            }
-
-            void Unsub()
-            {
-                SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-                _idToInfoImGui.Remove(key);
-            }
+            string error = EnsureKey(property, (PositionHandleAttribute)saintsAttribute, info, parent).Error;
+            return error == ""
+                ? position
+                : ImGuiHelpBox.Draw(position, error, MessageType.Error);
         }
-
-        // private void OnSceneGUIIMGUI(SceneView sceneView)
-        // {
-        //     if (_idToInfoImGui.TryGetValue(_cacheKey, out PositionHandleInfo positionHandleInfo))
-        //     {
-        //         if (!OnSceneGUIInternal(sceneView, positionHandleInfo))
-        //         {
-        //             Debug.LogWarning($"Target disposed, remove SceneGUI");
-        //             SceneView.duringSceneGui -= OnSceneGUIIMGUI;
-        //         }
-        //     }
-        // }
-
-        #endregion
     }
 }

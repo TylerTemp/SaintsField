@@ -1303,7 +1303,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfo(Space space, SerializedProperty property, FieldInfo info, object parent)
+        public static TargetWorldPosInfo GetPropertyTargetWorldPosInfo(Space space, SerializedProperty property, MemberInfo info, object parent)
         {
             try
             {

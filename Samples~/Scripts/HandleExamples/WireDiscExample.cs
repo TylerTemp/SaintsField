@@ -36,7 +36,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
 
         public Color color;
 
-        [PositionHandle(Space.Self)] public Vector3 positionOffset;
+        [PositionHandle] public Vector3 positionOffset;
 
         [AdvancedDropdown] public Vector3 normal;
 

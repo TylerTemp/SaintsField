@@ -29,12 +29,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             PositionHandleAttribute positionHandleAttribute = (PositionHandleAttribute)saintsAttribute;
             _positionHandleInfoUIToolkit = new PositionHandleInfo
             {
-                Property = property,
-                Info = info,
+                Error = "",
+
+                SerializedProperty = property,
+                MemberInfo = info,
                 Parent = parent,
                 Space = positionHandleAttribute.Space,
 
-                TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(positionHandleAttribute.Space, property, info, parent),
+                TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(positionHandleAttribute.Space, property, info, parent),
             };
 
             VisualElement child = new VisualElement
@@ -44,30 +46,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             child.RegisterCallback<AttachToPanelEvent>(_ => SceneView.duringSceneGui += OnSceneGUIUIToolkit);
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
             container.Add(child);
-        }
-
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        {
-            if (_positionHandleInfoUIToolkit.TargetWorldPosInfo.Error != "")
-            {
-                return;
-            }
-
-            if (_positionHandleInfoUIToolkit.TargetWorldPosInfo.IsTransform)
-            {
-                return;
-            }
-
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-
-            if (parent == null)
-            {
-                return;
-            }
-
-            _positionHandleInfoUIToolkit.TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfo(_positionHandleInfoUIToolkit.Space, property, info, parent);
         }
 
         // private GUIStyle _guiStyleUIToolkit;
@@ -81,7 +59,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
             try
             {
-                string _ = _positionHandleInfoUIToolkit.Property.propertyPath;
+                string _ = _positionHandleInfoUIToolkit.SerializedProperty.propertyPath;
             }
             catch (NullReferenceException)
             {
@@ -96,10 +74,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 return;
             }
 
-            if(!OnSceneGUIInternal(sceneView, _positionHandleInfoUIToolkit)) {
-                Debug.LogWarning("Target disposed, removing SceneGUI");
-                SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
-            }
+            OnSceneGUIInternal(sceneView, _positionHandleInfoUIToolkit);
         }
     }
 }
