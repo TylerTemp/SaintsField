@@ -4,7 +4,6 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 {
@@ -178,7 +177,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             {
                 if (wireDiscInfo.TargetWorldPosInfo.IsTransform)
                 {
-                    scale = GetLocalToWorldScale(wireDiscInfo.TargetWorldPosInfo.Transform);
+                    scale = HandleUtils.GetLocalToWorldScale(wireDiscInfo.TargetWorldPosInfo.Transform);
                 }
                 else
                 {
@@ -190,7 +189,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 #endif
                         return;
                     }
-                    scale = GetLocalToWorldScale(wireDiscInfo.SpaceTransform);
+                    scale = HandleUtils.GetLocalToWorldScale(wireDiscInfo.SpaceTransform);
                 }
             }
 
@@ -240,19 +239,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             wireDiscInfo.Error = "";
         }
 
-        private static Vector3 GetLocalToWorldScale(Transform transform)
-        {
-            Vector3 worldScale = transform.localScale;
-            Transform parent = transform.parent;
 
-            while (parent != null)
-            {
-                worldScale = Vector3.Scale(worldScale,parent.localScale);
-                parent = parent.parent;
-            }
-
-            return worldScale;
-        }
 
         private static WireDiscInfo CreateWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
         {
@@ -278,49 +265,17 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 return;
             }
 
-            if (wireDiscInfo.TargetWorldPosInfo.Transform != null)
+            (string error, Transform trans) = HandleUtils.GetSpaceTransform(wireDiscInfo.TargetWorldPosInfo,
+                wireDiscInfo.DrawWireDiscAttribute.Space, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo,
+                wireDiscInfo.Parent);
+
+            if (error != "")
             {
-                wireDiscInfo.SpaceTransform = wireDiscInfo.TargetWorldPosInfo.Transform;
+                wireDiscInfo.Error = error;
                 return;
             }
 
-            string parentSpace = wireDiscInfo.DrawWireDiscAttribute.Space;
-
-            Debug.Assert(parentSpace != null);
-
-            Transform spaceTrans;
-
-            Object spaceTarget;
-            if (parentSpace == "this")
-            {
-                spaceTarget = wireDiscInfo.SerializedProperty.serializedObject.targetObject;
-            }
-            else
-            {
-                (string error, Object result) = Util.GetOf<Object>(parentSpace, null,
-                    wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent);
-                if (error != "")
-                {
-                    wireDiscInfo.Error = error;
-                    return;
-                }
-                spaceTarget = result;
-            }
-
-            switch (spaceTarget)
-            {
-                case GameObject go:
-                    spaceTrans = go.transform;
-                    break;
-                case Component comp:
-                    spaceTrans = comp.transform;
-                    break;
-                default:
-                    wireDiscInfo.Error = $"Space {parentSpace} is not a GameObject or Component";
-                    return;
-            }
-
-            wireDiscInfo.SpaceTransform = spaceTrans;
+            wireDiscInfo.SpaceTransform = trans;
         }
     }
 }
