@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.30.0 ##
+## 3.30.1 ##
 
 1.  Add `SphereHandleCap` which can draw a sphere in the scene
 2.  **Breaking Changes**: change the arguments of `DrawLabel` to support dynamic color, arguments of `DrawLine`, `DrawArrow` for better usage case support
