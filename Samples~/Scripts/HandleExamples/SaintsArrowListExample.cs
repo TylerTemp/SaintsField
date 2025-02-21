@@ -4,6 +4,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
 {
     public class SaintsArrowListExample : MonoBehaviour
     {
+#if SAINTSFIELD_SAINTSDRAW
         [SerializeField, GetComponent, DrawLabel("Entrance"),
          // connect this to worldPos[0]
          SaintsArrow(end: nameof(worldPos), endIndex: 0),
@@ -28,5 +29,6 @@ namespace SaintsField.Samples.Scripts.HandleExamples
         ] public Transform exit;
 
         private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
+#endif
     }
 }
