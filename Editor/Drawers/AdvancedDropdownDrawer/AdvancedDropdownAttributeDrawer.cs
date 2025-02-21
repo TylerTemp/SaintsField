@@ -76,6 +76,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     foreach (FieldInfo eachField in staticFields)
                     {
                         object value = eachField.GetValue(null);
+                        // ReSharper disable once InvertIf
                         if (value != null && elementType.IsAssignableFrom(value.GetType()))
                         {
                             if (!valueToNames.TryGetValue(value, out List<string> names))
@@ -101,7 +102,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         }
                     }
 
-                    foreach (KeyValuePair<object,List<string>> kv in valueToNames)
+                    // ReSharper disable once UseDeconstruction
+                    foreach (KeyValuePair<object, List<string>> kv in valueToNames)
                     {
                         object value = kv.Key;
                         List<string> names = kv.Value;
@@ -126,10 +128,33 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
             else
             {
-                (string getOfError, IAdvancedDropdownList getOfDropdownListValue) =
-                    Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
+                (string getOfError, object obj) =
+                    Util.GetOf<object>(funcName, null, property, field, parentObj);
                 error = getOfError;
-                dropdownListValue = getOfDropdownListValue;
+                if (obj is IAdvancedDropdownList getOfDropdownListValue)
+                {
+                    dropdownListValue = getOfDropdownListValue;
+                }
+                else if (obj is IEnumerable<object> ieObj)
+                {
+                    AdvancedDropdownList<object> list = new AdvancedDropdownList<object>(isImGui? "Pick an item": "");
+                    foreach (object each in ieObj)
+                    {
+                        list.Add($"{each}", each);
+                    }
+
+                    dropdownListValue = list;
+                }
+                else
+                {
+                    error = $"{funcName} return value is not a AdvancedDropdownList";
+                }
+
+                // dropdownListValue = getOfDropdownListValue;
+                // (string getOfError, IAdvancedDropdownList getOfDropdownListValue) =
+                //     Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
+                // error = getOfError;
+                // dropdownListValue = getOfDropdownListValue;
             }
             if(dropdownListValue == null || error != "")
             {

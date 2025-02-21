@@ -21,25 +21,34 @@ namespace SaintsField
 
         public GUIColorAttribute(string hexColor)
         {
-            if (hexColor.StartsWith("$"))
-            {
-                IsCallback = true;
-                Callback = RuntimeUtil.ParseCallback(hexColor).content;
-            }
-            else
+            if (hexColor.StartsWith("#"))
             {
                 if (!ColorUtility.TryParseHtmlString(hexColor, out Color color))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(hexColor), hexColor, $"Not a html hex color string");
+                    throw new ArgumentOutOfRangeException(nameof(hexColor), hexColor, "Not a html hex color string");
                 }
 
                 Color = color;
             }
+            else
+            {
+                IsCallback = true;
+                Callback = RuntimeUtil.ParseCallback(hexColor).content;
+            }
         }
 
-        public GUIColorAttribute(EColor eColor)
+        public GUIColorAttribute(EColor eColor, float alpha = 1f)
         {
-            Color = eColor.GetColor();
+            if(alpha >= 1f)
+            {
+                Color = eColor.GetColor();
+            }
+            else
+            {
+                Color c = eColor.GetColor();
+                c.a = alpha;
+                Color = c;
+            }
         }
     }
 }

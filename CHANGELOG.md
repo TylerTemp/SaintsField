@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.30.0 ##
+
+1.  Add `SphereHandleCap` which can draw a sphere in the scene
+2.  **Breaking Changes**: change the arguments of `DrawLabel` to support dynamic color, arguments of `DrawLine`, `DrawArrow` for better usage case support
+3.  `AdvancedDropdown` now can accept any `IEnumerable<object>` return type
+4.  Add alpha argument for `GUIColor` when using `EColor` parameter
+
+Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
+
 ## 3.29.0 ##
 
 1.  Add `DrawWireDisc` to trace an object in the scene drawing a disc.

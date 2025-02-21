@@ -81,10 +81,15 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.29.0**
+**3.30.0**
 
-1.  Add `DrawWireDisc` to trace an object in the scene drawing a disc.
-2.  `AdvancedDropdown` now will use all the static value from the type when you omit `funcName`.
+1.  Add `SphereHandleCap` which can draw a sphere in the scene
+2.  **Breaking Changes**: change the arguments of `DrawLabel` to support dynamic color, arguments of `DrawLine`, `DrawArrow` for better usage case support
+3.  `AdvancedDropdown` now can accept any `IEnumerable<object>` return type
+4.  Add alpha argument for `GUIColor` when using `EColor` parameter
+
+Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
+
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -554,21 +559,21 @@ Change the color of the field.
 
 **Override**:
 
-*   `GUIColorAttribute(EColor eColor)`
+*   `GUIColorAttribute(EColor eColor, float alpha = 1f)`
 
-    Use `EColor`
+    Use `EColor` with custom alpha value
 
 *   `GUIColorAttribute(string hexColorOrCallback)`
 
-    Use hex color which starts with `#`, or use a callback which starts with `$`, to get the color
+    Use hex color which starts with `#`, or use a callback, to get the color
 
 *   `GUIColorAttribute(float r, float g, float b, float a = 1f)`
 
     Use rgb/rgba color (0-1 range)
 
 ```csharp
-// EColor
-[GUIColor(EColor.Cyan)] public int intField;
+// EColor + alpha
+[GUIColor(EColor.Cyan, 0.9f)] public int intField;
 // Hex color
 [GUIColor("#FFC0CB")] public string[] stringArray;
 // rgb/rgba
@@ -581,8 +586,8 @@ public Transform transparentBlue;
 [GUIColor("$" + nameof(dynamicColor)), Range(0, 10)] public int rangeField;
 public Color dynamicColor;
 
-// Dynamic color of callback
-[GUIColor("$" + nameof(DynamicColorFunc)), TextArea] public string textArea;
+// Dynamic color of callback. `$` can be omitted
+[GUIColor(nameof(DynamicColorFunc)), TextArea] public string textArea;
 private Color DynamicColorFunc() => dynamicColor;
 
 // validation
@@ -3226,7 +3231,7 @@ Parameters:
 *   [Optional] `EColor eColor`: color of the label. Default is white.
 *   `string content = null`: the label text to show. Starting with `$` to make it an attribute/callback. `null` means using the field's name.
 *   `string space = "this"`: when using on a `Vector3` or `Vector2`, `"this"` means using current object as the space container, null means world space, otherwise use the space from this callback/field value.
-*   `string colorCallback = null`: use a html color if this starts with `#`, otherwise use a callback/field value as the color.
+*   `string color = null`: use a html color if this starts with `#`, otherwise use a callback/field value as the color.
 
 ```csharp
 using SaintsField;
@@ -3470,7 +3475,7 @@ Parameters:
 *   `float rotX = 0f, float rotY = 0f, float rotZ = 0f`: rotation of the disc related to `space`
 *   `string rotCallback = null`: use a callback or a field value as the rotation. The value must be a `Quaternion`
 *   `EColor eColor = EColor.White`: line color of the disc
-*   `string colorCallback = null`: If it's starting with `#`, use a html color for the line. Otherwise, use a callback or a field value as the color. The value must be a `Color`
+*   `string color = null`: If it's starting with `#`, use a html color for the line. Otherwise, use a callback or a field value as the color. The value must be a `Color`
 
 ```csharp
 using SaintsField;
@@ -3500,7 +3505,7 @@ A simple example to show debugging a player's alert/idle range:
 
 ```csharp
 [GetComponent]
-[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, colorCallback: nameof(curColor), radisCallback: nameof(curRadius))]
+[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, color: nameof(curColor), radisCallback: nameof(curRadius))]
 [DrawLabel(EColor.Brown, "$" + nameof(curStatus))]
 public Transform player;
 
