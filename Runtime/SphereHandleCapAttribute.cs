@@ -24,14 +24,14 @@ namespace SaintsField
         public readonly string ColorCallback;
 
         public SphereHandleCapAttribute(
-            float radius = 1f, string radisCallback = null,
+            float radius = 1f, string radiusCallback = null,
             string space = "this",
             float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f, string posOffsetCallback = null,
             EColor eColor = EColor.White, string color = null
         )
         {
             Radius = radius;
-            RadiusCallback = radisCallback;
+            RadiusCallback = radiusCallback;
             Space = space;
             PosOffset = new Vector3(posXOffset, posYOffset, posZOffset);
             PosOffsetCallback = posOffsetCallback;

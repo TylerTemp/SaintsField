@@ -3556,6 +3556,31 @@ public void Update()
 
 [![video](https://github.com/user-attachments/assets/ce94f758-7a72-442e-9ced-a972cd0783a9)](https://github.com/user-attachments/assets/2d12f926-bc66-4c41-8dfd-92bdf81ba55d)
 
+#### `SphereHandleCap` ####
+
+Draw a sphere in the scene like Unity's [`SphereHandleCap`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Handles.SphereHandleCap.html).
+
+**Parameters**:
+
+*   `float radius = 1f`: radius of the sphere. If the target field is a number, use the field's value instead 
+*   `string radiusCallback = null`: use a callback or a field value as the radius 
+*   `string space = "this"`: the containing space of the sphere. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value 
+*   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the sphere related to the `space`
+*   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
+*   `EColor eColor = EColor.White`: color of the sphere 
+*   `string color = null`: If it's starting with `#`, use a html color for the sphere. Otherwise, use a callback or a field value as the color. The value must be a `Color`
+
+```csharp
+[DrawLine]  // also draw the lines
+[SphereHandleCap(color: "#FF000099", radius: 0.1f)]
+public Vector3[] localPos;
+
+[SphereHandleCap(radius: 0.1f)]
+public GameObject[] objPos;  // use obj's position
+```
+
+![image](https://github.com/user-attachments/assets/4f31ad1e-1818-409c-91ae-48f4e766a8fb)
+
 ### Miscellaneous ###
 
 #### `Dropdown` ####
