@@ -1,6 +1,7 @@
 using System;
 using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -23,7 +24,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 
             // Debug.Log(target);
 
-            if (Util.IsNull(target))
+            if (RuntimeUtil.IsNull(target))
             {
                 return;
             }

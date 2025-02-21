@@ -10,6 +10,7 @@ using SaintsField.SaintsXPathParser;
 using SaintsField.SaintsXPathParser.Optimization;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -175,7 +176,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                             return each.Resource;
                         })
-                        .Where(each => !Util.IsNull(each))
+                        .Where(each => !RuntimeUtil.IsNull(each))
                         .Select(each => ValidateXPathResult(each, expectedType, expectedInterface))
                         .Where(each => each.valid)
                         .Select(each => each.value);

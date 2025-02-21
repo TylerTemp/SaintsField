@@ -21,5 +21,15 @@ namespace SaintsField.Utils
 
             return (content, false);
         }
+
+        public static bool IsNull(object obj)
+        {
+            if (obj is UnityEngine.Object uObject)
+            {
+                return uObject == null;
+            }
+
+            return obj == null;
+        }
     }
 }

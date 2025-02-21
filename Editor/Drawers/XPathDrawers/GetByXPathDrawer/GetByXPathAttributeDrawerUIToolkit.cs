@@ -271,7 +271,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(propertyPath);
 
-            PropertyCache propertyCache = genericCache.IndexToPropertyCache[propertyIndex];
+            if (!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
+            {
+                return;
+            }
 
             if (propertyCache.Error != "")
             {

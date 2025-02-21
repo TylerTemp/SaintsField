@@ -1,6 +1,7 @@
 #if UNITY_2021_2_OR_NEWER
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,7 +38,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                 return (error, null);
             }
 
-            if (Util.IsNull(uObj))
+            if (RuntimeUtil.IsNull(uObj))
             {
                 return ($"Target `{callback}` is null", null);
             }
@@ -75,7 +76,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
             }
 
             Material result = targetMaterials[index];
-            if (Util.IsNull(result))
+            if (RuntimeUtil.IsNull(result))
             {
                 return ("Material is null", null);
             }

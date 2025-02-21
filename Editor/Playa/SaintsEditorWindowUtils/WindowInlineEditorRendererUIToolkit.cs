@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -18,7 +19,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             // SaintsEditorWindowSpecialEditor editor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(value);
             // editor.EditorShowMonoScript = false;
             _container = new VisualElement();
-            if(!Util.IsNull(_value))
+            if(!RuntimeUtil.IsNull(_value))
             {
                 ReCreateEditor();
             }

@@ -369,13 +369,13 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static string GetIWrapPropName(Type type)
+        public static string GetIWrapPropName(Type type, string staticNameHolder = "EditorPropertyName")
         {
             Type lastType = type;
 
             while (true)
             {
-                string name = GetStaticFieldStringValueFromType(lastType, "EditorPropertyName");
+                string name = GetStaticFieldStringValueFromType(lastType, staticNameHolder);
                 if (!string.IsNullOrEmpty(name))
                 {
                     return name;

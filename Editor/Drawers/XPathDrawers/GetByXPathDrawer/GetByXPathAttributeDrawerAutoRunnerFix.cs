@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -163,9 +164,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
 
                 propertyCache.OriginalValue = originalValue;
-                bool fieldIsNull = Util.IsNull(originalValue);
+                bool fieldIsNull = RuntimeUtil.IsNull(originalValue);
                 propertyCache.TargetValue = targetResult;
-                bool targetIsNull = Util.IsNull(targetResult);
+                bool targetIsNull = RuntimeUtil.IsNull(targetResult);
                 propertyCache.TargetIsNull = targetIsNull;
 
                 propertyCache.MisMatch = Mismatch(originalValue, targetResult);

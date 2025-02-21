@@ -36,6 +36,8 @@ namespace SaintsField.Editor.Core
         private static string NameSaintsPropertyDrawerRoot(SerializedProperty property) =>
             $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__SaintsFieldRoot";
 
+        protected virtual bool UseCreateFieldUIToolKit => false;
+
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -83,6 +85,15 @@ namespace SaintsField.Editor.Core
                 {
                     saintsPropertyDrawers.Add(fieldAttributeWithIndex);
                 }
+                else if(UseCreateFieldUIToolKit)
+                {
+                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    {
+                        Drawer = this,
+                        Attribute = null,
+                        Index = -1,
+                    });
+                }
             }
 
             #region Above
@@ -91,10 +102,11 @@ namespace SaintsField.Editor.Core
                 new Dictionary<string, List<SaintsPropertyInfo>>();
             foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
-                if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.Attribute.GroupBy,
+                string groupBy = eachAttributeWithIndex.Attribute?.GroupBy ?? "";
+                if (!groupedAboveDrawers.TryGetValue(groupBy,
                         out List<SaintsPropertyInfo> currentGroup))
                 {
-                    groupedAboveDrawers[eachAttributeWithIndex.Attribute.GroupBy] = currentGroup = new List<SaintsPropertyInfo>();
+                    groupedAboveDrawers[groupBy] = currentGroup = new List<SaintsPropertyInfo>();
                 }
 
                 currentGroup.Add(eachAttributeWithIndex);
@@ -207,13 +219,26 @@ namespace SaintsField.Editor.Core
 
             if (fieldIsFallback)
             {
+                if (UseCreateFieldUIToolKit)
+                {
+                    VisualElement fieldElement = CreateFieldUIToolKit(property,
+                        null, allAttributes, containerElement, fieldInfo, parent);
+                    fieldElement.style.flexGrow = 1;
+                    fieldElement.AddToClassList(ClassFieldUIToolkit(property));
+                    fieldContainer.Add(fieldElement);
+                    // fieldContainer.userData = null;
+                }
+                else
+                {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log("fallback field drawer");
+                    Debug.Log("fallback field drawer");
 #endif
-                VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, allAttributes, saintsPropertyDrawers, parent);
-                fallback.AddToClassList(ClassFieldUIToolkit(property));
-                fieldContainer.Add(fallback);
-                containerElement.visible = false;
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement,
+                        allAttributes, saintsPropertyDrawers, parent);
+                    fallback.AddToClassList(ClassFieldUIToolkit(property));
+                    fieldContainer.Add(fallback);
+                    containerElement.visible = false;
+                }
             }
             else
             {
@@ -274,10 +299,11 @@ namespace SaintsField.Editor.Core
                 new Dictionary<string, List<SaintsPropertyInfo>>();
             foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
             {
-                if(!groupedDrawers.TryGetValue(eachAttributeWithIndex.Attribute.GroupBy, out List<SaintsPropertyInfo> currentGroup))
+                string groupBy = eachAttributeWithIndex.Attribute?.GroupBy ?? "";
+                if(!groupedDrawers.TryGetValue(groupBy, out List<SaintsPropertyInfo> currentGroup))
                 {
                     currentGroup = new List<SaintsPropertyInfo>();
-                    groupedDrawers[eachAttributeWithIndex.Attribute.GroupBy] = currentGroup;
+                    groupedDrawers[groupBy] = currentGroup;
                 }
                 currentGroup.Add(eachAttributeWithIndex);
             }
@@ -867,6 +893,7 @@ namespace SaintsField.Editor.Core
             object parent,  Action<object> onValueChangedCallback, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, IReadOnlyList<PropertyAttribute> allAttributes)
         {
 
+            // Debug.Log("OnAwakeReady");
             // Action<object> onValueChangedCallback = obj =>
             // {
             //     foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)

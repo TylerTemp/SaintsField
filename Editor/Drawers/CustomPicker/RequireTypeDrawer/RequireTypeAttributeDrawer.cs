@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -124,7 +125,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 {
                     Type fieldType = ReflectUtils.GetElementType(info.FieldType);
                     Object result = OnSelectWindowSelected(fieldResult, fieldType, requireTypeAttribute.RequiredTypes);
-                    if(requireTypeAttribute.FreeSign && Util.IsNull(result))
+                    if(requireTypeAttribute.FreeSign && RuntimeUtil.IsNull(result))
                     {
                         result = NoInterfaceGetResult(fieldResult, fieldType);
                     }
@@ -138,7 +139,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
         private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType, IReadOnlyList<Type> requiredTypes)
         {
-            if (Util.IsNull(fieldResult))
+            if (RuntimeUtil.IsNull(fieldResult))
             {
                 return null;
             }

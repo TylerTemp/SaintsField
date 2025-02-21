@@ -1270,16 +1270,6 @@ namespace SaintsField.Editor.Utils
             return ($"Not found index {index} in {source}", null);
         }
 
-        public static bool IsNull(object obj)
-        {
-            if (obj is UnityEngine.Object uObject)
-            {
-                return uObject == null;
-            }
-
-            return obj == null;
-        }
-
         #region Scene Related
 
         public struct TargetWorldPosInfo

@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -330,9 +331,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             foreach ((object targetResult, ProcessPropertyInfo propertyInfo) in processingTargets.Zip(processingProperties, (targetResult, propertyInfo) => (targetResult, propertyInfo)))
             {
                 propertyInfo.PropertyCache.OriginalValue = propertyInfo.Value;
-                bool fieldIsNull = Util.IsNull(propertyInfo.Value);
+                bool fieldIsNull = RuntimeUtil.IsNull(propertyInfo.Value);
                 propertyInfo.PropertyCache.TargetValue = targetResult;
-                bool targetIsNull = Util.IsNull(targetResult);
+                bool targetIsNull = RuntimeUtil.IsNull(targetResult);
                 propertyInfo.PropertyCache.TargetIsNull = targetIsNull;
 
                 propertyInfo.PropertyCache.MisMatch = Mismatch(propertyInfo.Value, targetResult);
@@ -576,7 +577,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     propertyCache.OriginalValue = null;
                     propertyCache.TargetValue = targetResult;
-                    bool targetIsNull = Util.IsNull(targetResult);
+                    bool targetIsNull = RuntimeUtil.IsNull(targetResult);
                     propertyCache.TargetIsNull = targetIsNull;
 
                     propertyCache.MisMatch = !targetIsNull;
@@ -602,7 +603,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static string GetMismatchErrorMessage(object originalValue, object targetValue, bool targetValueIsNull)
         {
-            return $"Expected {(targetValueIsNull? "null": targetValue)}, but got {(Util.IsNull(originalValue)? "null": originalValue)}";
+            return $"Expected {(targetValueIsNull? "null": targetValue)}, but got {(RuntimeUtil.IsNull(originalValue)? "null": originalValue)}";
         }
 
         private static bool NothingSigner(GetByXPathAttribute getByXPathAttribute)
