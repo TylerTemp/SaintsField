@@ -146,8 +146,6 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
 `[NoLabel]` is a shortcut for `[RichLabel(null)]`
 
-```csharp
-
 Special Note:
 
 Use it on an array/list will apply it to all the direct child element instead of the field label itself.
@@ -3718,9 +3716,9 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 
 **Arguments**
 
-*   `string funcName=null` callback function. Must return a `AdvancedDropdownList<T>`.
+*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
-    When omited, it will try to find all the static values from the field type.
+    When omitted, it will try to find all the static values from the field type.
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
@@ -3831,6 +3829,20 @@ public AdvancedDropdownList<int> AdvDropdownNoNest()
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1e0ad6f4-e65d-4953-9f2a-fa9e22e706af)
+
+Example of returning an array/list:
+
+```csharp
+// field:
+[AdvancedDropdown(nameof(childTrans))] public Transform selected;
+[GetComponentInChildren] public Transform[] childTrans;
+
+// or a callback of IEnumerable:
+[AdvancedDropdown(nameof(ChildTrans))] public Transform selectedCallback;
+private IEnumerable<Transform> ChildTrans() => transform.Cast<Transform>();
+```
+
+![image](https://github.com/user-attachments/assets/f6ff44c4-64eb-43f6-b12b-d2121aef095c)
 
 Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
 
