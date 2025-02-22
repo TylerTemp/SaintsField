@@ -197,11 +197,12 @@ namespace SaintsField
 
         public bool TryAdd(TKey key, TValue value)
         {
-            if (!_dictionary.TryAdd(key, value))
+            if (_dictionary.ContainsKey(key))
             {
                 return false;
             }
 
+            _dictionary.Add(key, value);
 #if UNITY_EDITOR
             SerializedKeys.Add(key);
             SerializedValues.Add(value);
