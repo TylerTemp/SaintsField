@@ -1,5 +1,4 @@
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace SaintsField.Editor.Core

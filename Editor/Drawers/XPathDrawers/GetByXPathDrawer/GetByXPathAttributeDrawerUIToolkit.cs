@@ -198,11 +198,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 UpdateSharedCacheSource(genericCache, property, info);
                 UpdateSharedCacheSetValue(genericCache, true, property);
 
-                SaintsEditorApplicationChanged.OnProjectChangedEvent.AddListener(ProjectChangedHandler);
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(ProjectChangedHandler);
 
                 NoLongerInspectingWatch(property.serializedObject.targetObject, arrayRemovedKey, () =>
                 {
-                    SaintsEditorApplicationChanged.OnProjectChangedEvent.RemoveListener(ProjectChangedHandler);
+                    SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(ProjectChangedHandler);
                     SharedCache.Remove(arrayRemovedKey);
                 });
             }
