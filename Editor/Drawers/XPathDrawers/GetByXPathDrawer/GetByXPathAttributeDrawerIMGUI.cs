@@ -258,7 +258,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // {
             //     Debug.Log($"{genericCache.UpdateResourceAfterTime} {EditorApplication.timeSinceStartup}");
             // }
-            Debug.Log(genericCache.UpdateResourceAfterTime);
+            // Debug.Log(genericCache.UpdateResourceAfterTime);
             if(!configExists || genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
             {
                 genericCache.UpdateResourceAfterTime = double.MinValue;
