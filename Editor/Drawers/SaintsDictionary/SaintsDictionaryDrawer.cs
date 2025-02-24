@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
     [CustomPropertyDrawer(typeof(SaintsDictionaryAttribute), true)]
     public partial class SaintsDictionaryDrawer: SaintsPropertyDrawer
     {
-        private static Color WarningColor = new Color(0.8490566f, 0.3003738f, 0.3003738f);
+        private static readonly Color WarningColor = new Color(0.8490566f, 0.3003738f, 0.3003738f);
 
         // [InitializeOnLoadMethod]
         // private static void AddSaintsPropertyInfoInjectAnimatorState()
@@ -50,6 +50,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             if (keySize == newValue)
             {
                 bool changed = false;
+                // ReSharper disable once InvertIf
                 if(valueProp.arraySize != newValue)
                 {
                     changed = true;
@@ -60,6 +61,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             keyProp.arraySize = newValue;
             valueProp.arraySize = newValue;
+            // Debug.Log($"resize to {newValue}");
             return true;
         }
 
@@ -68,6 +70,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             int curSize = keyProp.arraySize;
             foreach (int index in indexReversed.Where(each => each < curSize))
             {
+                Debug.Log($"Remove index {index}");
                 keyProp.DeleteArrayElementAtIndex(index);
                 valueProp.DeleteArrayElementAtIndex(index);
             }
@@ -89,6 +92,23 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             return (_keysPropName, _valuesPropName);
+        }
+
+        private static List<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch)
+        {
+            int size = keysProp.arraySize;
+
+            List<int> results = string.IsNullOrEmpty(keySearch)
+                ? Enumerable.Range(0, size).ToList()
+                : SerializedUtils.SearchArrayProperty(keysProp, keySearch).ToList();
+            // int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
+            if (string.IsNullOrEmpty(valueSearch))
+            {
+                return results;
+            }
+
+            int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
+            return results.Where(each => valueResults.Contains(each)).ToList();
         }
     }
 }

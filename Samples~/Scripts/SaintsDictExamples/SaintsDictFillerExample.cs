@@ -16,7 +16,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             private List<int> _intKeys = new List<int>();
 
             [SerializeField, NoLabel]
-            [GetComponentInChildren]
+            // [GetComponentInChildren]
             private List<GameObject> _objValues = new List<GameObject>();
 
 #if UNITY_EDITOR
@@ -28,7 +28,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         }
 
         public ValueFillerDict valueFillerDict;
-        [SaintsDictionary]
+        [SaintsDictionary("键", "值", numberOfItemsPerPage: 2)]
         public ValueFillerDict decValueFillerDict;
 
         [LayoutStart("Buttons", ELayout.Horizontal)]

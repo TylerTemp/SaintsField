@@ -17,7 +17,7 @@ namespace SaintsField
         public readonly int NumberOfItemsPerPage;
         public readonly bool Searchable;
 
-        public SaintsDictionaryAttribute(string keyLabel = "Key", string valueLabel = "Value", bool searchable = false, int numberOfItemsPerPage = 0)
+        public SaintsDictionaryAttribute(string keyLabel = "Keys", string valueLabel = "Values", bool searchable = false, int numberOfItemsPerPage = 0)
         {
             KeyLabel = keyLabel;
             ValueLabel = valueLabel;

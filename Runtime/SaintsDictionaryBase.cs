@@ -15,6 +15,8 @@ namespace SaintsField
 
         private Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
 
+
+
         // [Conditional("UNITY_EDITOR")]
         // private void EditorSyncDictionaryToBackingField()
         // {
@@ -43,6 +45,7 @@ namespace SaintsField
                 {
                     SerializedKeys.Add(default);
                 }
+                Debug.Log($"Balance add {addCount} to keys");
             }
             else if (keyCount > valueCount)
             {
@@ -51,6 +54,7 @@ namespace SaintsField
                 {
                     SerializedValues.Add(default);
                 }
+                Debug.Log($"Balance add {addCount} to values");
             }
 #else
             SerializedKeys.Clear();

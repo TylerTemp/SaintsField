@@ -1,9 +1,12 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -26,14 +29,32 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         private static string NameTotalCount(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_TotalCount";
 
         private static string NameListView(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_ListView";
+        private static string NameTotalCountBottom(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_TotalCountBottom";
+
+        private static string NamePagePreButton(SerializedProperty property) =>
+            $"{property.propertyPath}__SaintsDictinoary_PagePreButton";
+
+        private static string NamePage(SerializedProperty property) =>
+            $"{property.propertyPath}__SaintsDictinoary_Page";
+
+        private static string NamePageLabel(SerializedProperty property) =>
+            $"{property.propertyPath}____SaintsDictionary_PageLabel";
+        private static string NamePageNextButton(SerializedProperty property) =>
+            $"{property.propertyPath}__SaintsDictinoary_PageNextButton";
+
         private static string NameAddButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_AddButton";
         private static string NameRemoveButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_RemoveButton";
+
+        private static string NameNumberOfItemsPerPage(SerializedProperty property) =>
+            $"{property.propertyPath}__SaintsDictionary_NameNumberOfItemsPerPage";
 
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
+            SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
+
             VisualElement root = new VisualElement
             {
                 style =
@@ -110,14 +131,148 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 },
             };
 
+            int numberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
+
+            IntegerField numberOfItemsPerPageField = new IntegerField
+            {
+                value = numberOfItemsPerPage,
+                isDelayed = true,
+                style =
+                {
+                    minWidth = 30,
+                },
+                name = NameNumberOfItemsPerPage(property),
+            };
+            if(numberOfItemsPerPage > 0)
+            {
+                TextElement numberOfItemsPerPageFieldTextElement = numberOfItemsPerPageField.Q<TextElement>();
+                if (numberOfItemsPerPageFieldTextElement != null)
+                {
+                    numberOfItemsPerPageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
+                }
+            }
+            else
+            {
+                numberOfItemsPerPageField.style.display = DisplayStyle.None;
+            }
+
+            footerButtons.Add(numberOfItemsPerPageField);
+
+            Label numberOfItemsSep = new Label("/")
+            {
+                style =
+                {
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                },
+            };
+            footerButtons.Add(numberOfItemsSep);
+            IntegerField totalCountBottomField = new IntegerField
+            {
+                isDelayed = true,
+                style =
+                {
+                    minWidth = 30,
+                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                },
+                name = NameTotalCountBottom(property),
+                // value = property.arraySize,
+            };
+            footerButtons.Add(totalCountBottomField);
+
+            Label numberOfItemsDesc = new Label("Items")
+            {
+                style =
+                {
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                },
+            };
+            footerButtons.Add(numberOfItemsDesc);
+
+            Button pagePreButton = new Button
+            {
+                style =
+                {
+                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-left.png"),
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                },
+                name = NamePagePreButton(property),
+            };
+            footerButtons.Add(pagePreButton);
+
+            IntegerField pageField = new IntegerField
+            {
+                isDelayed = true,
+                value = 1,
+                style =
+                {
+                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                    minWidth = 30,
+                },
+                name = NamePage(property),
+            };
+            TextElement pageFieldTextElement = pageField.Q<TextElement>();
+            if(pageFieldTextElement != null)
+            {
+                pageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
+            }
+            footerButtons.Add(pageField);
+            Label pageLabel = new Label(" / 1")
+            {
+                style =
+                {
+                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                },
+                name = NamePageLabel(property),
+            };
+            footerButtons.Add(pageLabel);
+            Button pageNextButton = new Button
+            {
+                style =
+                {
+                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-right.png"),
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                },
+                name = NamePageNextButton(property),
+            };
+            footerButtons.Add(pageNextButton);
+
             footerButtons.Add(new Button
             {
                 text = "+",
+                style =
+                {
+                    marginLeft = 0,
+                    marginRight = 0,
+                },
                 name = NameAddButton(property),
             });
             footerButtons.Add(new Button
             {
                 text = "-",
+                style =
+                {
+                    marginLeft = 0,
+                    marginRight = 0,
+                },
                 name = NameRemoveButton(property),
             });
 
@@ -136,37 +291,26 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
             Type rawType = arrayIndex == -1 ? info.FieldType : info.FieldType.GetElementType();
+            Debug.Assert(rawType != null, $"Failed to get element type from {property.propertyPath}");
             // Debug.Log(info.FieldType);
             (string propKeysName, string propValuesName) = GetKeysValuesPropName(rawType);
 
-            Debug.Log(propKeysName);
+            // Debug.Log(propKeysName);
 
             SerializedProperty keysProp = property.FindPropertyRelative(propKeysName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysName);
             SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesName);
 
             FieldInfo keysField = rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
-            FieldInfo valuesField = rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+            Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
 
-            (string curFieldError, int _, object curFieldVaue) = Util.GetValue(property, info, parent);
-            Debug.Log(curFieldVaue);
+            IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
+            totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
+            IntegerField totalCountBottomField = container.Q<IntegerField>(name: NameTotalCountBottom(property));
+            totalCountBottomField.SetValueWithoutNotify(keysProp.arraySize);
 
-            IEnumerable<object> allKeyList = keysField.GetValue(curFieldVaue) as IEnumerable<object>;
-            Debug.Log(allKeyList);
-
-            // foreach (object key in allKeyList)
-            // {
-            //     Debug.Log(key);
-            // }
-
-            IntegerField integerField = container.Q<IntegerField>(name: NameTotalCount(property));
-            integerField.SetValueWithoutNotify(keysProp.arraySize);
-            integerField.TrackPropertyValue(keysProp, _ =>
+            void ManuallySetSize(int size)
             {
-                integerField.SetValueWithoutNotify(keysProp.arraySize);
-            });
-            integerField.RegisterValueChangedCallback(evt =>
-            {
-                int newSize = Mathf.Max(evt.newValue, 0);
+                int newSize = Mathf.Max(size, 0);
                 if (newSize >= keysProp.arraySize)
                 {
                     if (IncreaseArraySize(newSize, keysProp, valuesProp))
@@ -182,52 +326,233 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     DecreaseArraySize(deleteIndexes, keysProp, valuesProp);
                     property.serializedObject.ApplyModifiedProperties();
                 }
-            });
+                totalCountFieldTop.SetValueWithoutNotify(newSize);
+                totalCountBottomField.SetValueWithoutNotify(newSize);
+            }
 
-            // List<int> itemIndexToPropertyIndex = Enumerable.Range(0, keysProp.arraySize).ToList();
+            totalCountFieldTop.TrackPropertyValue(keysProp, _ =>
+            {
+                totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
+            });
+            totalCountFieldTop.RegisterValueChangedCallback(evt => ManuallySetSize(evt.newValue));
+
+            totalCountBottomField.TrackPropertyValue(keysProp, _ =>
+            {
+                totalCountBottomField.SetValueWithoutNotify(keysProp.arraySize);
+            });
+            totalCountBottomField.RegisterValueChangedCallback(evt => ManuallySetSize(evt.newValue));
+
+            Label pageLabel = container.Q<Label>(name: NamePageLabel(property));
+            Button pagePreButton = container.Q<Button>(name: NamePagePreButton(property));
+            IntegerField pageField = container.Q<IntegerField>(name: NamePage(property));
+            Button pageNextButton = container.Q<Button>(name: NamePageNextButton(property));
+
+            List<int> itemIndexToPropertyIndex = Enumerable.Range(0, keysProp.arraySize).ToList();
 
             MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>(name: NameListView(property));
 
+            #region Paging & Search
+
+            string preKeySearch = "";
+            string preValueSearch = "";
+            int prePageIndex = 0;
+            int preSize = 0;
+            int preNumberOfItemsPerPage = -1;
+            int preTotalPage = 1;
+
+            SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
+            // int numberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
+            List<int> hitTargetIndexes = new List<int>(itemIndexToPropertyIndex);
+
+            void RefreshList(string keySearch, string valueSearch, int curPageIndex, int numberOfItemsPerPage)
+            {
+                bool needRebuild = false;
+                int nowArraySize = keysProp.arraySize;
+
+                List<int> fullList = Enumerable.Range(0, nowArraySize).ToList();
+                // List<int> useIndexes = new List<int>(itemIndexToPropertyIndex);
+                List<int> refreshedHitTargetIndexes = new List<int>(hitTargetIndexes);
+                // if (forceRebuild)
+                // {
+                //     refreshedHitTargetIndexes = Enumerable.Range(0, nowArraySize).ToList();
+                // }
+                if (nowArraySize != preSize)
+                {
+                    preSize = nowArraySize;
+                    needRebuild = true;
+                    refreshedHitTargetIndexes = fullList;
+                }
+
+                // processing search result
+                bool needSearchAgain = false;
+                if (needRebuild)
+                {
+                    needSearchAgain = true;
+                }
+                else
+                {
+                    if (preKeySearch != keySearch)
+                    {
+                        preKeySearch = keySearch;
+                        needSearchAgain = true;
+                    }
+
+                    if (preValueSearch != valueSearch)
+                    {
+                        preValueSearch = valueSearch;
+                        needSearchAgain = true;
+                    }
+                }
+
+                if (needSearchAgain)
+                {
+                    needRebuild = true;
+                    refreshedHitTargetIndexes = Search(keysProp, valuesProp, keySearch, valueSearch);
+                    // Debug.Log($"hit search {keySearch}/{valueSearch}: {string.Join(",", refreshedHitTargetIndexes)}");
+                }
+
+                hitTargetIndexes = refreshedHitTargetIndexes;
+                // preNumberOfItemsPerPage = numberOfItemsPerPage;
+                // paging
+                if (numberOfItemsPerPage > 0)
+                {
+                    int startIndex = curPageIndex * numberOfItemsPerPage;
+                    int endIndex = Mathf.Min((curPageIndex + 1) * numberOfItemsPerPage, hitTargetIndexes.Count);
+                    itemIndexToPropertyIndex = hitTargetIndexes.GetRange(startIndex, endIndex - startIndex);
+                    int totalPage = Mathf.Max(1, Mathf.CeilToInt(hitTargetIndexes.Count / (float)numberOfItemsPerPage));
+
+                    // pageField.SetValueWithoutNotify(curPageIndex + 1);
+
+
+                    needRebuild = preNumberOfItemsPerPage != numberOfItemsPerPage
+                                  || preTotalPage != totalPage
+                                  || prePageIndex != curPageIndex;
+
+                    preNumberOfItemsPerPage = numberOfItemsPerPage;
+                    preTotalPage = totalPage;
+                    prePageIndex = curPageIndex;
+                }
+                else
+                {
+                    itemIndexToPropertyIndex = hitTargetIndexes;
+                }
+
+                // if (needRebuild)
+                {
+                    multiColumnListView.itemsSource = itemIndexToPropertyIndex;
+                    multiColumnListView.Rebuild();
+                    pagePreButton.SetEnabled(prePageIndex > 0);
+                    pageField.SetValueWithoutNotify(prePageIndex + 1);
+                    pageLabel.text = $"/ {preTotalPage}";
+                    pageNextButton.SetEnabled(prePageIndex + 1 < preTotalPage);
+                }
+            }
+
+            #endregion
+
+            IntegerField numberOfItemsPerPage = container.Q<IntegerField>(name: NameNumberOfItemsPerPage(property));
+            numberOfItemsPerPage.RegisterValueChangedCallback(evt =>
+            {
+                RefreshList(preKeySearch, preValueSearch, prePageIndex, evt.newValue);
+            });
+
             multiColumnListView.columns.Add(new Column
             {
-                name = "Keys",
+                name ="Keys",
                 // title = "Keys",
                 stretchable = true,
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
-                    header.Add(new Label("Keys"));
-                    header.Add(new TextField
+                    string keyLabel = saintsDictionaryAttribute is null
+                        ? "Keys"
+                        : saintsDictionaryAttribute.KeyLabel;
+                    if(!string.IsNullOrEmpty(keyLabel))
                     {
+                        header.Add(new Label(keyLabel));
+                    }
+                    TextField keySearch = new TextField
+                    {
+                        isDelayed = true,
                         style =
                         {
                             marginRight = 3,
                         },
+                    };
+                    header.Add(keySearch);
+                    keySearch.RegisterValueChangedCallback(evt =>
+                    {
+                        // Debug.Log($"key search {evt.newValue}");
+                        RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
                     });
                     return header;
                 },
-                makeCell = () =>
-                {
-                    PropertyField propField = new PropertyField
-                    {
-                        label = "",
-                    };
-                    propField.Bind(property.serializedObject);
-                    return propField;
-                },
+                makeCell = () => new VisualElement(),
                 bindCell = (element, elementIndex) =>
                 {
-                    PropertyField propertyField = (PropertyField)element;
-                    SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(elementIndex);
-
-                    propertyField.TrackPropertyValue(elementProp, _ =>
+                    // Debug.Log($"bind {elementIndex}");
+                    element.Clear();
+                    PropertyField propertyField = new PropertyField
                     {
-                        IEnumerable<object> allKeyList = keysField.GetValue(parent) as IEnumerable<object>;
+                        label = "",
+                        style =
+                        {
+                            marginRight = 3,
+                        },
+                    };
+                    propertyField.Bind(property.serializedObject);
+                    element.Add(propertyField);
+                    int propIndex = itemIndexToPropertyIndex[elementIndex];
 
-                        // integerField.SetValueWithoutNotify(keysProp.arraySize);
-                    });
-
+                    SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(propIndex);
                     propertyField.BindProperty(elementProp);
+
+                    void RefreshConflict()
+                    {
+                        if (propIndex >= keysProp.arraySize)
+                        {
+                            return;
+                        }
+
+                        (string curFieldError, int _, object curFieldVaue) = Util.GetValue(property, info, parent);
+                        // Debug.Log(curFieldVaue);
+                        if (curFieldError != "")
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.LogError(curFieldError);
+#endif
+                            return;
+                        }
+
+                        IEnumerable allKeyList = keysField.GetValue(curFieldVaue) as IEnumerable;
+                        Debug.Assert(allKeyList != null, $"key list {keysField.Name} is null");
+                        (object value, int index)[] indexedValue = allKeyList.Cast<object>().WithIndex().ToArray();
+                        object thisKey = indexedValue[propIndex].value;
+                        // Debug.Log($"checking with {thisKey}");
+                        foreach ((object existKey, int _) in indexedValue.Where(each => each.index != propIndex))
+                        {
+                            // Debug.Log($"{existKey}/{thisKey}");
+                            // ReSharper disable once InvertIf
+                            if (Util.GetIsEqual(existKey, thisKey))
+                            {
+                                propertyField.style.backgroundColor = WarningColor;
+                                return;
+                            }
+                        }
+
+                        propertyField.style.backgroundColor = Color.clear;
+                    }
+
+                    // propertyField.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
+                    // {
+                    //     RefreshConflict();
+                    // });
+                    propertyField.TrackPropertyValue(keysProp, _ =>
+                    {
+                        RefreshConflict();
+                    });
+                    // Debug.Log($"RefreshConflict {elementIndex}");
+                    RefreshConflict();
                 },
             });
 
@@ -239,13 +564,30 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
-                    header.Add(new Label("Values"));
-                    header.Add(new TextField
+
+                    string valueLabel = saintsDictionaryAttribute is null
+                        ? "Values"
+                        : saintsDictionaryAttribute.ValueLabel;
+
+                    if(!string.IsNullOrEmpty(valueLabel))
                     {
+                        header.Add(new Label(valueLabel));
+                    }
+
+                    // header.Add(new Label("Values"));
+                    TextField valueSearch = new TextField
+                    {
+                        isDelayed = true,
                         style =
                         {
                             marginRight = 3,
                         },
+                    };
+                    header.Add(valueSearch);
+                    valueSearch.RegisterValueChangedCallback(evt =>
+                    {
+                        // Debug.Log($"value search {evt.newValue}");
+                        RefreshList(preKeySearch, evt.newValue, prePageIndex, numberOfItemsPerPage.value);
                     });
                     return header;
                 },
@@ -261,73 +603,106 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 bindCell = (element, elementIndex) =>
                 {
                     PropertyField propertyField = (PropertyField)element;
-                    SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(elementIndex);
+                    SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(itemIndexToPropertyIndex[elementIndex]);
                     propertyField.BindProperty(elementProp);
                 },
             });
+
+            pagePreButton.clicked += () =>
+            {
+                RefreshList(preKeySearch, preValueSearch, Mathf.Max(0, prePageIndex - 1), numberOfItemsPerPage.value);
+            };
+
+            pageField.RegisterValueChangedCallback(evt =>
+            {
+                RefreshList(preKeySearch, preValueSearch, Mathf.Clamp(evt.newValue - 1, 0, preTotalPage - 1), numberOfItemsPerPage.value);
+            });
+
+            pageNextButton.clicked += () =>
+            {
+                RefreshList(preKeySearch, preValueSearch, Mathf.Min(prePageIndex + 1, preTotalPage - 1), numberOfItemsPerPage.value);
+            };
 
             Button addButton = container.Q<Button>(name: NameAddButton(property));
             addButton.clicked += () =>
             {
                 IncreaseArraySize(keysProp.arraySize + 1, keysProp, valuesProp);
                 property.serializedObject.ApplyModifiedProperties();
-                multiColumnListView.itemsSource = MakeSource(keysProp);
+                // multiColumnListView.itemsSource = MakeSource(keysProp);
+                //
+                RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
                 multiColumnListView.Rebuild();
             };
             Button deleteButton = container.Q<Button>(name: NameRemoveButton(property));
             deleteButton.clicked += () =>
             {
                 // Debug.Log("Clicked");
-                List<int> selected = multiColumnListView.selectedIndices.OrderByDescending(each => each).ToList();
+                property.serializedObject.Update();
+                // var keysProp = property.FindPropertyRelative(propKeysName);
+                // var valuesProp = property.FindPropertyRelative(propValuesName);
+
+                List<int> selected = multiColumnListView.selectedIndices
+                    .Select(oriIndex => itemIndexToPropertyIndex[oriIndex])
+                    .OrderByDescending(each => each)
+                    .ToList();
+
                 if (selected.Count == 0)
                 {
                     int curSize = keysProp.arraySize;
+                    Debug.Log($"curSize={curSize}");
                     if (curSize == 0)
                     {
                         return;
                     }
-                    selected.Add(curSize);
+                    selected.Add(curSize - 1);
                 }
 
-                // Debug.Log($"delete key at {string.Join(",", selected)}");
+                Debug.Log($"delete {keysProp.propertyPath}/{keysProp.arraySize} key at {string.Join(",", selected)}");
 
                 DecreaseArraySize(selected, keysProp, valuesProp);
                 property.serializedObject.ApplyModifiedProperties();
-                multiColumnListView.itemsSource = MakeSource(keysProp);
+                // keysProp.serializedObject.ApplyModifiedProperties();
+                // valuesProp.serializedObject.ApplyModifiedProperties();
+                // multiColumnListView.itemsSource = MakeSource(keysProp);
+                // multiColumnListView.Rebuild();
+                RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
                 multiColumnListView.Rebuild();
+                Debug.Log($"new size = {keysProp.arraySize}");
             };
 
-            int curSize = keysProp.arraySize;
             multiColumnListView.TrackPropertyValue(keysProp, _ =>
             {
-                if (curSize != keysProp.arraySize)
+                if (preSize != keysProp.arraySize)
                 {
-                    curSize = keysProp.arraySize;
-                    multiColumnListView.itemsSource = MakeSource(keysProp);
-                    multiColumnListView.Rebuild();
+                    RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
                 }
             });
 
-            multiColumnListView.itemIndexChanged += (first, second) =>
-            {
+//             multiColumnListView.itemIndexChanged += (first, second) =>
+//             {
 //                 int fromPropIndex = itemIndexToPropertyIndex[first];
 //                 int toPropIndex = itemIndexToPropertyIndex[second];
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_DICTIONARY
 //                 Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second})");
 // #endif
 //
-//                 property.MoveArrayElement(fromPropIndex, toPropIndex);
+//                 keysProp.MoveArrayElement(fromPropIndex, toPropIndex);
+//                 valuesProp.MoveArrayElement(fromPropIndex, toPropIndex);
+//                 (itemIndexToPropertyIndex[fromPropIndex], itemIndexToPropertyIndex[toPropIndex]) = (
+//                     itemIndexToPropertyIndex[toPropIndex], itemIndexToPropertyIndex[fromPropIndex]);
 //                 property.serializedObject.ApplyModifiedProperties();
-            };
+//                 RefreshList(preKeySearch, preValueSearch, prePageIndex);
+//             };
 
-            multiColumnListView.itemsSource = MakeSource(keysProp);
-            multiColumnListView.Rebuild();
+            // multiColumnListView.itemsSource = itemIndexToPropertyIndex;
+            // multiColumnListView.Rebuild();
+            RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
         }
 
-        private static List<int> MakeSource(SerializedProperty property)
-        {
-            return Enumerable.Range(0, property.arraySize).ToList();
-        }
+        // private static List<int> MakeSource(SerializedProperty property)
+        // {
+        //     return Enumerable.Range(0, property.arraySize).ToList();
+        // }
     }
 }
 #endif
