@@ -232,12 +232,23 @@ namespace SaintsField.Editor.Core
             // Debug.Log(disabledLabelField);
 
             float labelBasicHeight = saintsDrawNoLabel ? 0f : EditorGUIUtility.singleLineHeight;
-            float fieldBasicHeight = hasSaintsField
-                ? fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute, fieldInfo,
-                    !disabledLabelField, parent)
-                // : EditorGUIUtility.singleLineHeight;
-                // : EditorGUI.GetPropertyHeight(property, label, true);
-                : GetPropertyHeightFallback(property, label, fieldInfo);
+            float fieldBasicHeight;
+            if (hasSaintsField)
+            {
+                fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
+                    fieldInfo,
+                    !disabledLabelField, parent);
+            }
+            else if (UseCreateFieldIMGUI)
+            {
+                fieldBasicHeight = GetFieldHeight(property, label, null,
+                    fieldInfo,
+                    !disabledLabelField, parent);
+            }
+            else
+            {
+                fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo);
+            }
 
             // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
             _labelFieldBasicHeight = Mathf.Max(labelBasicHeight, fieldBasicHeight);
@@ -362,6 +373,8 @@ namespace SaintsField.Editor.Core
             public SaintsPropertyDrawer labelDrawerInstance;
             public Rect rect;
         }
+
+        protected virtual bool UseCreateFieldIMGUI => false;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -693,10 +706,13 @@ namespace SaintsField.Editor.Core
                 using (new ResetIndentScoop())
                 using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
-                    if (fieldDrawer == null)
+                    if (fieldDrawer == null && UseCreateFieldIMGUI)
                     {
-                        // GUI.SetNextControlName(_fieldControlName);
-                        // Debug.Log($"default drawer for {label.text}");
+                        DrawField(fieldUseRectNoPost, property, useGuiContent,
+                            null, allAttributes, onGUIPayload, fieldInfo, parent);
+                    }
+                    else if (fieldDrawer == null)
+                    {
                         DefaultDrawer(fieldUseRectNoPost, property, useGuiContent, fieldInfo);
                     }
                     else
