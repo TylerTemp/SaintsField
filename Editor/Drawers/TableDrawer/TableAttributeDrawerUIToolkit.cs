@@ -464,7 +464,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
     }
 }
 #elif UNITY_2021_3_OR_NEWER
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
@@ -514,6 +513,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     ? GUIContent.none
                     : new GUIContent(imguiLabelHelper.RichLabel);
 
+                property.serializedObject.Update();
 
                 using(new ImGuiFoldoutStyleRichTextScoop())
                 using(new ImGuiLabelStyleRichTextScoop())
@@ -541,6 +541,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     //     }
                     // }
                 }
+
+                property.serializedObject.ApplyModifiedProperties();
             })
             {
                 style =
