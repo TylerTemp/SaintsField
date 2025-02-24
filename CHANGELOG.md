@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.30.2 ##
+
+Fix auto getters didn't refresh the sources when hierarchy changed [#150](https://github.com/TylerTemp/SaintsField/issues/150)
+
 ## 3.30.1 ##
 
 1.  Add `SphereHandleCap` which can draw a sphere in the scene

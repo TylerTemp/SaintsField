@@ -81,12 +81,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.30.1**
+**3.30.2**
 
-1.  Add `SphereHandleCap` which can draw a sphere in the scene
-2.  **Breaking Changes**: change the arguments of `DrawLabel` to support dynamic color, arguments of `DrawLine`, `DrawArrow` for better usage case support
-3.  `AdvancedDropdown` now can accept any `IEnumerable<object>` return type
-4.  Add alpha argument for `GUIColor` when using `EColor` parameter
+Fix auto getters didn't refresh the sources when hierarchy changed [#150](https://github.com/TylerTemp/SaintsField/issues/150)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -3560,12 +3557,12 @@ Draw a sphere in the scene like Unity's [`SphereHandleCap`](https://docs.unity3d
 
 **Parameters**:
 
-*   `float radius = 1f`: radius of the sphere. If the target field is a number, use the field's value instead 
-*   `string radiusCallback = null`: use a callback or a field value as the radius 
-*   `string space = "this"`: the containing space of the sphere. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value 
+*   `float radius = 1f`: radius of the sphere. If the target field is a number, use the field's value instead
+*   `string radiusCallback = null`: use a callback or a field value as the radius
+*   `string space = "this"`: the containing space of the sphere. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the sphere related to the `space`
 *   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
-*   `EColor eColor = EColor.White`: color of the sphere 
+*   `EColor eColor = EColor.White`: color of the sphere
 *   `string color = null`: If it's starting with `#`, use a html color for the sphere. Otherwise, use a callback or a field value as the color. The value must be a `Color`
 
 ```csharp
