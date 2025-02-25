@@ -520,7 +520,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 // using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
                     float height =
-                        GetFieldHeight(property, label, saintsAttribute, info, true, parent);
+                        GetFieldHeight(property, label, Screen.width, saintsAttribute, info, true, parent);
                     Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
 
                     DrawField(rect, property, label, saintsAttribute, allAttributes, new OnGUIPayload(), info, parent);
