@@ -88,7 +88,7 @@ Add `SaintsDictionary<,>`. It allows:
 2.  Give a warning for duplicated keys
 3.  Allow search for keys & values
 4.  Allow paging for large dictionary
-5.  Allow inherence to add some custom attributes, especually with auto getters to gain the auto-fulfill ability.
+5.  Allow inherent to add some custom attributes, especially with auto getters to gain the auto-fulfill ability.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
