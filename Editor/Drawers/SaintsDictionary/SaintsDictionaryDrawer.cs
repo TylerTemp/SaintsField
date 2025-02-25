@@ -110,5 +110,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
             return results.Where(each => valueResults.Contains(each)).ToList();
         }
+
+        private static string GetKeyLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null
+            ? "Keys"
+            : saintsDictionaryAttribute.KeyLabel;
+
+        private static string GetValueLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null
+            ? "Values"
+            : saintsDictionaryAttribute.ValueLabel;
     }
 }

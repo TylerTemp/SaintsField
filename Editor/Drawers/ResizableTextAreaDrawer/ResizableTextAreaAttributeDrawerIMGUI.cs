@@ -13,13 +13,14 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
         private string _error = "";
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             // _hasLabel = hasLabel;
             // bool fullWidth = ((ResizableTextAreaAttribute)saintsAttribute).FullWidth;
-            Rect indented = EditorGUI.IndentedRect(new Rect(0, 0, EditorGUIUtility.currentViewWidth,
-                EditorGUIUtility.singleLineHeight));
-            float viewWidth = indented.width;
+            // Rect indented = EditorGUI.IndentedRect(new Rect(0, 0, EditorGUIUtility.currentViewWidth,
+            //     EditorGUIUtility.singleLineHeight));
+            // float viewWidth = indented.width;
             // bool breakLine = BreakLine(saintsAttribute);
 
             // bool useFullView = !hasLabelWidth;
@@ -33,7 +34,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             // Debug.Log(hasLabelWidth);
             return GetHeight(
                 property.stringValue,
-                viewWidth
+                width
             ) + (hasLabelWidth ? EditorGUIUtility.singleLineHeight : 0f);
         }
 
@@ -57,6 +58,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             //     position.width
             // );
 
+            // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 // Debug.Log(position);

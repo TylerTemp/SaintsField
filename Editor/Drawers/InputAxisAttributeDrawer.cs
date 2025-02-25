@@ -42,6 +42,7 @@ namespace SaintsField.Editor.Drawers
         private IReadOnlyList<string> _axisNames;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             return EditorGUIUtility.singleLineHeight;

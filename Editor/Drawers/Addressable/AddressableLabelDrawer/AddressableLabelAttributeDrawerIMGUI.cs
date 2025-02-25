@@ -10,6 +10,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
     public partial class AddressableLabelAttributeDrawer
     {
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
             bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;

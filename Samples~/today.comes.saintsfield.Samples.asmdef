@@ -46,6 +46,11 @@
             "name": "today.comes.saintsdraw",
             "expression": "1.0.4",
             "define": "SAINTSFIELD_SAINTSDRAW"
+        },
+        {
+            "name": "com.unity.nuget.newtonsoft-json",
+            "expression": "",
+            "define": "SAINTSFIELD_JSON"
         }
     ],
     "noEngineReferences": false

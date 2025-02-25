@@ -22,6 +22,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         private static readonly Dictionary<string, ShaderParamInfoIMGUI> CachedIMGUI = new Dictionary<string, ShaderParamInfoIMGUI>();
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
             bool hasLabelWidth, object parent)

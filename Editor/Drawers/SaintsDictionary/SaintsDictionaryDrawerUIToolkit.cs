@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -103,7 +102,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 // showBoundCollectionSize = true,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                // itemsSource = MakeSource(keysProp),
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
                 showBorder = true,
@@ -439,7 +437,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                 // if (needRebuild)
                 {
-                    multiColumnListView.itemsSource = itemIndexToPropertyIndex;
+                    multiColumnListView.itemsSource = itemIndexToPropertyIndex.ToList();
                     multiColumnListView.Rebuild();
                     pagePreButton.SetEnabled(prePageIndex > 0);
                     pageField.SetValueWithoutNotify(prePageIndex + 1);
@@ -464,26 +462,36 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
-                    string keyLabel = saintsDictionaryAttribute is null
-                        ? "Keys"
-                        : saintsDictionaryAttribute.KeyLabel;
+                    string keyLabel = GetKeyLabel(saintsDictionaryAttribute);
                     if(!string.IsNullOrEmpty(keyLabel))
                     {
                         header.Add(new Label(keyLabel));
                     }
-                    TextField keySearch = new TextField
+                    ToolbarSearchField keySearch = new ToolbarSearchField
                     {
-                        isDelayed = true,
+                        // isDelayed = true,
                         style =
                         {
                             marginRight = 3,
+                            display = saintsDictionaryAttribute?.Searchable ?? true
+                                ? DisplayStyle.Flex
+                                : DisplayStyle.None,
+                            width = Length.Percent(97f),
                         },
                     };
+                    TextField keySearchText = keySearch.Q<TextField>();
+                    if (keySearchText != null)
+                    {
+                        keySearchText.isDelayed = true;
+                    }
                     header.Add(keySearch);
                     keySearch.RegisterValueChangedCallback(evt =>
                     {
                         // Debug.Log($"key search {evt.newValue}");
-                        RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+                        if(evt.newValue != preKeySearch)
+                        {
+                            RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+                        }
                     });
                     return header;
                 },
@@ -505,6 +513,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     int propIndex = itemIndexToPropertyIndex[elementIndex];
 
                     SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(propIndex);
+                    elementProp.isExpanded = true;
                     propertyField.BindProperty(elementProp);
 
                     void RefreshConflict()
@@ -565,9 +574,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 {
                     VisualElement header = new VisualElement();
 
-                    string valueLabel = saintsDictionaryAttribute is null
-                        ? "Values"
-                        : saintsDictionaryAttribute.ValueLabel;
+                    string valueLabel = GetValueLabel(saintsDictionaryAttribute);
 
                     if(!string.IsNullOrEmpty(valueLabel))
                     {
@@ -575,19 +582,31 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
 
                     // header.Add(new Label("Values"));
-                    TextField valueSearch = new TextField
+                    ToolbarSearchField valueSearch = new ToolbarSearchField
                     {
-                        isDelayed = true,
+                        // isDelayed = true,
                         style =
                         {
                             marginRight = 3,
+                            display = saintsDictionaryAttribute?.Searchable ?? true
+                                ? DisplayStyle.Flex
+                                : DisplayStyle.None,
+                            width = Length.Percent(97f),
                         },
                     };
+                    TextField valueSearchText = valueSearch.Q<TextField>();
+                    if (valueSearchText != null)
+                    {
+                        valueSearchText.isDelayed = true;
+                    }
                     header.Add(valueSearch);
                     valueSearch.RegisterValueChangedCallback(evt =>
                     {
                         // Debug.Log($"value search {evt.newValue}");
-                        RefreshList(preKeySearch, evt.newValue, prePageIndex, numberOfItemsPerPage.value);
+                        if(evt.newValue != preValueSearch)
+                        {
+                            RefreshList(preKeySearch, evt.newValue, prePageIndex, numberOfItemsPerPage.value);
+                        }
                     });
                     return header;
                 },
@@ -604,6 +623,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 {
                     PropertyField propertyField = (PropertyField)element;
                     SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(itemIndexToPropertyIndex[elementIndex]);
+                    elementProp.isExpanded = true;
                     propertyField.BindProperty(elementProp);
                 },
             });
@@ -628,16 +648,15 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 IncreaseArraySize(keysProp.arraySize + 1, keysProp, valuesProp);
                 property.serializedObject.ApplyModifiedProperties();
-                // multiColumnListView.itemsSource = MakeSource(keysProp);
                 //
                 RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
-                multiColumnListView.Rebuild();
+                // multiColumnListView.Rebuild();
             };
             Button deleteButton = container.Q<Button>(name: NameRemoveButton(property));
             deleteButton.clicked += () =>
             {
                 // Debug.Log("Clicked");
-                property.serializedObject.Update();
+                // property.serializedObject.Update();
                 // var keysProp = property.FindPropertyRelative(propKeysName);
                 // var valuesProp = property.FindPropertyRelative(propValuesName);
 
@@ -649,7 +668,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 if (selected.Count == 0)
                 {
                     int curSize = keysProp.arraySize;
-                    Debug.Log($"curSize={curSize}");
+                    // Debug.Log($"curSize={curSize}");
                     if (curSize == 0)
                     {
                         return;
@@ -657,17 +676,16 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     selected.Add(curSize - 1);
                 }
 
-                Debug.Log($"delete {keysProp.propertyPath}/{keysProp.arraySize} key at {string.Join(",", selected)}");
+                // Debug.Log($"delete {keysProp.propertyPath}/{keysProp.arraySize} key at {string.Join(",", selected)}");
 
                 DecreaseArraySize(selected, keysProp, valuesProp);
                 property.serializedObject.ApplyModifiedProperties();
                 // keysProp.serializedObject.ApplyModifiedProperties();
                 // valuesProp.serializedObject.ApplyModifiedProperties();
-                // multiColumnListView.itemsSource = MakeSource(keysProp);
                 // multiColumnListView.Rebuild();
                 RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
-                multiColumnListView.Rebuild();
-                Debug.Log($"new size = {keysProp.arraySize}");
+                // multiColumnListView.Rebuild();
+                // Debug.Log($"new size = {keysProp.arraySize}");
             };
 
             multiColumnListView.TrackPropertyValue(keysProp, _ =>
@@ -678,31 +696,41 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
             });
 
-//             multiColumnListView.itemIndexChanged += (first, second) =>
-//             {
-//                 int fromPropIndex = itemIndexToPropertyIndex[first];
-//                 int toPropIndex = itemIndexToPropertyIndex[second];
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_DICTIONARY
-//                 Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second})");
-// #endif
-//
-//                 keysProp.MoveArrayElement(fromPropIndex, toPropIndex);
-//                 valuesProp.MoveArrayElement(fromPropIndex, toPropIndex);
-//                 (itemIndexToPropertyIndex[fromPropIndex], itemIndexToPropertyIndex[toPropIndex]) = (
-//                     itemIndexToPropertyIndex[toPropIndex], itemIndexToPropertyIndex[fromPropIndex]);
-//                 property.serializedObject.ApplyModifiedProperties();
-//                 RefreshList(preKeySearch, preValueSearch, prePageIndex);
-//             };
+            multiColumnListView.itemIndexChanged += (first, second) =>
+            {
+                // Debug.Log($"first={first}, second={second} | {string.Join(",", itemIndexToPropertyIndex)}");
+                int fromPropIndex = itemIndexToPropertyIndex[first];
+                int toPropIndex = itemIndexToPropertyIndex[second];
 
-            // multiColumnListView.itemsSource = itemIndexToPropertyIndex;
+                // Debug.Log($"array {fromPropIndex} <-> {toPropIndex}");
+
+                keysProp.MoveArrayElement(fromPropIndex, toPropIndex);
+                valuesProp.MoveArrayElement(fromPropIndex, toPropIndex);
+
+                ListSwapValue(itemIndexToPropertyIndex, fromPropIndex, toPropIndex);
+                ListSwapValue(hitTargetIndexes, fromPropIndex, toPropIndex);
+
+                property.serializedObject.ApplyModifiedProperties();
+                multiColumnListView.itemsSource = itemIndexToPropertyIndex.ToList();
+                // multiColumnListView.Rebuild();
+            };
+
             // multiColumnListView.Rebuild();
             RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+            // Debug.Log($"{string.Join(",", itemIndexToPropertyIndex)}");
         }
 
         // private static List<int> MakeSource(SerializedProperty property)
         // {
         //     return Enumerable.Range(0, property.arraySize).ToList();
         // }
+        private static void ListSwapValue(IList<int> lis, int a, int b)
+        {
+            int aIndex = lis.IndexOf(a);
+            int bIndex = lis.IndexOf(b);
+
+            (lis[aIndex], lis[bIndex]) = (lis[bIndex], lis[aIndex]);
+        }
     }
 }
 #elif UNITY_2021_3_OR_NEWER
@@ -717,16 +745,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 {
     public partial class SaintsDictionaryDrawer
     {
+        protected override bool UseCreateFieldUIToolKit => true;
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            if (propertyIndex != 0)
-            {
-                return new VisualElement();
-            }
-
             // Action<object> onValueChangedCallback = null;
             // onValueChangedCallback = value =>
             // {
@@ -762,7 +786,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 // using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
                     float height =
-                        GetFieldHeight(property, label, saintsAttribute, info, true, parent);
+                        GetFieldHeight(property, label, Screen.width, saintsAttribute, info, true, parent);
                     Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
 
                     DrawField(rect, property, label, saintsAttribute, allAttributes, new OnGUIPayload(), info, parent);

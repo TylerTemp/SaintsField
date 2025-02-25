@@ -231,17 +231,21 @@ namespace SaintsField.Editor.Core
             bool disabledLabelField = label.text == "" || saintsDrawNoLabel;
             // Debug.Log(disabledLabelField);
 
+            float fullWidth = _filedWidthCache <= 0
+                ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
+                : _filedWidthCache;
+
             float labelBasicHeight = saintsDrawNoLabel ? 0f : EditorGUIUtility.singleLineHeight;
             float fieldBasicHeight;
             if (hasSaintsField)
             {
-                fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fieldFound.iSaintsAttribute,
+                fieldBasicHeight = fieldFound.drawer.GetFieldHeight(property, label, fullWidth, fieldFound.iSaintsAttribute,
                     fieldInfo,
                     !disabledLabelField, parent);
             }
             else if (UseCreateFieldIMGUI)
             {
-                fieldBasicHeight = GetFieldHeight(property, label, null,
+                fieldBasicHeight = GetFieldHeight(property, label, fullWidth, null,
                     fieldInfo,
                     !disabledLabelField, parent);
             }
@@ -256,9 +260,7 @@ namespace SaintsField.Editor.Core
             float aboveHeight = 0;
             float belowHeight = 0;
 
-            float fullWidth = _filedWidthCache <= 0
-                ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
-                : _filedWidthCache;
+
             // Nah, Unity will give `EditorGUIUtility.currentViewWidth=0` on first render...
             // Let Drawer decide what to do then...
             // float fullWidth = 100;
@@ -329,6 +331,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual float GetFieldHeight(SerializedProperty property, GUIContent label,
+            float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             return 0;

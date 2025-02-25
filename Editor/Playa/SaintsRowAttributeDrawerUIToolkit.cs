@@ -1,6 +1,7 @@
 ﻿#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -13,7 +14,7 @@ namespace SaintsField.Editor.Playa
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             VisualElement root = new VisualElement();
-            FillElement(root, property);
+            FillElement(root, property, (SaintsRowAttribute)attribute, fieldInfo, this, this);
 
             // if (property.propertyType == SerializedPropertyType.ManagedReference)
             // {
@@ -33,7 +34,7 @@ namespace SaintsField.Editor.Playa
             return root;
         }
 
-        private void FillElement(VisualElement root, SerializedProperty property)
+        private static void FillElement(VisualElement root, SerializedProperty property, SaintsRowAttribute saintsRowAttribute, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
             object value;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -47,7 +48,7 @@ namespace SaintsField.Editor.Playa
             else
             {
                 object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                (string error, int _, object getValue) = Util.GetValue(property, fieldInfo, parentValue);
+                (string error, int _, object getValue) = Util.GetValue(property, info, parentValue);
                 if (error != "")
                 {
                     root.Add(new HelpBox(error, HelpBoxMessageType.Error));
@@ -60,10 +61,10 @@ namespace SaintsField.Editor.Playa
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                 .ToDictionary(each => each.name, each => each.property);
 
-            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
+            // SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
 
             IReadOnlyList<ISaintsRenderer> renderer =
-                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, this, value);
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, value);
 
             // VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
             VisualElement bodyElement = new VisualElement();
@@ -77,8 +78,8 @@ namespace SaintsField.Editor.Playa
             }
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-            bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(this));
-            bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(this));
+            bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
+            bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));
 #endif
 
             if (saintsRowAttribute.Inline)

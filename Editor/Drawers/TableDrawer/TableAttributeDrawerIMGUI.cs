@@ -298,7 +298,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
         }
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info,
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width,
+            ISaintsAttribute saintsAttribute, FieldInfo info,
             bool hasLabelWidth, object parent)
         {
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);

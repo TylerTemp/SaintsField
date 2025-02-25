@@ -15,8 +15,6 @@ namespace SaintsField
 
         private Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
 
-
-
         // [Conditional("UNITY_EDITOR")]
         // private void EditorSyncDictionaryToBackingField()
         // {
@@ -92,7 +90,7 @@ namespace SaintsField
                     _dictionary.Add(key, value);
                 }
 #else
-                _dictionary.Add(key, value)
+                _dictionary.Add(key, value);
 #endif
                 // _dictionary[_keys[index]] = _values[index];
             }
@@ -201,6 +199,7 @@ namespace SaintsField
 
         public bool TryAdd(TKey key, TValue value)
         {
+            // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
             if (_dictionary.ContainsKey(key))
             {
                 return false;

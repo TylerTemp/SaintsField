@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+// #if SAINTSFIELD_JSON
+// using Newtonsoft.Json;
+// #endif
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
@@ -28,7 +31,8 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         }
 
         public ValueFillerDict valueFillerDict;
-        [SaintsDictionary("键", "值", numberOfItemsPerPage: 2)]
+
+        [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
         public ValueFillerDict decValueFillerDict;
 
         [LayoutStart("Buttons", ELayout.Horizontal)]
@@ -36,25 +40,63 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         [Button]
         private void AddRandom()
         {
-            int[] keys = Enumerable.Range(0, 100).Except(valueFillerDict.Keys).ToArray();
+            int[] keys = Enumerable.Range(0, 100).Except(decValueFillerDict.Keys).ToArray();
             if (keys.Length == 0)
             {
                 return;
             }
 
             int key = keys[UnityEngine.Random.Range(0, keys.Length)];
-            valueFillerDict.Add(key, gameObject);
+            decValueFillerDict.Add(key, gameObject);
         }
 
         [Button]
         private void DeleteRandom()
         {
-            int[] keys = valueFillerDict.Keys.ToArray();
+            int[] keys = decValueFillerDict.Keys.ToArray();
             if (keys.Length == 0)
             {
                 return;
             }
-            valueFillerDict.Remove(keys[UnityEngine.Random.Range(0, keys.Length)]);
+            decValueFillerDict.Remove(keys[UnityEngine.Random.Range(0, keys.Length)]);
         }
+
+        [Serializable]
+        public struct MyStruct
+        {
+            [NoLabel, AboveRichLabel]
+            public string myStringField;
+            [NoLabel, AboveRichLabel]
+            public int myIntField;
+        }
+
+        [Serializable]
+        public class MyConfig: SaintsDictionaryBase<int, MyStruct>
+        {
+            [SerializeField, NoLabel]
+            private List<int> _keys = new List<int>();
+
+            [SerializeField, NoLabel, SaintsRow(inline: true)]
+            // [GetComponentInChildren]
+            private List<MyStruct> _values = new List<MyStruct>();
+
+#if UNITY_EDITOR
+            private static string EditorPropKeys => nameof(_keys);
+            private static string EditorPropValues => nameof(_values);
+#endif
+            protected override List<int> SerializedKeys => _keys;
+            protected override List<MyStruct> SerializedValues => _values;
+        }
+
+        // public SaintsDictionary<int, MyStruct> basicType;
+        public MyConfig basicType;
+
+// #if SAINTSFIELD_JSON
+//         [Button]
+//         private void SerializeTarget()
+//         {
+//             Debug.Log(JsonConvert.SerializeObject(basicType));
+//         }
+// #endif
     }
 }
