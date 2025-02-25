@@ -25,7 +25,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             private readonly FieldInfo _info;
             private readonly object _parent;
 
-            public readonly UnityEvent<IReadOnlyList<(int, int)>> IndexSwapEvent = new UnityEvent<IReadOnlyList<(int, int)>>();
+            public class SwapEvent: UnityEvent<IReadOnlyList<(int, int)>> {}
+
+            public readonly SwapEvent IndexSwapEvent = new SwapEvent();
 
             public SaintsDictionaryTable(
                 TreeViewState state, MultiColumnHeader multiColumnHeader,
