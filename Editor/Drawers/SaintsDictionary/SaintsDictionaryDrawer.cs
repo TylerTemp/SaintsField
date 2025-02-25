@@ -70,7 +70,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             int curSize = keyProp.arraySize;
             foreach (int index in indexReversed.Where(each => each < curSize))
             {
-                Debug.Log($"Remove index {index}");
+                // Debug.Log($"Remove index {index}");
                 keyProp.DeleteArrayElementAtIndex(index);
                 valueProp.DeleteArrayElementAtIndex(index);
             }

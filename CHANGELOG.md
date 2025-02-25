@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.31.0 ##
+
+Add `SaintsDictionary<,>`. It allows:
+1.  Allow any type of kay/value type as long as `Dictionary<,>` allows
+2.  Give a warning for duplicated keys
+3.  Allow search for keys & values
+4.  Allow paging for large dictionary
+5.  Allow inherence to add some custom attributes, especually with auto getters to gain the auto-fulfill ability.
+
 ## 3.30.2 ##
 
 Fix auto getters didn't refresh the sources when hierarchy changed [#150](https://github.com/TylerTemp/SaintsField/issues/150)

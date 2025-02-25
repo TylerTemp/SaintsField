@@ -522,37 +522,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d8104be554c34f4e9eeb7d789bd5901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  valueFillerDict:
+  decValueFillerDict:
     _intKeys: 
     _objValues: []
-  decValueFillerDict:
-    _intKeys: 00000000000000000200000003000000050000002e0000000d00000028000000390000002e0000005b0000003d00000031000000180000002000000013000000440000001c000000
-    _objValues:
-    - {fileID: 59883450}
-    - {fileID: 177648926}
-    - {fileID: 1649096653}
-    - {fileID: 691523130}
-    - {fileID: 1829989614}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
-    - {fileID: 59883450}
   basicType:
     _keys: 0000000001000000
     _values:
-    - myStringField: Content
+    - myStringField: First
       myIntField: 0
-    - myStringField: Here
-      myIntField: 1
+    - myStringField: Second
+      myIntField: 0
 --- !u!1 &61780217
 GameObject:
   m_ObjectHideFlags: 0
@@ -26841,9 +26820,9 @@ MonoBehaviour:
     - 4
     - 4
     _values:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    - {fileID: 2137894679}
+    - {fileID: 446354015}
+    - {fileID: 1465660264}
     - {fileID: 0}
     - {fileID: 0}
 --- !u!1 &2009356786

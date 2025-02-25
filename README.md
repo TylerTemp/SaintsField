@@ -81,9 +81,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.30.2**
+**3.31.0**
 
-Fix auto getters didn't refresh the sources when hierarchy changed [#150](https://github.com/TylerTemp/SaintsField/issues/150)
+Add `SaintsDictionary<,>`. It allows:
+1.  Allow any type of kay/value type as long as `Dictionary<,>` allows
+2.  Give a warning for duplicated keys
+3.  Allow search for keys & values
+4.  Allow paging for large dictionary
+5.  Allow inherence to add some custom attributes, especually with auto getters to gain the auto-fulfill ability.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4469,6 +4474,115 @@ using SaintsField.Editor.Drawers.TypeDrawers;
 public class MyArrayDrawer: SaintsArrayDrawer {}
 #endif
 ```
+
+### `SaintsDictionary<,>` ###
+
+A simple dictionary serialization tool. It allows:
+
+1.  Allow any type of kay/value type as long as `Dictionary<,>` allows
+2.  Give a warning for duplicated keys
+3.  Allow search for keys & values
+4.  Allow paging for large dictionary
+5.  Allow inherence to add some custom attributes, especually with auto getters to gain the auto-fulfill ability.
+
+Know issue: using value of normal struct/class type will lead to foldout and label issue. See below about the workaround.
+
+This is very like [Serialized Dictionary](https://assetstore.unity.com/packages/tools/utilities/serialized-dictionary-243052) with these differences:
+
+1.  `SaintsDictionary` with struct/class type as key/value will have some label/foldout issue and requires some workaround.
+2.  `SaintsDictionaryBase` allows you to customize the dictionary behavior, for example, together with `GetComponentInChildren`, you can allow auto-fulfill.
+
+In short, if you don't need the custom attributes ability, it's suggested to use [Serialized Dictionary](https://assetstore.unity.com/packages/tools/utilities/serialized-dictionary-243052) instead.
+
+Basic usage:
+
+```csharp
+public SaintsDictionary<string, GameObject> genDict;
+```
+
+![image](https://github.com/user-attachments/assets/a0d087fd-98ba-4419-82ef-1acf0d0a5243)
+
+Add `SaintsDictionary` attribute to control:
+
+1.  Change keys' label & values' label
+2.  Disable the search, if you want
+3.  Enable the paging
+
+**Parameters**:
+
+*   `string keyLabel = "Keys"`
+*   `string valueLabel = "Values"`
+*   `bool searchable = true`: false to disable the search ability
+*   `int numberOfItemsPerPage = 0`: items per page. 0 for no paging
+
+```csharp
+[SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
+public SaintsDictionary<int, GameObject> slotToEnemyPrefab;
+```
+
+[![video](https://github.com/user-attachments/assets/c05e0e54-dc74-4a58-b83f-9005a16fdc8d)](https://github.com/user-attachments/assets/886203a6-ed24-4ef2-a254-00f7e0ff14e2)
+
+Using on a struct/class requires you to manually add some attributes:
+
+```csharp
+[Serializable]
+public struct MyStruct
+{
+    [NoLabel, AboveRichLabel]  // use this to show the label above the field
+    public string myStringField;
+    [NoLabel, AboveRichLabel]
+    public int myIntField;
+}
+
+[Serializable]
+public class MyConfig: SaintsDictionaryBase<int, MyStruct>
+{
+    [SerializeField]
+    private List<int> _keys = new List<int>();
+
+    [SerializeField, SaintsRow(inline: true)]  // SaintsRow-inline so the value will not be foldout by Unity
+    // [GetComponentInChildren]
+    private List<MyStruct> _values = new List<MyStruct>();
+
+#if UNITY_EDITOR
+    private static string EditorPropKeys => nameof(_keys);  // this is required!
+    private static string EditorPropValues => nameof(_values);  // this is required!
+#endif
+    protected override List<int> SerializedKeys => _keys;
+    protected override List<MyStruct> SerializedValues => _values;
+}
+
+public MyConfig basicType;
+```
+
+![image](https://github.com/user-attachments/assets/c2dad54d-bfa6-4c52-acee-e2aa74898d71)
+
+At last, use auto getters so it can auto-fetch some values:
+
+(Note: ATM you still need to click the plus button once to make the array filling)
+
+```csharp
+[Serializable]
+public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
+{
+    [SerializeField, NoLabel]
+    private List<int> _intKeys = new List<int>();
+
+    [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
+    private List<GameObject> _objValues = new List<GameObject>();
+
+#if UNITY_EDITOR
+    private static string EditorPropKeys => nameof(_intKeys);
+    private static string EditorPropValues => nameof(_objValues);
+#endif
+    protected override List<int> SerializedKeys => _intKeys;
+    protected override List<GameObject> SerializedValues => _objValues;
+}
+
+public ValueFillerDict decValueFillerDict;
+```
+
+[![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
 
 ### `SaintsInterface<,>` ###
 

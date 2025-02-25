@@ -364,7 +364,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             void RefreshList(string keySearch, string valueSearch, int curPageIndex, int numberOfItemsPerPage)
             {
-                bool needRebuild = false;
+                // bool needRebuild = false;
                 int nowArraySize = keysProp.arraySize;
 
                 List<int> fullList = Enumerable.Range(0, nowArraySize).ToList();
@@ -377,17 +377,17 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 if (nowArraySize != preSize)
                 {
                     preSize = nowArraySize;
-                    needRebuild = true;
+                    // needRebuild = true;
                     refreshedHitTargetIndexes = fullList;
                 }
 
                 // processing search result
                 bool needSearchAgain = false;
-                if (needRebuild)
-                {
-                    needSearchAgain = true;
-                }
-                else
+                // if (needRebuild)
+                // {
+                //     needSearchAgain = true;
+                // }
+                // else
                 {
                     if (preKeySearch != keySearch)
                     {
@@ -404,7 +404,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                 if (needSearchAgain)
                 {
-                    needRebuild = true;
+                    // needRebuild = true;
                     refreshedHitTargetIndexes = Search(keysProp, valuesProp, keySearch, valueSearch);
                     // Debug.Log($"hit search {keySearch}/{valueSearch}: {string.Join(",", refreshedHitTargetIndexes)}");
                 }
@@ -415,6 +415,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 if (numberOfItemsPerPage > 0)
                 {
                     int startIndex = curPageIndex * numberOfItemsPerPage;
+                    if (startIndex >= hitTargetIndexes.Count)
+                    {
+                        startIndex = 0;
+                        curPageIndex = 0;
+                    }
                     int endIndex = Mathf.Min((curPageIndex + 1) * numberOfItemsPerPage, hitTargetIndexes.Count);
                     itemIndexToPropertyIndex = hitTargetIndexes.GetRange(startIndex, endIndex - startIndex);
                     int totalPage = Mathf.Max(1, Mathf.CeilToInt(hitTargetIndexes.Count / (float)numberOfItemsPerPage));
@@ -422,9 +427,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     // pageField.SetValueWithoutNotify(curPageIndex + 1);
 
 
-                    needRebuild = preNumberOfItemsPerPage != numberOfItemsPerPage
-                                  || preTotalPage != totalPage
-                                  || prePageIndex != curPageIndex;
+                    // needRebuild = preNumberOfItemsPerPage != numberOfItemsPerPage
+                    //               || preTotalPage != totalPage
+                    //               || prePageIndex != curPageIndex;
 
                     preNumberOfItemsPerPage = numberOfItemsPerPage;
                     preTotalPage = totalPage;

@@ -18,8 +18,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             [SerializeField, NoLabel]
             private List<int> _intKeys = new List<int>();
 
-            [SerializeField, NoLabel]
-            // [GetComponentInChildren]
+            [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
             private List<GameObject> _objValues = new List<GameObject>();
 
 #if UNITY_EDITOR
@@ -30,7 +29,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             protected override List<GameObject> SerializedValues => _objValues;
         }
 
-        public ValueFillerDict valueFillerDict;
+        // public ValueFillerDict valueFillerDict;
 
         [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
         public ValueFillerDict decValueFillerDict;
@@ -73,10 +72,10 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         [Serializable]
         public class MyConfig: SaintsDictionaryBase<int, MyStruct>
         {
-            [SerializeField, NoLabel]
+            [SerializeField]
             private List<int> _keys = new List<int>();
 
-            [SerializeField, NoLabel, SaintsRow(inline: true)]
+            [SerializeField, SaintsRow(inline: true)]
             // [GetComponentInChildren]
             private List<MyStruct> _values = new List<MyStruct>();
 
@@ -89,6 +88,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         }
 
         // public SaintsDictionary<int, MyStruct> basicType;
+        [Space(200)]
         public MyConfig basicType;
 
 // #if SAINTSFIELD_JSON
