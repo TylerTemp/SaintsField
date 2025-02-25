@@ -16,7 +16,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(GetByXPathAttribute))]
-#if !SAINTSFIELD_OLD_GETTER
     [CustomPropertyDrawer(typeof(GetComponentAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentInChildrenAttribute))]
     [CustomPropertyDrawer(typeof(GetComponentInParentAttribute))]
@@ -26,7 +25,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [CustomPropertyDrawer(typeof(GetPrefabWithComponentAttribute))]
     [CustomPropertyDrawer(typeof(GetScriptableObjectAttribute))]
     [CustomPropertyDrawer(typeof(FindComponentAttribute))]
-#endif
     public partial class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
 
