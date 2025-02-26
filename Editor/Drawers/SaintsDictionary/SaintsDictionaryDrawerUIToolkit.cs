@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -459,6 +460,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 RefreshList(preKeySearch, preValueSearch, prePageIndex, evt.newValue);
             });
 
+            bool keyStructChecked = false;
+            bool keyStructNeedPlain = false;
+
+            bool valueStructChecked = false;
+            bool valueStructNeedPlain = false;
+
             multiColumnListView.columns.Add(new Column
             {
                 name ="Keys",
@@ -503,23 +510,63 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 makeCell = () => new VisualElement(),
                 bindCell = (element, elementIndex) =>
                 {
-                    // Debug.Log($"bind {elementIndex}");
-                    element.Clear();
-                    PropertyField propertyField = new PropertyField
+                    int propIndex = itemIndexToPropertyIndex[elementIndex];
+                    SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(propIndex);
+
+                    if (!keyStructChecked)
                     {
-                        label = "",
+                        keyStructChecked = true;
+                        // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
+                        // Debug.Log(elementProp.propertyType);
+                        if (elementProp.propertyType == SerializedPropertyType.Generic)
+                        {
+                            (PropertyAttribute[] valuesAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(elementProp);
+                            // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
+                            // AboveRichLabelAttribute aboveRichLabelAttributes = valuesAttributes.OfType<AboveRichLabelAttribute>().FirstOrDefault();
+                            SaintsRowAttribute saintsRowAttribute =
+                                valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
+                            if (saintsRowAttribute is null)
+                            {
+                                keyStructNeedPlain = true;
+                            }
+                        }
+                    }
+
+                    elementProp.isExpanded = true;
+                    element.Clear();
+
+                    VisualElement keyContainer = new VisualElement
+                    {
                         style =
                         {
                             marginRight = 3,
                         },
                     };
-                    propertyField.Bind(property.serializedObject);
-                    element.Add(propertyField);
-                    int propIndex = itemIndexToPropertyIndex[elementIndex];
+                    element.Add(keyContainer);
+                    if (keyStructNeedPlain)
+                    {
+                        foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
+                        {
+                            keyContainer.Add(new Label(childProp.displayName));
+                            PropertyField propertyField = new PropertyField(childProp)
+                            {
+                                label = "",
+                            };
+                            propertyField.Bind(property.serializedObject);
+                            keyContainer.Add(propertyField);
+                        }
+                    }
+                    else
+                    {
+                        PropertyField propertyField = new PropertyField(elementProp)
+                        {
+                            label = "",
+                        };
+                        propertyField.Bind(property.serializedObject);
+                        keyContainer.Add(propertyField);
+                    }
 
-                    SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(propIndex);
-                    elementProp.isExpanded = true;
-                    propertyField.BindProperty(elementProp);
+                    // propertyField.BindProperty(elementProp);
 
                     void RefreshConflict()
                     {
@@ -549,19 +596,19 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             // ReSharper disable once InvertIf
                             if (Util.GetIsEqual(existKey, thisKey))
                             {
-                                propertyField.style.backgroundColor = WarningColor;
+                                keyContainer.style.backgroundColor = WarningColor;
                                 return;
                             }
                         }
 
-                        propertyField.style.backgroundColor = Color.clear;
+                        keyContainer.style.backgroundColor = Color.clear;
                     }
 
                     // propertyField.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
                     // {
                     //     RefreshConflict();
                     // });
-                    propertyField.TrackPropertyValue(keysProp, _ =>
+                    keyContainer.TrackPropertyValue(keysProp, _ =>
                     {
                         RefreshConflict();
                     });
@@ -615,21 +662,61 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     });
                     return header;
                 },
-                makeCell = () =>
-                {
-                    PropertyField propField = new PropertyField
-                    {
-                        label = "",
-                    };
-                    propField.Bind(property.serializedObject);
-                    return propField;
-                },
+                makeCell = () => new VisualElement(),
                 bindCell = (element, elementIndex) =>
                 {
-                    PropertyField propertyField = (PropertyField)element;
                     SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(itemIndexToPropertyIndex[elementIndex]);
                     elementProp.isExpanded = true;
-                    propertyField.BindProperty(elementProp);
+
+                    if (!valueStructChecked)
+                    {
+                        valueStructChecked = true;
+                        // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
+                        // Debug.Log(elementProp.propertyType);
+                        if (elementProp.propertyType == SerializedPropertyType.Generic)
+                        {
+                            (PropertyAttribute[] valuesAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(elementProp);
+                            // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
+                            // AboveRichLabelAttribute aboveRichLabelAttributes = valuesAttributes.OfType<AboveRichLabelAttribute>().FirstOrDefault();
+                            SaintsRowAttribute saintsRowAttribute =
+                                valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
+                            if (saintsRowAttribute is null)
+                            {
+                                valueStructNeedPlain = true;
+                            }
+                        }
+                    }
+
+                    VisualElement valueContainer = new VisualElement
+                    {
+                        style =
+                        {
+                            marginRight = 3,
+                        },
+                    };
+                    element.Add(valueContainer);
+                    if (valueStructNeedPlain)
+                    {
+                        foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
+                        {
+                            valueContainer.Add(new Label(childProp.displayName));
+                            PropertyField propertyField = new PropertyField(childProp)
+                            {
+                                label = "",
+                            };
+                            propertyField.Bind(property.serializedObject);
+                            valueContainer.Add(propertyField);
+                        }
+                    }
+                    else
+                    {
+                        PropertyField propertyField = new PropertyField(elementProp)
+                        {
+                            label = "",
+                        };
+                        propertyField.Bind(property.serializedObject);
+                        valueContainer.Add(propertyField);
+                    }
                 },
             });
 

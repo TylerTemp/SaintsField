@@ -7,10 +7,10 @@ namespace SaintsField
     [Serializable]
     public class SaintsDictionary<TKey, TValue>: SaintsDictionaryBase<TKey, TValue>
     {
-        [SerializeField, NoLabel]
+        [SerializeField]
         private List<TKey> _keys = new List<TKey>();
 
-        [SerializeField, NoLabel]
+        [SerializeField]
         private List<TValue> _values = new List<TValue>();
 
 #if UNITY_EDITOR
