@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -14,6 +15,8 @@ namespace SaintsField
 
         public readonly int Min;
         public readonly int Max;
+
+        public readonly string Callback;
 
         public ArraySizeAttribute(int size=-1, int min=-1, int max=-1, string groupBy = "")
         {
@@ -31,6 +34,12 @@ namespace SaintsField
                 Min = min;
                 Max = max;
             }
+            GroupBy = groupBy;
+        }
+
+        public ArraySizeAttribute(string callback, string groupBy = "")
+        {
+            Callback = RuntimeUtil.ParseCallback(callback).content;
             GroupBy = groupBy;
         }
     }
