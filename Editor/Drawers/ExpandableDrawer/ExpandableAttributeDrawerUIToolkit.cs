@@ -38,12 +38,15 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
             foldOut.RegisterValueChangedCallback(v =>
             {
+                property.isExpanded = v.newValue;
                 container.Q<VisualElement>(NameProps(property)).style.display =
                     v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
             });
 
             return foldOut;
         }
+
+        private static readonly Color BackgroundColor = EColor.EditorEmphasized.GetColor();
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
@@ -54,7 +57,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 style =
                 {
                     display = DisplayStyle.None,
-                    backgroundColor = EColor.EditorEmphasized.GetColor(),
+                    backgroundColor = BackgroundColor,
                 },
                 name = NameProps(property),
                 userData = null,
@@ -85,10 +88,12 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
             Object curObject = (Object)propsElement.userData;
 
-            Object serObject = SerializedUtils.GetSerObject(property, info, parent);
+            Object serObject = GetSerObject(property, info, parent);
+            // Debug.Log(serObject);
 
             if (ReferenceEquals(serObject, curObject))
             {
+                // Debug.Log($"equal: {serObject}/{curObject}");
                 return;
             }
 
@@ -105,20 +110,52 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 return;
             }
 
-            InspectorElement inspectorElement = new InspectorElement(serObject)
+            if (serObject is GameObject go)
             {
-                // style =
-                // {
-                //     width = Length.Percent(100),
-                // },
-            };
+                // wtf Unity you can not inspect GameObject?
+                foreach (Component comp in go.GetComponents<Component>())
+                {
+                    VisualElement subContainer = new VisualElement
+                    {
+                        style =
+                        {
+                            backgroundColor = BackgroundColor,
+                            marginTop = 2,
+                            marginBottom = 2,
+                        },
+                    };
 
-            propsElement.Add(inspectorElement);
+                    string name = ObjectNames.NicifyVariableName(comp.GetType().Name);
+                    Foldout foldout = new Foldout
+                    {
+                        text = name,
+                        value = true,
+                        style =
+                        {
+                            marginLeft = 15,
+                        },
+                    };
+                    InspectorElement inspectorElement = new InspectorElement(comp);
 
-            // foreach (PropertyField propertyField in GetPropertyFields(property, property.objectReferenceValue))
-            // {
-            //     propsElement.Add(propertyField);
-            // }
+                    foldout.Add(inspectorElement);
+                    subContainer.Add(foldout);
+                    propsElement.Add(subContainer);
+
+                    VisualElement foldoutContent = foldout.Q<VisualElement>(classes: "unity-foldout__content");
+                    if (foldoutContent != null)
+                    {
+                        foldoutContent.style.marginLeft = 0;
+                    }
+                }
+
+                propsElement.style.backgroundColor = Color.clear;
+            }
+            else
+            {
+                InspectorElement inspectorElement = new InspectorElement(serObject);
+                propsElement.Add(inspectorElement);
+                propsElement.style.backgroundColor = BackgroundColor;
+            }
         }
 
     }

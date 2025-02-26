@@ -43,80 +43,11 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
         private static readonly Dictionary<string, ExpandableInfo> IdToInfo = new Dictionary<string, ExpandableInfo>();
 
-        // private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
-
-        // private string _cacheKey = "";
-
-        // private static void DisposeExpandableInfo(ExpandableInfo expandableInfo)
-        // {
-        //     // ReSharper disable once MergeIntoPattern
-        //     // ReSharper disable once MergeSequentialChecks
-        //     if (expandableInfo == null || expandableInfo.SerializedObject == null)
-        //     {
-        //         return;
-        //     }
-        //
-        //     try
-        //     {
-        //         expandableInfo.SerializedObject.Dispose();
-        //     }
-        //     catch (Exception)
-        //     {
-        //         // do nothing
-        //     }
-        // }
-
-        // private ExpandableInfo GetSerializedObject(SerializedProperty property, FieldInfo info, object parent)
-        // {
-        //     // ImGuiEnsureDispose(property.serializedObject.targetObject);
-        //     _cacheKey = GetKey(property);
-        //     if (IdToInfo.TryGetValue(_cacheKey, out ExpandableInfo expandableInfo) &&
-        //         expandableInfo.SerializedObject != null)
-        //     {
-        //         return expandableInfo;
-        //     }
-        //
-        //     Object serObject = SerializedUtils.GetSerObject(property, info, parent);
-        //     if (serObject == null)
-        //     {
-        //         if (IdToInfo.TryGetValue(_cacheKey, out ExpandableInfo expandableNullInfo))
-        //         {
-        //             DisposeExpandableInfo(expandableNullInfo);
-        //         }
-        //
-        //         return IdToInfo[_cacheKey] = new ExpandableInfo
-        //         {
-        //             Error = "",
-        //             SerializedObject = null,
-        //         };
-        //     }
-        //
-        //     SerializedObject serializedObject = null;
-        //     try
-        //     {
-        //         serializedObject = new SerializedObject(serObject);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         return IdToInfo[_cacheKey] = new ExpandableInfo
-        //         {
-        //             Error = $"Failed to create a SerializedObject: {e.Message}",
-        //             SerializedObject = null,
-        //         };
-        //     }
-        //
-        //     return IdToInfo[_cacheKey] = new ExpandableInfo
-        //     {
-        //         Error = "",
-        //         SerializedObject = serializedObject,
-        //     };
-        // }
-
         private static ExpandableInfo EnsureExpandableInfo(IMakeRenderer makeRenderer, SerializedProperty property, MemberInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
 
-            Object serObject = SerializedUtils.GetSerObject(property, info, parent);
+            Object serObject = GetSerObject(property, info, parent);
 
             bool hasKey = IdToInfo.TryGetValue(key, out ExpandableInfo expandableInfo);
             // ReSharper disable once ConvertIfStatementToSwitchStatement

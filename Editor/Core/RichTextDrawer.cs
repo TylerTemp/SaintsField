@@ -216,7 +216,9 @@ namespace SaintsField.Editor.Core
                     if (!parsedResult.isSelfClose)
                     {
                         // ReSharper disable once UseIndexFromEndExpression
-                        Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content);
+#if SAINTSFIELD_DEBUG
+                        Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content, parsedResult.content);
+#endif
                         openTags.RemoveAt(openTags.Count - 1);
                     }
 
