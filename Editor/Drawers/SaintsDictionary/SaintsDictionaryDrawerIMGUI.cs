@@ -25,6 +25,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             private readonly FieldInfo _info;
             private readonly object _parent;
 
+            private bool _keyStructChecked;
+            private bool _keyStructNeedFlatten;
+
+            private bool _valueStructChecked;
+            private bool _valueStructNeedFlatten;
+
             public class SwapEvent: UnityEvent<IReadOnlyList<(int, int)>> {}
 
             public readonly SwapEvent IndexSwapEvent = new SwapEvent();
@@ -95,11 +101,35 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             protected override float GetCustomRowHeight(int row, TreeViewItem item)
             {
                 int index = item.id;
-                return new[] { _keysProp, _valuesProp }
-                    .Select(each => each.GetArrayElementAtIndex(index))
-                    .Where(each => each != null)
-                    .Select(each => EditorGUI.GetPropertyHeight(each, GUIContent.none, true))
-                    .Max();
+                SerializedProperty keyProp = _keysProp.GetArrayElementAtIndex(index);
+                SerializedProperty valueProp = _valuesProp.GetArrayElementAtIndex(index);
+
+                if (!_keyStructChecked)
+                {
+                    _keyStructChecked = true;
+                    _keyStructNeedFlatten = GetNeedFlatten(keyProp);
+                }
+                if (!_valueStructChecked)
+                {
+                    _valueStructChecked = true;
+                    _valueStructNeedFlatten = GetNeedFlatten(valueProp);
+                }
+
+                float keyHeight = _keyStructNeedFlatten
+                    ? SerializedUtils.GetPropertyChildren(keyProp)
+                        .Where(each => each != null)
+                        .Select(each => EditorGUI.GetPropertyHeight(each, GUIContent.none, true) + SingleLineHeight)
+                        .Sum()
+                    : EditorGUI.GetPropertyHeight(keyProp, GUIContent.none, true);
+
+                float valueHeight = _valueStructNeedFlatten
+                    ? SerializedUtils.GetPropertyChildren(valueProp)
+                        .Where(each => each != null)
+                        .Select(each => EditorGUI.GetPropertyHeight(each, GUIContent.none, true) + SingleLineHeight)
+                        .Sum()
+                    : EditorGUI.GetPropertyHeight(valueProp, GUIContent.none, true);
+
+                return Mathf.Max(keyHeight, valueHeight);
             }
 
             private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn)
@@ -133,11 +163,46 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
                 }
 
+                // flatten
+                if (isKeyColumn && !_keyStructChecked)
+                {
+                    _keyStructChecked = true;
+                    _keyStructNeedFlatten = GetNeedFlatten(itemProp);
+                }
+                else if (!isKeyColumn && !_valueStructChecked)
+                {
+                    _valueStructChecked = true;
+                    _valueStructNeedFlatten = GetNeedFlatten(itemProp);
+                }
+
+                bool needFlatten = isKeyColumn ? _keyStructNeedFlatten : _valueStructNeedFlatten;
+
                 // ReSharper disable once ConvertToUsingDeclaration
                 using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 using(new GUIColorScoop(conflicted? WarningColor: GUI.color))
                 {
-                    EditorGUI.PropertyField(getCellRect, itemProp, GUIContent.none);
+                    if (needFlatten)
+                    {
+                        Rect leftRect = getCellRect;
+                        foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(itemProp)
+                                     .Where(each => each != null))
+                        {
+                            float itemHeight = EditorGUI.GetPropertyHeight(childProp, GUIContent.none, true);
+
+                            (Rect labelRect, Rect afterLabelRect) = RectUtils.SplitHeightRect(leftRect, SingleLineHeight);
+                            leftRect = afterLabelRect;
+                            EditorGUI.LabelField(labelRect, childProp.displayName);
+
+                            (Rect fieldRect, Rect afterFieldRect) =
+                                RectUtils.SplitHeightRect(leftRect, itemHeight);
+                            EditorGUI.PropertyField(fieldRect, childProp, GUIContent.none);
+                            leftRect = afterFieldRect;
+                        }
+                    }
+                    else
+                    {
+                        EditorGUI.PropertyField(getCellRect, itemProp, GUIContent.none);
+                    }
                     if (conflicted && changed.changed)
                     {
                         Reload();

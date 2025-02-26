@@ -356,7 +356,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             string preValueSearch = "";
             int prePageIndex = 0;
             int preSize = 0;
-            int preNumberOfItemsPerPage = -1;
+            // int preNumberOfItemsPerPage = -1;
             int preTotalPage = 1;
 
             SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
@@ -432,7 +432,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     //               || preTotalPage != totalPage
                     //               || prePageIndex != curPageIndex;
 
-                    preNumberOfItemsPerPage = numberOfItemsPerPage;
+                    // preNumberOfItemsPerPage = numberOfItemsPerPage;
                     preTotalPage = totalPage;
                     prePageIndex = curPageIndex;
                 }
@@ -461,14 +461,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             });
 
             bool keyStructChecked = false;
-            bool keyStructNeedPlain = false;
+            bool keyStructNeedFlatten = false;
 
             bool valueStructChecked = false;
-            bool valueStructNeedPlain = false;
+            bool valueStructNeedFlatten = false;
 
             multiColumnListView.columns.Add(new Column
             {
-                name ="Keys",
+                name = "Keys",
                 // title = "Keys",
                 stretchable = true,
                 makeHeader = () =>
@@ -516,20 +516,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     if (!keyStructChecked)
                     {
                         keyStructChecked = true;
-                        // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
-                        // Debug.Log(elementProp.propertyType);
-                        if (elementProp.propertyType == SerializedPropertyType.Generic)
-                        {
-                            (PropertyAttribute[] valuesAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(elementProp);
-                            // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
-                            // AboveRichLabelAttribute aboveRichLabelAttributes = valuesAttributes.OfType<AboveRichLabelAttribute>().FirstOrDefault();
-                            SaintsRowAttribute saintsRowAttribute =
-                                valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
-                            if (saintsRowAttribute is null)
-                            {
-                                keyStructNeedPlain = true;
-                            }
-                        }
+                        keyStructNeedFlatten = GetNeedFlatten(elementProp);
                     }
 
                     elementProp.isExpanded = true;
@@ -543,7 +530,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         },
                     };
                     element.Add(keyContainer);
-                    if (keyStructNeedPlain)
+                    if (keyStructNeedFlatten)
                     {
                         foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
                         {
@@ -671,20 +658,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     if (!valueStructChecked)
                     {
                         valueStructChecked = true;
-                        // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
-                        // Debug.Log(elementProp.propertyType);
-                        if (elementProp.propertyType == SerializedPropertyType.Generic)
-                        {
-                            (PropertyAttribute[] valuesAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(elementProp);
-                            // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
-                            // AboveRichLabelAttribute aboveRichLabelAttributes = valuesAttributes.OfType<AboveRichLabelAttribute>().FirstOrDefault();
-                            SaintsRowAttribute saintsRowAttribute =
-                                valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
-                            if (saintsRowAttribute is null)
-                            {
-                                valueStructNeedPlain = true;
-                            }
-                        }
+                        valueStructNeedFlatten = GetNeedFlatten(elementProp);
                     }
 
                     VisualElement valueContainer = new VisualElement
@@ -695,7 +669,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         },
                     };
                     element.Add(valueContainer);
-                    if (valueStructNeedPlain)
+                    if (valueStructNeedFlatten)
                     {
                         foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
                         {

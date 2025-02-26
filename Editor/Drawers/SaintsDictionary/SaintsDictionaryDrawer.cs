@@ -118,5 +118,21 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         private static string GetValueLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null
             ? "Values"
             : saintsDictionaryAttribute.ValueLabel;
+
+        private static bool GetNeedFlatten(SerializedProperty elementProp)
+        {
+            if (elementProp.propertyType != SerializedPropertyType.Generic)
+            {
+                return false;
+            }
+
+            (PropertyAttribute[] valuesAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(elementProp);
+            // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
+            // AboveRichLabelAttribute aboveRichLabelAttributes = valuesAttributes.OfType<AboveRichLabelAttribute>().FirstOrDefault();
+            SaintsRowAttribute saintsRowAttribute =
+                valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
+
+            return saintsRowAttribute is null;
+        }
     }
 }
