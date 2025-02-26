@@ -503,17 +503,20 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
                 }
 
-                EditorGUI.LabelField(new Rect(keySearchRect)
+                if(string.IsNullOrEmpty(cachedInfo.KeySearch))
                 {
-                    width = keySearchRect.width - 6,
-                }, "Key Search", new GUIStyle("label")
-                {
-                    alignment = TextAnchor.MiddleRight, normal =
+                    EditorGUI.LabelField(new Rect(keySearchRect)
                     {
-                        textColor = Color.gray,
-                    },
-                    fontStyle = FontStyle.Italic
-                });
+                        width = keySearchRect.width - 6,
+                    }, "Key Search", new GUIStyle("label")
+                    {
+                        alignment = TextAnchor.MiddleRight, normal =
+                        {
+                            textColor = Color.gray,
+                        },
+                        fontStyle = FontStyle.Italic,
+                    });
+                }
 
                 Rect valueSearchRect = ShrinkRect(valueSearchRawRect);
                 using (EditorGUI.ChangeCheckScope valueSearchChanged = new EditorGUI.ChangeCheckScope())
@@ -528,17 +531,20 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
                 }
 
-                EditorGUI.LabelField(new Rect(valueSearchRect)
+                if(string.IsNullOrEmpty(cachedInfo.ValueSearch))
                 {
-                    width = valueSearchRect.width - 6,
-                }, "Value Search", new GUIStyle("label")
-                {
-                    alignment = TextAnchor.MiddleRight, normal =
+                    EditorGUI.LabelField(new Rect(valueSearchRect)
                     {
-                        textColor = Color.gray,
-                    },
-                    fontStyle = FontStyle.Italic
-                });
+                        width = valueSearchRect.width - 6,
+                    }, "Value Search", new GUIStyle("label")
+                    {
+                        alignment = TextAnchor.MiddleRight, normal =
+                        {
+                            textColor = Color.gray,
+                        },
+                        fontStyle = FontStyle.Italic,
+                    });
+                }
             }
 
             (Rect tableRect, Rect bottomRawRect) = RectUtils.SplitHeightRect(searchLeftRect, searchLeftRect.height - SingleLineHeight);
