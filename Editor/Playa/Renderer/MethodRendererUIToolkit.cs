@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (buttonAttribute == null)
             {
-                return (null, false);
+                return (null, methodBindAttributes.Count > 0);
             }
             // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 
@@ -235,8 +235,10 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 needUpdate = FieldWithInfo.PlayaAttributes.Count(each =>
                     // ReSharper disable once MergeIntoLogicalPattern
-                    each is PlayaShowIfAttribute || each is PlayaEnableIfAttribute ||
-                    each is PlayaDisableIfAttribute) > 0;
+                    each is PlayaShowIfAttribute
+                    || each is PlayaEnableIfAttribute
+                    || each is PlayaDisableIfAttribute
+                    || each is IPlayaMethodBindAttribute) > 0;
             }
 
             if (!hasParameters)
@@ -257,6 +259,14 @@ namespace SaintsField.Editor.Playa.Renderer
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
             PreCheckResult baseResult = base.OnUpdateUIToolKit(root);
+
+            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in FieldWithInfo.PlayaAttributes.OfType<IPlayaMethodBindAttribute>())
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+                Debug.Log($"button click {playaMethodBindAttribute}");
+#endif
+                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
+            }
 
             Button buttonElement;
             try

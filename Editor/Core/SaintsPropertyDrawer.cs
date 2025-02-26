@@ -144,7 +144,7 @@ namespace SaintsField.Editor.Core
             SceneView.RepaintAll();
         }
 
-        protected static void EnqueueSceneViewNotification(string message)
+        public static void EnqueueSceneViewNotification(string message)
         {
             if (!_sceneViewNotificationListened)
             {

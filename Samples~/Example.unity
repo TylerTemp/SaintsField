@@ -17517,6 +17517,7 @@ Transform:
   - {fileID: 1495021543}
   - {fileID: 533526052}
   - {fileID: 325018646}
+  - {fileID: 1567553376}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1494371783
@@ -18304,6 +18305,80 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noPanda: 0
   range: {x: 2, y: 10}
+--- !u!1 &1567553375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1567553376}
+  - component: {fileID: 1567553377}
+  - component: {fileID: 1567553378}
+  m_Layer: 0
+  m_Name: OnEventUpdate
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1567553376
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567553375}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1567553377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567553375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32401508156202d4bad0348c53009151, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  example: {fileID: 1567553378}
+--- !u!114 &1567553378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567553375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cbd09c0c31273d4f898b68fce6f9e4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  evt:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1567553377}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.IssueAndTesting.Testing.OnEventLoopCheck.OnEventListenerExample,
+          today.comes.saintsfield.Samples
+        m_MethodName: OnEvent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1569764962
 GameObject:
   m_ObjectHideFlags: 0
@@ -26814,17 +26889,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   genDict:
     _keys:
-    - 1
-    - 2
-    - 3
-    - 4
-    - 4
+    - 
+    - 
     _values:
-    - {fileID: 2137894679}
-    - {fileID: 446354015}
-    - {fileID: 1465660264}
     - {fileID: 0}
     - {fileID: 0}
+  dict:
+    _keys: 
+    _values: []
 --- !u!1 &2009356786
 GameObject:
   m_ObjectHideFlags: 0

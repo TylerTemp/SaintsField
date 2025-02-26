@@ -81,14 +81,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.31.0**
+**3.31.1**
 
-Add `SaintsDictionary<,>`. It allows:
-1.  Allow any type of kay/value type as long as `Dictionary<,>` allows
-2.  Give a warning for duplicated keys
-3.  Allow search for keys & values
-4.  Allow paging for large dictionary
-5.  Allow inherent to add some custom attributes, especially with auto getters to gain the auto-fulfill ability.
+1.  `SaintsDictionary` now can flatten fields the key/value of a general strict/class
+2.  `OnButtonClick` and `OnEvent` in UI Toolkit now can check the event signing while the target is being inspected
+3.  Remove a log when rich label has a bad label format
+4.  `Expandable` now support addressable reference
+5.  UI Toolkit: `Expandable` now support a `GameObject`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4485,12 +4484,7 @@ A simple dictionary serialization tool. It allows:
 4.  Allow paging for large dictionary
 5.  Allow inherence to add some custom attributes, especually with auto getters to gain the auto-fulfill ability.
 
-Know issue: using value of normal struct/class type will lead to foldout and label issue. See below about the workaround.
-
-This is very like [Serialized Dictionary](https://assetstore.unity.com/packages/tools/utilities/serialized-dictionary-243052) with these differences:
-
-1.  `SaintsDictionary` with struct/class type as key/value will have some label/foldout issue and requires some workaround.
-2.  `SaintsDictionaryBase` allows you to customize the dictionary behavior, for example, together with `GetComponentInChildren`, you can allow auto-fulfill.
+This is very like [Serialized Dictionary](https://assetstore.unity.com/packages/tools/utilities/serialized-dictionary-243052) with differences: `SaintsDictionaryBase` allows you to customize the dictionary behavior, for example, together with `GetComponentInChildren`, you can allow auto-fulfill.
 
 In short, if you don't need the custom attributes ability, it's suggested to use [Serialized Dictionary](https://assetstore.unity.com/packages/tools/utilities/serialized-dictionary-243052) instead.
 
@@ -4516,43 +4510,28 @@ Add `SaintsDictionary` attribute to control:
 *   `int numberOfItemsPerPage = 0`: items per page. 0 for no paging
 
 ```csharp
+suing SaintsField;
+
 [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
 public SaintsDictionary<int, GameObject> slotToEnemyPrefab;
 ```
 
 [![video](https://github.com/user-attachments/assets/c05e0e54-dc74-4a58-b83f-9005a16fdc8d)](https://github.com/user-attachments/assets/886203a6-ed24-4ef2-a254-00f7e0ff14e2)
 
-Using on a struct/class requires you to manually add some attributes:
+Using on a general struct/class is supported:
 
 ```csharp
+suing SaintsField;
+
 [Serializable]
 public struct MyStruct
 {
-    [NoLabel, AboveRichLabel]  // use this to show the label above the field
     public string myStringField;
-    [NoLabel, AboveRichLabel]
     public int myIntField;
 }
 
-[Serializable]
-public class MyConfig: SaintsDictionaryBase<int, MyStruct>
-{
-    [SerializeField]
-    private List<int> _keys = new List<int>();
 
-    [SerializeField, SaintsRow(inline: true)]  // SaintsRow-inline so the value will not be foldout by Unity
-    // [GetComponentInChildren]
-    private List<MyStruct> _values = new List<MyStruct>();
-
-#if UNITY_EDITOR
-    private static string EditorPropKeys => nameof(_keys);  // this is required!
-    private static string EditorPropValues => nameof(_values);  // this is required!
-#endif
-    protected override List<int> SerializedKeys => _keys;
-    protected override List<MyStruct> SerializedValues => _values;
-}
-
-public MyConfig basicType;
+public SaintsDictionary<int, MyStruct> basicType;
 ```
 
 ![image](https://github.com/user-attachments/assets/c2dad54d-bfa6-4c52-acee-e2aa74898d71)
@@ -4562,6 +4541,8 @@ At last, use auto getters so it can auto-fetch some values:
 (Note: ATM you still need to click the plus button once to make the array filling)
 
 ```csharp
+suing SaintsField;
+
 [Serializable]
 public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
 {
@@ -5643,7 +5624,7 @@ public AnimationCurve naCurveHandled;
 
 2.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
 
-    NOTE: In many cases `Odin` does not fallback to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
+    NOTE: In many cases `Odin` does not fall back to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
 
 Special Note:
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -38,6 +39,7 @@ namespace SaintsField.Editor.Playa.Renderer
             UnityEventBase unityEventBase = null;
             UnityEngine.Object unityEventContainerObject = null;
             List<Type> invokeRequiredTypes = new List<Type>();
+            string eventDisplayName;
             if (methodBind == MethodBind.ButtonOnClick)
             {
                 UnityEngine.UI.Button uiButton = eventTarget is null
@@ -55,9 +57,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 unityEventContainerObject = uiButton;
                 unityEventBase = uiButton.onClick;
+                eventDisplayName = $"{eventTarget ?? "Button"}.onClick";
             }
             else  // custom event at the moment
             {
+                eventDisplayName = eventTarget;
                 List<string> attrNames = new List<string>();
                 if (eventTarget.Contains("."))
                 {
@@ -153,6 +157,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     (UnityAction)Delegate.CreateDelegate(typeof(UnityAction),
                         fieldWithInfo.Target, fieldWithInfo.MethodInfo));
                 EditorUtility.SetDirty(unityEventContainerObject);
+                SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`");
                 return;
             }
 
@@ -168,6 +173,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 value = foundValue;
             }
             Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Target, value);
+            SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`({value})");
             EditorUtility.SetDirty(unityEventContainerObject);
         }
 

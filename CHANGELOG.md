@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.31.1 ##
+
+1.  `SaintsDictionary` now can flatten fields the key/value of a general strict/class
+2.  `OnButtonClick` and `OnEvent` in UI Toolkit now can check the event signing while the target is being inspected
+3.  Remove a log when rich label has a bad label format
+4.  `Expandable` now support addressable reference
+5.  UI Toolkit: `Expandable` now support a `GameObject`
+
 ## 3.31.0 ##
 
 Add `SaintsDictionary<,>`. It allows:
