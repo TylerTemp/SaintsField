@@ -1,5 +1,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEngine;
+
 #if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -7,9 +9,20 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
 {
+    [CustomPropertyDrawer(typeof(ImGuiFallback.GameObjectChild), true)]
     [CustomPropertyDrawer(typeof(ImGuiFallback.Container<,>), true)]
     public sealed class ContainerDrawer : PropertyDrawer
     {
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return 30;
+        }
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            EditorGUI.HelpBox(position, $"Intentionally left blank for testing: {property.propertyPath}", MessageType.None);
+        }
+
 #if UNITY_2021_3_OR_NEWER
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
