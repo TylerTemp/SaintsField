@@ -1410,15 +1410,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state:
-    <layerIndex>k__BackingField: 1
-    <stateNameHash>k__BackingField: 1370463806
-    <stateName>k__BackingField: TestSubState
-    <stateSpeed>k__BackingField: 1
-    <stateTag>k__BackingField: 
-    <animationClip>k__BackingField: {fileID: 0}
-    <subStateMachineNameChain>k__BackingField:
-    - TestStateMachine
-  decState:
     <layerIndex>k__BackingField: 0
     <stateNameHash>k__BackingField: 0
     <stateName>k__BackingField: 
@@ -1426,6 +1417,16 @@ MonoBehaviour:
     <stateTag>k__BackingField: 
     <animationClip>k__BackingField: {fileID: 0}
     <subStateMachineNameChain>k__BackingField: []
+  decState:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1198717087
+    <stateName>k__BackingField: Sub2State
+    <stateSpeed>k__BackingField: 1
+    <stateTag>k__BackingField: 
+    <animationClip>k__BackingField: {fileID: 0}
+    <subStateMachineNameChain>k__BackingField:
+    - SubStateMachine1
+    - Sub1-2
 --- !u!95 &223760086
 Animator:
   serializedVersion: 5

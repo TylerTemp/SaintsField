@@ -302,8 +302,8 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             SerializedProperty property, MemberInfo memberInfo, object parent)
         {
-            AnimatorStateAttribute animatorStateAttribute = (AnimatorStateAttribute)propertyAttribute;
-            MetaInfo metaInfo = GetMetaInfo(property, animatorStateAttribute.AnimFieldName, memberInfo, parent);
+            AnimatorStateAttribute animatorStateAttribute = propertyAttribute as AnimatorStateAttribute;
+            MetaInfo metaInfo = GetMetaInfo(property, animatorStateAttribute?.AnimFieldName, memberInfo, parent);
             if (metaInfo.Error != "")
             {
                 return new AutoRunnerFixerResult
@@ -313,6 +313,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
                 };
             }
 
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.String when string.IsNullOrEmpty(property.stringValue):
