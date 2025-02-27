@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -30,8 +31,8 @@ namespace SaintsField.Editor.Drawers.ArraySizeDrawer
             {
                 case int fixedSize:
                     return ("", true, fixedSize, fixedSize);
-                case (int min, int max):
-                    return AdjustDynamicMinMax(min, max);
+                case ValueTuple<int, int> vt:
+                    return AdjustDynamicMinMax(vt.Item1, vt.Item2);
                 case Vector2 v2:
                     return AdjustDynamicMinMax((int)v2.x, (int)v2.y);
                 case Vector2Int v2Int:
