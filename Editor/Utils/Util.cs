@@ -545,6 +545,18 @@ namespace SaintsField.Editor.Utils
                         }
                     }
                 }
+                catch (FormatException)
+                {
+                    try
+                    {
+                        finalResult = (T)genResult;
+                    }
+                    catch (InvalidCastException e)
+                    {
+                        Debug.LogException(e);
+                        return (e.Message, defaultValue);
+                    }
+                }
 
                 return ("", finalResult);
             }

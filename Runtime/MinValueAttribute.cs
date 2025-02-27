@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -9,21 +10,25 @@ namespace SaintsField
     public class MinValueAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
+        public string GroupBy { get; }
 
         public readonly float Value;
         public readonly string ValueCallback;
 
-        public MinValueAttribute(float value)
+        public MinValueAttribute(float value, string gruopBy = "")
         {
             Value = value;
             ValueCallback = null;
+
+            GroupBy = gruopBy;
         }
 
-        public MinValueAttribute(string valueCallback)
+        public MinValueAttribute(string valueCallback, string gruopBy = "")
         {
             Value = -1;
-            ValueCallback = valueCallback;
+            ValueCallback = RuntimeUtil.ParseCallback(valueCallback).content;
+
+            GroupBy = gruopBy;
         }
     }
 }

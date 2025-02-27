@@ -80,12 +80,21 @@ namespace SaintsField.Editor.Core
             SaintsPropertyInfo fieldAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
             if(fieldAttributeWithIndex.Attribute == null)
             {
-                fieldAttributeWithIndex = CheckSaintsPropertyInfoInject(property, allAttributes, fieldInfo, saintsPropertyDrawers.Count);
-                if (fieldAttributeWithIndex.Drawer != null)
-                {
-                    saintsPropertyDrawers.Add(fieldAttributeWithIndex);
-                }
-                else if(UseCreateFieldUIToolKit)
+                // fieldAttributeWithIndex = CheckSaintsPropertyInfoInject(property, allAttributes, fieldInfo, saintsPropertyDrawers.Count);
+                // if (fieldAttributeWithIndex.Drawer != null)
+                // {
+                //     saintsPropertyDrawers.Add(fieldAttributeWithIndex);
+                // }
+                // else if(UseCreateFieldUIToolKit)
+                // {
+                //     saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                //     {
+                //         Drawer = this,
+                //         Attribute = null,
+                //         Index = -1,
+                //     });
+                // }
+                if(UseCreateFieldUIToolKit)
                 {
                     saintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
@@ -382,31 +391,31 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static readonly List<Func<SerializedProperty, FieldInfo,IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)>> _saintsPropertyInfoInjects = new List<Func<SerializedProperty, FieldInfo, IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)>>();
+        // private static readonly List<Func<SerializedProperty, FieldInfo,IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)>> _saintsPropertyInfoInjects = new List<Func<SerializedProperty, FieldInfo, IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)>>();
 
-        private static SaintsPropertyInfo CheckSaintsPropertyInfoInject(SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, int length)
-        {
-            foreach (Func<SerializedProperty, FieldInfo,IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)> func in _saintsPropertyInfoInjects)
-            {
-                (ISaintsAttribute fakeAttribute, Type drawerType) = func(property, info, allAttributes);
-                if (drawerType != null)
-                {
-                    return new SaintsPropertyInfo
-                    {
-                        Drawer = (SaintsPropertyDrawer)MakePropertyDrawer(drawerType, info, (PropertyAttribute)fakeAttribute),
-                        Attribute = fakeAttribute,
-                        Index = length,
-                    };
-                }
-            }
+        // private static SaintsPropertyInfo CheckSaintsPropertyInfoInject(SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, int length)
+        // {
+        //     foreach (Func<SerializedProperty, FieldInfo,IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)> func in _saintsPropertyInfoInjects)
+        //     {
+        //         (ISaintsAttribute fakeAttribute, Type drawerType) = func(property, info, allAttributes);
+        //         if (drawerType != null)
+        //         {
+        //             return new SaintsPropertyInfo
+        //             {
+        //                 Drawer = (SaintsPropertyDrawer)MakePropertyDrawer(drawerType, info, (PropertyAttribute)fakeAttribute),
+        //                 Attribute = fakeAttribute,
+        //                 Index = length,
+        //             };
+        //         }
+        //     }
+        //
+        //     return default;
+        // }
 
-            return default;
-        }
-
-        protected static void AddSaintsPropertyInfoInject(Func<SerializedProperty, FieldInfo, IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)> func)
-        {
-            _saintsPropertyInfoInjects.Add(func);
-        }
+        // protected static void AddSaintsPropertyInfoInject(Func<SerializedProperty, FieldInfo, IReadOnlyList<PropertyAttribute>, (ISaintsAttribute fakeAttribute, Type drawerType)> func)
+        // {
+        //     _saintsPropertyInfoInjects.Add(func);
+        // }
 
         private static VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {

@@ -13,10 +13,10 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 {
-    [CustomPropertyDrawer(typeof(AnimatorStateBase))]
-    [CustomPropertyDrawer(typeof(AnimatorState))]
     public partial class AnimatorStateAttributeDrawer
     {
+        protected override bool UseCreateFieldUIToolKit => true;
+
         private static string NameDropdownButton(SerializedProperty property) =>
             $"{property.propertyPath}__AnimatorState_DropdownButton";
 
@@ -42,32 +42,32 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
             typeof(ISubStateMachineNameChain),
         };
 
-        [InitializeOnLoadMethod]
-        private static void AddSaintsPropertyInfoInjectAnimatorState()
-        {
-            AddSaintsPropertyInfoInject((property, info, allAttributes) =>
-            {
-                if (allAttributes.Any(each => each is AnimatorStateAttribute))
-                {
-                    return (null, null);
-                }
-
-                if (property.propertyType != SerializedPropertyType.Generic)
-                {
-                    return (null, null);
-                }
-                Type infoType = ReflectUtils.GetElementType(info.FieldType);
-
-
-                if (!InterfaceTypes.All(interfaceType => interfaceType.IsAssignableFrom(infoType)))
-                {
-                    return (null, null);
-                }
-
-                AnimatorStateAttribute fakeAttribute = new AnimatorStateAttribute();
-                return (fakeAttribute, typeof(AnimatorStateAttributeDrawer));
-            });
-        }
+        // [InitializeOnLoadMethod]
+        // private static void AddSaintsPropertyInfoInjectAnimatorState()
+        // {
+        //     AddSaintsPropertyInfoInject((property, info, allAttributes) =>
+        //     {
+        //         if (allAttributes.Any(each => each is AnimatorStateAttribute))
+        //         {
+        //             return (null, null);
+        //         }
+        //
+        //         if (property.propertyType != SerializedPropertyType.Generic)
+        //         {
+        //             return (null, null);
+        //         }
+        //         Type infoType = ReflectUtils.GetElementType(info.FieldType);
+        //
+        //
+        //         if (!InterfaceTypes.All(interfaceType => interfaceType.IsAssignableFrom(infoType)))
+        //         {
+        //             return (null, null);
+        //         }
+        //
+        //         AnimatorStateAttribute fakeAttribute = new AnimatorStateAttribute();
+        //         return (fakeAttribute, typeof(AnimatorStateAttributeDrawer));
+        //     });
+        // }
 
         protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,

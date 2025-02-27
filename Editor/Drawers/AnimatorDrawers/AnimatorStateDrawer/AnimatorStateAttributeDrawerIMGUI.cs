@@ -11,6 +11,8 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 {
     public partial class AnimatorStateAttributeDrawer
     {
+        protected override bool UseCreateFieldIMGUI => true;
+
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {

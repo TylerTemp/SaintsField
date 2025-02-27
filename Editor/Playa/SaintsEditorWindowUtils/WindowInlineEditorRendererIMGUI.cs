@@ -19,6 +19,47 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             // {
             //     return;
             // }
+            // Object target = SerializedUtils.GetSerObject(_fieldWithInfo.SerializedProperty,
+            //     _fieldWithInfo.FieldInfo, _fieldWithInfo.Target);
+            //
+            // // Debug.Log(target);
+            //
+            // if (RuntimeUtil.IsNull(target))
+            // {
+            //     return;
+            // }
+            //
+            // if (!ReferenceEquals(target, _curTarget))
+            // {
+            //     if (_editor != null)
+            //     {
+            //         Object.DestroyImmediate(_editor);
+            //         _editor = null;
+            //     }
+            // }
+            //
+            // if (_editor == null)
+            // {
+            //     _editor = UnityEditor.Editor.CreateEditor(target, _editorType);
+            // }
+            //
+            // try
+            // {
+            //     _editor.OnInspectorGUI();
+            // }
+            // catch (ArgumentException)
+            // {
+            //     // ignored
+            // }
+        }
+
+        protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
+        {
+            return 0.1f;
+        }
+
+        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        {
             Object target = SerializedUtils.GetSerObject(_fieldWithInfo.SerializedProperty,
                 _fieldWithInfo.FieldInfo, _fieldWithInfo.Target);
 
@@ -46,21 +87,12 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             try
             {
                 _editor.OnInspectorGUI();
+                // Debug.Log($"{_editor} drawn");
             }
             catch (ArgumentException)
             {
                 // ignored
             }
-        }
-
-        protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            throw new System.NotSupportedException();
-        }
-
-        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
-        {
-            throw new System.NotSupportedException();
         }
     }
 }

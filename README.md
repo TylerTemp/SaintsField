@@ -5573,7 +5573,7 @@ It can also specify if you want to skip the hidden fields (hidden by `ShowIf`, `
 
 This tool is very simple, and will get more update in the future.
 
-See [Auto Validator example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) to learn how to make a quick auto runner for a specific group of assets.
+See [Auto Validator example code](https://github.com/TylerTemp/SaintsField/blob/master/Editor/AutoRunner/AutoRunnerTemplate.cs) to learn how to make a quick auto validator for a specific group of assets.
 
 [![video](https://github.com/user-attachments/assets/bf5e7b7a-c15c-4fa4-92b9-53621d41ccb4)](https://github.com/user-attachments/assets/76683bc3-cfea-4952-9377-788e02d7e075)
 

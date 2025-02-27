@@ -16,6 +16,8 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(AnimatorStateAttribute), true)]
+    [CustomPropertyDrawer(typeof(AnimatorStateBase), true)]
+    [CustomPropertyDrawer(typeof(AnimatorState), true)]
     public partial class AnimatorStateAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private bool _onEnableChecked;
