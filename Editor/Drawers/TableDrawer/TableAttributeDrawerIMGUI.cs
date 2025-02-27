@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -141,6 +142,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn)
             {
+                if(item.id >= ArrayProp.arraySize)
+                {
+                    return;
+                }
+
                 SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
                 IReadOnlyList<string> propNames = _headerToPropNames[getColumn];
 
@@ -302,7 +308,20 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             ISaintsAttribute saintsAttribute, FieldInfo info,
             bool hasLabelWidth, object parent)
         {
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            int propertyIndex;
+            try
+            {
+                propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            }
+            catch (NullReferenceException)
+            {
+                return 0;
+            }
+            catch (ObjectDisposedException)
+            {
+                return 0;
+            }
+
             if (propertyIndex != 0)
             {
                 return 0;
@@ -438,7 +457,20 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            int propertyIndex;
+            try
+            {
+                propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+
             if (propertyIndex != 0)
             {
                 return;
@@ -460,30 +492,52 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }, controlRect.width - rightWidth);
 
             ArraySizeAttribute arraySizeAttribute = allAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
-            int min = 0;
-            int max = int.MaxValue;
+            int min = -1;
+            int max = -1;
             if (arraySizeAttribute != null)
             {
-                min = arraySizeAttribute.Min;
-                max = arraySizeAttribute.Max;
+                (string error, bool dynamic, int min, int max) arraySize = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, property, info, parent);
+                if(arraySize.error == "")
+                {
+                    min = arraySize.min;
+                    max = arraySize.max;
+                }
+#if SAINTSFIELD_DEBUG
+                else
+                {
+                    Debug.LogError(arraySize.error);
+                }
+#endif
                 // Debug.Log($"{min} ~ {max}");
             }
 
             (Rect numberRect, Rect controlsRect) = RectUtils.SplitWidthRect(rightRect, arraySizeWidth);
 
-            using(new EditorGUI.DisabledScope(min == max))
+            // Debug.Log($"{min} ~ {max}");
+            using(new EditorGUI.DisabledScope(min > 0 && min == max))
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 int newSize = EditorGUI.DelayedIntField(numberRect, _saintsTable.ArrayProp.arraySize);
                 if (changed.changed)
                 {
-                    ChangeArraySize(newSize, _saintsTable.ArrayProp);
-                    _saintsTable.Reload();
+                    if(min > 0 && newSize < min)
+                    {
+                        newSize = min;
+                    }
+                    else if(max > 0 && newSize > max)
+                    {
+                        newSize = max;
+                    }
+                    if(newSize != _saintsTable.ArrayProp.arraySize)
+                    {
+                        ChangeArraySize(newSize, _saintsTable.ArrayProp);
+                        _saintsTable.Reload();
+                    }
                 }
             }
 
             (Rect plusButton, Rect minusButton) = RectUtils.SplitWidthRect(controlsRect, EditorGUIUtility.singleLineHeight);
-            using(new EditorGUI.DisabledScope(_saintsTable.ArrayProp.arraySize >= max))
+            using(new EditorGUI.DisabledScope(max >= 0 && _saintsTable.ArrayProp.arraySize >= max))
             {
                 if (GUI.Button(plusButton, "+"))
                 {
@@ -491,7 +545,9 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     _saintsTable.Reload();
                 }
             }
-            using(new EditorGUI.DisabledScope(_saintsTable.ArrayProp.arraySize <= min))
+
+            // Debug.Log($"{_saintsTable.ArrayProp.arraySize} {max} {min}");
+            using(new EditorGUI.DisabledScope(min >= 0 &&  _saintsTable.ArrayProp.arraySize <= min))
             {
                 if (GUI.Button(minusButton, "-"))
                 {
@@ -500,7 +556,18 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 }
             }
 
-            _saintsTable.OnGUI(tableRect);
+            try
+            {
+                _saintsTable.OnGUI(tableRect);
+            }
+            catch (NullReferenceException)
+            {
+                OnDisposeIMGUI();
+            }
+            catch (ObjectDisposedException)
+            {
+                OnDisposeIMGUI();
+            }
         }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, FieldInfo info,

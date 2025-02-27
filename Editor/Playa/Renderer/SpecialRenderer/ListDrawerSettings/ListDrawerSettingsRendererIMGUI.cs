@@ -74,6 +74,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
         private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute, bool delayed)
         {
+            int min = -1;
+            int max = -1;
+            bool dynamic = true;
+            if (arraySizeAttribute != null)
+            {
+                (string error, bool dynamicValue, int minValue, int maxValue) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute,
+                    FieldWithInfo.SerializedProperty,
+                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+
+                if (error == "")
+                {
+                    min = minValue;
+                    max = maxValue;
+                    dynamic = dynamicValue;
+                }
+            }
+
             Rect usePosition = new Rect(position)
             {
                 y = position.y + 1,
@@ -101,7 +118,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
                 Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
 
-                DrawListDrawerHeader(paddingTitle, delayed, elementType, property);
+                DrawListDrawerHeader(paddingTitle, delayed, elementType, property, arraySizeAttribute);
                 return;
             }
 
@@ -121,66 +138,60 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     };
 
                 Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
-                _imGuiReorderableList.drawHeaderCallback += v => DrawListDrawerHeader(v, delayed, elementType, property);
+                _imGuiReorderableList.drawHeaderCallback += v => DrawListDrawerHeader(v, delayed, elementType, property, arraySizeAttribute);
                 _imGuiReorderableList.elementHeightCallback += DrawListDrawerItemHeight;
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
 
                 if(arraySizeAttribute != null)
                 {
-                    (string error, bool dynamic, int min, int max) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
-                        FieldWithInfo.FieldInfo, FieldWithInfo.Target);
-                    if (error == "")
+                    if (dynamic)
                     {
-                        if (dynamic)
+                        _imGuiReorderableList.onCanRemoveCallback += r =>
+                        {
+                            (string removeError, bool _, int removeMin, int _) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
+                                FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                            if (removeError != "")
+                            {
+                                return true;
+                            }
+                            bool canRemove = r.count > removeMin;
+                            // Debug.Log($"canRemove={canRemove}, count={r.count}, min={arraySizeAttribute.Min}");
+                            return canRemove;
+                        };
+                        _imGuiReorderableList.onCanAddCallback += r =>
+                        {
+                            (string addError, bool _, int _, int addMax) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
+                                FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                            if (addError != "")
+                            {
+                                return true;
+                            }
+                            bool canAdd = r.count < addMax;
+                            // Debug.Log($"canAdd={canAdd}, count={r.count}, max={arraySizeAttribute.Max}");
+                            return canAdd;
+                        };
+                    }
+                    else
+                    {
+                        if(min > 0)
                         {
                             _imGuiReorderableList.onCanRemoveCallback += r =>
                             {
-                                (string removeError, bool _, int removeMin, int _) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
-                                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
-                                if (removeError != "")
-                                {
-                                    return true;
-                                }
-                                bool canRemove = r.count > removeMin;
+                                bool canRemove = r.count > min;
                                 // Debug.Log($"canRemove={canRemove}, count={r.count}, min={arraySizeAttribute.Min}");
                                 return canRemove;
                             };
+                        }
+                        if (max > 0)
+                        {
                             _imGuiReorderableList.onCanAddCallback += r =>
                             {
-                                (string addError, bool _, int _, int addMax) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
-                                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
-                                if (addError != "")
-                                {
-                                    return true;
-                                }
-                                bool canAdd = r.count < addMax;
+                                bool canAdd = r.count < max;
                                 // Debug.Log($"canAdd={canAdd}, count={r.count}, max={arraySizeAttribute.Max}");
                                 return canAdd;
                             };
                         }
-                        else
-                        {
-                            if(min > 0)
-                            {
-                                _imGuiReorderableList.onCanRemoveCallback += r =>
-                                {
-                                    bool canRemove = r.count > min;
-                                    // Debug.Log($"canRemove={canRemove}, count={r.count}, min={arraySizeAttribute.Min}");
-                                    return canRemove;
-                                };
-                            }
-                            if (max > 0)
-                            {
-                                _imGuiReorderableList.onCanAddCallback += r =>
-                                {
-                                    bool canAdd = r.count < max;
-                                    // Debug.Log($"canAdd={canAdd}, count={r.count}, max={arraySizeAttribute.Max}");
-                                    return canAdd;
-                                };
-                            }
-                        }
                     }
-
                     // _imGuiReorderableList.onCanAddCallback += _ => !(arraySizeAttribute.Min >= 0 && property.arraySize <= arraySizeAttribute.Min);
                 }
             }
@@ -190,7 +201,18 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             using(new UnsetGuiStyleFixedHeight("RL Header"))
             {
-                _imGuiReorderableList.DoList(usePosition);
+                try
+                {
+                    _imGuiReorderableList.DoList(usePosition);
+                }
+                catch (ObjectDisposedException)
+                {
+                    _imGuiReorderableList = null;
+                }
+                catch (NullReferenceException)
+                {
+                    _imGuiReorderableList = null;
+                }
             }
         }
 
@@ -198,8 +220,25 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
         private Texture2D _iconLeft;
         private Texture2D _iconRight;
 
-        private void DrawListDrawerHeader(Rect rect, bool delayed, Type elementType, SerializedProperty property)
+        private void DrawListDrawerHeader(Rect rect, bool delayed, Type elementType, SerializedProperty property, ArraySizeAttribute arraySizeAttribute)
         {
+            int min = -1;
+            int max = -1;
+            bool dynamic = true;
+            if (arraySizeAttribute != null)
+            {
+                (string error, bool dynamicValue, int minValue, int maxValue) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute,
+                    FieldWithInfo.SerializedProperty,
+                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+
+                if (error == "")
+                {
+                    min = minValue;
+                    max = maxValue;
+                    dynamic = dynamicValue;
+                }
+            }
+
             DragAndDropImGui(rect, elementType, property);
 
             // const float twoNumberInputWidth = 20;
@@ -225,26 +264,30 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 titleItemTotalRect.y += 1;
                 titleItemTotalRect.height -= 2;
 
+                using(new EditorGUI.DisabledScope(min > 0 && min == max))
                 using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
                     int newCount = EditorGUI.DelayedIntField(titleItemTotalRect, GUIContent.none,
                         _imGuiListInfo.PagingInfo.IndexesAfterSearch.Count);
                     if (changed.changed)
                     {
-                        _imGuiListInfo.Property.arraySize = newCount;
-                        _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
-                        _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.Property, _imGuiListInfo.PageIndex,
-                            _imGuiListInfo.SearchText, _imGuiListInfo.NumberOfItemsPrePage);
-                        return;
+                        if(min > 0 && newCount < min)
+                        {
+                            newCount = min;
+                        }
+                        else if(max > 0 && newCount > max)
+                        {
+                            newCount = max;
+                        }
+                        if(_imGuiListInfo.Property.arraySize != newCount)
+                        {
+                            _imGuiListInfo.Property.arraySize = newCount;
+                            _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
+                            _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.Property, _imGuiListInfo.PageIndex,
+                                _imGuiListInfo.SearchText, _imGuiListInfo.NumberOfItemsPrePage);
+                            return;
+                        }
                     }
-
-                    // EditorGUI.LabelField(new Rect(titleItemTotalRect)
-                    // {
-                    //     width = titleItemTotalRect.width - 6,
-                    // }, "Items", new GUIStyle("label") { alignment = TextAnchor.MiddleRight, normal =
-                    // {
-                    //     textColor = Color.gray,
-                    // }, fontStyle = FontStyle.Italic});
                 }
 
                 titleButtonRect = titleButtonNewRect;
@@ -558,17 +601,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             return height;
         }
 
-        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        protected override void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
-            bool isArray = FieldWithInfo.SerializedProperty.isArray;
-            OnArraySizeChangedAttribute onArraySizeChangedAttribute =
-                FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
-            int arraySize = -1;
-            if (isArray && onArraySizeChangedAttribute != null)
-            {
-                arraySize = FieldWithInfo.SerializedProperty.arraySize;
-            }
-
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
@@ -580,20 +614,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 {
                     _imGuiListInfo.PreCheckResult = preCheckResult;
                     ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
-                    // ReSharper disable once ConvertToUsingDeclaration
-                    using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                    {
-                        DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute, listDrawerSettingsAttribute.Delayed);
-                        // ReSharper disable once InvertIf
-                        if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
-                           arraySize != FieldWithInfo.SerializedProperty.arraySize)
-                        {
-                            FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                            InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
-                                FieldWithInfo.SerializedProperty,
-                                (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
-                        }
-                    }
+                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute, listDrawerSettingsAttribute.Delayed);
                 }
             }
         }

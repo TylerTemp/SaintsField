@@ -31,18 +31,34 @@ namespace SaintsField.Editor.Drawers.ArraySizeDrawer
                 case int fixedSize:
                     return ("", true, fixedSize, fixedSize);
                 case (int min, int max):
-                    return ("", true, min, max);
+                    return AdjustDynamicMinMax(min, max);
                 case Vector2 v2:
-                    return ("", true, (int)v2.x, (int)v2.y);
+                    return AdjustDynamicMinMax((int)v2.x, (int)v2.y);
                 case Vector2Int v2Int:
-                    return ("", true, v2Int.x, v2Int.y);
+                    return AdjustDynamicMinMax(v2Int.x, v2Int.y);
                 case Vector3 v3:
-                    return ("", true, (int)v3.x, (int)v3.y);
+                    return AdjustDynamicMinMax((int)v3.x, (int)v3.y);
                 case Vector3Int v3Int:
-                    return ("", true, v3Int.x, v3Int.y);
+                    return AdjustDynamicMinMax(v3Int.x, v3Int.y);
                 default:
                     return ($"Unsupported callback return type {result?.GetType()}({result})", true, -1, -1);
             }
+        }
+
+        private static (string error, bool dynamic, int min, int max) AdjustDynamicMinMax(int min, int max)
+        {
+            if (max == -1)
+            {
+                return ("", true, min, max);
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (max < min)
+            {
+                return ("", true, min, -1);
+            }
+
+            return ("", true, min, max);
         }
     }
 }

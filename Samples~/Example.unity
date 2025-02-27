@@ -5055,9 +5055,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 010780e354ff69f4aad0a1ae423c72fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intValue: 2
+  intValue: 1
   dynamic1:
-  - 
   - 
   v2Value: {x: 2, y: 4}
   dynamic2:
@@ -5085,20 +5084,15 @@ MonoBehaviour:
   intValue: 1
   dynamic1:
   - 
-  v2Value: {x: 2, y: 4}
+  v2Value: {x: 1, y: 3}
   dynamic2:
+  - 
   - 
   - 
   dynamic3:
   - 
-  - 
-  - 
-  - 
-  zeroUpdateValue: 5
+  zeroUpdateValue: 2
   dynamic4:
-  - 
-  - 
-  - 
   - 
   - 
 --- !u!1 &676684123
@@ -26788,8 +26782,17 @@ MonoBehaviour:
   - myInt: 0
     myString: 
     myObject: {fileID: 0}
-  v2Value: {x: 1, y: 3}
+  v2Value: {x: 4, y: -1}
   dynamicRange:
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
   - myInt: 0
     myString: 
     myObject: {fileID: 0}

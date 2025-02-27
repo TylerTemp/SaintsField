@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         // protected readonly SerializedObject SerializedObject;
         // ReSharper enable InconsistentNaming
 
-        protected struct PreCheckResult
+        public struct PreCheckResult
         {
             public bool IsShown;
             public bool IsDisabled;
@@ -41,7 +41,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             switch (info.RenderType)
             {
                 case SaintsRenderType.SerializedField:
-                    return info.FieldInfo;
                 case SaintsRenderType.NonSerializedField:
                     return info.FieldInfo;
                 case SaintsRenderType.Method:

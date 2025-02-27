@@ -2705,7 +2705,7 @@ A decorator that limit the size of the array or list.
 
 Note: Because of the limitation of `PropertyDrawer`:
 
-1.  Delete an element will first be deleted, then the array will duplicated the last element.
+1.  Delete an element will first be deleted, then the array will duplicate the last element.
 2.  UI Toolkit: you might see the UI flicked when you remove an element.
 
 Enable `SaintsEditor` if possible, otherwise:
@@ -2721,7 +2721,22 @@ Parameters:
 *   `int min` min value of the size
 *   `int max` max value of the size
 *   `string groupBy = ""` for error message grouping
-*   AllowMultiple: No
+
+Parameters overload:
+
+*   `string callback`: a callback or property for the size.
+
+    If the value is an integer, the size is fixed to this value.
+
+    If the value is a `(int, int)` tuple, a `Vector2`/`Vector2Int`, the size will be limited to the range. If any value in the range is `< 0`, then the side is not limited. For example, `(1, -1)` means the size is at least 1. `(-1, 20)` means the max size is 20.
+
+    If the value is a `Vector3`/`Vector3Int`, then the `x`, `y` value will be used as the limit
+
+    If the min `>= 0` and the max `< min`, the max value will be ignored
+
+*   `string groupBy = ""` for error message grouping
+
+*   Allow Multiple: Yes
 
 For example:
 
@@ -2738,7 +2753,17 @@ public string[] myArr;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/4a2f3d42-d574-4212-a57a-76328fbf218f)
 
+```csharp
+using SaintsField;
+using SaintsField.Playa;
 
+[MinValue(1), Range(1, 10)] public int intValue;
+[ArraySize(nameof(intValue)), ListDrawerSettings] public string[] dynamic1;
+
+[Space]
+public Vector2Int v2Value;
+[ArraySize(nameof(v2Value)), ListDrawerSettings] public string[] dynamic2;
+```
 
 #### `PlayaArraySize` ####
 

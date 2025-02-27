@@ -121,12 +121,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 Debug.Log(
                     $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; preCheckResult.ArraySize={preCheckResult.ArraySize}, curSize={FieldWithInfo.SerializedProperty.arraySize}");
 #endif
+                // Debug.Log(preCheckResult.ArraySize);
                 if (preCheckResult.ArraySize.min != -1 || preCheckResult.ArraySize.max != -1)
                 {
                     int sizeMin = preCheckResult.ArraySize.min;
                     int sizeMax = preCheckResult.ArraySize.max;
 
                     bool changed = false;
+                    // Debug.Log($"sizeMin={sizeMin}, sizeMax={sizeMax}, arraySize={FieldWithInfo.SerializedProperty.arraySize}");
                     if (sizeMin >= 0 && FieldWithInfo.SerializedProperty.arraySize < sizeMin)
                     {
                         FieldWithInfo.SerializedProperty.arraySize = sizeMin;
@@ -135,6 +137,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     if(sizeMax >= 0 && FieldWithInfo.SerializedProperty.arraySize > sizeMax)
                     {
                         FieldWithInfo.SerializedProperty.arraySize = sizeMax;
+                        // Debug.Log($"size to {sizeMax} for min");
                         changed = true;
                     }
 

@@ -14,19 +14,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public abstract partial class AbsRenderer
     {
-        public virtual void RenderIMGUI(float width)
+        public void RenderIMGUI(float width)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
-            if (!preCheckResult.IsShown)
+            float height = GetHeightIMGUI(width);
+            if (height <= Mathf.Epsilon)
             {
                 return;
             }
-            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
-            {
-                RenderAboveIMGUI();
-                RenderTargetIMGUI(width, preCheckResult);
-                RenderBelowIMGUI();
-            }
+            Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
+            RenderPositionTargetIMGUI(rect, preCheckResult);
         }
 
         private class FakeDisposable : IDisposable
@@ -244,16 +241,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return totalHeight;
         }
 
-        public virtual void RenderPositionIMGUI(Rect position)
+        public void RenderPositionIMGUI(Rect position)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
-            if (!preCheckResult.IsShown)
-            {
-                return;
-            }
-
             Rect aboveRect = RenderAbovePosition(position);
-
             float targetHeight = GetFieldHeightIMGUI(position.width, preCheckResult);
             (Rect targetRect, Rect belowRect) = RectUtils.SplitHeightRect(aboveRect, targetHeight);
             RenderPositionTargetIMGUI(targetRect, preCheckResult);

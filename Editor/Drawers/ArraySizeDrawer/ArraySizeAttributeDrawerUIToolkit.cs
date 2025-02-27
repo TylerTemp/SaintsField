@@ -75,6 +75,9 @@ namespace SaintsField.Editor.Drawers.ArraySizeDrawer
 
             bool changed = false;
             int curSize = arrProp.arraySize;
+
+            // Debug.Log($"{curSize}: {_min}/{_max}");
+
             if (_min >= 0 && curSize < _min)
             {
                 // Debug.Log($"change array size {curSize} to min {arraySizeAttribute.Min}");

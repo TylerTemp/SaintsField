@@ -89,6 +89,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             InvokeCallback(callback, newValue, parent);
         }
 
+
         public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo?.Name ?? FieldWithInfo.SerializedProperty.displayName}>";
     }
 }

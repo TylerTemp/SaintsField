@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.32.0 ##
+
+1.  `ArraySize` now support callback argument to dynamicly limit the size.
+2.  UI Toolkit: fix a bug that `ListDrawerSettings` without paging can not set the size correctly.
+
 ## 3.31.1 ##
 
 1.  `SaintsDictionary` now can flatten fields the key/value of a general strict/class

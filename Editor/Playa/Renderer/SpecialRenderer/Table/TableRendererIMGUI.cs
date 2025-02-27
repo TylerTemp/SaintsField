@@ -21,9 +21,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                 : EditorGUIUtility.singleLineHeight;
         }
 
-        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        protected override void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
-            // TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().First();
 
             bool needIndent = SaintsRendererGroup.IMGUINeedIndentFix && (FieldWithInfo.SerializedProperty.isArray ||
                                                                          FieldWithInfo.SerializedProperty
@@ -53,13 +52,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                             left,
                             FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0), useGUIContent);
                     }
-
-                    // Rect dropArea = expanded
-                    //     ? new Rect(foldout)
-                    //     {
-                    //         height = EditorGUIUtility.singleLineHeight,
-                    //     }
-                    //     : foldout;
 
                     DragAndDropImGui(foldout, ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType), FieldWithInfo.SerializedProperty);
                 }

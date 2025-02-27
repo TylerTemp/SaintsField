@@ -10,20 +10,17 @@ namespace SaintsField.Editor.Playa.Renderer
             return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
         }
 
-        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        protected override void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
-            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
-            {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
-                Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
+            Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
 #endif
 
-                GUIContent useGUIContent = preCheckResult.HasRichLabel
-                    ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length), tooltip: FieldWithInfo.SerializedProperty.tooltip)
-                    : new GUIContent(FieldWithInfo.SerializedProperty.displayName, tooltip: FieldWithInfo.SerializedProperty.tooltip);
+            GUIContent useGUIContent = preCheckResult.HasRichLabel
+                ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length), tooltip: FieldWithInfo.SerializedProperty.tooltip)
+                : new GUIContent(FieldWithInfo.SerializedProperty.displayName, tooltip: FieldWithInfo.SerializedProperty.tooltip);
 
-                EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, useGUIContent, true);
-            }
+            EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, useGUIContent, true);
         }
 
         protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)

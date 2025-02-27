@@ -27,15 +27,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             // ArraySizeAttribute arraySizeAttribute =
             //     FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
 
-            (ListView listView, Button addButton, Button removeButton) = MakeListDrawerSettingsField(listDrawerSettingsAttribute);
+            (VisualElement root, Button addButton, Button removeButton) = MakeListDrawerSettingsField(listDrawerSettingsAttribute, FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault());
             _addButton = addButton;
             _removeButton = removeButton;
 
-            return (listView, false);
+            return (root, false);
         }
 
-        private (ListView listView, Button addButton, Button removeButton) MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        private (VisualElement root, Button addButton, Button removeButton) MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, ArraySizeAttribute arraySizeAttribute)
         {
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    position = Position.Relative,
+                },
+            };
             SerializedProperty property = FieldWithInfo.SerializedProperty;
 
             // int numberOfItemsPerPage = 0;
@@ -53,7 +61,17 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log(($"bind: {index}, propIndex: {itemIndexToPropertyIndex[index]}, itemIndexes={string.Join(", ", itemIndexToPropertyIndex)}"));
 #endif
-                SerializedProperty prop = property.GetArrayElementAtIndex(itemIndexToPropertyIndex[index]);
+                if(index >= itemIndexToPropertyIndex.Count)
+                {
+                    return;
+                }
+
+                int propIndex = itemIndexToPropertyIndex[index];
+                if(propIndex >= property.arraySize)
+                {
+                    return;
+                }
+                SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
                 PropertyField propertyField = (PropertyField)propertyFieldRaw;
                 propertyField.BindProperty(prop);
             }
@@ -64,7 +82,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 bindItem = BindItem,
                 selectionType = SelectionType.Multiple,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
+                // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
+                showBoundCollectionSize = false,
                 showFoldoutHeader = true,
                 headerTitle = property.displayName,
                 showAddRemoveFooter = true,
@@ -73,6 +92,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 style =
                 {
                     flexGrow = 1,
+                    position = Position.Relative,
                 },
             };
 
@@ -259,8 +279,10 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             // don't use TrackPropertyValue because if you remove anything from list, it gives error
             // this is Unity's fault
             // result.TrackPropertyValue(property, p =>
-            listView.TrackSerializedObjectValue(property.serializedObject, _ =>
+            // listView.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
+            listView.TrackPropertyValue(property, _ =>
             {
+                // Debug.Log($"property changed: {arraySize} -> {property.arraySize}");
                 int newSize;
                 try
                 {
@@ -274,6 +296,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 {
                     return;
                 }
+
+                // Debug.Log($"size check {arraySize}/{newSize}");
 
                 if (newSize == arraySize)
                 {
@@ -301,9 +325,39 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1, numberOfItemsPerPageField.value));
             numberOfItemsTotalField.RegisterValueChangedCallback(e =>
             {
-                property.arraySize = e.newValue;
-                property.serializedObject.ApplyModifiedProperties();
-                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                int min = -1;
+                int max = -1;
+                if (arraySizeAttribute != null)
+                {
+                    (string error, bool dynamic, int min, int max) getArraySize = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, property, FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                    if(getArraySize.error == "")
+                    {
+                        min = getArraySize.min;
+                        max = getArraySize.max;
+                    }
+                }
+
+                int newSize = e.newValue;
+
+                if(min > 0 && newSize < min)
+                {
+                    newSize = min;
+                }
+                else if(max > 0 && newSize > max)
+                {
+                    newSize = max;
+                }
+
+                if(property.arraySize != newSize)
+                {
+                    property.arraySize = newSize;
+                    property.serializedObject.ApplyModifiedProperties();
+                    UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                }
+                else
+                {
+                    numberOfItemsTotalField.SetValueWithoutNotify(property.arraySize);
+                }
             });
 
             void UpdateNumberOfItemsPerPage(int newValue)
@@ -367,7 +421,17 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             pagingContainer.Add(numberOfItemsPerPageField);
             pagingContainer.Add(numberOfItemsSep);
-            pagingContainer.Add(numberOfItemsTotalField);
+            if(listDrawerSettingsAttribute.NumberOfItemsPerPage > 0)
+            {
+                pagingContainer.Add(numberOfItemsTotalField);
+            }
+            else
+            {
+                numberOfItemsTotalField.style.position = Position.Absolute;
+                numberOfItemsTotalField.style.right = 2;
+                numberOfItemsTotalField.style.top = 1;
+                numberOfItemsTotalField.style.minWidth = 50;
+            }
             pagingContainer.Add(numberOfItemsDesc);
 
             pagingContainer.Add(pagePreButton);
@@ -433,8 +497,14 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             foldoutContent.Insert(0, preContent);
 
             // UpdateAddRemoveButtons();
+            root.Add(listView);
 
-            return (listView, listViewAddButton, listViewRemoveButton);
+            if (listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0)
+            {
+                root.Add(numberOfItemsTotalField);
+            }
+
+            return (root, listViewAddButton, listViewRemoveButton);
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
