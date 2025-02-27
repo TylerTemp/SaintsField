@@ -121,12 +121,27 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 Debug.Log(
                     $"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; preCheckResult.ArraySize={preCheckResult.ArraySize}, curSize={FieldWithInfo.SerializedProperty.arraySize}");
 #endif
-                if (preCheckResult.ArraySize != -1 &&
-                    ((preCheckResult.ArraySize == 0 && FieldWithInfo.SerializedProperty.arraySize > 0)
-                     || (preCheckResult.ArraySize >= 1 && FieldWithInfo.SerializedProperty.arraySize == 0)))
+                if (preCheckResult.ArraySize.min != -1 || preCheckResult.ArraySize.max != -1)
                 {
-                    FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
-                    FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                    int sizeMin = preCheckResult.ArraySize.min;
+                    int sizeMax = preCheckResult.ArraySize.max;
+
+                    bool changed = false;
+                    if (sizeMin >= 0 && FieldWithInfo.SerializedProperty.arraySize < sizeMin)
+                    {
+                        FieldWithInfo.SerializedProperty.arraySize = sizeMin;
+                        changed = true;
+                    }
+                    if(sizeMax >= 0 && FieldWithInfo.SerializedProperty.arraySize > sizeMax)
+                    {
+                        FieldWithInfo.SerializedProperty.arraySize = sizeMax;
+                        changed = true;
+                    }
+
+                    if (changed)
+                    {
+                        FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                    }
                 }
             }
 

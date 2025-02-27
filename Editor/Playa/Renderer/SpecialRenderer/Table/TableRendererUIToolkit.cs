@@ -13,8 +13,10 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
     {
         private static string NameTableContainer(SerializedProperty property)
         {
-            return $"saints-table-container-{property.propertyPath}";
+            return $"saints-table-container-{SerializedUtils.GetUniqueId(property)}";
         }
+
+        private bool _hasSize;
 
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
@@ -26,16 +28,46 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                 name = NameTableContainer(FieldWithInfo.SerializedProperty),
             };
 
-            Type elementType =
-                ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
-                                            FieldWithInfo.PropertyInfo.PropertyType);
-
-            FillTable(FieldWithInfo.SerializedProperty, result, elementType, FieldWithInfo.SerializedProperty);
+            // Type elementType =
+            //     ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+            //                                 FieldWithInfo.PropertyInfo.PropertyType);
+            //
+            // _hasSize = FillTable(FieldWithInfo.SerializedProperty, result, elementType, FieldWithInfo.SerializedProperty);
+            FillTableToContainer(result);
 
             return (result, true);
         }
 
-        private static void FillTable(SerializedProperty arrayProperty, VisualElement result, Type elementType, SerializedProperty property)
+        private void FillTableToContainer(VisualElement container)
+        {
+            container.Clear();
+            Type elementType =
+                ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+                                            FieldWithInfo.PropertyInfo.PropertyType);
+
+            _hasSize = FillTable(FieldWithInfo.SerializedProperty, container, elementType, FieldWithInfo.SerializedProperty);
+        }
+
+        protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
+        {
+            PreCheckResult result = base.OnUpdateUIToolKit(root);
+
+            int curSize = FieldWithInfo.SerializedProperty.arraySize;
+            // ReSharper disable once InvertIf
+            if ((curSize > 0 && !_hasSize)
+                || (curSize == 0 && _hasSize))
+            {
+                VisualElement tableContainer =
+                    root.Q<VisualElement>(name: NameTableContainer(FieldWithInfo.SerializedProperty));
+                // tableContainer.Clear();
+
+                FillTableToContainer(tableContainer);
+            }
+
+            return result;
+        }
+
+        private static bool FillTable(SerializedProperty arrayProperty, VisualElement result, Type elementType, SerializedProperty property)
         {
             bool hasSize = arrayProperty.arraySize > 0;
             SerializedProperty targetProperty = hasSize
@@ -101,6 +133,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
             {
                 result.Add(propField);
             }
+
+            return hasSize;
         }
     }
 }

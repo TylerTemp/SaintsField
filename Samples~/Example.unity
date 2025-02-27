@@ -5083,10 +5083,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   intValue: 1
-  dynamic1: []
+  dynamic1:
+  - 
   v2Value: {x: 2, y: 4}
-  dynamic2: []
-  dynamic3: []
+  dynamic2:
+  - 
+  - 
+  dynamic3:
+  - 
+  - 
+  - 
+  - 
+  zeroUpdateValue: 5
+  dynamic4:
+  - 
+  - 
+  - 
+  - 
+  - 
 --- !u!1 &676684123
 GameObject:
   m_ObjectHideFlags: 0
@@ -26757,6 +26771,25 @@ MonoBehaviour:
     myString: 
     myObject: {fileID: 0}
   min1Max3:
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  intValue: 4
+  dynamicFixed:
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  v2Value: {x: 1, y: 3}
+  dynamicRange:
   - myInt: 0
     myString: 
     myObject: {fileID: 0}

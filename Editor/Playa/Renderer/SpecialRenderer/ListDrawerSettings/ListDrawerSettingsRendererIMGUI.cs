@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 {
@@ -127,35 +127,63 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
                 if(arraySizeAttribute != null)
                 {
-                    if(arraySizeAttribute.Min > 0)
+                    (string error, bool dynamic, int min, int max) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
+                        FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                    if (error == "")
                     {
-                        // _imGuiReorderableList.displayRemove = true;
-                        // _imGuiReorderableList.onRemoveCallback += r =>
-                        // {
-                        //     Debug.Log(r);
-                        // };
-                        _imGuiReorderableList.onCanRemoveCallback += r =>
+                        if (dynamic)
                         {
-                            bool canRemove = r.count > arraySizeAttribute.Min;
-                            // Debug.Log($"canRemove={canRemove}, count={r.count}, min={arraySizeAttribute.Min}");
-                            return canRemove;
-                        };
+                            _imGuiReorderableList.onCanRemoveCallback += r =>
+                            {
+                                (string removeError, bool _, int removeMin, int _) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
+                                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                                if (removeError != "")
+                                {
+                                    return true;
+                                }
+                                bool canRemove = r.count > removeMin;
+                                // Debug.Log($"canRemove={canRemove}, count={r.count}, min={arraySizeAttribute.Min}");
+                                return canRemove;
+                            };
+                            _imGuiReorderableList.onCanAddCallback += r =>
+                            {
+                                (string addError, bool _, int _, int addMax) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
+                                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                                if (addError != "")
+                                {
+                                    return true;
+                                }
+                                bool canAdd = r.count < addMax;
+                                // Debug.Log($"canAdd={canAdd}, count={r.count}, max={arraySizeAttribute.Max}");
+                                return canAdd;
+                            };
+                        }
+                        else
+                        {
+                            if(min > 0)
+                            {
+                                _imGuiReorderableList.onCanRemoveCallback += r =>
+                                {
+                                    bool canRemove = r.count > min;
+                                    // Debug.Log($"canRemove={canRemove}, count={r.count}, min={arraySizeAttribute.Min}");
+                                    return canRemove;
+                                };
+                            }
+                            if (max > 0)
+                            {
+                                _imGuiReorderableList.onCanAddCallback += r =>
+                                {
+                                    bool canAdd = r.count < max;
+                                    // Debug.Log($"canAdd={canAdd}, count={r.count}, max={arraySizeAttribute.Max}");
+                                    return canAdd;
+                                };
+                            }
+                        }
                     }
 
-                    if (arraySizeAttribute.Max > 0)
-                    {
-                        _imGuiReorderableList.onCanAddCallback += r =>
-                        {
-                            bool canAdd = r.count < arraySizeAttribute.Max;
-                            // Debug.Log($"canAdd={canAdd}, count={r.count}, max={arraySizeAttribute.Max}");
-                            return canAdd;
-                        };
-                    }
                     // _imGuiReorderableList.onCanAddCallback += _ => !(arraySizeAttribute.Min >= 0 && property.arraySize <= arraySizeAttribute.Min);
                 }
             }
-
-
 
             // Debug.Log(ReorderableList.defaultBehaviours);
             // Debug.Log(ReorderableList.defaultBehaviours.headerBackground);
@@ -541,11 +569,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 arraySize = FieldWithInfo.SerializedProperty.arraySize;
             }
 
-            if (preCheckResult.ArraySize != -1 && FieldWithInfo.SerializedProperty.arraySize != preCheckResult.ArraySize)
-            {
-                FieldWithInfo.SerializedProperty.arraySize = preCheckResult.ArraySize;
-            }
-
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
@@ -577,7 +600,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
         protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
-
             float height = GetFieldHeightIMGUI(width, preCheckResult);
             Rect position = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
             RenderPositionTargetIMGUI(position, preCheckResult);

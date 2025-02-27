@@ -1,8 +1,9 @@
-﻿#if UNITY_2022_2_OR_NEWER
+﻿#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_FUCKED_UP
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -41,8 +42,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             VisualElement root = new VisualElement();
 
-            ArraySizeAttribute arraySizeAttribute = allAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
-
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
             if(itemIsObject)
             {
@@ -65,27 +64,18 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         root.Clear();
                         property.objectReferenceValue = evt.newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        root.Add(BuildContent(arraySizeAttribute, root, property, info));
+                        root.Add(BuildContent(arrayProp, root, property, info));
                     });
                     return root;
                 }
             }
 
-            BuildContent(arraySizeAttribute, root, property, info);
+            BuildContent(arrayProp, root, property, info);
             return root;
         }
 
-        private VisualElement BuildContent(ArraySizeAttribute arraySizeAttribute, VisualElement root, SerializedProperty property, FieldInfo info)
+        private VisualElement BuildContent(SerializedProperty arrayProp, VisualElement root, SerializedProperty property, FieldInfo info)
         {
-            int min = 0;
-            int max = int.MaxValue;
-            if (arraySizeAttribute != null)
-            {
-                min = arraySizeAttribute.Min;
-                max = arraySizeAttribute.Max;
-                // Debug.Log($"{min} ~ {max}");
-            }
-
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -93,14 +83,14 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             {
                 return new VisualElement();
             }
-            (string error, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
+            // (string error, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
 
             _preArraySize = arrayProp.arraySize;
 
-            if (error != "")
-            {
-                return new HelpBox(error, HelpBoxMessageType.Error);
-            }
+            // if (error != "")
+            // {
+            //     return new HelpBox(error, HelpBoxMessageType.Error);
+            // }
 
             // controls
             VisualElement controls = new VisualElement
@@ -379,29 +369,71 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     multiColumnListView.itemsSource = MakeSource(arrayProp);
                     multiColumnListView.Rebuild();
                     arraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
-                    // container.Q<IntegerField>(name: NameArraySize(property)).SetValueWithoutNotify(arrayProp.arraySize);
-
-                    if (arraySizeAttribute != null)
-                    {
-                        // Debug.Log($"{arrayProp.arraySize}: {min} ~ {max}");
-                        addButton.SetEnabled(arrayProp.arraySize < max);
-                        removeButton.SetEnabled(arrayProp.arraySize > min);
-                    }
                 }
             });
 
-            if (arraySizeAttribute != null)
-            {
-                addButton.SetEnabled(arrayProp.arraySize < max);
-                removeButton.SetEnabled(arrayProp.arraySize > min);
+            return root;
+        }
 
-                if (arraySizeAttribute.Min == arraySizeAttribute.Max)
-                {
-                    arraySizeField.SetEnabled(false);
-                }
+        private ArraySizeAttribute _arraySizeAttribute;
+        private bool _dynamic;
+        private int _min;
+        private int _max;
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            _arraySizeAttribute = allAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
+            if (_arraySizeAttribute == null)
+            {
+                return;
             }
 
-            return root;
+            (string error, bool dynamic, int min, int max) = ArraySizeAttributeDrawer.GetMinMax(_arraySizeAttribute, property, info, parent);
+            if (error != "")
+            {
+                return;
+            }
+
+            _dynamic = dynamic;
+            _min = min;
+            _max = max;
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        {
+            (string arrayError, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
+            if (arrayError != "")
+            {
+                return;
+            }
+
+            if (_dynamic)
+            {
+                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if (parent == null)
+                {
+                    return;
+                }
+
+                (string error, bool _, int min, int max) = ArraySizeAttributeDrawer.GetMinMax(_arraySizeAttribute, property, info, parent);
+                if (error != "")
+                {
+                    return;
+                }
+
+                _min = min;
+                _max = max;
+            }
+
+            Button addButton = container.Q<Button>(name: NameAddButton(property));
+            Button removeButton = container.Q<Button>(name: NameRemoveButton(property));
+
+            // Debug.Log($"{arrayProp.arraySize}: {_max}");
+
+            addButton.SetEnabled(arrayProp.arraySize < _max);
+            removeButton.SetEnabled(arrayProp.arraySize > _min);
         }
 
         // this does not work because Unity internally update the style using inline
@@ -463,7 +495,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         }
     }
 }
-#elif UNITY_2021_3_OR_NEWER
+#elif UNITY_2021_3_OR_NEWER || SAINTSFIELD_DEBUG_UNITY_FUCKED_UP
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;

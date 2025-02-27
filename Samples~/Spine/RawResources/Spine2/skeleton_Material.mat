@@ -31,6 +31,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Cutoff: 0.1
+    - _Fill: 0
     - _OutlineMipLevel: 0
     - _OutlineOpaqueAlpha: 1
     - _OutlineReferenceTexWidth: 1024

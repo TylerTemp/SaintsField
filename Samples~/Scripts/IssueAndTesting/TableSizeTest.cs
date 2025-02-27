@@ -22,5 +22,16 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting
         [Table]
         [ArraySize(1, 3)]
         public MyStruct[] min1Max3;
+
+        [MinValue(0)]
+        public int intValue;
+        [Table]
+        [ArraySize(nameof(intValue))]
+        public MyStruct[] dynamicFixed;
+
+        public Vector2Int v2Value;
+        [Table]
+        [ArraySize(nameof(v2Value))]
+        public MyStruct[] dynamicRange;
     }
 }

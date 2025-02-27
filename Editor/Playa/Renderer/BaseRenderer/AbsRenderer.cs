@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
@@ -22,7 +23,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             public bool IsShown;
             public bool IsDisabled;
-            public int ArraySize;  // NOTE: -1=No Limit, 0=0, 1=More Than 0
+            // public int ArraySize;  // NOTE: -1=No Limit, 0=0, 1=More Than 0
+            public (int min, int max) ArraySize;
             public bool HasRichLabel;
             public string RichLabelXml;
         }
@@ -54,7 +56,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         protected PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo, bool isImGui)
         {
             List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>();
-            int arraySize = -1;
+            (int, int) arraySize = (-1, -1);
             foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
             {
                 switch (playaAttribute)
@@ -90,7 +92,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             arraySize = fieldWithInfo.SerializedProperty.isArray
                                 ? GetArraySize(arraySizeAttribute, fieldWithInfo.SerializedProperty,
                                     fieldWithInfo.FieldInfo, fieldWithInfo.Target, isImGui)
-                                : -1;
+                                : (-1, -1);
                         }
                         break;
                 }
@@ -151,37 +153,36 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private bool _getByXPathKeepUpdate = true;
 
-        private int GetArraySize(IPlayaArraySizeAttribute genArraySizeAttribute, SerializedProperty property, FieldInfo info, object parent, bool isImGui)
+        private (int min, int max) GetArraySize(IPlayaArraySizeAttribute genArraySizeAttribute, SerializedProperty property, FieldInfo info, object parent, bool isImGui)
         {
             switch (genArraySizeAttribute)
             {
 #pragma warning disable 0618
                 case PlayaArraySizeAttribute playaArraySizeAttribute:
-                    return playaArraySizeAttribute.Size;
+                    return (playaArraySizeAttribute.Size, playaArraySizeAttribute.Size);
 #pragma warning restore 0618
                 case ArraySizeAttribute arraySizeAttribute:
-                    return arraySizeAttribute.Min;
-                // case GetComponentInParentsAttribute getComponentInParentsAttribute:
-                //     return GetComponentInParentsAttributeDrawer.HelperGetArraySize(property, getComponentInParentsAttribute, info);
-                // case GetComponentInSceneAttribute getComponentInSceneAttribute:
-                //     return GetComponentInSceneAttributeDrawer.HelperGetArraySize(getComponentInSceneAttribute, info);
-                // case GetComponentByPathAttribute getComponentByPathAttribute:
-                //     return GetComponentByPathAttributeDrawer.HelperGetArraySize(property, getComponentByPathAttribute, info);
-                // case GetPrefabWithComponentAttribute getPrefabWithComponentAttribute:
-                //     return GetPrefabWithComponentAttributeDrawer.HelperGetArraySize(getPrefabWithComponentAttribute, info);
-                // case GetScriptableObjectAttribute getScriptableObjectAttribute:
-                //     return GetScriptableObjectAttributeDrawer.HelperGetArraySize(getScriptableObjectAttribute, info);
+                {
+                    (string error, bool _, int min, int max) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, property, info, parent);
+#if SAINTSFIELD_DEBUG
+                    if (error != "")
+                    {
+                        Debug.LogError(error);
+                    }
+#endif
+                    return (min, max);
+                }
                 case GetByXPathAttribute _:
                 {
                     if (!_getByXPathKeepUpdate)
                     {
-                        return -1;
+                        return (-1, -1);
                     }
                     _getByXPathKeepUpdate = GetByXPathAttributeDrawer.HelperGetArraySize(property, info, isImGui);
                 }
-                    return -1;
+                    return (-1, -1);
                 default:
-                    return -1;
+                    return (-1, -1);
             }
         }
 

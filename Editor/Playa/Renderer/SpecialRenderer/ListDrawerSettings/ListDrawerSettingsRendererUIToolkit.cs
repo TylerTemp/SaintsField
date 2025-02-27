@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -13,23 +14,27 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 {
     public partial class ListDrawerSettingsRenderer
     {
-        private PropertyField _result;
-        private VisualElement _fieldElement;
+        // private PropertyField _result;
+        // private VisualElement _fieldElement;
+
+        private Button _addButton;
+        private Button _removeButton;
 
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
             ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
             Debug.Assert(listDrawerSettingsAttribute != null, $"{FieldWithInfo.SerializedProperty.propertyPath}");
-            ArraySizeAttribute arraySizeAttribute =
-                FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
+            // ArraySizeAttribute arraySizeAttribute =
+            //     FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
 
-            VisualElement result = MakeListDrawerSettingsField(listDrawerSettingsAttribute, arraySizeAttribute?.Min ?? -1,
-                arraySizeAttribute?.Max ?? -1);
+            (ListView listView, Button addButton, Button removeButton) = MakeListDrawerSettingsField(listDrawerSettingsAttribute);
+            _addButton = addButton;
+            _removeButton = removeButton;
 
-            return (result, false);
+            return (listView, false);
         }
 
-        private VisualElement MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, int minSize, int maxSize)
+        private (ListView listView, Button addButton, Button removeButton) MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute)
         {
             SerializedProperty property = FieldWithInfo.SerializedProperty;
 
@@ -247,7 +252,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 listView.itemsSource = curPageItems;
                 // Debug.Log("rebuild listView");
                 listView.Rebuild();
-                UpdateAddRemoveButtons();
+                // UpdateAddRemoveButtons();
             }
 
             int arraySize = property.arraySize;
@@ -279,15 +284,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 numberOfItemsTotalField.SetValueWithoutNotify(arraySize);
                 UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
             });
-
-            void UpdateAddRemoveButtons()
-            {
-                int curSize = property.arraySize;
-                bool canNotAddMore = maxSize >= 0 && curSize >= maxSize;
-                listViewAddButton.SetEnabled(!canNotAddMore);
-                bool canNotRemoveMore = minSize >= 0 && curSize <= minSize;
-                listViewRemoveButton.SetEnabled(!canNotRemoveMore);
-            }
 
             searchField.RegisterValueChangedCallback(_ =>
             {
@@ -436,9 +432,24 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             foldoutContent.Insert(0, preContent);
 
-            UpdateAddRemoveButtons();
+            // UpdateAddRemoveButtons();
 
-            return listView;
+            return (listView, listViewAddButton, listViewRemoveButton);
+        }
+
+        protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
+        {
+            PreCheckResult result = base.OnUpdateUIToolKit(root);
+
+            (int minSize, int maxSize) = result.ArraySize;
+
+            int curSize = FieldWithInfo.SerializedProperty.arraySize;
+            bool canNotAddMore = maxSize >= 0 && curSize >= maxSize;
+            _addButton.SetEnabled(!canNotAddMore);
+            bool canNotRemoveMore = minSize >= 0 && curSize <= minSize;
+            _removeButton.SetEnabled(!canNotRemoveMore);
+
+            return result;
         }
     }
 }

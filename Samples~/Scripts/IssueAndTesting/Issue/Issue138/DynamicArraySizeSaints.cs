@@ -16,5 +16,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue138
         private (int min, int max) TupleCallback() => (intValue, intValue + 3);
         [Space]
         [ArraySize(nameof(TupleCallback)), ListDrawerSettings] public string[] dynamic3;
+
+        public int zeroUpdateValue;
+
+        [ArraySize(nameof(zeroUpdateValue)), ListDrawerSettings] public string[] dynamic4;
     }
 }
