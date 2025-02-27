@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
-            string[] scenes = GetScenes();
+            string[] scenes = GetTrimedScenePath(((SceneAttribute)saintsAttribute).FullPath);
 
             // const string optionName = "Edit Scenes In Build...";
             string[] sceneOptions = scenes

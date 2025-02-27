@@ -768,6 +768,10 @@ public LayerMask myLayerMask;
 
 A dropdown selector for a scene in the build list, plus a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
 
+**Parameters**:
+
+*   `bool fullPath = false`: `true` to use the full-path name, `false` to use the scene name only. Useful if you have the same scene name under different path. Only works for string field type.
+
 *   AllowMultiple: No
 
 ```csharp
@@ -775,6 +779,7 @@ using SaintsField;
 
 [Scene] public int _sceneInt;
 [Scene] public string _sceneString;
+[Scene(true)] public string _sceneFullPath;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/0da47bd1-0741-4707-b96b-6c08e4c5844c)

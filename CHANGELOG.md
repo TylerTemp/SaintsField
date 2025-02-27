@@ -4,6 +4,8 @@
 
 1.  Add Auto Validator for `MinValue`, fix `MinValue` not get called on first inspecting of the field in IMGUI. Fix `MinValue` use shared error message when using on a list in IMGUI.
 2.  Same fix for `MaxValue`
+3.  Refactor IMGUI drawer when no attribute is provided
+4.  `Scene` add a parameter to allow to save a full-path scene name in build rather than just the name
 
 ## 3.32.0 ##
 

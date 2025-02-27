@@ -13,5 +13,12 @@ namespace SaintsField
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
+
+        public readonly bool FullPath;
+
+        public SceneAttribute(bool fullPath = false)
+        {
+            FullPath = fullPath;
+        }
     }
 }

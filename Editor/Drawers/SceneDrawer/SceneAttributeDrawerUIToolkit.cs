@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
         {
             UIToolkitUtils.DropdownButtonField buttonLabel =
                 container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
-            (int _, string displayName) = GetSelected(property);
+            (int _, string displayName) = GetSelected(property, (SceneAttribute)saintsAttribute);
             buttonLabel.ButtonLabelElement.text = displayName;
 
             container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).ButtonElement.clicked += () =>
@@ -60,13 +60,13 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, object parent, Action<object> onChange)
         {
-            string[] scenes = GetScenes();
+            string[] scenes = GetTrimedScenePath(((SceneAttribute)saintsAttribute).FullPath);
 
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
             UIToolkitUtils.DropdownButtonField buttonDropdown =
                 container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
 
-            (int selectedIndex, string _) = GetSelected(property);
+            (int selectedIndex, string _) = GetSelected(property, (SceneAttribute)saintsAttribute);
 
             foreach (int index in Enumerable.Range(0, scenes.Length))
             {
@@ -103,9 +103,9 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             genericDropdownMenu.DropDown(buttonDropdown.ButtonElement.worldBound, buttonDropdown, true);
         }
 
-        private static (int index, string displayName) GetSelected(SerializedProperty property)
+        private static (int index, string displayName) GetSelected(SerializedProperty property, SceneAttribute sceneAttribute)
         {
-            string[] scenes = GetScenes();
+            string[] scenes = GetTrimedScenePath(sceneAttribute.FullPath);
             if (property.propertyType == SerializedPropertyType.String)
             {
                 string scene = property.stringValue;
