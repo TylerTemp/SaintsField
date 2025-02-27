@@ -81,16 +81,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.31.1**
+**3.32.0**
 
-1.  `SaintsDictionary` now can flatten fields the key/value of a general strict/class
-2.  `OnButtonClick` and `OnEvent` in UI Toolkit now can check the event signing while the target is being inspected
-3.  Remove a log when rich label has a bad label format
-4.  `Expandable` now support addressable reference
-5.  UI Toolkit: `Expandable` now support a `GameObject`
+1.  `ArraySize` now support callback argument to dynamicly limit the size.
+2.  UI Toolkit: fix a bug that `ListDrawerSettings` without paging can not set the size correctly.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
-
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -2764,6 +2760,8 @@ using SaintsField.Playa;
 public Vector2Int v2Value;
 [ArraySize(nameof(v2Value)), ListDrawerSettings] public string[] dynamic2;
 ```
+
+[![video](https://github.com/user-attachments/assets/fdf756bc-b548-4047-a667-b15887055b2e)](https://github.com/user-attachments/assets/bc3b3387-08b7-45da-9597-1333edb31c95)
 
 #### `PlayaArraySize` ####
 

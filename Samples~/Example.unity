@@ -5087,14 +5087,10 @@ MonoBehaviour:
   v2Value: {x: 1, y: 3}
   dynamic2:
   - 
-  - 
-  - 
   dynamic3:
   - 
-  zeroUpdateValue: 2
-  dynamic4:
-  - 
-  - 
+  zeroUpdateValue: 0
+  dynamic4: []
 --- !u!1 &676684123
 GameObject:
   m_ObjectHideFlags: 0
