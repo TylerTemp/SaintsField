@@ -8,10 +8,11 @@
 4.  `Scene` add a parameter to allow to save a full-path scene name in build rather than just the name
 5.  `ParticlePlay` now will disable the button if the target gameObject is not active. It no longer report an error if the target is `null`. Use `Required` for this purpose.
 6.  Rename `FuckDOTween` to `DOTweenDetectPanel` [#152](https://github.com/TylerTemp/SaintsField/issues/152)
+7.  Add `EXP.ForceReOrder` to config auto getters to re-order the result (old behavior). This will make the list/array un-reorderable. [#153](https://github.com/TylerTemp/SaintsField/issues/153)
 
 ## 3.32.0 ##
 
-1.  `ArraySize` now support callback argument to dynamicly limit the size.
+1.  `ArraySize` now support callback argument to dynamically limit the size.
 2.  UI Toolkit: fix a bug that `ListDrawerSettings` without paging can not set the size correctly.
 
 ## 3.31.1 ##

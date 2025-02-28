@@ -89,6 +89,7 @@ namespace: `SaintsField`
 4.  `Scene` add a parameter to allow to save a full-path scene name in build rather than just the name
 5.  `ParticlePlay` now will disable the button if the target gameObject is not active. It no longer report an error if the target is `null`. Use `Required` for this purpose.
 6.  Rename `FuckDOTween` to `DOTweenDetectPanel` [#152](https://github.com/TylerTemp/SaintsField/issues/152)
+7.  Add `EXP.ForceReOrder` to config auto getters to re-order the result (old behavior). This will make the list/array un-reorderable. [#153](https://github.com/TylerTemp/SaintsField/issues/153)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5518,6 +5519,7 @@ using multiple filters means all conditions must be met. Otherwise, use the keyw
 *   `NoMessage`: when `NoAutoResign` and `NOResignButton` is on, by default there will be an error box when value is mismatched. Turn this on to hide the error message.
 *   `NoPicker`: this will remove the custom picker. This is on by default (if you do not pass `EXP` as first argument) to keep the consistency.
 *   `KeepOriginalPicker`: UI Toolkit only. By default, when a custom picker is shown, Unity's default picker will hide. This will keep Unity's picker together.
+*   `ForceReOrder`: Force the auto-getters to changes the order the way how the resources are found for list/array. This is useful when you want to get children of way points, as the order is important.
 
 And some shortcut:
 
