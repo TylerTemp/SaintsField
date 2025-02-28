@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.FuckDOTween
+namespace SaintsField.Editor.DOTweenDetectPanel
 {
     // ReSharper disable once InconsistentNaming
     public class DOTweenHelperPanel: EditorWindow
