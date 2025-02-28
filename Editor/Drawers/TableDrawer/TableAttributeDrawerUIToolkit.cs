@@ -1,4 +1,4 @@
-﻿#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_FUCKED_UP
+﻿#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -495,7 +495,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         }
     }
 }
-#elif UNITY_2021_3_OR_NEWER || SAINTSFIELD_DEBUG_UNITY_FUCKED_UP
+#elif UNITY_2021_3_OR_NEWER || SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;

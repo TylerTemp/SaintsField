@@ -1,11 +1,13 @@
 # Changelog
 
-## WIP ##
+## 3.32.1 ##
 
 1.  Add Auto Validator for `MinValue`, fix `MinValue` not get called on first inspecting of the field in IMGUI. Fix `MinValue` use shared error message when using on a list in IMGUI.
 2.  Same fix for `MaxValue`
 3.  Refactor IMGUI drawer when no attribute is provided
 4.  `Scene` add a parameter to allow to save a full-path scene name in build rather than just the name
+5.  `ParticlePlay` now will disable the button if the target gameObject is not active. It no longer report an error if the target is `null`. Use `Required` for this purpose.
+6.  Rename `FuckDOTween` to `DOTweenDetectPanel` [#152](https://github.com/TylerTemp/SaintsField/issues/152)
 
 ## 3.32.0 ##
 

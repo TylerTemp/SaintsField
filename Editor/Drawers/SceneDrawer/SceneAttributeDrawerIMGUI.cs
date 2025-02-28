@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.SceneDrawer
@@ -26,20 +29,20 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             string[] scenes = GetTrimedScenePath(((SceneAttribute)saintsAttribute).FullPath);
 
             // const string optionName = "Edit Scenes In Build...";
-            string[] sceneOptions = scenes
-                .Select((name, index) => $"{index}: {name}")
-                // .Concat(scenes.Length > 0? new[]{"", optionName}: new[]{optionName})
-                .ToArray();
+            // string[] sceneOptions = scenes
+            //     .Select((name, index) => $"{index}: {name}")
+            //     // .Concat(scenes.Length > 0? new[]{"", optionName}: new[]{optionName})
+            //     .ToArray();
 
             _error = "";
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.String:
-                    DrawPropertyForString(position, property, label, scenes, sceneOptions);
+                    DrawPropertyForString(position, property, label, scenes);
                     break;
                 case SerializedPropertyType.Integer:
-                    DrawPropertyForInt(position, property, label, sceneOptions);
+                    DrawPropertyForInt(position, property, label, scenes);
                     break;
                 default:
                     _error = $"{property.name} must be an int or a string, get {property.propertyType}";
@@ -49,7 +52,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
         }
 
         private static void DrawPropertyForString(Rect rect, SerializedProperty property, GUIContent label,
-            string[] scenes, string[] sceneOptions)
+            string[] scenes)
         {
             int index = IndexOfOrZero(scenes, property.stringValue);
 
@@ -58,47 +61,126 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 property.stringValue = scenes[0];
             }
 
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
+            DrawDropdown(scenes, index, property.stringValue, rect, label, (scene, _) =>
             {
-                int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions
-                    .Concat(new[] { "", "Edit Scenes In Build..." })
-                    .ToArray());
-                // ReSharper disable once InvertIf
-                if (changeCheck.changed)
-                {
-                    if (newIndex >= sceneOptions.Length)
-                    {
-                        OpenBuildSettings();
-                        return;
-                    }
+                property.stringValue = scene;
+                property.serializedObject.ApplyModifiedProperties();
+            });
 
-                    property.stringValue = scenes[newIndex];
-                }
-            }
+            // // ReSharper disable once ConvertToUsingDeclaration
+            // using (EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
+            // {
+            //     int newIndex = EditorGUI.Popup(rect, label.text, index, sceneOptions
+            //         .Concat(new[] { "", "Edit Scenes In Build..." })
+            //         .ToArray());
+            //     // ReSharper disable once InvertIf
+            //     if (changeCheck.changed)
+            //     {
+            //         if (newIndex >= sceneOptions.Length)
+            //         {
+            //             OpenBuildSettings();
+            //             return;
+            //         }
+            //
+            //         property.stringValue = scenes[newIndex];
+            //     }
+            // }
         }
 
         private static void DrawPropertyForInt(Rect rect, SerializedProperty property, GUIContent label,
             string[] scenes)
         {
             int index = property.intValue;
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
-            {
-                int newIndex = EditorGUI.Popup(rect, label.text, index, scenes
-                    .Concat(new[] { "", "Edit Scenes In Build..." })
-                    .ToArray());
-                // ReSharper disable once InvertIf
-                if (changeCheck.changed)
-                {
-                    if (newIndex >= scenes.Length)
-                    {
-                        OpenBuildSettings();
-                        return;
-                    }
 
-                    property.intValue = newIndex;
-                }
+            DrawDropdown(scenes, index, $"{property.intValue}", rect, label, (_, sceneIndex) =>
+            {
+                property.intValue = sceneIndex;
+                property.serializedObject.ApplyModifiedProperties();
+            });
+
+            // ReSharper disable once ConvertToUsingDeclaration
+            // using (EditorGUI.ChangeCheckScope changeCheck = new EditorGUI.ChangeCheckScope())
+            // {
+            //     int newIndex = EditorGUI.Popup(rect, label.text, index, scenes
+            //         .Concat(new[] { "", "Edit Scenes In Build..." })
+            //         .ToArray());
+            //     // ReSharper disable once InvertIf
+            //     if (changeCheck.changed)
+            //     {
+            //         if (newIndex >= scenes.Length)
+            //         {
+            //             OpenBuildSettings();
+            //             return;
+            //         }
+            //
+            //         property.intValue = newIndex;
+            //     }
+            // }
+        }
+
+        private static void DrawDropdown(IReadOnlyList<string> sceneNames, int selectedIndex, string fallbackName, Rect position, GUIContent label, Action<string, int> onSelected)
+        {
+            AdvancedDropdownList<int> dropdownList = new AdvancedDropdownList<int>("Pick a Scene");
+            foreach ((string sceneName, int index) in sceneNames.WithIndex())
+            {
+                dropdownList.Add(new AdvancedDropdownList<int>($"[{index}] {sceneName}", index));
+            }
+
+            dropdownList.AddSeparator();
+            dropdownList.Add("Edit Scenes In Build...", -1);
+
+            string display = selectedIndex >= sceneNames.Count || selectedIndex < 0
+                ? fallbackName
+                : $"[{selectedIndex}] {sceneNames[selectedIndex]}";
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                Error = "",
+                // FieldInfo = field,
+                CurDisplay = display,
+                CurValues = new object[] { selectedIndex },
+                DropdownListValue = dropdownList,
+                SelectStacks = new []
+                {
+                    new AdvancedDropdownAttributeDrawer.SelectStack
+                    {
+                        Display = display,
+                        Index = selectedIndex,
+                    },
+                },
+            };
+
+            Rect leftRect = EditorGUI.PrefixLabel(position, label);
+
+            if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
+            {
+                float minHeight = AdvancedDropdownAttribute.MinHeight;
+                float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
+                    ? AdvancedDropdownAttribute.ItemHeight
+                    : EditorGUIUtility.singleLineHeight;
+                float titleHeight = AdvancedDropdownAttribute.TitleHeight;
+                Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(metaInfo.DropdownListValue, position.width);
+
+                // OnGUIPayload targetPayload = onGUIPayload;
+                SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
+                    metaInfo.DropdownListValue,
+                    size,
+                    position,
+                    new AdvancedDropdownState(),
+                    curItem =>
+                    {
+                        int index = (int)curItem;
+                        if (index == -1)
+                        {
+                            OpenBuildSettings();
+                            return;
+                        }
+
+                        onSelected(sceneNames[index], index);
+                    },
+                    _ => null);
+                dropdown.Show(position);
+                dropdown.BindWindowPosition();
             }
         }
 

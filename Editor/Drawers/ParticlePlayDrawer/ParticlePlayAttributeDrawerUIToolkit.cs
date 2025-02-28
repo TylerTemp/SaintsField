@@ -1,205 +1,16 @@
-﻿using System;
+#if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
-#endif
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.ParticlePlayDrawer
 {
-#if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
-#endif
-    [CustomPropertyDrawer(typeof(ParticlePlayAttribute), true)]
-    public class ParticlePlayAttributeDrawer: SaintsPropertyDrawer
+    public partial class ParticlePlayAttributeDrawer
     {
-        private enum PlayState
-        {
-            None,  // not playing at all
-            Playing,
-            Paused,
-        }
-
-        #region IMGUI
-
-        private double _startTime;
-        private double _pausedTime;
-        private float _runTime;
-        private PlayState _playing;
-
-        private Texture2D _playIcon;
-        private Texture2D _pauseIcon;
-        private Texture2D _resumeIcon;
-        private Texture2D _stopIcon;
-        private GUIStyle _iconButtonStyle;
-
-        private string _error = "";
-
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute,
-            int index,
-            OnGUIPayload onGuiPayload,
-            FieldInfo info, object parent)
-        {
-            return SingleLineHeight * (_playing == PlayState.None ? 1 : 2);
-        }
-
-        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
-            GUIContent label,
-            ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info,
-            object parent)
-        {
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
-            ParticleSystem particleSystem = null;
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (property.objectReferenceValue)
-            {
-                case GameObject go:
-                    particleSystem = go.GetComponent<ParticleSystem>();
-                    break;
-                case Component compo:
-                    particleSystem = compo.GetComponent<ParticleSystem>();
-                    break;
-            }
-
-            if (particleSystem == null)
-            {
-                _error = "No ParticleSystem found.";
-                using(new EditorGUI.DisabledScope(true))
-                {
-                    GUI.Button(position, "?");
-                }
-                return false;
-            }
-
-            if(_iconButtonStyle == null)
-            {
-                _playIcon = Util.LoadResource<Texture2D>("play.png");
-                _pauseIcon = Util.LoadResource<Texture2D>("pause.png");
-                _resumeIcon = Util.LoadResource<Texture2D>("resume.png");
-                _stopIcon = Util.LoadResource<Texture2D>("stop.png");
-                _iconButtonStyle = new GUIStyle(EditorStyles.miniButton)
-                {
-                    padding = new RectOffset(0, 0, 0, 0),
-                };
-            }
-
-            if (onGUIPayload.changed)
-            {
-                _startTime = _pausedTime = 0;
-                EditorApplication.update -= Update;
-                _playing = PlayState.None;
-                // ReSharper disable once Unity.NoNullPropagation
-                particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                SceneView.RepaintAll();
-            }
-
-            Rect playPauseRect = position;
-            if (_playing != PlayState.None)
-            {
-                Rect stopRect;
-                (stopRect, playPauseRect) = RectUtils.SplitWidthRect(playPauseRect, SingleLineHeight);
-
-                if (GUI.Button(stopRect, _stopIcon))
-                {
-                    _startTime = 0;
-                    EditorApplication.update -= Update;
-                    _playing = PlayState.None;
-                    // ReSharper disable once Unity.NoNullPropagation
-                    particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                    SceneView.RepaintAll();
-                }
-            }
-
-            Texture2D buttonLabel;
-            switch (_playing)
-            {
-                case PlayState.None:
-                    buttonLabel = _playIcon;
-                    break;
-                case PlayState.Playing:
-                    buttonLabel = _pauseIcon;
-                    break;
-                case PlayState.Paused:
-                    buttonLabel = _resumeIcon;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(_playing), _playing, null);
-            }
-
-            if (GUI.Button(playPauseRect, buttonLabel))
-            {
-                switch (_playing)
-                {
-                    case PlayState.None:  // start to play
-                        _startTime = _pausedTime = EditorApplication.timeSinceStartup;
-                        EditorApplication.update += Update;
-                        _playing = PlayState.Playing;
-                        break;
-                    case PlayState.Playing:  // pause
-                        _pausedTime = EditorApplication.timeSinceStartup;
-                        EditorApplication.update -= Update;
-                        _playing = PlayState.Paused;
-                        break;
-                    case PlayState.Paused:  // resume
-                        _startTime += EditorApplication.timeSinceStartup - _pausedTime;
-                        EditorApplication.update += Update;
-                        _playing = PlayState.Playing;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(_playing), _playing, null);
-                }
-            }
-
-            if(_playing == PlayState.Playing)
-            {
-                // ReSharper disable once Unity.NoNullPropagation
-                particleSystem.Simulate(_runTime, true);
-                SceneView.RepaintAll();
-            }
-
-            return true;
-        }
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            EditorApplication.update -= Update;
-        }
-
-        private void Update()
-        {
-            _runTime = (float)(EditorApplication.timeSinceStartup - _startTime);
-        }
-
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            FieldInfo info,
-            object parent)
-        {
-            return _error != "";
-        }
-
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
-        {
-            return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
-        }
-
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
-            _error == ""
-                ? position
-                : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
-        #endregion
-
-#if UNITY_2021_3_OR_NEWER
         private class UserPayload
         {
             public PlayState playState;
@@ -214,11 +25,18 @@ namespace SaintsField.Editor.Drawers
         }
 
         private static string NameContainer(SerializedProperty property) => $"{property.propertyPath}__ParticlePlay";
-        private static string NameStopButton(SerializedProperty property) => $"{property.propertyPath}__ParticlePlay_Stop";
-        private static string NamePlayPauseButton(SerializedProperty property) => $"{property.propertyPath}__ParticlePlay_PlayPause";
-        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__ParticlePlay_HelpBox";
 
-        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        private static string NameStopButton(SerializedProperty property) =>
+            $"{property.propertyPath}__ParticlePlay_Stop";
+
+        private static string NamePlayPauseButton(SerializedProperty property) =>
+            $"{property.propertyPath}__ParticlePlay_PlayPause";
+
+        private static string NameHelpBox(SerializedProperty property) =>
+            $"{property.propertyPath}__ParticlePlay_HelpBox";
+
+        protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
             Texture2D playIcon = Util.LoadResource<Texture2D>("play.png");
@@ -254,7 +72,7 @@ namespace SaintsField.Editor.Drawers
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+                    backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
@@ -280,7 +98,7 @@ namespace SaintsField.Editor.Drawers
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+                    backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
@@ -297,7 +115,8 @@ namespace SaintsField.Editor.Drawers
             return root;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -332,7 +151,7 @@ namespace SaintsField.Editor.Drawers
             {
                 switch (userPayload.playState)
                 {
-                    case PlayState.None:  // start to play
+                    case PlayState.None: // start to play
                     {
                         userPayload.startTime = userPayload.pausedTime = EditorApplication.timeSinceStartup;
                         userPayload.playState = PlayState.Playing;
@@ -347,7 +166,7 @@ namespace SaintsField.Editor.Drawers
                         playPauseButton.style.backgroundImage = userPayload.pauseIcon;
                         break;
                     }
-                    case PlayState.Playing:  // pause
+                    case PlayState.Playing: // pause
                     {
                         userPayload.pausedTime = EditorApplication.timeSinceStartup;
                         userPayload.playState = PlayState.Paused;
@@ -355,26 +174,28 @@ namespace SaintsField.Editor.Drawers
                         break;
                     }
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(userPayload.playState), userPayload.playState, null);
+                        throw new ArgumentOutOfRangeException(nameof(userPayload.playState), userPayload.playState,
+                            null);
                 }
             };
 
             root.schedule.Execute(() => UpdateParticleSystem(stopButton, playPauseButton, userPayload)).Every(1);
         }
 
-        private static void UpdateParticleSystem(VisualElement stopButton, VisualElement playPauseButton, UserPayload userPayload)
+        private static void UpdateParticleSystem(VisualElement stopButton, VisualElement playPauseButton,
+            UserPayload userPayload)
         {
-            if(userPayload.playState != PlayState.Playing)
+            if (userPayload.playState != PlayState.Playing)
             {
                 return;
             }
 
-            if(userPayload.particle == null)
+            if (userPayload.particle == null)
             {
                 if (userPayload.playState != PlayState.None)
                 {
                     ResetToNone(stopButton, playPauseButton, userPayload, false);
-                    if(playPauseButton.enabledSelf)
+                    if (playPauseButton.enabledSelf)
                     {
                         playPauseButton.SetEnabled(false);
                     }
@@ -387,7 +208,8 @@ namespace SaintsField.Editor.Drawers
             SceneView.RepaintAll();
         }
 
-        private static void ResetToNone(VisualElement stopButton, VisualElement playPauseButton, UserPayload userPayload, bool checkPlayPauseEnable)
+        private static void ResetToNone(VisualElement stopButton, VisualElement playPauseButton,
+            UserPayload userPayload, bool checkPlayPauseEnable)
         {
             userPayload.playState = PlayState.None;
             userPayload.startTime = userPayload.pausedTime = EditorApplication.timeSinceStartup;
@@ -400,7 +222,8 @@ namespace SaintsField.Editor.Drawers
             {
                 stopButton.style.display = DisplayStyle.None;
             }
-            if(checkPlayPauseEnable && !playPauseButton.enabledSelf)
+
+            if (checkPlayPauseEnable && !playPauseButton.enabledSelf)
             {
                 playPauseButton.SetEnabled(true);
             }
@@ -436,23 +259,26 @@ namespace SaintsField.Editor.Drawers
             Button playPauseButton = root.Q<Button>(NamePlayPauseButton(property));
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
 
-            if(particleSystem == null)
+            if (particleSystem == null)
             {
                 ResetToNone(stopButton, playPauseButton, userPayload, false);
-                if(playPauseButton.enabledSelf)
+                if (playPauseButton.enabledSelf)
                 {
                     playPauseButton.SetEnabled(false);
                 }
 
-                const string error = "No ParticleSystem found.";
-                // Debug.Log($"helpBox={helpBox}");
+                playPauseButton.tooltip = "No ParticleSystem found";
 
-                // ReSharper disable once InvertIf
-                if (helpBox.text != error)
-                {
-                    helpBox.text = error;
-                    helpBox.style.display = DisplayStyle.Flex;
-                }
+                // const string error = "No ParticleSystem found.";
+                // // Debug.Log($"helpBox={helpBox}");
+                //
+                // // ReSharper disable once InvertIf
+                // if (helpBox.text != error)
+                // {
+                //     helpBox.text = error;
+                //     helpBox.style.display = DisplayStyle.Flex;
+                // }
+
                 return;
             }
 
@@ -475,7 +301,22 @@ namespace SaintsField.Editor.Drawers
                 playPauseButton.SetEnabled(particleSystem != null);
                 stopButton.style.display = DisplayStyle.None;
             }
+
+            bool butttonEnable = particleSystem.gameObject.activeInHierarchy;
+            if (!butttonEnable)
+            {
+                ResetToNone(stopButton, playPauseButton, userPayload, false);
+                if(particleSystem.isPlaying)
+                {
+                    particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                }
+            }
+            if (playPauseButton.enabledSelf != butttonEnable)
+            {
+                playPauseButton.SetEnabled(butttonEnable);
+                playPauseButton.tooltip = butttonEnable? "Click to Play": "The GameObject is not active";
+            }
         }
-#endif
     }
 }
+#endif

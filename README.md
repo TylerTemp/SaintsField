@@ -81,10 +81,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.32.0**
+**3.32.1**
 
-1.  `ArraySize` now support callback argument to dynamicly limit the size.
-2.  UI Toolkit: fix a bug that `ListDrawerSettings` without paging can not set the size correctly.
+1.  Add Auto Validator for `MinValue`, fix `MinValue` not get called on first inspecting of the field in IMGUI. Fix `MinValue` use shared error message when using on a list in IMGUI.
+2.  Same fix for `MaxValue`
+3.  Refactor IMGUI drawer when no attribute is provided
+4.  `Scene` add a parameter to allow to save a full-path scene name in build rather than just the name
+5.  `ParticlePlay` now will disable the button if the target gameObject is not active. It no longer report an error if the target is `null`. Use `Required` for this purpose.
+6.  Rename `FuckDOTween` to `DOTweenDetectPanel` [#152](https://github.com/TylerTemp/SaintsField/issues/152)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

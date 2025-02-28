@@ -4775,9 +4775,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71aaeaf3bdd04306ba6b52810d6f241c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneI: 0
-  sceneS: GameMap
-  fullPathScene: Scenes/PlayMaJiang
+  sceneI: 4
+  sceneS: GameCaptcha
+  fullPathScene: Scenes/GameCaptcha
   sceneDisabled: Example
 --- !u!4 &633783411
 Transform:
@@ -5193,7 +5193,6 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 832112d0d8069044fa7b775831f6ef0f, type: 2}
-  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10635,9 +10634,9 @@ MonoBehaviour:
   myDummy: {fileID: 1271404094}
   myDummyTrans: {fileID: 1271404091}
   myDummyGo: {fileID: 1271404088}
-  myDummyXPath: {fileID: 0}
-  myDummyTransXPath: {fileID: 0}
-  myDummyGoXPath: {fileID: 0}
+  myDummyXPath: {fileID: 1271404094}
+  myDummyTransXPath: {fileID: 1271404091}
+  myDummyGoXPath: {fileID: 1271404088}
 --- !u!1 &768079759
 GameObject:
   m_ObjectHideFlags: 0
@@ -15139,7 +15138,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particle: {fileID: 1944822172}
-  particle2: {fileID: 676684123}
 --- !u!4 &1209951772
 Transform:
   m_ObjectHideFlags: 0
