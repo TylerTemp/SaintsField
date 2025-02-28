@@ -32,7 +32,7 @@ namespace SaintsField.Utils
 
         [LayoutStart("Auto Getters Configs", ELayout.FoldoutBox, marginTop: 10)]
 
-        [LayoutStart("./Bootstrap", ELayout.FoldoutBox, marginTop: 5, marginBottom: 5)]
+        // [LayoutStart("./Bootstrap", ELayout.FoldoutBox, marginTop: 5, marginBottom: 5)]
 
         // [InfoBox("How much delay should a getter wait until the first resource check?\n0 means as soon as possible. (but not right now, it'll still use some delay)", EMessageType.None)]
         // [MinValue(0), AboveRichLabel("Delay (ms) <color=green><b>(UI Toolkit)"), RichLabel(null)]
@@ -62,9 +62,9 @@ namespace SaintsField.Utils
         // public int getByXPathArrayPassIMGUI = GetByXPathDefaultArrayPassIMGUI;
         // public const int GetByXPathDefaultArrayPassIMGUI = 10;
 
-        [LayoutEnd(".")]
+        // [LayoutEnd(".")]
 
-        [Space]
+        // [Space]
 
         [FlagsDropdown] public EXP getComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
         [FlagsDropdown] public EXP getComponentInChildrenExp = EXP.NoPicker | EXP.NoAutoResignToNull;

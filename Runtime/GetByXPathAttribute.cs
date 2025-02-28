@@ -26,6 +26,7 @@ namespace SaintsField
         public bool UsePickerButton;
         public bool UseErrorMessage;
         public bool KeepOriginalPicker;
+        public bool ForceReOrder;
 
         public OptimizationPayload OptimizationPayload { get; protected set; }
 
@@ -70,6 +71,8 @@ namespace SaintsField
             {
                 UseErrorMessage = !UseResignButton;
             }
+
+            ForceReOrder = config.HasFlag(EXP.ForceReOrder);
         }
 
         public GetByXPathAttribute(EXP config, params string[] ePaths)

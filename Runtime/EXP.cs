@@ -15,6 +15,7 @@ namespace SaintsField
         NoMessage = 1 << 5,
         NoPicker = 1 << 6,
         KeepOriginalPicker = 1 << 7,
+        ForceReOrder = 1 << 8,
 
         NoAutoResign = NoAutoResignToValue | NoAutoResignToNull,
 

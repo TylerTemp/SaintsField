@@ -234,35 +234,43 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             bool nothingSigner = NothingSigner(target.GetByXPathAttributes[0]);
 
+            bool forceReOrder = target.GetByXPathAttributes[0].ForceReOrder;
+
             if(!nothingSigner && isArray && target.ArrayProperty.arraySize != expandedResults.Count)
             {
-                if (expandedResults.Count < target.ArrayProperty.arraySize)  // reducing the size, let's check if we need to shift the array first (to erase null values)
+                if(!forceReOrder)
                 {
-                    int accValueIndex = 0;
-                    foreach (int arrayIndex in Enumerable.Range(0, target.ArrayProperty.arraySize))
+                    if (expandedResults.Count <
+                        target.ArrayProperty
+                            .arraySize) // reducing the size, let's check if we need to shift the array first (to erase null values)
                     {
-                        SerializedProperty element = target.ArrayProperty.GetArrayElementAtIndex(arrayIndex);
-                        if (element.propertyType != SerializedPropertyType.ObjectReference)
+                        int accValueIndex = 0;
+                        foreach (int arrayIndex in Enumerable.Range(0, target.ArrayProperty.arraySize))
                         {
-                            break;
-                        }
-
-                        Object elementValue = element.objectReferenceValue;
-                        if (RuntimeUtil.IsNull(elementValue))
-                        {
-
-                        }
-                        else
-                        {
-                            if (arrayIndex != accValueIndex)
+                            SerializedProperty element = target.ArrayProperty.GetArrayElementAtIndex(arrayIndex);
+                            if (element.propertyType != SerializedPropertyType.ObjectReference)
                             {
+                                break;
+                            }
+
+                            Object elementValue = element.objectReferenceValue;
+                            if (RuntimeUtil.IsNull(elementValue))
+                            {
+
+                            }
+                            else
+                            {
+                                if (arrayIndex != accValueIndex)
+                                {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                                 Debug.Log($"#GetByXPath# shift array element {arrayIndex} to {accValueIndex}");
 #endif
 
-                                target.ArrayProperty.MoveArrayElement(arrayIndex, accValueIndex);
+                                    target.ArrayProperty.MoveArrayElement(arrayIndex, accValueIndex);
+                                }
+
+                                accValueIndex += 1;
                             }
-                            accValueIndex += 1;
                         }
                     }
                 }
@@ -345,13 +353,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return;
             }
 
-            foreach ((object processingTarget, int processingTargetIndex) in processingTargets.WithIndex().Reverse().ToArray())
+            if(!forceReOrder)
             {
-                int processingPropertyMatchedIndex = processingProperties.FindIndex(each => each.Value == processingTarget);
-                if (processingPropertyMatchedIndex >= 0)
+                foreach ((object processingTarget, int processingTargetIndex) in processingTargets.WithIndex().Reverse()
+                             .ToArray())
                 {
-                    processingTargets.RemoveAt(processingTargetIndex);
-                    processingProperties.RemoveAt(processingPropertyMatchedIndex);
+                    int processingPropertyMatchedIndex =
+                        processingProperties.FindIndex(each => each.Value == processingTarget);
+                    if (processingPropertyMatchedIndex >= 0)
+                    {
+                        processingTargets.RemoveAt(processingTargetIndex);
+                        processingProperties.RemoveAt(processingPropertyMatchedIndex);
+                    }
                 }
             }
 
