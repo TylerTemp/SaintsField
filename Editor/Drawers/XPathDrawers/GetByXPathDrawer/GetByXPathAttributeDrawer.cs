@@ -236,6 +236,36 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             if(!nothingSigner && isArray && target.ArrayProperty.arraySize != expandedResults.Count)
             {
+                if (expandedResults.Count < target.ArrayProperty.arraySize)  // reducing the size, let's check if we need to shift the array first (to erase null values)
+                {
+                    int accValueIndex = 0;
+                    foreach (int arrayIndex in Enumerable.Range(0, target.ArrayProperty.arraySize))
+                    {
+                        SerializedProperty element = target.ArrayProperty.GetArrayElementAtIndex(arrayIndex);
+                        if (element.propertyType != SerializedPropertyType.ObjectReference)
+                        {
+                            break;
+                        }
+
+                        Object elementValue = element.objectReferenceValue;
+                        if (RuntimeUtil.IsNull(elementValue))
+                        {
+
+                        }
+                        else
+                        {
+                            if (arrayIndex != accValueIndex)
+                            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                                Debug.Log($"#GetByXPath# shift array element {arrayIndex} to {accValueIndex}");
+#endif
+
+                                target.ArrayProperty.MoveArrayElement(arrayIndex, accValueIndex);
+                            }
+                            accValueIndex += 1;
+                        }
+                    }
+                }
                 target.ArrayProperty.arraySize = expandedResults.Count;
                 EnqueueSceneViewNotification($"Adjust array {target.ArrayProperty.displayName} to length {target.ArrayProperty.arraySize}");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
@@ -325,7 +355,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }
 
-            // now check dismatched
+            // now check mismatched
             foreach ((object targetResult, ProcessPropertyInfo propertyInfo) in processingTargets.Zip(processingProperties, (targetResult, propertyInfo) => (targetResult, propertyInfo)))
             {
                 propertyInfo.PropertyCache.OriginalValue = propertyInfo.Value;
@@ -339,9 +369,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 // Debug.Log($"#GetByXPath# o={originalValue}({processingProperty.propertyPath}), t={targetResult}, mismatch={propertyCache.MisMatch}");
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                Debug.Log($"#GetByXPath# mismatch={propertyCache.MisMatch}, {originalValue}, {targetResult}: {propertyCache.SerializedProperty.propertyPath}");
-                // Debug.Log(property.objectReferenceValue);
-                // Debug.Log(Event.current);
+                Debug.Log($"#GetByXPath# mismatch={propertyInfo.PropertyCache.MisMatch}, {propertyInfo.PropertyCache.OriginalValue} -> {targetResult}: {propertyInfo.PropertyCache.SerializedProperty.propertyPath}");
 #endif
 
                 if(propertyInfo.PropertyCache.MisMatch)
@@ -361,6 +389,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         DoSignPropertyCache(propertyInfo.PropertyCache, true);
                     }
                 }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log("Done");
+#endif
             }
         }
 

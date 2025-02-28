@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Condition;
 using SaintsField.Editor.Linq;
-using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;

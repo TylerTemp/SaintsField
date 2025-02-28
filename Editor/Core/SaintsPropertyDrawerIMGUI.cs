@@ -185,7 +185,7 @@ namespace SaintsField.Editor.Core
                 filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Field);
 
 
-            if (UseCreateFieldUIToolKit && fieldFound.iSaintsAttribute is null)
+            if (UseCreateFieldIMGUI && fieldFound.iSaintsAttribute is null)
             {
                 SaintsWithIndex thisFake = new SaintsWithIndex
                 {
