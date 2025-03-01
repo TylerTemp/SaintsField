@@ -10927,12 +10927,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 819902565}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb13ccf63cf61c441a7b971773e29b09, type: 3}
+  m_Script: {fileID: 11500000, guid: 6592a4ac93892354eabd04ce44ce0e55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   sceneReference:
-    sceneAsset: {fileID: 102900000, guid: 57d2cfd4f45f54b4fa8a58b365e7a492, type: 3}
-    scenePath: Assets/SaintsField/Samples/WireDiscPlayerExample.unity
+    sceneAsset: {fileID: 0}
+    scenePath: 
+  deletedTarget: {fileID: 0}
 --- !u!1 &822337502
 GameObject:
   m_ObjectHideFlags: 0

@@ -876,7 +876,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 }
 
-                {  // fallback draw properties and fields
+                {
+                    // fallback draw properties and fields
                     (Rect labelRect, Rect leftRect) =
                         RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
@@ -886,6 +887,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                     const BindingFlags bindAttrNormal =
                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+                    // Debug.Log($"valueType={valueType}");
 
                     foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
                     {
