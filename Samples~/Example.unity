@@ -4750,9 +4750,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71aaeaf3bdd04306ba6b52810d6f241c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneI: 4
+  sceneI: 0
   sceneS: GameCaptcha
-  fullPathScene: 
+  fullPathScene: SaintsField/Samples/Example
   sceneDisabled: Example
 --- !u!4 &633783411
 Transform:
@@ -10887,6 +10887,52 @@ Transform:
   m_Father: {fileID: 1743019391}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &819902565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 819902566}
+  - component: {fileID: 819902567}
+  m_Layer: 0
+  m_Name: Issue155Drawer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &819902566
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819902565}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_RootOrder: 73
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &819902567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819902565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb13ccf63cf61c441a7b971773e29b09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneReference:
+    sceneAsset: {fileID: 102900000, guid: 57d2cfd4f45f54b4fa8a58b365e7a492, type: 3}
+    scenePath: Assets/SaintsField/Samples/WireDiscPlayerExample.unity
 --- !u!1 &822337502
 GameObject:
   m_ObjectHideFlags: 0
@@ -17454,6 +17500,7 @@ Transform:
   - {fileID: 670806082}
   - {fileID: 174285246}
   - {fileID: 1984240050}
+  - {fileID: 819902566}
   m_Father: {fileID: 0}
   m_RootOrder: 46
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
