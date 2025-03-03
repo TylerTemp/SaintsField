@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.33.0 ##
+
+1.  Add `Adapt` which can work with `PropRange`
+
 ## 3.32.1 ##
 
 1.  Add Auto Validator for `MinValue`, fix `MinValue` not get called on first inspecting of the field in IMGUI. Fix `MinValue` use shared error message when using on a list in IMGUI.
