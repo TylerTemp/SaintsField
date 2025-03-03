@@ -1,10 +1,14 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -110,17 +114,42 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             return helpBox;
         }
 
+        private float _cachedChangeValue;
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+
             Slider slider = container.Q<Slider>(NameSlider(property));
 
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+            PropRangeAttribute propRangeAttribute = (PropRangeAttribute)saintsAttribute;
+
+            MetaInfo metaInfo = GetMetaInfo(property, propRangeAttribute, info, parent);
             bool isFloat = metaInfo.IsFloat;
-            float curValue = isFloat ? property.floatValue : property.intValue;
-            float minValue = metaInfo.MinValue;
-            float maxValue = metaInfo.MaxValue;
+            (string error, double value) curValueInfo = GetPreValue(isFloat ? property.floatValue : property.intValue, adaptAttribute);
+            if (curValueInfo.error != "")
+            {
+                return;
+            }
+            float curValue = (float) curValueInfo.value;
+
+            (string error, double value) minValueInfo = GetPreValue(metaInfo.MinValue, adaptAttribute);
+            if (minValueInfo.error != "")
+            {
+                return;
+            }
+            float minValue = (float)minValueInfo.value;
+
+            (string error, double value) maxValueInfo = GetPreValue(metaInfo.MaxValue, adaptAttribute);
+            if (maxValueInfo.error != "")
+            {
+                return;
+            }
+            float maxValue = (float)maxValueInfo.value;
+
+            // Debug.Log($"{minValue}/{maxValue}");
 
             slider.lowValue = minValue;
             slider.highValue = maxValue;
@@ -135,14 +164,20 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 floatField.value = curValue;
                 floatField.RegisterValueChangedCallback(changed =>
                 {
+                    float adaptedValue = changed.newValue;
+                    (string error, double value) postValueInfo = GetPostValue(changed.newValue, adaptAttribute);
+                    if (postValueInfo.error != "")
+                    {
+                        return;
+                    }
                     float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent),
-                        changed.newValue);
-                    property.floatValue = parsedValue;
+                        (float)postValueInfo.value);
+                    property.doubleValue = _cachedChangeValue = parsedValue;
                     property.serializedObject.ApplyModifiedProperties();
-                    info.SetValue(parent, parsedValue);
 
-                    floatField.SetValueWithoutNotify(parsedValue);
-                    slider.SetValueWithoutNotify(parsedValue);
+                    floatField.SetValueWithoutNotify(adaptedValue);
+                    slider.SetValueWithoutNotify(adaptedValue);
+                    info.SetValue(parent, parsedValue);
                     onValueChangedCallback.Invoke(parsedValue);
                 });
             }
@@ -151,94 +186,216 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 integerField.value = (int)curValue;
                 integerField.RegisterValueChangedCallback(changed =>
                 {
+                    float adaptedValue = changed.newValue;
+                    (string error, double value) postValueInfo = GetPostValue(changed.newValue, adaptAttribute);
+                    if (postValueInfo.error != "")
+                    {
+                        return;
+                    }
                     int parsedValue = (int)GetValue(GetMetaInfo(property, saintsAttribute, info, parent),
-                        changed.newValue);
+                        (float)postValueInfo.value);
                     property.intValue = parsedValue;
+                    _cachedChangeValue = property.intValue;
                     property.serializedObject.ApplyModifiedProperties();
-                    info.SetValue(parent, parsedValue);
 
-                    slider.SetValueWithoutNotify(parsedValue);
-                    integerField.SetValueWithoutNotify(parsedValue);
+                    floatField.SetValueWithoutNotify(adaptedValue);
+                    slider.SetValueWithoutNotify(adaptedValue);
+                    info.SetValue(parent, parsedValue);
                     onValueChangedCallback.Invoke(parsedValue);
                 });
             }
 
             slider.RegisterValueChangedCallback(changed =>
             {
-                float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent), changed.newValue);
+                float adaptedValue = changed.newValue;
+                (string error, double value) postValueInfo = GetPostValue(adaptedValue, adaptAttribute);
+                if (postValueInfo.error != "")
+                {
+                    return;
+                }
+
+                float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent), (float)postValueInfo.value);
+
+                (string error, double value) preValueInfo = GetPreValue(parsedValue, adaptAttribute);
+                if (preValueInfo.error != "")
+                {
+                    return;
+                }
+
                 if (property.propertyType == SerializedPropertyType.Float)
                 {
-                    property.floatValue = parsedValue;
+                    property.doubleValue = parsedValue;
+                    _cachedChangeValue = parsedValue;
                     property.serializedObject.ApplyModifiedProperties();
-                    info.SetValue(parent, parsedValue);
 
-                    floatField.SetValueWithoutNotify(parsedValue);
-                    slider.SetValueWithoutNotify(parsedValue);
+                    floatField.SetValueWithoutNotify((float)preValueInfo.value);
+                    slider.SetValueWithoutNotify((float)preValueInfo.value);
+                    info.SetValue(parent, parsedValue);
                     onValueChangedCallback.Invoke(parsedValue);
                 }
                 else
                 {
                     int intValue = (int)parsedValue;
                     property.intValue = intValue;
+                    _cachedChangeValue = intValue;
                     property.serializedObject.ApplyModifiedProperties();
-                    info.SetValue(parent, intValue);
 
-                    integerField.SetValueWithoutNotify(intValue);
-                    slider.SetValueWithoutNotify(intValue);
+                    floatField.SetValueWithoutNotify((int) preValueInfo.value);
+                    slider.SetValueWithoutNotify((int) preValueInfo.value);
+                    info.SetValue(parent, intValue);
                     onValueChangedCallback.Invoke(intValue);
                 }
 
                 property.serializedObject.ApplyModifiedProperties();
             });
 
-            // ReSharper disable once InvertIf
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
             if (metaInfo.Error != "")
             {
-                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
                 helpBox.text = metaInfo.Error;
                 helpBox.style.display = DisplayStyle.Flex;
             }
+
+            helpBox.TrackPropertyValue(property, _ => UpdateExternal());
+            helpBox.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateExternal));
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateExternal);
+            return;
+
+            void UpdateExternal()
+            {
+                if (metaInfo.IsFloat)
+                {
+                    if (Mathf.Approximately(property.floatValue, _cachedChangeValue))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    if (Mathf.Approximately(property.intValue, _cachedChangeValue))
+                    {
+                        return;
+                    }
+                }
+                UpdateDisplay(property, propRangeAttribute, adaptAttribute, container, info);
+            }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
+        private static void UpdateDisplay(SerializedProperty property, PropRangeAttribute propRangeAttribute,
+            AdaptAttribute adaptAttribute,
+            VisualElement container, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, propRangeAttribute, info, parent);
 
             Slider slider = container.Q<Slider>(NameSlider(property));
-            MetaInfo curMetaInfo = (MetaInfo)slider.userData;
+            // MetaInfo curMetaInfo = (MetaInfo)slider.userData;
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
 
-            bool changed = false;
-
-            if (metaInfo.Error != curMetaInfo.Error)
+            if (metaInfo.Error != helpBox.text)
             {
-                changed = true;
                 helpBox.text = metaInfo.Error;
                 helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                if (metaInfo.Error != "")
+                {
+                    return;
+                }
             }
 
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (metaInfo.MinValue != curMetaInfo.MinValue
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                || metaInfo.MaxValue != curMetaInfo.MaxValue)
+            if (!string.IsNullOrEmpty(propRangeAttribute.MinCallback))
             {
-                changed = true;
                 slider.lowValue = metaInfo.MinValue;
+            }
+
+            if (!string.IsNullOrEmpty(propRangeAttribute.MaxCallback))
+            {
                 slider.highValue = metaInfo.MaxValue;
             }
 
-            if (changed)
+            (string error, double value) curValueInfo = GetPreValue(metaInfo.IsFloat ? property.floatValue : property.intValue, adaptAttribute);
+            if (curValueInfo.error != "")
             {
-                slider.userData = metaInfo;
+                return;
             }
+            float curValue = (float) curValueInfo.value;
+
+            IntegerField integerField = container.Q<IntegerField>(NameInteger(property));
+            FloatField floatField = container.Q<FloatField>(NameFloat(property));
+
+            if (metaInfo.IsFloat)
+            {
+                floatField.SetValueWithoutNotify(curValue);
+            }
+            else
+            {
+                integerField.SetValueWithoutNotify((int)curValue);
+            }
+
+            // let it trigger the change
+            slider.value = curValue;
         }
 
+        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        //     int index,
+        //     VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
+        // {
+        //     object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+        //
+        //     MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+        //
+        //     Slider slider = container.Q<Slider>(NameSlider(property));
+        //     MetaInfo curMetaInfo = (MetaInfo)slider.userData;
+        //
+        //     HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+        //
+        //     bool changed = false;
+        //
+        //     if (metaInfo.Error != curMetaInfo.Error)
+        //     {
+        //         changed = true;
+        //         helpBox.text = metaInfo.Error;
+        //         helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+        //     }
+        //
+        //     // ReSharper disable once CompareOfFloatsByEqualityOperator
+        //     if (metaInfo.MinValue != curMetaInfo.MinValue
+        //         // ReSharper disable once CompareOfFloatsByEqualityOperator
+        //         || metaInfo.MaxValue != curMetaInfo.MaxValue)
+        //     {
+        //         changed = true;
+        //         slider.lowValue = metaInfo.MinValue;
+        //         slider.highValue = metaInfo.MaxValue;
+        //     }
+        //
+        //     if (changed)
+        //     {
+        //         slider.userData = metaInfo;
+        //     }
+        // }
 
+        private static (string error, double value) GetPreValue(double value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetDoubleValuePre(value);
+        }
+
+        private static (string error, double value) GetPostValue(double value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetDoubleValuePost(value);
+        }
     }
 }
 #endif
