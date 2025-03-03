@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa;
+using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;

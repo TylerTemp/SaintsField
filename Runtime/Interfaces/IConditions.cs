@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SaintsField.Condition;
 
-namespace SaintsField
+namespace SaintsField.Interfaces
 {
     public interface IConditions
     {

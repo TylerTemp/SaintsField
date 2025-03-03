@@ -6,6 +6,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;

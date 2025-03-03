@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;

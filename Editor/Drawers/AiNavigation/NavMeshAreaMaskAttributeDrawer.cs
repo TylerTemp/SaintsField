@@ -7,6 +7,7 @@ using SaintsField.Editor.Core;
 using UnityEditor;
 using SaintsField.AiNavigation;
 using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
 using UnityEditor.UIElements;
 using UnityEngine;
 
