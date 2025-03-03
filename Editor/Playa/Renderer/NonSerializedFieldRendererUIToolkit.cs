@@ -25,6 +25,10 @@ namespace SaintsField.Editor.Playa.Renderer
                 name = $"saints-field--non-serialized-field--{FieldWithInfo.FieldInfo.Name}",
             };
             VisualElement result = UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
+            if (result == null)
+            {
+                return (container, false);
+            }
             result.name = $"saints-field--non-serialized-field--value-{FieldWithInfo.FieldInfo.Name}";
             container.Add(result);
 

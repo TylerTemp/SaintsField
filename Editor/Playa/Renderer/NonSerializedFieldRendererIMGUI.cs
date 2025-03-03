@@ -5,6 +5,23 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class NonSerializedFieldRenderer
     {
+        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
+        {
+            if (!_renderField)
+            {
+                return;
+            }
+
+            float height = GetFieldHeightIMGUI(width, preCheckResult);
+            if (height < Mathf.Epsilon)
+            {
+                return;
+            }
+
+            Rect position = EditorGUILayout.GetControlRect(false, height);
+            RenderPositionTargetIMGUI(position, preCheckResult);
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             if (!_renderField)

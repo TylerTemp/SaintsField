@@ -8,6 +8,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -710,6 +711,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 root.Add(listView);
 
                 return WrapVisualElement(root);
+            }
+
+            if (RuntimeUtil.IsNull(value))
+            {
+                return null;
             }
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));

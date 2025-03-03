@@ -14,7 +14,5 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue155
 
 		[Button]
 		private void SceneRefButton(SceneReference sr) => Debug.Log(sr);
-
-		[Required] public Transform deletedTarget;
 	}
 }

@@ -26,14 +26,17 @@ namespace SaintsField.Editor.Playa.Renderer
             };
             VisualElement result =
                 UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name));
-            container.Add(result);
+            if(result != null)
+            {
+                container.Add(result);
+            }
 
             // _callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
             // container.RegisterCallback<AttachToPanelEvent>(_ =>
             //     container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
             // );
 
-            return (_fieldElement = container, true);
+            return (_fieldElement = container, result != null);
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -41,6 +44,11 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
             if (!RenderField)
+            {
+                return preCheckResult;
+            }
+
+            if (_fieldElement == null)
             {
                 return preCheckResult;
             }
