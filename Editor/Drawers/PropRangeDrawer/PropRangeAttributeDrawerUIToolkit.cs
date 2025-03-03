@@ -336,66 +336,6 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             // let it trigger the change
             slider.value = curValue;
         }
-
-        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     int index,
-        //     VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
-        // {
-        //     object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-        //
-        //     MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
-        //
-        //     Slider slider = container.Q<Slider>(NameSlider(property));
-        //     MetaInfo curMetaInfo = (MetaInfo)slider.userData;
-        //
-        //     HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-        //
-        //     bool changed = false;
-        //
-        //     if (metaInfo.Error != curMetaInfo.Error)
-        //     {
-        //         changed = true;
-        //         helpBox.text = metaInfo.Error;
-        //         helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-        //     }
-        //
-        //     // ReSharper disable once CompareOfFloatsByEqualityOperator
-        //     if (metaInfo.MinValue != curMetaInfo.MinValue
-        //         // ReSharper disable once CompareOfFloatsByEqualityOperator
-        //         || metaInfo.MaxValue != curMetaInfo.MaxValue)
-        //     {
-        //         changed = true;
-        //         slider.lowValue = metaInfo.MinValue;
-        //         slider.highValue = metaInfo.MaxValue;
-        //     }
-        //
-        //     if (changed)
-        //     {
-        //         slider.userData = metaInfo;
-        //     }
-        // }
-
-        private static (string error, double value) GetPreValue(double value, AdaptAttribute adaptAttribute)
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
-            {
-                return ("", value);
-            }
-
-            return AdaptAttributeDrawer.GetDoubleValuePre(value);
-        }
-
-        private static (string error, double value) GetPostValue(double value, AdaptAttribute adaptAttribute)
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
-            {
-                return ("", value);
-            }
-
-            return AdaptAttributeDrawer.GetDoubleValuePost(value);
-        }
     }
 }
 #endif

@@ -1,8 +1,12 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer
 {
@@ -10,7 +14,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(PropRangeAttribute), true)]
-    public partial class PropRangeAttributeDrawer: SaintsPropertyDrawer
+    public partial class PropRangeAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private struct MetaInfo
         {
@@ -25,7 +29,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         }
 
         private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            FieldInfo info, object parentTarget)
+            MemberInfo info, object parentTarget)
         {
             PropRangeAttribute propRangeAttribute = (PropRangeAttribute)saintsAttribute;
 
@@ -85,6 +89,61 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 Step = propRangeAttribute.Step,
                 Error = error,
             };
+        }
+
+        private static (string error, double value) GetPreValue(double value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetDoubleValuePre(value);
+        }
+
+        private static (string error, double value) GetPostValue(double value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetDoubleValuePost(value);
+        }
+
+        public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            SerializedProperty property, MemberInfo memberInfo, object parent)
+        {
+            MetaInfo metaInfo = GetMetaInfo(property, (PropRangeAttribute)propertyAttribute, memberInfo, parent);
+            float curPropValue = metaInfo.IsFloat ? property.floatValue : property.intValue;
+            float parsedValue = GetValue(metaInfo, curPropValue);
+            if (Mathf.Approximately(curPropValue, parsedValue))
+            {
+                return null;
+            }
+
+            return new AutoRunnerFixerResult
+            {
+                ExecError = "",
+                Error = $"Expect {parsedValue}, but got {curPropValue}",
+                CanFix = true,
+                Callback = () =>
+                {
+                    if (metaInfo.IsFloat)
+                    {
+                        property.doubleValue = parsedValue;
+                    }
+                    else
+                    {
+                        property.intValue = (int)parsedValue;
+                    }
+
+                    property.serializedObject.ApplyModifiedProperties();
+                },
+            };
+
         }
     }
 }

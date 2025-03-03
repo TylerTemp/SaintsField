@@ -20886,8 +20886,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   percentF: -0.96
   percentI: -26
-  percentRange: 0.6
+  percentRange: 0.55
   stepRange: 0.90000004
+  v: 0.233333
 --- !u!1 &1829989614
 GameObject:
   m_ObjectHideFlags: 0
