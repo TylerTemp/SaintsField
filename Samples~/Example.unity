@@ -20946,7 +20946,7 @@ MonoBehaviour:
   percentF: -0.96
   percentI: -26
   percentRange: 0
-  stepRange: 0.25
+  stepRange: 0.85
   v: 0.233333
 --- !u!1 &1829989614
 GameObject:

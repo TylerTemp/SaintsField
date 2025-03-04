@@ -5,6 +5,7 @@
 1.  Add `Adapt` which can work with `PropRange`
 2.  Add `PropRange` support for `Auto Validator`
 3.  UI Toolkit: fix `OverlayRichLabel(end: true)` incorrect overlap
+4.  IMGUI: update `Table` on every draw [#157](https://github.com/TylerTemp/SaintsField/issues/157)
 
 ## 3.32.1 ##
 

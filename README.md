@@ -1422,6 +1422,11 @@ public int max;
 
 ![range](https://github.com/TylerTemp/SaintsField/assets/6391063/55f3fc5a-3ee4-4bd8-9b0a-cd016a7a79e7)
 
+**Adapt**
+
+`PropRange` can work with `[Adapt(EUnit.Percent)]` to show a percent value, but still get the actual float value:
+
+[![c_prop_range_adapt](https://github.com/user-attachments/assets/82381ab1-9405-4fdc-bf5f-5c9debb56136)](https://github.com/user-attachments/assets/bb322c3a-56ba-48a4-bcba-7c3908ae2c34)
 
 #### `MinMaxSlider` ####
 
