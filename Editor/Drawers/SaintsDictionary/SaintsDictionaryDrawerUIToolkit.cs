@@ -537,10 +537,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
                         {
                             keyContainer.Add(new Label(childProp.displayName));
-                            PropertyField propertyField = new PropertyField(childProp)
-                            {
-                                label = "",
-                            };
+                            PropertyField propertyField = new PropertyField(childProp, "");
                             propertyField.Bind(property.serializedObject);
                             keyContainer.Add(propertyField);
                         }
