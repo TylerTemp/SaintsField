@@ -1423,6 +1423,17 @@ public int max;
 
 `PropRange` can work with `[Adapt(EUnit.Percent)]` to show a percent value, but still get the actual float value:
 
+```csharp
+[
+    PropRange(0f, 1f, step: 0.05f),
+    Adapt(EUnit.Percent),
+    OverlayRichLabel("<color=gray>%", end: true),
+    BelowRichLabel("$" + nameof(DisplayActualValue)),
+] public float stepRange;
+
+private string DisplayActualValue(float av) => $"<color=gray>Actual Value: {av}";
+```
+
 [![c_prop_range_adapt](https://github.com/user-attachments/assets/82381ab1-9405-4fdc-bf5f-5c9debb56136)](https://github.com/user-attachments/assets/bb322c3a-56ba-48a4-bcba-7c3908ae2c34)
 
 #### `MinMaxSlider` ####
