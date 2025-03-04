@@ -81,15 +81,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.32.1**
+**3.33.0**
 
-1.  Add Auto Validator for `MinValue`, fix `MinValue` not get called on first inspecting of the field in IMGUI. Fix `MinValue` use shared error message when using on a list in IMGUI.
-2.  Same fix for `MaxValue`
-3.  Refactor IMGUI drawer when no attribute is provided
-4.  `Scene` add a parameter to allow to save a full-path scene name in build rather than just the name
-5.  `ParticlePlay` now will disable the button if the target gameObject is not active. It no longer report an error if the target is `null`. Use `Required` for this purpose.
-6.  Rename `FuckDOTween` to `DOTweenDetectPanel` [#152](https://github.com/TylerTemp/SaintsField/issues/152)
-7.  Add `EXP.ForceReOrder` to config auto getters to re-order the result (old behavior). This will make the list/array un-reorderable. [#153](https://github.com/TylerTemp/SaintsField/issues/153)
+1.  Add `Adapt` which can work with `PropRange`
+2.  Add `PropRange` support for `Auto Validator`9
+3.  UI Toolkit: fix `OverlayRichLabel(end: true)` incorrect overlap
+4.  IMGUI: update `Table` on every draw [#157](https://github.com/TylerTemp/SaintsField/issues/157)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1425,6 +1422,17 @@ public int max;
 **Adapt**
 
 `PropRange` can work with `[Adapt(EUnit.Percent)]` to show a percent value, but still get the actual float value:
+
+```csharp
+[
+    PropRange(0f, 1f, step: 0.05f),
+    Adapt(EUnit.Percent),
+    OverlayRichLabel("<color=gray>%", end: true),
+    BelowRichLabel("$" + nameof(DisplayActualValue)),
+] public float stepRange;
+
+private string DisplayActualValue(float av) => $"<color=gray>Actual Value: {av}";
+```
 
 [![c_prop_range_adapt](https://github.com/user-attachments/assets/82381ab1-9405-4fdc-bf5f-5c9debb56136)](https://github.com/user-attachments/assets/bb322c3a-56ba-48a4-bcba-7c3908ae2c34)
 
