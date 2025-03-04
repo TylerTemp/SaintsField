@@ -6,8 +6,8 @@ namespace SaintsField.Samples.Scripts.AdaptExamples
     {
         [Adapt(EUnit.Percent)] public float percentF;
         [Adapt(EUnit.Percent)] public int percentI;
-        [PropRange(0f, 1f), Adapt(EUnit.Percent), OverlayRichLabel("%", end: true), BelowRichLabel("$" + nameof(percentRange)), BelowButton("$" + nameof(ExternalPumpValue), "Pump")] public float percentRange;
-        [PropRange(0f, 1f, step: 0.05f), Adapt(EUnit.Percent), OverlayRichLabel("%", end: true), BelowRichLabel("$" + nameof(stepRange)), BelowButton("$" + nameof(ExternalPumpValueStep), "Pump"), BelowButton("$" + nameof(SetValue))] public float stepRange;
+        [PropRange(0f, 1f), Adapt(EUnit.Percent), OverlayRichLabel("<color=gray>%", end: true), BelowRichLabel("$" + nameof(percentRange)), BelowButton("$" + nameof(ExternalPumpValue), "Pump")] public float percentRange;
+        [PropRange(0f, 1f, step: 0.05f), Adapt(EUnit.Percent), OverlayRichLabel("<color=gray>%", end: true), BelowRichLabel("$" + nameof(stepRange)), BelowButton("$" + nameof(ExternalPumpValueStep), "Pump"), BelowButton("$" + nameof(SetValue))] public float stepRange;
 
         private void ExternalPumpValue(float curValue)
         {

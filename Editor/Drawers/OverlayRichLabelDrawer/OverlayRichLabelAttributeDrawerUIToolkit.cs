@@ -56,7 +56,8 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
                     // alignItems = Align.Center,
 
                     flexShrink = 0,
-                    flexGrow = 0,
+                    flexGrow = 1,
+                    width = Length.Percent(100),
                 },
                 name = NameRichLabelContainer(property, index),
                 // userData = new string(' ', property.displayName.Length),
@@ -134,6 +135,8 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).style.position = Position.Relative;
+
             OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute)saintsAttribute;
             CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);
         }
@@ -187,13 +190,13 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
 
             if (labelContainer.style.left != contentRect.x)
             {
-                // Debug.Log("left changed");
+                // Debug.Log($"left changed {contentRect.x}");
                 labelContainer.style.left = contentRect.x;
             }
 
             if (labelContainer.style.width != contentRect.width)
             {
-                // Debug.Log("left changed");
+                // Debug.Log($"width changed {contentRect.width}");
                 labelContainer.style.width = contentRect.width;
             }
 

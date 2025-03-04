@@ -3,6 +3,8 @@
 ## 3.33.0 ##
 
 1.  Add `Adapt` which can work with `PropRange`
+2.  Add `PropRange` support for `Auto Validator`
+3.  UI Toolkit: fix `OverlayRichLabel(end: true)` incorrect overlap
 
 ## 3.32.1 ##
 
