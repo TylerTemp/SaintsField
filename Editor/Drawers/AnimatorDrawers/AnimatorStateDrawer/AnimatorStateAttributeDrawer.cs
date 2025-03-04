@@ -55,19 +55,33 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 
             // otherwise, search on the serialized object
             Object targetObj = property.serializedObject.targetObject;
-            RuntimeAnimatorController animatorController;
+            RuntimeAnimatorController animatorController = null;
             switch (targetObj)
             {
                 case GameObject go:
-                    animatorController = go.GetComponent<Animator>().runtimeAnimatorController;
+                {
+                    Animator animator = go.GetComponent<Animator>();
+                    if(animator != null)
+                    {
+                        animatorController = animator.runtimeAnimatorController;
+                    }
+                }
                     break;
                 case Component component:
-                    animatorController = component.GetComponent<Animator>().runtimeAnimatorController;
+                {
+                    Animator animator = component.GetComponent<Animator>();
+                    if(animator != null)
+                    {
+                        animatorController = animator.runtimeAnimatorController;
+                    }
+                }
                     break;
                 default:
+                {
                     // string error = $"Animator controller not found in {targetObj}. Try specific a name instead.";
                     string error = $"Target {targetObj} is not a GameObject or Component";
                     return (error, null);
+                }
             }
 
             return animatorController == null

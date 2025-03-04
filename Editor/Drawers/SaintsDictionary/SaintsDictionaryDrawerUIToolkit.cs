@@ -301,6 +301,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             FieldInfo keysField = rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
             Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
+            FieldInfo valuesField = rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+            Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
@@ -516,7 +518,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     if (!keyStructChecked)
                     {
                         keyStructChecked = true;
-                        keyStructNeedFlatten = GetNeedFlatten(elementProp);
+                        keyStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(keysField.FieldType));
                     }
 
                     elementProp.isExpanded = true;
@@ -658,7 +660,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     if (!valueStructChecked)
                     {
                         valueStructChecked = true;
-                        valueStructNeedFlatten = GetNeedFlatten(elementProp);
+                        valueStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(valuesField.FieldType));
                     }
 
                     VisualElement valueContainer = new VisualElement
@@ -684,10 +686,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
                     else
                     {
-                        PropertyField propertyField = new PropertyField(elementProp)
-                        {
-                            label = "",
-                        };
+                        PropertyField propertyField = new PropertyField(elementProp, "");
                         propertyField.Bind(property.serializedObject);
                         valueContainer.Add(propertyField);
                     }

@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Core
             public bool UseForChildren;
         }
 
-        private static readonly Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>> PropertyAttributeToPropertyDrawers =
+        protected static readonly Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>>();
 // #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
         private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
@@ -385,18 +385,18 @@ namespace SaintsField.Editor.Core
             //     });
         }
 
-        private static Type FindTypeDrawer(FieldInfo fieldInfo)
+        private static Type FindTypeDrawer(Type baseType, bool nonSaints)
         {
             List<Type> lookingForType = new List<Type>
             {
-                fieldInfo.FieldType,
+                baseType,
             };
 
-            Type elementType = ReflectUtils.GetElementType(fieldInfo.FieldType);
-            if (elementType != fieldInfo.FieldType)
-            {
-                lookingForType.Insert(0, elementType);
-            }
+            // Type elementType = ReflectUtils.GetElementType(fieldInfo.FieldType);
+            // if (elementType != fieldInfo.FieldType)
+            // {
+            //     lookingForType.Insert(0, elementType);
+            // }
 
             foreach (Type fieldType in lookingForType)
             {
@@ -428,7 +428,7 @@ namespace SaintsField.Editor.Core
                     {
                         matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                        Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.drawerType))}");
+                        Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.DrawerType))}");
 #endif
                         if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
                         {
@@ -443,7 +443,8 @@ namespace SaintsField.Editor.Core
                     if (matched)
                     {
                         Type foundDrawer = propertyAttributeToPropertyDrawer.Value
-                            .FirstOrDefault(each => !each.IsSaints)
+                            // ReSharper disable once SimplifyConditionalTernaryExpression
+                            .FirstOrDefault(each => nonSaints? !each.IsSaints : true)
                             // [0]
                             .DrawerType;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
@@ -458,6 +459,16 @@ namespace SaintsField.Editor.Core
 
             }
             return null;
+        }
+
+        private static Type FindTypeDrawerNonSaints(Type baseType)
+        {
+            return FindTypeDrawer(baseType, true);
+        }
+
+        protected static Type FindTypeDrawerAny(Type baseType)
+        {
+            return FindTypeDrawer(baseType, false);
         }
 
         protected static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo, Attribute attribute)

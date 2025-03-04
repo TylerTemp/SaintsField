@@ -23,6 +23,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             private readonly SerializedProperty _valuesProp;
             private List<int> _itemIndexToPropertyIndex;
             private readonly FieldInfo _keysField;
+            private readonly FieldInfo _valuesField;
             private readonly FieldInfo _info;
             private readonly object _parent;
 
@@ -40,7 +41,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 TreeViewState state, MultiColumnHeader multiColumnHeader,
                 SerializedProperty property,
                 SerializedProperty keysProp, SerializedProperty valuesProp,
-                FieldInfo keysField, FieldInfo info, object parent
+                FieldInfo keysField, FieldInfo valuesField, FieldInfo info, object parent
                 ) : base(state, multiColumnHeader)
             {
                 // Custom setup
@@ -59,6 +60,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 _keysProp = keysProp;
                 _valuesProp = valuesProp;
                 _keysField = keysField;
+                _valuesField = valuesField;
 
                 _info = info;
                 _parent = parent;
@@ -108,12 +110,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 if (!_keyStructChecked)
                 {
                     _keyStructChecked = true;
-                    _keyStructNeedFlatten = GetNeedFlatten(keyProp);
+                    _keyStructNeedFlatten = GetNeedFlatten(keyProp, ReflectUtils.GetElementType(_keysField.FieldType));
                 }
                 if (!_valueStructChecked)
                 {
                     _valueStructChecked = true;
-                    _valueStructNeedFlatten = GetNeedFlatten(valueProp);
+                    _valueStructNeedFlatten = GetNeedFlatten(valueProp, ReflectUtils.GetElementType(_valuesField.FieldType));
                 }
 
                 float keyHeight = _keyStructNeedFlatten
@@ -168,12 +170,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 if (isKeyColumn && !_keyStructChecked)
                 {
                     _keyStructChecked = true;
-                    _keyStructNeedFlatten = GetNeedFlatten(itemProp);
+                    _keyStructNeedFlatten = GetNeedFlatten(itemProp, ReflectUtils.GetElementType(_keysField.FieldType));
                 }
                 else if (!isKeyColumn && !_valueStructChecked)
                 {
                     _valueStructChecked = true;
-                    _valueStructNeedFlatten = GetNeedFlatten(itemProp);
+                    _valueStructNeedFlatten = GetNeedFlatten(itemProp, ReflectUtils.GetElementType(_valuesField.FieldType));
                 }
 
                 bool needFlatten = isKeyColumn ? _keyStructNeedFlatten : _valueStructNeedFlatten;
@@ -302,6 +304,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                 FieldInfo keysField = rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
                 Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
+                FieldInfo valuesField = rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+                Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
 
                 float useWidth = Mathf.Max(width / 2 - 25, 25);
 
@@ -320,7 +324,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             width = useWidth,
                         },
                     })),
-                    property, keysProp, valuesProp, keysField, info, parent);
+                    property, keysProp, valuesProp, keysField, valuesField, info, parent);
 
                 // saintsDictionaryTable.SetItemIndexToPropertyIndex(Enumerable.Range(0, keysProp.arraySize).ToArray());
 

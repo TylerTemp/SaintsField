@@ -5,6 +5,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsDictionary
 {
@@ -119,7 +120,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             ? "Values"
             : saintsDictionaryAttribute.ValueLabel;
 
-        private static bool GetNeedFlatten(SerializedProperty elementProp)
+        private static bool GetNeedFlatten(SerializedProperty elementProp, Type baseType)
         {
             if (elementProp.propertyType != SerializedPropertyType.Generic)
             {
@@ -132,7 +133,28 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SaintsRowAttribute saintsRowAttribute =
                 valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
 
-            return saintsRowAttribute is null;
+            if (saintsRowAttribute is null)
+            {
+                // check if it has a 3rd party drawer
+                bool drawer = valuesAttributes.Any(eachAttr =>
+                    PropertyAttributeToPropertyDrawers.TryGetValue(eachAttr.GetType(), out IReadOnlyList<PropertyDrawerInfo> d) &&
+                    d.Any(each => !each.IsSaints));
+
+                if (drawer)
+                {
+                    return false;
+                }
+
+                // check if it has a type drawer
+                Type typeDrawer = FindTypeDrawerAny(baseType);
+                // Debug.Log($"{baseType}:{typeDrawer}");
+                if (typeDrawer != null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

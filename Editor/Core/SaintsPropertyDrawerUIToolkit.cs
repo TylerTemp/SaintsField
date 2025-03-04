@@ -428,7 +428,7 @@ namespace SaintsField.Editor.Core
                 return PropertyFieldFallbackUIToolkit(property);
             }
 
-            Type foundDrawer = FindTypeDrawer(info);
+            Type foundDrawer = FindTypeDrawerNonSaints(property.isArray? ReflectUtils.GetElementType(info.FieldType) : info.FieldType);
             // Debug.LogWarning(foundDrawer);
 
             if (foundDrawer == null)
