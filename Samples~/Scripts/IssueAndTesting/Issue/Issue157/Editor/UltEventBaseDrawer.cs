@@ -1,17 +1,13 @@
 #if UNITY_EDITOR
-using System.Reflection;
-using SaintsField.Editor.Core;
-using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue157.Editor
 {
     [CustomPropertyDrawer(typeof(UltEventBase), true)]
-    public class UltEventBaseDrawer : SaintsPropertyDrawer
+    public class UltEventBaseDrawer : PropertyDrawer
     {
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute,
-            FieldInfo info, bool hasLabelWidth, object parent)
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             return property.isExpanded
                 ? EditorGUIUtility.singleLineHeight * 2

@@ -10802,8 +10802,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e15ff37d61cdcf4187d4d0a5c936138, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatEvent:
+    value: 0
+    onEvent:
+      m_PersistentCalls:
+        m_Calls: []
   FloatEvents:
-  - value: 0
+  - value: 1321
     onEvent:
       m_PersistentCalls:
         m_Calls: []

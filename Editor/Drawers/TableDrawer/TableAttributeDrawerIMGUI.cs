@@ -220,6 +220,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         GUIContent guiContent = prop.propertyType == SerializedPropertyType.Generic
                             ? new GUIContent(prop.displayName)
                             : GUIContent.none;
+                        // Debug.Log(getCellRect.height);
                         EditorGUI.PropertyField(getCellRect, prop,
                             guiContent);
                     }
@@ -293,7 +294,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         private string _error;
         private bool _isObjectReference;
 
-        private int _curSize;
+        // private int _curSize;
 
         protected override void OnDisposeIMGUI()
         {
@@ -444,11 +445,12 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 );
             }
 
-            if (_curSize != arrayProp.arraySize)
-            {
-                _curSize = arrayProp.arraySize;
-                _saintsTable.Reload();
-            }
+            // if (_curSize != arrayProp.arraySize)
+            // {
+            //     _curSize = arrayProp.arraySize;
+            //     // _saintsTable.Reload();
+            // }
+            _saintsTable.Reload();
 
             return Mathf.Max(_saintsTable.totalHeight, EditorGUIUtility.singleLineHeight * (arrayProp.arraySize + 1)) + SingleLineHeight;
         }
