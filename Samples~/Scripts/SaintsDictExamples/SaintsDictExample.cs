@@ -29,5 +29,12 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         }
 
         public SaintsDictionary<int, Value> dict;
+
+        private void Awake()
+        {
+
+            SaintsDictionary<int, Value> d = new SaintsDictionary<int, Value>();
+            SaintsDictionary<int, Value> d2 = new SaintsDictionary<int, Value>(dict);
+        }
     }
 }

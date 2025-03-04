@@ -13,7 +13,7 @@ namespace SaintsField
         protected abstract List<TKey> SerializedKeys { get; }
         protected abstract List<TValue> SerializedValues { get; }
 
-        private Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
+        protected Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
 
         // [Conditional("UNITY_EDITOR")]
         // private void EditorSyncDictionaryToBackingField()
