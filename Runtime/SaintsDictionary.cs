@@ -46,6 +46,7 @@ namespace SaintsField
             }
         }
 
+#if UNITY_2021_2_OR_NEWER
         public SaintsDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection)
         {
             _dictionary = new Dictionary<TKey, TValue>(collection);
@@ -66,7 +67,7 @@ namespace SaintsField
                 _values.Add(kv.Value);
             }
         }
-
+#endif
         public SaintsDictionary(IEqualityComparer<TKey> comparer)
         {
             _dictionary = new Dictionary<TKey, TValue>(comparer);
