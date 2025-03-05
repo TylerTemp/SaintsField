@@ -18,7 +18,8 @@
     "precompiledReferences": [
         "DOTweenEditor.dll",
         "DOTween.dll",
-        "Sirenix.OdinInspector.Editor.dll"
+        "Sirenix.OdinInspector.Editor.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
@@ -47,6 +48,11 @@
             "name": "com.unity.netcode.gameobjects",
             "expression": "",
             "define": "SAINTSFIELD_NETCODE_GAMEOBJECTS"
+        },
+        {
+            "name": "com.unity.nuget.newtonsoft-json",
+            "expression": "",
+            "define": "SAINTSFIELD_NEWTONSOFT_JSON"
         }
     ],
     "noEngineReferences": false

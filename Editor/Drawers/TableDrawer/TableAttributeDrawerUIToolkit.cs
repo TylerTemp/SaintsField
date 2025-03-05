@@ -65,17 +65,17 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         root.Clear();
                         property.objectReferenceValue = evt.newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        root.Add(BuildContent(arrayProp, root, property, info));
+                        root.Add(BuildContent(arrayProp, root, property, info, parent));
                     });
                     return root;
                 }
             }
 
-            BuildContent(arrayProp, root, property, info);
+            BuildContent(arrayProp, root, property, info, parent);
             return root;
         }
 
-        private VisualElement BuildContent(SerializedProperty arrayProp, VisualElement root, SerializedProperty property, FieldInfo info)
+        private VisualElement BuildContent(SerializedProperty arrayProp, VisualElement root, SerializedProperty property, FieldInfo info, object parent)
         {
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
 
@@ -372,6 +372,60 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     arraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
                 }
             });
+
+            // try to impletment copy/paste and failed
+// #if SAINTSFIELD_NEWTONSOFT_JSON
+//             bool focused = false;
+//             multiColumnListView.RegisterCallback<FocusOutEvent>(_ => focused = false);
+//             multiColumnListView.RegisterCallback<FocusInEvent>(_ => focused = true);
+//             multiColumnListView.RegisterCallback<KeyDownEvent>(evt =>
+//             {
+//                 if (!focused)
+//                 {
+//                     return;
+//                 }
+//
+//                 // ReSharper disable once MergeIntoLogicalPattern
+//                 if (evt.keyCode == KeyCode.C && (evt.modifiers == EventModifiers.Control ||
+//                                                  evt.modifiers == EventModifiers.Command))
+//                 {
+//                     SerializedProperty[] selected = multiColumnListView.selectedItems
+//                         .Cast<SerializedProperty>()
+//                         // .Select(each => SerializedUtils.PropertyPathIndex(each.propertyPath))
+//                         .ToArray();
+//                     // Debug.Log(string.Join(", ", selected));
+//                     if (selected.Length == 0)
+//                     {
+//                         return;
+//                     }
+//
+//                     List<object> results = new List<object>();
+//                     foreach (SerializedProperty serProp in selected)
+//                     {
+//                         (string error, int index, object value) values = Util.GetValue(serProp, info, parent);
+//                         if (values.error == "")
+//                         {
+//                             results.Add(values.value);
+//                         }
+//                     }
+//
+//                     // Debug.Log(string.Join(", ", results));
+//
+//                     if (results.Count == 0)
+//                     {
+//                         return;
+//                     }
+//
+//                     bool isUObject = results[0] is Object;
+//
+//                     if (results.Count == 1)
+//                     {
+//
+//                     }
+//                 }
+//                 // Debug.Log($"{focused}: {evt.keyCode}/{evt.commandKey}/{string.Join(",", evt.modifiers)}");
+//             });
+// #endif
 
             return root;
         }

@@ -51,6 +51,11 @@
             "name": "com.unity.nuget.newtonsoft-json",
             "expression": "",
             "define": "SAINTSFIELD_JSON"
+        },
+        {
+            "name": "com.unity.nuget.newtonsoft-json",
+            "expression": "",
+            "define": "SAINTSFIELD_NEWTONSOFT_JSON"
         }
     ],
     "noEngineReferences": false
