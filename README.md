@@ -81,12 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.33.0**
+**3.33.1**
 
-1.  Add `Adapt` which can work with `PropRange`
-2.  Add `PropRange` support for `Auto Validator`9
-3.  UI Toolkit: fix `OverlayRichLabel(end: true)` incorrect overlap
-4.  IMGUI: update `Table` on every draw [#157](https://github.com/TylerTemp/SaintsField/issues/157)
+1.  Add constructor for `SaintsDictionary<,>` so it can be created exactly like a standard c-sharp `Dictionary<,>`
+2.  If the key/value for `SaintsDictionary<,>` is a general class/struct which already has a custom drawer, use that custom drawer rather than flat it.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

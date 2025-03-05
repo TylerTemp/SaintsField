@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.33.1 ##
+
+1.  Add constructor for `SaintsDictionary<,>` so it can be created exactly like a standard c-sharp `Dictionary<,>`
+2.  If the key/value for `SaintsDictionary<,>` is a general class/struct which already has a custom drawer, use that custom drawer rather than flat it.
+
 ## 3.33.0 ##
 
 1.  Add `Adapt` which can work with `PropRange`
