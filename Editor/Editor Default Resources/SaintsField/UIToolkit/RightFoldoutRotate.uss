@@ -1,0 +1,9 @@
+.saints-right-foldout-rotate {
+    /*rotate: 180deg;*/
+    transition-duration: 0.1s;
+    /*transition-timing-function: ease-in-out;*/
+    transition-timing-function: linear;
+    /*transition-property: transform;*/
+    transition-property: rotate;
+    transition-delay: 0s;
+}

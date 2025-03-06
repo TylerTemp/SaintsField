@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
     {
         private static string GetSelectedNames(IReadOnlyDictionary<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName, int selectedInt)
         {
-            string[] names = bitValueToName.Where(kv => EnumFlagsUtil.isOn(selectedInt, kv.Key)).Select(kv => kv.Value.HasRichName? kv.Value.RichName.Split('/').Last(): kv.Value.Name).ToArray();
+            string[] names = bitValueToName.Where(kv => EnumFlagsUtil.IsOn(selectedInt, kv.Key)).Select(kv => kv.Value.HasRichName? kv.Value.RichName.Split('/').Last(): kv.Value.Name).ToArray();
             return names.Length == 0? "-":  string.Join(",", names);
         }
 
@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             #region Get Cur Value
 
             IReadOnlyList<object> curValues = bitValueToName.Keys
-                .Where(kv => EnumFlagsUtil.isOn(curMask, kv))
+                .Where(kv => EnumFlagsUtil.IsOn(curMask, kv))
                 .Cast<object>()
                 .ToArray();
 

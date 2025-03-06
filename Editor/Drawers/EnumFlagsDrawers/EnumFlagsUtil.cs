@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             };
         }
 
-        public static bool isOn(int curValue, int checkValue)
+        public static bool IsOn(int curValue, int checkValue)
         {
             if (checkValue == 0)
             {
@@ -60,7 +60,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
         public static int ToggleBit(int curValue, int bitValue)
         {
-            if (isOn(curValue, bitValue))
+            if (IsOn(curValue, bitValue))
             {
                 int fullBits = curValue | bitValue;
                 return fullBits ^ bitValue;

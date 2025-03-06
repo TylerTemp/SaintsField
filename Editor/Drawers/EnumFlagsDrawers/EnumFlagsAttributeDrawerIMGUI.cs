@@ -227,7 +227,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     int value = kv.Key;
                     string name = kv.Value.HasRichName? kv.Value.RichName: kv.Value.Name;
 
-                    bool on = EnumFlagsUtil.isOn(curValue, value);
+                    bool on = EnumFlagsUtil.IsOn(curValue, value);
                     GUIContent btnLabel = new GUIContent(name);
                     // GUIStyle btnStyle = on ? activeBtn : normalBtn;
                     btnInfos.Add(new BtnInfo
@@ -255,7 +255,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                              .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt)
                              .Select((each, index) => (each.Key, each.Value.HasRichName? each.Value.RichName: each.Value.Name, index)))
                 {
-                    bool on = EnumFlagsUtil.isOn(curValue, value);
+                    bool on = EnumFlagsUtil.IsOn(curValue, value);
 
                     // GUIStyle normalBtn = _normalButtonStyle;
 

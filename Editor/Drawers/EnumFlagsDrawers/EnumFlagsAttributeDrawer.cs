@@ -23,10 +23,5 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             _checkboxEmptyTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
             _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
         }
-
-        ~EnumFlagsAttributeDrawer()
-        {
-            _checkboxCheckedTexture2D = _checkboxEmptyTexture2D = _checkboxIndeterminateTexture2D = null;
-        }
     }
 }

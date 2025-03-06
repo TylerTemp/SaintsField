@@ -18,6 +18,8 @@ namespace SaintsField.Samples.Scripts
             [RichLabel("M4")]
             Mask4 = 1 << 3,
             Mask5 = 1 << 4,
+            MaskLongLongLongLong = 1 << 5,
+            MaskLongLongLongLong2 = 1 << 6,
         }
 
         [RichLabel("<icon=star.png /><label />")]
