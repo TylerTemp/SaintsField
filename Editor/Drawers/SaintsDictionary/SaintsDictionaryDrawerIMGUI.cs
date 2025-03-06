@@ -145,10 +145,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 bool conflicted = false;
                 if(isKeyColumn)
                 {
-                    (string curFieldError, int _, object curFieldVaue) = Util.GetValue(_property, _info, _parent);
+                    (string curFieldError, int _, object curFieldValue) = Util.GetValue(_property, _info, _parent);
                     if (curFieldError == "")
                     {
-                        IEnumerable allKeyList = _keysField.GetValue(curFieldVaue) as IEnumerable;
+                        IEnumerable allKeyList = _keysField.GetValue(curFieldValue) as IEnumerable;
                         Debug.Assert(allKeyList != null, $"key list {_keysField.Name} is null");
                         (object value, int index)[] indexedValue = allKeyList.Cast<object>().WithIndex().ToArray();
                         object thisKey = indexedValue[index].value;
@@ -295,17 +295,28 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-                Type rawType = arrayIndex == -1 ? info.FieldType : info.FieldType.GetElementType();
+                Type rawType = arrayIndex == -1 ? info.FieldType : ReflectUtils.GetElementType(info.FieldType);
                 Debug.Assert(rawType != null, $"Failed to get element type from {property.propertyPath}");
                 // Debug.Log(info.FieldType);
                 (string propKeysName, string propValuesName) = GetKeysValuesPropName(rawType);
+                Debug.Assert(!string.IsNullOrEmpty(propKeysName), $"Failed to get propKeysName from {rawType}");
                 SerializedProperty keysProp = property.FindPropertyRelative(propKeysName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysName);
                 SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesName);
 
-                FieldInfo keysField = rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
-                Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
-                FieldInfo valuesField = rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
-                Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
+                FieldInfo keysField =
+                    ReflectUtils.GetSelfAndBaseTypesFromType(rawType)
+                        .Select(each => each.GetField(propKeysName,
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
+                            BindingFlags.FlattenHierarchy))
+                        .FirstOrDefault(each => each != null);
+                    // rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+                Debug.Assert(keysField != null, $"Failed to get keys field {propKeysName} from {property.propertyPath}");
+                FieldInfo valuesField =
+                    ReflectUtils.GetSelfAndBaseTypesFromType(rawType)
+                        .Select(each => each.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+                        .FirstOrDefault(each => each != null);
+                    // rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+                Debug.Assert(valuesField != null, $"Failed to get values field {propValuesName} from {property.propertyPath}");
 
                 float useWidth = Mathf.Max(width / 2 - 25, 25);
 

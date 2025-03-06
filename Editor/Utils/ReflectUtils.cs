@@ -12,9 +12,14 @@ namespace SaintsField.Editor.Utils
     {
         public static List<Type> GetSelfAndBaseTypes(object target)
         {
+            return GetSelfAndBaseTypesFromType(target.GetType());
+        }
+
+        public static List<Type> GetSelfAndBaseTypesFromType(Type thisType)
+        {
             List<Type> types = new List<Type>
             {
-                target.GetType(),
+                thisType,
             };
 
             while (types.Last().BaseType != null)

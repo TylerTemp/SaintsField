@@ -289,7 +289,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
-            Type rawType = arrayIndex == -1 ? info.FieldType : info.FieldType.GetElementType();
+            Type rawType = arrayIndex == -1 ? info.FieldType : ReflectUtils.GetElementType(info.FieldType);
             Debug.Assert(rawType != null, $"Failed to get element type from {property.propertyPath}");
             // Debug.Log(info.FieldType);
             (string propKeysName, string propValuesName) = GetKeysValuesPropName(rawType);
@@ -299,9 +299,17 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SerializedProperty keysProp = property.FindPropertyRelative(propKeysName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysName);
             SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesName);
 
-            FieldInfo keysField = rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+            FieldInfo keysField =
+                ReflectUtils.GetSelfAndBaseTypesFromType(rawType)
+                    .Select(each => each.GetField(propKeysName,
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
+                        BindingFlags.FlattenHierarchy))
+                    .FirstOrDefault(each => each != null);
             Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
-            FieldInfo valuesField = rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+            FieldInfo valuesField =
+                ReflectUtils.GetSelfAndBaseTypesFromType(rawType)
+                    .Select(each => each.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+                    .FirstOrDefault(each => each != null);
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
