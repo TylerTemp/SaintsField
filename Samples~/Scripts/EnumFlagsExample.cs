@@ -24,9 +24,11 @@ namespace SaintsField.Samples.Scripts
             Mask8 = 1 << 8,
         }
 
-        [RichLabel("<icon=star.png /><label />")]
+        // [RichLabel("<icon=star.png /><label />")]
         [EnumFlags]
         public BitMask myMask;
+
+        [Space(60)]
 
         [EnumFlags, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
         private void ValueChanged() => Debug.Log(myMask2);

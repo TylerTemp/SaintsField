@@ -81,11 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.33.1**
+**3.33.2**
 
-1.  Add constructor for `SaintsDictionary<,>` so it can be created exactly like a standard c-sharp `Dictionary<,>`
-2.  If the key/value for `SaintsDictionary<,>` is a general class/struct which already has a custom drawer, use that custom drawer rather than flat it.
-3.  Fix `SaintsDictionary<,>` can not detect the serialized field when get inherited
+1.  Change the layout of `EnumFlags` so it can handle a large enum without displaying a super long list
+2.  **Breaking Changes**: `AutoExpanded` is removed from `EnumFlags`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2303,7 +2302,7 @@ This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `B
 Different from `EnableIf`/`DisableIf` in the following:
 1.  apply on an array will directly enable or disable the array itself, rather than each element.
 2.  Callback function can not receive value and index
-3.  this method can not detect foldout, which means using it on `Expandable`, `EnumFlags`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
+3.  this method can not detect foldout, which means using it on `Expandable`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -3933,14 +3932,8 @@ This field has compact mode and expanded mode.
 
 For each argument:
 
-*   `bool autoExpand=true`: if the view is not enough to show all buttons in a row, automatically expand to a vertical group.
-*   `bool defaultExpanded=false`: if true, the buttons group will be expanded as a vertical group by default.
+*   `bool defaultExpanded=false`: if true, the buttons group will be expanded on below by default.
 *   AllowMultiple: No
-
-Known Issue:
-
-1.  IMGUI: If you have a lot of flags and you turn **OFF** `autoExpand`, The buttons **WILL** go off-view.
-2.  UI Toolkit: when `autoExpand=true`, `defaultExpanded` will be ignored
 
 ```csharp
 using SaintsField;
@@ -3957,7 +3950,7 @@ public enum BitMask
 [EnumFlags] public BitMask myMask;
 ```
 
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/710d3efc-5cba-471b-a0f1-a4319ded86fd)](https://github.com/TylerTemp/SaintsField/assets/6391063/48f4c25b-a4cd-40c6-bb42-913a0dc18daa)
+[![video](https://github.com/user-attachments/assets/13f86449-6632-4489-ba3f-31e55f718966)](https://github.com/user-attachments/assets/0a589a01-f00f-4bfd-a845-57b1ddce45fa)
 
 You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
 

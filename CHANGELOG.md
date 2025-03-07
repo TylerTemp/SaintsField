@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.33.2 ##
+
+1.  Change the layout of `EnumFlags` so it can handle a large enum without displaying a super long list
+2.  **Breaking Changes**: `AutoExpanded` is removed from `EnumFlags`
+
 ## 3.33.1 ##
 
 1.  Add constructor for `SaintsDictionary<,>` so it can be created exactly like a standard c-sharp `Dictionary<,>`

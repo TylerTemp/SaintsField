@@ -25,6 +25,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
         private static string NameEnumFlags(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
+        private static string NameFillEmpty(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_FillEmpty";
         private static string NameToggleButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButton";
         private static string NameCheckAllButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_CheckAllButton";
         private static string NameEmptyButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_EmptyButton";
@@ -176,6 +177,26 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 inlineToggleButton.AddToClassList(ClassToggleBitButton(property));
                 fieldContainer.Add(inlineToggleButton);
             }
+
+            fieldContainer.Add(new Button
+            {
+                text = "",
+                style =
+                {
+                    flexGrow = 1,
+
+                    backgroundColor = Color.clear,
+                    borderLeftWidth = 0,
+                    borderRightWidth = 0,
+                    borderTopWidth = 0,
+                    borderBottomWidth = 0,
+                    marginLeft = 0,
+                    marginRight = 0,
+                    paddingLeft = 0,
+                    paddingRight = 0,
+                },
+                name = NameFillEmpty(property),
+            });
 
             EnumFlagsField enumFlagsField = new EnumFlagsField(property.displayName, fieldContainer);
             enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
@@ -368,6 +389,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             RefreshDisplayToggle(curExpanded, toggleButton, checkAllButton, emptyButton, toggleBitFieldButtons,
                 belowAllElement, foldoutButton);
             foldoutButton.clicked += () =>
+            {
+                bool nowExpanded = property.isExpanded = !property.isExpanded;
+                RefreshDisplayToggle(nowExpanded, toggleButton, checkAllButton, emptyButton, toggleBitFieldButtons,
+                    belowAllElement, foldoutButton);
+            };
+
+            Button fillEmptyButton = container.Q<Button>(name: NameFillEmpty(property));
+            fillEmptyButton.clicked += () =>
             {
                 bool nowExpanded = property.isExpanded = !property.isExpanded;
                 RefreshDisplayToggle(nowExpanded, toggleButton, checkAllButton, emptyButton, toggleBitFieldButtons,
