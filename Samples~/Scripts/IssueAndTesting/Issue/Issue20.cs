@@ -20,9 +20,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [BelowRichLabel(nameof(original), true)]
         public Bldg_DestructState original;
 
-        [EnumFlags(autoExpand: false, defaultExpanded: false)] public Bldg_DestructState noAutoDefaultNoExpand;
-        [EnumFlags(autoExpand: false, defaultExpanded: true)] public Bldg_DestructState noAutoDefaultExpanded;
-        [EnumFlags(autoExpand: true, defaultExpanded: false)] public Bldg_DestructState autoDefaultNoExpand;
-        [EnumFlags(autoExpand: true, defaultExpanded: true)] public Bldg_DestructState autoDefaultExpanded;
+        [EnumFlags(defaultExpanded: false)] public Bldg_DestructState autoDefaultNoExpand;
+        [EnumFlags(defaultExpanded: true)] public Bldg_DestructState autoDefaultExpanded;
     }
 }

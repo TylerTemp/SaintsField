@@ -10,16 +10,12 @@ namespace SaintsField
     public class EnumFlagsAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string GroupBy => "__LABEL_FIELD__";
+        public string GroupBy => "";
 
-        // ReSharper disable InconsistentNaming
-        public readonly bool AutoExpand;
         public readonly bool DefaultExpanded;
-        // ReSharper enable InconsistentNaming
 
-        public EnumFlagsAttribute(bool autoExpand=true, bool defaultExpanded=false)
+        public EnumFlagsAttribute(bool defaultExpanded=false)
         {
-            AutoExpand = autoExpand;
             DefaultExpanded = defaultExpanded;
         }
     }

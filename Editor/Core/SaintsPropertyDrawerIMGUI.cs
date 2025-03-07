@@ -252,7 +252,7 @@ namespace SaintsField.Editor.Core
             bool disabledLabelField = label.text == "" || saintsDrawNoLabel;
             // Debug.Log(disabledLabelField);
 
-            float fullWidth = _filedWidthCache <= 0
+            float fullWidth = _filedWidthCache - 1 <= Mathf.Epsilon
                 ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
                 : _filedWidthCache;
 
@@ -405,6 +405,7 @@ namespace SaintsField.Editor.Core
             if (position.width - 1 > Mathf.Epsilon && Event.current.type == EventType.Repaint)
             {
                 _filedWidthCache = position.width;
+                // Debug.Log($"draw update _filedWidthCache={_filedWidthCache}");
             }
             // Debug.Log($"OnGUI: pos={position}");
 

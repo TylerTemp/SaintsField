@@ -20,13 +20,15 @@ namespace SaintsField.Samples.Scripts
             Mask5 = 1 << 4,
             MaskLongLongLongLong = 1 << 5,
             MaskLongLongLongLong2 = 1 << 6,
+            Mask7 = 1 << 7,
+            Mask8 = 1 << 8,
         }
 
         [RichLabel("<icon=star.png /><label />")]
         [EnumFlags]
         public BitMask myMask;
-        [EnumFlags, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
 
+        [EnumFlags, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
         private void ValueChanged() => Debug.Log(myMask2);
 
         [Serializable]
