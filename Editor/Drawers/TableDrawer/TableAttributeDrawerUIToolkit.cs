@@ -41,6 +41,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 return new HelpBox(error, HelpBoxMessageType.Error);
             }
 
+            TableAttribute tableAttribute = (TableAttribute) saintsAttribute;
+
             VisualElement root = new VisualElement();
 
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
@@ -65,17 +67,17 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         root.Clear();
                         property.objectReferenceValue = evt.newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        root.Add(BuildContent(arrayProp, root, property, info, parent));
+                        root.Add(BuildContent(arrayProp, root, tableAttribute, property, info, parent));
                     });
                     return root;
                 }
             }
 
-            BuildContent(arrayProp, root, property, info, parent);
+            BuildContent(arrayProp, root, tableAttribute, property, info, parent);
             return root;
         }
 
-        private VisualElement BuildContent(SerializedProperty arrayProp, VisualElement root, SerializedProperty property, FieldInfo info, object parent)
+        private VisualElement BuildContent(SerializedProperty arrayProp, VisualElement root, TableAttribute tableAttribute, SerializedProperty property, FieldInfo info, object parent)
         {
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
 
@@ -157,6 +159,10 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 text = "+",
                 name = NameAddButton(property),
             };
+            if (tableAttribute.HideAddButton)
+            {
+                addButton.style.display = DisplayStyle.None;
+            }
             toolbar.Add(addButton);
             ToolbarButton removeButton = new ToolbarButton(() =>
             {
@@ -166,7 +172,17 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 text = "-",
                 name = NameRemoveButton(property),
             };
+            if (tableAttribute.HideRemoveButton)
+            {
+                removeButton.style.display = DisplayStyle.None;
+            }
             toolbar.Add(removeButton);
+
+            if (tableAttribute.HideAddButton && tableAttribute.HideRemoveButton)
+            {
+                arraySizeField.SetEnabled(false);
+            }
+
             controls.Add(toolbar);
 
             root.Add(controls);
@@ -432,8 +448,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
         private ArraySizeAttribute _arraySizeAttribute;
         private bool _dynamic;
-        private int _min;
-        private int _max;
+        private int _min = -1;
+        private int _max = -1;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -458,6 +474,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
+            if (_arraySizeAttribute is null)
+            {
+                return;
+            }
+
             (string arrayError, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
             if (arrayError != "")
             {
@@ -487,8 +508,14 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             // Debug.Log($"{arrayProp.arraySize}: {_max}");
 
-            addButton.SetEnabled(arrayProp.arraySize < _max);
-            removeButton.SetEnabled(arrayProp.arraySize > _min);
+            if(_max >= 0)
+            {
+                addButton.SetEnabled(arrayProp.arraySize < _max);
+            }
+            if(_min >= 0)
+            {
+                removeButton.SetEnabled(arrayProp.arraySize > _min);
+            }
         }
 
         // this does not work because Unity internally update the style using inline

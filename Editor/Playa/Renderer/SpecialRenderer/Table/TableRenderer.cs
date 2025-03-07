@@ -7,6 +7,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
     {
         public TableRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
+            ConstructorIMGUI();
         }
     }
 }

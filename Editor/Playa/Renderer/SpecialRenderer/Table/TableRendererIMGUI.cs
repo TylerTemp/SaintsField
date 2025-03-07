@@ -1,3 +1,4 @@
+using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
@@ -8,12 +9,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
 {
     public partial class TableRenderer
     {
+        private void ConstructorIMGUI()
+        {
+            TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().FirstOrDefault();
+
+            // ReSharper disable once MergeIntoPattern
+            if (tableAttribute != null && tableAttribute.DefaultExpanded)
+            {
+                FieldWithInfo.SerializedProperty.isExpanded = true;
+            }
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             int arraySize = FieldWithInfo.SerializedProperty.arraySize;
             if (arraySize == 0)
             {
-                return SaintsPropertyDrawer.SingleLineHeight * 3;
+                return SaintsPropertyDrawer.SingleLineHeight * 3 + 8;
             }
 
             return FieldWithInfo.SerializedProperty.isExpanded

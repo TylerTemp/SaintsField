@@ -11664,6 +11664,17 @@ MonoBehaviour:
   - myInt: 49
     myString: 
     myObject: {fileID: 0}
+  defaultExpanded2: []
+  hideButtons:
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
 --- !u!114 &833747052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13884,7 +13895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45cb9069ce004c2ab4ee78763c064fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myMask: 0
+  myMask: 499
   myMask2: 68
   myStruct:
     myMask: 0

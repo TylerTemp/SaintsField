@@ -460,6 +460,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+            TableAttribute tableAttribute = (TableAttribute) saintsAttribute;
+
             int propertyIndex;
             try
             {
@@ -517,6 +519,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             (Rect numberRect, Rect controlsRect) = RectUtils.SplitWidthRect(rightRect, arraySizeWidth);
 
             // Debug.Log($"{min} ~ {max}");
+            using(new EditorGUI.DisabledScope(tableAttribute.HideRemoveButton && tableAttribute.HideAddButton))
             using(new EditorGUI.DisabledScope(min > 0 && min == max))
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
@@ -540,22 +543,29 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
 
             (Rect plusButton, Rect minusButton) = RectUtils.SplitWidthRect(controlsRect, EditorGUIUtility.singleLineHeight);
-            using(new EditorGUI.DisabledScope(max >= 0 && _saintsTable.ArrayProp.arraySize >= max))
+
+            if(!tableAttribute.HideAddButton)
             {
-                if (GUI.Button(plusButton, "+"))
+                using (new EditorGUI.DisabledScope(max >= 0 && _saintsTable.ArrayProp.arraySize >= max))
                 {
-                    ChangeArraySize(_saintsTable.ArrayProp.arraySize + 1, _saintsTable.ArrayProp);
-                    _saintsTable.Reload();
+                    if (GUI.Button(plusButton, "+"))
+                    {
+                        ChangeArraySize(_saintsTable.ArrayProp.arraySize + 1, _saintsTable.ArrayProp);
+                        _saintsTable.Reload();
+                    }
                 }
             }
 
             // Debug.Log($"{_saintsTable.ArrayProp.arraySize} {max} {min}");
-            using(new EditorGUI.DisabledScope(min >= 0 &&  _saintsTable.ArrayProp.arraySize <= min))
+            if(!tableAttribute.HideRemoveButton)
             {
-                if (GUI.Button(minusButton, "-"))
+                using (new EditorGUI.DisabledScope(min >= 0 && _saintsTable.ArrayProp.arraySize <= min))
                 {
-                    DeleteArrayElement(_saintsTable.ArrayProp, _saintsTable.GetSelection());
-                    _saintsTable.Reload();
+                    if (GUI.Button(minusButton, "-"))
+                    {
+                        DeleteArrayElement(_saintsTable.ArrayProp, _saintsTable.GetSelection());
+                        _saintsTable.Reload();
+                    }
                 }
             }
 
