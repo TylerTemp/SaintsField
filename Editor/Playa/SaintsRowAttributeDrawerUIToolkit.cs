@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -13,6 +12,7 @@ namespace SaintsField.Editor.Playa
     {
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
+            // Debug.Log(property.isExpanded);
             VisualElement root = new VisualElement();
             FillElement(root, property, (SaintsRowAttribute)attribute, fieldInfo, this, this);
 
@@ -88,18 +88,27 @@ namespace SaintsField.Editor.Playa
                 return;
             }
 
-            bodyElement.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
+            // bodyElement.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
+
+            // Debug.Log(property.isExpanded);
 
             Foldout toggle = new Foldout
             {
                 text = property.displayName,
-                value = true,
+                value = property.isExpanded,
             };
+
+            bodyElement.style.display = property.isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
             toggle.RegisterValueChangedCallback(evt =>
-                bodyElement.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+            {
+                property.isExpanded = evt.newValue;
+                // bodyElement.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+            });
+
+            toggle.Add(bodyElement);
 
             root.Add(toggle);
-            root.Add(bodyElement);
+            // root.Add(bodyElement);
 
         }
     }

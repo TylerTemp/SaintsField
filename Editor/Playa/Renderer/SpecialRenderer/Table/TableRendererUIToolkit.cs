@@ -23,11 +23,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
             TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().FirstOrDefault();
             Debug.Assert(tableAttribute != null, FieldWithInfo.SerializedProperty.propertyPath);
 
-            if (tableAttribute.DefaultExpanded)
-            {
-                FieldWithInfo.SerializedProperty.isExpanded = true;
-            }
-
             VisualElement result = new VisualElement
             {
                 name = NameTableContainer(FieldWithInfo.SerializedProperty),

@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -34,15 +35,8 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                     width = LabelBaseWidth - IndentWidth,
                 },
                 name = NameFoldout(property),
-                value = false,
+                value = property.isExpanded,
             };
-
-            foldOut.RegisterValueChangedCallback(v =>
-            {
-                property.isExpanded = v.newValue;
-                container.Q<VisualElement>(NameProps(property)).style.display =
-                    v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
-            });
 
             return foldOut;
         }
@@ -67,6 +61,27 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             visualElement.AddToClassList(ClassAllowDisable);
 
             return visualElement;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            Foldout foldOut = container.Q<Foldout>(NameFoldout(property));
+
+            VisualElement nameProp = container.Q<VisualElement>(NameProps(property));
+
+            foldOut.RegisterValueChangedCallback(v =>
+            {
+                // Debug.Log($"foldOut value changed to ={v.newValue}");
+                property.isExpanded = v.newValue;
+                nameProp.style.display =
+                    v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+            });
+
+            nameProp.style.display =
+                property.isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
+            // foldOut.value = property.isExpanded;
+            // Debug.Log($"Awake set foldOut.value={foldOut.value}");
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,

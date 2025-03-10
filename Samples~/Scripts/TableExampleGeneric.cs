@@ -34,7 +34,7 @@ namespace SaintsField.Samples.Scripts
 
         private void SizeChanged(List<MyStruct> newLis) => Debug.Log(newLis.Count);
 
-        [Table(defaultExpanded: true)] public MyStruct[] defaultExpanded2;
-        [Table(defaultExpanded: true, hideAddButton: true, hideRemoveButton: true)] public MyStruct[] hideButtons;
+        [ArrayDefaultExpand, Table] public MyStruct[] defaultExpanded2;
+        [ArrayDefaultExpand, Table(hideAddButton: true, hideRemoveButton: true)] public MyStruct[] hideButtons;
     }
 }

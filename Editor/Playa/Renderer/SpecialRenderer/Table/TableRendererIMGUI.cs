@@ -9,17 +9,6 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
 {
     public partial class TableRenderer
     {
-        private void ConstructorIMGUI()
-        {
-            TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().FirstOrDefault();
-
-            // ReSharper disable once MergeIntoPattern
-            if (tableAttribute != null && tableAttribute.DefaultExpanded)
-            {
-                FieldWithInfo.SerializedProperty.isExpanded = true;
-            }
-        }
-
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             int arraySize = FieldWithInfo.SerializedProperty.arraySize;

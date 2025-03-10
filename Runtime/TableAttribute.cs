@@ -13,13 +13,13 @@ namespace SaintsField
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
-        public readonly bool DefaultExpanded;
+        // public readonly bool DefaultExpanded;
         public readonly bool HideAddButton;
         public readonly bool HideRemoveButton;
 
-        public TableAttribute(bool defaultExpanded=false, bool hideAddButton=false, bool hideRemoveButton=false)
+        public TableAttribute(bool hideAddButton=false, bool hideRemoveButton=false)
         {
-            DefaultExpanded = defaultExpanded;
+            // DefaultExpanded = defaultExpanded;
             HideAddButton = hideAddButton;
             HideRemoveButton = hideRemoveButton;
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,6 +13,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
     {
         protected SerializedFieldBaseRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
+            if (fieldWithInfo.PlayaAttributes.Any(each => each is ArrayDefaultExpandAttribute))
+            {
+                fieldWithInfo.SerializedProperty.isExpanded = true;
+            }
         }
 
         protected static IEnumerable<UnityEngine.Object> CanDrop(IEnumerable<UnityEngine.Object> targets, Type elementType) => targets.Where(each => Util.GetTypeFromObj(each, elementType));
