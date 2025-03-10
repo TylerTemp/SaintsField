@@ -1295,6 +1295,12 @@ Note:
 2.  for UI Toolkit user: it requires Unity 2022.2+, otherwise it'll fall back to IMGUI.
 3.  IMGUI: complex field might not resize properly even I've set up the height function as Unity's document said. Drag component like `Range` sometimes will get triggered even out of the drawing area. This can not be fixed unless Unity gives a guild of how to resolve it.
 
+**Parameters**:
+
+*   `bool defaultExpanded=false`: Should the foldout be expanded by default?
+*   `bool hideAddButton=false`: Should the add button be hidden?
+*   `bool hideRemoveButton=false`: Shoule the remove button be hidden?
+
 ```csharp
 using SaintsField;
 
