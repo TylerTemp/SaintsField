@@ -517,6 +517,15 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
 
             (Rect numberRect, Rect controlsRect) = RectUtils.SplitWidthRect(rightRect, arraySizeWidth);
+            if (tableAttribute.HideRemoveButton && tableAttribute.HideAddButton)  // remove space
+            {
+                // numberRect = new Rect(numberRect)
+                // {
+                //     x = numberRect.x + arraySizeWidth,
+                //     width = numberRect.width - arraySizeWidth,
+                // };
+                numberRect = rightRect;
+            }
 
             // Debug.Log($"{min} ~ {max}");
             using(new EditorGUI.DisabledScope(tableAttribute.HideRemoveButton && tableAttribute.HideAddButton))

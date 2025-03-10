@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.33.3 ##
+
+1.  UI Toolkit: fix `Table` add/remove button can not click after version 3.32.0
+2.  `Table` add `bool defaultExpanded=false`, `bool hideAddButton=false`, `bool hideRemoveButton=false` parameters [#125](https://github.com/TylerTemp/SaintsField/issues/125)
+
 ## 3.33.2 ##
 
 1.  Change the layout of `EnumFlags` so it can handle a large enum without displaying a super long list

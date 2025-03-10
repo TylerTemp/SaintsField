@@ -81,10 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.33.2**
+**3.33.3**
 
-1.  Change the layout of `EnumFlags` so it can handle a large enum without displaying a super long list
-2.  **Breaking Changes**: `AutoExpanded` is removed from `EnumFlags`
+1.  UI Toolkit: fix `Table` add/remove button can not click after version 3.32.0
+2.  `Table` add `bool defaultExpanded=false`, `bool hideAddButton=false`, `bool hideRemoveButton=false` parameters [#125](https://github.com/TylerTemp/SaintsField/issues/125)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
