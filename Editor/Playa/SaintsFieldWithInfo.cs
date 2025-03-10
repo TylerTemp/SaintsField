@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Playa
 
         public override string ToString()
         {
-            return $"{RenderType} {FieldInfo?.Name} {PropertyInfo?.Name} {MethodInfo?.Name}";
+            return $"<SaintsFieldWithInfo {RenderType} {FieldInfo?.Name} {PropertyInfo?.Name} {MethodInfo?.Name} {SerializedProperty?.propertyPath}/>";
         }
     }
 }

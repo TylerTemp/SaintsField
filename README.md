@@ -85,6 +85,14 @@ namespace: `SaintsField`
 
 1.  Add `SpineAttachmentPicker` to pick an `attachment` from spine.
 2.  Fix Spine related attributes gave error when a target `skeletonData` is missing.
+3.  Add `LayoutCloseHere` as a shortcut of `[Layout(".", keepGrouping: false), LayoutEnd(".")]` to include the current field and then close the last named layout group
+
+    `LayoutCloseHere` is useful when you're done with your subgroup, but you might add some field later, but at the point you don't have a field to put a `LayoutEnd`
+
+4.  Add `LayoutTerminateHere` as a shortcut of `[Layout(".", keepGrouping: false), LayoutEnd]` to include the current field and then ternimate the whole layout group
+
+    `LayoutTerminateHere` is useful when you're done with your group, and your script is also done here (so nowhere to put `EndLayout`). Oneday you come back and add some new fields, this attribute can avoid them to be included in the group accidently.
+
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -3150,6 +3158,55 @@ public string afterGroupLast;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
+
+#### `LayoutCloseHere` / `LayoutTerminateHere` ####
+
+Include the current field into the coresponding group, then:
+*   `LayoutCloseHere` will close the most recent group, like a `LayoutEnd(".")`
+*   `LayoutTerminateHere` will close all groups, like a `LayoutEnd`
+
+`LayoutCloseHere` is useful when you're done with your subgroup, but you might add some field later, but at the point you don't have a field to put a `LayoutEnd`
+
+```csharp
+[LayoutStart("Tab", ELayout.TitleBox)] public string tab;
+
+[LayoutStart("./1", ELayout.TitleBox)]
+public string tab1Sub1;
+public string tab1Sub2;
+[LayoutCloseHere]
+// same as: [Layout(".", keepGrouping: false), LayoutEnd(".")]
+public string tab1Sub3;
+
+// some feature day you might add some field below, `LayoutCloseHere` ensures you don't accidently include them into the subgroup
+// ... you field added in the feature
+
+[Button]
+public void AFunction() {}
+[Button]
+public void BFunction() {}
+```
+
+![image](https://github.com/user-attachments/assets/c4ea66c9-2706-45fe-9fbf-c7a0023677c6)
+
+`LayoutTerminateHere` is useful when you're done with your group, and your script is also done here (so nowhere to put `EndLayout`). Oneday you come back and add some new fields, this attribute can avoid them to be included in the group accidently.
+
+```csharp
+[LayoutStart("Tab", ELayout.TitleBox)] public string tab;
+
+[LayoutStart("./1", ELayout.TitleBox)]
+public string tab1Sub1;
+public string tab1Sub2;
+[LayoutTerminateHere]
+// same as: [Layout("."), LayoutEnd]
+public string tab1Sub3;
+
+[Button]
+public void AFunction() {}
+[Button]
+public void BFunction() {}
+```
+
+![image](https://github.com/user-attachments/assets/b5afa6ae-3d44-4499-b0b9-3b5ba96c24a3)
 
 #### `LayoutDisableIf` / `LayoutEnableIf` ####
 
