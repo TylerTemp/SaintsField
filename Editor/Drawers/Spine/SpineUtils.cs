@@ -17,9 +17,9 @@ namespace SaintsField.Editor.Drawers.Spine
                 switch (obj)
                 {
                     case Component comp:
-                        return SkeletonDataOrNull(comp.GetComponent<SkeletonRenderer>());
+                        return SkeletonDataOrNull(comp.GetComponent<SkeletonRenderer>(), $"{comp}");
                     case GameObject go:
-                        return SkeletonDataOrNull(go.GetComponent<SkeletonRenderer>());
+                        return SkeletonDataOrNull(go.GetComponent<SkeletonRenderer>(), $"{go}");
                     default:
                         return ($"{obj} is not a valid target", null);
                 }
@@ -39,23 +39,31 @@ namespace SaintsField.Editor.Drawers.Spine
             {
                 case SkeletonDataAsset skeletonDataAsset:
                     return ("", skeletonDataAsset);
+
                 case SkeletonRenderer skeletonRenderer:
-                    return ("", skeletonRenderer.skeletonDataAsset);
+                    return SkeletonDataOrNull(skeletonRenderer, $"{skeletonRenderer}");
                 case Component comp:
-                    return SkeletonDataOrNull(comp.GetComponent<SkeletonRenderer>());
+                    return SkeletonDataOrNull(comp.GetComponent<SkeletonRenderer>(), $"{comp}");
                 case GameObject go:
-                    return SkeletonDataOrNull(go.GetComponent<SkeletonRenderer>());
+                    return SkeletonDataOrNull(go.GetComponent<SkeletonRenderer>(), $"{go}");
                 default:
                     return ($"Target `{callback}` is not a valid target: {uObj} ({uObj.GetType()})", null);
             }
         }
 
         private static (string error, SkeletonDataAsset skeletonDataAsset) SkeletonDataOrNull(
-            SkeletonRenderer skeletonRenderer)
+            SkeletonRenderer skeletonRenderer, string targetName)
         {
-            return skeletonRenderer == null
-                ? ($"SkeletonRenderer not found", null)
-                : ("", skeletonRenderer.skeletonDataAsset);
+            if (skeletonRenderer == null)
+            {
+                return ($"SkeletonRenderer not found on {targetName}", null);
+            }
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (skeletonRenderer.skeletonDataAsset == null)
+            {
+                return ($"skeletonDataAsset not found on {targetName}({skeletonRenderer})", null);
+            }
+            return ("", skeletonRenderer.skeletonDataAsset);
         }
     }
 }

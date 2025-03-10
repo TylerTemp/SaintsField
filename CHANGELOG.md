@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.34.0 ##
+
+1.  Add `SpineAttachmentPicker` to pick an `attachment` from spine.
+2.  Fix Spine related attributes gave error when a target `skeletonData` is missing.
+
 ## 3.33.3 ##
 
 1.  UI Toolkit: fix `Table` add/remove button can not click after version 3.32.0

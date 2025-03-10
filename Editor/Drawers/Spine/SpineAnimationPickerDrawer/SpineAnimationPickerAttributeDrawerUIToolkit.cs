@@ -6,6 +6,7 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Spine;
+using Spine;
 using Spine.Unity;
 using UnityEditor;
 using UnityEngine;
@@ -110,6 +111,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                     return;
                 }
 
+                // UpdateDisplay(container, spineAnimationPickerAttribute, property, info, parent);
+
                 float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
                 // Rect worldBound = dropdownButton.worldBound;
                 Rect worldBound = fieldContainer.worldBound;
@@ -164,6 +167,14 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
 
             (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineAnimationPickerAttribute.SkeletonTarget, property, info, parent);
+            if (error == "")
+            {
+                SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
+                if (skeletonData != null)
+                {
+                    error = $"SkeletonData of {skeletonDataAsset} is null";
+                }
+            }
             if (error != "")
             {
                 // dropdownButton.SetEnabled(false);
@@ -177,6 +188,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
                 return;
             }
+
+            // Debug.Log(skeletonDataAsset);
 
             bool found = GetSelectedAnimation(property, skeletonDataAsset);
 

@@ -81,10 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.33.3**
+**3.34.0**
 
-1.  UI Toolkit: fix `Table` add/remove button can not click after version 3.32.0
-2.  `Table` add `bool defaultExpanded=false`, `bool hideAddButton=false`, `bool hideRemoveButton=false` parameters [#125](https://github.com/TylerTemp/SaintsField/issues/125)
+1.  Add `SpineAttachmentPicker` to pick an `attachment` from spine.
+2.  Fix Spine related attributes gave error when a target `skeletonData` is missing.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4929,6 +4929,34 @@ using SaintsField.Spine;
 public SkeletonAnimation _spine;
 [SpineSlotPicker(nameof(_spine))] private string slotNameFromTarget;
 ```
+
+### `SpineAttachmentPicker` ###
+
+Pick a spine attachment from a spine skeleton - skin - slot, into a string field.
+
+**Parameters**
+
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+*   `string skinTarget = null`: If specified, a locally scoped field with the name supplied by in `skinTarget` will be used to limit the popup results to entries of the named skin
+*   `string slotTarget = null`: If specified, a locally scoped field with the name supplied by in `slotTarget` will be used to limit the popup results to children of a named slot
+*   `bool currentSkinOnly = true`: Filters results to only include the current Skin. Only valid when a `SkeletonRenderer` is the data source.
+*   `bool returnAttachmentPath = false`: Returns a fully qualified path for an Attachment in the format "Skin/Slot/AttachmentName". This path format is only used by the SpineAttachment helper methods like `SpineAttachment.GetAttachment` and `.GetHierarchy`. Do not use full path anywhere else in Spine's system
+*   `bool placeholdersOnly = false`: Filters results to exclude attachments that are not children of Skin Placeholders
+*   `bool sepAsSub = true`: do not seperate as sub items in the picker.
+
+```csharp
+using SaintsField.Spine;
+
+// get on current target
+[SpineAttachmentPicker] private string spineAttachmentCurrent;
+
+// get from other field or callback
+public SkeletonAnimation _spine;
+[SpineAttachmentPicker(nameof(_spine))] private string spineAttachment;
+```
+
+![image](https://github.com/user-attachments/assets/2d05f473-5789-482d-8d63-69ec2c732bce)
 
 ## DOTween ##
 

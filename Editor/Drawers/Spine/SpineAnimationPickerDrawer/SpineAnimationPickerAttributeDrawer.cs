@@ -49,24 +49,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             ExposedList<Animation> animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
             if(property.propertyType == SerializedPropertyType.String)
             {
-                if(animations.Any(each => each.Name == property.stringValue))
-                {
-                    return true;
-                }
-                return false;
+                return animations.Any(each => each.Name == property.stringValue);
             }
 
             AnimationReferenceAsset animationReferenceAsset = property.objectReferenceValue as AnimationReferenceAsset;
-            if(animationReferenceAsset == null)
+            if(animationReferenceAsset == null || animationReferenceAsset.Animation == null)
             {
                 return false;
             }
 
-            if(animations.Any(each => each.Name == animationReferenceAsset.Animation.Name && ReferenceEquals(skeletonDataAsset, animationReferenceAsset.SkeletonDataAsset)))
-            {
-                return true;
-            }
-            return false;
+            return animations.Any(each =>
+                each.Name == animationReferenceAsset.Animation.Name
+                && ReferenceEquals(skeletonDataAsset, animationReferenceAsset.SkeletonDataAsset));
         }
 
         private static AdvancedDropdownMetaInfo GetMetaInfoString(string selectedSpineAnimationInfo, SkeletonDataAsset skeletonDataAsset)

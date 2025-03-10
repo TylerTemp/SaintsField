@@ -431,6 +431,7 @@ GameObject:
   - component: {fileID: 1813937676}
   - component: {fileID: 1813937675}
   - component: {fileID: 1813937681}
+  - component: {fileID: 1813937682}
   m_Layer: 0
   m_Name: Spine GameObject (skeleton)
   m_TagString: Untagged
@@ -450,9 +451,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b11ce145cbf03f64296decf650d1865f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animationName: Idle
+  animationName: 
   spine: {fileID: 1813937677}
-  animationReference: {fileID: 11400000, guid: a924776cd53f906479b59420d1a8e895, type: 2}
+  animationReference: {fileID: 11400000, guid: 687c5206e57b41046a2fcf250d8bfabc, type: 2}
 --- !u!114 &1813937676
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -587,8 +588,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c621dd00b18e9f468fcd1faa16ff8b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spineSlotDefault: White1
-  spineSlotPicker: 
+  spineSlotDefault: Red
+  spineSlotPicker: White1
+--- !u!114 &1813937682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1813937674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e75001919fd1a34c8e785702c8e4308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attachmentOriginal: White1
+  spineAttachment: White1
 --- !u!1 &1879873669
 GameObject:
   m_ObjectHideFlags: 0
