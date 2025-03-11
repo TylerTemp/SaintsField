@@ -3,6 +3,7 @@
 ## 3.35.0 ##
 
 1.  `Show/Hide/Disable/Endable-If` now accept sub-fields.
+2.  rich label now support `<field />`, `<field.subField/>`, `<field.subField=formatControl />` to display the target field's value.
 
 ## 3.34.0 ##
 

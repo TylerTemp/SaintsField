@@ -81,19 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.34.0**
+**3.35.0**
 
-1.  Add `SpineAttachmentPicker` to pick an `attachment` from spine.
-2.  Fix Spine related attributes gave error when a target `skeletonData` is missing.
-3.  Add `LayoutCloseHere` as a shortcut of `[Layout(".", keepGrouping: false), LayoutEnd(".")]` to include the current field and then close the last named layout group
-
-    `LayoutCloseHere` is useful when you're done with your subgroup, but you might add some field later, but at the point you don't have a field to put a `LayoutEnd`
-
-4.  Add `LayoutTerminateHere` as a shortcut of `[Layout(".", keepGrouping: false), LayoutEnd]` to include the current field and then ternimate the whole layout group
-
-    `LayoutTerminateHere` is useful when you're done with your group, and your script is also done here (so nowhere to put `EndLayout`). Oneday you come back and add some new fields, this attribute can avoid them to be included in the group accidently.
-5.  Add `DefaultExpand` and `ArrayDefaultExpand`
-6.  Remove `defaultExpanded` from `Table`, use `ArrayDefaultExpand` instead
+1.  `Show/Hide/Disable/Endable-If` now accept sub-fields.
+2.  rich label now support `<field />`, `<field.subField/>`, `<field.subField=formatControl />` to display the target field's value.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
