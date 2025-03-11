@@ -92,7 +92,8 @@ namespace: `SaintsField`
 4.  Add `LayoutTerminateHere` as a shortcut of `[Layout(".", keepGrouping: false), LayoutEnd]` to include the current field and then ternimate the whole layout group
 
     `LayoutTerminateHere` is useful when you're done with your group, and your script is also done here (so nowhere to put `EndLayout`). Oneday you come back and add some new fields, this attribute can avoid them to be included in the group accidently.
-
+5.  Add `DefaultExpand` and `ArrayDefaultExpand`
+6.  Remove `defaultExpanded` from `Table`, use `ArrayDefaultExpand` instead
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4084,8 +4085,6 @@ using SaintsField;
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/202a742a-965c-4e68-a829-4a8aa4c8fe9e)](https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922)
 
-
-
 #### `LeftToggle` ####
 
 A toggle button on the left of the bool field. Only works on boolean field.
@@ -4098,7 +4097,6 @@ using SaintsField;
 ```
 
 ![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
-
 
 #### `ResourcePath` ####
 
@@ -4177,6 +4175,78 @@ using SaintsField;
 ```
 
 [![video](https://github.com/user-attachments/assets/ad5042db-6de3-4f98-8c5d-6387178e3dec)](https://github.com/user-attachments/assets/3c391078-8fcf-4dba-954d-28b6db21b57b)
+
+#### `DefaultExpand` ####
+
+Expand the field by default. Only works on the field that can be expanded, e.g. `struct/class`, `Expandable`, `EnumFlags`, `SaintsRow`.
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct SaintsRowStruct
+{
+    [LayoutStart("Hi", ELayout.TitleBox)]
+    public string s1;
+    public string s2;
+
+}
+
+[DefaultExpand]
+public SaintsRowStruct defaultStruct;
+
+[DefaultExpand, SaintsRow] public SaintsRowStruct row;
+
+[DefaultExpand, GetScriptableObject, Expandable] public Scriptable so;
+
+[Serializable, Flags]
+public enum BitMask
+{
+    None = 0,  // this will be replaced for all/none button
+    [RichLabel("M<color=red>1</color>")]
+    Mask1 = 1,
+    [RichLabel("M<color=green>2</color>")]
+    Mask2 = 1 << 1,
+    [RichLabel("M<color=blue>3</color>")]
+    Mask3 = 1 << 2,
+    [RichLabel("M4")]
+    Mask4 = 1 << 3,
+    Mask5 = 1 << 4,
+}
+
+[DefaultExpand, EnumFlags] public BitMask mask;
+```
+
+#### `ArrayDefaultExpand` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Expand all the elements in the array by default. This works exactly the same as `DefaultExpand`, plus `list`, `array`, `ListDrawerSettings`
+
+```csharp
+using SaintsField;
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[ArrayDefaultExpand]
+public string[] arrayDefault;
+
+[ArrayDefaultExpand]
+public List<string> listDefault;
+
+[ArrayDefaultExpand, ListDrawerSettings]
+public string[] arrayDrawer;
+
+[Serializable]
+public struct TableStruct
+{
+    public string name;
+    public int value;
+}
+
+[ArrayDefaultExpand, Table] public TableStruct[] table;
+```
 
 #### `AssetFolder` ####
 

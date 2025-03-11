@@ -11,6 +11,8 @@
 4.  Add `LayoutTerminateHere` as a shortcut of `[Layout(".", keepGrouping: false), LayoutEnd]` to include the current field and then ternimate the whole layout group
 
     `LayoutTerminateHere` is useful when you're done with your group, and your script is also done here (so nowhere to put `EndLayout`). Oneday you come back and add some new fields, this attribute can avoid them to be included in the group accidently.
+5.  Add `DefaultExpand` and `ArrayDefaultExpand`
+6.  Remove `defaultExpanded` from `Table`, use `ArrayDefaultExpand` instead
 
 ## 3.33.3 ##
 

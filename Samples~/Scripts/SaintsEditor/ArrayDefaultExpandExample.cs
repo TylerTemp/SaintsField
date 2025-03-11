@@ -15,9 +15,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [ArrayDefaultExpand, ListDrawerSettings]
         public string[] arrayDrawer;
 
-        [ArrayDefaultExpand, ListDrawerSettings]
-        public List<string> listDrawer;
-
         [Serializable]
         public struct TableStruct
         {
