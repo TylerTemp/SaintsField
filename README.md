@@ -108,8 +108,9 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 *   `string|null richTextXml` the content of the label, supported tag:
 
     *   All Unity rich label tag, like `<color=#ff0000>red</color>`
-    *   `<label />` for current field name
     *   `<icon=path/to/image.png />` for icon
+    *   `<label />` for current field name
+    *   `<field />`, `<field.subField/>`, `<field.subField=formatControl />` read the value from the field first, if tag has sub-field, continue to read, then use `string.Format` if there is a `formatControl`. See the example below.
     *   `<container.Type />` for the class/struct name of the container of the field
     *   `<container.Type.BaseType />` for the class/struct name of the field's container's parent
 
@@ -203,6 +204,40 @@ private string ArrayLabels(object _, int index) => $"<color=pink>[{(char)('A' + 
 ```
 
 ![label_array](https://github.com/TylerTemp/SaintsField/assets/6391063/232da62c-9e31-4415-a09a-8e1e95ae9441)
+
+Example of using `<field />` to display field value/propery value:
+
+```csharp
+using SaintsField;
+
+public class SubField : MonoBehaviour
+{
+    [SerializeField] private string _subLabel;
+
+    public double doubleVal;
+}
+
+[Separator("Field")]
+// read field value
+[RichLabel("<color=lime><field/>")] public string fieldLabel;
+// read the `_subLabel` field/function from the field
+[RichLabel("<field._subLabel/>"), GetComponentInChildren, Expandable] public SubField subField;
+// again read the property
+[RichLabel("<color=lime><field.gameObject.name/>")] public SubField subFieldName;
+
+[Separator("Field Null")]
+// not found target will be rendered as empty string
+[RichLabel("<field._subLabel/>")] public SubField notFoundField;
+[RichLabel("<field._noSuch/>"), GetComponentInChildren] public SubField notFoundField2;
+
+[Separator("Formatter")]
+// format as percent
+[RichLabel("<field=P2/>"), PropRange(0f, 1f)] public float percent;
+// format `doubleVal` field as exponential
+[RichLabel("<field.doubleVal=E/>")] public SubField subFieldCurrency;
+```
+
+[![video](https://github.com/user-attachments/assets/dc65d897-fcbf-4a40-b4aa-d99a8a4975a7)](https://github.com/user-attachments/assets/a6d93600-500b-4a0e-bf2d-9f2e8fb8bc32)
 
 #### `AboveRichLabel` / `BelowRichLabel` ####
 
@@ -2305,7 +2340,7 @@ public bool boolVal;
 [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
 ```
 
-It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
 
 #### `PlayaEnableIf`/`PlayaDisableIf` ####
 
@@ -2344,7 +2379,7 @@ using SaintsField.Playa;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
 
-It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
 
 #### `ShowIf` / `HideIf` ####
 
@@ -2498,7 +2533,7 @@ public bool boolValue;
 [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
 ```
 
-It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
 
 
 #### `PlayaShowIf`/`PlayaHideIf` ####
@@ -2553,7 +2588,7 @@ public bool boolValue;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
 
-It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
 
 #### `Required` ####
 
@@ -3236,7 +3271,7 @@ For `LayoutEnableIf`: The layout group will be enabled if **ANY** condition is t
 
 For multiple attributes: The layout group will be disabled if **ANY** condition is true (`or` operation)
 
-It also supports value comparison like `==`, `>`, `<=`. Read more in the "Value Comparison for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
 
 ```csharp
 using SaintsField.Playa;
@@ -5417,8 +5452,7 @@ This only works for decorator draws above or below the field. The above drawer w
 
 `""` means no group.
 
-### Value Comparison for Show/Hide/Enable/Disable-If ##
-
+### Syntax for Show/Hide/Enable/Disable-If ##
 
 This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
 
@@ -5427,6 +5461,27 @@ These decorators accept many objects.
 **By Default**
 
 Passing many strings, each string is represent either a field, property or a method. SaintsField will check the value accordingly. If it's a method, it'll also receive the field's value and index if it's inside an array/list.
+
+**Sub Field**
+
+You can use dot (`.`) to obtain a sub-field from a field/property/method. This is useful if your condition is relayed on a sub-field of a field.
+
+```csharp
+using SaintsField;
+[GetComponentInChildren, Expandable] public ToggleSub toggle;
+
+// Show if toggle.requireADescription is a truly value
+[ShowIf(nameof(toggle) + ".requireADescription")]
+public string description;
+
+// ToggleSub.cs
+public class ToggleSub : MonoBehaviour
+{
+    [LeftToggle] public bool requireADescription;
+}
+```
+
+[![video](https://github.com/user-attachments/assets/f001fd35-3dc3-469f-b08f-127ab0448984)](https://github.com/user-attachments/assets/11e3029b-a03c-47b1-949a-a0d59b150cbd)
 
 **Value Equality**
 

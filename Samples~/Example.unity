@@ -451,7 +451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _subLabel: Sub field Value!
-  doubleVal: 101194649
+  doubleVal: 101273314
 --- !u!1 &53890677
 GameObject:
   m_ObjectHideFlags: 0
@@ -20631,12 +20631,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0df8e151171e0c42bb1c3f8812f9368, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fieldLabel: Hi there!
+  fieldLabel: Hi There!
   subField: {fileID: 40666260}
   subFieldName: {fileID: 1671702971}
   notFoundField: {fileID: 0}
   notFoundField2: {fileID: 40666260}
-  percent: 0.541
+  percent: 0.502
   subFieldCurrency: {fileID: 40666260}
 --- !u!1 &1700820806
 GameObject:

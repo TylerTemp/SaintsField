@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.35.0 ##
+
+1.  `Show/Hide/Disable/Endable-If` now accept sub-fields.
+
 ## 3.34.0 ##
 
 1.  Add `SpineAttachmentPicker` to pick an `attachment` from spine.
