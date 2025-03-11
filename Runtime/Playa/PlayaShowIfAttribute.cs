@@ -16,7 +16,9 @@ namespace SaintsField.Playa
 
         public PlayaShowIfAttribute(params object[] andCallbacks)
         {
-            ConditionInfos = Parser.Parse(andCallbacks).ToArray();
+            ConditionInfos = andCallbacks.Length == 0
+                ? Parser.Parse(new object[]{true}).ToArray()
+                : Parser.Parse(andCallbacks).ToArray();
         }
     }
 }

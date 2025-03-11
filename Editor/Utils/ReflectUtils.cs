@@ -10,12 +10,12 @@ namespace SaintsField.Editor.Utils
 {
     public static class ReflectUtils
     {
-        public static List<Type> GetSelfAndBaseTypes(object target)
+        public static IReadOnlyList<Type> GetSelfAndBaseTypes(object target)
         {
             return GetSelfAndBaseTypesFromType(target.GetType());
         }
 
-        public static List<Type> GetSelfAndBaseTypesFromType(Type thisType)
+        public static IReadOnlyList<Type> GetSelfAndBaseTypesFromType(Type thisType)
         {
             List<Type> types = new List<Type>
             {
@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Utils
                 types.Add(types.Last().BaseType);
             }
 
-            types.Reverse();
+            // types.Reverse();
 
             return types;
         }

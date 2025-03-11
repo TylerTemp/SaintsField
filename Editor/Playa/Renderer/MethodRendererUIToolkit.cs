@@ -103,10 +103,13 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     VisualElement element = UIToolkitLayout(GetParameterDefaultValue(parameterInfo),
                         ObjectNames.NicifyVariableName(parameterInfo.Name), parameterInfo.ParameterType);
-                    element.style.marginRight = 3;
-                    element.SetEnabled(true);
-                    parameterElements.Add(element);
-                    root.Add(element);
+                    if(element != null)
+                    {
+                        element.style.marginRight = 3;
+                        element.SetEnabled(true);
+                        parameterElements.Add(element);
+                        root.Add(element);
+                    }
                 }
 
             }

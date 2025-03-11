@@ -20,7 +20,9 @@ namespace SaintsField
 
         public ShowIfAttribute(params object[] andCallbacks)
         {
-            ConditionInfos = Parser.Parse(andCallbacks).ToArray();
+            ConditionInfos = andCallbacks.Length > 0
+                ? Parser.Parse(andCallbacks).ToArray()
+                : Parser.Parse(new object[]{true}).ToArray();
         }
     }
 }

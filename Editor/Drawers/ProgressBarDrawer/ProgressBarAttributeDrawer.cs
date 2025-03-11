@@ -170,8 +170,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return ("", $"{formatValue} / {maxValue}");
             }
 
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
-            types.Reverse();
+            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;

@@ -343,8 +343,7 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T value) GetOfNoParams<T>(object target, string by, T defaultValue)
         {
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            types.Reverse();
+            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
 
             foreach (Type type in types)
             {
@@ -435,8 +434,7 @@ namespace SaintsField.Editor.Utils
                 return ("Target is null", defaultValue);
             }
 
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            types.Reverse();
+            IEnumerable<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
 
             foreach (Type type in types)
             {
@@ -565,8 +563,7 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
         {
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            types.Reverse();
+            IEnumerable<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
@@ -873,7 +870,10 @@ namespace SaintsField.Editor.Utils
                     continue;
                 }
 
-                (string error, object result) = GetOf<object>(conditionStringTarget, null, property, info, target);
+                (string error, object result) = conditionStringTarget.Contains(".")
+                    ? AccGetOf<object>(conditionStringTarget, null, property, target)
+                    : GetOf<object>(conditionStringTarget, null, property, info, target);
+
                 if (error != "")
                 {
                     errors.Add(error);
@@ -945,6 +945,32 @@ namespace SaintsField.Editor.Utils
             }
 
             return (Array.Empty<string>(), callbackBoolResults);
+        }
+
+        private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
+            object parent)
+        {
+            object accParent = parent;
+            // MemberInfo accMemberInfo = memberInfo;
+            (string error, T result) thisResult = ("No Attributes", defaultValue);
+
+            foreach (string attrName in by.Split('.'))
+            {
+                MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(parent)
+                    .SelectMany(type => type
+                        .GetMember(attrName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy))
+                    .FirstOrDefault(each => each != null);
+
+                thisResult = GetOf(attrName, defaultValue, property, accMemberInfo, accParent);
+                // Debug.Log($"{attrName} = {thisResult.result}");
+                if (thisResult.error != "")
+                {
+                    return thisResult;
+                }
+                accParent = thisResult.result;
+            }
+            return thisResult;
+
         }
 
         public static void BindEventWithValue(UnityEventBase unityEventBase, MethodInfo methodInfo, Type[] invokeRequiredTypeArr, object target, object value)

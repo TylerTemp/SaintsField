@@ -23,8 +23,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static void InvokeCallback(string callback, object newValue, object parent)
         {
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
-            types.Reverse();
+            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
+            // types.Reverse();
 
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;

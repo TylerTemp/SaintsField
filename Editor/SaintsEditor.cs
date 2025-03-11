@@ -89,7 +89,7 @@ namespace SaintsField.Editor
             object target)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(target).Reverse().ToArray();
 
             // Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
             Dictionary<string, SerializedProperty> pendingSerializedProperties = serializedPropertyDict.ToDictionary(each => each.Key, each => each.Value);
