@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.RichLabelExamples
 {
     public class RichLabelExample: MonoBehaviour
     {

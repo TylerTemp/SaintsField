@@ -246,7 +246,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 EnumFlagsUtil.EnumDisplayInfo displayInfo = kv.Value;
                 if (displayInfo.HasRichName)
                 {
-                    RichTextDrawer.RichTextChunk[] richChunks = RichTextDrawer.ParseRichXml(displayInfo.RichName, property.displayName, info, parent).ToArray();
+                    RichTextDrawer.RichTextChunk[] richChunks = RichTextDrawer.ParseRichXml(displayInfo.RichName, property.displayName, property, info, parent).ToArray();
                     float useWidth = cachedInfo.RichTextDrawer.GetWidth(label, position.height, richChunks);
                     Rect drawRichRect;
                     bool breakOut = false;
@@ -351,7 +351,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             ImGuiInfo cachedInfo = EnsureKey(property, (EnumFlagsAttribute)saintsAttribute);
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
             // Debug.Log("CALC START ----------");
-            return GetFlexButtons(width, metaInfo, label, cachedInfo, property.displayName, info, parent)
+            return GetFlexButtons(width, metaInfo, label, cachedInfo, property.displayName, property, info, parent)
                 .Select(each => each.YOffset)
                 .DefaultIfEmpty(0)
                 .Max() + EditorGUIUtility.singleLineHeight;
@@ -380,7 +380,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
             // Debug.Log("DRAW START ----------");
 
-            foreach (FlexButton flexButton in GetFlexButtons(position.width, metaInfo, label, cachedInfo, property.displayName, info, parent))
+            foreach (FlexButton flexButton in GetFlexButtons(position.width, metaInfo, label, cachedInfo, property.displayName, property, info, parent))
             {
                 yAcc = flexButton.YOffset;
 
@@ -433,7 +433,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             // public Action OnClick;
         }
 
-        private IEnumerable<FlexButton> GetFlexButtons(float width, EnumFlagsMetaInfo metaInfo, GUIContent guiContent, ImGuiInfo cachedInfo, string displayName, FieldInfo info, object parent)
+        private IEnumerable<FlexButton> GetFlexButtons(float width, EnumFlagsMetaInfo metaInfo, GUIContent guiContent, ImGuiInfo cachedInfo, string displayName, SerializedProperty property, FieldInfo info, object parent)
         {
             float xOffset = 0;
             float yOffset = 0;
@@ -448,7 +448,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
                 if (displayInfo.HasRichName)
                 {
-                    chunks = RichTextDrawer.ParseRichXml(displayInfo.RichName, displayName, info, parent).ToArray();
+                    chunks = RichTextDrawer.ParseRichXml(displayInfo.RichName, displayName, property, info, parent).ToArray();
                     useWidth = cachedInfo.RichTextDrawer.GetWidth(guiContent, EditorGUIUtility.singleLineHeight, chunks);
                 }
                 else

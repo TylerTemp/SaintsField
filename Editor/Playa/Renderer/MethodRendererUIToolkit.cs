@@ -219,7 +219,7 @@ namespace SaintsField.Editor.Playa.Renderer
             };
             buttonElement.Add(buttonLabelContainer);
             foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
-                         FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target)))
+                         FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target)))
             {
                 buttonLabelContainer.Add(element);
             }
@@ -354,7 +354,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 IEnumerable<VisualElement> chunks = buttonUserData.RichTextDrawer.DrawChunksUIToolKit(
                     RichTextDrawer.ParseRichXml(result,
-                        FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target));
+                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target));
 
                 foreach (VisualElement chunk in chunks)
                 {

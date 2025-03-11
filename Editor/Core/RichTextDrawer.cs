@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Core
     public class RichTextDrawer
     {
         // cache
-        private struct TextureCacheKey
+        private struct TextureCacheKey : IEquatable<TextureCacheKey>
         {
             public string ColorPresent;
             public string IconPath;
@@ -26,6 +26,7 @@ namespace SaintsField.Editor.Core
 
             public override bool Equals(object obj)
             {
+                // ReSharper disable once UseNegatedPatternInIsExpression
                 if (!(obj is TextureCacheKey other))
                 {
                     return false;
@@ -36,12 +37,17 @@ namespace SaintsField.Editor.Core
 
             public override int GetHashCode()
             {
-                unchecked
+                if (ColorPresent == null)
                 {
-                    int hashCode = ColorPresent != null ? ColorPresent.GetHashCode() : 0;
-                    hashCode = (hashCode * 397) ^ (IconPath != null ? IconPath.GetHashCode() : 0);
-                    return hashCode;
+                    return IconPath != null ? IconPath.GetHashCode() : 0;
                 }
+
+                return Util.CombineHashCode(ColorPresent, IconPath);
+            }
+
+            public bool Equals(TextureCacheKey other)
+            {
+                return ColorPresent == other.ColorPresent && IconPath == other.IconPath;
             }
         }
 
@@ -166,7 +172,7 @@ namespace SaintsField.Editor.Core
 
         // NOTE: Unity rich text is NOT xml; This is not Unity rich text as
         // Unity will treat invalid rich text as plain text. This will try to fix the broken xml
-        public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, MemberInfo fieldInfo, object parent)
+        public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
             List<string> colors = new List<string>();
 
@@ -185,12 +191,15 @@ namespace SaintsField.Editor.Core
             {
                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
-                // Debug.Log($"parse: {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
+                // Debug.Log($"parse: {part} -> {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
 
+                // ReSharper disable once MergeIntoPattern
+                // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
                 {
                     richText.Append(parsedResult.content);
                 }
+                // ReSharper disable once MergeIntoPattern
                 else if (parsedResult.partType == RichPartType.StartTag && !parsedResult.isSelfClose)
                 {
                     // Debug.Log($"parse={parsedResult.content}, {parsedResult.value}");
@@ -225,7 +234,9 @@ namespace SaintsField.Editor.Core
                     switch (parsedResult.content)
                     {
                         case "color" when colors.Count == 0:
-                            Debug.LogWarning($"missing open color tag for {richText}");
+#if SAINTSFIELD_DEBUG
+                            Debug.LogError($"missing open color tag for {richText}");
+#endif
                             break;
                         case "color" when colors.Count > 0:
                             colors.RemoveAt(colors.Count - 1);
@@ -238,13 +249,13 @@ namespace SaintsField.Editor.Core
                         case "container.Type":
                         {
                             Type decType = fieldInfo?.DeclaringType;
-                            richText.Append(decType == null ? "null" : decType.Name);
+                            richText.Append(decType == null ? "" : decType.Name);
                         }
                             break;
                         case "container.Type.BaseType":
                         {
                             Type baseType = fieldInfo?.DeclaringType?.BaseType;
-                            richText.Append(baseType == null? "null": baseType.Name);
+                            richText.Append(baseType == null? "": baseType.Name);
                         }
                             break;
                         case "icon":
@@ -277,7 +288,113 @@ namespace SaintsField.Editor.Core
                             break;
                         default:
                         {
-                            richText.Append(part);
+                            // Debug.Log(parsedResult.content);
+                            if (parsedResult.content != null && (parsedResult.content == "field" ||
+                                                                 parsedResult.content.StartsWith("field.")))
+                            {
+                                (string error, int index, object value) fieldValue = Util.GetValue(property, fieldInfo, parent);
+                                if (fieldValue.error != "")
+                                {
+#if SAINTSFIELD_DEBUG
+                                    Debug.LogError(fieldValue.error);
+#endif
+                                }
+                                else
+                                {
+                                    object finalValue = null;
+                                    bool hasError = false;
+                                    if(parsedResult.content == "field")
+                                    {
+                                        // richText.Append(RuntimeUtil.IsNull(fieldValue.value)
+                                        //     ? ""
+                                        //     : $"{fieldValue.value}");
+                                        finalValue = fieldValue.value;
+                                    }
+                                    else
+                                    {
+                                        object accParent = fieldValue.value;
+                                        // Debug.Log(parsedResult.content);
+                                        (string error, int index, object value) accResult = ("Field value is null", -1, null);
+                                        if(!RuntimeUtil.IsNull(accParent))
+                                        {
+                                            // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split('.');
+                                            foreach (string attrName in subFields)
+                                            {
+                                                MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(accParent)
+                                                    .SelectMany(type => type
+                                                        .GetMember(attrName,
+                                                            BindingFlags.Public | BindingFlags.NonPublic |
+                                                            BindingFlags.Instance | BindingFlags.Static |
+                                                            BindingFlags.FlattenHierarchy))
+                                                    .FirstOrDefault(each => each != null);
+
+                                                accResult = Util.GetValueAtIndex(-1, accMemberInfo, accParent);
+                                                if (accResult.error != "")
+                                                {
+#if SAINTSFIELD_DEBUG
+                                                    Debug.LogError($"{attrName} from {accParent}: {accResult.error}");
+#endif
+                                                    break;
+                                                }
+
+                                                accParent = accResult.value;
+                                                if (accParent == null)
+                                                {
+                                                    accResult = ($"No target found for {attrName}", -1, null);
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if (accResult.error == "")
+                                        {
+                                            // Debug.Log($"{parsedResult.content}: {accResult.value}");
+                                            // Debug.Log($"accResult.value={accResult.value}");
+                                            finalValue = accResult.value;
+                                        }
+                                        else
+                                        {
+                                            hasError = true;
+                                        }
+                                        //
+                                        // Debug.Log(string.Join(".", subFields));
+                                    }
+
+                                    if (!hasError)
+                                    {
+                                        string tagFinalResult;
+                                        if (RuntimeUtil.IsNull(finalValue))
+                                        {
+                                            tagFinalResult = "";
+                                        }
+                                        else if (string.IsNullOrEmpty(parsedResult.value))
+                                        {
+                                            tagFinalResult = $"{finalValue}";
+                                        }
+                                        else
+                                        {
+                                            string formatString = $"{{0:{parsedResult.value}}}";
+                                            try
+                                            {
+                                                tagFinalResult = string.Format(formatString, finalValue);
+                                            }
+                                            catch (Exception ex)
+                                            {
+#if SAINTSFIELD_DEBUG
+                                                Debug.LogException(ex);
+#endif
+                                                tagFinalResult = $"{finalValue}";
+                                            }
+                                        }
+                                        richText.Append(tagFinalResult);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                richText.Append(part);
+                            }
                         }
                             break;
                     }
@@ -346,7 +463,8 @@ namespace SaintsField.Editor.Core
 
         private static (string tagName, string tagValue) ParseTag(string tagRaw)
         {
-            const string reg = @"(\w+)=(.+)";
+            // const string reg = @"(\w+)=(.+)";
+            const string reg = @"([^\=]+)=(.+)";
             Match match = Regex.Match(tagRaw, reg);
             if (!match.Success)
             {
@@ -483,7 +601,8 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        public const float ImageWidth = SaintsPropertyDrawer.SingleLineHeight + 2;
+        public const float ImageWidth = SaintsPropertyDrawer.SingleLineHeight;
+        // public const float ImageWidth = EditorGUIUtility.SingleLineHeight;
 
 #if UNITY_2021_3_OR_NEWER
         public IEnumerable<VisualElement> DrawChunksUIToolKit(IEnumerable<RichTextChunk> payloads)

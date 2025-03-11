@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
             }
             else
             {
-                richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, info, parent).ToArray();
+                richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, property, info, parent).ToArray();
             }
 
             return PaddingWidth * 2 + Mathf.Min(position.width,

@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 if (_cachedRichTextChunksIMGUI == null)
                 {
                     _cachedRichTextChunksIMGUI = RichTextDrawer.ParseRichXml(buttonAttribute.Label,
-                        FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target).ToArray();
+                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target).ToArray();
                 }
 
                 return _cachedRichTextChunksIMGUI;
@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXml(result,
-                FieldWithInfo.MethodInfo.Name, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
+                FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
             _cachedCallbackLabelIMGUI = result;
             _cachedRichTextChunksIMGUI = chunks.ToArray();
 

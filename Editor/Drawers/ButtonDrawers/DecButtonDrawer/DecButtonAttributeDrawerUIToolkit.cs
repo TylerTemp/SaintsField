@@ -168,7 +168,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
             labelContainer.userData = newXml;
             labelContainer.Clear();
-            IEnumerable<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(newXml, property.displayName, info, parent);
+            IEnumerable<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(newXml, property.displayName, property, info, parent);
             foreach (VisualElement visualElement in RichTextDrawer.DrawChunksUIToolKit(richChunks))
             {
                 labelContainer.Add(visualElement);

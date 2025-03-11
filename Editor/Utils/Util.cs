@@ -956,7 +956,7 @@ namespace SaintsField.Editor.Utils
 
             foreach (string attrName in by.Split('.'))
             {
-                MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(parent)
+                MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(accParent)
                     .SelectMany(type => type
                         .GetMember(attrName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy))
                     .FirstOrDefault(each => each != null);
@@ -1151,17 +1151,24 @@ namespace SaintsField.Editor.Utils
         public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
             int arrayIndex;
-            try
+            if (property == null)
             {
-                arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                arrayIndex = -1;
             }
-            catch (NullReferenceException e)
+            else
             {
-                return (e.Message, -1, null);
-            }
-            catch (ObjectDisposedException e)
-            {
-                return (e.Message, -1, null);
+                try
+                {
+                    arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                }
+                catch (NullReferenceException e)
+                {
+                    return (e.Message, -1, null);
+                }
+                catch (ObjectDisposedException e)
+                {
+                    return (e.Message, -1, null);
+                }
             }
 
             return GetValueAtIndex(arrayIndex, fieldInfo, parent);

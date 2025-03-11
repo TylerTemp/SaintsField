@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
             float labelWidth = hasLabel ? EditorGUIUtility.labelWidth : 0;
 
             RichTextDrawer.RichTextChunk[] payloads =
-                RichTextDrawer.ParseRichXml(labelXml, label.text, info, parent).ToArray();
+                RichTextDrawer.ParseRichXml(labelXml, label.text, property, info, parent).ToArray();
             float overlayWidth = _richTextDrawer.GetWidth(label, position.height, payloads);
 
             float leftWidth = position.width - labelWidth - contentWidth;

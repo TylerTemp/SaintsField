@@ -232,7 +232,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
                 }
 
                 foreach (VisualElement visualElement in _richTextDrawer.DrawChunksUIToolKit(
-                             RichTextDrawer.ParseRichXml(xml, property.displayName, info, parent)))
+                             RichTextDrawer.ParseRichXml(xml, property.displayName, property, info, parent)))
                 {
                     // Debug.Log(visualElement);
                     visualElement.AddToClassList(ClassRichLabelElement(property, index));

@@ -342,7 +342,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             label.Clear();
             foreach (VisualElement richTextElement in infoBoxUserData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, member, infoBoxUserData.FieldWithInfo.Target))
+                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, infoBoxUserData.FieldWithInfo.SerializedProperty, member, infoBoxUserData.FieldWithInfo.Target))
                      )
             {
                 label.Add(richTextElement);

@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers
             }
             // object target = property.serializedObject.targetObject;
             // string labelXml = GetButtonLabelXml((DecButtonAttribute)saintsAttribute, target, target.GetType());
-            float xmlWidth = RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(UnSeeXml, "", info, parent));
+            float xmlWidth = RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(UnSeeXml, "", property, info, parent));
             if (xmlWidth > 0)
             {
                 return _width = xmlWidth;

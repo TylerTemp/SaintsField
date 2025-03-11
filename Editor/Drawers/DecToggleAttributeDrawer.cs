@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, info, target).ToArray();
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, property, info, target).ToArray();
             float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
             Rect labelRect = buttonRect;
             if (textWidth < labelRect.width)

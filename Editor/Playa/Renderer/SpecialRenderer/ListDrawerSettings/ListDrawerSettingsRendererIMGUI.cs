@@ -313,7 +313,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 {
                     _curXmlChunks =
                         RichTextDrawer
-                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
+                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
                             .ToArray();
                 }
 

@@ -151,7 +151,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             }
             else
             {
-                richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text, info, target).ToArray();
+                richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text, property, info, target).ToArray();
             }
 
             // GetWidth
