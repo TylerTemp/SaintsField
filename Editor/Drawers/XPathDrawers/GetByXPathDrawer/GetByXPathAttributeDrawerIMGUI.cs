@@ -301,8 +301,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     if (GUI.Button(actionButtonRect, _removeIcon))
                     {
-                        DoSignPropertyCache(propertyCache, false);
-                        onGUIPayload.SetValue(propertyCache.TargetValue);
+                        if(DoSignPropertyCache(propertyCache, false))
+                        {
+                            propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                            onGUIPayload.SetValue(propertyCache.TargetValue);
+                        }
                     }
                 }
                 else
@@ -314,8 +317,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     if (GUI.Button(actionButtonRect, _refreshIcon))
                     {
-                        DoSignPropertyCache(propertyCache, false);
-                        onGUIPayload.SetValue(null);
+                        if(DoSignPropertyCache(propertyCache, false))
+                        {
+                            propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                            onGUIPayload.SetValue(null);
+                        }
                     }
                 }
             }
@@ -330,9 +336,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         genericCache.ExpectedType, genericCache.ExpectedInterface,
                         newValue =>
                         {
+                            var oldValue = propertyCache.TargetValue;
                             propertyCache.TargetValue = newValue;
-                            DoSignPropertyCache(propertyCache, false);
-                            onGUIPayload.SetValue(newValue);
+                            if(DoSignPropertyCache(propertyCache, false))
+                            {
+                                propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                                onGUIPayload.SetValue(newValue);
+                            }
+                            else
+                            {
+                                propertyCache.TargetValue = oldValue;
+                            }
                         }, propertyCache.Parent);
                 }
             }
@@ -354,9 +368,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     genericCache.ExpectedType, genericCache.ExpectedInterface,
                     newValue =>
                     {
+                        object oldValue = propertyCache.TargetValue;
                         propertyCache.TargetValue = newValue;
-                        DoSignPropertyCache(propertyCache, false);
-                        onGUIPayload.SetValue(newValue);
+                        if(DoSignPropertyCache(propertyCache, false))
+                        {
+                            propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                            onGUIPayload.SetValue(newValue);
+                        }
+                        else
+                        {
+                            propertyCache.TargetValue = oldValue;
+                        }
                     }, propertyCache.Parent);
             }
 

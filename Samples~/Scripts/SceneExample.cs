@@ -24,9 +24,9 @@ namespace SaintsField.Samples.Scripts
         [ReadOnly]
         [Scene] public string sceneDisabled;
 
-        private void Start()
-        {
-            SceneManager.LoadScene(fullPathScene);
-        }
+        // private void Start()
+        // {
+        //     SceneManager.LoadScene(fullPathScene);
+        // }
     }
 }

@@ -192,7 +192,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                             CanFix = true,
                             Callback = () =>
                             {
-                                DoSignPropertyCache(propertyCache, true);
+                                if (DoSignPropertyCache(propertyCache, true))
+                                {
+                                    propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                                }
                             },
                         };
                     }

@@ -290,18 +290,22 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             refreshButton.clicked += () =>
             {
-                DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex], false);
-                property.serializedObject.ApplyModifiedProperties();
-                refreshButton.style.display = DisplayStyle.None;
-                onValueChangedCallback.Invoke(genericCache.IndexToPropertyCache[propertyIndex].OriginalValue);
+                if(DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex], false))
+                {
+                    property.serializedObject.ApplyModifiedProperties();
+                    refreshButton.style.display = DisplayStyle.None;
+                    onValueChangedCallback.Invoke(genericCache.IndexToPropertyCache[propertyIndex].OriginalValue);
+                }
             };
 
             removeButton.clicked += () =>
             {
-                DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex], false);
-                property.serializedObject.ApplyModifiedProperties();
-                removeButton.style.display = DisplayStyle.None;
-                onValueChangedCallback.Invoke(genericCache.IndexToPropertyCache[propertyIndex].OriginalValue);
+                if(DoSignPropertyCache(genericCache.IndexToPropertyCache[propertyIndex], false))
+                {
+                    property.serializedObject.ApplyModifiedProperties();
+                    removeButton.style.display = DisplayStyle.None;
+                    onValueChangedCallback.Invoke(genericCache.IndexToPropertyCache[propertyIndex].OriginalValue);
+                }
             };
 
             GetByXPathAttribute getByXPathAttribute = genericCache.GetByXPathAttributes[0];
@@ -321,10 +325,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     OpenPicker(property, info, genericCache.GetByXPathAttributes, genericCache.ExpectedType, genericCache.ExpectedInterface,
                         newValue =>
                         {
+                            object oldValue = propertyCache.TargetValue;
                             propertyCache.TargetValue = newValue;
-                            DoSignPropertyCache(propertyCache, false);
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke(newValue);
+                            if(DoSignPropertyCache(propertyCache, false))
+                            {
+                                property.serializedObject.ApplyModifiedProperties();
+                                onValueChangedCallback.Invoke(newValue);
+                            }
+                            else
+                            {
+                                propertyCache.TargetValue = oldValue;
+                            }
                         }, updatedParent);
                 };
 

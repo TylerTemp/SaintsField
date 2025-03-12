@@ -399,7 +399,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                     if (resign)
                     {
-                        DoSignPropertyCache(propertyInfo.PropertyCache, true);
+                        if (DoSignPropertyCache(propertyInfo.PropertyCache, true))
+                        {
+                            propertyInfo.PropertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                        }
+
                     }
                 }
 
@@ -449,7 +453,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 //         }
 
         // no longer process with element remove, because we'll always adjust array size to correct size.
-        private static void DoSignPropertyCache(PropertyCache propertyCache, bool notice)
+        private static bool DoSignPropertyCache(PropertyCache propertyCache, bool notice)
         {
             try
             {
@@ -460,14 +464,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
 #endif
-                return;
+                return false;
             }
             catch (ObjectDisposedException e)
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
 #endif
-                return;
+                return false;
             }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
@@ -488,7 +492,29 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 propertyCache.Parent,
                 propertyCache.TargetValue);
             Util.SignPropertyValue(propertyCache.SerializedProperty, propertyCache.MemberInfo, propertyCache.Parent, propertyCache.TargetValue);
-            // propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+
+            // check prefab instance
+            GameObject inspectingGo = null;
+            if (propertyCache.SerializedProperty.serializedObject.targetObject is GameObject go)
+            {
+                inspectingGo = go;
+            }
+            else if (propertyCache.SerializedProperty.serializedObject.targetObject is Component comp)
+            {
+                inspectingGo = comp.gameObject;
+            }
+
+            if (!(inspectingGo is null))
+            {
+                Object prefabHandle = PrefabUtility.GetPrefabInstanceHandle(inspectingGo);
+                // Debug.Log($"prefabHandle={prefabHandle}");
+                if (prefabHandle != null)
+                {
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(prefabHandle);
+                }
+            }
+
+            return true;
         }
 
         public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info, bool isImGui)
@@ -628,7 +654,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                     Debug.Log($"#GetByXPath# Helper: Sign {propertyCache.SerializedProperty.propertyPath} from {propertyCache.OriginalValue} to {propertyCache.TargetValue}");
 #endif
-                    DoSignPropertyCache(propertyCache, true);
+                    if (DoSignPropertyCache(propertyCache, true))
+                    {
+                        propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                    }
                 }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
