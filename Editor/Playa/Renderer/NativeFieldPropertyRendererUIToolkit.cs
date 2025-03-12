@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
-    public partial class NativePropertyRenderer
+    public partial class NativeFieldPropertyRenderer
     {
         private VisualElement _fieldElement;
 
@@ -17,15 +17,15 @@ namespace SaintsField.Editor.Playa.Renderer
                 return (null, false);
             }
 
-            object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
+            object value = GetValue(FieldWithInfo);
 
             VisualElement container = new VisualElement
             {
                 userData = value,
-                name = $"saints-field--native-property--{FieldWithInfo.PropertyInfo.Name}",
+                name = $"saints-field--native-property-field--{GetName(FieldWithInfo)}",
             };
             VisualElement result =
-                UIToolkitLayout(value, ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name));
+                UIToolkitLayout(value, GetNiceName(FieldWithInfo));
             if(result != null)
             {
                 container.Add(result);
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             object userData = _fieldElement.userData;
-            object value = FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Target);
+            object value = GetValue(FieldWithInfo);
 
             bool isEqual = Util.GetIsEqual(userData, value);
 
@@ -68,8 +68,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 StyleEnum<DisplayStyle> displayStyle = child.style.display;
                 _fieldElement.Clear();
                 _fieldElement.userData = value;
-                _fieldElement.Add(child = UIToolkitLayout(value,
-                    ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name)));
+                _fieldElement.Add(child = UIToolkitLayout(value, GetNiceName(FieldWithInfo)));
                 child.style.display = displayStyle;
             }
 

@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
-    public partial class NonSerializedFieldRenderer
+    public partial class NativeFieldPropertyRenderer
     {
         protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
-            if (!_renderField)
+            if (!RenderField)
             {
                 return;
             }
@@ -24,25 +24,22 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
-            if (!_renderField)
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (!RenderField)
             {
-                return 0;
+                return 0f;
             }
-
-            return FieldHeight(FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target),
-                ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name));
+            return FieldHeight(GetValue(FieldWithInfo), GetNiceName(FieldWithInfo));
         }
 
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
-            if (!_renderField)
+            if (!RenderField)
             {
                 return;
             }
 
-            object value = FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
-            FieldPosition(position, value, ObjectNames.NicifyVariableName(FieldWithInfo
-                .FieldInfo.Name));
+            FieldPosition(position, GetValue(FieldWithInfo), GetNiceName(FieldWithInfo));
         }
     }
 }

@@ -39,6 +39,7 @@ namespace SaintsField.Editor.ColorPalette
         {
             List<SaintsField.ColorPalette> nowColorPalettes = new List<SaintsField.ColorPalette>();
             string[] guids = AssetDatabase.FindAssets("t:" + nameof(SaintsField.ColorPalette));
+            // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (string guid in guids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);

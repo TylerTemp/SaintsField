@@ -841,11 +841,11 @@ namespace SaintsField.Editor
                     }
                     return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.NonSerializedField:
-                    return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo);
+                    // return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo);
+                case SaintsRenderType.NativeProperty:
+                    return new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.Method:
                     return new MethodRenderer(serializedObject, fieldWithInfo);
-                case SaintsRenderType.NativeProperty:
-                    return new NativePropertyRenderer(serializedObject, fieldWithInfo);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }

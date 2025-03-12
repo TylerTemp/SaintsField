@@ -100,6 +100,7 @@ namespace SaintsField.Editor.ColorPalette
         public SaintsField.ColorPalette editorInlineInspect;
 
         [Ordered, Button("<color=red><icon=trash.png/></color> Delete"), PlayaHideIf(nameof(EditorInlineInspectNoFile))]
+        // ReSharper disable once UnusedMember.Local
         private void Delete()
         {
             string path = AssetDatabase.GetAssetPath(inspectTarget);

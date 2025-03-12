@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 {
-    public partial class ResultsRenderer: NativePropertyRenderer
+    public partial class ResultsRenderer: NativeFieldPropertyRenderer
     {
         private readonly AutoRunnerWindowBase _autoRunner;
 
