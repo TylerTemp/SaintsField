@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.35.1 ##
+
+Fix auto getters won't apply changes in some cases [#161](https://github.com/TylerTemp/SaintsField/issues/161)
+
 ## 3.35.0 ##
 
 1.  `Show/Hide/Disable/Endable-If` now accept sub-fields.

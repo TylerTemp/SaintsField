@@ -81,10 +81,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.35.0**
+**3.35.1**
 
-1.  `Show/Hide/Disable/Endable-If` now accept sub-fields.
-2.  rich label now support `<field />`, `<field.subField/>`, `<field.subField=formatControl />` to display the target field's value.
+Fix auto getters won't apply changes in some cases [#161](https://github.com/TylerTemp/SaintsField/issues/161)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
