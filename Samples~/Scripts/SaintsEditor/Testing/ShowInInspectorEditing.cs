@@ -14,6 +14,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         [ShowInInspector] private bool _boolV;
+        [ShowInInspector] private byte _byteV;
+        [ShowInInspector] private sbyte _sbyteV;
         [ShowInInspector] private short _shortV = -5;
         [ShowInInspector] private ushort _ushortV = 0;
         [ShowInInspector] private long _longV = long.MaxValue;

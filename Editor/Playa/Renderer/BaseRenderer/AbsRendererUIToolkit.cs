@@ -398,6 +398,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static StyleSheet _nullUss;
 
+        // Obsolete: Need to merge to UIToolkitValueEdit
         protected static VisualElement UIToolkitLayout(object value, string label, Type type=null)
         {
             if (type == null && value == null)
@@ -747,9 +748,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     fieldValue = fieldInfo.GetValue(value);
                 }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
                 catch (NullReferenceException e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);
@@ -818,6 +819,70 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(sbyte))
+            {
+                if (oldElement is IntegerField integerField)
+                {
+                    integerField.SetValueWithoutNotify((sbyte)value);
+                    return null;
+                }
+
+                IntegerField element = new IntegerField(label)
+                {
+                    value = (sbyte)value,
+                };
+                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        sbyte newValue = (sbyte)evt.newValue;
+                        setterOrNull(newValue);
+                        if (newValue != evt.newValue)
+                        {
+                            element.SetValueWithoutNotify(newValue);
+                        }
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(byte))
+            {
+                if (oldElement is IntegerField oldIntegerField)
+                {
+                    oldIntegerField.SetValueWithoutNotify((byte)value);
+                    return null;
+                }
+
+                IntegerField element = new IntegerField(label)
+                {
+                    value = (byte)value,
+                };
+                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        byte newValue = (byte)evt.newValue;
+                        setterOrNull(newValue);
+                        if (newValue != evt.newValue)
+                        {
+                            element.SetValueWithoutNotify(newValue);
+                        }
                     });
                 }
 

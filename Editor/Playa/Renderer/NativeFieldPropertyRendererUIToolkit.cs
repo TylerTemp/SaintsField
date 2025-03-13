@@ -31,7 +31,17 @@ namespace SaintsField.Editor.Playa.Renderer
 
             VisualElement container = new VisualElement
             {
-                // userData = value,
+                style =
+                {
+                    borderLeftWidth = 2,
+                    borderRightWidth = 2,
+                    borderLeftColor = EColor.EditorEmphasized.GetColor(),
+                    borderRightColor = EColor.EditorEmphasized.GetColor(),
+                    borderTopLeftRadius = 3,
+                    borderBottomLeftRadius = 3,
+                    marginLeft = 1,
+                    marginRight = 1,
+                },
                 name = $"saints-field--native-property-field--{GetName(FieldWithInfo)}",
             };
             // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
