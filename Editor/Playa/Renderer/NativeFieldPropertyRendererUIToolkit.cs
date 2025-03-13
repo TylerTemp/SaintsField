@@ -1,14 +1,24 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Linq;
 using SaintsField.Editor.Utils;
-using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class NativeFieldPropertyRenderer
     {
-        private VisualElement _fieldElement;
+        // private VisualElement _fieldElement;
+
+        private string NameContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}";
+        private string NameResult() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-result";
+
+        private class DataPayload
+        {
+            public bool HasDrawer;
+            public Action<object> Setter;
+            public object Value;
+        }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
@@ -21,26 +31,38 @@ namespace SaintsField.Editor.Playa.Renderer
 
             VisualElement container = new VisualElement
             {
-                userData = value,
+                // userData = value,
                 name = $"saints-field--native-property-field--{GetName(FieldWithInfo)}",
             };
-            VisualElement result =
-                UIToolkitLayout(value, GetNiceName(FieldWithInfo));
+            // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
+            Action<object> setter = GetSetterOrNull(FieldWithInfo);
+            VisualElement result = UIToolkitValueEdit(null, GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, setter);
+            //
             if(result != null)
             {
+                result.name = NameResult();
                 container.Add(result);
+                container.userData = new DataPayload
+                {
+                    HasDrawer = true,
+                    Value = value,
+                    Setter = setter,
+                };
+            }
+            else
+            {
+                container.userData = new DataPayload
+                {
+                    HasDrawer = false,
+                    Value = null,
+                    Setter = setter,
+                };
             }
 
-            // _callUpdate = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute) > 0;
-            // container.RegisterCallback<AttachToPanelEvent>(_ =>
-            //     container.schedule.Execute(() => WatchValueChanged(FieldWithInfo, container, callUpdate)).Every(100)
-            // );
-
-            return (_fieldElement = container, result != null);
+            return (container, true);
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
-            // private static void WatchValueChanged(SaintsFieldWithInfo fieldWithInfo,  VisualElement container, bool callUpdate)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
             if (!RenderField)
@@ -48,28 +70,38 @@ namespace SaintsField.Editor.Playa.Renderer
                 return preCheckResult;
             }
 
-            if (_fieldElement == null)
-            {
-                return preCheckResult;
-            }
+            VisualElement container= root.Q<VisualElement>(NameContainer());
 
-            object userData = _fieldElement.userData;
+            DataPayload userData = (DataPayload)container.userData;
+
             object value = GetValue(FieldWithInfo);
-
-            bool isEqual = Util.GetIsEqual(userData, value);
-
-            VisualElement child = _fieldElement.Children().First();
+            bool isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
+            VisualElement fieldElementOrNull = container.Q<VisualElement>(NameResult());
 
             if (!isEqual)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
                 Debug.Log($"native property update {container.name} {userData} -> {value}");
 #endif
-                StyleEnum<DisplayStyle> displayStyle = child.style.display;
-                _fieldElement.Clear();
-                _fieldElement.userData = value;
-                _fieldElement.Add(child = UIToolkitLayout(value, GetNiceName(FieldWithInfo)));
-                child.style.display = displayStyle;
+                userData.Value = value;
+                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, userData.Setter);
+                if(result != null)
+                {
+                    result.name = NameResult();
+                    container.Clear();
+                    container.Add(result);
+                    userData.HasDrawer = true;
+                }
+                else
+                {
+                    userData.HasDrawer = false;
+                }
+
+                // StyleEnum<DisplayStyle> displayStyle = child.style.display;
+                // fieldElement.Clear();
+                // fieldElement.userData = value;
+                // fieldElement.Add(child = UIToolkitValueEdit(GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, GetSetterOrNull(FieldWithInfo)));
+                // child.style.display = displayStyle;
             }
 
             return preCheckResult;

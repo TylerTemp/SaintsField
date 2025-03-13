@@ -770,6 +770,826 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             visualElement.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
             return visualElement;
         }
+
+        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> setterOrNull)
+        {
+            // if (RuntimeUtil.IsNull(value))
+            // {
+            //     return null;
+            // }
+
+            if (valueType == typeof(bool))
+            {
+                if (oldElement is Toggle oldToggle)
+                {
+                    oldToggle.SetValueWithoutNotify(Convert.ToBoolean(value));
+                    return null;
+                }
+
+                Toggle element = new Toggle(label)
+                {
+                    value = (bool)value,
+                };
+                element.AddToClassList(Toggle.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(short))
+            {
+                if (oldElement is IntegerField oldIntegerField)
+                {
+                    oldIntegerField.SetValueWithoutNotify((short)value);
+                    return null;
+                }
+
+                IntegerField element = new IntegerField(label)
+                {
+                    value = (short)value,
+                };
+                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        short newValue = (short)evt.newValue;
+                        setterOrNull(newValue);
+                        if (newValue != evt.newValue)
+                        {
+                            element.SetValueWithoutNotify(newValue);
+                        }
+                    });
+                }
+                return element;
+            }
+            if (valueType == typeof(ushort))
+            {
+                if (oldElement is IntegerField oldIntegerField)
+                {
+                    oldIntegerField.SetValueWithoutNotify((ushort)value);
+                    return null;
+                }
+
+                IntegerField element = new IntegerField(label)
+                {
+                    value = (ushort)value,
+                };
+                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        ushort newValue = (ushort)evt.newValue;
+                        setterOrNull(newValue);
+                        if (newValue != evt.newValue)
+                        {
+                            element.SetValueWithoutNotify(newValue);
+                        }
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(int))
+            {
+                if (oldElement is IntegerField oldIntegerField)
+                {
+                    oldIntegerField.SetValueWithoutNotify((int)value);
+                    return null;
+                }
+
+                IntegerField element = new IntegerField(label)
+                {
+                    value = (int)value,
+                };
+                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(uint))
+            {
+                if (oldElement is LongField oldLongField)
+                {
+                    oldLongField.SetValueWithoutNotify((uint)value);
+                    return null;
+                }
+
+                LongField element = new LongField(label)
+                {
+                    value = (uint)value,
+                };
+                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        uint newValue = (uint)evt.newValue;
+                        setterOrNull(newValue);
+                        if (newValue != evt.newValue)
+                        {
+                            element.SetValueWithoutNotify(newValue);
+                        }
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(long))
+            {
+                if (oldElement is LongField oldLongField)
+                {
+                    oldLongField.SetValueWithoutNotify((long)value);
+                    return null;
+                }
+
+                LongField element = new LongField(label)
+                {
+                    value = (long)value,
+                };
+                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(ulong))
+            {
+                // wtf...
+                // long longValue = Convert.ToInt64(value);
+                // long longValue = unchecked((long) value);
+                // long longValue = unchecked((long)Convert.ChangeType(value, typeof(long)));
+                // long longValue = (long) value;
+                ulong ulongRawValue = (ulong)value;
+                long longValue = (long) ulongRawValue;
+                if (oldElement is LongField oldLongField)
+                {
+                    oldLongField.SetValueWithoutNotify(longValue);
+                    return null;
+                }
+
+                LongField element = new LongField(label)
+                {
+                    value = longValue,
+                };
+
+                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        // wtf x2...
+                        long rawNewValue = evt.newValue;
+                        ulong useNewValue;
+                        if (rawNewValue < 0)
+                        {
+                            useNewValue = 0;
+                        }
+                        else
+                        {
+                            useNewValue = (ulong) rawNewValue;
+                        }
+                        long checkLong = (long) useNewValue;
+
+                        setterOrNull(useNewValue);
+                        if (rawNewValue != checkLong)
+                        {
+                            element.SetValueWithoutNotify(checkLong);
+                        }
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(float))
+            {
+                if (oldElement is FloatField oldFloatField)
+                {
+                    oldFloatField.SetValueWithoutNotify((float)value);
+                    return null;
+                }
+
+                FloatField element = new FloatField(label)
+                {
+                    value = (float)value,
+                };
+                element.AddToClassList(FloatField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(double))
+            {
+                if (oldElement is DoubleField oldDoubleField)
+                {
+                    oldDoubleField.SetValueWithoutNotify((double)value);
+                    return null;
+                }
+
+                DoubleField element = new DoubleField(label)
+                {
+                    value = (double)value,
+                };
+                element.AddToClassList(DoubleField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(string))
+            {
+                if (oldElement is TextField oldTextField)
+                {
+                    oldTextField.SetValueWithoutNotify((string)value);
+                    return null;
+                }
+
+                TextField element = new TextField(label)
+                {
+                    value = (string)value,
+                };
+                element.AddToClassList(TextField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Vector2))
+            {
+                if (oldElement is Vector2Field oldVector2Field)
+                {
+                    oldVector2Field.SetValueWithoutNotify((Vector2)value);
+                    return null;
+                }
+
+                Vector2Field element = new Vector2Field(label)
+                {
+                    value = (Vector2)value,
+                };
+                element.AddToClassList(Vector2Field.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Vector3))
+            {
+                if (oldElement is Vector3Field oldVector3Field)
+                {
+                    oldVector3Field.SetValueWithoutNotify((Vector3)value);
+                    return null;
+                }
+
+                Vector3Field element = new Vector3Field(label)
+                {
+                    value = (Vector3)value,
+                };
+                element.AddToClassList(Vector3Field.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Vector4))
+            {
+                if (oldElement is Vector4Field oldVector4Field)
+                {
+                    oldVector4Field.SetValueWithoutNotify((Vector4)value);
+                    return null;
+                }
+
+                Vector4Field element = new Vector4Field(label)
+                {
+                    value = (Vector4)value,
+                };
+                element.AddToClassList(Vector4Field.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Vector2Int))
+            {
+                if (oldElement is Vector2IntField oldVector2IntField)
+                {
+                    oldVector2IntField.SetValueWithoutNotify((Vector2Int)value);
+                    return null;
+                }
+
+                Vector2IntField element = new Vector2IntField(label)
+                {
+                    value = (Vector2Int)value,
+                };
+                element.AddToClassList(Vector2IntField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Vector3Int))
+            {
+                if (oldElement is Vector3IntField oldVector3IntField)
+                {
+                    oldVector3IntField.SetValueWithoutNotify((Vector3Int)value);
+                    return null;
+                }
+
+                Vector3IntField element = new Vector3IntField(label)
+                {
+                    value = (Vector3Int)value,
+                };
+                element.AddToClassList(Vector3IntField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Color))
+            {
+                if (oldElement is ColorField oldColorField)
+                {
+                    oldColorField.SetValueWithoutNotify((Color)value);
+                    return null;
+                }
+
+                ColorField element = new ColorField(label)
+                {
+                    value = (Color)value,
+                };
+                element.AddToClassList(ColorField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Bounds))
+            {
+                if (oldElement is BoundsField oldBoundsField)
+                {
+                    oldBoundsField.SetValueWithoutNotify((Bounds)value);
+                    return null;
+                }
+
+                BoundsField element = new BoundsField(label)
+                {
+                    value = (Bounds)value,
+                };
+                element.AddToClassList(BoundsField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(Rect))
+            {
+                if (oldElement is RectField oldRectField)
+                {
+                    oldRectField.SetValueWithoutNotify((Rect)value);
+                    return null;
+                }
+
+                RectField element = new RectField(label)
+                {
+                    value = (Rect)value,
+                };
+                element.AddToClassList(RectField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(RectInt))
+            {
+                if (oldElement is RectIntField oldRectIntField)
+                {
+                    oldRectIntField.SetValueWithoutNotify((RectInt)value);
+                    return null;
+                }
+
+                RectIntField element = new RectIntField(label)
+                {
+                    value = (RectInt)value,
+                };
+                element.AddToClassList(RectIntField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType.BaseType == typeof(Enum))
+            {
+                if (oldElement is EnumField oldEnumField)
+                {
+                    oldEnumField.SetValueWithoutNotify((Enum)value);
+                    return null;
+                }
+
+                EnumField element = new EnumField(label, (Enum)value);
+                // ReSharper disable once PossibleNullReferenceException
+                typeof(EnumField).GetField("m_EnumType", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(element, valueType);
+                element.AddToClassList(EnumField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
+            {
+                if (oldElement is ObjectField oldUnityEngineObjectField)
+                {
+                    oldUnityEngineObjectField.objectType = valueType;
+                    oldUnityEngineObjectField.SetValueWithoutNotify((UnityEngine.Object)value);
+                    return null;
+                }
+
+                ObjectField element = new ObjectField(label)
+                {
+                    value = (UnityEngine.Object)value,
+                    objectType = valueType,
+                };
+                element.AddToClassList(ObjectField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType.BaseType == typeof(TypeInfo))  // generic type?
+            {
+                // EditorGUILayout.TextField(label, value.ToString());
+                return WrapVisualElement(new TextField(label)
+                {
+                    value = value.ToString(),
+                });
+            }
+            if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+            {
+                // ReSharper disable once AssignNullToNotNullAttribute
+                object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
+
+                Foldout foldout = new Foldout
+                {
+                    text = $"{label} <color=#808080ff>(Dictionary x{kvPairs.Length})</color>",
+                };
+
+                const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                              BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+
+                foreach ((object kvPair, int index) in kvPairs.WithIndex())
+                {
+                    Type kvPairType = kvPair.GetType();
+                    PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
+                    if (keyProp == null)
+                    {
+                        foldout.Add(new HelpBox($"Failed to obtain key on element {index}: {kvPair}", HelpBoxMessageType.Error));
+                        continue;
+                    }
+                    PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
+                    if (valueProp == null)
+                    {
+                        foldout.Add(new HelpBox($"Failed to obtain value on element {index}: {kvPair}", HelpBoxMessageType.Error));
+                        continue;
+                    }
+
+                    object dictKey = keyProp.GetValue(kvPair);
+                    object dictValue = valueProp.GetValue(kvPair);
+                    foldout.Add(UIToolkitLayout(dictKey, $"{dictKey} <color=#808080ff>(Key {index})</color>"));
+                    VisualElement valueContainer = new VisualElement
+                    {
+                        style =
+                        {
+                            paddingLeft = SaintsPropertyDrawer.IndentWidth,
+                        },
+                    };
+                    valueContainer.Add(UIToolkitLayout(dictValue, $"{dictValue} <color=#808080ff>(Value {index})</color>"));
+                    foldout.Add(valueContainer);
+                }
+
+                return foldout;
+                // return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
+            }
+            if (value is IEnumerable enumerableValue)
+            {
+                // List<object> values = enumerableValue.Cast<object>().ToList();
+                // Debug.Log($"!!!!!!!!!{value}/{valueType}/{valueType.IsArray}/{valueType.BaseType}");
+                // return new ListView(((IEnumerable<object>)enumerableValue).ToList());
+                VisualElement root = new VisualElement();
+
+                Foldout foldout = new Foldout
+                {
+                    text = label,
+                };
+
+                // this is sooooo buggy.
+                // ListView listView = new ListView(
+                //     values,
+                //     -1f,
+                //     () => new VisualElement(),
+                //     (element, index) => element.Add(UIToolkitLayout(values[index], $"Element {index}")))
+                // {
+                //     showBorder = true,
+                //     showBoundCollectionSize  = true,
+                // };
+                VisualElement listView = new VisualElement
+                {
+                    style =
+                    {
+                        backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f),
+
+                        borderTopWidth = 1,
+                        borderLeftWidth = 1,
+                        borderRightWidth = 1,
+                        borderBottomWidth = 1,
+                        borderTopLeftRadius = 3,
+                        borderTopRightRadius = 3,
+                        borderBottomLeftRadius = 3,
+                        borderBottomRightRadius = 3,
+                        borderLeftColor = EColor.MidnightAsh.GetColor(),
+                        borderRightColor = EColor.MidnightAsh.GetColor(),
+                        borderTopColor = EColor.MidnightAsh.GetColor(),
+                        borderBottomColor = EColor.MidnightAsh.GetColor(),
+
+                        paddingTop = 2,
+                        paddingBottom = 2,
+                        paddingLeft = 2,
+                        paddingRight = 2,
+                    },
+                };
+
+                foreach ((object item, int index) in enumerableValue.Cast<object>().WithIndex())
+                {
+                    VisualElement child = UIToolkitLayout(item, $"Element {index}");
+                    listView.Add(child);
+                }
+
+                listView.SetEnabled(false);
+
+                foldout.RegisterValueChangedCallback(evt =>
+                {
+                    listView.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                });
+
+                root.Add(foldout);
+                root.Add(listView);
+
+                return WrapVisualElement(root);
+            }
+
+            if (RuntimeUtil.IsNull(value))
+            {
+                TextField textField = new TextField(label)
+                {
+                    value = "null",
+                    pickingMode = PickingMode.Ignore,
+                };
+
+                if(_nullUss == null)
+                {
+                    _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
+                }
+                textField.styleSheets.Add(_nullUss);
+
+                return WrapVisualElement(textField);
+            }
+
+            // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            Foldout genFoldout = oldElement as Foldout;
+            bool useOld = genFoldout != null;
+            if (!useOld)
+            {
+                genFoldout = new Foldout
+                {
+                    text = label,
+                };
+            }
+            foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
+            {
+                string name = fieldInfo.Name;
+                object fieldValue = fieldInfo.GetValue(value);
+                VisualElement result = UIToolkitValueEdit(
+                    oldElement?.Q<VisualElement>(name: name),
+                    ObjectNames.NicifyVariableName(name),
+                    fieldInfo.FieldType,
+                    fieldValue,
+                    newValue =>
+                    {
+                        fieldInfo.SetValue(value, newValue);
+                        setterOrNull?.Invoke(value);
+                    });
+                // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
+                // ReSharper disable once InvertIf
+                if(result != null)
+                {
+                    result.name = name;
+                    genFoldout.Add(result);
+                }
+            }
+
+            foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
+            {
+                if (!propertyInfo.CanRead)
+                {
+                    continue;
+                }
+
+                string name = propertyInfo.Name;
+                object propertyValue = propertyInfo.GetValue(value);
+
+                VisualElement result = UIToolkitValueEdit(
+                    oldElement?.Q<VisualElement>(name: name),
+                    ObjectNames.NicifyVariableName(name),
+                    propertyInfo.PropertyType,
+                    propertyValue,
+                    propertyInfo.CanWrite
+                        ? (newValue =>
+                        {
+                            propertyInfo.SetValue(value, newValue);
+                            setterOrNull?.Invoke(newValue);
+                        })
+                        : null);
+                // ReSharper disable once InvertIf
+                if(result != null)
+                {
+                    result.name = name;
+                    genFoldout.Add(result);
+                }
+            }
+
+            return useOld? null: genFoldout;
+        }
     }
 }
 #endif

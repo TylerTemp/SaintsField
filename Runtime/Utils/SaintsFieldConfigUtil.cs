@@ -61,9 +61,9 @@ namespace SaintsField.Utils
             // }
 
             // Debug.Log("Reload");
-#if SAINTSFIELD_DEBUG
-            Debug.Log("Load SaintsFieldConfig");
-#endif
+// #if SAINTSFIELD_DEBUG
+//             Debug.Log("Load SaintsFieldConfig");
+// #endif
             try
             {
                 Config = (SaintsFieldConfig)EditorGUIUtility.Load(EditorResourcePath);
