@@ -2,7 +2,6 @@
 using SaintsField.Playa;
 using UnityEditor;
 using System.Linq;
-using System.Reflection;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -14,6 +13,10 @@ namespace SaintsField.Editor.Playa.Renderer
         public NativeFieldPropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             RenderField = fieldWithInfo.PlayaAttributes.Any(each => each is ShowInInspectorAttribute);
+            if (RenderField && FieldWithInfo.PropertyInfo != null)
+            {
+                RenderField = FieldWithInfo.PropertyInfo.CanRead;
+            }
         }
 
         public override void OnDestroy()

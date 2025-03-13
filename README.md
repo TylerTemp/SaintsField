@@ -81,9 +81,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.35.1**
+**3.36.0**
 
-Fix auto getters won't apply changes in some cases [#161](https://github.com/TylerTemp/SaintsField/issues/161)
+1.  Allow `ShowInInspector` to editor in inspector like Odin. (Does not support list/array, dictionary, null-class yet)
+2.  `ShowInInspector` add `byte`/`sbyte` type support ([PR](https://github.com/TylerTemp/SaintsField/pull/164) by [@Insprill](https://github.com/Insprill))
+3.  Suppress all compiler warnings of CS0168 & CS0219 caused by preprocessors ([PR](https://github.com/TylerTemp/SaintsField/pull/165) by [@Insprill](https://github.com/Insprill))
+4.  `ShowInInspector` no longer try to display a property without a getter
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1383,6 +1386,12 @@ public List<MyStruct> myStructs;
 > Enable `SaintsEditor` before using
 
 Show a non-field property.
+
+For UI Toolkit: this attribute allow you to edit the corresponing field like odin do. Limitation:
+
+1.  UI Toolkit only
+2.  Does not use custom drawer even the type has one (Same as Odin)
+3.  Does not support list/array/dictionary/null-class yet
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
