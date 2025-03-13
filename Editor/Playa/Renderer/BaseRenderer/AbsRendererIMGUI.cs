@@ -567,6 +567,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             Type valueType = value.GetType();
 
             if (valueType == typeof(bool)
+                || valueType == typeof(sbyte)
+                || valueType == typeof(byte)
                 || valueType == typeof(short)
                 || valueType == typeof(ushort)
                 || valueType == typeof(int)
@@ -682,6 +684,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return EditorGUI.Toggle(position, label, (bool)value);
                 }
 
+                if (valueType == typeof(sbyte))
+                {
+                    return EditorGUI.IntField(position, label, (sbyte)value);
+                }
+                if (valueType == typeof(byte))
+                {
+                    return EditorGUI.IntField(position, label, (byte)value);
+                }
                 if (valueType == typeof(short))
                 {
                     return EditorGUI.IntField(position, label, (short)value);
