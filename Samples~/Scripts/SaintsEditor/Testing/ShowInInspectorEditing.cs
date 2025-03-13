@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -51,5 +52,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         [ShowInInspector] private MyStruct _myStruct;
+
+        [ShowInInspector] private Color[] _colors = {Color.red, Color.green, Color.blue};
+
+        [ShowInInspector] private Dictionary<string, Color> _dictColors = new Dictionary<string, Color>
+        {
+            { "Red", Color.red },
+            { "Green", Color.green },
+            { "Blue", Color.blue },
+        };
     }
 }

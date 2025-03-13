@@ -1385,14 +1385,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType.BaseType == typeof(TypeInfo))  // generic type?
-            {
-                // EditorGUILayout.TextField(label, value.ToString());
-                return WrapVisualElement(new TextField(label)
-                {
-                    value = value.ToString(),
-                });
-            }
             if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
@@ -1505,6 +1497,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 root.Add(listView);
 
                 return WrapVisualElement(root);
+            }
+            if (valueType.BaseType == typeof(TypeInfo))  // generic type?
+            {
+                // EditorGUILayout.TextField(label, value.ToString());
+                return WrapVisualElement(new TextField(label)
+                {
+                    value = value.ToString(),
+                });
             }
 
             if (RuntimeUtil.IsNull(value))
