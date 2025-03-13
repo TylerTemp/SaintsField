@@ -46,9 +46,12 @@ namespace SaintsField.Editor.Playa.Renderer
                 return value => fieldWithInfo.FieldInfo.SetValue(fieldWithInfo.Target, value);
             }
 
-            return fieldWithInfo.PropertyInfo.CanWrite
-                ? value => fieldWithInfo.PropertyInfo.SetValue(fieldWithInfo.Target, value)
-                : null;
+            if (fieldWithInfo.PropertyInfo.CanWrite)
+            {
+                return value => fieldWithInfo.PropertyInfo.SetValue(fieldWithInfo.Target, value);
+            }
+
+            return null;
 
             // MethodInfo prop = fieldWithInfo.PropertyInfo?.GetSetMethod(true);
             // if (prop != null)
