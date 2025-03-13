@@ -335,8 +335,10 @@ namespace SaintsField.Editor.TroubleshootEditor
             return result;
         }
 
+#pragma warning disable CS0414
         private (EMessageType, string) _targetMessage = (EMessageType.Warning, null);
         private (EMessageType, string) _fieldMessage = (EMessageType.Warning, null);
+#pragma warning restore CS0414
 
         // [Ordered, ]
         private void RunTargetChecker(int index)

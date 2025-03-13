@@ -459,14 +459,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 string _ = propertyCache.SerializedProperty.propertyPath;
             }
+#pragma warning disable CS0168 
             catch (NullReferenceException e)
+#pragma warning restore CS0168 
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
 #endif
                 return false;
             }
+#pragma warning disable CS0168 
             catch (ObjectDisposedException e)
+#pragma warning restore CS0168 
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
@@ -623,7 +627,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         processingProperty =
                             target.ArrayProperty.GetArrayElementAtIndex(propertyCacheKey);
                     }
+#pragma warning disable CS0168 
                     catch (NullReferenceException e)
+#pragma warning restore CS0168 
                     {
 #if SAINTSFIELD_DEBUG
                         Debug.LogException(e);

@@ -155,11 +155,15 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
             {
+#pragma warning disable CS0219
                 float minHeight = AdvancedDropdownAttribute.MinHeight;
+#pragma warning restore CS0219
                 float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
                     ? AdvancedDropdownAttribute.ItemHeight
                     : EditorGUIUtility.singleLineHeight;
+#pragma warning disable CS0219
                 float titleHeight = AdvancedDropdownAttribute.TitleHeight;
+#pragma warning restore CS0219
                 Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(metaInfo.DropdownListValue, position.width);
 
                 // OnGUIPayload targetPayload = onGUIPayload;

@@ -670,7 +670,9 @@ namespace SaintsField.Editor.Utils
                 {
                     go = property.pptrValue;
                 }
+#pragma warning disable CS0168 
                 catch (Exception e)
+#pragma warning restore CS0168 
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);

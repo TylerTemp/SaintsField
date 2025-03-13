@@ -163,9 +163,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                                 {
                                     return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
                                 }
-#pragma warning disable CS0168 // Variable is declared but never used
+#pragma warning disable CS0168 
                                 catch (Exception e)
-#pragma warning restore CS0168 // Variable is declared but never used
+#pragma warning restore CS0168 
                                 {
 #if SAINTSFIELD_DEBUG
                                     Debug.LogException(e);

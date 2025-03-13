@@ -379,7 +379,9 @@ namespace SaintsField.Editor.Core
                                             {
                                                 tagFinalResult = string.Format(formatString, finalValue);
                                             }
+#pragma warning disable CS0168 
                                             catch (Exception ex)
+#pragma warning restore CS0168 
                                             {
 #if SAINTSFIELD_DEBUG
                                                 Debug.LogException(ex);
