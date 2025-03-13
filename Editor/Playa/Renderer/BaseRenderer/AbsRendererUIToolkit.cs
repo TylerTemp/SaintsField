@@ -430,6 +430,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 });
             }
 
+            if (valueType == typeof(sbyte))
+            {
+                // EditorGUILayout.IntField(label, (sbyte)value);
+                return WrapVisualElement(new IntegerField(label)
+                {
+                    value = (sbyte)value,
+                });
+            }
+            if (valueType == typeof(byte))
+            {
+                // EditorGUILayout.IntField(label, (byte)value);
+                return WrapVisualElement(new IntegerField(label)
+                {
+                    value = (byte)value,
+                });
+            }
             if (valueType == typeof(short))
             {
                 // EditorGUILayout.IntField(label, (short)value);
