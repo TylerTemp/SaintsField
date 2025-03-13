@@ -73,7 +73,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
             }
+#pragma warning disable CS0168 
             catch (ObjectDisposedException e)
+#pragma warning restore CS0168 
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
@@ -81,7 +83,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 return 0;
             }
+#pragma warning disable CS0168 
             catch (NullReferenceException e)
+#pragma warning restore CS0168 
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);

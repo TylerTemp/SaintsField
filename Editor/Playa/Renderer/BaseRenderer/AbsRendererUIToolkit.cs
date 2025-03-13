@@ -430,6 +430,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 });
             }
 
+            if (valueType == typeof(sbyte))
+            {
+                // EditorGUILayout.IntField(label, (sbyte)value);
+                return WrapVisualElement(new IntegerField(label)
+                {
+                    value = (sbyte)value,
+                });
+            }
+            if (valueType == typeof(byte))
+            {
+                // EditorGUILayout.IntField(label, (byte)value);
+                return WrapVisualElement(new IntegerField(label)
+                {
+                    value = (byte)value,
+                });
+            }
             if (valueType == typeof(short))
             {
                 // EditorGUILayout.IntField(label, (short)value);
@@ -731,9 +747,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     fieldValue = fieldInfo.GetValue(value);
                 }
-#pragma warning disable CS0168 // Variable is declared but never used
+#pragma warning disable CS0168 
                 catch (NullReferenceException e)
-#pragma warning restore CS0168 // Variable is declared but never used
+#pragma warning restore CS0168 
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);
@@ -750,7 +766,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     propertyValue = propertyInfo.GetValue(value);
                 }
+#pragma warning disable CS0168
                 catch (NullReferenceException e)
+#pragma warning restore CS0168
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);

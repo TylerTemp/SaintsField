@@ -67,7 +67,9 @@ namespace SaintsField.Editor.AutoRunner
                 {
                     so = new SerializedObject(obj);
                 }
+#pragma warning disable CS0168 
                 catch (Exception e)
+#pragma warning restore CS0168 
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
@@ -102,7 +104,9 @@ namespace SaintsField.Editor.AutoRunner
                     {
                         so = new SerializedObject(comp);
                     }
+#pragma warning disable CS0168 
                     catch (Exception e)
+#pragma warning restore CS0168 
                     {
 #if SAINTSFIELD_DEBUG
                         Debug.Log($"#AutoRunner# Skip {comp} as it's not a valid object: {e}");
@@ -243,7 +247,9 @@ namespace SaintsField.Editor.AutoRunner
                     {
                         so = new SerializedObject(extra);
                     }
+#pragma warning disable CS0168 
                     catch (Exception e)
+#pragma warning restore CS0168 
                     {
 #if SAINTSFIELD_DEBUG
                         Debug.Log($"#AutoRunner# Skip {extra} as it's not a valid object: {e}");
