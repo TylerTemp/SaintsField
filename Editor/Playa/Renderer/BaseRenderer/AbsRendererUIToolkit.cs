@@ -747,9 +747,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     fieldValue = fieldInfo.GetValue(value);
                 }
-#pragma warning disable CS0168 // Variable is declared but never used
+#pragma warning disable CS0168 
                 catch (NullReferenceException e)
-#pragma warning restore CS0168 // Variable is declared but never used
+#pragma warning restore CS0168 
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);
@@ -766,7 +766,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     propertyValue = propertyInfo.GetValue(value);
                 }
+#pragma warning disable CS0168
                 catch (NullReferenceException e)
+#pragma warning restore CS0168
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);

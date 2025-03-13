@@ -10,7 +10,9 @@ namespace SaintsField.Utils
 
 #if UNITY_EDITOR
     [InitializeOnLoad]
+#pragma warning disable CS0618
     public class SaintsFieldConfigDeleteWatcher : AssetModificationProcessor
+#pragma warning restore CS0618
     {
         // ReSharper disable once EmptyConstructor
         static SaintsFieldConfigDeleteWatcher()
@@ -68,7 +70,9 @@ namespace SaintsField.Utils
             {
                 Config = (SaintsFieldConfig)EditorGUIUtility.Load(EditorResourcePath);
             }
+#pragma warning disable CS0168
             catch (Exception e)
+#pragma warning restore CS0168
             {
                 // do nothing
 #if SAINTSFIELD_DEBUG
