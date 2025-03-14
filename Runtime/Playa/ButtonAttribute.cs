@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using SaintsField.Utils;
-#if SAINTSFIELD_JETBRAINS_RIDER
 using JetBrains.Annotations;
-#endif
-
+using SaintsField.Utils;
 
 namespace SaintsField.Playa
 {
-#if SAINTSFIELD_JETBRAINS_RIDER
     [MeansImplicitUse]
-#endif
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method)]
     public class ButtonAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute
