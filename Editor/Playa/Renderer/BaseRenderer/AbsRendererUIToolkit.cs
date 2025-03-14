@@ -790,6 +790,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return visualElement;
         }
 
+        private class LabelButtonField : BaseField<object>
+        {
+            public LabelButtonField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+            }
+        }
+
         protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> setterOrNull)
         {
             // if (RuntimeUtil.IsNull(value))
@@ -1592,19 +1599,38 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (RuntimeUtil.IsNull(value))
             {
-                TextField textField = new TextField(label)
+                if (setterOrNull is null)
                 {
-                    value = "null",
-                    pickingMode = PickingMode.Ignore,
-                };
+                    TextField textField = new TextField(label)
+                    {
+                        value = "null",
+                        pickingMode = PickingMode.Ignore,
+                    };
 
-                if(_nullUss == null)
-                {
-                    _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
+                    if(_nullUss == null)
+                    {
+                        _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
+                    }
+                    textField.styleSheets.Add(_nullUss);
+
+                    return WrapVisualElement(textField);
                 }
-                textField.styleSheets.Add(_nullUss);
 
-                return WrapVisualElement(textField);
+                LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
+                {
+                    setterOrNull(Activator.CreateInstance(valueType));
+                })
+                {
+                    text = $"null (Click to Create)",
+                    tooltip = "Click to Create",
+                    style =
+                    {
+                        flexGrow = 1,
+                        unityTextAlign = TextAnchor.MiddleLeft,
+                    },
+                });
+                labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
+                return labelButtonField;
             }
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
@@ -1616,7 +1642,42 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 genFoldout = new Foldout
                 {
                     text = label,
+                    style =
+                    {
+                        position = Position.Relative,
+                    },
                 };
+
+                // Debug.Log($"new foldout valueType: {valueType.IsValueType}, setter={setterOrNull}");
+
+                if (!valueType.IsValueType && setterOrNull != null)
+                {
+                    // nullable
+                    genFoldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+                    {
+                        // text = "x",
+                        tooltip = "Set to null",
+                        style =
+                        {
+                            position = Position.Absolute,
+                            // top = -EditorGUIUtility.singleLineHeight,
+                            top = 0,
+                            right = 0,
+                            width = EditorGUIUtility.singleLineHeight,
+                            height = EditorGUIUtility.singleLineHeight,
+
+                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+#if UNITY_2022_2_OR_NEWER
+                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                            backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                        },
+                    });
+                }
             }
             foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
             {
@@ -1669,6 +1730,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     result.name = name;
                     genFoldout.Add(result);
                 }
+            }
+
+            bool enabled = setterOrNull != null;
+            if (genFoldout.enabledSelf != enabled)
+            {
+                genFoldout.SetEnabled(enabled);
             }
 
             return useOld? null: genFoldout;
