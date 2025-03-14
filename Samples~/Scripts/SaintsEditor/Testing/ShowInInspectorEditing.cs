@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEngine;
@@ -12,6 +13,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             One,
             Two,
         }
+
+        private class MyClass
+        {
+            public string MyString;
+            public GameObject MyObj;
+            private MyEnum _myEnum;
+        }
+
 
         [ShowInInspector] private bool _boolV;
         [ShowInInspector] private byte _byteV;
@@ -37,12 +46,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [ShowInInspector] private Transform _trans;
         [ShowInInspector] private Scriptable _so;
 
-        private class MyClass
-        {
-            public string MyString;
-            public GameObject MyObj;
-            private MyEnum _myEnum;
-        }
+
 
         [ShowInInspector] private MyClass _myClass;
         [ShowInInspector] private MyClass _myClassD = new MyClass
@@ -58,6 +62,41 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [ShowInInspector] private MyStruct _myStruct;
 
         [ShowInInspector] private Color[] _colors = {Color.red, Color.green, Color.blue};
+        [ShowInInspector, Ordered] private Color[] _colorEmptyArray;
+
+        [Button, Ordered]
+        private void ArrayToNull()
+        {
+            _colorEmptyArray = null;
+        }
+
+        [Button, Ordered]
+        private void ArrayChangeColor()
+        {
+            _colorEmptyArray[0] = Color.red;
+        }
+
+        [Button, Ordered]
+        private void ArraySwap()
+        {
+            (_colorEmptyArray[0], _colorEmptyArray[1]) = (_colorEmptyArray[1], _colorEmptyArray[0]);
+        }
+
+        [ShowInInspector, Ordered] private List<Color> _colorEmptyList;
+        [Button, Ordered]
+        private void ListToNull() => _colorEmptyList = null;
+        [Button, Ordered]
+        private void ListChangeColor()
+        {
+            _colorEmptyList[0] = Color.red;
+        }
+        [Button, Ordered]
+        private void ListChangeSize()
+        {
+            _colorEmptyList.Add(Color.blue);
+        }
+
+        [ShowInInspector, Ordered] private MyClass[] _myClasses;
 
         [ShowInInspector] private Dictionary<string, Color> _dictColors = new Dictionary<string, Color>
         {

@@ -374,6 +374,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return UpdatePreCheckUIToolkitInternal(FieldWithInfo, _rootElement);
         }
 
+        // TODO: paging & searching
         private PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo, false);
@@ -1524,69 +1525,58 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (value is IEnumerable enumerableValue)
             {
-                // List<object> values = enumerableValue.Cast<object>().ToList();
-                // Debug.Log($"!!!!!!!!!{value}/{valueType}/{valueType.IsArray}/{valueType.BaseType}");
-                // return new ListView(((IEnumerable<object>)enumerableValue).ToList());
-                VisualElement root = new VisualElement();
-
-                Foldout foldout = new Foldout
-                {
-                    text = label,
-                };
-
-                // this is sooooo buggy.
-                // ListView listView = new ListView(
-                //     values,
-                //     -1f,
-                //     () => new VisualElement(),
-                //     (element, index) => element.Add(UIToolkitLayout(values[index], $"Element {index}")))
+                // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
+                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), setterOrNull);
+                // VisualElement root = new VisualElement();
+                //
+                // Foldout foldout = new Foldout
                 // {
-                //     showBorder = true,
-                //     showBoundCollectionSize  = true,
+                //     text = label,
                 // };
-                VisualElement listView = new VisualElement
-                {
-                    style =
-                    {
-                        backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f),
-
-                        borderTopWidth = 1,
-                        borderLeftWidth = 1,
-                        borderRightWidth = 1,
-                        borderBottomWidth = 1,
-                        borderTopLeftRadius = 3,
-                        borderTopRightRadius = 3,
-                        borderBottomLeftRadius = 3,
-                        borderBottomRightRadius = 3,
-                        borderLeftColor = EColor.MidnightAsh.GetColor(),
-                        borderRightColor = EColor.MidnightAsh.GetColor(),
-                        borderTopColor = EColor.MidnightAsh.GetColor(),
-                        borderBottomColor = EColor.MidnightAsh.GetColor(),
-
-                        paddingTop = 2,
-                        paddingBottom = 2,
-                        paddingLeft = 2,
-                        paddingRight = 2,
-                    },
-                };
-
-                foreach ((object item, int index) in enumerableValue.Cast<object>().WithIndex())
-                {
-                    VisualElement child = UIToolkitLayout(item, $"Element {index}");
-                    listView.Add(child);
-                }
-
-                listView.SetEnabled(false);
-
-                foldout.RegisterValueChangedCallback(evt =>
-                {
-                    listView.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
-                });
-
-                root.Add(foldout);
-                root.Add(listView);
-
-                return WrapVisualElement(root);
+                //
+                // VisualElement listView = new VisualElement
+                // {
+                //     style =
+                //     {
+                //         backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f),
+                //
+                //         borderTopWidth = 1,
+                //         borderLeftWidth = 1,
+                //         borderRightWidth = 1,
+                //         borderBottomWidth = 1,
+                //         borderTopLeftRadius = 3,
+                //         borderTopRightRadius = 3,
+                //         borderBottomLeftRadius = 3,
+                //         borderBottomRightRadius = 3,
+                //         borderLeftColor = EColor.MidnightAsh.GetColor(),
+                //         borderRightColor = EColor.MidnightAsh.GetColor(),
+                //         borderTopColor = EColor.MidnightAsh.GetColor(),
+                //         borderBottomColor = EColor.MidnightAsh.GetColor(),
+                //
+                //         paddingTop = 2,
+                //         paddingBottom = 2,
+                //         paddingLeft = 2,
+                //         paddingRight = 2,
+                //     },
+                // };
+                //
+                // foreach ((object item, int index) in enumerableValue.Cast<object>().WithIndex())
+                // {
+                //     VisualElement child = UIToolkitLayout(item, $"Element {index}");
+                //     listView.Add(child);
+                // }
+                //
+                // listView.SetEnabled(false);
+                //
+                // foldout.RegisterValueChangedCallback(evt =>
+                // {
+                //     listView.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                // });
+                //
+                // root.Add(foldout);
+                // root.Add(listView);
+                //
+                // return WrapVisualElement(root);
             }
             if (valueType.BaseType == typeof(TypeInfo))  // generic type?
             {
@@ -1596,6 +1586,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     value = value.ToString(),
                 });
             }
+
+            // TODO: Allow to select different type
 
             if (RuntimeUtil.IsNull(value))
             {
@@ -1618,6 +1610,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
                 {
+                    if (valueType.IsArray)
+                    {
+                        setterOrNull(Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0));
+                        return;
+                    }
                     setterOrNull(Activator.CreateInstance(valueType));
                 })
                 {
@@ -1739,6 +1736,215 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             return useOld? null: genFoldout;
+        }
+
+        // private int _listCurPageIndex = 0;
+        // private List<int> _listItemIndexToOriginIndex;
+
+        private class ListViewPayload
+        {
+            public List<object> RawValues;
+            public List<int> ItemIndexToOriginIndex;
+            public object RawListValue;
+        }
+
+        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> setterOrNull)
+        {
+            Foldout foldout = oldElement;
+            if (foldout == null)
+            {
+                // Debug.Log($"Create new Foldout");
+                foldout = new Foldout
+                {
+                    text = label,
+                };
+                VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
+                if (foldoutContent != null)
+                {
+                    foldoutContent.style.marginLeft = 0;
+                }
+
+                // nullable
+                foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+                {
+                    // text = "x",
+                    tooltip = "Set to null",
+                    style =
+                    {
+                        position = Position.Absolute,
+                        // top = -EditorGUIUtility.singleLineHeight,
+                        top = 0,
+                        right = 0,
+                        width = EditorGUIUtility.singleLineHeight,
+                        height = EditorGUIUtility.singleLineHeight,
+
+                        backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+#if UNITY_2022_2_OR_NEWER
+                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                        backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                    },
+                });
+            }
+
+            ListView listView = foldout.Q<ListView>();
+            if (listView == null)
+            {
+                ListViewPayload payload = new ListViewPayload
+                {
+                    RawValues = listValue.ToList(),
+                    ItemIndexToOriginIndex = listValue.Select((_, index) => index).ToList(),
+                    RawListValue = rawListValue,
+                };
+                // Debug.Log($"Create new listView");
+                listView = new ListView
+                {
+                    selectionType = SelectionType.Multiple,
+                    virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                    // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
+                    showBoundCollectionSize = false,
+                    showFoldoutHeader = false,
+                    headerTitle = label,
+                    showAddRemoveFooter = true,
+                    reorderMode = ListViewReorderMode.Animated,
+                    reorderable = true,
+                    style =
+                    {
+                        flexGrow = 1,
+                        position = Position.Relative,
+                    },
+                    itemsSource = listValue.Select(((o, index) => index)).ToList(),
+                    makeItem = () => new VisualElement(),
+
+                    userData = payload,
+                };
+
+                Type elementType = ReflectUtils.GetElementType(valueType);
+
+                void BindItem(VisualElement visualElement, int index)
+                {
+                    // int actualIndex = (int)listView.itemsSource[index];
+                    // Debug.Log($"{index} -> {actualIndex}");
+                    // Debug.Log($"index={index}, ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
+                    int actualIndex = payload.ItemIndexToOriginIndex[index];
+                    object actualValue = payload.RawValues[actualIndex];
+                    VisualElement item = UIToolkitValueEdit(
+                        visualElement.Children().FirstOrDefault(),
+                        $"Element {actualIndex}",
+                        elementType,
+                        actualValue,
+                        newItemValue =>
+                        {
+                            IList rawListValueArray = (IList) payload.RawListValue;
+                            rawListValueArray[actualIndex] = newItemValue;
+                            payload.RawValues[actualIndex] = newItemValue;
+                        });
+                    if (item != null)
+                    {
+                        visualElement.Clear();
+                        visualElement.Add(item);
+                    }
+                }
+
+                listView.bindItem = BindItem;
+
+                Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
+
+                listViewAddButton.clickable = new Clickable(() =>
+                {
+                    int oldSize = payload.RawValues.Count;
+                    int newSize = oldSize + 1;
+                    object addItem = elementType.IsValueType
+                        ? Activator.CreateInstance(elementType)
+                        : null;
+
+                    if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
+                    {
+                        Array newArray = Array.CreateInstance(elementType, newSize);
+                        payload.RawValues.Add(addItem);
+                        Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
+                        payload.RawListValue = newArray;
+                        setterOrNull?.Invoke(newArray);
+                    }
+                    else
+                    {
+                        IList rawListValueArray = (IList) payload.RawListValue;
+                        rawListValueArray.Add(addItem);
+                        payload.RawValues.Add(addItem);
+                        listView.itemsSource = payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
+                    }
+                });
+
+                listView.itemsRemoved += objects =>
+                {
+                    List<int> removeIndexInRaw = objects
+                        .Select(removeIndex => payload.ItemIndexToOriginIndex[removeIndex])
+                        .OrderByDescending(each => each)
+                        .ToList();
+
+                    if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
+                    {
+                        Array newArray = Array.CreateInstance(elementType, payload.RawValues.Count - removeIndexInRaw.Count());
+                        Array rawArray = (Array) payload.RawListValue;
+                        int copyIndex = 0;
+                        foreach ((object rawValue, int rawIndex) in rawArray.Cast<object>().WithIndex())
+                        {
+                            if (removeIndexInRaw.Contains(rawIndex))
+                            {
+                                continue;
+                            }
+
+                            newArray.SetValue(rawValue, copyIndex);
+                            copyIndex++;
+                        }
+                        // payload.RawValues.Add(addItem);
+                        // Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
+                        payload.RawListValue = newArray;
+                        setterOrNull?.Invoke(newArray);
+                    }
+                    else
+                    {
+                        IList rawListValueArray = (IList) payload.RawListValue;
+                        foreach (int removeIndex in removeIndexInRaw)
+                        {
+                            rawListValueArray.RemoveAt(removeIndex);
+                        }
+                    }
+                };
+
+                listView.itemIndexChanged += (first, second) =>
+                {
+                    int fromPropIndex = payload.ItemIndexToOriginIndex[first];
+                    int toPropIndex = payload.ItemIndexToOriginIndex[second];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+                    Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second})");
+#endif
+
+                    IList lis = (IList)payload.RawListValue;
+                    (lis[fromPropIndex], lis[toPropIndex]) = (lis[toPropIndex], lis[fromPropIndex]);
+                };
+
+                foldout.Add(listView);
+            }
+
+            ListViewPayload oldPayload = (ListViewPayload)listView.userData;
+            oldPayload.RawValues = listValue.ToList();
+            oldPayload.RawListValue = rawListValue;
+
+            // Debug.Log($"Refresh count={listValue.Length}");
+            listView.itemsSource = oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((o, index) => index).ToList();
+            // Debug.Log($"itemSource({listView.itemsSource.Count})={string.Join(",", listView.itemsSource)}");
+            // if (listValue.Length > 0)
+            // {
+            //     Debug.Log($"0 listValue={listValue[0]}; listView.itemsSource={listView.itemsSource[0]}");
+            // }
+            listView.Rebuild();
+
+            return oldElement == null? foldout : null;
         }
     }
 }

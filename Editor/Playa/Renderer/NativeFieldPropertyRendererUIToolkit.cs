@@ -1,5 +1,7 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
@@ -20,6 +22,8 @@ namespace SaintsField.Editor.Playa.Renderer
             public bool HasDrawer;
             public Action<object> Setter;
             public object Value;
+            public bool IsCollection;
+            public IReadOnlyList<object> OldCollection;
         }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
@@ -44,14 +48,21 @@ namespace SaintsField.Editor.Playa.Renderer
                     marginLeft = 1,
                     marginRight = 1,
                 },
-                name = $"saints-field--native-property-field--{GetName(FieldWithInfo)}",
+                name = NameContainer(),
             };
             // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
             Action<object> setter = GetSetterOrNull(FieldWithInfo);
-            VisualElement result = UIToolkitValueEdit(null, GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, setter);
-            //
+            Type fieldType = GetFieldType(FieldWithInfo);
+            VisualElement result = UIToolkitValueEdit(null, GetNiceName(FieldWithInfo), fieldType, value, setter);
+
+            bool isCollection = fieldType.IsArray || typeof(IList).IsAssignableFrom(fieldType);
+            // Debug.Log(isCollection);
+            // Debug.Log(fieldType);
+            // Debug.Log(typeof(IList).IsAssignableFrom(fieldType));
+
             if(result != null)
             {
+                IReadOnlyList<object> oldCollection = isCollection && (value != null) ? ((IEnumerable)value).Cast<object>().ToArray() : null;
                 result.name = NameResult();
                 container.Add(result);
                 container.userData = new DataPayload
@@ -59,6 +70,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     HasDrawer = true,
                     Value = value,
                     Setter = setter,
+                    IsCollection = isCollection,
+                    OldCollection = oldCollection,
                 };
             }
             else
@@ -68,6 +81,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     HasDrawer = false,
                     Value = null,
                     Setter = setter,
+                    IsCollection = isCollection,
+                    OldCollection = null,
                 };
             }
 
@@ -88,14 +103,43 @@ namespace SaintsField.Editor.Playa.Renderer
 
             object value = GetValue(FieldWithInfo);
             bool isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
+            if(isEqual && userData.IsCollection)
+            {
+                IReadOnlyList<object> oldCollection = userData.OldCollection;
+                if (oldCollection == null && value == null)
+                {
+                }
+                else if (oldCollection != null && value == null)
+                {
+                    isEqual = false;
+                }
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                else if (oldCollection == null && value != null)
+                {
+                    isEqual = false;
+                }
+                else
+                {
+                    isEqual = oldCollection.SequenceEqual(((IEnumerable)value).Cast<object>());
+                    // Debug.Log($"sequence equal: {isEqual}");
+                }
+            }
+            // bool isEqual = userData.HasDrawer && (userData.Value == value || ReferenceEquals(userData.Value, value));
             VisualElement fieldElementOrNull = container.Q<VisualElement>(NameResult());
+
+            // Debug.Log($"isEqual={isEqual}");
 
             if (!isEqual)
             {
+                // Debug.Log($"fieldElementOrNull={fieldElementOrNull?.name}");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-                Debug.Log($"native property update {container.name} {userData} -> {value}");
+                Debug.Log($"native property update {userData.Value} -> {value}");
 #endif
                 userData.Value = value;
+                if (userData.IsCollection)
+                {
+                    userData.OldCollection = ((IEnumerable)value)?.Cast<object>().ToArray();
+                }
                 VisualElement result = UIToolkitValueEdit(fieldElementOrNull, GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, userData.Setter);
                 if(result != null)
                 {
@@ -104,7 +148,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     container.Add(result);
                     userData.HasDrawer = true;
                 }
-                else
+                else if(fieldElementOrNull == null)
                 {
                     userData.HasDrawer = false;
                 }
