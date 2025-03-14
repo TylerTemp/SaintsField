@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.36.2 ##
+
+UI Toolkit: `ShowInInspector` can now edit list/array type
+
 ## 3.36.1 ##
 
 1.  UI Toolkit: `ShowInInspector` can now edit a general class type

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEngine;
@@ -20,7 +19,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public GameObject MyObj;
             private MyEnum _myEnum;
         }
-
 
         [ShowInInspector] private bool _boolV;
         [ShowInInspector] private byte _byteV;
@@ -71,7 +69,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         [Button, Ordered]
-        private void ArrayChangeColor()
+        private void ArrayChange0ToRed()
         {
             _colorEmptyArray[0] = Color.red;
         }

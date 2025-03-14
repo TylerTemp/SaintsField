@@ -1875,7 +1875,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         IList rawListValueArray = (IList) payload.RawListValue;
                         rawListValueArray.Add(addItem);
                         payload.RawValues.Add(addItem);
-                        listView.itemsSource = payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
+                        payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
+                        listView.itemsSource = payload.ItemIndexToOriginIndex.ToList();
                     }
                 });
 
@@ -1921,11 +1922,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     int fromPropIndex = payload.ItemIndexToOriginIndex[first];
                     int toPropIndex = payload.ItemIndexToOriginIndex[second];
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-                    Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second})");
+                    Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second}); ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
 #endif
 
                     IList lis = (IList)payload.RawListValue;
-                    (lis[fromPropIndex], lis[toPropIndex]) = (lis[toPropIndex], lis[fromPropIndex]);
+                    MoveArrayElement(lis, fromPropIndex, toPropIndex);
+                    // (lis[fromPropIndex], lis[toPropIndex]) = (lis[toPropIndex], lis[fromPropIndex]);
+                    // payload.RawValues = lis.Cast<object>().ToList();
+                    // (payload.RawValues[fromPropIndex], payload.RawValues[toPropIndex]) = (payload.RawValues[toPropIndex], payload.RawValues[fromPropIndex]);
+                    // (payload.ItemIndexToOriginIndex[fromPropIndex], payload.ItemIndexToOriginIndex[toPropIndex]) = (payload.ItemIndexToOriginIndex[toPropIndex], payload.ItemIndexToOriginIndex[fromPropIndex]);
+                    // payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
+                    // listView.Rebuild();
                 };
 
                 foldout.Add(listView);
@@ -1936,7 +1943,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             oldPayload.RawListValue = rawListValue;
 
             // Debug.Log($"Refresh count={listValue.Length}");
-            listView.itemsSource = oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((o, index) => index).ToList();
+            oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((o, index) => index).ToList();
+            listView.itemsSource = oldPayload.ItemIndexToOriginIndex.ToList();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+            Debug.Log($"ItemIndexToOriginIndex={string.Join(",", oldPayload.ItemIndexToOriginIndex)}");
+#endif
             // Debug.Log($"itemSource({listView.itemsSource.Count})={string.Join(",", listView.itemsSource)}");
             // if (listValue.Length > 0)
             // {
@@ -1945,6 +1956,56 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             listView.Rebuild();
 
             return oldElement == null? foldout : null;
+        }
+
+        private static void MoveArrayElement(IList list, int fromIndex, int toIndex)
+        {
+            if (list == null)
+            {
+#if SAINTSFIELD_DEBUG
+                throw new ArgumentNullException(nameof(list));
+#endif
+                return;
+            }
+            if (fromIndex < 0 || fromIndex >= list.Count)
+            {
+#if SAINTSFIELD_DEBUG
+                throw new ArgumentOutOfRangeException(nameof(fromIndex));
+#endif
+                return;
+            }
+            if (toIndex < 0 || toIndex >= list.Count)
+            {
+#if SAINTSFIELD_DEBUG
+                throw new ArgumentOutOfRangeException(nameof(toIndex));
+#endif
+                return;
+            }
+
+            if (fromIndex == toIndex)
+            {
+                return;
+            }
+
+            // shifting
+            object item = list[fromIndex];
+
+            if (fromIndex < toIndex)
+            {
+                for (int i = fromIndex; i < toIndex; i++)
+                {
+                    list[i] = list[i + 1];
+                }
+            }
+            else
+            {
+                for (int i = fromIndex; i > toIndex; i--)
+                {
+                    list[i] = list[i - 1];
+                }
+            }
+
+            list[toIndex] = item;
         }
     }
 }

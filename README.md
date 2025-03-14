@@ -81,10 +81,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.1**
+**3.36.2**
 
-1.  UI Toolkit: `ShowInInspector` can now edit a general class type
-2.  `Button` no longer gives "Method is never used" warning if you have jetbrains ide package installed (this package is installed default by Unity) [PR](https://github.com/TylerTemp/SaintsField/pull/171) by [@Insprill](https://github.com/Insprill)
+UI Toolkit: `ShowInInspector` can now edit list/array type
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1389,7 +1388,7 @@ For UI Toolkit: this attribute allow you to edit the corresponing field like odi
 
 1.  UI Toolkit only
 2.  Does not use custom drawer even the type has one (Same as Odin)
-3.  Does not support list/array/dictionary yet
+3.  Does not support polymorphism-class, interface, dictionary yet
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1431,6 +1430,31 @@ private class MyClass
 
 [![video](https://github.com/user-attachments/assets/b1c69072-76af-46ac-9c20-c3e8f6671e84)](https://github.com/user-attachments/assets/8928b38c-d756-4ff5-b924-e4b5a0f3543e)
 
+An array/list can be created, edited and set to `null`:
+
+```csharp
+using SaintsField;
+
+private class MyClass
+{
+    public string MyString;
+    public GameObject MyObj;
+    private MyEnum _myEnum;
+}
+
+[ShowInInspector] private Color[] _colors = {Color.red, Color.green, Color.blue};
+[ShowInInspector, Ordered] private Color[] _colorEmptyArray;
+
+[Button, Ordered]
+private void ArrayChange0ToRed()
+{
+    _colorEmptyArray[0] = Color.red;
+}
+
+[ShowInInspector, Ordered] private MyClass[] _myClasses;
+```
+
+[![video](https://github.com/user-attachments/assets/99201b88-439c-4508-a1cf-04cf32748ca7)](https://github.com/user-attachments/assets/0baed2e8-13ad-41f8-88e4-9a8bb32d0dd1)
 
 ### Numerical ###
 
