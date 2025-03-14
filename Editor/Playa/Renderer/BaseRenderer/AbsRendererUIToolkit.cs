@@ -1598,7 +1598,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (RuntimeUtil.IsNull(value))
             {
-                if (setterOrNull is null)
+                if (valueType.IsArray || typeof(IList).IsAssignableFrom(valueType))
+                {
+                    LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
+                    {
+
+                        setterOrNull(Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0));
+                        return;
+                        // setterOrNull(Activator.CreateInstance(valueType));
+                    })
+                    {
+                        text = $"null (Click to Create)",
+                        tooltip = "Click to Create",
+                        style =
+                        {
+                            flexGrow = 1,
+                            unityTextAlign = TextAnchor.MiddleLeft,
+                        },
+                    });
+                    labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
+                    return labelButtonField;
+                }
+
+                if (setterOrNull == null)
                 {
                     TextField textField = new TextField(label)
                     {
@@ -1615,26 +1637,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return WrapVisualElement(textField);
                 }
 
-                LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
+                UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
+                dropdownButton.ButtonElement.text = "null";
+                dropdownButton.ButtonElement.clicked += () =>
                 {
-                    if (valueType.IsArray)
-                    {
-                        setterOrNull(Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0));
-                        return;
-                    }
-                    setterOrNull(Activator.CreateInstance(valueType));
-                })
-                {
-                    text = $"null (Click to Create)",
-                    tooltip = "Click to Create",
-                    style =
-                    {
-                        flexGrow = 1,
-                        unityTextAlign = TextAnchor.MiddleLeft,
-                    },
-                });
-                labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
-                return labelButtonField;
+                    
+                };
+                return dropdownButton;
+
+                // normal field
             }
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
