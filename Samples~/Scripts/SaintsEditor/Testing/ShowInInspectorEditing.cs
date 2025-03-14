@@ -40,6 +40,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         private class MyClass
         {
             public string MyString;
+            public GameObject MyObj;
+            private MyEnum _myEnum;
         }
 
         [ShowInInspector] private MyClass _myClass;
