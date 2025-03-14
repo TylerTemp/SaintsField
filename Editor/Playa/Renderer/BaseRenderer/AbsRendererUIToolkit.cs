@@ -1321,6 +1321,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return null;
                 }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+                Debug.Log($"Create color field for {label}");
+#endif
+
                 ColorField element = new ColorField(label)
                 {
                     value = (Color)value,
@@ -1334,6 +1338,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+                        Debug.Log($"Set Color {evt.newValue}");
+#endif
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1830,15 +1837,24 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // int actualIndex = (int)listView.itemsSource[index];
                     // Debug.Log($"{index} -> {actualIndex}");
                     // Debug.Log($"index={index}, ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
+
+                    VisualElement firstChild = visualElement.Children().FirstOrDefault();
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+                    Debug.Log($"bind {index} with old child: {firstChild}");
+#endif
+
                     int actualIndex = payload.ItemIndexToOriginIndex[index];
                     object actualValue = payload.RawValues[actualIndex];
                     VisualElement item = UIToolkitValueEdit(
-                        visualElement.Children().FirstOrDefault(),
+                        firstChild,
                         $"Element {actualIndex}",
                         elementType,
                         actualValue,
                         newItemValue =>
                         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+                            Debug.Log($"List {actualIndex} set newValue {newItemValue}");
+#endif
                             IList rawListValueArray = (IList) payload.RawListValue;
                             rawListValueArray[actualIndex] = newItemValue;
                             payload.RawValues[actualIndex] = newItemValue;
@@ -1953,7 +1969,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // {
             //     Debug.Log($"0 listValue={listValue[0]}; listView.itemsSource={listView.itemsSource[0]}");
             // }
-            listView.Rebuild();
+            // listView.Rebuild();
 
             return oldElement == null? foldout : null;
         }

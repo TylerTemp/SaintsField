@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -26,8 +27,11 @@ namespace SaintsField.Editor.Playa.Renderer
             public IReadOnlyList<object> OldCollection;
         }
 
+        // private double _lastValueChangedTime;
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
         {
+            // _lastValueChangedTime = EditorApplication.timeSinceStartup;
             if (!RenderField)
             {
                 return (null, false);
