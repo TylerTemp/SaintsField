@@ -81,12 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.0**
+**3.36.1**
 
-1.  Allow `ShowInInspector` to editor in inspector like Odin. (Does not support list/array, dictionary, null-class yet)
-2.  `ShowInInspector` add `byte`/`sbyte` type support ([PR](https://github.com/TylerTemp/SaintsField/pull/164) by [@Insprill](https://github.com/Insprill))
-3.  Suppress all compiler warnings of CS0168 & CS0219 caused by preprocessors ([PR](https://github.com/TylerTemp/SaintsField/pull/165) by [@Insprill](https://github.com/Insprill))
-4.  `ShowInInspector` no longer try to display a property without a getter
+1.  UI Toolkit: `ShowInInspector` can now edit a general class type
+2.  `Button` no longer gives "Method is never used" warning if you have jetbrains ide package installed (this package is installed default by Unity) [PR](https://github.com/TylerTemp/SaintsField/pull/171) by [@Insprill](https://github.com/Insprill)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1391,7 +1389,7 @@ For UI Toolkit: this attribute allow you to edit the corresponing field like odi
 
 1.  UI Toolkit only
 2.  Does not use custom drawer even the type has one (Same as Odin)
-3.  Does not support list/array/dictionary/null-class yet
+3.  Does not support list/array/dictionary yet
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1412,6 +1410,27 @@ public Color AutoColor
 ```
 
 ![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
+
+A null-class can be created, edited and set to `null`:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+private class MyClass
+{
+    public string MyString;
+}
+
+[ShowInInspector] private MyClass _myClass;
+[ShowInInspector] private MyClass _myClassD = new MyClass
+{
+    MyString = "Hi",
+};
+```
+
+[![video](https://github.com/user-attachments/assets/b1c69072-76af-46ac-9c20-c3e8f6671e84)](https://github.com/user-attachments/assets/8928b38c-d756-4ff5-b924-e4b5a0f3543e)
+
 
 ### Numerical ###
 

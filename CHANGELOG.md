@@ -1,8 +1,13 @@
 # Changelog
 
+## 3.36.1 ##
+
+1.  UI Toolkit: `ShowInInspector` can now edit a general class type
+2.  `Button` no longer gives "Method is never used" warning if you have jetbrains ide package installed (this package is installed default by Unity) [PR](https://github.com/TylerTemp/SaintsField/pull/171) by [@Insprill](https://github.com/Insprill)
+
 ## 3.36.0 ##
 
-1.  Allow `ShowInInspector` to editor in inspector like Odin. (Does not support list/array, dictionary, null-class yet)
+1.  UI Toolkit: Allow `ShowInInspector` to editor in inspector like Odin. (Does not support list/array, dictionary, null-class yet)
 2.  `ShowInInspector` add `byte`/`sbyte` type support ([PR](https://github.com/TylerTemp/SaintsField/pull/164) by [@Insprill](https://github.com/Insprill))
 3.  Suppress all compiler warnings of CS0168 & CS0219 caused by preprocessors ([PR](https://github.com/TylerTemp/SaintsField/pull/165) by [@Insprill](https://github.com/Insprill))
 4.  `ShowInInspector` no longer try to display a property without a getter
