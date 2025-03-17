@@ -619,7 +619,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     value = value.ToString(),
                 });
             }
-            if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+
+            if (Array.Exists(
+                    valueType.GetInterfaces(),
+                    i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IDictionary<,>) || i.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))))
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1472,34 +1475,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
             {
                 return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, setterOrNull);
-                // if (oldElement is ObjectField oldUnityEngineObjectField)
-                // {
-                //     oldUnityEngineObjectField.objectType = valueType;
-                //     oldUnityEngineObjectField.SetValueWithoutNotify((UnityEngine.Object)value);
-                //     return null;
-                // }
-                //
-                // ObjectField element = new ObjectField(label)
-                // {
-                //     value = (UnityEngine.Object)value,
-                //     objectType = valueType,
-                // };
-                // element.AddToClassList(ObjectField.alignedFieldUssClassName);
-                // if (setterOrNull == null)
-                // {
-                //     element.SetEnabled(false);
-                // }
-                // else
-                // {
-                //     element.RegisterValueChangedCallback(evt =>
-                //     {
-                //         setterOrNull(evt.newValue);
-                //     });
-                // }
-                //
-                // return element;
             }
-            if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+
+            IEnumerable<Type> genTypes = valueType.GetInterfaces()
+                .Where(each => each.IsGenericType)
+                .Select(each => each.GetGenericTypeDefinition());
+            if (valueType.IsGenericType)
+            {
+                genTypes = genTypes.Prepend(valueType.GetGenericTypeDefinition());
+            }
+
+            if(genTypes.Any(each => each == typeof(IDictionary<,>) || each == typeof(IReadOnlyDictionary<,>)))
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1508,6 +1494,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     text = $"{label} <color=#808080ff>(Dictionary x{kvPairs.Length})</color>",
                 };
+                foldout.AddToClassList("saintsfield-dictionary");
 
                 const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                               BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
@@ -1618,6 +1605,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
             const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
             Foldout genFoldout = oldElement as Foldout;
+            if (genFoldout != null && !genFoldout.ClassListContains("saintsfield-general"))
+            {
+                genFoldout = null;
+            }
+
             bool useOld = genFoldout != null;
             if (!useOld)
             {
@@ -1633,37 +1625,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         UnityObjectOverrideType = value?.GetType(),
                     },
                 };
-
-                // Debug.Log($"new foldout valueType: {valueType.IsValueType}, setter={setterOrNull}");
-
-//                 if (!valueType.IsValueType && setterOrNull != null)
-//                 {
-//                     // nullable
-//                     genFoldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
-//                     {
-//                         // text = "x",
-//                         tooltip = "Set to null",
-//                         style =
-//                         {
-//                             position = Position.Absolute,
-//                             // top = -EditorGUIUtility.singleLineHeight,
-//                             top = 0,
-//                             right = 0,
-//                             width = EditorGUIUtility.singleLineHeight,
-//                             height = EditorGUIUtility.singleLineHeight,
-//
-//                             backgroundImage = Util.LoadResource<Texture2D>("close.png"),
-// #if UNITY_2022_2_OR_NEWER
-//                             backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                             backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                             backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-//                             backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
-// #else
-//                             unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-// #endif
-//                         },
-//                     });
-//                 }
+                genFoldout.AddToClassList("saintsfield-general");
 
                 VisualElement fieldsBodyNew = new VisualElement
                 {
@@ -1990,6 +1952,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> setterOrNull)
         {
             Foldout foldout = oldElement;
+            if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
+            {
+                foldout = null;
+            }
             if (foldout == null)
             {
                 // Debug.Log($"Create new Foldout");
@@ -1997,6 +1963,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     text = label,
                 };
+                foldout.AddToClassList("saintsfield-list");
                 VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
                 if (foldoutContent != null)
                 {
@@ -2040,6 +2007,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     RawListValue = rawListValue,
                 };
                 // Debug.Log($"Create new listView");
+                bool showAddRemoveFooter = true;
+                if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
+                {
+                    // Debug.Log("array");
+                }
+                else if (rawListValue is IList)
+                {
+                    // Debug.Log("IList");
+                }
+                else
+                {
+                    showAddRemoveFooter = false;
+                }
                 listView = new ListView
                 {
                     selectionType = SelectionType.Multiple,
@@ -2048,9 +2028,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     showBoundCollectionSize = false,
                     showFoldoutHeader = false,
                     headerTitle = label,
-                    showAddRemoveFooter = true,
+                    showAddRemoveFooter = showAddRemoveFooter,
                     reorderMode = ListViewReorderMode.Animated,
-                    reorderable = true,
+                    reorderable = showAddRemoveFooter,
                     style =
                     {
                         flexGrow = 1,
@@ -2062,7 +2042,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     userData = payload,
                 };
 
-                Type elementType = ReflectUtils.GetElementType(valueType);
+                Type elementType = null;
+                foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromType(valueType))
+                {
+                    Type tryGetElementType = ReflectUtils.GetElementType(eachType);
+                    // Debug.Log($"{eachType}({eachType.IsGenericType}) -> {tryGetElementType}");
+                    if (tryGetElementType != eachType)
+                    {
+                        elementType = tryGetElementType;
+                        break;
+                    }
+                }
+
+                if (elementType == null)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError($"Failed to find element type in {valueType}");
+#endif
+                    elementType = typeof(object);
+                }
+
+                //
+                // Type elementType = ReflectUtils.GetElementType(valueType);
+                // Debug.Log(elementType.IsGenericType);
+                // if(elementType.IsGenericType)
+                // {
+                //     Debug.Log(elementType.GetGenericArguments()[0]);
+                // }
+                // Debug.Log($"elementType={elementType}");
 
                 void BindItem(VisualElement visualElement, int index)
                 {
@@ -2077,20 +2084,23 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                     int actualIndex = payload.ItemIndexToOriginIndex[index];
                     object actualValue = payload.RawValues[actualIndex];
+                    // Debug.Log($"elementType={elementType}, actualValue={actualValue}, rawValues={string.Join(",", payload.RawValues)}");
                     VisualElement item = UIToolkitValueEdit(
                         firstChild,
                         $"Element {actualIndex}",
                         elementType,
                         actualValue,
-                        newItemValue =>
-                        {
+                        showAddRemoveFooter
+                         ? newItemValue =>
+                            {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-                            Debug.Log($"List {actualIndex} set newValue {newItemValue}");
+                                Debug.Log($"List {actualIndex} set newValue {newItemValue}");
 #endif
-                            IList rawListValueArray = (IList) payload.RawListValue;
-                            rawListValueArray[actualIndex] = newItemValue;
-                            payload.RawValues[actualIndex] = newItemValue;
-                        });
+                                IList rawListValueArray = (IList) payload.RawListValue;
+                                rawListValueArray[actualIndex] = newItemValue;
+                                payload.RawValues[actualIndex] = newItemValue;
+                            }
+                         : null);
                     if (item != null)
                     {
                         visualElement.Clear();
@@ -2101,32 +2111,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 listView.bindItem = BindItem;
 
                 Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
-
-                listViewAddButton.clickable = new Clickable(() =>
+                if(listViewAddButton != null)
                 {
-                    int oldSize = payload.RawValues.Count;
-                    int newSize = oldSize + 1;
-                    object addItem = elementType.IsValueType
-                        ? Activator.CreateInstance(elementType)
-                        : null;
+                    listViewAddButton.clickable = new Clickable(() =>
+                    {
+                        int oldSize = payload.RawValues.Count;
+                        int newSize = oldSize + 1;
+                        object addItem = elementType.IsValueType
+                            ? Activator.CreateInstance(elementType)
+                            : null;
 
-                    if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
-                    {
-                        Array newArray = Array.CreateInstance(elementType, newSize);
-                        payload.RawValues.Add(addItem);
-                        Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
-                        payload.RawListValue = newArray;
-                        setterOrNull?.Invoke(newArray);
-                    }
-                    else
-                    {
-                        IList rawListValueArray = (IList) payload.RawListValue;
-                        rawListValueArray.Add(addItem);
-                        payload.RawValues.Add(addItem);
-                        payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
-                        listView.itemsSource = payload.ItemIndexToOriginIndex.ToList();
-                    }
-                });
+                        if (valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
+                        {
+                            Array newArray = Array.CreateInstance(elementType, newSize);
+                            payload.RawValues.Add(addItem);
+                            Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
+                            payload.RawListValue = newArray;
+                            setterOrNull?.Invoke(newArray);
+                        }
+                        else
+                        {
+                            IList rawListValueArray = (IList)payload.RawListValue;
+                            rawListValueArray.Add(addItem);
+                            payload.RawValues.Add(addItem);
+                            payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
+                            listView.itemsSource = payload.ItemIndexToOriginIndex.ToList();
+                        }
+                    });
+                }
 
                 listView.itemsRemoved += objects =>
                 {

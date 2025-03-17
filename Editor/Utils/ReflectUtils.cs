@@ -341,9 +341,22 @@ namespace SaintsField.Editor.Utils
                 return type.GetElementType();
             }
 
-            if (type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type))
+            if(type.IsInterface)
             {
-                return type.GetGenericArguments()[0];
+                if (type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type))
+                {
+                    return type.GetGenericArguments()[0];
+                }
+            }
+            else
+            {
+                foreach (Type typeInterface in type.GetInterfaces())
+                {
+                    if (typeInterface.IsGenericType && typeof(IEnumerable).IsAssignableFrom(typeInterface))
+                    {
+                        return typeInterface.GetGenericArguments()[0];
+                    }
+                }
             }
 
             // if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))

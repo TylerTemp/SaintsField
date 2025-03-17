@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Playa;
@@ -11,14 +12,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class ShowInInspectorEditing : SaintsMonoBehaviour
     {
-        public struct NullSwap
-        {
-            public int Number;
-        }
-
-        [NonSerialized, ShowInInspector] public NullSwap _nullSwap;
-
-
         private enum MyEnum
         {
             None,
@@ -170,5 +163,46 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             }
         }
 #endif
+
+        public struct NullSwap
+        {
+            public int Number;
+        }
+
+        [NonSerialized, ShowInInspector] public NullSwap _nullSwap;
+
+        [ShowInInspector]
+        private IReadOnlyDictionary<int, string> _readOnlyDict =
+            new Dictionary<int, string>();
+
+        [ShowInInspector]
+        private IEnumerable<int> _ie = Enumerable.Range(0, 3);
+
+        private class MyList : IReadOnlyList<int>
+        {
+            public int[] Lis;
+
+            public IEnumerator<int> GetEnumerator()
+            {
+                if (Lis == null)
+                {
+                    yield break;
+                }
+
+                foreach (int i in Lis)
+                {
+                    yield return i;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            public int Count => Lis?.Length ?? 0;
+
+            public int this[int index] => Lis[index];
+        }
+
+        // [ShowInInspector] private MyList _myListNull;
+        [ShowInInspector] private MyList _myListSome = new MyList { Lis = new[] { 1, 2 } };
     }
 }
