@@ -4,6 +4,6 @@ namespace SaintsField.Samples.Scripts
     {
         string GetComment();
 
-        public int MyInt { get; set; }
+        int MyInt { get; set; }
     }
 }

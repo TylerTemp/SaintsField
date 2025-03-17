@@ -108,7 +108,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         private interface Inter
         {
-            public int MyInt { get; set; }
+            int MyInt { get; set; }
         }
 
         public class InterClass : Inter
