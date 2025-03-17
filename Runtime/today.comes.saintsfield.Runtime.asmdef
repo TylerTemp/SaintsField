@@ -31,11 +31,6 @@
             "name": "today.comes.saintsdraw",
             "expression": "1.0.4",
             "define": "SAINTSFIELD_SAINTSDRAW"
-        },
-        {
-            "name": "com.unity.ide.rider",
-            "expression": "",
-            "define": "SAINTSFIELD_JETBRAINS_RIDER"
         }
     ],
     "noEngineReferences": false
