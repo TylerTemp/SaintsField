@@ -81,7 +81,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.2**
+**3.36.3**
 
 1.  UI Toolkit: `ShowInInspector` can now create/edit polymorphism class, struct & interface
 2.  UI Toolkit: Fix `ShowInInspector` losing editing focus when editing an element inside an array/list
