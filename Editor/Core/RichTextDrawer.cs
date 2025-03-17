@@ -318,7 +318,7 @@ namespace SaintsField.Editor.Core
                                         if(!RuntimeUtil.IsNull(accParent))
                                         {
                                             // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split('.');
+                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split(SerializedUtils.pathSplitSeparator);
                                             foreach (string attrName in subFields)
                                             {
                                                 MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(accParent)

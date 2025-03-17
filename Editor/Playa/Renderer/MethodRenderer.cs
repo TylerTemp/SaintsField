@@ -65,7 +65,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 List<string> attrNames = new List<string>();
                 if (eventTarget.Contains("."))
                 {
-                    attrNames.AddRange(eventTarget.Split('.'));
+                    attrNames.AddRange(eventTarget.Split(SerializedUtils.pathSplitSeparator));
                 }
                 else
                 {
