@@ -11,6 +11,8 @@ namespace SaintsField.Editor.Utils
 {
     public static class SerializedUtils
     {
+        public static readonly char[] pathSplitSeparator = { '.' };
+
         public static SerializedProperty FindPropertyByAutoPropertyName(SerializedObject obj, string propName)
         {
             return obj.FindProperty($"<{propName}>k__BackingField");
@@ -31,18 +33,18 @@ namespace SaintsField.Editor.Utils
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
         {
             string originPath = property.propertyPath;
-            string[] propPaths = originPath.Split('.');
-            (bool arrayTrim, IEnumerable<string> propPathSegments) = TrimEndArray(propPaths);
+            IReadOnlyList<string> propPaths = originPath.Split(pathSplitSeparator);
+            (bool arrayTrim, IReadOnlyList<string> propPathSegments) = TrimEndArray(propPaths);
             if (arrayTrim)
             {
-                propPaths = propPathSegments.ToArray();
+                propPaths = propPathSegments;
             }
 
             object sourceObj = property.serializedObject.targetObject;
             FieldOrProp fieldOrProp = default;
 
             bool preNameIsArray = false;
-            foreach (int propIndex in Enumerable.Range(0, propPaths.Length))
+            for (int propIndex = 0; propIndex < propPaths.Count; propIndex++)
             {
                 string propSegName = propPaths[propIndex];
                 // Debug.Log($"check key {propSegName}");
@@ -116,18 +118,18 @@ namespace SaintsField.Editor.Utils
 
         public static string GetUniqueIdArray(SerializedProperty property)
         {
-            string[] paths = property.propertyPath.Split('.');
+            string[] paths = property.propertyPath.Split(pathSplitSeparator);
 
-            (bool _, IEnumerable<string> propPathSegments) = TrimEndArray(paths);
+            (bool _, IReadOnlyList<string> propPathSegments) = TrimEndArray(paths);
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{string.Join(".", propPathSegments)}";
         }
 
         public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
         {
             // Debug.Log(property.propertyPath);
-            string[] paths = property.propertyPath.Split('.');
+            string[] paths = property.propertyPath.Split(pathSplitSeparator);
 
-            (bool arrayTrim, IEnumerable<string> propPathSegments) = TrimEndArray(paths);
+            (bool arrayTrim, IReadOnlyList<string> propPathSegments) = TrimEndArray(paths);
             if (!arrayTrim)
             {
                 return ($"{property.propertyPath} is not an array/list.", null);
@@ -148,7 +150,7 @@ namespace SaintsField.Editor.Utils
             return ("", arrayProp);
         }
 
-        private static (bool trimed, IEnumerable<string> propPathSegs) TrimEndArray(IReadOnlyList<string> propPathSegments)
+        private static (bool trimed, IReadOnlyList<string> propPathSegs) TrimEndArray(IReadOnlyList<string> propPathSegments)
         {
 
             int usePathLength = propPathSegments.Count;
@@ -237,7 +239,7 @@ namespace SaintsField.Editor.Utils
 
         public static int PropertyPathIndex(string propertyPath)
         {
-            string[] propPaths = propertyPath.Split('.');
+            string[] propPaths = propertyPath.Split(pathSplitSeparator);
             // ReSharper disable once UseIndexFromEndExpression
             string lastPropPath = propPaths[propPaths.Length - 1];
             if (lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
@@ -309,16 +311,15 @@ namespace SaintsField.Editor.Utils
 
         public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string search)
         {
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (int index in Enumerable.Range(0, property.arraySize))
+            for (int i = 0; i < property.arraySize; i++)
             {
-                SerializedProperty childProperty = property.GetArrayElementAtIndex(index);
+                SerializedProperty childProperty = property.GetArrayElementAtIndex(i);
                 if(SearchProp(childProperty, search))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"found: {childProperty.propertyPath}");
 #endif
-                    yield return index;
+                    yield return i;
                 }
             }
         }
@@ -419,9 +420,12 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                         Debug.Log($"is array {property.arraySize}: {property.propertyPath}");
 #endif
-                        return Enumerable.Range(0, property.arraySize)
-                            .Select(property.GetArrayElementAtIndex)
-                            .Any(childProperty => SearchProp(childProperty, search));
+                        for (int i = 0; i < property.arraySize; i++)
+                        {
+                            if (SearchProp(property.GetArrayElementAtIndex(i), search))
+                                return true;
+                        }
+                        return false;
                     }
 
                     // ReSharper disable once LoopCanBeConvertedToQuery
