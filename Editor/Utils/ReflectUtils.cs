@@ -10,6 +10,28 @@ namespace SaintsField.Editor.Utils
 {
     public static class ReflectUtils
     {
+        private static readonly Dictionary<AttributesKey, object[]> CustomAttributes = new Dictionary<AttributesKey , object[]>();
+
+        readonly struct AttributesKey : IEquatable<AttributesKey>
+        {
+            readonly MemberInfo memberInfo;
+            readonly bool inherit;
+            readonly Type type;
+
+            public AttributesKey(MemberInfo memberInfo, bool inherit, Type type = null)
+            {
+                this.memberInfo = memberInfo;
+                this.inherit = inherit;
+                this.type = type;
+            }
+
+            public bool Equals(AttributesKey other) => Equals(memberInfo, other.memberInfo) && inherit == other.inherit && type == other.type;
+
+            public override bool Equals(object obj) => obj is AttributesKey other && Equals(other);
+
+            public override int GetHashCode() => Util.CombineHashCode(memberInfo, inherit, type);
+        }
+
         public static IReadOnlyList<Type> GetSelfAndBaseTypes(object target)
         {
             return GetSelfAndBaseTypesFromType(target.GetType());
@@ -443,6 +465,28 @@ namespace SaintsField.Editor.Utils
             FieldInfo wrapFieldInfo = wrapPropType.GetField(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             Debug.Assert(wrapFieldInfo != null);
             return wrapFieldInfo.FieldType;
+        }
+
+        public static Attribute[] GetCustomAttributesFast(this MemberInfo memberInfo, bool inherit = false)
+        {
+            var key = new AttributesKey(memberInfo, inherit);
+            if (CustomAttributes.TryGetValue(key, out var attributes))
+                return (Attribute[])attributes;
+            // ReSharper disable once CoVariantArrayConversion
+            attributes = memberInfo.GetCustomAttributes().ToArray();
+            CustomAttributes[key] = attributes;
+            return (Attribute[])attributes;
+        }
+
+        public static T[] GetCustomAttributesFast<T>(this MemberInfo memberInfo, bool inherit = false) where T : class
+        {
+            var key = new AttributesKey(memberInfo, inherit, typeof(T));
+            if (CustomAttributes.TryGetValue(key, out var attributes))
+                return (T[])attributes;
+            // ReSharper disable once CoVariantArrayConversion
+            attributes = memberInfo.GetCustomAttributes().OfType<T>().ToArray();
+            CustomAttributes[key] = attributes;
+            return (T[])attributes;
         }
 
         public static Type GetDictionaryType(Type type)

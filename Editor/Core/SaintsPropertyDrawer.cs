@@ -194,7 +194,7 @@ namespace SaintsField.Editor.Core
 
                 foreach (Type eachPropertyDrawer in allSubPropertyDrawers)
                 {
-                    foreach (Type attr in eachPropertyDrawer.GetCustomAttributes<CustomPropertyDrawer>(true)
+                    foreach (Type attr in eachPropertyDrawer.GetCustomAttributesFast<CustomPropertyDrawer>(true)
                                  .Select(instance => typeof(CustomPropertyDrawer)
                                      .GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance)
                                      ?.GetValue(instance))
@@ -219,7 +219,7 @@ namespace SaintsField.Editor.Core
 
                 foreach (Type eachDecoratorDrawer in allSubDecoratorDrawers)
                 {
-                    foreach (Type attr in eachDecoratorDrawer.GetCustomAttributes<CustomPropertyDrawer>(true)
+                    foreach (Type attr in eachDecoratorDrawer.GetCustomAttributesFast<CustomPropertyDrawer>(true)
                                  .Select(instance => typeof(CustomPropertyDrawer)
                                      .GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance)
                                      ?.GetValue(instance))
@@ -250,7 +250,7 @@ namespace SaintsField.Editor.Core
                         {
                             IsSaints = each.IsSubclassOf(typeof(SaintsPropertyDrawer)),
                             DrawerType = each,
-                            UseForChildren = each.GetCustomAttributes<CustomPropertyDrawer>(true)
+                            UseForChildren = each.GetCustomAttributesFast<CustomPropertyDrawer>(true)
                                 .Any(instance => typeof(CustomPropertyDrawer)
                                     .GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance)
                                     ?.GetValue(instance) is bool useForChildren && useForChildren)
@@ -325,7 +325,7 @@ namespace SaintsField.Editor.Core
         private static (Attribute attributeInstance, Type attributeDrawerType) GetOtherAttributeDrawerType(MemberInfo fieldInfo)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
-            foreach (Attribute fieldAttribute in fieldInfo.GetCustomAttributes().Where(each => !(each is ISaintsAttribute)))
+            foreach (Attribute fieldAttribute in fieldInfo.GetCustomAttributesFast().Where(each => !(each is ISaintsAttribute)))
             {
                 foreach (KeyValuePair<Type,IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
                 {

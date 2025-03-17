@@ -202,14 +202,8 @@ namespace SaintsField.Editor.Utils
             // this does not work with interface type
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute)));
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes());
-            T[] attributes = fieldOrProp.IsField
-                ? fieldOrProp.FieldInfo.GetCustomAttributes()
-                    .OfType<T>()
-                    .ToArray()
-                : fieldOrProp.PropertyInfo.GetCustomAttributes()
-                    .OfType<T>()
-                    .ToArray();
-            return (attributes, sourceObj);
+            MemberInfo memberInfo = fieldOrProp.IsField ? (MemberInfo)fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo;
+            return (memberInfo.GetCustomAttributesFast<T>(), sourceObj);
         }
 
         private static FieldOrProp GetFileOrProp(object source, string name)

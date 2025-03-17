@@ -111,8 +111,7 @@ namespace SaintsField.Editor
                              .OrderBy(memberInfo => memberInfo.MetadataToken))  // this is still not the correct order, but... a bit better
                 {
                     // Debug.Log(memberInfo.Name);
-                    IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfo
-                        .GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfo.GetCustomAttributesFast<IPlayaAttribute>();
 
                     ISaintsLayoutBase[] layoutBases = GetLayoutBases(playaAttributes.OfType<ISaintsLayoutBase>()).ToArray();
                     switch (memberInfo)
