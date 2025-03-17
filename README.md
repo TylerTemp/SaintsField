@@ -1457,6 +1457,29 @@ private void ArrayChange0ToRed()
 
 [![video](https://github.com/user-attachments/assets/99201b88-439c-4508-a1cf-04cf32748ca7)](https://github.com/user-attachments/assets/0baed2e8-13ad-41f8-88e4-9a8bb32d0dd1)
 
+It can also create/edit an interface. Depending on the actual type is Unity Object or general class/struct, it'll show object picker or field editor accordingly.
+
+```csharp
+public class GeneralDummyClass: IDummy
+{
+    public string GetComment()
+    {
+        return "DummyClass";
+    }
+
+    public int MyInt { get; set; }
+    public int GenDumInt;
+    public string GenDumString;
+}
+
+[ShowInInspector] private static IDummy _dummy;
+
+[Button]
+private void DebugDummy() => Debug.Log(_dummy);
+```
+
+[![video](https://github.com/user-attachments/assets/ea978ef2-6c6f-492d-8c2d-1befffe014d9)](https://github.com/user-attachments/assets/ca9bc4e5-abb3-4635-b41b-96101d63d264)
+
 ### Numerical ###
 
 #### `Rate` ####
