@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Core
 {
-    public class InsideSaintsFieldScoop: IDisposable
+    public readonly struct InsideSaintsFieldScoop: IDisposable
     {
         public readonly struct PropertyKey : IEquatable<PropertyKey>
         {
