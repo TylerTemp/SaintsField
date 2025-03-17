@@ -83,7 +83,8 @@ namespace: `SaintsField`
 
 **3.36.2**
 
-UI Toolkit: `ShowInInspector` can now edit list/array type
+1.  UI Toolkit: `ShowInInspector` can now create/edit polymorphism class, struct & interface
+2.  UI Toolkit: Fix `ShowInInspector` losing editing focus when editing an element inside an array/list
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

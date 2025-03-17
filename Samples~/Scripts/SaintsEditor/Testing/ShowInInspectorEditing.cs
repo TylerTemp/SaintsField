@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Playa;
@@ -10,6 +11,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class ShowInInspectorEditing : SaintsMonoBehaviour
     {
+        public struct NullSwap
+        {
+            public int Number;
+        }
+
+        [NonSerialized, ShowInInspector] public NullSwap _nullSwap;
+
+
         private enum MyEnum
         {
             None,

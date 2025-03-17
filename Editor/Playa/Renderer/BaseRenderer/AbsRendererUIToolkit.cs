@@ -1750,11 +1750,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             obj = ReferencePickerAttributeDrawer.CopyObj(value, obj);
                         }
-                        setterOrNull?.Invoke(obj);
                         if (payload.State != UIToolkitValueEditPayloadState.GenericType)
                         {
+                            payload.State = UIToolkitValueEditPayloadState.GenericType;
                             fieldsBodyNew.Clear();
                         }
+
+                        // Debug.Log($"swap {preType} -> {newType}: {obj}; setter={setterOrNull}");
+
+                        setterOrNull?.Invoke(obj);
                     }
                 }));
                 genFoldout.Add(fieldsBodyNew);
@@ -1795,6 +1799,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             payload.State = UIToolkitValueEditPayloadState.GenericType;
 
+            // Debug.Log("Init generic type");
             // ReSharper disable once PossibleNullReferenceException
             foreach (FieldInfo fieldInfo in value.GetType().GetFields(bindAttrNormal))
             {
@@ -1905,13 +1910,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     .GetTypesDerivedFrom(fieldType)
                     .ToArray();
 
-                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
+                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
+
+                if(!fieldType.IsValueType)
                 {
-                    {"[Null]", null},
-                };
-                if (optionTypes.Length > 0)
-                {
-                    dropdownList.AddSeparator();
+                    dropdownList.Add("[Null]", null);
+                    if (optionTypes.Length > 0)
+                    {
+                        dropdownList.AddSeparator();
+                    }
                 }
 
                 foreach (Type type in optionTypes)
