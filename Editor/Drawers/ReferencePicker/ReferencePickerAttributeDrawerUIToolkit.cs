@@ -170,7 +170,6 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                     SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
                 };
 
-
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,
                     root.worldBound.width,

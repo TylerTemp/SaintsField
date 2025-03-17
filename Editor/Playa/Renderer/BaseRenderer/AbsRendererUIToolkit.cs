@@ -800,6 +800,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
         }
 
+        private enum UIToolkitValueEditPayloadState
+        {
+            None,
+            FieldObject,
+            GenericType,
+        }
+
+        private class UIToolkitValueEditPayload
+        {
+            public Type UnityObjectOverrideType;
+            public UIToolkitValueEditPayloadState State;
+        }
+
         protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> setterOrNull)
         {
             // if (RuntimeUtil.IsNull(value))
@@ -1458,32 +1471,33 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
             {
-                if (oldElement is ObjectField oldUnityEngineObjectField)
-                {
-                    oldUnityEngineObjectField.objectType = valueType;
-                    oldUnityEngineObjectField.SetValueWithoutNotify((UnityEngine.Object)value);
-                    return null;
-                }
-
-                ObjectField element = new ObjectField(label)
-                {
-                    value = (UnityEngine.Object)value,
-                    objectType = valueType,
-                };
-                element.AddToClassList(ObjectField.alignedFieldUssClassName);
-                if (setterOrNull == null)
-                {
-                    element.SetEnabled(false);
-                }
-                else
-                {
-                    element.RegisterValueChangedCallback(evt =>
-                    {
-                        setterOrNull(evt.newValue);
-                    });
-                }
-
-                return element;
+                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, setterOrNull);
+                // if (oldElement is ObjectField oldUnityEngineObjectField)
+                // {
+                //     oldUnityEngineObjectField.objectType = valueType;
+                //     oldUnityEngineObjectField.SetValueWithoutNotify((UnityEngine.Object)value);
+                //     return null;
+                // }
+                //
+                // ObjectField element = new ObjectField(label)
+                // {
+                //     value = (UnityEngine.Object)value,
+                //     objectType = valueType,
+                // };
+                // element.AddToClassList(ObjectField.alignedFieldUssClassName);
+                // if (setterOrNull == null)
+                // {
+                //     element.SetEnabled(false);
+                // }
+                // else
+                // {
+                //     element.RegisterValueChangedCallback(evt =>
+                //     {
+                //         setterOrNull(evt.newValue);
+                //     });
+                // }
+                //
+                // return element;
             }
             if (Array.Exists(valueType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
             {
@@ -1549,8 +1563,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 });
             }
 
-
-            if (RuntimeUtil.IsNull(value))
+            bool valueIsNull = RuntimeUtil.IsNull(value);
+            if (valueIsNull)
             {
                 if (valueType.IsArray || typeof(IList).IsAssignableFrom(valueType))
                 {
@@ -1590,10 +1604,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return WrapVisualElement(textField);
                 }
 
-                UIToolkitUtils.DropdownButtonField dropdownButton = MakeTypeDropdown(label, valueType, null, setterOrNull);
-                dropdownButton.ButtonElement.text = "null";
-                return dropdownButton;
+                // UIToolkitUtils.DropdownButtonField dropdownButton = MakeTypeDropdown(label, valueType, null,
+                //     selectedType =>
+                //     {
+                //
+                //     });
+                // dropdownButton.ButtonElement.text = "null";
+                // return dropdownButton;
             }
+
+            const string objFieldName = "saintsfield-objectfield";
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
             const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
@@ -1608,41 +1628,174 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         position = Position.Relative,
                     },
+                    userData = new UIToolkitValueEditPayload
+                    {
+                        UnityObjectOverrideType = value?.GetType(),
+                    },
                 };
 
                 // Debug.Log($"new foldout valueType: {valueType.IsValueType}, setter={setterOrNull}");
 
-                if (!valueType.IsValueType && setterOrNull != null)
-                {
-                    // nullable
-                    genFoldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
-                    {
-                        // text = "x",
-                        tooltip = "Set to null",
-                        style =
-                        {
-                            position = Position.Absolute,
-                            // top = -EditorGUIUtility.singleLineHeight,
-                            top = 0,
-                            right = 0,
-                            width = EditorGUIUtility.singleLineHeight,
-                            height = EditorGUIUtility.singleLineHeight,
+//                 if (!valueType.IsValueType && setterOrNull != null)
+//                 {
+//                     // nullable
+//                     genFoldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+//                     {
+//                         // text = "x",
+//                         tooltip = "Set to null",
+//                         style =
+//                         {
+//                             position = Position.Absolute,
+//                             // top = -EditorGUIUtility.singleLineHeight,
+//                             top = 0,
+//                             right = 0,
+//                             width = EditorGUIUtility.singleLineHeight,
+//                             height = EditorGUIUtility.singleLineHeight,
+//
+//                             backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+// #if UNITY_2022_2_OR_NEWER
+//                             backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+//                             backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+//                             backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+//                             backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+// #else
+//                             unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+// #endif
+//                         },
+//                     });
+//                 }
 
-                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
-#if UNITY_2022_2_OR_NEWER
-                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                            backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                        },
-                    });
+                VisualElement fieldsBodyNew = new VisualElement
+                {
+                    name = "saintsfield-edit-fields",
+                };
+
+                genFoldout.Add(MakeTypeDropdown("", valueType, value, newType =>
+                {
+                    UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
+                    Type preType = payload.UnityObjectOverrideType;
+                    payload.UnityObjectOverrideType = newType;
+
+                    if (payload.State == UIToolkitValueEditPayloadState.FieldObject && newType != null &&
+                        typeof(UnityEngine.Object).IsAssignableFrom(newType))
+                    {
+                        // string objFieldName = $"saintsfield-objectfield";
+                        if (preType != newType)
+                        {
+                            // ObjectField preField = fieldsBodyNew.Q<ObjectField>(name: objFieldName);
+                            VisualElement fieldsBody = genFoldout.Q<VisualElement>(name: "saintsfield-edit-fields");
+                            // Debug.Log($"swap {preType} -> {newType}: {fieldsBody.childCount}");
+                            fieldsBody.Clear();
+
+                            bool canConvert = value == null || newType.IsAssignableFrom(value.GetType());
+
+                            ObjectField objFieldResult;
+                            if(canConvert)
+                            {
+                                objFieldResult =
+                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, setterOrNull);
+                            }
+                            else
+                            {
+                                objFieldResult =
+                                    UIToolkitObjectFieldEdit(null, label, newType, null, setterOrNull);
+                                setterOrNull?.Invoke(null);
+                            }
+                            objFieldResult.name = objFieldName;
+                            fieldsBody.Add(objFieldResult);
+                            objFieldResult.label = "";
+                        }
+
+                        return;
+                    }
+
+                    // Debug.Log(($"Override new type: {newType}"));
+                    if (newType == null)
+                    {
+                        setterOrNull?.Invoke(null);
+                        if (payload.State != UIToolkitValueEditPayloadState.None)
+                        {
+                            payload.State = UIToolkitValueEditPayloadState.None;
+                            fieldsBodyNew.Clear();
+                        }
+                    }
+                    else if (typeof(UnityEngine.Object).IsAssignableFrom(newType))
+                    {
+                        setterOrNull?.Invoke(null);
+                        // the objectoverride will handle the rest
+                        if (payload.State != UIToolkitValueEditPayloadState.FieldObject)
+                        {
+                            fieldsBodyNew.Clear();
+                        }
+                        else
+                        {
+                            // string objFieldName = $"saintsfield-objectfield-{preType?.Name}";
+                            if (preType != newType)
+                            {
+                                ObjectField preField = fieldsBodyNew.Q<ObjectField>(name: objFieldName);
+                                Debug.Log($"swap {preType} -> {newType}: {preField}");
+                                if (preField != null)
+                                {
+                                    preField.SetValueWithoutNotify(null);
+                                    preField.objectType = newType;
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        object obj = Activator.CreateInstance(newType);
+                        if (!valueIsNull)
+                        {
+                            obj = ReferencePickerAttributeDrawer.CopyObj(value, obj);
+                        }
+                        setterOrNull?.Invoke(obj);
+                        if (payload.State != UIToolkitValueEditPayloadState.GenericType)
+                        {
+                            fieldsBodyNew.Clear();
+                        }
+                    }
+                }));
+                genFoldout.Add(fieldsBodyNew);
+                // genFoldout.Add(new VisualElement
+                // {
+                //     name = "saintsfield-edit-fields",
+                // });
+            }
+
+            VisualElement fieldsBody = genFoldout.Q<VisualElement>(name: "saintsfield-edit-fields");
+
+            UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
+
+            Type valueActualType = payload.UnityObjectOverrideType ?? value?.GetType();
+            // Debug.Log($"valueActualType={valueActualType}");
+            if (valueActualType != null && typeof(UnityEngine.Object).IsAssignableFrom(valueActualType))
+            {
+                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, setterOrNull);
+                // Debug.Log($"objFieldResult={objFieldResult}");
+                if (objFieldResult != null)
+                {
+                    objFieldResult.name = objFieldName;
+                    fieldsBody.Clear();
+                    fieldsBody.Add(objFieldResult);
+                    payload.State = UIToolkitValueEditPayloadState.FieldObject;
+                    objFieldResult.label = "";
                 }
 
-                genFoldout.Add(MakeTypeDropdown("", valueType, value, setterOrNull));
+                return useOld? null: genFoldout;
             }
+
+            if (valueIsNull)
+            {
+                fieldsBody.Clear();
+                payload.State = UIToolkitValueEditPayloadState.FieldObject;
+                return useOld? null: genFoldout;
+            }
+
+            payload.State = UIToolkitValueEditPayloadState.GenericType;
+
+            // ReSharper disable once PossibleNullReferenceException
             foreach (FieldInfo fieldInfo in value.GetType().GetFields(bindAttrNormal))
             {
                 string name = fieldInfo.Name;
@@ -1662,7 +1815,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(result != null)
                 {
                     result.name = name;
-                    genFoldout.Add(result);
+                    fieldsBody.Add(result);
                 }
             }
 
@@ -1692,7 +1845,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(result != null)
                 {
                     result.name = name;
-                    genFoldout.Add(result);
+                    fieldsBody.Add(result);
                 }
             }
 
@@ -1705,6 +1858,36 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return useOld? null: genFoldout;
         }
 
+        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> setterOrNull)
+        {
+            if (oldElement is ObjectField oldUnityEngineObjectField)
+            {
+                oldUnityEngineObjectField.objectType = valueType;
+                oldUnityEngineObjectField.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            ObjectField element = new ObjectField(label)
+            {
+                value = value,
+                objectType = valueType,
+            };
+            element.AddToClassList(ObjectField.alignedFieldUssClassName);
+            if (setterOrNull == null)
+            {
+                element.SetEnabled(false);
+            }
+            else
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    setterOrNull(evt.newValue);
+                });
+            }
+
+            return element;
+        }
+
         private static string GetDropdownTypeLabel(Type type)
         {
             return type == null
@@ -1712,7 +1895,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
         }
 
-        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<object> setterOrNull)
+        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<Type> setType)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
             dropdownButton.ButtonElement.text = GetDropdownTypeLabel(currentValue?.GetType());
@@ -1766,7 +1949,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         if (newType == null)
                         {
                             dropdownButton.ButtonElement.text = "null";
-                            setterOrNull(null);
+                            setType(null);
                             return;
                         }
 
@@ -1778,12 +1961,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         //     return;
                         // }
 
-                        object newObj = Activator.CreateInstance(newType);
-                        if (!RuntimeUtil.IsNull(currentValue))
-                        {
-                            newObj = ReferencePickerAttributeDrawer.CopyObj(currentValue, newObj);
-                        }
-                        setterOrNull(newObj);
+                        setType(newType);
                         dropdownButton.ButtonElement.text = GetDropdownTypeLabel(newType);
                     }
                 ));
@@ -1871,7 +2049,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         flexGrow = 1,
                         position = Position.Relative,
                     },
-                    itemsSource = listValue.Select(((o, index) => index)).ToList(),
+                    itemsSource = listValue.Select((_, index) => index).ToList(),
                     makeItem = () => new VisualElement(),
 
                     userData = payload,
@@ -2028,21 +2206,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if SAINTSFIELD_DEBUG
                 throw new ArgumentNullException(nameof(list));
 #endif
+#pragma warning disable CS0162 // Unreachable code detected
+                // ReSharper disable once HeuristicUnreachableCode
                 return;
+#pragma warning restore CS0162 // Unreachable code detected
             }
             if (fromIndex < 0 || fromIndex >= list.Count)
             {
 #if SAINTSFIELD_DEBUG
                 throw new ArgumentOutOfRangeException(nameof(fromIndex));
 #endif
+#pragma warning disable CS0162 // Unreachable code detected
+                // ReSharper disable once HeuristicUnreachableCode
                 return;
+#pragma warning restore CS0162 // Unreachable code detected
             }
             if (toIndex < 0 || toIndex >= list.Count)
             {
 #if SAINTSFIELD_DEBUG
                 throw new ArgumentOutOfRangeException(nameof(toIndex));
 #endif
+#pragma warning disable CS0162 // Unreachable code detected
+                // ReSharper disable once HeuristicUnreachableCode
                 return;
+#pragma warning restore CS0162 // Unreachable code detected
             }
 
             if (fromIndex == toIndex)

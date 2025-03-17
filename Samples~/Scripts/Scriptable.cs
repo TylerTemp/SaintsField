@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SaintsField.Samples.Scripts
 {
     // [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Scriptable", order = 0)]
-    public class Scriptable : ScriptableObject, IInterface2
+    public class Scriptable : ScriptableObject, IInterface2, IDummy
     {
         [SerializeField]
         [RichLabel("<color=red><label /></color>")]
@@ -30,5 +30,12 @@ namespace SaintsField.Samples.Scripts
         public MyStruct myStruct;
 
         public MyStruct[] myStructs;
+        public string GetComment()
+        {
+            return "";
+        }
+
+        [field: SerializeField]
+        public int MyInt { get; set; }
     }
 }

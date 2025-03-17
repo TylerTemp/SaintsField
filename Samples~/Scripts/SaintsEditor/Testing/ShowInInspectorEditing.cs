@@ -1,6 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Playa;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
@@ -43,8 +47,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         // [ShowInInspector] private GameObject _go;
         // [ShowInInspector] private Transform _trans;
         // [ShowInInspector] private Scriptable _so;
-        //
-        //
+        // // private void SetDummy() => _dummy = _so;
         //
         // [ShowInInspector] private MyClass _myClass;
         // [ShowInInspector] private MyClass _myClassD = new MyClass
@@ -102,36 +105,61 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         //     { "Green", Color.green },
         //     { "Blue", Color.blue },
         // };
-
-        private interface Inter
-        {
-            public int MyInt { get; set; }
-        }
-
-        public class InterClass : Inter
-        {
-            public int MyInt { get; set; }
-            public string InterClassField;
-        }
-
-        public struct InterStruct : Inter
-        {
-            public string InterStructField;
-            public int MyInt { get; set; }
-        }
-
-        [ShowInInspector] private Inter _inter;
-
-        // public class GeneralDummy : IDummy
-        // {
-        //     public string GetComment()
-        //     {
-        //         return nameof(GeneralDummy);
-        //     }
         //
+        // private interface Inter
+        // {
         //     public int MyInt { get; set; }
         // }
         //
-        // [ShowInInspector] private IDummy _dummy;
+        // public class InterClass : Inter
+        // {
+        //     public int MyInt { get; set; }
+        //     public string InterClassField;
+        // }
+        //
+        // public struct InterStruct : Inter
+        // {
+        //     public string InterStructField;
+        //     public int MyInt { get; set; }
+        // }
+        //
+        // [ShowInInspector] private static Inter _inter;
+
+        public class GeneralDummy : IDummy
+        {
+            public string GetComment()
+            {
+                return nameof(GeneralDummy);
+            }
+
+            public int MyInt { get; set; }
+        }
+
+        public class GeneralDummyClass: IDummy
+        {
+            public string GetComment()
+            {
+                return "DummyClass";
+            }
+
+            public int MyInt { get; set; }
+        }
+
+        [ShowInInspector] private static IDummy _dummy;
+
+        [Button]
+        private void DebugDummy() => Debug.Log(_dummy);
+
+#if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+        private static void Initialize()
+        {
+            string g = AssetDatabase.FindAssets("t:Scriptable").FirstOrDefault();
+            if (!string.IsNullOrEmpty(g))
+            {
+                _dummy = AssetDatabase.LoadAssetAtPath<Scriptable>(AssetDatabase.GUIDToAssetPath(g));
+            }
+        }
+#endif
     }
 }
