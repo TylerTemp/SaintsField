@@ -43,6 +43,10 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             if (fieldWithInfo.FieldInfo != null)
             {
+                if (fieldWithInfo.FieldInfo.IsLiteral || fieldWithInfo.FieldInfo.IsInitOnly)
+                {
+                    return null;
+                }
                 return value => fieldWithInfo.FieldInfo.SetValue(fieldWithInfo.Target, value);
             }
 
