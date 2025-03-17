@@ -23,11 +23,25 @@ namespace SaintsField.Editor.Utils
             return property.FindPropertyRelative($"<{propName}>k__BackingField");
         }
 
-        public struct FieldOrProp
+        public readonly struct FieldOrProp
         {
-            public bool IsField;
-            public FieldInfo FieldInfo;
-            public PropertyInfo PropertyInfo;
+            public readonly bool IsField;
+            public readonly FieldInfo FieldInfo;
+            public readonly PropertyInfo PropertyInfo;
+
+            public FieldOrProp(FieldInfo fieldInfo)
+            {
+                IsField = true;
+                FieldInfo = fieldInfo;
+                PropertyInfo = null;
+            }
+
+            public FieldOrProp(PropertyInfo propertyInfo)
+            {
+                IsField = false;
+                FieldInfo = null;
+                PropertyInfo = propertyInfo;
+            }
         }
 
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
@@ -209,12 +223,7 @@ namespace SaintsField.Editor.Utils
                 if (field != null)
                 {
                     // Debug.Log($"return field {field.Name} by {name}");
-                    return new FieldOrProp
-                    {
-                        IsField = true,
-                        PropertyInfo = null,
-                        FieldInfo = field,
-                    };
+                    return new FieldOrProp(field);
                 }
 
                 PropertyInfo property = type.GetProperty(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -222,12 +231,7 @@ namespace SaintsField.Editor.Utils
                 {
                     // return property.GetValue(source, null);
                     // Debug.Log($"return prop {property.Name} by {name}");
-                    return new FieldOrProp
-                    {
-                        IsField = false,
-                        PropertyInfo = property,
-                        FieldInfo = null,
-                    };
+                    return new FieldOrProp(property);
                 }
 
                 type = type.BaseType;

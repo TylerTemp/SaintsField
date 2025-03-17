@@ -69,22 +69,14 @@ namespace SaintsField.Editor.Utils
                 // Debug.Log(actualFieldInfo);
                 if (actualFieldInfo != null)
                 {
-                    return new SerializedUtils.FieldOrProp
-                    {
-                        IsField = true,
-                        FieldInfo = actualFieldInfo,
-                    };
+                    return new SerializedUtils.FieldOrProp(actualFieldInfo);
                 }
 
                 PropertyInfo actualPropertyInfo = selfAndBaseType.GetProperty(propName, bind);
                 // Debug.Log(actualPropertyInfo);
                 if (actualPropertyInfo != null)
                 {
-                    return new SerializedUtils.FieldOrProp
-                    {
-                        IsField = false,
-                        PropertyInfo = actualPropertyInfo,
-                    };
+                    return new SerializedUtils.FieldOrProp(actualPropertyInfo);
                 }
                 // Debug.Assert(actualFieldInfo != null);
                 // actualFieldInfo.SetValue(wrapProp, curItem);
