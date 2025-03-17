@@ -16,5 +16,6 @@ namespace SaintsField.Samples.Scripts.Interface
         }
 
         public string GetComment() => name;
+        public int MyInt { get; set; }
     }
 }

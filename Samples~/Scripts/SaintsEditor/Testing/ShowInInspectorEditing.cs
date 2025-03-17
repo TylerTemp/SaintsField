@@ -121,5 +121,17 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         [ShowInInspector] private Inter _inter;
+
+        // public class GeneralDummy : IDummy
+        // {
+        //     public string GetComment()
+        //     {
+        //         return nameof(GeneralDummy);
+        //     }
+        //
+        //     public int MyInt { get; set; }
+        // }
+        //
+        // [ShowInInspector] private IDummy _dummy;
     }
 }

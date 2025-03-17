@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ReferencePickerAttribute), true)]
-    public partial class ReferencePickerAttributeDrawer: SaintsPropertyDrawer
+    public partial class ReferencePickerAttributeDrawer : SaintsPropertyDrawer
     {
         private static IEnumerable<Type> GetTypes(SerializedProperty property)
         {
@@ -24,15 +24,26 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             Type realType = Type.GetType($"{typeContainerSlashClass}, {typeAssemblyName}");
             // Debug.Log($"{typeContainerSlashClass} -> {typeAssemblyName} = {realType}");
 
+            // return TypeCache.GetTypesDerivedFrom(realType)
+            //     .Prepend(realType)
+            //     .Where(each => !each.IsSubclassOf(typeof(UnityEngine.Object)))
+            //     .Where(each => !each.IsAbstract) // abstract classes
+            //     .Where(each => !each.ContainsGenericParameters) // generic classes
+            //     .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null);
+            return GetTypesDerivedFrom(realType)
+                .Where(each => !each.IsSubclassOf(typeof(UnityEngine.Object)));
+        }
+
+        public static IEnumerable<Type> GetTypesDerivedFrom(Type realType)
+        {
             return TypeCache.GetTypesDerivedFrom(realType)
                 .Prepend(realType)
-                .Where(each => !each.IsSubclassOf(typeof(UnityEngine.Object)))
                 .Where(each => !each.IsAbstract) // abstract classes
                 .Where(each => !each.ContainsGenericParameters) // generic classes
                 .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null);
         }
 
-        private static object CopyObj(object oldObj, object newObj)
+        public static object CopyObj(object oldObj, object newObj)
         {
             if (newObj == null || oldObj == null)
             {

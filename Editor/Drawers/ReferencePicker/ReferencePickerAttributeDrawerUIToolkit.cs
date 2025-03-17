@@ -14,7 +14,6 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 {
     public partial class ReferencePickerAttributeDrawer
     {
-        #region UI Toolkit
         // private static string NamePropertyContainer(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField_Container";
         // private static string NamePropertyField(SerializedProperty property) => $"{property.propertyPath}__Reference_PropertyField";
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__Reference_Button";
@@ -246,7 +245,6 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 label.text = newLabel;
             }
         }
-        #endregion
     }
 }
 

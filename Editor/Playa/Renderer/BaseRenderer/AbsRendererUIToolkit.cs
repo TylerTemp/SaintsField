@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -1534,57 +1536,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
                 return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), setterOrNull);
-                // VisualElement root = new VisualElement();
-                //
-                // Foldout foldout = new Foldout
-                // {
-                //     text = label,
-                // };
-                //
-                // VisualElement listView = new VisualElement
-                // {
-                //     style =
-                //     {
-                //         backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f),
-                //
-                //         borderTopWidth = 1,
-                //         borderLeftWidth = 1,
-                //         borderRightWidth = 1,
-                //         borderBottomWidth = 1,
-                //         borderTopLeftRadius = 3,
-                //         borderTopRightRadius = 3,
-                //         borderBottomLeftRadius = 3,
-                //         borderBottomRightRadius = 3,
-                //         borderLeftColor = EColor.MidnightAsh.GetColor(),
-                //         borderRightColor = EColor.MidnightAsh.GetColor(),
-                //         borderTopColor = EColor.MidnightAsh.GetColor(),
-                //         borderBottomColor = EColor.MidnightAsh.GetColor(),
-                //
-                //         paddingTop = 2,
-                //         paddingBottom = 2,
-                //         paddingLeft = 2,
-                //         paddingRight = 2,
-                //     },
-                // };
-                //
-                // foreach ((object item, int index) in enumerableValue.Cast<object>().WithIndex())
-                // {
-                //     VisualElement child = UIToolkitLayout(item, $"Element {index}");
-                //     listView.Add(child);
-                // }
-                //
-                // listView.SetEnabled(false);
-                //
-                // foldout.RegisterValueChangedCallback(evt =>
-                // {
-                //     listView.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
-                // });
-                //
-                // root.Add(foldout);
-                // root.Add(listView);
-                //
-                // return WrapVisualElement(root);
             }
+
+            // Debug.Log(valueType);
+
             if (valueType.BaseType == typeof(TypeInfo))  // generic type?
             {
                 // EditorGUILayout.TextField(label, value.ToString());
@@ -1594,7 +1549,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 });
             }
 
-            // TODO: Allow to select different type
 
             if (RuntimeUtil.IsNull(value))
             {
@@ -1602,9 +1556,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
                     {
-
                         setterOrNull(Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0));
-                        return;
+                        // return;
                         // setterOrNull(Activator.CreateInstance(valueType));
                     })
                     {
@@ -1637,15 +1590,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return WrapVisualElement(textField);
                 }
 
-                UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
+                UIToolkitUtils.DropdownButtonField dropdownButton = MakeTypeDropdown(label, valueType, null, setterOrNull);
                 dropdownButton.ButtonElement.text = "null";
-                dropdownButton.ButtonElement.clicked += () =>
-                {
-                    
-                };
                 return dropdownButton;
-
-                // normal field
             }
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
@@ -1693,8 +1640,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         },
                     });
                 }
+
+                genFoldout.Add(MakeTypeDropdown("", valueType, value, setterOrNull));
             }
-            foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
+            foreach (FieldInfo fieldInfo in value.GetType().GetFields(bindAttrNormal))
             {
                 string name = fieldInfo.Name;
                 object fieldValue = fieldInfo.GetValue(value);
@@ -1717,7 +1666,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
+            foreach (PropertyInfo propertyInfo in value.GetType().GetProperties(bindAttrNormal))
             {
                 if (!propertyInfo.CanRead)
                 {
@@ -1736,7 +1685,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         ? (newValue =>
                         {
                             propertyInfo.SetValue(value, newValue);
-                            setterOrNull?.Invoke(newValue);
+                            setterOrNull?.Invoke(value);
                         })
                         : null);
                 // ReSharper disable once InvertIf
@@ -1754,6 +1703,93 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             return useOld? null: genFoldout;
+        }
+
+        private static string GetDropdownTypeLabel(Type type)
+        {
+            return type == null
+                ? "null"
+                : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
+        }
+
+        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<object> setterOrNull)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
+            dropdownButton.ButtonElement.text = GetDropdownTypeLabel(currentValue?.GetType());
+            dropdownButton.ButtonElement.clicked += () =>
+            {
+                Type[] optionTypes = ReferencePickerAttributeDrawer
+                    .GetTypesDerivedFrom(fieldType)
+                    .ToArray();
+
+                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
+                {
+                    {"[Null]", null},
+                };
+                if (optionTypes.Length > 0)
+                {
+                    dropdownList.AddSeparator();
+                }
+
+                foreach (Type type in optionTypes)
+                {
+                    string displayName = GetDropdownTypeLabel(type);
+                    dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+                }
+
+                AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+                {
+                    Error = "",
+                    CurDisplay = "null",
+                    CurValues = new Type[]{},
+                    DropdownListValue = dropdownList,
+                    SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                };
+
+                Rect worldBound = dropdownButton.worldBound;
+                float maxHeight = Screen.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
+                if (maxHeight < 100)
+                {
+                    // Debug.LogError($"near out of screen: {maxHeight}");
+                    worldBound.y -= 300 + worldBound.height;
+                    maxHeight = 300;
+                }
+                worldBound.height = SaintsPropertyDrawer.SingleLineHeight;
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                    metaInfo,
+                    dropdownButton.worldBound.width,
+                    maxHeight,
+                    false,
+                    (_, curItem) =>
+                    {
+                        Type newType = (Type)curItem;
+                        if (newType == null)
+                        {
+                            dropdownButton.ButtonElement.text = "null";
+                            setterOrNull(null);
+                            return;
+                        }
+
+                        // if (newType.IsSubclassOf(typeof(ScriptableObject)))
+                        // {
+                        //     Debug.Log($"is so!");
+                        //     // var so = ScriptableObject.CreateInstance(newType);
+                        //     setterOrNull((UnityEngine.Object)null);
+                        //     return;
+                        // }
+
+                        object newObj = Activator.CreateInstance(newType);
+                        if (!RuntimeUtil.IsNull(currentValue))
+                        {
+                            newObj = ReferencePickerAttributeDrawer.CopyObj(currentValue, newObj);
+                        }
+                        setterOrNull(newObj);
+                        dropdownButton.ButtonElement.text = GetDropdownTypeLabel(newType);
+                    }
+                ));
+
+            };
+            return dropdownButton;
         }
 
         // private int _listCurPageIndex = 0;

@@ -218,6 +218,7 @@ namespace SaintsField.Editor.Utils
                     marginRight = 0,
                     marginLeft = 0,
                     alignItems = Align.FlexStart,
+                    unityTextAlign = TextAnchor.MiddleLeft,
                 },
                 // name = NameButtonField(property),
                 // userData = metaInfo.SelectedIndex == -1

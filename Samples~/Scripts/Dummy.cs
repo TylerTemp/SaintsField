@@ -7,6 +7,7 @@ namespace SaintsField.Samples.Scripts
     {
         public string comment;
         public string GetComment() => comment;
+        public int MyInt { get; set; }
 
         [SerializeField]
         [BelowButton(nameof(ReadCopy))]
