@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo, bool isImGui)
         {
-            List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>();
+            List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>(fieldWithInfo.PlayaAttributes.Count);
             (int, int) arraySize = (-1, -1);
             foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
             {
@@ -63,27 +63,27 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     case IVisibilityAttribute visibilityAttribute:
                         preCheckInternalInfos.Add(new ToggleCheckInfo
-                        {
-                            Type = visibilityAttribute.IsShow? ToggleType.Show: ToggleType.Hide,
-                            ConditionInfos = visibilityAttribute.ConditionInfos,
-                            Target = fieldWithInfo.Target,
-                        });
+                        (
+                            visibilityAttribute.IsShow? ToggleType.Show: ToggleType.Hide,
+                            visibilityAttribute.ConditionInfos,
+                            fieldWithInfo.Target
+                        ));
                         break;
                     case PlayaEnableIfAttribute enableIfAttribute:
                         preCheckInternalInfos.Add(new ToggleCheckInfo
-                        {
-                            Type = ToggleType.Enable,
-                            ConditionInfos = enableIfAttribute.ConditionInfos,
-                            Target = fieldWithInfo.Target,
-                        });
+                        (
+                            ToggleType.Enable,
+                            enableIfAttribute.ConditionInfos,
+                            fieldWithInfo.Target
+                        ));
                         break;
                     case PlayaDisableIfAttribute disableIfAttribute:
                         preCheckInternalInfos.Add(new ToggleCheckInfo
-                        {
-                            Type = ToggleType.Disable,
-                            ConditionInfos = disableIfAttribute.ConditionInfos,
-                            Target = fieldWithInfo.Target,
-                        });
+                        (
+                            ToggleType.Disable,
+                            disableIfAttribute.ConditionInfos,
+                            fieldWithInfo.Target
+                        ));
                         break;
                     case IPlayaArraySizeAttribute arraySizeAttribute:
                         if(fieldWithInfo.SerializedProperty != null)
@@ -98,9 +98,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            foreach (ToggleCheckInfo preCheckInternalInfo in preCheckInternalInfos)
+            for (var i = 0; i < preCheckInternalInfos.Count; i++)
             {
-                SaintsEditorUtils.FillResult(preCheckInternalInfo);
+                preCheckInternalInfos[i] = SaintsEditorUtils.FillResult(preCheckInternalInfos[i]);
             }
 
             (bool showIfResult, bool disableIfResult) = SaintsEditorUtils.GetToggleResult(preCheckInternalInfos);

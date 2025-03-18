@@ -96,27 +96,17 @@ namespace SaintsField.Editor.Playa.Utils
         //     return (Array.Empty<string>(), callbackBoolResults);
         // }
 
-        public static void FillResult(ToggleCheckInfo toggleCheckInfo)
+        public static ToggleCheckInfo FillResult(ToggleCheckInfo toggleCheckInfo)
         {
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(toggleCheckInfo.ConditionInfos, null, null, toggleCheckInfo.Target);
 
-            if (errors.Count > 0)
-            {
-                toggleCheckInfo.Errors = errors;
-                toggleCheckInfo.BoolResults = Array.Empty<bool>();
-                return;
-            }
-
-            toggleCheckInfo.Errors = Array.Empty<string>();
-            toggleCheckInfo.BoolResults = boolResults;
+            return new ToggleCheckInfo(toggleCheckInfo, errors, boolResults);
         }
 
-        public static (bool show, bool disable) GetToggleResult(IReadOnlyList<ToggleCheckInfo> toggleCheckInfos)
+        public static (bool show, bool disable) GetToggleResult(List<ToggleCheckInfo> toggleCheckInfos)
         {
-            if (toggleCheckInfos.Any(each => each.Errors.Count > 0))
-            {
+            if (!toggleCheckInfos.TrueForAll((each) => each.Errors.Count == 0))
                 return (true, false);
-            }
 
             List<bool> showResults = new List<bool>();
             // bool hide = false;
@@ -127,8 +117,11 @@ namespace SaintsField.Editor.Playa.Utils
             // any enable attribute is true: enable; otherwise: not-enable
             bool enable = true;
 
-            foreach (ToggleCheckInfo toggleCheckInfo in toggleCheckInfos.Where(each => each.Errors.Count == 0))
+            foreach (ToggleCheckInfo toggleCheckInfo in toggleCheckInfos)
             {
+                if (toggleCheckInfo.Errors.Count != 0)
+                    continue;
+
                 switch (toggleCheckInfo.Type)
                 {
                     case ToggleType.Show:

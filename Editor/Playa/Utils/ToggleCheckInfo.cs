@@ -3,13 +3,32 @@ using SaintsField.Condition;
 
 namespace SaintsField.Editor.Playa.Utils
 {
-    public class ToggleCheckInfo
+    public readonly struct ToggleCheckInfo
     {
-        public ToggleType Type;
-        public IReadOnlyList<ConditionInfo> ConditionInfos;
-        public object Target;
+        public readonly ToggleType Type;
+        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
+        public readonly object Target;
 
-        public IReadOnlyList<string> Errors;
-        public IReadOnlyList<bool> BoolResults;
+        public readonly IReadOnlyList<string> Errors;
+        public readonly IReadOnlyList<bool> BoolResults;
+
+        public ToggleCheckInfo(ToggleType type, IReadOnlyList<ConditionInfo> conditionInfos, object target)
+        {
+            Type = type;
+            ConditionInfos = conditionInfos;
+            Target = target;
+
+            Errors = null;
+            BoolResults = null;
+        }
+
+        public ToggleCheckInfo(ToggleCheckInfo otherInfo, IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults)
+        {
+            Type = otherInfo.Type;
+            ConditionInfos = otherInfo.ConditionInfos;
+            Target = otherInfo.Target;
+            Errors = errors;
+            BoolResults = boolResults;
+        }
     }
 }
