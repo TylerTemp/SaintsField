@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
-    public class RenderTextureTemporaryScoop: IDisposable
+    public readonly struct RenderTextureTemporaryScoop: IDisposable
     {
         public readonly RenderTexture RenderTex;
 

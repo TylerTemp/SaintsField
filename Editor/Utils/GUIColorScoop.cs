@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
-    public class GUIColorScoop: IDisposable
+    public readonly struct GUIColorScoop: IDisposable
     {
         private readonly Color _color;
 
