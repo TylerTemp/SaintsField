@@ -127,8 +127,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (int eventIndex in Enumerable.Range(0, unityEventBase.GetPersistentEventCount()))
+            for (int eventIndex = 0; eventIndex < unityEventBase.GetPersistentEventCount(); eventIndex++)
             {
                 UnityEngine.Object persistentTarget = unityEventBase.GetPersistentTarget(eventIndex);
                 string persistentMethodName = unityEventBase.GetPersistentMethodName(eventIndex);

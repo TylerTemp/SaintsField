@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
         private static IEnumerable<ShaderInfo> GetShaderInfo(Shader shader, ShaderPropertyType? filterPropertyType)
         {
-            foreach (int index in Enumerable.Range(0, shader.GetPropertyCount()))
+            for (int index = 0; index < shader.GetPropertyCount(); index++)
             {
                 string propertyName = shader.GetPropertyName(index);
                 string propertyDescription = shader.GetPropertyDescription(index);

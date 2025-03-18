@@ -96,7 +96,7 @@ namespace SaintsField.Editor
             // Debug.Log($"{string.Join(",", pendingSerializedProperties.Keys)}");
             pendingSerializedProperties.Remove("m_Script");
 
-            foreach (int inherentDepth in Enumerable.Range(0, types.Count))
+            for (var inherentDepth = 0; inherentDepth < types.Count; inherentDepth++)
             {
                 Type systemType = types[inherentDepth];
 

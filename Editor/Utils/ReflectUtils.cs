@@ -166,7 +166,7 @@ namespace SaintsField.Editor.Utils
             Debug.Log($"toFillQueue.Count={toFillQueue.Count}");
 #endif
             // required:
-            foreach (int index in Enumerable.Range(0, methodParams.Count))
+            for (var index = 0; index < methodParams.Count; index++)
             {
                 if (!methodParams[index].IsOptional)
                 {
@@ -210,7 +210,7 @@ namespace SaintsField.Editor.Utils
             // optional:
             if(leftOverQueue.Count > 0)
             {
-                foreach (int index in Enumerable.Range(0, methodParams.Count))
+                for (var index = 0; index < methodParams.Count; index++)
                 {
                     if (leftOverQueue.Count == 0)
                     {

@@ -149,7 +149,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
             IReadOnlyList<(string, object, bool, bool)> dropdownActualList = dropdownListValueUnique.ToArray();
 
-            foreach (int dropdownIndex in Enumerable.Range(0, dropdownActualList.Count))
+            for (var dropdownIndex = 0; dropdownIndex < dropdownActualList.Count; dropdownIndex++)
             {
                 (string _, object itemValue, bool _, bool isSeparator) = dropdownActualList[dropdownIndex];
                 if (isSeparator)
