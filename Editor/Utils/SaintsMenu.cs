@@ -5,6 +5,9 @@ using System.Linq;
 using SaintsField.Editor.I2Setup;
 using SaintsField.Utils;
 using UnityEditor;
+#if UNITY_2023_1_OR_NEWER
+using UnityEditor.Build;
+#endif
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils
@@ -201,7 +204,11 @@ namespace SaintsField.Editor.Utils
                 string defines;
                 try
                 {
+#if UNITY_2023_1_OR_NEWER
+                    defines = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(grp));
+#else
                     defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(grp);
+#endif
                 }
                 catch (ArgumentException)
                 {
@@ -215,7 +222,11 @@ namespace SaintsField.Editor.Utils
                     defines += newDefineCompileConstant;
                     try
                     {
-                        PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, defines);
+#if UNITY_2023_1_OR_NEWER
+                    PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(grp), defines);
+#else
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, defines);
+#endif
                     }
                     catch (Exception e)
                     {
@@ -235,7 +246,11 @@ namespace SaintsField.Editor.Utils
                 string defines;
                 try
                 {
+#if UNITY_2023_1_OR_NEWER
+                    defines = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(grp));
+#else
                     defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(grp);
+#endif
                 }
                 catch (ArgumentException)
                 {
@@ -251,7 +266,11 @@ namespace SaintsField.Editor.Utils
 
                 try
                 {
+#if UNITY_2023_1_OR_NEWER
+                    PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(grp), result);
+#else
                     PlayerSettings.SetScriptingDefineSymbolsForGroup(grp, result);
+#endif
                 }
                 catch (Exception e)
                 {
