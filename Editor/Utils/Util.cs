@@ -1107,39 +1107,41 @@ namespace SaintsField.Editor.Utils
             };
         }
 
-        public static int CombineHashCode(object object1, object object2)
+        public static int CombineHashCode<T1, T2>(T1 object1, T2 object2)
         {
             // HashCode.Combine does not exist in old Unity
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2);
 #else
-            return MockHashCode(new[] {object1, object2});
+            var hashCode = 17;
+            hashCode *= 31 + object1?.GetHashCode() ?? 0;
+            hashCode *= 31 + object2?.GetHashCode() ?? 0;
+            return hashCode;
 #endif
         }
-        public static int CombineHashCode(object object1, object object2, object object3)
+        public static int CombineHashCode<T1, T2, T3>(T1 object1, T2 object2, T3 object3)
         {
             // HashCode.Combine does not exist in old Unity
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2, object3);
 #else
-            return MockHashCode(new[] {object1, object2, object3});
+            var hashCode = CombineHashCode(object1, object2);
+            hashCode *= 31 + object3?.GetHashCode() ?? 0;
+            return hashCode;
 #endif
         }
 
-        public static int CombineHashCode(object object1, object object2, object object3, object object4)
+        public static int CombineHashCode<T1, T2, T3, T4>(T1 object1, T2 object2, T3 object3, T4 object4)
         {
             // HashCode.Combine does not exist in old Unity
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2, object3, object4);
 #else
-            return MockHashCode(new[] {object1, object2, object3, object4});
+            var hashCode = CombineHashCode(object1, object2, object3);
+            hashCode *= 31 + object4?.GetHashCode() ?? 0;
+            return hashCode;
 #endif
         }
-
-#if !UNITY_2021_1_OR_NEWER
-        private static int MockHashCode(object[] objects) =>
-            objects.Aggregate(17, (current, obj) => current * 31 + (obj?.GetHashCode() ?? 0));
-#endif
 
         public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
