@@ -60,11 +60,16 @@ namespace SaintsField.Editor.Core
         private static bool _sceneViewNotificationListened;
         private static readonly HashSet<string> SceneViewNotifications = new HashSet<string>();
 
-        private struct SaintsWithIndex : IEquatable<SaintsWithIndex>
+        private readonly struct SaintsWithIndex : IEquatable<SaintsWithIndex>
         {
-            public ISaintsAttribute SaintsAttribute;
-            // ReSharper disable once NotAccessedField.Local
-            public int Index;
+            public readonly ISaintsAttribute SaintsAttribute;
+            public readonly int Index;
+
+            public SaintsWithIndex(ISaintsAttribute saintsAttribute, int index)
+            {
+                SaintsAttribute = saintsAttribute;
+                Index = index;
+            }
 
             public bool Equals(SaintsWithIndex other)
             {
