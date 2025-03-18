@@ -94,7 +94,7 @@ namespace SaintsField.Editor.TroubleshootEditor
                     // {
                     //     yield return null;
                     // }
-                    foreach (CustomEditor customEditor in eachEditorType.GetCustomAttributesFast<CustomEditor>(true))
+                    foreach (CustomEditor customEditor in ReflectCache.GetCustomAttributes<CustomEditor>(eachEditorType, true))
                     {
                         yield return null;
                         Type v = (Type)typeof(CustomEditor)
@@ -370,7 +370,7 @@ namespace SaintsField.Editor.TroubleshootEditor
             string error = "";
             List<Attribute> playaAttributes = new List<Attribute>();
 
-            Attribute[] allBaseAttributes = memberInfo.GetCustomAttributesFast();
+            Attribute[] allBaseAttributes = ReflectCache.GetCustomAttributes(memberInfo);
             if (!isSaintsEditor)
             {
                 playaAttributes.AddRange(allBaseAttributes.Where(each => each is IPlayaAttribute));

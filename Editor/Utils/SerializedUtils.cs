@@ -203,7 +203,7 @@ namespace SaintsField.Editor.Utils
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute)));
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes());
             MemberInfo memberInfo = fieldOrProp.IsField ? (MemberInfo)fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo;
-            return (memberInfo.GetCustomAttributesFast<T>(), sourceObj);
+            return (ReflectCache.GetCustomAttributes<T>(memberInfo), sourceObj);
         }
 
         private static FieldOrProp GetFileOrProp(object source, string name)

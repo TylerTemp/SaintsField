@@ -194,7 +194,7 @@ namespace SaintsField.Editor.Core
 
                 foreach (Type eachPropertyDrawer in allSubPropertyDrawers)
                 {
-                    foreach (Type attr in eachPropertyDrawer.GetCustomAttributesFast<CustomPropertyDrawer>(true)
+                    foreach (Type attr in ReflectCache.GetCustomAttributes<CustomPropertyDrawer>(eachPropertyDrawer, true)
                                  .Select(instance => typeof(CustomPropertyDrawer)
                                      .GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance)
                                      ?.GetValue(instance))
@@ -219,7 +219,7 @@ namespace SaintsField.Editor.Core
 
                 foreach (Type eachDecoratorDrawer in allSubDecoratorDrawers)
                 {
-                    foreach (Type attr in eachDecoratorDrawer.GetCustomAttributesFast<CustomPropertyDrawer>(true)
+                    foreach (Type attr in ReflectCache.GetCustomAttributes<CustomPropertyDrawer>(eachDecoratorDrawer, true)
                                  .Select(instance => typeof(CustomPropertyDrawer)
                                      .GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance)
                                      ?.GetValue(instance))
@@ -250,7 +250,7 @@ namespace SaintsField.Editor.Core
                         {
                             IsSaints = each.IsSubclassOf(typeof(SaintsPropertyDrawer)),
                             DrawerType = each,
-                            UseForChildren = each.GetCustomAttributesFast<CustomPropertyDrawer>(true)
+                            UseForChildren = ReflectCache.GetCustomAttributes<CustomPropertyDrawer>(each, true)
                                 .Any(instance => typeof(CustomPropertyDrawer)
                                     .GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance)
                                     ?.GetValue(instance) is bool useForChildren && useForChildren)
@@ -325,15 +325,19 @@ namespace SaintsField.Editor.Core
         private static (Attribute attributeInstance, Type attributeDrawerType) GetOtherAttributeDrawerType(MemberInfo fieldInfo)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
-            foreach (Attribute fieldAttribute in fieldInfo.GetCustomAttributesFast().Where(each => !(each is ISaintsAttribute)))
+            foreach (Attribute fieldAttribute in ReflectCache.GetCustomAttributes(fieldInfo))
             {
-                foreach (KeyValuePair<Type,IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
+                if (fieldAttribute is ISaintsAttribute)
+                    continue;
+
+                foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
                 {
                     Type canDrawType = kv.Key;
                     // Debug.Log($"{fieldAttribute}:{kv.Key}:--");
                     // foreach ((bool isSaints, Type drawerType) in kv.Value.Where(each => !each.isSaints))
-                    foreach (var info in kv.Value.Where(each => !each.IsSaints))
+                    foreach (var info in kv.Value)
                     {
+                        if (info.IsSaints) continue;
                         // if ($"{drawerType}" == "UnityEditor.RangeDrawer")
                         // {
                         //     Debug.Log($"{canDrawType}:{fieldAttribute}={drawerType} -- {canDrawType.IsInstanceOfType(fieldAttribute)}");
