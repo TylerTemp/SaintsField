@@ -335,9 +335,7 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T value) GetOfNoParams<T>(object target, string by, T defaultValue)
         {
-            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
@@ -426,9 +424,7 @@ namespace SaintsField.Editor.Utils
                 return ("Target is null", defaultValue);
             }
 
-            IEnumerable<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
@@ -555,8 +551,6 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
         {
-            IEnumerable<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
@@ -566,7 +560,7 @@ namespace SaintsField.Editor.Utils
                 return (error, defaultValue);
             }
 
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
             {
                 MethodInfo methodInfo = type.GetMethod(by, bindAttr);
                 if (methodInfo == null)
@@ -948,10 +942,17 @@ namespace SaintsField.Editor.Utils
 
             foreach (string attrName in by.Split(SerializedUtils.pathSplitSeparator))
             {
-                MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(accParent)
-                    .SelectMany(type => type
-                        .GetMember(attrName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy))
-                    .FirstOrDefault(each => each != null);
+                MemberInfo accMemberInfo = null;
+                foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(accParent))
+                {
+                    MemberInfo[] members = type.GetMember(attrName,
+                        BindingFlags.Public | BindingFlags.NonPublic |
+                        BindingFlags.Instance | BindingFlags.Static |
+                        BindingFlags.FlattenHierarchy);
+                    if (members.Length <= 0) continue;
+                    accMemberInfo = members[0];
+                    break;
+                }
 
                 thisResult = GetOf(attrName, defaultValue, property, accMemberInfo, accParent);
                 // Debug.Log($"{attrName} = {thisResult.result}");

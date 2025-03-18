@@ -191,9 +191,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             object target = fieldWithInfo.Target;
 
-            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
             // types.Reverse();
-            foreach (Type eachType in types)
+            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypes(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
                     ReflectUtils.GetProp(eachType, by);

@@ -170,13 +170,11 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return ("", $"{formatValue} / {maxValue}");
             }
 
-            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
-
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(parent))
             {
                 MethodInfo methodInfo = type.GetMethod(titleCallback, bindAttr);
                 if (methodInfo == null)

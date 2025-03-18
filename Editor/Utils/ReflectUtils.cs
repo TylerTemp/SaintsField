@@ -32,21 +32,21 @@ namespace SaintsField.Editor.Utils
             public override int GetHashCode() => Util.CombineHashCode(memberInfo, inherit, type);
         }
 
-        public static IReadOnlyList<Type> GetSelfAndBaseTypes(object target)
+        public static List<Type> GetSelfAndBaseTypes(object target)
         {
             return GetSelfAndBaseTypesFromType(target.GetType());
         }
 
-        public static IReadOnlyList<Type> GetSelfAndBaseTypesFromType(Type thisType)
+        public static List<Type> GetSelfAndBaseTypesFromType(Type thisType)
         {
-            List<Type> types = new List<Type>
+            List<Type> types = new List<Type>(1)
             {
                 thisType,
             };
 
-            while (types.Last().BaseType != null)
+            while (types[types.Count - 1].BaseType != null)
             {
-                types.Add(types.Last().BaseType);
+                types.Add(types[types.Count - 1].BaseType);
             }
 
             // types.Reverse();
