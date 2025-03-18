@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _groupPath = groupPath;
             _config = config;
             _eLayout = config.ELayout;
-            _foldout = !config.ELayout.HasFlag(ELayout.Collapse);
+            _foldout = !config.ELayout.HasFlagFast(ELayout.Collapse);
             _containerObject = containerObject;
 
             List<ToggleCheckInfo> toggleCheckInfos = new List<ToggleCheckInfo>(_config.Toggles.Count);
@@ -133,11 +133,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public override string ToString() => $"<Group path={_groupPath} layout={_eLayout}/>";
 
-        private static bool IsFancyBox(ELayout eLayout) => eLayout.HasFlag(ELayout.Background) || eLayout.HasFlag(ELayout.Tab);
+        private static bool IsFancyBox(ELayout eLayout) => eLayout.HasFlagFast(ELayout.Background) || eLayout.HasFlagFast(ELayout.Tab);
 
         private static bool NeedIndentCheck(ELayout eLayout) => IsFancyBox(eLayout) ||
-                                                                eLayout.HasFlag(ELayout.Foldout) ||
-                                                                eLayout.HasFlag(ELayout.Collapse);
+                                                                eLayout.HasFlagFast(ELayout.Foldout) ||
+                                                                eLayout.HasFlagFast(ELayout.Collapse);
 
     }
 }

@@ -50,9 +50,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 },
             };
 
-            bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout) || _eLayout.HasFlag(ELayout.Collapse);
-            bool hasTitle = _eLayout.HasFlag(ELayout.Title) || _eLayout.HasFlag(ELayout.TitleOut);
-            bool hasTab = _eLayout.HasFlag(ELayout.Tab);
+            bool hasFoldout = _eLayout.HasFlagFast(ELayout.Foldout) || _eLayout.HasFlagFast(ELayout.Collapse);
+            bool hasTitle = _eLayout.HasFlagFast(ELayout.Title) || _eLayout.HasFlagFast(ELayout.TitleOut);
+            bool hasTab = _eLayout.HasFlagFast(ELayout.Tab);
 
             Toolbar toolbar = new Toolbar
             {
@@ -124,10 +124,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 style =
                 {
                     flexGrow = 1,
-                    flexDirection = _eLayout.HasFlag(ELayout.Horizontal)? FlexDirection.Row :FlexDirection.Column,
+                    flexDirection = _eLayout.HasFlagFast(ELayout.Horizontal)? FlexDirection.Row :FlexDirection.Column,
                 },
             };
-            if (_eLayout.HasFlag(ELayout.Background))
+            if (_eLayout.HasFlagFast(ELayout.Background))
             {
                 body.style.paddingRight = 4;
                 body.style.paddingTop = 1;
@@ -172,9 +172,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         borderTopRightRadius = radius,
                     },
                 };
-                if (_eLayout.HasFlag(ELayout.TitleOut))
+                if (_eLayout.HasFlagFast(ELayout.TitleOut))
                 {
-                    if(_eLayout.HasFlag(ELayout.Background))
+                    if(_eLayout.HasFlagFast(ELayout.Background))
                     {
                         // boxed
                         title.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
@@ -199,8 +199,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     || hasTitle
                     || !hasTab))
             {
-                bool titleOut = _eLayout.HasFlag(ELayout.TitleOut);
-                bool background = _eLayout.HasFlag(ELayout.Background);
+                bool titleOut = _eLayout.HasFlagFast(ELayout.TitleOut);
+                bool background = _eLayout.HasFlagFast(ELayout.Background);
                 bool fancy = titleOut && background;
                 if (fancy)  // title clickable foldout
                 {
@@ -288,9 +288,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         text = _groupPath.Split('/').Last(),
                         value = _foldout,
                     };
-                    if (_eLayout.HasFlag(ELayout.TitleOut))
+                    if (_eLayout.HasFlagFast(ELayout.TitleOut))
                     {
-                        if (_eLayout.HasFlag(ELayout.Background))
+                        if (_eLayout.HasFlagFast(ELayout.Background))
                         {
                             foldout.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
                         }
@@ -429,7 +429,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             //     labels.ForEach(UIToolkitUtils.FixLabelWidthUIToolkit);
             // }, 200);
 
-            if (_eLayout.HasFlag(ELayout.Tab))
+            if (_eLayout.HasFlagFast(ELayout.Tab))
             {
                 // ReSharper disable once ConvertToLocalFunction
                 EventCallback<AttachToPanelEvent> switchOnAttack = null;
@@ -450,7 +450,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             root.style.marginBottom = marginBottom;
 
             // sub container has some space left
-            if(_groupPath.Contains('/') && _eLayout.HasFlag(ELayout.Background) && _eLayout.HasFlag(ELayout.Title) && _eLayout.HasFlag(ELayout.TitleOut))
+            if(_groupPath.Contains('/') && _eLayout.HasFlagFast(ELayout.Background) && _eLayout.HasFlagFast(ELayout.Title) && _eLayout.HasFlagFast(ELayout.TitleOut))
             {
                 root.style.marginLeft = 4;
             }

@@ -18,4 +18,9 @@ namespace SaintsField.Playa
         FoldoutBox = Background | Title | TitleOut | Foldout,
         CollapseBox = Background | Title | TitleOut | Collapse,
     }
+
+    public static class ELayoutExtensions
+    {
+        public static bool HasFlagFast(this ELayout lhs, ELayout rhs) => (lhs & rhs) != 0;
+    }
 }

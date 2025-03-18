@@ -821,8 +821,8 @@ namespace SaintsField.Editor.Utils
 
         private static bool ConditionEditModeChecker(EMode editorMode)
         {
-            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
+            bool editorRequiresEdit = editorMode.HasFlagFast(EMode.Edit);
+            bool editorRequiresPlay = editorMode.HasFlagFast(EMode.Play);
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if(editorRequiresEdit && editorRequiresPlay)
             {

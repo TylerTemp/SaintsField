@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private IEnumerable<ISaintsRenderer> GetRenderer()
         {
-            return _eLayout.HasFlag(ELayout.Tab)
+            return _eLayout.HasFlagFast(ELayout.Tab)
                 ? _groupIdToRenderer[_orderedKeys[_curSelected]]
                 : _renderers.Select(each => each.renderer);
         }
@@ -94,15 +94,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
             float titleHeight = 0f;
 
-            bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout);
-            bool hasTitle = _eLayout.HasFlag(ELayout.Title);
-            bool hasTab = _eLayout.HasFlag(ELayout.Tab);
+            bool hasFoldout = _eLayout.HasFlagFast(ELayout.Foldout);
+            bool hasTitle = _eLayout.HasFlagFast(ELayout.Title);
+            bool hasTab = _eLayout.HasFlagFast(ELayout.Tab);
 
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
                 titleHeight += EditorGUIUtility.singleLineHeight;
                 // EditorGUILayout.LabelField(_groupPath.Split('/').Last(), _titleLabelStyle);
-                if(_eLayout.HasFlag(ELayout.TitleOut))
+                if(_eLayout.HasFlagFast(ELayout.TitleOut))
                 {
                     titleHeight += 1;
                     // Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
@@ -119,7 +119,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 // _foldout = EditorGUILayout.Foldout(_foldout, _groupPath.Split('/').Last(), true, new GUIStyle(EditorStyles.foldout){
                 //     fontStyle = FontStyle.Bold,
                 // });
-                if(_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                if(_eLayout.HasFlagFast(ELayout.TitleOut) && _foldout)
                 {
                     titleHeight += 1f;
                     // Rect lineSep = EditorGUILayout.GetControlRect(false, 1);
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             float contentHeight = 0f;
             if(_foldout)
             {
-                if (_eLayout.HasFlag(ELayout.Horizontal))
+                if (_eLayout.HasFlagFast(ELayout.Horizontal))
                 {
                     contentHeight += Mathf.Max(GetRenderer().Select(each => each.GetHeightIMGUI(width)).ToArray());
                 }
@@ -194,7 +194,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 height = position.height - marginTop - marginBottom - 4,
             };
 
-            // Debug.Assert(!_eLayout.HasFlag(ELayout.Horizontal), $"Horizontal is not supported for IMGUI in SaintsEditorAttribute mode");
+            // Debug.Assert(!_eLayout.HasFlagFast(ELayout.Horizontal), $"Horizontal is not supported for IMGUI in SaintsEditorAttribute mode");
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_foldoutSmallStyle == null)
@@ -215,15 +215,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
-            if (_eLayout.HasFlag(ELayout.Background) || _eLayout.HasFlag(ELayout.Tab))
+            if (_eLayout.HasFlagFast(ELayout.Background) || _eLayout.HasFlagFast(ELayout.Tab))
             {
                 GUI.Box(marginedRect, GUIContent.none, EditorStyles.helpBox);
             }
 
-            // GUIStyle fullBoxStyle = _eLayout.HasFlag(ELayout.Background)
+            // GUIStyle fullBoxStyle = _eLayout.HasFlagFast(ELayout.Background)
             //     ? GUI.skin.box
             //     : GUIStyle.none;
-            // IDisposable disposable = _eLayout.HasFlag(ELayout.Horizontal)
+            // IDisposable disposable = _eLayout.HasFlagFast(ELayout.Horizontal)
             //     // ReSharper disable once RedundantCast
             //     ? (IDisposable)new EditorGUILayout.HorizontalScope(fullBoxStyle)
             //     : new EditorGUILayout.VerticalScope(fullBoxStyle);
@@ -237,9 +237,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                 // using (new EditorGUILayout.VerticalScope())
                 {
-                    bool hasFoldout = _eLayout.HasFlag(ELayout.Foldout) || _eLayout.HasFlag(ELayout.Collapse);
-                    bool hasTitle = _eLayout.HasFlag(ELayout.Title);
-                    bool hasTab = _eLayout.HasFlag(ELayout.Tab);
+                    bool hasFoldout = _eLayout.HasFlagFast(ELayout.Foldout) || _eLayout.HasFlagFast(ELayout.Collapse);
+                    bool hasTitle = _eLayout.HasFlagFast(ELayout.Title);
+                    bool hasTab = _eLayout.HasFlagFast(ELayout.Tab);
 
                     Rect titleRect = new Rect(marginedRect)
                     {
@@ -269,7 +269,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         titleRect.y += titleRect.height;
                         titleUsedHeight += titleRect.height;
 
-                        if(_eLayout.HasFlag(ELayout.TitleOut))
+                        if(_eLayout.HasFlagFast(ELayout.TitleOut))
                         {
                             titleRect.height = 1;
                             EditorGUI.DrawRect(titleRect, EColor.EditorSeparator.GetColor());
@@ -289,7 +289,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             || hasTitle
                             || !hasTab))
                     {
-                        bool fancy = _eLayout.HasFlag(ELayout.TitleOut) && _eLayout.HasFlag(ELayout.Background);
+                        bool fancy = _eLayout.HasFlagFast(ELayout.TitleOut) && _eLayout.HasFlagFast(ELayout.Background);
                         if (fancy) // title clickable foldout
                         {
                             titleRect.height = EditorGUIUtility.singleLineHeight;
@@ -322,7 +322,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             titleRect.y += titleRect.height;
                             titleUsedHeight += titleRect.height;
 
-                            if (_eLayout.HasFlag(ELayout.TitleOut) && _foldout)
+                            if (_eLayout.HasFlagFast(ELayout.TitleOut) && _foldout)
                             {
                                 titleRect.height = 1;
                                 EditorGUI.DrawRect(titleRect, EColor.EditorSeparator.GetColor());
@@ -420,7 +420,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     //     y = marginedRect.y + titleUsedHeight,
                     //     height = marginedRect.height - titleUsedHeight,
                     // };
-                    if (_eLayout.HasFlag(ELayout.Horizontal))
+                    if (_eLayout.HasFlagFast(ELayout.Horizontal))
                     {
                         ISaintsRenderer[] renderers = GetRenderer().ToArray();
                         float splitWidth = bodyRect.width / renderers.Length;

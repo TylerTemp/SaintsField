@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Utils
             }
 
             MethodInfo methodInfo = targetType.GetMethod(fieldName, bindAttr);
-            // Debug.Log($"methodInfo={methodInfo}, fieldName={fieldName}, targetType={targetType}/FlattenHierarchy={bindAttr.HasFlag(BindingFlags.FlattenHierarchy)}");
+            // Debug.Log($"methodInfo={methodInfo}, fieldName={fieldName}, targetType={targetType}/FlattenHierarchy={bindAttr.HasFlagFast(BindingFlags.FlattenHierarchy)}");
             return methodInfo == null ? (GetPropType.NotFound, null) : (GetPropType.Method, methodInfo);
 
         }

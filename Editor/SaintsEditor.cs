@@ -803,7 +803,7 @@ namespace SaintsField.Editor
 
         // private static ISaintsRendererGroup MakeRendererGroup(LayoutInfo layoutInfo)
         // {
-        //     if (layoutInfo.Config.HasFlag(ELayout.Vertical))
+        //     if (layoutInfo.Config.HasFlagFast(ELayout.Vertical))
         //     {
         //         return new VerticalGroup(layoutInfo.Config);
         //     }
@@ -811,11 +811,11 @@ namespace SaintsField.Editor
         // }
         // private static ISaintsRendererGroup MakeRendererGroup(ELayout layoutInfo)
         // {
-        //     if (layoutInfo.HasFlag(ELayout.Tab))
+        //     if (layoutInfo.HasFlagFast(ELayout.Tab))
         //     {
         //         return new SaintsRendererGroup(layoutInfo);
         //     }
-        //     if (layoutInfo.HasFlag(ELayout.Horizontal))
+        //     if (layoutInfo.HasFlagFast(ELayout.Horizontal))
         //     {
         //         return new HorizontalGroup(layoutInfo);
         //     }
