@@ -385,78 +385,73 @@ namespace SaintsField.Editor.Core
             //     });
         }
 
-        private static Type FindTypeDrawer(Type baseType, bool nonSaints)
+        private static Type FindTypeDrawer(Type fieldType, bool nonSaints)
         {
-            List<Type> lookingForType = new List<Type>
-            {
-                baseType,
-            };
-
             // Type elementType = ReflectUtils.GetElementType(fieldInfo.FieldType);
             // if (elementType != fieldInfo.FieldType)
             // {
             //     lookingForType.Insert(0, elementType);
             // }
 
-            foreach (Type fieldType in lookingForType)
-            {
-                bool isGenericType = fieldType.IsGenericType;
-    #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+            bool isGenericType = fieldType.IsGenericType;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log($"FindTypeDrawer for {fieldType}, isGenericType={isGenericType}");
-    #endif
+#endif
 
-                // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-                foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> propertyAttributeToPropertyDrawer in PropertyAttributeToPropertyDrawers)
+            {
+                bool matched;
+                if (isGenericType)
                 {
-                    bool matched;
-                    if (isGenericType)
+                    Type genericType = fieldType.GetGenericTypeDefinition();
+                    // maybe we only need the first one condition?
+                    matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType) || genericType == propertyAttributeToPropertyDrawer.Key || genericType.IsSubclassOf(propertyAttributeToPropertyDrawer.Key);
+                    // Debug.Log(fieldType.GetGenericTypeDefinition().IsSubclassOf(propertyAttributeToPropertyDrawer.Key));
+                    // Debug.Log(fieldType.IsAssignableFrom(propertyAttributeToPropertyDrawer.Key));
+                    // Debug.Log(propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType));
+                    // ReSharper disable once MergeIntoPattern
+                    if (!matched && fieldType.BaseType != null && fieldType.BaseType.IsGenericType)
                     {
-                        Type genericType = fieldType.GetGenericTypeDefinition();
-                        // maybe we only need the first one condition?
-                        matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType) || genericType == propertyAttributeToPropertyDrawer.Key || genericType.IsSubclassOf(propertyAttributeToPropertyDrawer.Key);
-                        // Debug.Log(fieldType.GetGenericTypeDefinition().IsSubclassOf(propertyAttributeToPropertyDrawer.Key));
-                        // Debug.Log(fieldType.IsAssignableFrom(propertyAttributeToPropertyDrawer.Key));
-                        // Debug.Log(propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType));
-                        // ReSharper disable once MergeIntoPattern
-                        if (!matched && fieldType.BaseType != null && fieldType.BaseType.IsGenericType)
-                        {
-                            matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType.BaseType
-                                .GetGenericTypeDefinition());
-                        }
+                        matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType.BaseType
+                            .GetGenericTypeDefinition());
                     }
-                    else
-                    {
-                        matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType);
+                }
+                else
+                {
+                    matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                         Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.DrawerType))}");
 #endif
-                        if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
-                        {
-                            matched = ReflectUtils.IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldType);
-                        }
+                    if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
+                    {
+                        matched = ReflectUtils.IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldType);
                     }
+                }
 
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
 //                     Debug.Log($"fieldInfo.FieldType={fieldInfo.FieldType}, isGenericType={isGenericType}, GetGenericTypeDefinition={(isGenericType ? fieldInfo.FieldType.GetGenericTypeDefinition().ToString() : "")}, key={propertyAttributeToPropertyDrawer.Key}, {matched}");
 // #endif
-                    // ReSharper disable once InvertIf
-                    if (matched)
+                // ReSharper disable once InvertIf
+                if (matched)
+                {
+                    PropertyDrawerInfo first = new PropertyDrawerInfo();
+                    foreach (var each in propertyAttributeToPropertyDrawer.Value)
                     {
-                        Type foundDrawer = propertyAttributeToPropertyDrawer.Value
-                            // ReSharper disable once SimplifyConditionalTernaryExpression
-                            .FirstOrDefault(each => nonSaints? !each.IsSaints : true)
-                            // [0]
-                            .DrawerType;
+                        if (nonSaints && each.IsSaints) continue;
+                        first = each;
+                        break;
+                    }
+                    Type foundDrawer = first
+                        .DrawerType;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                         Debug.Log($"foundDrawer={foundDrawer} for {fieldType}");
 #endif
-                        if(foundDrawer != null)
-                        {
-                            return foundDrawer;
-                        }
+                    if (foundDrawer != null)
+                    {
+                        return foundDrawer;
                     }
                 }
-
             }
             return null;
         }
