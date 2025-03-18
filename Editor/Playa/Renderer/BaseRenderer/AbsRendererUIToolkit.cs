@@ -620,9 +620,32 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 });
             }
 
-            if (Array.Exists(
-                    valueType.GetInterfaces(),
-                    i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IDictionary<,>) || i.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))))
+            Type dictionaryInterface = typeof(IDictionary<,>);
+            Type readonlyDictionaryInterface = typeof(IReadOnlyDictionary<,>);
+            bool isNormalDictionary = false;
+            bool isReadonlyDictionary = false;
+            foreach (Type interfaceType in valueType.GetInterfaces())
+            {
+                if (!interfaceType.IsGenericType)
+                {
+                    continue;
+                }
+
+                Type genType = interfaceType.GetGenericTypeDefinition();
+                if (genType == dictionaryInterface)
+                {
+                    isNormalDictionary = true;
+                    break;
+                }
+
+                if (genType == readonlyDictionaryInterface)
+                {
+                    isReadonlyDictionary = true;
+                    break;
+                }
+            }
+
+            if (isNormalDictionary || isReadonlyDictionary)
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1479,15 +1502,46 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             IEnumerable<Type> genTypes = valueType.GetInterfaces()
                 .Where(each => each.IsGenericType)
-                .Select(each => each.GetGenericTypeDefinition());
+                // .Select(each => each.GetGenericTypeDefinition())
+                ;
             if (valueType.IsGenericType)
             {
-                genTypes = genTypes.Prepend(valueType.GetGenericTypeDefinition());
+                genTypes = genTypes.Prepend(valueType);
             }
 
-            if(genTypes.Any(each => each == typeof(IDictionary<,>) || each == typeof(IReadOnlyDictionary<,>)))
+            Type dictionaryInterface = typeof(IDictionary<,>);
+            Type readonlyDictionaryInterface = typeof(IReadOnlyDictionary<,>);
+            Type[] dictionaryArgTypes = null;
+            bool isNormalDictionary = false;
+            bool isReadonlyDictionary = false;
+
+            // IDictionary;
+            // IReadOnlyDictionary;
+
+            foreach (Type normType in genTypes)
             {
-                // ReSharper disable once AssignNullToNotNullAttribute
+                Type genType = normType.GetGenericTypeDefinition();
+                if (genType == dictionaryInterface)
+                {
+                    isNormalDictionary = true;
+                    dictionaryArgTypes = normType.GetGenericArguments();
+                    break;
+                }
+
+                if (genType == readonlyDictionaryInterface)
+                {
+                    isReadonlyDictionary = true;
+                    dictionaryArgTypes = normType.GetGenericArguments();
+                    break;
+                }
+            }
+
+            if(isNormalDictionary || isReadonlyDictionary)
+            {
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
+                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadonlyDictionary, dictionaryArgTypes[0], dictionaryArgTypes[1], setterOrNull);
+#else
+                ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
 
                 Foldout foldout = new Foldout
@@ -1531,7 +1585,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
 
                 return foldout;
-                // return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
+                return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
+#endif
             }
             if (value is IEnumerable enumerableValue)
             {
@@ -2217,6 +2272,256 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             return oldElement == null? foldout : null;
         }
+
+        private class DictionaryViewPayload
+        {
+            public object RawDictValue;
+            public readonly PropertyInfo KeysProperty;
+            public readonly PropertyInfo IndexerProperty;
+            public readonly MethodInfo RemoveMethod;
+
+            public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
+                MethodInfo removeMethod)
+            {
+                RawDictValue = rawDictValue;
+                KeysProperty = keysProperty;
+                IndexerProperty = indexerProperty;
+                RemoveMethod = removeMethod;
+            }
+
+            public IEnumerable<object> GetKeys() => ((IEnumerable)KeysProperty.GetValue(RawDictValue)).Cast<object>();
+
+            public object GetValue(object key) => IndexerProperty.GetValue(RawDictValue, new[] { key });
+            public void DeleteKey(object key) => RemoveMethod.Invoke(RawDictValue, new[] { key });
+            public void SetKeyValue(object key, object value) => IndexerProperty.SetValue(RawDictValue, new[] { key, value });
+        }
+
+        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> setterOrNull)
+        {
+            // Debug.Log(dictKeyType);
+            // Debug.Log(dictValueType);
+
+            Foldout foldout = oldElement;
+            if (foldout != null && !foldout.ClassListContains("saintsfield-dictionary"))
+            {
+                foldout = null;
+            }
+            if (foldout == null)
+            {
+                // Debug.Log($"Create new Foldout");
+                foldout = new Foldout
+                {
+                    text = label,
+                };
+                foldout.AddToClassList("saintsfield-dictionary");
+                VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
+                if (foldoutContent != null)
+                {
+                    foldoutContent.style.marginLeft = 0;
+                }
+
+                // nullable
+                foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+                {
+                    // text = "x",
+                    tooltip = "Set to null",
+                    style =
+                    {
+                        position = Position.Absolute,
+                        // top = -EditorGUIUtility.singleLineHeight,
+                        top = 0,
+                        right = 0,
+                        width = EditorGUIUtility.singleLineHeight,
+                        height = EditorGUIUtility.singleLineHeight,
+
+                        backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+#if UNITY_2022_2_OR_NEWER
+                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                        backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                    },
+                });
+            }
+
+            MultiColumnListView listView = foldout.Q<MultiColumnListView>();
+            if (listView == null)
+            {
+                PropertyInfo keysProperty =  valueType.GetProperty("Keys");
+                Debug.Assert(keysProperty != null, $"Failed to get keys from {valueType}");
+
+                PropertyInfo indexerProperty = valueType.GetProperty("Item", new []{dictKeyType});
+                Debug.Assert(keysProperty != null, $"Failed to get key indexer from {valueType}");
+
+                MethodInfo removeMethod = valueType.GetMethod("Remove", new[]{dictKeyType});
+                Debug.Assert(keysProperty != null, $"Failed to get `Remove` function from {valueType}");
+
+                DictionaryViewPayload payload = new DictionaryViewPayload(rawDictValue, keysProperty, indexerProperty, removeMethod);
+
+                listView = new MultiColumnListView
+                {
+                    selectionType = SelectionType.Multiple,
+                    virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                    // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
+                    showBoundCollectionSize = false,
+                    showFoldoutHeader = false,
+                    // headerTitle = label,
+                    showAddRemoveFooter = !isReadOnly,
+                    reorderMode = ListViewReorderMode.Animated,
+                    reorderable = false,
+                    style =
+                    {
+                        flexGrow = 1,
+                        position = Position.Relative,
+                    },
+                    itemsSource = payload.GetKeys().ToList(),
+                    userData = payload,
+                };
+
+                listView.columns.Add(new Column
+                {
+                    name = "Keys",
+                    // title = "Keys",
+                    stretchable = true,
+                    makeHeader = () =>
+                    {
+                        VisualElement header = new VisualElement();
+                        header.Add(new Label("Keys"));
+                        // ToolbarSearchField keySearch = new ToolbarSearchField
+                        // {
+                        //     // isDelayed = true,
+                        //     style =
+                        //     {
+                        //         marginRight = 3,
+                        //         display = saintsDictionaryAttribute?.Searchable ?? true
+                        //             ? DisplayStyle.Flex
+                        //             : DisplayStyle.None,
+                        //         width = Length.Percent(97f),
+                        //     },
+                        // };
+                        // TextField keySearchText = keySearch.Q<TextField>();
+                        // if (keySearchText != null)
+                        // {
+                        //     keySearchText.isDelayed = true;
+                        // }
+                        // header.Add(keySearch);
+                        // keySearch.RegisterValueChangedCallback(evt =>
+                        // {
+                        //     // Debug.Log($"key search {evt.newValue}");
+                        //     if(evt.newValue != preKeySearch)
+                        //     {
+                        //         RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+                        //     }
+                        // });
+                        return header;
+                    },
+                    makeCell = () => new VisualElement(),
+                    bindCell = (element, elementIndex) =>
+                    {
+                        object key = listView.itemsSource[elementIndex];
+
+                        VisualElement keyChild = element.Children().FirstOrDefault();
+
+                        VisualElement editing = UIToolkitValueEdit(keyChild, "", dictKeyType, key, newKey =>
+                        {
+                            object oldValue = payload.GetValue(key);
+                            payload.DeleteKey(key);
+                            payload.SetKeyValue(newKey, oldValue);
+                        });
+
+                        if (editing != null)
+                        {
+                            element.Clear();
+                            element.Add(editing);
+                        }
+                    },
+                });
+
+                listView.columns.Add(new Column
+                {
+                    name = "Values",
+                    // title = "Keys",
+                    stretchable = true,
+                    makeHeader = () =>
+                    {
+                        VisualElement header = new VisualElement();
+                        header.Add(new Label("Values"));
+                        // ToolbarSearchField keySearch = new ToolbarSearchField
+                        // {
+                        //     // isDelayed = true,
+                        //     style =
+                        //     {
+                        //         marginRight = 3,
+                        //         display = saintsDictionaryAttribute?.Searchable ?? true
+                        //             ? DisplayStyle.Flex
+                        //             : DisplayStyle.None,
+                        //         width = Length.Percent(97f),
+                        //     },
+                        // };
+                        // TextField keySearchText = keySearch.Q<TextField>();
+                        // if (keySearchText != null)
+                        // {
+                        //     keySearchText.isDelayed = true;
+                        // }
+                        // header.Add(keySearch);
+                        // keySearch.RegisterValueChangedCallback(evt =>
+                        // {
+                        //     // Debug.Log($"key search {evt.newValue}");
+                        //     if(evt.newValue != preKeySearch)
+                        //     {
+                        //         RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+                        //     }
+                        // });
+                        return header;
+                    },
+                    makeCell = () => new VisualElement(),
+                    bindCell = (element, elementIndex) =>
+                    {
+                        object key = listView.itemsSource[elementIndex];
+                        object value = payload.GetValue(key);
+
+                        VisualElement valueChild = element.Children().FirstOrDefault();
+
+                        VisualElement editing = UIToolkitValueEdit(valueChild, "", dictValueType, value, newKey =>
+                        {
+                            payload.SetKeyValue(key, newKey);
+                        });
+
+                        if (editing != null)
+                        {
+                            element.Clear();
+                            element.Add(editing);
+                        }
+                    },
+                });
+
+                foldout.Add(listView);
+            }
+
+            DictionaryViewPayload oldPayload = (DictionaryViewPayload)listView.userData;
+            oldPayload.RawDictValue = rawDictValue;
+//             oldPayload.RawValues = listValue.ToList();
+//             oldPayload.RawListValue = rawListValue;
+//
+//             // Debug.Log($"Refresh count={listValue.Length}");
+//             oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((o, index) => index).ToList();
+//             listView.itemsSource = oldPayload.ItemIndexToOriginIndex.ToList();
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+//             Debug.Log($"ItemIndexToOriginIndex={string.Join(",", oldPayload.ItemIndexToOriginIndex)}");
+// #endif
+//             // Debug.Log($"itemSource({listView.itemsSource.Count})={string.Join(",", listView.itemsSource)}");
+//             // if (listValue.Length > 0)
+//             // {
+//             //     Debug.Log($"0 listValue={listValue[0]}; listView.itemsSource={listView.itemsSource[0]}");
+//             // }
+//             // listView.Rebuild();
+
+            return oldElement == null? foldout : null;
+        }
+
 
         private static void MoveArrayElement(IList list, int fromIndex, int toIndex)
         {

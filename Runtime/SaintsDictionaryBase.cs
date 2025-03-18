@@ -8,12 +8,14 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public abstract class SaintsDictionaryBase<TKey, TValue>: IDictionary<TKey, TValue>, ISerializationCallbackReceiver
+    public abstract class SaintsDictionaryBase<TKey, TValue>: IDictionary, IDictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
         protected abstract List<TKey> SerializedKeys { get; }
         protected abstract List<TValue> SerializedValues { get; }
 
-        protected Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
+        protected Dictionary<TKey, TValue> Dictionary = new Dictionary<TKey, TValue>();
+        private ICollection _keys;
+        private ICollection _values;
 
         // [Conditional("UNITY_EDITOR")]
         // private void EditorSyncDictionaryToBackingField()
@@ -68,7 +70,7 @@ namespace SaintsField
 
         public void OnAfterDeserialize()
         {
-            _dictionary.Clear();
+            Dictionary.Clear();
 
             // Debug.Log($"OnAfterDeserialize keys={SerializedKeys.Count}, values={SerializedValues.Count}");
             // int keyCount = SerializedKeys.Count;
@@ -85,9 +87,9 @@ namespace SaintsField
                 TValue value = SerializedValues.Count > index ? SerializedValues[index] : default;
 #if UNITY_EDITOR
                 // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
-                if (!RuntimeUtil.IsNull(key) && !_dictionary.ContainsKey(key))
+                if (!RuntimeUtil.IsNull(key) && !Dictionary.ContainsKey(key))
                 {
-                    _dictionary.Add(key, value);
+                    Dictionary.Add(key, value);
                 }
 #else
                 _dictionary.Add(key, value);
@@ -105,7 +107,7 @@ namespace SaintsField
 
         public void Add(TKey key, TValue value)
         {
-            _dictionary.Add(key, value);
+            Dictionary.Add(key, value);
 #if UNITY_EDITOR
             SerializedKeys.Add(key);
             SerializedValues.Add(value);
@@ -114,15 +116,47 @@ namespace SaintsField
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return _dictionary.TryGetValue(key, out value);
+            return Dictionary.TryGetValue(key, out value);
         }
 
-        public ICollection<TKey> Keys => _dictionary.Keys;
-        public ICollection<TValue> Values => _dictionary.Values;
+        public ICollection<TKey> Keys => Dictionary.Keys;
+
+        ICollection IDictionary.Values => Dictionary.Values;
+
+        ICollection IDictionary.Keys => Dictionary.Keys;
+
+        public ICollection<TValue> Values => Dictionary.Values;
+
+        public bool Contains(object key)
+        {
+            return Dictionary.ContainsKey((TKey) key);
+        }
+
+        IDictionaryEnumerator IDictionary.GetEnumerator()
+        {
+            return Dictionary.GetEnumerator();
+        }
+
+        public void Remove(object key)
+        {
+            TKey tKey = (TKey)key;
+
+            bool removed = Dictionary.Remove(tKey);
+#if UNITY_EDITOR
+            if(removed)
+            {
+                int keyIndex = SerializedKeys.IndexOf(tKey);
+                SerializedValues.RemoveAt(keyIndex);
+                SerializedKeys.RemoveAt(keyIndex);
+            }
+#endif
+        }
+
+        public virtual bool IsFixedSize => false;
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return _dictionary.GetEnumerator();
+            return Dictionary.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -136,7 +170,12 @@ namespace SaintsField
             SerializedKeys.Add(item.Key);
             SerializedValues.Add(item.Value);
 #endif
-            _dictionary.Add(item.Key, item.Value);
+            Dictionary.Add(item.Key, item.Value);
+        }
+
+        public void Add(object key, object value)
+        {
+            throw new NotImplementedException();
         }
 
         public void Clear()
@@ -145,22 +184,22 @@ namespace SaintsField
             SerializedKeys.Clear();
             SerializedValues.Clear();
 #endif
-            _dictionary.Clear();
+            Dictionary.Clear();
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return _dictionary.Contains(item);
+            return Dictionary.Contains(item);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            ((ICollection<KeyValuePair<TKey, TValue>>)_dictionary).CopyTo(array, arrayIndex);
+            ((ICollection<KeyValuePair<TKey, TValue>>)Dictionary).CopyTo(array, arrayIndex);
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            bool result = _dictionary.Remove(item.Key);
+            bool result = Dictionary.Remove(item.Key);
 #if UNITY_EDITOR
             if(result)
             {
@@ -172,17 +211,61 @@ namespace SaintsField
             return result;
         }
 
-        public int Count => _dictionary.Count;
-        public bool IsReadOnly => false;
+        #region IDictionary
+        public void CopyTo(Array array, int arrayIndex)
+        {
+            KeyValuePair<object, object>[] keyValuePairs = new KeyValuePair<object, object>[Dictionary.Count];
+            int index = 0;
+            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
+            {
+                keyValuePairs[index] = new KeyValuePair<object, object>(kv.Key, kv.Value);
+                index++;
+            }
+
+            keyValuePairs.CopyTo(array, arrayIndex);
+        }
+
+        public int Count => Dictionary.Count;
+        public bool IsSynchronized => false;
+
+        protected readonly object SyncRootObj = new object();
+
+        public virtual object SyncRoot => SyncRootObj;
+        public virtual bool IsReadOnly => false;
+
+        public object this[object key]
+        {
+            get => Dictionary[(TKey)key];
+            set
+            {
+                TKey tKey = (TKey)key;
+                TValue tValue = (TValue)value;
+                Dictionary[tKey] = tValue;
+#if UNITY_EDITOR
+                int index = SerializedKeys.IndexOf(tKey);
+                if (index >= 0)
+                {
+                    SerializedValues[index] = tValue;
+                }
+                else
+                {
+                    SerializedKeys.Add(tKey);
+                    SerializedValues.Add(tValue);
+                }
+#endif
+            }
+        }
+
+        #endregion
 
         public bool ContainsKey(TKey key)
         {
-            return _dictionary.ContainsKey(key);
+            return Dictionary.ContainsKey(key);
         }
 
         public bool Remove(TKey key)
         {
-            if (_dictionary.Remove(key))
+            if (Dictionary.Remove(key))
             {
 #if UNITY_EDITOR
                 int index = SerializedKeys.IndexOf(key);
@@ -200,12 +283,12 @@ namespace SaintsField
         public bool TryAdd(TKey key, TValue value)
         {
             // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
-            if (_dictionary.ContainsKey(key))
+            if (Dictionary.ContainsKey(key))
             {
                 return false;
             }
 
-            _dictionary.Add(key, value);
+            Dictionary.Add(key, value);
 #if UNITY_EDITOR
             SerializedKeys.Add(key);
             SerializedValues.Add(value);
@@ -215,10 +298,10 @@ namespace SaintsField
 
         public TValue this[TKey key]
         {
-            get => _dictionary[key];
+            get => Dictionary[key];
             set
             {
-                _dictionary[key] = value;
+                Dictionary[key] = value;
 #if UNITY_EDITOR
                 int index = SerializedKeys.IndexOf(key);
                 if (index >= 0)

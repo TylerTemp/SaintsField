@@ -28,8 +28,8 @@ namespace SaintsField
 
         public SaintsDictionary(IDictionary<TKey, TValue> dictionary)
         {
-            _dictionary = new Dictionary<TKey, TValue>(dictionary);
-            foreach (KeyValuePair<TKey,TValue> kv in _dictionary)
+            Dictionary = new Dictionary<TKey, TValue>(dictionary);
+            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
                 _keys.Add(kv.Key);
                 _values.Add(kv.Value);
@@ -38,8 +38,8 @@ namespace SaintsField
 
         public SaintsDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
-            _dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
-            foreach (KeyValuePair<TKey,TValue> kv in _dictionary)
+            Dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
+            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
                 _keys.Add(kv.Key);
                 _values.Add(kv.Value);
@@ -49,8 +49,8 @@ namespace SaintsField
 #if UNITY_2021_2_OR_NEWER
         public SaintsDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection)
         {
-            _dictionary = new Dictionary<TKey, TValue>(collection);
-            foreach (KeyValuePair<TKey,TValue> kv in _dictionary)
+            Dictionary = new Dictionary<TKey, TValue>(collection);
+            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
                 _keys.Add(kv.Key);
                 _values.Add(kv.Value);
@@ -60,8 +60,8 @@ namespace SaintsField
         public SaintsDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection,
             IEqualityComparer<TKey> comparer)
         {
-            _dictionary = new Dictionary<TKey, TValue>(collection, comparer);
-            foreach (KeyValuePair<TKey,TValue> kv in _dictionary)
+            Dictionary = new Dictionary<TKey, TValue>(collection, comparer);
+            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
                 _keys.Add(kv.Key);
                 _values.Add(kv.Value);
@@ -70,8 +70,8 @@ namespace SaintsField
 #endif
         public SaintsDictionary(IEqualityComparer<TKey> comparer)
         {
-            _dictionary = new Dictionary<TKey, TValue>(comparer);
-            foreach (KeyValuePair<TKey,TValue> kv in _dictionary)
+            Dictionary = new Dictionary<TKey, TValue>(comparer);
+            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
                 _keys.Add(kv.Key);
                 _values.Add(kv.Value);
