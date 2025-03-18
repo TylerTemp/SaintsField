@@ -47,8 +47,8 @@ namespace SaintsField.Editor.Utils
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
         {
             string originPath = property.propertyPath;
-            IReadOnlyList<string> propPaths = originPath.Split(pathSplitSeparator);
-            (bool arrayTrim, IReadOnlyList<string> propPathSegments) = TrimEndArray(propPaths);
+            string[] propPaths = originPath.Split(pathSplitSeparator);
+            (bool arrayTrim, string[] propPathSegments) = TrimEndArray(propPaths);
             if (arrayTrim)
             {
                 propPaths = propPathSegments;
@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Utils
             FieldOrProp fieldOrProp = default;
 
             bool preNameIsArray = false;
-            for (int propIndex = 0; propIndex < propPaths.Count; propIndex++)
+            for (int propIndex = 0; propIndex < propPaths.Length; propIndex++)
             {
                 string propSegName = propPaths[propIndex];
                 // Debug.Log($"check key {propSegName}");
@@ -134,7 +134,7 @@ namespace SaintsField.Editor.Utils
         {
             string[] paths = property.propertyPath.Split(pathSplitSeparator);
 
-            (bool _, IReadOnlyList<string> propPathSegments) = TrimEndArray(paths);
+            (bool _, string[] propPathSegments) = TrimEndArray(paths);
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{string.Join(".", propPathSegments)}";
         }
 
@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Utils
             // Debug.Log(property.propertyPath);
             string[] paths = property.propertyPath.Split(pathSplitSeparator);
 
-            (bool arrayTrim, IReadOnlyList<string> propPathSegments) = TrimEndArray(paths);
+            (bool arrayTrim, string[] propPathSegments) = TrimEndArray(paths);
             if (!arrayTrim)
             {
                 return ($"{property.propertyPath} is not an array/list.", null);
@@ -164,10 +164,10 @@ namespace SaintsField.Editor.Utils
             return ("", arrayProp);
         }
 
-        private static (bool trimed, IReadOnlyList<string> propPathSegs) TrimEndArray(IReadOnlyList<string> propPathSegments)
+        private static (bool trimed, string[] propPathSegs) TrimEndArray(string[] propPathSegments)
         {
 
-            int usePathLength = propPathSegments.Count;
+            int usePathLength = propPathSegments.Length;
 
             if (usePathLength <= 2)
             {
@@ -183,9 +183,8 @@ namespace SaintsField.Editor.Utils
             }
 
             // old Unity does not have SkipLast
-            List<string> propPaths = new List<string>(propPathSegments);
-            propPaths.RemoveAt(propPaths.Count - 1);
-            propPaths.RemoveAt(propPaths.Count - 1);
+            string[] propPaths = new string[usePathLength - 2];
+            Array.Copy(propPathSegments, 0, propPaths, 0, usePathLength - 2);
             return (true, propPaths);
         }
 
