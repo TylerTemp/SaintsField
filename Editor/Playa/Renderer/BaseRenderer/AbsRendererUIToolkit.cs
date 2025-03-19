@@ -1521,6 +1521,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             foreach (Type normType in genTypes)
             {
                 Type genType = normType.GetGenericTypeDefinition();
+                // Debug.Log(genType);
                 if (genType == dictionaryInterface)
                 {
                     isNormalDictionary = true;
@@ -1532,14 +1533,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     isReadonlyDictionary = true;
                     dictionaryArgTypes = normType.GetGenericArguments();
-                    break;
+                    // break;
                 }
             }
 
             if(isNormalDictionary || isReadonlyDictionary)
             {
+                bool isReadOnly = !isNormalDictionary;
+
+                // Debug.Log($"isReadonlyDictionary={isReadonlyDictionary}");
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadonlyDictionary, dictionaryArgTypes[0], dictionaryArgTypes[1], setterOrNull);
+                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], setterOrNull);
 #else
                 ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -2293,7 +2297,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             public object GetValue(object key) => IndexerProperty.GetValue(RawDictValue, new[] { key });
             public void DeleteKey(object key) => RemoveMethod.Invoke(RawDictValue, new[] { key });
-            public void SetKeyValue(object key, object value) => IndexerProperty.SetValue(RawDictValue, new[] { key, value });
+            public void SetKeyValue(object key, object value) => IndexerProperty.SetValue(RawDictValue, value, new[] { key });
         }
 
         private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> setterOrNull)
@@ -2358,6 +2362,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 MethodInfo removeMethod = valueType.GetMethod("Remove", new[]{dictKeyType});
                 Debug.Assert(keysProperty != null, $"Failed to get `Remove` function from {valueType}");
+
+                Debug.Assert(rawDictValue != null, "Dictionary value should not be null");
 
                 DictionaryViewPayload payload = new DictionaryViewPayload(rawDictValue, keysProperty, indexerProperty, removeMethod);
 
@@ -2428,6 +2434,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         VisualElement editing = UIToolkitValueEdit(keyChild, "", dictKeyType, key, newKey =>
                         {
                             object oldValue = payload.GetValue(key);
+                            // Debug.Log($"set key {key} -> {newKey} with value {oldValue}");
                             payload.DeleteKey(key);
                             payload.SetKeyValue(newKey, oldValue);
                         });
