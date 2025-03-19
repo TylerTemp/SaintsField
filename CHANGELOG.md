@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.37.0 ##
+## 3.36.5 ##
 
 1.  UI Toolkit: `ShowInInspector` can now edit a dictionary
 2.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize its element type wrong and fail (e.g. auto getters)
