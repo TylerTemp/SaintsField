@@ -344,9 +344,7 @@ namespace SaintsField.Editor.AutoRunner
                             ? (MemberInfo)info.fieldOrProp.FieldInfo
                             : info.fieldOrProp.PropertyInfo;
 
-                        PropertyAttribute[] allProperties = memberInfo.GetCustomAttributes()
-                            .OfType<PropertyAttribute>()
-                            .ToArray();
+                        PropertyAttribute[] allProperties = ReflectCache.GetCustomAttributes<PropertyAttribute>(memberInfo);
 
                         PropertyAttribute[] saintsAttribute = allProperties
                             .Where(each => each is ISaintsAttribute)

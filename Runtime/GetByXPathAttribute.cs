@@ -50,21 +50,21 @@ namespace SaintsField
 
         protected void ParseOptions(EXP config)
         {
-            InitSign = !config.HasFlag(EXP.NoInitSign);
-            UsePickerButton = !config.HasFlag(EXP.NoPicker);
-            KeepOriginalPicker = !UsePickerButton || config.HasFlag(EXP.KeepOriginalPicker);
-            AutoResignToValue = !config.HasFlag(EXP.NoAutoResignToValue);
-            AutoResignToNull = !config.HasFlag(EXP.NoAutoResignToNull);
+            InitSign = !config.HasFlagFast(EXP.NoInitSign);
+            UsePickerButton = !config.HasFlagFast(EXP.NoPicker);
+            KeepOriginalPicker = !UsePickerButton || config.HasFlagFast(EXP.KeepOriginalPicker);
+            AutoResignToValue = !config.HasFlagFast(EXP.NoAutoResignToValue);
+            AutoResignToNull = !config.HasFlagFast(EXP.NoAutoResignToNull);
             if (AutoResignToValue && AutoResignToNull)
             {
                 UseResignButton = false;
             }
             else
             {
-                UseResignButton = !config.HasFlag(EXP.NoResignButton);
+                UseResignButton = !config.HasFlagFast(EXP.NoResignButton);
             }
 
-            if (config.HasFlag(EXP.NoMessage))
+            if (config.HasFlagFast(EXP.NoMessage))
             {
                 UseErrorMessage = false;
             }
@@ -73,7 +73,7 @@ namespace SaintsField
                 UseErrorMessage = !UseResignButton;
             }
 
-            ForceReOrder = config.HasFlag(EXP.ForceReOrder);
+            ForceReOrder = config.HasFlagFast(EXP.ForceReOrder);
         }
 
         public GetByXPathAttribute(EXP config, params string[] ePaths)

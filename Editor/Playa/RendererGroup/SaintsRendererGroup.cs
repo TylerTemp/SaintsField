@@ -39,17 +39,17 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private readonly object _containerObject;
 
-        private readonly IReadOnlyList<ToggleCheckInfo> _toggleCheckInfos;
+        private readonly List<ToggleCheckInfo> _toggleCheckInfos;
 
         public SaintsRendererGroup(string groupPath, Config config, object containerObject)
         {
             _groupPath = groupPath;
             _config = config;
             _eLayout = config.ELayout;
-            _foldout = !config.ELayout.HasFlag(ELayout.Collapse);
+            _foldout = !config.ELayout.HasFlagFast(ELayout.Collapse);
             _containerObject = containerObject;
 
-            List<ToggleCheckInfo> toggleCheckInfos = new List<ToggleCheckInfo>();
+            List<ToggleCheckInfo> toggleCheckInfos = new List<ToggleCheckInfo>(_config.Toggles.Count);
 
             foreach (ISaintsLayoutToggle configToggle in _config.Toggles)
             {
@@ -59,36 +59,36 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         // layoutEnableIf.Add(layoutEnableIfAttribute);
                         // Debug.Log(layoutEnableIfAttribute);
                         toggleCheckInfos.Add(new ToggleCheckInfo
-                        {
-                            Type = ToggleType.Enable,
-                            ConditionInfos = layoutEnableIfAttribute.ConditionInfos,
-                            Target = _containerObject,
-                        });
+                        (
+                            ToggleType.Enable,
+                            layoutEnableIfAttribute.ConditionInfos,
+                            _containerObject
+                        ));
                         break;
                     case LayoutReadOnlyAttribute layoutReadOnlyAttribute:
                         toggleCheckInfos.Add(new ToggleCheckInfo
-                        {
-                            Type = ToggleType.Disable,
-                            ConditionInfos = layoutReadOnlyAttribute.ConditionInfos,
-                            Target = _containerObject,
-                        });
+                        (
+                            ToggleType.Disable,
+                            layoutReadOnlyAttribute.ConditionInfos,
+                            _containerObject
+                        ));
                         break;
 
                     case LayoutHideIfAttribute layoutHideIfAttribute:
                         toggleCheckInfos.Add(new ToggleCheckInfo
-                        {
-                            Type = ToggleType.Hide,
-                            ConditionInfos = layoutHideIfAttribute.ConditionInfos,
-                            Target = _containerObject,
-                        });
+                        (
+                            ToggleType.Hide,
+                            layoutHideIfAttribute.ConditionInfos,
+                            _containerObject
+                        ));
                         break;
                     case LayoutShowIfAttribute layoutShowIfAttribute:
                         toggleCheckInfos.Add(new ToggleCheckInfo
-                        {
-                            Type = ToggleType.Show,
-                            ConditionInfos = layoutShowIfAttribute.ConditionInfos,
-                            Target = _containerObject,
-                        });
+                        (
+                            ToggleType.Show,
+                            layoutShowIfAttribute.ConditionInfos,
+                            _containerObject
+                        ));
                         break;
 
                     default:
@@ -133,11 +133,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public override string ToString() => $"<Group path={_groupPath} layout={_eLayout}/>";
 
-        private static bool IsFancyBox(ELayout eLayout) => eLayout.HasFlag(ELayout.Background) || eLayout.HasFlag(ELayout.Tab);
+        private static bool IsFancyBox(ELayout eLayout) => eLayout.HasFlagFast(ELayout.Background) || eLayout.HasFlagFast(ELayout.Tab);
 
         private static bool NeedIndentCheck(ELayout eLayout) => IsFancyBox(eLayout) ||
-                                                                eLayout.HasFlag(ELayout.Foldout) ||
-                                                                eLayout.HasFlag(ELayout.Collapse);
+                                                                eLayout.HasFlagFast(ELayout.Foldout) ||
+                                                                eLayout.HasFlagFast(ELayout.Collapse);
 
     }
 }

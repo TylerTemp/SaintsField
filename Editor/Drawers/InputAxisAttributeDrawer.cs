@@ -142,7 +142,7 @@ namespace SaintsField.Editor.Drawers
             int selectedIndex = IndexOf(axisNames, property.stringValue);
 
             // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
-            foreach (int index in Enumerable.Range(0, axisNames.Count))
+            for (var index = 0; index < axisNames.Count; index++)
             {
                 int curIndex = index;
 

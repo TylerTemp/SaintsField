@@ -41,7 +41,7 @@ namespace SaintsField
             if (keyCount < valueCount)
             {
                 int addCount = valueCount - keyCount;
-                foreach (int _ in Enumerable.Range(0, addCount))
+                for (int i = 0; i < addCount; i++)
                 {
                     SerializedKeys.Add(default);
                 }
@@ -50,7 +50,7 @@ namespace SaintsField
             else if (keyCount > valueCount)
             {
                 int addCount = keyCount - valueCount;
-                foreach (int _ in Enumerable.Range(0, addCount))
+                for (int i = 0; i < addCount; i++)
                 {
                     SerializedValues.Add(default);
                 }
@@ -81,7 +81,7 @@ namespace SaintsField
             //
             // }
 
-            foreach (int index in Enumerable.Range(0, SerializedKeys.Count))
+            for (var index = 0; index < SerializedKeys.Count; index++)
             {
                 TKey key = SerializedKeys[index];
                 TValue value = SerializedValues.Count > index ? SerializedValues[index] : default;

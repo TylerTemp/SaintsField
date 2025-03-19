@@ -231,7 +231,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         VisualElement itemContainer = new VisualElement();
                         // PropertyField propField = new PropertyField();
                         // itemContainer.Add(propField);
-                        foreach (int _ in Enumerable.Range(0, properties.Count))
+                        for (var i = 0; i < properties.Count; i++)
                         {
                             itemContainer.Add(new PropertyField());
                         }
@@ -335,10 +335,9 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         // PropertyField propField = new PropertyField();
                         // itemContainer.Add(propField);
                         // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                        foreach (int _ in Enumerable.Range(0, properties.Count))
+                        for (var i = 0; i < properties.Count; i++)
                         {
-                            PropertyField propField = new PropertyField();
-                            itemContainer.Add(propField);
+                            itemContainer.Add(new PropertyField());
                         }
                         return itemContainer;
                     };

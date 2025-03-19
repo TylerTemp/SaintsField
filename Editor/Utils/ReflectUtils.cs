@@ -10,21 +10,21 @@ namespace SaintsField.Editor.Utils
 {
     public static class ReflectUtils
     {
-        public static IReadOnlyList<Type> GetSelfAndBaseTypes(object target)
+        public static List<Type> GetSelfAndBaseTypes(object target)
         {
             return GetSelfAndBaseTypesFromType(target.GetType());
         }
 
-        public static IReadOnlyList<Type> GetSelfAndBaseTypesFromType(Type thisType)
+        public static List<Type> GetSelfAndBaseTypesFromType(Type thisType)
         {
-            List<Type> types = new List<Type>
+            List<Type> types = new List<Type>(1)
             {
                 thisType,
             };
 
-            while (types.Last().BaseType != null)
+            while (types[types.Count - 1].BaseType != null)
             {
-                types.Add(types.Last().BaseType);
+                types.Add(types[types.Count - 1].BaseType);
             }
 
             // types.Reverse();
@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Utils
             }
 
             MethodInfo methodInfo = targetType.GetMethod(fieldName, bindAttr);
-            // Debug.Log($"methodInfo={methodInfo}, fieldName={fieldName}, targetType={targetType}/FlattenHierarchy={bindAttr.HasFlag(BindingFlags.FlattenHierarchy)}");
+            // Debug.Log($"methodInfo={methodInfo}, fieldName={fieldName}, targetType={targetType}/FlattenHierarchy={bindAttr.HasFlagFast(BindingFlags.FlattenHierarchy)}");
             return methodInfo == null ? (GetPropType.NotFound, null) : (GetPropType.Method, methodInfo);
 
         }
@@ -144,7 +144,7 @@ namespace SaintsField.Editor.Utils
             Debug.Log($"toFillQueue.Count={toFillQueue.Count}");
 #endif
             // required:
-            foreach (int index in Enumerable.Range(0, methodParams.Count))
+            for (var index = 0; index < methodParams.Count; index++)
             {
                 if (!methodParams[index].IsOptional)
                 {
@@ -188,7 +188,7 @@ namespace SaintsField.Editor.Utils
             // optional:
             if(leftOverQueue.Count > 0)
             {
-                foreach (int index in Enumerable.Range(0, methodParams.Count))
+                for (var index = 0; index < methodParams.Count; index++)
                 {
                     if (leftOverQueue.Count == 0)
                     {
@@ -474,10 +474,10 @@ namespace SaintsField.Editor.Utils
         {
             string enumFieldName = Enum.GetName(enumType, enumValue);
             FieldInfo fieldInfo = enumType.GetField(enumFieldName);
-            RichLabelAttribute attribute = (RichLabelAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(RichLabelAttribute));
-            if (attribute != null)
+            RichLabelAttribute[] attributes = ReflectCache.GetCustomAttributes<RichLabelAttribute>(fieldInfo);
+            if (attributes.Length > 0)
             {
-                return (true, attribute.RichTextXml);
+                return (true, attributes[0].RichTextXml);
             }
             return (false, enumFieldName);
         }

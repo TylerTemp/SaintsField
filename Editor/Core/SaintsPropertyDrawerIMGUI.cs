@@ -164,11 +164,7 @@ namespace SaintsField.Editor.Core
             List<SaintsWithIndex> saintsAttributeWithIndexes = allAttributes
                 .OfType<ISaintsAttribute>()
                 // .Where(each => !(each is VisibilityAttribute))
-                .Select((each, index) => new SaintsWithIndex
-                {
-                    SaintsAttribute = each,
-                    Index = index,
-                })
+                .Select((each, index) => new SaintsWithIndex(each, index))
                 .ToList();
 
             Dictionary<SaintsWithIndex, SaintsPropertyDrawer> usedAttributes = saintsAttributeWithIndexes
@@ -188,11 +184,7 @@ namespace SaintsField.Editor.Core
 
             if (UseCreateFieldIMGUI && fieldFound.iSaintsAttribute is null)
             {
-                SaintsWithIndex thisFake = new SaintsWithIndex
-                {
-                    Index = -1,
-                    SaintsAttribute = null,
-                };
+                SaintsWithIndex thisFake = new SaintsWithIndex(null, -1);
                 saintsAttributeWithIndexes.Insert(0, thisFake);
                 usedAttributes[thisFake] = this;
             }
@@ -431,11 +423,7 @@ namespace SaintsField.Editor.Core
             }
 
             List<SaintsWithIndex> allSaintsAttributes = iSaintsAttributes
-                .Select((each, index) => new SaintsWithIndex
-                {
-                    SaintsAttribute = each,
-                    Index = index,
-                })
+                .Select((each, index) => new SaintsWithIndex(each, index))
                 .ToList();
 
             SaintsWithIndex fieldAttributeWithIndex =
@@ -446,11 +434,7 @@ namespace SaintsField.Editor.Core
 
             if (useCreateFieldIMGUI)
             {
-                fieldAttributeWithIndex = new SaintsWithIndex
-                {
-                    Index = -1,
-                    SaintsAttribute = null,
-                };
+                fieldAttributeWithIndex = new SaintsWithIndex(null, -1);
                 allSaintsAttributes.Insert(0, fieldAttributeWithIndex);
             }
 
@@ -1264,7 +1248,7 @@ namespace SaintsField.Editor.Core
                 // this code is used to prevent the decorator to be drawn everytime a fallback happens
                 // the marco is not added by default
 #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
-                Type dec = fieldInfo.GetCustomAttributes<PropertyAttribute>(true)
+                Type dec = fieldInfo.GetCustomAttributesFast<PropertyAttribute>(true)
                     .Select(propertyAttribute =>
                     {
                         // Debug.Log(propertyAttribute.GetType());

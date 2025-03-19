@@ -303,19 +303,25 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 SerializedProperty keysProp = property.FindPropertyRelative(propKeysName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysName);
                 SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesName);
 
-                FieldInfo keysField =
-                    ReflectUtils.GetSelfAndBaseTypesFromType(rawType)
-                        .Select(each => each.GetField(propKeysName,
-                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
-                            BindingFlags.FlattenHierarchy))
-                        .FirstOrDefault(each => each != null);
-                    // rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+                FieldInfo keysField = null;
+                foreach (var each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
+                {
+                    var field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                    if (field == null) continue;
+                    keysField = field;
+                    break;
+                }
+                // rawType.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
                 Debug.Assert(keysField != null, $"Failed to get keys field {propKeysName} from {property.propertyPath}");
-                FieldInfo valuesField =
-                    ReflectUtils.GetSelfAndBaseTypesFromType(rawType)
-                        .Select(each => each.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
-                        .FirstOrDefault(each => each != null);
-                    // rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
+                FieldInfo valuesField = null;
+                foreach (var each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
+                {
+                    var field = each.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                    if (field == null) continue;
+                    valuesField = field;
+                    break;
+                }
+                // rawType.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance  | BindingFlags.FlattenHierarchy);
                 Debug.Assert(valuesField != null, $"Failed to get values field {propValuesName} from {property.propertyPath}");
 
                 float useWidth = Mathf.Max(width / 2 - 25, 25);

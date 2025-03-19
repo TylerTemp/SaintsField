@@ -38,11 +38,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
             protected override bool AllowScene =>
                 // Debug.Log(_editorPick);
-                _editorPick.HasFlag(EPick.Scene);
+                _editorPick.HasFlagFast(EPick.Scene);
 
             protected override bool AllowAssets =>
                 // Debug.Log(_editorPick);
-                _editorPick.HasFlag(EPick.Assets);
+                _editorPick.HasFlagFast(EPick.Assets);
 
             private string _error = "";
             protected override string Error => _error;

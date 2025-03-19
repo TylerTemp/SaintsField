@@ -92,8 +92,7 @@ namespace SaintsField.Editor.Drawers
                 return "Can not find parent target";
             }
 
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (int eventIndex in Enumerable.Range(0, uiButton.onClick.GetPersistentEventCount()))
+            for (int eventIndex = 0; eventIndex < uiButton.onClick.GetPersistentEventCount(); eventIndex++)
             {
                 Object persistentTarget = uiButton.onClick.GetPersistentTarget(eventIndex);
                 string persistentMethodName = uiButton.onClick.GetPersistentMethodName(eventIndex);

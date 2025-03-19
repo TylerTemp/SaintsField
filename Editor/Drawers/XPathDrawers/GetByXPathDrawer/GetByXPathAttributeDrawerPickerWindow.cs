@@ -36,11 +36,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             protected override bool AllowScene =>
                 // Debug.Log(_editorPick);
-                _editorPick.HasFlag(EPick.Scene);
+                _editorPick.HasFlagFast(EPick.Scene);
 
             protected override bool AllowAssets =>
                 // Debug.Log(_editorPick);
-                _editorPick.HasFlag(EPick.Assets);
+                _editorPick.HasFlagFast(EPick.Assets);
 
             protected override IEnumerable<ItemInfo> FetchAllAssets()
             {

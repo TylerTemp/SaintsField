@@ -175,7 +175,7 @@ namespace SaintsField.Editor.Drawers
 
             UIToolkitUtils.DropdownButtonField buttonLabel = container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
 
-            foreach (int index in Enumerable.Range(0, layers.Length))
+            for (var index = 0; index < layers.Length; index++)
             {
                 int curIndex = index;
                 string curItem = layers[index];

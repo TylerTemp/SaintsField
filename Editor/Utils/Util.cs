@@ -69,22 +69,14 @@ namespace SaintsField.Editor.Utils
                 // Debug.Log(actualFieldInfo);
                 if (actualFieldInfo != null)
                 {
-                    return new SerializedUtils.FieldOrProp
-                    {
-                        IsField = true,
-                        FieldInfo = actualFieldInfo,
-                    };
+                    return new SerializedUtils.FieldOrProp(actualFieldInfo);
                 }
 
                 PropertyInfo actualPropertyInfo = selfAndBaseType.GetProperty(propName, bind);
                 // Debug.Log(actualPropertyInfo);
                 if (actualPropertyInfo != null)
                 {
-                    return new SerializedUtils.FieldOrProp
-                    {
-                        IsField = false,
-                        PropertyInfo = actualPropertyInfo,
-                    };
+                    return new SerializedUtils.FieldOrProp(actualPropertyInfo);
                 }
                 // Debug.Assert(actualFieldInfo != null);
                 // actualFieldInfo.SetValue(wrapProp, curItem);
@@ -343,9 +335,7 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T value) GetOfNoParams<T>(object target, string by, T defaultValue)
         {
-            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
@@ -434,9 +424,7 @@ namespace SaintsField.Editor.Utils
                 return ("Target is null", defaultValue);
             }
 
-            IEnumerable<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
@@ -563,8 +551,6 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
         {
-            IEnumerable<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
@@ -574,7 +560,7 @@ namespace SaintsField.Editor.Utils
                 return (error, defaultValue);
             }
 
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
             {
                 MethodInfo methodInfo = type.GetMethod(by, bindAttr);
                 if (methodInfo == null)
@@ -829,8 +815,8 @@ namespace SaintsField.Editor.Utils
 
         private static bool ConditionEditModeChecker(EMode editorMode)
         {
-            bool editorRequiresEdit = editorMode.HasFlag(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlag(EMode.Play);
+            bool editorRequiresEdit = editorMode.HasFlagFast(EMode.Edit);
+            bool editorRequiresPlay = editorMode.HasFlagFast(EMode.Play);
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if(editorRequiresEdit && editorRequiresPlay)
             {
@@ -954,12 +940,19 @@ namespace SaintsField.Editor.Utils
             // MemberInfo accMemberInfo = memberInfo;
             (string error, T result) thisResult = ("No Attributes", defaultValue);
 
-            foreach (string attrName in by.Split('.'))
+            foreach (string attrName in by.Split(SerializedUtils.pathSplitSeparator))
             {
-                MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(accParent)
-                    .SelectMany(type => type
-                        .GetMember(attrName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy))
-                    .FirstOrDefault(each => each != null);
+                MemberInfo accMemberInfo = null;
+                foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(accParent))
+                {
+                    MemberInfo[] members = type.GetMember(attrName,
+                        BindingFlags.Public | BindingFlags.NonPublic |
+                        BindingFlags.Instance | BindingFlags.Static |
+                        BindingFlags.FlattenHierarchy);
+                    if (members.Length <= 0) continue;
+                    accMemberInfo = members[0];
+                    break;
+                }
 
                 thisResult = GetOf(attrName, defaultValue, property, accMemberInfo, accParent);
                 // Debug.Log($"{attrName} = {thisResult.result}");
@@ -1114,39 +1107,41 @@ namespace SaintsField.Editor.Utils
             };
         }
 
-        public static int CombineHashCode(object object1, object object2)
+        public static int CombineHashCode<T1, T2>(T1 object1, T2 object2)
         {
             // HashCode.Combine does not exist in old Unity
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2);
 #else
-            return MockHashCode(new[] {object1, object2});
+            var hashCode = 17;
+            hashCode *= 31 + object1?.GetHashCode() ?? 0;
+            hashCode *= 31 + object2?.GetHashCode() ?? 0;
+            return hashCode;
 #endif
         }
-        public static int CombineHashCode(object object1, object object2, object object3)
+        public static int CombineHashCode<T1, T2, T3>(T1 object1, T2 object2, T3 object3)
         {
             // HashCode.Combine does not exist in old Unity
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2, object3);
 #else
-            return MockHashCode(new[] {object1, object2, object3});
+            var hashCode = CombineHashCode(object1, object2);
+            hashCode *= 31 + object3?.GetHashCode() ?? 0;
+            return hashCode;
 #endif
         }
 
-        public static int CombineHashCode(object object1, object object2, object object3, object object4)
+        public static int CombineHashCode<T1, T2, T3, T4>(T1 object1, T2 object2, T3 object3, T4 object4)
         {
             // HashCode.Combine does not exist in old Unity
 #if UNITY_2021_1_OR_NEWER
             return HashCode.Combine(object1, object2, object3, object4);
 #else
-            return MockHashCode(new[] {object1, object2, object3, object4});
+            var hashCode = CombineHashCode(object1, object2, object3);
+            hashCode *= 31 + object4?.GetHashCode() ?? 0;
+            return hashCode;
 #endif
         }
-
-#if !UNITY_2021_1_OR_NEWER
-        private static int MockHashCode(object[] objects) =>
-            objects.Aggregate(17, (current, obj) => current * 31 + (obj?.GetHashCode() ?? 0));
-#endif
 
         public static (string error, int index, object value) GetValue(SerializedProperty property, MemberInfo fieldInfo, object parent)
         {

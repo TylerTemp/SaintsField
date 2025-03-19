@@ -182,8 +182,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                     prefix = skinPrefix;
                 }
 
-                // for (int slotIndex = 0; slotIndex < skeletonData.Slots.Count; slotIndex++) {
-                foreach(int slotIndex in Enumerable.Range(0, skeletonData.Slots.Count)) {
+                for (int slotIndex = 0; slotIndex < skeletonData.Slots.Count; slotIndex++) {
                     if (slotMatch.Length > 0 && !skeletonData.Slots.Items[slotIndex].Name.Equals(slotMatch, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;

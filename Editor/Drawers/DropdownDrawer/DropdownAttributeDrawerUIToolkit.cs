@@ -141,7 +141,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 // FIXED: can not get correct index
                 int selectedIndex = metaInfo.SelectedIndex;
                 // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
-                foreach (int index in Enumerable.Range(0, metaInfo.DropdownListValue.Count))
+                for (var index = 0; index < metaInfo.DropdownListValue.Count; index++)
                 {
                     // int curIndex = index;
                     (string curName, object curItem, bool disabled, bool curIsSeparator) =

@@ -9,4 +9,9 @@ namespace SaintsField
         ForceResign = 1,
         NoResignButton = 1 << 1,
     }
+
+    public static class EGetCompExtensions
+    {
+        public static bool HasFlagFast(this EGetComp lhs, EGetComp rhs) => (lhs & rhs) != 0;
+    }
 }

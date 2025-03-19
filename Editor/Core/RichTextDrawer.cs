@@ -318,16 +318,22 @@ namespace SaintsField.Editor.Core
                                         if(!RuntimeUtil.IsNull(accParent))
                                         {
                                             // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split('.');
+                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split(SerializedUtils.pathSplitSeparator);
                                             foreach (string attrName in subFields)
                                             {
-                                                MemberInfo accMemberInfo = ReflectUtils.GetSelfAndBaseTypes(accParent)
-                                                    .SelectMany(type => type
-                                                        .GetMember(attrName,
-                                                            BindingFlags.Public | BindingFlags.NonPublic |
-                                                            BindingFlags.Instance | BindingFlags.Static |
-                                                            BindingFlags.FlattenHierarchy))
-                                                    .FirstOrDefault(each => each != null);
+                                                MemberInfo accMemberInfo = null;
+                                                foreach (var type in ReflectUtils.GetSelfAndBaseTypes(accParent))
+                                                {
+                                                    foreach (var info in type.GetMember(attrName,
+                                                                 BindingFlags.Public | BindingFlags.NonPublic |
+                                                                 BindingFlags.Instance | BindingFlags.Static |
+                                                                 BindingFlags.FlattenHierarchy))
+                                                    {
+                                                        if (info == null) continue;
+                                                        accMemberInfo = info;
+                                                        break;
+                                                    }
+                                                }
 
                                                 accResult = Util.GetValueAtIndex(-1, accMemberInfo, accParent);
                                                 if (accResult.error != "")
