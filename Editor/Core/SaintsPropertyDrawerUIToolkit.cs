@@ -436,7 +436,19 @@ namespace SaintsField.Editor.Core
                 return PropertyFieldFallbackUIToolkit(property);
             }
 
+            // Debug.Log($"PropertyFieldFallbackUIToolkit on foundDrawer={foundDrawer}: {property.displayName}");
+            // return PropertyFieldFallbackUIToolkit(property);
+            // var draw = new UnityEditorInternal.UnityEventDrawer();
+
             PropertyDrawer typeDrawer = MakePropertyDrawer(foundDrawer, info, null);
+
+            FieldInfo preferredLabelField = typeDrawer.GetType().GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (preferredLabelField != null)
+            {
+                // Debug.Log($"preferredLabelField={preferredLabelField}");
+                preferredLabelField.SetValue(typeDrawer, property.displayName);
+            }
+
             VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, allAttributes, saintsPropertyDrawers, containerElement, parent);
             // return element ?? PropertyFieldFallbackUIToolkit(property);
             return element ?? PropertyFieldFallbackUIToolkit(property);
