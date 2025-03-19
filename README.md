@@ -81,11 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.4**
+**3.37.0**
 
-1.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize it as list and fail (e.g. auto getters)
-2.  Cache MemberInfo attributes and other misc optimizations by [@Insprill](https://github.com/Insprill), [PR #175](https://github.com/TylerTemp/SaintsField/pull/175)
-3.  Inherent `SaintsDictionaryBase` from `IDictionary` to make it more like a normal dictionary
+1.  UI Toolkit: `ShowInInspector` can now edit a dictionary
+2.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize its element type wrong and fail (e.g. auto getters)
+3.  UI Toolkit: fix some fallback drawer can not display a correct label [#176](https://github.com/TylerTemp/SaintsField/issues/176)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1390,7 +1390,6 @@ For UI Toolkit: this attribute allow you to edit the corresponing field like odi
 
 1.  UI Toolkit only
 2.  Does not use custom drawer even the type has one (Same as Odin)
-3.  Does not support dictionary editing yet
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1412,7 +1411,7 @@ public Color AutoColor
 
 ![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
 
-A null-class can be created, edited and set to `null`:
+UI Toolkit: A null-class can be created, edited and set to `null`:
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1432,7 +1431,7 @@ private class MyClass
 
 [![video](https://github.com/user-attachments/assets/b1c69072-76af-46ac-9c20-c3e8f6671e84)](https://github.com/user-attachments/assets/8928b38c-d756-4ff5-b924-e4b5a0f3543e)
 
-An array/list can be created, edited and set to `null`:
+UI Toolkit: An array/list can be created, edited and set to `null`:
 
 ```csharp
 using SaintsField;
@@ -1458,7 +1457,7 @@ private void ArrayChange0ToRed()
 
 [![video](https://github.com/user-attachments/assets/99201b88-439c-4508-a1cf-04cf32748ca7)](https://github.com/user-attachments/assets/0baed2e8-13ad-41f8-88e4-9a8bb32d0dd1)
 
-It can also create/edit an interface. Depending on the actual type is Unity Object or general class/struct, it'll show object picker or field editor accordingly.
+UI Toolkit: It can also create/edit an interface. Depending on the actual type is Unity Object or general class/struct, it'll show object picker or field editor accordingly.
 
 ```csharp
 public class GeneralDummyClass: IDummy
@@ -1480,6 +1479,20 @@ private void DebugDummy() => Debug.Log(_dummy);
 ```
 
 [![video](https://github.com/user-attachments/assets/ea978ef2-6c6f-492d-8c2d-1befffe014d9)](https://github.com/user-attachments/assets/ca9bc4e5-abb3-4635-b41b-96101d63d264)
+
+UI Toolkit: dictionary/`IReadOnlyDictionary` is now supported
+
+```csharp
+[ShowInInspector] private Dictionary<string, int> _myDictionaryNull;
+
+[Button]
+private void DictExternalAdd()
+{
+    _myDictionaryNull["External"] = 1;
+}
+```
+
+[![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
 ### Numerical ###
 

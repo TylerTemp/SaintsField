@@ -321,7 +321,7 @@ namespace SaintsField.Editor.Core
             (Attribute _, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
             if (attributeDrawerType == null)
             {
-                Type drawerType = FindTypeDrawerNonSaints(property.isArray? ReflectUtils.GetElementType(fieldInfo.FieldType): fieldInfo.FieldType);
+                Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fieldInfo.FieldType): fieldInfo.FieldType);
                 if (drawerType != null)
                 {
                     // type drawer has no attribute
@@ -1219,7 +1219,7 @@ namespace SaintsField.Editor.Core
             (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
             if (attributeDrawerType == null)  // not attribute drawer, use type drawer
             {
-                Type drawerType = FindTypeDrawerNonSaints(property.isArray? ReflectUtils.GetElementType(fieldInfo.FieldType) : fieldInfo.FieldType);
+                Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fieldInfo.FieldType) : fieldInfo.FieldType);
                 if (drawerType != null)
                 {
                     // type drawer has no attribute

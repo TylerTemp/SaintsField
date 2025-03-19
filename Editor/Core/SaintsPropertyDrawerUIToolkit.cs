@@ -428,7 +428,7 @@ namespace SaintsField.Editor.Core
                 return PropertyFieldFallbackUIToolkit(property);
             }
 
-            Type foundDrawer = FindTypeDrawerNonSaints(property.isArray? ReflectUtils.GetElementType(info.FieldType) : info.FieldType);
+            Type foundDrawer = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType) : info.FieldType);
             // Debug.LogWarning(foundDrawer);
 
             if (foundDrawer == null)
@@ -442,7 +442,8 @@ namespace SaintsField.Editor.Core
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(foundDrawer, info, null);
 
-            FieldInfo preferredLabelField = typeDrawer.GetType().GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            // Unity should, but does not, set the preferred label which is required by UnityEvent drawer to display the label
+            FieldInfo preferredLabelField = foundDrawer.GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
             if (preferredLabelField != null)
             {
                 // Debug.Log($"preferredLabelField={preferredLabelField}");

@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
         public static EnumFlagsMetaInfo GetMetaInfo(SerializedProperty property, FieldInfo info)
         {
-            Type enumType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;;
+            Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;;
 
             Dictionary<int, EnumDisplayInfo> allIntToName = Enum
                 .GetValues(enumType)

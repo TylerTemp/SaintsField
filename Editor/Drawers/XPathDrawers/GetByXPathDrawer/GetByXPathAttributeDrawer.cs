@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         {
             Type targetType = info is FieldInfo fi ? fi.FieldType : ((PropertyInfo)info).PropertyType;
 
-            Type rawType = property.isArray
+            Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
                 ? ReflectUtils.GetElementType(targetType)
                 : targetType;
 
@@ -184,6 +184,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             if (target.ExpectedType == null)
             {
                 (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(property, info);
+                // Debug.Log($"Update Shared Cache expectType={expectType}/{property.propertyPath}/{property.isArray}");
                 if (typeError != "")
                 {
                     // Debug.Log(typeError);
@@ -564,6 +565,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             (string typeError, Type expectType, Type expectInterface) = GetExpectedTypeOfProp(arrayProperty, info);
+
+            // Debug.Log($"array expectType={expectType}");
+
             if (typeError != "")
             {
                 return false;

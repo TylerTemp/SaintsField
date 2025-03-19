@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                     return "";
                 case SerializedPropertyType.ObjectReference:
                 {
-                    Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
+                    Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
                     Type assetType = typeof(AnimationReferenceAsset);
                     return fieldType == assetType || fieldType.IsSubclassOf(assetType)
                         ? ""

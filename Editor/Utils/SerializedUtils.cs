@@ -23,6 +23,17 @@ namespace SaintsField.Editor.Utils
             return property.FindPropertyRelative($"<{propName}>k__BackingField");
         }
 
+        public static bool IsArrayOrDirectlyInsideArray(SerializedProperty property)
+        {
+            bool extractFromArrayType = property.isArray;
+            if (extractFromArrayType)
+            {
+                return true;
+            }
+            int index = PropertyPathIndex(property.propertyPath);
+            return index >= 0;
+        }
+
         public readonly struct FieldOrProp
         {
             public readonly bool IsField;

@@ -203,7 +203,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 return ensureInfo;
             }
 
-            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
+            Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             bool isSprite = typeof(AssetReferenceSprite).IsAssignableFrom(fieldType);
 
             return InfoCacheImGui[key] = new InfoIMGUI

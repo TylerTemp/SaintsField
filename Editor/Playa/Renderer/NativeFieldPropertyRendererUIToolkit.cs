@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,7 +22,7 @@ namespace SaintsField.Editor.Playa.Renderer
             public bool HasDrawer;
             public Action<object> Setter;
             public object Value;
-            public bool IsCollection;
+            public bool IsGeneralCollection;
             public IReadOnlyList<object> OldCollection;
         }
 
@@ -59,14 +58,24 @@ namespace SaintsField.Editor.Playa.Renderer
             Type fieldType = GetFieldType(FieldWithInfo);
             VisualElement result = UIToolkitValueEdit(null, GetNiceName(FieldWithInfo), fieldType, value, setter);
 
-            bool isCollection = fieldType.IsArray || typeof(IList).IsAssignableFrom(fieldType);
+            bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
             // Debug.Log(fieldType);
             // Debug.Log(typeof(IList).IsAssignableFrom(fieldType));
 
             if(result != null)
             {
-                IReadOnlyList<object> oldCollection = isCollection && (value != null) ? ((IEnumerable)value).Cast<object>().ToArray() : null;
+                IReadOnlyList<object> oldCollection;
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                if (!RuntimeUtil.IsNull(value) && value is IEnumerable ie)
+                {
+                    oldCollection = ie.Cast<object>().ToArray();
+                }
+                else
+                {
+                    oldCollection = Array.Empty<object>();
+                }
+
                 result.name = NameResult();
                 container.Add(result);
                 container.userData = new DataPayload
@@ -74,7 +83,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     HasDrawer = true,
                     Value = value,
                     Setter = setter,
-                    IsCollection = isCollection,
+                    IsGeneralCollection = isCollection,
                     OldCollection = oldCollection,
                 };
             }
@@ -85,7 +94,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     HasDrawer = false,
                     Value = null,
                     Setter = setter,
-                    IsCollection = isCollection,
+                    IsGeneralCollection = isCollection,
                     OldCollection = null,
                 };
             }
@@ -106,19 +115,20 @@ namespace SaintsField.Editor.Playa.Renderer
             DataPayload userData = (DataPayload)container.userData;
 
             object value = GetValue(FieldWithInfo);
+            bool valueIsNull = RuntimeUtil.IsNull(value);
             bool isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
-            if(isEqual && userData.IsCollection)
+            if(isEqual && userData.IsGeneralCollection)
             {
                 IReadOnlyList<object> oldCollection = userData.OldCollection;
-                if (oldCollection == null && value == null)
+                if (oldCollection == null && valueIsNull)
                 {
                 }
-                else if (oldCollection != null && value == null)
+                else if (oldCollection != null && valueIsNull)
                 {
                     isEqual = false;
                 }
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                else if (oldCollection == null && value != null)
+                else if (oldCollection == null && !valueIsNull)
                 {
                     isEqual = false;
                 }
@@ -140,11 +150,20 @@ namespace SaintsField.Editor.Playa.Renderer
                 Debug.Log($"native property update {userData.Value} -> {value}");
 #endif
                 userData.Value = value;
-                if (userData.IsCollection)
+                if (userData.IsGeneralCollection)
                 {
-                    userData.OldCollection = ((IEnumerable)value)?.Cast<object>().ToArray();
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                    if (!RuntimeUtil.IsNull(value) && value is IEnumerable ie)
+                    {
+                        userData.OldCollection = ie.Cast<object>().ToArray();
+                    }
+                    else
+                    {
+                        userData.OldCollection = null;
+                    }
                 }
                 VisualElement result = UIToolkitValueEdit(fieldElementOrNull, GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, userData.Setter);
+                // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {
                     result.name = NameResult();

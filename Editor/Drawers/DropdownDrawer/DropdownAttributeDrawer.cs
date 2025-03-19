@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             IDropdownList dropdownListValue = null;
             if (dropdownAttribute.FuncName == null)
             {
-                Type enumType = property.isArray? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
+                Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
                 if(enumType.IsEnum)
                 {
                     Array enumValues = Enum.GetValues(enumType);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.37.0 ##
+
+1.  UI Toolkit: `ShowInInspector` can now edit a dictionary
+2.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize its element type wrong and fail (e.g. auto getters)
+3.  UI Toolkit: fix some fallback drawer can not display a correct label [#176](https://github.com/TylerTemp/SaintsField/issues/176)
+
 ## 3.36.4 ##
 
 1.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize it as list and fail (e.g. auto getters)

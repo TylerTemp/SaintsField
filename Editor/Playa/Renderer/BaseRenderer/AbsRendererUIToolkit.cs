@@ -1500,6 +1500,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, setterOrNull);
             }
 
+            bool valueIsNull = RuntimeUtil.IsNull(value);
+
             IEnumerable<Type> genTypes = valueType.GetInterfaces()
                 .Where(each => each.IsGenericType)
                 // .Select(each => each.GetGenericTypeDefinition())
@@ -1517,31 +1519,33 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             // IDictionary;
             // IReadOnlyDictionary;
-
-            foreach (Type normType in genTypes)
+            if(!valueIsNull)
             {
-                Type genType = normType.GetGenericTypeDefinition();
-                // Debug.Log(genType);
-                if (genType == dictionaryInterface)
+                foreach (Type normType in genTypes)
                 {
-                    isNormalDictionary = true;
-                    dictionaryArgTypes = normType.GetGenericArguments();
-                    break;
-                }
+                    Type genType = normType.GetGenericTypeDefinition();
+                    // Debug.Log(genType);
+                    if (genType == dictionaryInterface)
+                    {
+                        isNormalDictionary = true;
+                        dictionaryArgTypes = normType.GetGenericArguments();
+                        break;
+                    }
 
-                if (genType == readonlyDictionaryInterface)
-                {
-                    isReadonlyDictionary = true;
-                    dictionaryArgTypes = normType.GetGenericArguments();
-                    // break;
+                    if (genType == readonlyDictionaryInterface)
+                    {
+                        isReadonlyDictionary = true;
+                        dictionaryArgTypes = normType.GetGenericArguments();
+                        // break;
+                    }
                 }
             }
 
             if(isNormalDictionary || isReadonlyDictionary)
             {
-                // Debug.Log($"isReadonlyDictionary={isReadonlyDictionary}");
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 bool isReadOnly = !isNormalDictionary;
+                // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
                 return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], setterOrNull);
 #else
                 // ReSharper disable once AssignNullToNotNullAttribute
@@ -1607,7 +1611,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 });
             }
 
-            bool valueIsNull = RuntimeUtil.IsNull(value);
             if (valueIsNull)
             {
                 if (valueType.IsArray || typeof(IList).IsAssignableFrom(valueType))
@@ -1765,6 +1768,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     else
                     {
                         object obj = Activator.CreateInstance(newType);
+                        // Debug.Log($"Create {newType}: {obj}");
                         if (!valueIsNull)
                         {
                             obj = ReferencePickerAttributeDrawer.CopyObj(value, obj);
@@ -2260,7 +2264,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             oldPayload.RawListValue = rawListValue;
 
             // Debug.Log($"Refresh count={listValue.Length}");
-            oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((o, index) => index).ToList();
+            oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((_, index) => index).ToList();
             listView.itemsSource = oldPayload.ItemIndexToOriginIndex.ToList();
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
             Debug.Log($"ItemIndexToOriginIndex={string.Join(",", oldPayload.ItemIndexToOriginIndex)}");
@@ -2278,24 +2282,27 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private class DictionaryViewPayload
         {
             public object RawDictValue;
-            public readonly PropertyInfo KeysProperty;
-            public readonly PropertyInfo IndexerProperty;
-            public readonly MethodInfo RemoveMethod;
+            private readonly PropertyInfo _keysProperty;
+            private readonly PropertyInfo _indexerProperty;
+            private readonly MethodInfo _removeMethod;
+            private readonly MethodInfo _containesKeyMethod;
 
             public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
-                MethodInfo removeMethod)
+                MethodInfo removeMethod, MethodInfo containsKeyMethod)
             {
                 RawDictValue = rawDictValue;
-                KeysProperty = keysProperty;
-                IndexerProperty = indexerProperty;
-                RemoveMethod = removeMethod;
+                _keysProperty = keysProperty;
+                _indexerProperty = indexerProperty;
+                _removeMethod = removeMethod;
+                _containesKeyMethod = containsKeyMethod;
             }
 
-            public IEnumerable<object> GetKeys() => ((IEnumerable)KeysProperty.GetValue(RawDictValue)).Cast<object>();
+            public IEnumerable<object> GetKeys() => ((IEnumerable)_keysProperty.GetValue(RawDictValue)).Cast<object>();
 
-            public object GetValue(object key) => IndexerProperty.GetValue(RawDictValue, new[] { key });
-            public void DeleteKey(object key) => RemoveMethod.Invoke(RawDictValue, new[] { key });
-            public void SetKeyValue(object key, object value) => IndexerProperty.SetValue(RawDictValue, value, new[] { key });
+            public object GetValue(object key) => _indexerProperty.GetValue(RawDictValue, new[] { key });
+            public void DeleteKey(object key) => _removeMethod.Invoke(RawDictValue, new[] { key });
+            public void SetKeyValue(object key, object value) => _indexerProperty.SetValue(RawDictValue, value, new[] { key });
+            public bool ContainsKey(object key) => (bool)_containesKeyMethod.Invoke(RawDictValue, new[] { key });
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
@@ -2309,6 +2316,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 foldout = null;
             }
+
+            bool useOld = foldout != null;
+
             if (foldout == null)
             {
                 // Debug.Log($"Create new Foldout");
@@ -2362,9 +2372,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 MethodInfo removeMethod = valueType.GetMethod("Remove", new[]{dictKeyType});
                 Debug.Assert(keysProperty != null, $"Failed to get `Remove` function from {valueType}");
 
+                MethodInfo containsKeyMethod = valueType.GetMethod("ContainsKey", new[]{dictKeyType});
+
                 Debug.Assert(rawDictValue != null, "Dictionary value should not be null");
 
-                DictionaryViewPayload payload = new DictionaryViewPayload(rawDictValue, keysProperty, indexerProperty, removeMethod);
+                DictionaryViewPayload payload = new DictionaryViewPayload(rawDictValue, keysProperty, indexerProperty, removeMethod, containsKeyMethod);
 
                 listView = new MultiColumnListView
                 {
@@ -2382,7 +2394,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         flexGrow = 1,
                         position = Position.Relative,
                     },
-                    itemsSource = payload.GetKeys().ToList(),
+                    itemsSource = payload.GetKeys().OrderBy(each => each).ToList(),
                     userData = payload,
                 };
 
@@ -2432,10 +2444,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         VisualElement editing = UIToolkitValueEdit(keyChild, "", dictKeyType, key, newKey =>
                         {
+                            if (RuntimeUtil.IsNull(newKey))
+                            {
+                                Debug.LogWarning($"Setting key to null is not supported and is ignored");
+                                return;
+                            }
+
+                            if (payload.ContainsKey(newKey))
+                            {
+                                Debug.LogWarning($"Setting key {key} to existing key {newKey} is not supported and is ignored");
+                                return;
+                            }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                            Debug.Log($"dictionary editing key {key}");
+#endif
                             object oldValue = payload.GetValue(key);
-                            // Debug.Log($"set key {key} -> {newKey} with value {oldValue}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                            Debug.Log($"set key {key} -> {newKey} with value {oldValue}");
+#endif
                             payload.DeleteKey(key);
                             payload.SetKeyValue(newKey, oldValue);
+                            int sourceIndex = listView.itemsSource.IndexOf(key);
+                            listView.itemsSource[sourceIndex] = newKey;
+                            key = newKey;
                         });
 
                         if (editing != null)
@@ -2491,9 +2522,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         VisualElement valueChild = element.Children().FirstOrDefault();
 
-                        VisualElement editing = UIToolkitValueEdit(valueChild, "", dictValueType, value, newKey =>
+                        VisualElement editing = UIToolkitValueEdit(valueChild, "", dictValueType, value, newValue =>
                         {
-                            payload.SetKeyValue(key, newKey);
+                            object refreshedKey = listView.itemsSource[elementIndex];
+                            payload.SetKeyValue(refreshedKey, newValue);
                         });
 
                         if (editing != null)
@@ -2504,39 +2536,200 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     },
                 });
 
+                listView.itemsRemoved += ints =>
+                {
+                    int[] toRemoveIndices = ints.ToArray();
+                    // List<object> keepKeys = new List<object>();
+                    List<object> removeKeys = new List<object>();
+                    int index = 0;
+                    foreach (object key in listView.itemsSource)
+                    {
+                        if (Array.IndexOf(toRemoveIndices, index) != -1)
+                        {
+                            removeKeys.Add(key);
+                        }
+                        index++;
+                    }
+
+                    foreach (object key in removeKeys)
+                    {
+                        payload.DeleteKey(key);
+                        // listView.itemsSource.Remove(key);
+                    }
+
+                    // listView.itemsSource = keepKeys;
+                };
+
+                Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
+
+                const int pairPanelBorderWidth = 1;
+                Color pairPanelBorderColor = EColor.EditorEmphasized.GetColor();
+                VisualElement addPairPanel = new VisualElement
+                {
+                    style =
+                    {
+                        display = DisplayStyle.None,
+
+                        borderLeftWidth = pairPanelBorderWidth,
+                        borderRightWidth = pairPanelBorderWidth,
+                        borderTopWidth = pairPanelBorderWidth,
+                        borderBottomWidth = pairPanelBorderWidth,
+
+                        borderTopColor = pairPanelBorderColor,
+                        borderBottomColor = pairPanelBorderColor,
+                        borderLeftColor = pairPanelBorderColor,
+                        borderRightColor = pairPanelBorderColor,
+
+                        marginTop = 1,
+                        marginBottom = 1,
+                        marginLeft = 1,
+                        marginRight = 1,
+                    },
+                };
+
+                VisualElement addPairActionContainer = new VisualElement
+                {
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                        flexGrow = 1,
+                    },
+                };
+
+                Button addPairConfirmButton = new Button
+                {
+                    text = "OK",
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
+                addPairActionContainer.Add(addPairConfirmButton);
+                Button addPairCancleButton = new Button(() =>
+                {
+                    listViewAddButton.SetEnabled(true);
+                    addPairPanel.style.display = DisplayStyle.None;
+                })
+                {
+                    text = "Cancel",
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
+                addPairActionContainer.Add(addPairCancleButton);
+
+                VisualElement addPairKeyContainer = new VisualElement();
+                addPairPanel.Add(addPairKeyContainer);
+                object addPairKey = dictKeyType.IsValueType ? Activator.CreateInstance(dictKeyType) : null;
+                bool addPairKeyChange = true;
+                addPairKeyContainer.schedule.Execute(() =>
+                {
+                    if (!addPairKeyChange)
+                    {
+                        return;
+                    }
+
+                    VisualElement r = UIToolkitValueEdit(
+                        addPairKeyContainer.Children().FirstOrDefault(),
+                        "Key",
+                        dictKeyType,
+                        addPairKey,
+                        newKey =>
+                        {
+                            bool invalidKey = RuntimeUtil.IsNull(newKey);
+                            if (!invalidKey)
+                            {
+                                invalidKey = payload.ContainsKey(newKey);
+                            }
+
+                            addPairConfirmButton.SetEnabled(!invalidKey);
+                            if (!invalidKey)
+                            {
+                                addPairKey = newKey;
+                                addPairKeyChange = true;
+                            }
+                        }
+                    );
+                    // ReSharper disable once InvertIf
+                    if (r != null)
+                    {
+                        addPairKeyContainer.Clear();
+                        addPairKeyContainer.Add(r);
+                    }
+
+                    addPairKeyChange = false;
+                }).Every(100);
+
+                VisualElement addPairValueContainer = new VisualElement();
+                addPairPanel.Add(addPairValueContainer);
+                object addPairValue = dictValueType.IsValueType ? Activator.CreateInstance(dictValueType) : null;
+                bool addPairValueChanged = true;
+                addPairValueContainer.schedule.Execute(() =>
+                {
+                    if (!addPairValueChanged)
+                    {
+                        return;
+                    }
+
+                    VisualElement r = UIToolkitValueEdit(
+                        addPairValueContainer.Children().FirstOrDefault(),
+                        "Value",
+                        dictValueType,
+                        addPairValue,
+                        newValue =>
+                        {
+                            addPairValue = newValue;
+                            addPairValueChanged = true;
+                        }
+                    );
+                    // ReSharper disable once InvertIf
+                    if (r != null)
+                    {
+                        addPairValueContainer.Clear();
+                        addPairValueContainer.Add(r);
+                    }
+
+                    addPairValueChanged = false;
+                }).Every(100);
+
+                addPairConfirmButton.clicked += () =>
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                    Debug.Log($"dictionary set {addPairKey} -> {addPairValue}");
+#endif
+                    payload.SetKeyValue(addPairKey, addPairValue);
+                    addPairPanel.style.display = DisplayStyle.None;
+                    listViewAddButton.SetEnabled(true);
+                    // setterOrNull(payload.RawDictValue);
+                    // listView.Rebuild();
+                };
+
+                addPairPanel.Add(addPairActionContainer);
+
+                if (!isReadOnly)
+                {
+                    listViewAddButton.clickable = new Clickable(() =>
+                    {
+                        listViewAddButton.SetEnabled(false);
+                        addPairConfirmButton.SetEnabled(!RuntimeUtil.IsNull(addPairKey) && !payload.ContainsKey(addPairKey));
+                        addPairPanel.style.display = DisplayStyle.Flex;
+                    });
+                }
+
                 foldout.Add(listView);
+                foldout.Add(addPairPanel);
             }
 
             DictionaryViewPayload oldPayload = (DictionaryViewPayload)listView.userData;
             oldPayload.RawDictValue = rawDictValue;
-//             oldPayload.RawValues = listValue.ToList();
-//             oldPayload.RawListValue = rawListValue;
-//
-//             // Debug.Log($"Refresh count={listValue.Length}");
-//             oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((o, index) => index).ToList();
-//             listView.itemsSource = oldPayload.ItemIndexToOriginIndex.ToList();
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-//             Debug.Log($"ItemIndexToOriginIndex={string.Join(",", oldPayload.ItemIndexToOriginIndex)}");
-// #endif
-//             // Debug.Log($"itemSource({listView.itemsSource.Count})={string.Join(",", listView.itemsSource)}");
-//             // if (listValue.Length > 0)
-//             // {
-//             //     Debug.Log($"0 listValue={listValue[0]}; listView.itemsSource={listView.itemsSource[0]}");
-//             // }
-//             // listView.Rebuild();
-
-            // TODO: fix this
-            if (!foldout.value)
+            if (rawDictValue != null)
             {
-                foldout.value = true;
+                // Debug.Log($"Refresh listView");
+                listView.itemsSource = oldPayload.GetKeys().OrderBy(each => each).ToList();
             }
 
-            if (foldout.enabledSelf)
-            {
-                foldout.SetEnabled(false);
-            }
-
-            return oldElement == null? foldout : null;
+            return useOld? null : foldout;
         }
 #endif
         private static void MoveArrayElement(IList list, int fromIndex, int toIndex)

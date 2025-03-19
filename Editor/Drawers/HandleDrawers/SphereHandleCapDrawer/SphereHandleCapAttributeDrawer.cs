@@ -76,7 +76,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             Type rawType = sphereInfo.MemberInfo is FieldInfo fi
                 ? fi.FieldType
                 : ((PropertyInfo)sphereInfo.MemberInfo).PropertyType;
-            Type fieldType = sphereInfo.SerializedProperty.isArray? ReflectUtils.GetElementType(rawType): rawType;
+            Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(sphereInfo.SerializedProperty)? ReflectUtils.GetElementType(rawType): rawType;
             bool filedIsNumber = fieldType == typeof(float) || fieldType == typeof(double) || fieldType == typeof(int) || fieldType == typeof(long) || fieldType == typeof(short);
 
             if(filedIsNumber)
