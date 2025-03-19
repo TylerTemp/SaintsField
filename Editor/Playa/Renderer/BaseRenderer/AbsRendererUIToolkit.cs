@@ -1617,7 +1617,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
                     {
-                        setterOrNull(Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0));
+                        object result = valueType.IsArray ? Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0) : Activator.CreateInstance(valueType);
+                        setterOrNull(result);
                         // return;
                         // setterOrNull(Activator.CreateInstance(valueType));
                     })
@@ -2031,31 +2032,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     foldoutContent.style.marginLeft = 0;
                 }
 
-                // nullable
-                foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+                if(setterOrNull != null)
                 {
-                    // text = "x",
-                    tooltip = "Set to null",
-                    style =
+                    // nullable
+                    foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
                     {
-                        position = Position.Absolute,
-                        // top = -EditorGUIUtility.singleLineHeight,
-                        top = 0,
-                        right = 0,
-                        width = EditorGUIUtility.singleLineHeight,
-                        height = EditorGUIUtility.singleLineHeight,
+                        // text = "x",
+                        tooltip = "Set to null",
+                        style =
+                        {
+                            position = Position.Absolute,
+                            // top = -EditorGUIUtility.singleLineHeight,
+                            top = 0,
+                            right = 0,
+                            width = EditorGUIUtility.singleLineHeight,
+                            height = EditorGUIUtility.singleLineHeight,
 
-                        backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
 #if UNITY_2022_2_OR_NEWER
-                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                        backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
                             unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
-                    },
-                });
+                        },
+                    });
+                }
             }
 
             ListView listView = foldout.Q<ListView>();
@@ -2333,31 +2337,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     foldoutContent.style.marginLeft = 0;
                 }
 
-                // nullable
-                foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+                if(setterOrNull != null)
                 {
-                    // text = "x",
-                    tooltip = "Set to null",
-                    style =
+                    // nullable
+                    foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
                     {
-                        position = Position.Absolute,
-                        // top = -EditorGUIUtility.singleLineHeight,
-                        top = 0,
-                        right = 0,
-                        width = EditorGUIUtility.singleLineHeight,
-                        height = EditorGUIUtility.singleLineHeight,
+                        // text = "x",
+                        tooltip = "Set to null",
+                        style =
+                        {
+                            position = Position.Absolute,
+                            // top = -EditorGUIUtility.singleLineHeight,
+                            top = 0,
+                            right = 0,
+                            width = EditorGUIUtility.singleLineHeight,
+                            height = EditorGUIUtility.singleLineHeight,
 
-                        backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
 #if UNITY_2022_2_OR_NEWER
-                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                        backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
                             unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
-                    },
-                });
+                        },
+                    });
+                }
             }
 
             MultiColumnListView listView = foldout.Q<MultiColumnListView>();
