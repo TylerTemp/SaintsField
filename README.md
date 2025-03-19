@@ -84,8 +84,9 @@ namespace: `SaintsField`
 **3.36.5**
 
 1.  UI Toolkit: `ShowInInspector` can now edit a dictionary
-2.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize its element type wrong and fail (e.g. auto getters)
+2.  Fix a critical issue that when a field is inherited from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recognize its element type wrong and fail (e.g. auto getters)
 3.  UI Toolkit: fix some fallback drawer can not display a correct label [#176](https://github.com/TylerTemp/SaintsField/issues/176)
+4.  Fix AnimatorParam won't work if the target is inside a prefab which is not loaded into memory by Unity
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
