@@ -89,14 +89,15 @@ namespace SaintsField.Editor
             object target)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
-            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(target).Reverse().ToArray();
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+            types.Reverse();
 
             // Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
             Dictionary<string, SerializedProperty> pendingSerializedProperties = serializedPropertyDict.ToDictionary(each => each.Key, each => each.Value);
             // Debug.Log($"{string.Join(",", pendingSerializedProperties.Keys)}");
             pendingSerializedProperties.Remove("m_Script");
 
-            foreach (int inherentDepth in Enumerable.Range(0, types.Count))
+            for (var inherentDepth = 0; inherentDepth < types.Count; inherentDepth++)
             {
                 Type systemType = types[inherentDepth];
 
@@ -111,8 +112,7 @@ namespace SaintsField.Editor
                              .OrderBy(memberInfo => memberInfo.MetadataToken))  // this is still not the correct order, but... a bit better
                 {
                     // Debug.Log(memberInfo.Name);
-                    IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfo
-                        .GetCustomAttributes<Attribute>().OfType<IPlayaAttribute>().ToArray();
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = ReflectCache.GetCustomAttributes<IPlayaAttribute>(memberInfo);
 
                     ISaintsLayoutBase[] layoutBases = GetLayoutBases(playaAttributes.OfType<ISaintsLayoutBase>()).ToArray();
                     switch (memberInfo)
@@ -804,7 +804,7 @@ namespace SaintsField.Editor
 
         // private static ISaintsRendererGroup MakeRendererGroup(LayoutInfo layoutInfo)
         // {
-        //     if (layoutInfo.Config.HasFlag(ELayout.Vertical))
+        //     if (layoutInfo.Config.HasFlagFast(ELayout.Vertical))
         //     {
         //         return new VerticalGroup(layoutInfo.Config);
         //     }
@@ -812,11 +812,11 @@ namespace SaintsField.Editor
         // }
         // private static ISaintsRendererGroup MakeRendererGroup(ELayout layoutInfo)
         // {
-        //     if (layoutInfo.HasFlag(ELayout.Tab))
+        //     if (layoutInfo.HasFlagFast(ELayout.Tab))
         //     {
         //         return new SaintsRendererGroup(layoutInfo);
         //     }
-        //     if (layoutInfo.HasFlag(ELayout.Horizontal))
+        //     if (layoutInfo.HasFlagFast(ELayout.Horizontal))
         //     {
         //         return new HorizontalGroup(layoutInfo);
         //     }

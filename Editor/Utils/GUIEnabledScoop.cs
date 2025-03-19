@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
-    public class GUIEnabledScoop: IDisposable
+    public readonly struct GUIEnabledScoop: IDisposable
     {
         private readonly bool defaultValue;
 

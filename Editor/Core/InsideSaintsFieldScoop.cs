@@ -6,12 +6,18 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Core
 {
-    public class InsideSaintsFieldScoop: IDisposable
+    public readonly struct InsideSaintsFieldScoop: IDisposable
     {
-        public struct PropertyKey : IEquatable<PropertyKey>
+        public readonly struct PropertyKey : IEquatable<PropertyKey>
         {
-            public int ObjectHash;
-            public string PropertyPath;
+            public readonly int ObjectHash;
+            public readonly string PropertyPath;
+
+            public PropertyKey(int objectHash, string propertyPath)
+            {
+                ObjectHash = objectHash;
+                PropertyPath = propertyPath;
+            }
 
             public override string ToString()
             {
@@ -36,11 +42,10 @@ namespace SaintsField.Editor.Core
 
         private readonly PropertyKey _property;
 
-        public static PropertyKey MakeKey(SerializedProperty property) => new PropertyKey
-        {
-            ObjectHash = property.serializedObject.targetObject.GetInstanceID(),
-            PropertyPath = property.propertyPath,
-        };
+        public static PropertyKey MakeKey(SerializedProperty property) => new PropertyKey(
+            property.serializedObject.targetObject.GetInstanceID(),
+            property.propertyPath
+        );
 
         private readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> Counter;
 

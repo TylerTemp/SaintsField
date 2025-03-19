@@ -69,13 +69,10 @@ namespace SaintsField.Editor.Drawers
 
             // object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-            IReadOnlyList<Type> types = ReflectUtils.GetSelfAndBaseTypes(parent);
-            // types.Reverse();
-
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            foreach (Type type in types)
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(parent))
             {
                 MethodInfo methodInfo = type.GetMethod(callback, bindAttr);
                 if (methodInfo == null)

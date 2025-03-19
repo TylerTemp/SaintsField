@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                     : position;
 
                 Object fieldResult =
-                    EditorGUI.ObjectField(fieldRect, label, requiredValue, requiredComp, editorPick.HasFlag(EPick.Scene));
+                    EditorGUI.ObjectField(fieldRect, label, requiredValue, requiredComp, editorPick.HasFlagFast(EPick.Scene));
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {

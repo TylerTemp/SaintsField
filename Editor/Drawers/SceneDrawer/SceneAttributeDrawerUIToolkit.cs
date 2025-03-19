@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             (int selectedIndex, string _) = GetSelected(property, (SceneAttribute)saintsAttribute);
 
-            foreach (int index in Enumerable.Range(0, scenes.Length))
+            for (var index = 0; index < scenes.Length; index++)
             {
                 int curIndex = index;
                 string curItem = scenes[index];

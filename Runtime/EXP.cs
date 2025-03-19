@@ -23,4 +23,9 @@ namespace SaintsField
         JustPicker = NoInitSign | NoAutoResign | NoResignButton | NoMessage,
         Message = NoAutoResign | NoResignButton,
     }
+
+    public static class EXPExtensions
+    {
+        public static bool HasFlagFast(this EXP lhs, EXP rhs) => (lhs & rhs) != 0;
+    }
 }

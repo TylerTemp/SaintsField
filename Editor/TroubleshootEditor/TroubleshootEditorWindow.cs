@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEditor;
@@ -93,7 +94,7 @@ namespace SaintsField.Editor.TroubleshootEditor
                     // {
                     //     yield return null;
                     // }
-                    foreach (CustomEditor customEditor in eachEditorType.GetCustomAttributes<CustomEditor>(true))
+                    foreach (CustomEditor customEditor in ReflectCache.GetCustomAttributes<CustomEditor>(eachEditorType, true))
                     {
                         yield return null;
                         Type v = (Type)typeof(CustomEditor)
@@ -369,7 +370,7 @@ namespace SaintsField.Editor.TroubleshootEditor
             string error = "";
             List<Attribute> playaAttributes = new List<Attribute>();
 
-            Attribute[] allBaseAttributes = memberInfo.GetCustomAttributes().ToArray();
+            Attribute[] allBaseAttributes = ReflectCache.GetCustomAttributes(memberInfo);
             if (!isSaintsEditor)
             {
                 playaAttributes.AddRange(allBaseAttributes.Where(each => each is IPlayaAttribute));

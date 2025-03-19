@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers
 {
-    public class HandleColorScoop: IDisposable
+    public readonly struct HandleColorScoop: IDisposable
     {
         private readonly Color _oldColor;
 

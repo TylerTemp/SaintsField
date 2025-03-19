@@ -90,8 +90,8 @@ namespace SaintsField
 
         public GetComponentByPathAttribute(EGetComp config, string path, params string[] paths): this(TranslateConfig(config), path, paths)
         {
-            ForceResign = config.HasFlag(EGetComp.ForceResign);
-            ResignButton = !config.HasFlag(EGetComp.NoResignButton);
+            ForceResign = config.HasFlagFast(EGetComp.ForceResign);
+            ResignButton = !config.HasFlagFast(EGetComp.NoResignButton);
             RawPaths = paths
                 .Prepend(path)
                 .ToArray();
@@ -134,7 +134,7 @@ namespace SaintsField
         private static EXP TranslateConfig(EGetComp config)
         {
             EXP exp = EXP.NoPicker;
-            if (config.HasFlag(EGetComp.ForceResign))
+            if (config.HasFlagFast(EGetComp.ForceResign))
             {
                 // do nothing
             }
@@ -144,7 +144,7 @@ namespace SaintsField
                 exp |= EXP.NoAutoResignToNull;
             }
 
-            if (config.HasFlag(EGetComp.NoResignButton))
+            if (config.HasFlagFast(EGetComp.NoResignButton))
             {
                 exp |= EXP.NoResignButton;
             }

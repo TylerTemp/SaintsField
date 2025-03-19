@@ -245,7 +245,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                             .arraySize) // reducing the size, let's check if we need to shift the array first (to erase null values)
                     {
                         int accValueIndex = 0;
-                        foreach (int arrayIndex in Enumerable.Range(0, target.ArrayProperty.arraySize))
+                        for (int arrayIndex = 0; arrayIndex < target.ArrayProperty.arraySize; arrayIndex++)
                         {
                             SerializedProperty element = target.ArrayProperty.GetArrayElementAtIndex(arrayIndex);
                             if (element.propertyType != SerializedPropertyType.ObjectReference)
