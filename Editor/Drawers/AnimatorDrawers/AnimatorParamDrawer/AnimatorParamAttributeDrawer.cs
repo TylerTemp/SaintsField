@@ -9,6 +9,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -106,10 +107,24 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
                 };
             }
 
+            RuntimeAnimatorController runtimeController = animator.runtimeAnimatorController;
+
+            if (runtimeController == null)
+            {
+                return new MetaInfo
+                {
+                    Error = $"RuntimeAnimatorController must not be null in {animator.name}",
+                    AnimatorParameters = Array.Empty<AnimatorControllerParameter>(),
+                };
+            }
+
+            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(AssetDatabase.GetAssetPath(runtimeController));
+            // AnimatorController controller = (AnimatorController)runtimeController;
+
             List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>();
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            foreach (AnimatorControllerParameter parameter in controller.parameters)
             {
                 if (animatorParamAttribute.AnimatorParamType == null ||
                     parameter.type == animatorParamAttribute.AnimatorParamType)
