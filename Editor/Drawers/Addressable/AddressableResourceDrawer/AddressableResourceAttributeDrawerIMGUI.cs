@@ -196,14 +196,14 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
 
         private static readonly Dictionary<string, InfoIMGUI> InfoCacheImGui = new Dictionary<string, InfoIMGUI>();
 
-        private static InfoIMGUI EnsureInfo(string key, FieldInfo info)
+        private static InfoIMGUI EnsureInfo(string key, SerializedProperty property, FieldInfo info)
         {
             if (InfoCacheImGui.TryGetValue(key, out InfoIMGUI ensureInfo))
             {
                 return ensureInfo;
             }
 
-            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             bool isSprite = typeof(AssetReferenceSprite).IsAssignableFrom(fieldType);
 
             return InfoCacheImGui[key] = new InfoIMGUI
@@ -232,7 +232,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            InfoIMGUI cacheInfo = EnsureInfo(key, info);
+            InfoIMGUI cacheInfo = EnsureInfo(key, property, info);
             if (GUI.Button(position, EditIcon))
             {
                 cacheInfo.Expanded = !cacheInfo.Expanded;
@@ -258,7 +258,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             }
 
             string key = SerializedUtils.GetUniqueId(property);
-            InfoIMGUI cacheInfo = EnsureInfo(key, info);
+            InfoIMGUI cacheInfo = EnsureInfo(key, property, info);
             if (!cacheInfo.Expanded)
             {
                 return 0;
@@ -281,7 +281,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             }
 
             string key = SerializedUtils.GetUniqueId(property);
-            InfoIMGUI cacheInfo = EnsureInfo(key, info);
+            InfoIMGUI cacheInfo = EnsureInfo(key, property, info);
             if (!cacheInfo.Expanded)
             {
                 return position;

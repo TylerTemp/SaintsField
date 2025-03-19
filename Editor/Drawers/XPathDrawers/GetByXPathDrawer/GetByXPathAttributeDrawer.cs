@@ -84,7 +84,13 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         private static (string error, Type expectType, Type expectInterface) GetExpectedTypeOfProp(
             SerializedProperty property, MemberInfo info)
         {
-            Type rawType = ReflectUtils.GetElementType(info is FieldInfo fi? fi.FieldType: ((PropertyInfo) info).PropertyType);
+            Type targetType = info is FieldInfo fi ? fi.FieldType : ((PropertyInfo)info).PropertyType;
+
+            Type rawType = property.isArray
+                ? ReflectUtils.GetElementType(targetType)
+                : targetType;
+
+            // Debug.Log($"targetType={targetType}, rawType={rawType}");
             if (!typeof(IWrapProp).IsAssignableFrom(rawType))
             {
                 return ("", rawType, GetInterface(rawType));
@@ -192,6 +198,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static void UpdateSharedCacheSource(GetByXPathGenericCache target, SerializedProperty property, FieldInfo info)
         {
+            // Debug.Log(property.propertyPath);
             // target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
             GetXPathValuesResult iterResults = GetXPathValues(
                 target.GetByXPathAttributes
@@ -459,18 +466,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 string _ = propertyCache.SerializedProperty.propertyPath;
             }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
             catch (NullReferenceException e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
 #endif
                 return false;
             }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
             catch (ObjectDisposedException e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
@@ -627,9 +634,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         processingProperty =
                             target.ArrayProperty.GetArrayElementAtIndex(propertyCacheKey);
                     }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
                     catch (NullReferenceException e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
                     {
 #if SAINTSFIELD_DEBUG
                         Debug.LogException(e);

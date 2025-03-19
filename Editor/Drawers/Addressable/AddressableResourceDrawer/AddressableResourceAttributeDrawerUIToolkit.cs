@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             };
             root.Add(actionArea);
 
-            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             _isSprite = typeof(AssetReferenceSprite).IsAssignableFrom(fieldType);
 
             ObjectField objField = new ObjectField("Resource")

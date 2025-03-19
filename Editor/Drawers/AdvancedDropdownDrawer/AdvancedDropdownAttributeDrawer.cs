@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             IAdvancedDropdownList dropdownListValue = null;
             if (funcName is null)
             {
-                Type elementType = ReflectUtils.GetElementType(field.FieldType);
+                Type elementType = property.isArray? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
                 if(elementType.IsEnum)
                 {
                     Array enumValues = Enum.GetValues(elementType);

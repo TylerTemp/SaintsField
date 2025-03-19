@@ -120,10 +120,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
         protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
         {
+            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick,
-                ReflectUtils.GetElementType(info.FieldType), requireTypeAttribute.RequiredTypes, fieldResult =>
+                fieldType, requireTypeAttribute.RequiredTypes, fieldResult =>
                 {
-                    Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+                    // Type fieldType = ReflectUtils.GetElementType(info.FieldType);
                     Object result = OnSelectWindowSelected(fieldResult, fieldType, requireTypeAttribute.RequiredTypes);
                     if(requireTypeAttribute.FreeSign && RuntimeUtil.IsNull(result))
                     {

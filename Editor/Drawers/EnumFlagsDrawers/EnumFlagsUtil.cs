@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
@@ -15,9 +16,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             public string RichName;
         }
 
-        public static EnumFlagsMetaInfo GetMetaInfo(FieldInfo info)
+        public static EnumFlagsMetaInfo GetMetaInfo(SerializedProperty property, FieldInfo info)
         {
-            Type enumType = ReflectUtils.GetElementType(info.FieldType);
+            Type enumType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;;
 
             Dictionary<int, EnumDisplayInfo> allIntToName = Enum
                 .GetValues(enumType)

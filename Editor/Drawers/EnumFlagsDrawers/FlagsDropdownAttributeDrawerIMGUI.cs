@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
             AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
             _error = dropdownMetaInfo.Error;
 

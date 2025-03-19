@@ -81,10 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.3**
+**3.36.4**
 
-1.  UI Toolkit: `ShowInInspector` can now create/edit polymorphism class, struct & interface
-2.  UI Toolkit: Fix `ShowInInspector` losing editing focus when editing an element inside an array/list
+1.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize it as list and fail (e.g. auto getters)
+2.  Cache MemberInfo attributes and other misc optimizations by [@Insprill](https://github.com/Insprill), [PR #175](https://github.com/TylerTemp/SaintsField/pull/175)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1389,7 +1389,7 @@ For UI Toolkit: this attribute allow you to edit the corresponing field like odi
 
 1.  UI Toolkit only
 2.  Does not use custom drawer even the type has one (Same as Odin)
-3.  Does not support polymorphism-class, interface, dictionary yet
+3.  Does not support dictionary editing yet
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example

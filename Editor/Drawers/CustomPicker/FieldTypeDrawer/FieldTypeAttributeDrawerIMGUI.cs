@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
-            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
             Object requiredValue;
             try

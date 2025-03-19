@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         {
             LoadIcons();
 
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
 
             // float lineHeight = EditorGUIUtility.singleLineHeight;
 
@@ -261,7 +261,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
 
             VisualElement fieldContainer = new VisualElement
             {
@@ -301,7 +301,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute) saintsAttribute;
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
 
             Button toggleButton = container.Q<Button>(name: NameToggleButton(property));
             if (EnumFlagsUtil.IsOn(property.intValue, metaInfo.AllCheckedInt))

@@ -2526,6 +2526,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 //             // }
 //             // listView.Rebuild();
 
+            // TODO: fix this
+            if (!foldout.value)
+            {
+                foldout.value = true;
+            }
+
+            if (foldout.enabledSelf)
+            {
+                foldout.SetEnabled(false);
+            }
+
             return oldElement == null? foldout : null;
         }
 

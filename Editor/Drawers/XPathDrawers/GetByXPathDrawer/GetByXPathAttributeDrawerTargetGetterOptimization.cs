@@ -111,6 +111,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             Type type = compType ?? fieldType;
 
+            // Debug.Log($"type={type}, compType={compType}, fieldType={fieldType}");
+
             Object obj = property.serializedObject.targetObject;
             Scene scene;
 

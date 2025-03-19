@@ -137,7 +137,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
             bool isExpanded = property.isExpanded;
 
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
 
             Rect drawRect = position;
             if (!string.IsNullOrEmpty(label.text))
@@ -349,7 +349,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
             ImGuiLoadResources();
             ImGuiInfo cachedInfo = EnsureKey(property, (EnumFlagsAttribute)saintsAttribute);
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
             // Debug.Log("CALC START ----------");
             return GetFlexButtons(width, metaInfo, label, cachedInfo, property.displayName, property, info, parent)
                 .Select(each => each.YOffset)
@@ -371,7 +371,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
             ImGuiLoadResources();
 
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
             ImGuiInfo cachedInfo = EnsureKey(property, (EnumFlagsAttribute)saintsAttribute);
 
             int curValue = property.intValue;

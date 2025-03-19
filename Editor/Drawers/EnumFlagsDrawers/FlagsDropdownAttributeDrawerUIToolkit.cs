@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             FieldInfo info,
             object parent)
         {
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(info);
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
 
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
             dropdownButton.style.flexGrow = 1;

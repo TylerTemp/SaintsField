@@ -54,9 +54,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 
         private static void UpdateWireDiscInfo(WireDiscInfo wireDiscInfo)
         {
-            Type fieldType = ReflectUtils.GetElementType(wireDiscInfo.MemberInfo is FieldInfo fi
+            Type rawType = wireDiscInfo.MemberInfo is FieldInfo fi
                 ? fi.FieldType
-                : ((PropertyInfo)wireDiscInfo.MemberInfo).PropertyType);
+                : ((PropertyInfo)wireDiscInfo.MemberInfo).PropertyType;
+            Type fieldType = wireDiscInfo.SerializedProperty.isArray? ReflectUtils.GetElementType(rawType): rawType;
             bool filedIsNumber = fieldType == typeof(float) || fieldType == typeof(double) || fieldType == typeof(int) || fieldType == typeof(long) || fieldType == typeof(short);
 
             if(filedIsNumber)

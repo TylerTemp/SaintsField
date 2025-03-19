@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             bool customPicker = fieldTypeAttribute.CustomPicker;
-            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
             UnityEngine.Object requiredValue;
 
@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
-            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
             EPick editorPick = fieldTypeAttribute.EditorPick;
 
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
-            Type fieldType = ReflectUtils.GetElementType(info.FieldType);
+            Type fieldType = property.isArray? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
 
