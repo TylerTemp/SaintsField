@@ -1539,13 +1539,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if(isNormalDictionary || isReadonlyDictionary)
             {
-                bool isReadOnly = !isNormalDictionary;
-
                 // Debug.Log($"isReadonlyDictionary={isReadonlyDictionary}");
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
+                bool isReadOnly = !isNormalDictionary;
                 return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], setterOrNull);
 #else
-                ReSharper disable once AssignNullToNotNullAttribute
+                // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
 
                 Foldout foldout = new Foldout
@@ -1589,7 +1588,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
 
                 return foldout;
-                return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
 #endif
             }
             if (value is IEnumerable enumerableValue)
@@ -2300,6 +2298,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public void SetKeyValue(object key, object value) => IndexerProperty.SetValue(RawDictValue, value, new[] { key });
         }
 
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
         private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> setterOrNull)
         {
             // Debug.Log(dictKeyType);
@@ -2539,8 +2538,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             return oldElement == null? foldout : null;
         }
-
-
+#endif
         private static void MoveArrayElement(IList list, int fromIndex, int toIndex)
         {
             if (list == null)
