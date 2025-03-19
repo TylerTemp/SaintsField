@@ -4,6 +4,7 @@
 
 1.  Fix a critical issue that when a field is inherenced from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recongize it as list and fail (e.g. auto getters)
 2.  Cache MemberInfo attributes and other misc optimizations by [@Insprill](https://github.com/Insprill), [PR #175](https://github.com/TylerTemp/SaintsField/pull/175)
+3.  Inherent `SaintsDictionaryBase` from `IDictionary` to make it more like a normal dictionary
 
 ## 3.36.3 ##
 
