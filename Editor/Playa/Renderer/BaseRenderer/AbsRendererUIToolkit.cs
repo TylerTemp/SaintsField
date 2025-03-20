@@ -839,7 +839,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public UIToolkitValueEditPayloadState State;
         }
 
-        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> setterOrNull)
+        // before set: useful for struct editing that C# will messup and change the value of the reference you have
+        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull)
         {
             // if (RuntimeUtil.IsNull(value))
             // {
@@ -867,6 +868,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -895,6 +897,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         sbyte newValue = (sbyte)evt.newValue;
+                        beforeSet?.Invoke(value);
                         setterOrNull(newValue);
                         if (newValue != evt.newValue)
                         {
@@ -927,6 +930,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         byte newValue = (byte)evt.newValue;
+                        beforeSet?.Invoke(value);
                         setterOrNull(newValue);
                         if (newValue != evt.newValue)
                         {
@@ -959,6 +963,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         short newValue = (short)evt.newValue;
+                        beforeSet?.Invoke(value);
                         setterOrNull(newValue);
                         if (newValue != evt.newValue)
                         {
@@ -990,6 +995,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         ushort newValue = (ushort)evt.newValue;
+                        beforeSet?.Invoke(value);
                         setterOrNull(newValue);
                         if (newValue != evt.newValue)
                         {
@@ -1021,6 +1027,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+                        Debug.Log($"Invoke old value {value}");
+#endif
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1049,6 +1059,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         uint newValue = (uint)evt.newValue;
+                        beforeSet?.Invoke(value);
                         setterOrNull(newValue);
                         if (newValue != evt.newValue)
                         {
@@ -1080,6 +1091,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1128,6 +1140,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         }
                         long checkLong = (long) useNewValue;
 
+                        beforeSet?.Invoke(value);
                         setterOrNull(useNewValue);
                         if (rawNewValue != checkLong)
                         {
@@ -1159,6 +1172,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1186,6 +1200,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1213,6 +1228,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1240,6 +1256,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1267,6 +1284,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1294,6 +1312,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1321,6 +1340,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1342,6 +1362,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 element.AddToClassList(Vector3IntField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
+                    beforeSet?.Invoke(value);
                     element.SetEnabled(false);
                 }
                 else
@@ -1382,6 +1403,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
                         Debug.Log($"Set Color {evt.newValue}");
 #endif
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1409,6 +1431,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1436,6 +1459,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1463,6 +1487,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1489,6 +1514,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
+                        beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
                     });
                 }
@@ -1497,7 +1523,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
             {
-                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, setterOrNull);
+                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull);
             }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
@@ -1546,7 +1572,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 bool isReadOnly = !isNormalDictionary;
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
-                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], setterOrNull);
+                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull);
 #else
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1597,7 +1623,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
-                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), setterOrNull);
+                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull);
             }
 
             // Debug.Log(valueType);
@@ -1617,6 +1643,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
                     {
+                        beforeSet?.Invoke(value);
                         object result = valueType.IsArray ? Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0) : Activator.CreateInstance(valueType);
                         setterOrNull(result);
                         // return;
@@ -1716,12 +1743,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             if(canConvert)
                             {
                                 objFieldResult =
-                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, setterOrNull);
+                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, beforeSet, setterOrNull);
                             }
                             else
                             {
                                 objFieldResult =
-                                    UIToolkitObjectFieldEdit(null, label, newType, null, setterOrNull);
+                                    UIToolkitObjectFieldEdit(null, label, newType, null, beforeSet, setterOrNull);
+                                beforeSet?.Invoke(value);
                                 setterOrNull?.Invoke(null);
                             }
                             objFieldResult.name = objFieldName;
@@ -1756,7 +1784,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             if (preType != newType)
                             {
                                 ObjectField preField = fieldsBodyNew.Q<ObjectField>(name: objFieldName);
-                                Debug.Log($"swap {preType} -> {newType}: {preField}");
+                                // Debug.Log($"swap {preType} -> {newType}: {preField}");
                                 if (preField != null)
                                 {
                                     preField.SetValueWithoutNotify(null);
@@ -1782,6 +1810,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         // Debug.Log($"swap {preType} -> {newType}: {obj}; setter={setterOrNull}");
 
+                        beforeSet?.Invoke(value);
                         setterOrNull?.Invoke(obj);
                     }
                 }));
@@ -1800,7 +1829,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // Debug.Log($"valueActualType={valueActualType}");
             if (valueActualType != null && typeof(UnityEngine.Object).IsAssignableFrom(valueActualType))
             {
-                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, setterOrNull);
+                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, beforeSet, setterOrNull);
                 // Debug.Log($"objFieldResult={objFieldResult}");
                 if (objFieldResult != null)
                 {
@@ -1834,6 +1863,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     ObjectNames.NicifyVariableName(name),
                     fieldInfo.FieldType,
                     fieldValue,
+                    // _ => beforeSet?.Invoke(value),
+                    _ =>
+                    {
+                        // Debug.Log($"Before Set field {fieldInfo.Name}, invoke {value}");
+                        beforeSet?.Invoke(value);
+                    },
                     newValue =>
                     {
                         fieldInfo.SetValue(value, newValue);
@@ -1863,12 +1898,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     ObjectNames.NicifyVariableName(name),
                     propertyInfo.PropertyType,
                     propertyValue,
+                    _ => beforeSet?.Invoke(value),
                     propertyInfo.CanWrite
-                        ? (newValue =>
+                        ? newValue =>
                         {
                             propertyInfo.SetValue(value, newValue);
                             setterOrNull?.Invoke(value);
-                        })
+                        }
                         : null);
                 // ReSharper disable once InvertIf
                 if(result != null)
@@ -1887,7 +1923,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return useOld? null: genFoldout;
         }
 
-        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> setterOrNull)
+        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> beforeSet, Action<object> setterOrNull)
         {
             if (oldElement is ObjectField oldUnityEngineObjectField)
             {
@@ -1910,6 +1946,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 element.RegisterValueChangedCallback(evt =>
                 {
+                    beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);
                 });
             }
@@ -1928,29 +1965,36 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
             dropdownButton.ButtonElement.text = GetDropdownTypeLabel(currentValue?.GetType());
+
+            Type[] optionTypes = ReferencePickerAttributeDrawer
+                .GetTypesDerivedFrom(fieldType)
+                .ToArray();
+            AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
+            bool canBeNull = !fieldType.IsValueType;
+            if(canBeNull)
+            {
+                dropdownList.Add("[Null]", null);
+                if (optionTypes.Length > 0)
+                {
+                    dropdownList.AddSeparator();
+                }
+            }
+
+            foreach (Type type in optionTypes)
+            {
+                string displayName = GetDropdownTypeLabel(type);
+                dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+            }
+
+            int optionCount = (canBeNull ? 1 : 0) + optionTypes.Length;
+
+            if (optionCount <= 1)  // no more options, disallow picking
+            {
+                dropdownButton.style.display = DisplayStyle.None;
+            }
+
             dropdownButton.ButtonElement.clicked += () =>
             {
-                Type[] optionTypes = ReferencePickerAttributeDrawer
-                    .GetTypesDerivedFrom(fieldType)
-                    .ToArray();
-
-                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
-
-                if(!fieldType.IsValueType)
-                {
-                    dropdownList.Add("[Null]", null);
-                    if (optionTypes.Length > 0)
-                    {
-                        dropdownList.AddSeparator();
-                    }
-                }
-
-                foreach (Type type in optionTypes)
-                {
-                    string displayName = GetDropdownTypeLabel(type);
-                    dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
-                }
-
                 AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
                 {
                     Error = "",
@@ -2011,7 +2055,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public object RawListValue;
         }
 
-        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> setterOrNull)
+        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull)
         {
             Foldout foldout = oldElement;
             if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
@@ -2035,7 +2079,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(setterOrNull != null)
                 {
                     // nullable
-                    foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+                    foldout.Q<Toggle>().Add(new Button(() =>
+                    {
+                        beforeSet(rawListValue);
+                        setterOrNull(null);
+                    })
                     {
                         // text = "x",
                         tooltip = "Set to null",
@@ -2155,6 +2203,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         $"Element {actualIndex}",
                         elementType,
                         actualValue,
+                        null,
                         showAddRemoveFooter
                          ? newItemValue =>
                             {
@@ -2188,6 +2237,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         if (valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
                         {
+                            beforeSet.Invoke(rawListValue);
                             Array newArray = Array.CreateInstance(elementType, newSize);
                             payload.RawValues.Add(addItem);
                             Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
@@ -2214,6 +2264,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                     if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
                     {
+                        beforeSet.Invoke(rawListValue);
                         Array newArray = Array.CreateInstance(elementType, payload.RawValues.Count - removeIndexInRaw.Count());
                         Array rawArray = (Array) payload.RawListValue;
                         int copyIndex = 0;
@@ -2310,7 +2361,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> setterOrNull)
+        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull)
         {
             // Debug.Log(dictKeyType);
             // Debug.Log(dictValueType);
@@ -2340,7 +2391,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(setterOrNull != null)
                 {
                     // nullable
-                    foldout.Q<Toggle>().Add(new Button(() => setterOrNull(null))
+                    foldout.Q<Toggle>().Add(new Button(() =>
+                    {
+                        beforeSet?.Invoke(rawDictValue);
+                        setterOrNull(null);
+                    })
                     {
                         // text = "x",
                         tooltip = "Set to null",
@@ -2401,7 +2456,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         flexGrow = 1,
                         position = Position.Relative,
                     },
-                    itemsSource = payload.GetKeys().OrderBy(each => each).ToList(),
+                    itemsSource = payload.GetKeys().ToList(),
                     userData = payload,
                 };
 
@@ -2446,41 +2501,62 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     bindCell = (element, elementIndex) =>
                     {
                         object key = listView.itemsSource[elementIndex];
+                        object oldValue = payload.GetValue(key);
+                        bool keyChanged = true;
 
                         VisualElement keyChild = element.Children().FirstOrDefault();
 
-                        VisualElement editing = UIToolkitValueEdit(keyChild, "", dictKeyType, key, newKey =>
+                        element.schedule.Execute(() =>
                         {
-                            if (RuntimeUtil.IsNull(newKey))
+                            if (!keyChanged)
                             {
-                                Debug.LogWarning($"Setting key to null is not supported and is ignored");
                                 return;
                             }
 
-                            if (payload.ContainsKey(newKey))
-                            {
-                                Debug.LogWarning($"Setting key {key} to existing key {newKey} is not supported and is ignored");
-                                return;
-                            }
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                            Debug.Log($"dictionary editing key {key}");
-#endif
-                            object oldValue = payload.GetValue(key);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                            Debug.Log($"set key {key} -> {newKey} with value {oldValue}");
-#endif
-                            payload.DeleteKey(key);
-                            payload.SetKeyValue(newKey, oldValue);
-                            int sourceIndex = listView.itemsSource.IndexOf(key);
-                            listView.itemsSource[sourceIndex] = newKey;
-                            key = newKey;
-                        });
+                            keyChanged = false;
 
-                        if (editing != null)
-                        {
-                            element.Clear();
-                            element.Add(editing);
-                        }
+                            VisualElement editing = UIToolkitValueEdit(keyChild, "", dictKeyType, key, oldKey =>
+                            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                                Debug.Log($"oldKey={oldKey}");
+#endif
+                                oldValue = payload.GetValue(oldKey);
+                                payload.DeleteKey(oldKey);
+                            }, newKey =>
+                            {
+                                if (RuntimeUtil.IsNull(newKey))
+                                {
+                                    Debug.LogWarning($"Setting key to null is not supported and is ignored");
+                                    return;
+                                }
+
+                                if (payload.ContainsKey(newKey))
+                                {
+                                    Debug.LogWarning($"Setting key {key} to existing key {newKey} is not supported and is ignored");
+                                    return;
+                                }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                                Debug.Log($"dictionary editing key {key} -> {newKey}");
+#endif
+                                // object oldValue = payload.GetValue(key);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                                Debug.Log($"set key {key} -> {newKey} with value {oldValue}");
+#endif
+                                payload.DeleteKey(key);
+                                payload.SetKeyValue(newKey, oldValue);
+                                // int sourceIndex = listView.itemsSource.IndexOf(key);
+                                // listView.itemsSource[sourceIndex] = newKey;
+                                key = newKey;
+                                keyChanged = true;
+                            });
+
+                            if (editing != null)
+                            {
+                                element.Clear();
+                                element.Add(editing);
+                            }
+                        }).Every(100);
                     },
                 });
 
@@ -2529,7 +2605,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         VisualElement valueChild = element.Children().FirstOrDefault();
 
-                        VisualElement editing = UIToolkitValueEdit(valueChild, "", dictValueType, value, newValue =>
+                        VisualElement editing = UIToolkitValueEdit(valueChild, "", dictValueType, value, null, newValue =>
                         {
                             object refreshedKey = listView.itemsSource[elementIndex];
                             payload.SetKeyValue(refreshedKey, newValue);
@@ -2642,6 +2718,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         "Key",
                         dictKeyType,
                         addPairKey,
+                        null,
                         newKey =>
                         {
                             bool invalidKey = RuntimeUtil.IsNull(newKey);
@@ -2655,6 +2732,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             {
                                 addPairKey = newKey;
                                 addPairKeyChange = true;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                                Debug.Log($"set new pair key {newKey}");
+#endif
                             }
                         }
                     );
@@ -2684,6 +2764,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         "Value",
                         dictValueType,
                         addPairValue,
+                        null,
                         newValue =>
                         {
                             addPairValue = newValue;
@@ -2708,6 +2789,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     payload.SetKeyValue(addPairKey, addPairValue);
                     addPairPanel.style.display = DisplayStyle.None;
                     listViewAddButton.SetEnabled(true);
+                    listView.itemsSource = payload.GetKeys().ToList();
                     // setterOrNull(payload.RawDictValue);
                     // listView.Rebuild();
                 };
@@ -2733,7 +2815,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (rawDictValue != null)
             {
                 // Debug.Log($"Refresh listView");
-                listView.itemsSource = oldPayload.GetKeys().OrderBy(each => each).ToList();
+                listView.itemsSource = oldPayload.GetKeys().ToList();
             }
 
             return useOld? null : foldout;

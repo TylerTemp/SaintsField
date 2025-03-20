@@ -218,5 +218,32 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 //             };
 //
 //         [ShowInInspector, Ordered] public Dictionary<int, int[]> _intToInts = new Dictionary<int, int[]>();
+
+        public struct KeyStruct: IEquatable<KeyStruct>
+        {
+            public int Key;
+
+            public bool Equals(KeyStruct other)
+            {
+                return Key == other.Key;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is KeyStruct other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return Key;
+            }
+
+            public override string ToString()
+            {
+                return $"<KeyStruct Key={Key}/>";
+            }
+        }
+
+        [ShowInInspector] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
     }
 }
