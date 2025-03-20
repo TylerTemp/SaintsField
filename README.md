@@ -83,8 +83,8 @@ namespace: `SaintsField`
 
 **3.36.6**
 
-1.  `EnumButtons` now allow to quick select an enum if it's not a flag. [#139](https://github.com/TylerTemp/SaintsField/issues/139)
-2.  Change `EnumFlags` as an alias of `EnumButtons`
+1.  `EnumToggleButtons` now allow to quick select an enum if it's not a flag. [#139](https://github.com/TylerTemp/SaintsField/issues/139)
+2.  Change `EnumFlags` as an alias of `EnumToggleButtons`
 3.  UI Toolkit: fix an issue when editing a valued-type key for a dictionary type using `ShowInInspector`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
