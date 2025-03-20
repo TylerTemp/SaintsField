@@ -50,5 +50,16 @@ namespace SaintsField.Samples.Scripts
         [RichLabel("<icon=star.png /><label />")]
         public BitMask myMaskDisabledLabel;
 
+        [Serializable]
+        public enum EnumNormal
+        {
+            First,
+            Second,
+            [RichLabel("<color=blue><label /></color>")]
+            Third,
+        }
+
+        [EnumFlags] public EnumNormal myEnumNormal;
+
     }
 }

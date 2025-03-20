@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -164,7 +165,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             {
                 Button inlineToggleButton = new Button
                 {
-                    text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name,
+                    text = "",
+                    // text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name,
                     userData = bitValueToName.Key,
                     style =
                     {
@@ -174,6 +176,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                         paddingRight = 1,
                     },
                 };
+
+                FillButtonText(inlineToggleButton, bitValueToName.Value, property, info, parent);
+
                 inlineToggleButton.AddToClassList(ClassToggleBitButton(property));
                 fieldContainer.Add(inlineToggleButton);
             }
@@ -210,6 +215,32 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             enumFlagsField.AddToClassList(ClassAllowDisable);
 
             return enumFlagsField;
+        }
+
+        private RichTextDrawer _richTextDrawer;
+
+        private void FillButtonText(Button button, EnumFlagsUtil.EnumDisplayInfo displayInfo, SerializedProperty property, MemberInfo info, object parent)
+        {
+            if (displayInfo.HasRichName)
+            {
+                _richTextDrawer ??= new RichTextDrawer();
+                VisualElement visualElement = new VisualElement
+                {
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                    },
+                };
+                foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(displayInfo.RichName, displayInfo.Name, property, info, parent)))
+                {
+                    visualElement.Add(chunk);
+                }
+                button.Add(visualElement);
+            }
+            else
+            {
+                button.text = displayInfo.Name;
+            }
         }
 
         protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
@@ -280,7 +311,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             {
                 Button inlineToggleButton = new Button
                 {
-                    text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name,
+                    // text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name,
                     userData = bitValueToName.Key,
                     style =
                     {
@@ -290,6 +321,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                         paddingRight = 1,
                     },
                 };
+
+                FillButtonText(inlineToggleButton, bitValueToName.Value, property, info, parent);
                 inlineToggleButton.AddToClassList(ClassToggleBitButton(property));
                 fieldContainer.Add(inlineToggleButton);
             }
