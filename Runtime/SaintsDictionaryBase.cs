@@ -20,7 +20,7 @@ namespace SaintsField
         // [Conditional("UNITY_EDITOR")]
         // private void EditorSyncDictionaryToBackingField()
         // {
-        //     foreach (KeyValuePair<TKey, TValue> kvp in _dictionary)
+        //     foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)
         //     {
         //         SerializedKeys.Add(kvp.Key);
         //         SerializedValues.Add(kvp.Value);
@@ -31,7 +31,7 @@ namespace SaintsField
         {
             // Debug.Log($"OnBeforeSerialize keys={SerializedKeys.Count}, values={SerializedValues.Count}");
 #if UNITY_EDITOR
-            // if(SerializedKeys.Count != _dictionary.Count)
+            // if(SerializedKeys.Count != Dictionary.Count)
             // {
             //     EditorSyncDictionaryToBackingField();
             // }
@@ -59,7 +59,7 @@ namespace SaintsField
 #else
             SerializedKeys.Clear();
             SerializedValues.Clear();
-            foreach (KeyValuePair<TKey, TValue> kvp in _dictionary)
+            foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)
             {
                 SerializedKeys.Add(kvp.Key);
                 SerializedValues.Add(kvp.Value);
@@ -92,9 +92,9 @@ namespace SaintsField
                     Dictionary.Add(key, value);
                 }
 #else
-                _dictionary.Add(key, value);
+                Dictionary.Add(key, value);
 #endif
-                // _dictionary[_keys[index]] = _values[index];
+                // Dictionary[_keys[index]] = _values[index];
             }
 
 #if UNITY_EDITOR
