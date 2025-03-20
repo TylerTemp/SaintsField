@@ -658,7 +658,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                               BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-
                 foreach ((object kvPair, int index) in kvPairs.WithIndex())
                 {
                     Type kvPairType = kvPair.GetType();
@@ -1691,7 +1690,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             const string objFieldName = "saintsfield-objectfield";
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
-            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
             Foldout genFoldout = oldElement as Foldout;
             if (genFoldout != null && !genFoldout.ClassListContains("saintsfield-general"))
             {
@@ -1852,11 +1851,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             payload.State = UIToolkitValueEditPayloadState.GenericType;
 
-            // Debug.Log("Init generic type");
             // ReSharper disable once PossibleNullReferenceException
-            foreach (FieldInfo fieldInfo in value.GetType().GetFields(bindAttrNormal))
+            List<FieldInfo> fieldTargets = value.GetType().GetFields(bindAttrNormal).ToList();
+            Dictionary<string, FieldInfo> backingToFieldInfo = fieldTargets
+                .Where(each => each.Name.StartsWith("<") && each.Name.EndsWith(">k__BackingField"))
+                .ToDictionary(each => each.Name);
+            PropertyInfo[] propertyTargets = value.GetType().GetProperties(bindAttrNormal);
+            foreach (PropertyInfo propertyInfo in propertyTargets)
+            {
+                string propName = propertyInfo.Name;
+                string backingName = $"<{propName}>k__BackingField";
+                if (backingToFieldInfo.TryGetValue(backingName, out FieldInfo dupInfo))
+                {
+                    fieldTargets.Remove(dupInfo);
+                }
+            }
+
+            // Debug.Log("Init generic type");
+            foreach (FieldInfo fieldInfo in fieldTargets)
             {
                 string name = fieldInfo.Name;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+                Debug.Log($"render general field {name}");
+#endif
                 object fieldValue = fieldInfo.GetValue(value);
                 VisualElement result = UIToolkitValueEdit(
                     oldElement?.Q<VisualElement>(name: name),
@@ -1883,7 +1900,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            foreach (PropertyInfo propertyInfo in value.GetType().GetProperties(bindAttrNormal))
+            foreach (PropertyInfo propertyInfo in propertyTargets)
             {
                 if (!propertyInfo.CanRead)
                 {
@@ -1891,6 +1908,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
 
                 string name = propertyInfo.Name;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+                Debug.Log($"render general property {name}");
+#endif
                 object propertyValue = propertyInfo.GetValue(value);
 
                 VisualElement result = UIToolkitValueEdit(

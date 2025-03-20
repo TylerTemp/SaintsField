@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -69,7 +70,8 @@ namespace SaintsField.Editor.Playa.Renderer
             // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
             ParameterInfo[] parameters = methodInfo.GetParameters();
             bool hasParameters = parameters.Length > 0;
-            List<VisualElement> parameterElements = new List<VisualElement>();
+            // List<VisualElement> parameterElements = new List<VisualElement>();
+            object[] parameterValues = new object[parameters.Length];
             VisualElement root = null;
 
             if (hasParameters)
@@ -99,17 +101,52 @@ namespace SaintsField.Editor.Playa.Renderer
                     },
                 };
 
-                foreach (ParameterInfo parameterInfo in parameters)
+                foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
                 {
-                    VisualElement element = UIToolkitLayout(GetParameterDefaultValue(parameterInfo),
-                        ObjectNames.NicifyVariableName(parameterInfo.Name), parameterInfo.ParameterType);
-                    if(element != null)
+                    VisualElement paraContainer = new VisualElement();
+                    root.Add(paraContainer);
+
+                    Type paraType = parameterInfo.ParameterType;
+                    object paraValue;
+                    if(parameterInfo.HasDefaultValue)
                     {
-                        element.style.marginRight = 3;
-                        element.SetEnabled(true);
-                        parameterElements.Add(element);
-                        root.Add(element);
+                        paraValue = parameterInfo.DefaultValue;
                     }
+                    else
+                    {
+                        paraValue = paraType.IsValueType ? Activator.CreateInstance(paraType) : null;
+                    }
+                    parameterValues[index] = paraValue;
+
+                    bool paraValueChanged = true;
+                    paraContainer.schedule.Execute(() =>
+                    {
+                        if (!paraValueChanged)
+                        {
+                            return;
+                        }
+
+                        VisualElement r = UIToolkitValueEdit(
+                            paraContainer.Children().FirstOrDefault(),
+                            parameterInfo.Name,
+                            paraType,
+                            paraValue,
+                            null,
+                            newValue =>
+                            {
+                                paraValue = parameterValues[index] = newValue;
+                                paraValueChanged = true;
+                            }
+                        );
+                        // ReSharper disable once InvertIf
+                        if (r != null)
+                        {
+                            paraContainer.Clear();
+                            paraContainer.Add(r);
+                        }
+
+                        paraValueChanged = false;
+                    }).Every(100);
                 }
 
             }
@@ -143,8 +180,8 @@ namespace SaintsField.Editor.Playa.Renderer
 
             buttonElement = new Button(() =>
             {
-                object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
-                object returnValue = methodInfo.Invoke(target, paraValues);
+                // object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
+                object returnValue = methodInfo.Invoke(target, parameterValues);
                 // ReSharper disable once InvertIf
                 if (returnValue is IEnumerator enumerator)
                 {
