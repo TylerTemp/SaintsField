@@ -28,6 +28,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
         private static string NameFillEmpty(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_FillEmpty";
         private static string NameToggleButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButton";
+        private static string NameQuickCheckButtons(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_QuickCheckButtons";
         private static string NameCheckAllButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_CheckAllButton";
         private static string NameEmptyButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_EmptyButton";
         private static string NameBelowAll(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Below";
@@ -60,6 +61,15 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 },
             };
 
+            VisualElement quickCheckButtons = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
+            };
+            fieldContainer.Add(quickCheckButtons);
+
             Button hToggleButton = new Button
             {
                 name = NameToggleButton(property),
@@ -90,7 +100,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 #endif
                 },
             };
-            fieldContainer.Add(hToggleButton);
+            quickCheckButtons.Add(hToggleButton);
 
             Button hCheckAllButton = new Button
             {
@@ -124,7 +134,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 #endif
                 },
             };
-            fieldContainer.Add(hCheckAllButton);
+            quickCheckButtons.Add(hCheckAllButton);
 
             Button hEmptyButton = new Button
             {
@@ -158,10 +168,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 #endif
                 },
             };
-            fieldContainer.Add(hEmptyButton);
+            quickCheckButtons.Add(hEmptyButton);
 
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in metaInfo.BitValueToName
-                         .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt))
+            if (!metaInfo.HasFlags)
+            {
+                quickCheckButtons.style.display = DisplayStyle.None;
+            }
+
+            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in GetDisplayBit(metaInfo))
             {
                 Button inlineToggleButton = new Button
                 {
@@ -306,8 +320,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 name = NameBelowAll(property),
             };
 
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in metaInfo.BitValueToName
-                         .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt))
+            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in GetDisplayBit(metaInfo))
             {
                 Button inlineToggleButton = new Button
                 {
@@ -328,6 +341,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             }
 
             return fieldContainer;
+        }
+
+        private static IEnumerable<KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo>> GetDisplayBit(EnumFlagsMetaInfo metaInfo)
+        {
+            if (metaInfo.HasFlags)
+            {
+                return metaInfo.BitValueToName
+                    .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt);
+
+            }
+            return metaInfo.BitValueToName;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -352,9 +376,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             toggleButton.clicked += () =>
             {
                 int curToggleState = (int) toggleButton.userData;
+
+                // if (!metaInfo.HasFlags)
+                // {
+                //     property.intValue = curToggleState;
+                //     property.serializedObject.ApplyModifiedProperties();
+                //     onValueChangedCallback.Invoke(curToggleState);
+                //     return;
+                // }
+
                 switch (curToggleState)
                 {
-
                     case 0:  // none to all
                         property.intValue = metaInfo.AllCheckedInt;
                         toggleButton.userData = 1;
@@ -396,8 +428,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 button.clicked += () =>
                 {
                     int toggle = (int)button.userData;
-                    // Debug.Log($"{property.intValue} -> {toggle}: IsOn={EnumFlagsUtil.IsOn(toggle, property.intValue)}");
-                    int newValue = EnumFlagsUtil.ToggleBit(property.intValue, toggle);
+
+                    int newValue =
+                        metaInfo.HasFlags
+                            ? EnumFlagsUtil.ToggleBit(property.intValue, toggle)
+                            : toggle;
+
                     property.intValue = newValue;
                     // Debug.Log($"new={newValue}");
                     property.serializedObject.ApplyModifiedProperties();
@@ -443,12 +479,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     belowAllElement, foldoutButton);
             });
 
-            foldoutButton.TrackPropertyValue(property, _ => RefreshDisplay(toggleButton, checkAllButton, emptyButton, toggleBitButtons, metaInfo.AllCheckedInt, property.intValue));
+            foldoutButton.TrackPropertyValue(property, _ => RefreshDisplay(toggleButton, checkAllButton, emptyButton, toggleBitButtons, metaInfo.HasFlags, metaInfo.AllCheckedInt, property.intValue));
 
-            RefreshDisplay(toggleButton, checkAllButton, emptyButton, toggleBitButtons, metaInfo.AllCheckedInt, property.intValue);
+            RefreshDisplay(toggleButton, checkAllButton, emptyButton, toggleBitButtons, metaInfo.HasFlags, metaInfo.AllCheckedInt, property.intValue);
         }
 
-        private void RefreshDisplay(Button toggleButton, Button checkAllButton, Button emptyButton, IEnumerable<Button> toggleBitButtons, int allCheckedInt, int currentInt)
+        private void RefreshDisplay(Button toggleButton, Button checkAllButton, Button emptyButton, IEnumerable<Button> toggleBitButtons, bool hasFlags, int allCheckedInt, int currentInt)
         {
             if (currentInt == 0)
             {
@@ -479,7 +515,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             foreach (Button bitButton in toggleBitButtons)
             {
                 int buttonMask = (int) bitButton.userData;
-                bool on = EnumFlagsUtil.IsOn(currentInt, buttonMask);
+                bool on = hasFlags? EnumFlagsUtil.IsOn(currentInt, buttonMask): currentInt == buttonMask;
                 SetBitButtonStyle(bitButton, on);
             }
         }

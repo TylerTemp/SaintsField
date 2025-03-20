@@ -55,7 +55,7 @@ namespace SaintsField.Samples.Scripts
         {
             First,
             Second,
-            [RichLabel("<color=blue><label /></color>")]
+            [RichLabel("<color=lime><label /></color>")]
             Third,
         }
 

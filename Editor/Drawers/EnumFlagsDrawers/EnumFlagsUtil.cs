@@ -19,6 +19,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         public static EnumFlagsMetaInfo GetMetaInfo(SerializedProperty property, FieldInfo info)
         {
             Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;;
+            bool hasFlags = enumType.GetCustomAttributes(typeof(FlagsAttribute), true).Length > 0;
 
             Dictionary<int, EnumDisplayInfo> allIntToName = Enum
                 .GetValues(enumType)
@@ -45,6 +46,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 .ToDictionary(each => each.Key, each => each.Value);
             return new EnumFlagsMetaInfo
             {
+                HasFlags = hasFlags,
                 BitValueToName = bitValueToName,
                 AllCheckedInt = allCheckedInt,
             };

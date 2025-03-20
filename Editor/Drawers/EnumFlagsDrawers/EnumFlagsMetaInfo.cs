@@ -6,5 +6,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
     {
         public Dictionary<int, EnumFlagsUtil.EnumDisplayInfo> BitValueToName;
         public int AllCheckedInt;
+        public bool HasFlags;
     }
 }
