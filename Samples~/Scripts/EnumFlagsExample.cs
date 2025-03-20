@@ -25,28 +25,28 @@ namespace SaintsField.Samples.Scripts
         }
 
         // [RichLabel("<icon=star.png /><label />")]
-        [EnumFlags]
+        [EnumToggleButtons]
         public BitMask myMask;
 
-        [Space(60)]
+        // [Space(60)]
 
-        [EnumFlags, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
+        [EnumToggleButtons, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
         private void ValueChanged() => Debug.Log(myMask2);
 
         [Serializable]
         public struct MyStruct
         {
-            [EnumFlags, BelowRichLabel(nameof(myMask), true)] public BitMask myMask;
+            [EnumToggleButtons, BelowRichLabel(nameof(myMask), true)] public BitMask myMask;
         }
 
         public MyStruct myStruct;
 
         [ReadOnly]
-        [EnumFlags]
+        [EnumToggleButtons]
         public BitMask myMaskDisabled;
 
         [ReadOnly]
-        [EnumFlags]
+        [EnumToggleButtons]
         [RichLabel("<icon=star.png /><label />")]
         public BitMask myMaskDisabledLabel;
 
@@ -59,7 +59,23 @@ namespace SaintsField.Samples.Scripts
             Third,
         }
 
-        [EnumFlags] public EnumNormal myEnumNormal;
+        [EnumToggleButtons] public EnumNormal enumNormal;
 
+        [Serializable]
+        public enum EnumExpand
+        {
+            Value1,
+            Value2,
+            Value3,
+            Value4,
+            Value5,
+            Value6,
+            Value7,
+            Value8,
+            Value9,
+            Value10,
+        }
+
+        [EnumToggleButtons, DefaultExpand] public EnumExpand enumExpand;
     }
 }

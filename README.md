@@ -81,12 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.5**
+**3.36.6**
 
-1.  UI Toolkit: `ShowInInspector` can now edit a dictionary
-2.  Fix a critical issue that when a field is inherited from a `List<,>` or `IReadOnlyList<,>`, some field drawer will recognize its element type wrong and fail (e.g. auto getters)
-3.  UI Toolkit: fix some fallback drawer can not display a correct label [#176](https://github.com/TylerTemp/SaintsField/issues/176)
-4.  Fix AnimatorParam won't work if the target is inside a prefab which is not loaded into memory by Unity
+1.  `EnumButtons` now allow to quick select an enum if it's not a flag. [#139](https://github.com/TylerTemp/SaintsField/issues/139)
+2.  Change `EnumFlags` as an alias of `EnumButtons`
+3.  UI Toolkit: fix an issue when editing a valued-type key for a dictionary type using `ShowInInspector`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4104,16 +4103,15 @@ Also, using on a type like `Color` to pick a pre-defined static value:
 
 ![image](https://github.com/user-attachments/assets/404d4cd6-b4bf-4521-b633-2dd745ec4de1)
 
-#### `EnumFlags` ####
+#### `EnumToggleButtons` ####
 
-A toggle buttons group for enum flags (bit mask). It provides a button to toggle all bits on/off.
+A toggle buttons group for enum flags (bit mask) or a normal enum. It provides a button to toggle all bits on/off for flags, or a quick selector for normal enum.
 
 This field has compact mode and expanded mode.
 
-For each argument:
+Note: Use `DefaultExpand` if you want it to be expanded by default.
 
-*   `bool defaultExpanded=false`: if true, the buttons group will be expanded on below by default.
-*   AllowMultiple: No
+(Old Name: `EnumFlags`)
 
 ```csharp
 using SaintsField;
@@ -4127,10 +4125,44 @@ public enum BitMask
     Mask3 = 1 << 2,
 }
 
-[EnumFlags] public BitMask myMask;
+[EnumToggleButtons] public BitMask myMask;
 ```
 
 [![video](https://github.com/user-attachments/assets/13f86449-6632-4489-ba3f-31e55f718966)](https://github.com/user-attachments/assets/0a589a01-f00f-4bfd-a845-57b1ddce45fa)
+
+For a normal enum it allows you to do a quick select
+
+```csharp
+[Serializable]
+public enum EnumNormal  // normal enum, not flags
+{
+    First,
+    Second,
+    [RichLabel("<color=lime><label /></color>")]
+    Third,
+}
+
+[EnumToggleButtons] public EnumNormal myEnumNormal;
+
+[Serializable]
+public enum EnumExpand
+{
+    Value1,
+    Value2,
+    Value3,
+    Value4,
+    Value5,
+    Value6,
+    Value7,
+    Value8,
+    Value9,
+    Value10,
+}
+// expand it by default
+[EnumToggleButtons, DefaultExpand] public EnumExpand enumExpand;
+```
+
+![image](https://github.com/user-attachments/assets/0acb17ee-9866-41a3-abb7-5718cdc398f8)
 
 You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
 
@@ -4150,7 +4182,7 @@ public enum BitMask
     Mask5 = 1 << 4,
 }
 
-[EnumFlags]
+[EnumToggleButtons]
 public BitMask myMask;
 ```
 

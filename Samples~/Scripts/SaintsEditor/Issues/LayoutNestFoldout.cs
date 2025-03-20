@@ -22,24 +22,24 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 
         public string[] plainStrings;
         public MyStruct plainStruct;
-        [EnumFlags]
+        [EnumToggleButtons]
         public MyEnum plainEnum;
 
         [LayoutStart("Layout1", ELayout.FoldoutBox)]
 
         public string[] l1Strings;
         public MyStruct l1Struct;
-        [EnumFlags]
+        [EnumToggleButtons]
         public MyEnum l1Enum;
 
         [LayoutStart("./Layout2", ELayout.FoldoutBox)]
 
         public string[] l2Strings;
         public MyStruct l2Struct;
-        [EnumFlags]
+        [EnumToggleButtons]
         public MyEnum l2Enum;
 
-        [EnumFlags, RichLabel("<color=red><label/>")]
+        [EnumToggleButtons, RichLabel("<color=red><label/>")]
         public MyEnum l2EnumLabel;
     }
 }

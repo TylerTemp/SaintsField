@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue40
 {
@@ -13,6 +12,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue40
         [EnableIf(nameof(int01) + ">=", 1), RichLabel(">=1")] public string int01EnableGe1;
         [EnableIf(nameof(int01) + "<", 1), RichLabel("<1")] public string int01EnableLt1;
         [EnableIf(nameof(int01) + "<=", 1), RichLabel("<=1")] public string int01EnableLe1;
+        // ReSharper disable once InconsistentNaming
         [EnableIf(nameof(int01) + "!=", 1), RichLabel("!=1")] public string int01EnableNE1;
 
         [EnableIf("!" + nameof(int01), 1), RichLabel("! ==1")] public string int01EnableN1;
@@ -20,6 +20,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue40
         [EnableIf("!" + nameof(int01) + ">=", 1), RichLabel("! >=1")] public string int01EnableNGe1;
         [EnableIf("!" + nameof(int01) + "<", 1), RichLabel("! <1")] public string int01EnableNLt1;
         [EnableIf("!" + nameof(int01) + "<=", 1), RichLabel("! <=1")] public string int01EnableNLe1;
+        // ReSharper disable once InconsistentNaming
         [EnableIf("!" + nameof(int01) + "!=", 1), RichLabel("! !=1")] public string int01EnableNNE1;
 
         [Space]
@@ -30,6 +31,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue40
         [EnableIf(nameof(int01) + ">=$", nameof(int02)), RichLabel(">=$")] public string int01EnableGe1Callback;
         [EnableIf(nameof(int01) + "<$", nameof(int02)), RichLabel("<$")] public string int01EnableLt1Callback;
         [EnableIf(nameof(int01) + "<=$", nameof(int02)), RichLabel("<=$")] public string int01EnableLe1Callback;
+        // ReSharper disable once InconsistentNaming
         [EnableIf(nameof(int01) + "!=$", nameof(int02)), RichLabel("!=$")] public string int01EnableNE1Callback;
 
         [EnableIf("!" + nameof(int01) + "==$", nameof(int02)), RichLabel("! ==$")] public string int01EnableN1Callback;
@@ -37,6 +39,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue40
         [EnableIf("!" + nameof(int01) + ">=$", nameof(int02)), RichLabel("! >=$")] public string int01EnableNGe1Callback;
         [EnableIf("!" + nameof(int01) + "<$", nameof(int02)), RichLabel("! <&")] public string int01EnableNLt1Callback;
         [EnableIf("!" + nameof(int01) + "<=$", nameof(int02)), RichLabel("! <=$")] public string int01EnableNLe1Callback;
+        // ReSharper disable once InconsistentNaming
         [EnableIf("!" + nameof(int01) + "!=$", nameof(int02)), RichLabel("! !=$")] public string int01EnableNNE1Callback;
 
         public bool boolValue;
@@ -53,11 +56,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue40
         }
 
         [Space]
-        [EnumFlags]
+        [EnumToggleButtons]
         public EnumF enumF;
 
         [EnableIf(nameof(enumF), EnumF.A), RichLabel("hasFlag(A)")] public string enumFEnableA;
         [EnableIf(nameof(enumF), EnumF.B), RichLabel("hasFlag(B)")] public string enumFEnableB;
+        // ReSharper disable once InconsistentNaming
         [EnableIf(nameof(enumF), EnumF.A | EnumF.B), RichLabel("hasFlag(A | B)")] public string enumFEnableAB;
 
         [Serializable]

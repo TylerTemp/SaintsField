@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
@@ -7,16 +7,15 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field)]
-    public class EnumFlagsAttribute: PropertyAttribute, ISaintsAttribute
+    public class EnumFlagsAttribute: EnumToggleButtonsAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string GroupBy => "";
-
-        public readonly bool DefaultExpanded;
-
-        public EnumFlagsAttribute(bool defaultExpanded=false)
+        public EnumFlagsAttribute() : base()
         {
-            DefaultExpanded = defaultExpanded;
+        }
+
+        [Obsolete("Use [DefaultExpand] instead")]
+        public EnumFlagsAttribute(bool defaultExpanded) : base(defaultExpanded)
+        {
         }
     }
 }

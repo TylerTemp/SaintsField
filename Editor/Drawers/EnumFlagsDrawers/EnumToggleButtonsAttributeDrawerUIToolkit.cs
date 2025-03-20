@@ -14,9 +14,8 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
-    public partial class EnumFlagsAttributeDrawer
+    public partial class EnumToggleButtonsAttributeDrawer
     {
-
         public class EnumFlagsField : BaseField<Enum>
         {
             public EnumFlagsField(string label, VisualElement visualInput) : base(label, visualInput)
@@ -343,21 +342,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return fieldContainer;
         }
 
-        private static IEnumerable<KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo>> GetDisplayBit(EnumFlagsMetaInfo metaInfo)
-        {
-            if (metaInfo.HasFlags)
-            {
-                return metaInfo.BitValueToName
-                    .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt);
-
-            }
-            return metaInfo.BitValueToName;
-        }
-
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            EnumFlagsAttribute enumFlagsAttribute = (EnumFlagsAttribute) saintsAttribute;
+            EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute) saintsAttribute;
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
 
             Button toggleButton = container.Q<Button>(name: NameToggleButton(property));
@@ -449,7 +437,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 .ToList();
             VisualElement belowAllElement = container.Q<VisualElement>(name: NameBelowAll(property));
             Button foldoutButton = container.Q<Button>(name: NameFoldout(property));
-            bool curExpanded = enumFlagsAttribute.DefaultExpanded || property.isExpanded;
+            bool curExpanded = property.isExpanded;
             if (property.isExpanded != curExpanded)
             {
                 property.isExpanded = curExpanded;

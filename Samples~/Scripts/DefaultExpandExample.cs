@@ -37,6 +37,6 @@ namespace SaintsField.Samples.Scripts
             Mask5 = 1 << 4,
         }
 
-        [DefaultExpand, EnumFlags] public BitMask mask;
+        [DefaultExpand, EnumToggleButtons] public BitMask mask;
     }
 }

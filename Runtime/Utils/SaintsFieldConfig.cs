@@ -66,19 +66,19 @@ namespace SaintsField.Utils
 
         // [Space]
 
-        [EnumFlags(true)] public EXP getComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumFlags(true)] public EXP getComponentInChildrenExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumFlags(true)] public EXP getComponentInParentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumFlags(true)] public EXP getComponentInParentsExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumFlags(true)] public EXP getComponentInSceneExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumFlags(true)] public EXP getPrefabWithComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumFlags(true)] public EXP getScriptableObjectExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumFlags(true)] public EXP getByXPathExp = EXP.None;
+        [EnumToggleButtons, DefaultExpand] public EXP getComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP getComponentInChildrenExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP getComponentInParentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP getComponentInParentsExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP getComponentInSceneExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP getPrefabWithComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP getScriptableObjectExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP getByXPathExp = EXP.None;
 
         [LayoutStart("./Deprecated", ELayout.CollapseBox)]
         [InfoBox("Deprecated", EMessageType.Warning)]
-        [EnumFlags(true)] public EXP getComponentByPathExp = EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker;
+        [EnumToggleButtons, DefaultExpand] public EXP getComponentByPathExp = EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker;
         [InfoBox("Deprecated", EMessageType.Warning)]
-        [EnumFlags(true)] public EXP findComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, DefaultExpand] public EXP findComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
     }
 }

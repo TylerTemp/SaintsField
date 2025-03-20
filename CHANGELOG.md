@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.36.6 ##
+
+1.  `EnumButtons` now allow to quick select an enum if it's not a flag. [#139](https://github.com/TylerTemp/SaintsField/issues/139)
+2.  Change `EnumFlags` as an alias of `EnumButtons`
+3.  UI Toolkit: fix an issue when editing a valued-type key for a dictionary type using `ShowInInspector`
+
 ## 3.36.5 ##
 
 1.  UI Toolkit: `ShowInInspector` can now edit a dictionary

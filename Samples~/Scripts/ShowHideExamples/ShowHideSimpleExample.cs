@@ -44,7 +44,7 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
             Flag1And3 = Flag1 | Flag3,
         }
 
-        [EnumFlags]
+        [EnumToggleButtons]
         public EnumFlag enumFlag;
 
         [ShowIf(nameof(enumFlag), EnumFlag.Flag1 | EnumFlag.Flag3)] public string flag1Show;

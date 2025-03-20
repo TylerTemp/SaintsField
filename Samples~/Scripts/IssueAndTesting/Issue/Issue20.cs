@@ -6,6 +6,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
     public class Issue20 : MonoBehaviour
     {
         [Flags]
+        // ReSharper disable InconsistentNaming
         public enum Bldg_DestructState
         {
             NONE = 0,
@@ -14,13 +15,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             ADJ_LEFT = 16, ADJ_RIGHT = 32,
             FOUR = TOP_LEFT | TOP_RIGHT | BOT_LEFT | BOT_RIGHT,
         }
+        // ReSharper restore InconsistentNaming
 
         [BelowRichLabel(nameof(wrapped), true)]
-        [EnumFlags] public Bldg_DestructState wrapped;
+        [EnumToggleButtons] public Bldg_DestructState wrapped;
         [BelowRichLabel(nameof(original), true)]
         public Bldg_DestructState original;
 
-        [EnumFlags(defaultExpanded: false)] public Bldg_DestructState autoDefaultNoExpand;
-        [EnumFlags(defaultExpanded: true)] public Bldg_DestructState autoDefaultExpanded;
+        [EnumToggleButtons] public Bldg_DestructState autoDefaultNoExpand;
+        [EnumToggleButtons, DefaultExpand] public Bldg_DestructState autoDefaultExpanded;
     }
 }
