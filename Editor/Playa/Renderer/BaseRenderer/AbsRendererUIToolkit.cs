@@ -1153,6 +1153,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             Type dictionaryInterface = typeof(IDictionary<,>);
             Type readonlyDictionaryInterface = typeof(IReadOnlyDictionary<,>);
+            // ReSharper disable once NotAccessedVariable
             Type[] dictionaryArgTypes = null;
             bool isNormalDictionary = false;
             bool isReadonlyDictionary = false;
@@ -1168,6 +1169,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     if (genType == dictionaryInterface)
                     {
                         isNormalDictionary = true;
+                        // ReSharper disable once RedundantAssignment
                         dictionaryArgTypes = normType.GetGenericArguments();
                         break;
                     }
@@ -1175,6 +1177,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     if (genType == readonlyDictionaryInterface)
                     {
                         isReadonlyDictionary = true;
+                        // ReSharper disable once RedundantAssignment
                         dictionaryArgTypes = normType.GetGenericArguments();
                         // break;
                     }
@@ -1187,7 +1190,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 bool isReadOnly = !isNormalDictionary;
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
                 return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull);
-#else
+#else  // WTF Unity, backport it!
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
 
@@ -1203,6 +1206,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 foreach ((object kvPair, int index) in kvPairs.WithIndex())
                 {
+                    string kvContainerName = $"kv-{index}";
+                    VisualElement kvContainerOldElement = oldElement?.Q<VisualElement>(name: kvContainerName);
+                    bool hasOldContainer = kvContainerOldElement != null;
+                    VisualElement kvContainer = hasOldContainer ? kvContainerOldElement : null;
+
                     Type kvPairType = kvPair.GetType();
                     PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
                     if (keyProp == null)
@@ -1218,17 +1226,48 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
 
                     object dictKey = keyProp.GetValue(kvPair);
-                    object dictValue = valueProp.GetValue(kvPair);
-                    foldout.Add(UIToolkitLayout(dictKey, $"{dictKey} <color=#808080ff>(Key {index})</color>"));
-                    VisualElement valueContainer = new VisualElement
+                    string keyElemName = $"key-{index}";
+                    VisualElement oldKeyElement = kvContainer?.Q<VisualElement>(name: keyElemName);
+                    VisualElement newKeyElement = UIToolkitValueEdit(
+                        oldKeyElement,
+                        $"{dictKey} <color=#808080ff>(Key {index})</color>",
+                        keyProp.PropertyType,
+                        dictKey,
+                        null,
+                        null
+                    );
+                    if (newKeyElement != null)
                     {
-                        style =
-                        {
-                            paddingLeft = SaintsPropertyDrawer.IndentWidth,
-                        },
-                    };
-                    valueContainer.Add(UIToolkitLayout(dictValue, $"{dictValue} <color=#808080ff>(Value {index})</color>"));
-                    foldout.Add(valueContainer);
+                        newKeyElement.name = keyElemName;
+                        foldout.Add(newKeyElement);
+                    }
+
+                    string valueContainerName = $"value-container-{index}";
+                    VisualElement oldValueContainer = kvContainer?.Q<VisualElement>(name: valueContainerName);
+                    object dictValue = valueProp.GetValue(kvPair);
+                    VisualElement newValueContainer = UIToolkitValueEdit(
+                        oldValueContainer,
+                        $"{dictValue} <color=#808080ff>(Value {index})</color>",
+                        valueProp.PropertyType,
+                        dictValue,
+                        null,
+                        null
+                    );
+                    if (newValueContainer != null)
+                    {
+                        newValueContainer.name = valueContainerName;
+                        newValueContainer.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
+                        foldout.Add(newValueContainer);
+                    }
+                    // VisualElement valueContainer = new VisualElement
+                    // {
+                    //     style =
+                    //     {
+                    //         paddingLeft = SaintsPropertyDrawer.IndentWidth,
+                    //     },
+                    // };
+                    // valueContainer.Add(UIToolkitLayout(dictValue, $"{dictValue} <color=#808080ff>(Value {index})</color>"));
+                    // foldout.Add(valueContainer);
                 }
 
                 return foldout;
