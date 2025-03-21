@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            for (var i = 0; i < preCheckInternalInfos.Count; i++)
+            for (int i = 0; i < preCheckInternalInfos.Count; i++)
             {
                 preCheckInternalInfos[i] = SaintsEditorUtils.FillResult(preCheckInternalInfos[i]);
             }

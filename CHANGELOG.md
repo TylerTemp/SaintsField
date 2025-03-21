@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.36.8 ##
+
+1.  UI Toolkit: Add copy/paste ability to `ResizableTextArea`
+2.  UI Toolkit: Add copy/paste ability to `PropRange`
+3.  UI Toolkit: Add copy/paste ability to `Layer`. `Layer` now gives an error if the layer is not a valid value in project
+4.  Add auto validator ability to `Layer`
+
 ## 3.36.7 ##
 
 1.  UI Toolkit: `Button` with parameters now support interface, class, struct type

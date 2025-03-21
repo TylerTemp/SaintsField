@@ -4,13 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if SAINTSFIELD_NEWTONSOFT_JSON
+// using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+#endif
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer
 {
@@ -23,6 +26,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
         }
 
+        private static string NamePropRange(SerializedProperty property) => $"{property.propertyPath}__PropRange";
         private static string NameSlider(SerializedProperty property) => $"{property.propertyPath}__PropRange_Slider";
 
         private static string NameInteger(SerializedProperty property) =>
@@ -87,7 +91,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 });
             }
 
-            PropRangeField propRangeField = new PropRangeField(preferredLabel, root);
+            PropRangeField propRangeField = new PropRangeField(preferredLabel, root)
+            {
+                name = NamePropRange(property),
+            };
 
             propRangeField.AddToClassList(ClassAllowDisable);
             propRangeField.labelElement.style.overflow = Overflow.Hidden;
@@ -122,7 +129,85 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
 
-            Slider slider = container.Q<Slider>(NameSlider(property));
+            PropRangeField propRangeField = container.Q<PropRangeField>(name: NamePropRange(property));
+            propRangeField.labelElement.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
+#if SAINTSFIELD_NEWTONSOFT_JSON
+                evt.menu.AppendSeparator();
+                evt.menu.AppendAction("Copy", _ =>
+                {
+                    string content;
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                    if (property.propertyType == SerializedPropertyType.Integer)
+                    {
+                        content = ClipboardUtils.CopyGenericType(property.intValue);
+                    }
+                    else
+                    {
+                        content = ClipboardUtils.CopyGenericType(property.floatValue);
+                    }
+                    EditorGUIUtility.systemCopyBuffer = content;
+                });
+
+                JToken jtoken;
+                try
+                {
+                    jtoken = JToken.Parse(EditorGUIUtility.systemCopyBuffer);
+                }
+                catch (Exception)
+                {
+                    evt.menu.AppendAction("Paste", _ => { }, DropdownMenuAction.Status.Disabled);
+                    return;
+                }
+
+                int intResult = 0;
+                float floatResult = 0;
+
+                // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+                switch (jtoken.Type)
+                {
+                    case JTokenType.Integer:
+                        intResult = jtoken.Value<int>();
+                        break;
+                    case JTokenType.Float:
+                        floatResult = jtoken.Value<float>();
+                        break;
+                    default:
+                        evt.menu.AppendAction("Paste", _ => { }, DropdownMenuAction.Status.Disabled);
+                        return;
+                }
+
+                evt.menu.AppendAction("Paste", _ =>
+                {
+                    if (property.propertyType == SerializedPropertyType.Integer)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.Log($"Pasted: {intResult}");
+#endif
+                        property.intValue = intResult;
+                    }
+                    else
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.Log($"Pasted: {floatResult}");
+#endif
+                        property.floatValue = floatResult;
+                    }
+                    property.serializedObject.ApplyModifiedProperties();
+                    if (property.propertyType == SerializedPropertyType.Integer)
+                    {
+                        onValueChangedCallback.Invoke(intResult);
+                    }
+                    else
+                    {
+                        onValueChangedCallback.Invoke(floatResult);
+                    }
+                });
+#endif
+            }));
+
+            Slider slider = propRangeField.Q<Slider>(NameSlider(property));
 
             PropRangeAttribute propRangeAttribute = (PropRangeAttribute)saintsAttribute;
 

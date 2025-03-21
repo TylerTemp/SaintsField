@@ -81,10 +81,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.7**
+**3.36.8**
 
-1.  UI Toolkit: `Button` with parameters now support interface, class, struct type
-2.  Fix `SaintsDictionary` compile error in builds [PR #179](https://github.com/TylerTemp/SaintsField/pull/179) by [@Insprill](https://github.com/Insprill)
+1.  UI Toolkit: Add copy/paste ability to `ResizableTextArea`
+2.  UI Toolkit: Add copy/paste ability to `PropRange`
+3.  UI Toolkit: Add copy/paste ability to `Layer`. `Layer` now gives an error if the layer is not a valid value in project
+4.  Add auto validator ability to `Layer`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

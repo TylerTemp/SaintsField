@@ -18,6 +18,9 @@ namespace SaintsField.Samples.Scripts
         [PropRange(nameof(min), nameof(max), step: 2)] public int rangeIntStep;
 
         [Range(0, 10)] public int normalRange;
+        [Range(0, 10)] public float normalFloatRange;
+        [Range(0, 10)] public double normalDoubleRange;
+        [Range(0, 10)] public long normalLongRange;
 
         [Serializable]
         public struct MyRange

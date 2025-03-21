@@ -2343,6 +2343,9 @@ MonoBehaviour:
   rangeFloatStep: 14
   rangeIntStep: 20
   normalRange: 7
+  normalFloatRange: 0.73
+  normalDoubleRange: 6.75
+  normalLongRange: 0
   myRange:
     min: 0
     max: 37
@@ -10962,6 +10965,59 @@ MonoBehaviour:
   myDummyXPath: {fileID: 1271404094}
   myDummyTransXPath: {fileID: 1271404091}
   myDummyGoXPath: {fileID: 1271404088}
+--- !u!1 &764521261
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 764521262}
+  - component: {fileID: 764521263}
+  m_Layer: 0
+  m_Name: CopyPasteTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &764521262
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764521261}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &764521263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764521261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a01f32b96f151b4d9c2a0136de5f05f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boolV: 0
+  leftToggle: 0
+  sByteV: 30
+  byteV: 149
+  s: 149
+  res: 2.7
+  propR: 2.7
+  layerString: Default
+  layerInt: 5
 --- !u!1 &765557043
 GameObject:
   m_ObjectHideFlags: 0
@@ -18691,6 +18747,7 @@ Transform:
   - {fileID: 599819738}
   - {fileID: 897777686}
   - {fileID: 1208953266}
+  - {fileID: 764521262}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1494371783

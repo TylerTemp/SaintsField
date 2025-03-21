@@ -13,65 +13,57 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
 {
     public partial class ResizableTextAreaAttributeDrawer
     {
-        private static string NameLabelPlaceholder(SerializedProperty property) =>
-            $"{property.propertyPath}__ResizableTextArea_LabelPlaceholder";
+        private class ResizableTextArea: BaseField<string>
+        {
+            public readonly TextField TextField;
 
-        private static string NameTextArea(SerializedProperty property) =>
-            $"{property.propertyPath}__ResizableTextArea";
+            public ResizableTextArea(string label, TextField visualInput) : base(label, visualInput)
+            {
+                TextField = visualInput;
+            }
+        }
+
+        // private static string NameLabelPlaceholder(SerializedProperty property) =>
+        //     $"{property.propertyPath}__ResizableTextArea_LabelPlaceholder";
+
+        private static string NameResiable(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea";
+        // private static string NameTextArea(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement root = new VisualElement();
-            root.Add(new Label(preferredLabel)
-            {
-                name = NameLabelPlaceholder(property),
-                style =
-                {
-                    height = SingleLineHeight,
-                    paddingLeft = 4,
-                },
-                pickingMode = PickingMode.Ignore,
-            });
-
             const float singleLineHeight = 47 / 3f;
 
-            root.Add(new TextField
+            TextField textField = new TextField
             {
                 value = property.stringValue,
-                name = NameTextArea(property),
+                // name = NameTextArea(property),
                 multiline = true,
                 style =
                 {
                     whiteSpace = WhiteSpace.Normal,
                     minHeight = singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow(),
                 },
-            });
+            };
 
-            root.AddToClassList(ClassAllowDisable);
-
-            return root;
-            // return new TextField(property.displayName)
-            // {
-            //     value = property.stringValue,
-            //     name = NameTextArea(property),
-            //     multiline = true,
-            //     style =
-            //     {
-            //         whiteSpace = WhiteSpace.Normal,
-            //         minHeight = 47,
-            //     },
-            // };
+            return new ResizableTextArea(preferredLabel, textField)
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Column,
+                },
+                name = NameResiable(property),
+            };
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            TextField textArea = container.Q<TextField>(name: NameTextArea(property));
-            textArea.RegisterValueChangedCallback(changed =>
+            ResizableTextArea resizableTextArea = container.Q<ResizableTextArea>(name: NameResiable(property));
+            resizableTextArea.TextField.RegisterValueChangedCallback(changed =>
             {
                 property.stringValue = changed.newValue;
                 property.serializedObject.ApplyModifiedProperties();
@@ -79,13 +71,35 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 onValueChangedCallback?.Invoke(changed.newValue);
             });
 
-            textArea.TrackPropertyValue(property, newProp =>
+            resizableTextArea.TextField.TrackPropertyValue(property, newProp =>
             {
-                if (textArea.value != newProp.stringValue)
+                if (resizableTextArea.value != newProp.stringValue)
                 {
-                    textArea.SetValueWithoutNotify(newProp.stringValue);
+                    resizableTextArea.TextField.SetValueWithoutNotify(newProp.stringValue);
                 }
             });
+
+            resizableTextArea.labelElement.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
+                evt.menu.AppendSeparator();
+                evt.menu.AppendAction("Copy", _ => EditorGUIUtility.systemCopyBuffer = property.stringValue);
+                evt.menu.AppendAction("Paste", _ =>
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.Log($"Pasted: {EditorGUIUtility.systemCopyBuffer}");
+#endif
+                    property.stringValue = EditorGUIUtility.systemCopyBuffer;
+                    property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback.Invoke(property.stringValue);
+                });
+                evt.menu.AppendAction("Clear", _ =>
+                {
+                    property.stringValue = string.Empty;
+                    property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback.Invoke(property.stringValue);
+                });
+            }));
         }
 
     }
