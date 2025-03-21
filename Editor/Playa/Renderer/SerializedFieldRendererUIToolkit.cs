@@ -9,9 +9,6 @@ namespace SaintsField.Editor.Playa.Renderer
         private PropertyField _result;
 
         private VisualElement _fieldElement;
-        // private bool _arraySizeCondition;
-        // private bool _richLabelCondition;
-
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
             VisualElement result = new PropertyField(FieldWithInfo.SerializedProperty)
@@ -23,6 +20,25 @@ namespace SaintsField.Editor.Playa.Renderer
                 name = FieldWithInfo.SerializedProperty.propertyPath,
             };
             return (result, false);
+
+            #region Don't Delete
+            // On Hold, cuz SaintsPropertyDraw does not support copy/paste yet. Should fix that first
+            // if(ReflectCache.GetCustomAttributes<ISaintsAttribute>(FieldWithInfo.FieldInfo).Any())
+            // {
+            //     VisualElement result = new PropertyField(FieldWithInfo.SerializedProperty)
+            //     {
+            //         style =
+            //         {
+            //             flexGrow = 1,
+            //         },
+            //         name = FieldWithInfo.SerializedProperty.propertyPath,
+            //     };
+            //     return (result, false);
+            // }
+            //
+            // SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(SaintsPropertyDrawer), FieldWithInfo.FieldInfo, null, FieldWithInfo.SerializedProperty.displayName);
+            // return (saintsPropertyDrawer.CreatePropertyGUI(FieldWithInfo.SerializedProperty), false);
+            #endregion
         }
     }
 }

@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Core
     // above
     // pre, label, field, post
     // below-
-    public abstract partial class SaintsPropertyDrawer: PropertyDrawer, IDisposable
+    public partial class SaintsPropertyDrawer: PropertyDrawer, IDisposable
     {
         protected const int LabelLeftSpace = 4;
         protected const int LabelBaseWidth = 120;
@@ -475,7 +475,7 @@ namespace SaintsField.Editor.Core
             return FindTypeDrawer(baseType, false);
         }
 
-        protected static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo, Attribute attribute)
+        public static PropertyDrawer MakePropertyDrawer(Type foundDrawer, FieldInfo fieldInfo, Attribute attribute, string preferredLabel)
         {
             PropertyDrawer propertyDrawer;
             try
@@ -502,6 +502,14 @@ namespace SaintsField.Editor.Core
             }
 
             mAttributeField.SetValue(propertyDrawer, attribute);
+
+            FieldInfo preferredLabelField = foundDrawer.GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (preferredLabelField != null)
+            {
+                // Debug.Log($"preferredLabelField={preferredLabelField}");
+                preferredLabelField.SetValue(propertyDrawer, preferredLabel);
+            }
+
             return propertyDrawer;
         }
 

@@ -5,13 +5,11 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class LayoutHLabel : SaintsMonoBehaviour
     {
-        // [LayoutStart("H", ELayout.Horizontal | ELayout.TitleBox)]
-        //
         public string f1;
-        // public string f2;
-        // // public string f3;
-        // //
-        // [LayoutStart("C", ELayout.Horizontal | ELayout.TitleBox)]
+
+        [InfoBox("Test Info")]
+        public string f2;
+
         [PropRange(0, 10)] public int pRange;
 
         [Serializable]
@@ -23,5 +21,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         [EnumToggleButtons] public MyEnum myEnum;
+
+        [Serializable]
+        public struct MyStruct
+        {
+            public string myString;
+        }
+
+        public MyStruct myStruct;
     }
 }

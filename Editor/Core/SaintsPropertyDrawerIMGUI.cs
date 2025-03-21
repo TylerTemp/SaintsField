@@ -140,7 +140,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return GetPropertyHeightFallback(property, label, fieldInfo);
+                return GetPropertyHeightFallback(property, label, fieldInfo, preferredLabel);
             }
 
             if (SubGetHeightCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property),
@@ -148,7 +148,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"Sub GetHeight GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return GetPropertyHeightFallback(property, label, fieldInfo);
+                return GetPropertyHeightFallback(property, label, fieldInfo, preferredLabel);
             }
 
             (PropertyAttribute[] allAttributes, object parent) =
@@ -259,7 +259,7 @@ namespace SaintsField.Editor.Core
             }
             else
             {
-                fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo);
+                fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo, preferredLabel);
             }
 
             // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
@@ -316,7 +316,7 @@ namespace SaintsField.Editor.Core
         }
 
         private static float GetPropertyHeightFallback(SerializedProperty property, GUIContent label,
-            FieldInfo fieldInfo)
+            FieldInfo fieldInfo, string preferredLabel)
         {
             (Attribute _, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
             if (attributeDrawerType == null)
@@ -325,7 +325,7 @@ namespace SaintsField.Editor.Core
                 if (drawerType != null)
                 {
                     // type drawer has no attribute
-                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo, null);
+                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo, null, preferredLabel);
                     if (drawerInstance != null)
                     {
                         return drawerInstance.GetPropertyHeight(property, label);
@@ -406,7 +406,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
                 // EditorGUI.PropertyField(position, property, label, true);
-                UnityDraw(position, property, label, fieldInfo);
+                UnityDraw(position, property, label, fieldInfo, preferredLabel);
                 return;
             }
 
@@ -1200,7 +1200,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"use unity draw: {property.propertyType}");
 #endif
-            UnityDraw(position, property, label, info);
+            UnityDraw(position, property, label, info, preferredLabel);
 
             // EditorGUI.PropertyField(position, property, GUIContent.none, true);
             // if (property.propertyType == SerializedPropertyType.Generic)
@@ -1213,7 +1213,7 @@ namespace SaintsField.Editor.Core
             // }
         }
 
-        private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo)
+        private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo, string preferredLabel)
         {
             // Wait... it works now?
             (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
@@ -1223,7 +1223,7 @@ namespace SaintsField.Editor.Core
                 if (drawerType != null)
                 {
                     // type drawer has no attribute
-                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo, null);
+                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo, null, preferredLabel);
                     if (drawerInstance != null)
                     {
                         // drawerInstance.GetPropertyHeight(property, label);
@@ -1234,7 +1234,7 @@ namespace SaintsField.Editor.Core
             }
 
 
-            PropertyDrawer propertyDrawerInstance = MakePropertyDrawer(attributeDrawerType, fieldInfo, attributeInstance);
+            PropertyDrawer propertyDrawerInstance = MakePropertyDrawer(attributeDrawerType, fieldInfo, attributeInstance, preferredLabel);
             if (propertyDrawerInstance != null)
             {
                 propertyDrawerInstance.OnGUI(position, property, label);

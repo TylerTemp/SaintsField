@@ -40,6 +40,8 @@ namespace SaintsField.Editor.Core
 
         protected virtual bool UseCreateFieldUIToolKit => false;
 
+        public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
+
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -77,6 +79,19 @@ namespace SaintsField.Editor.Core
                     Index = each.index,
                 })
                 .ToList();
+
+            if (AppendSaintsAttributeDrawer != null)
+            {
+                foreach ((ISaintsAttribute appendAttr, SaintsPropertyDrawer appendDrawer) in AppendSaintsAttributeDrawer)
+                {
+                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    {
+                        Drawer = appendDrawer,
+                        Attribute = appendAttr,
+                        Index = saintsPropertyDrawers.Count,
+                    });
+                }
+            }
 
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
             if (string.IsNullOrEmpty(preferredLabel))
@@ -277,7 +292,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                     Debug.Log("fallback field drawer");
 #endif
-                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement,
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, preferredLabel,
                         allAttributes, saintsPropertyDrawers, parent);
                     fallback.AddToClassList(ClassFieldUIToolkit(property));
                     fieldContainer.Add(fallback);
@@ -452,7 +467,7 @@ namespace SaintsField.Editor.Core
         //     _saintsPropertyInfoInjects.Add(func);
         // }
 
-        private static VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
+        private static VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string preferredLabel, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
@@ -465,28 +480,32 @@ namespace SaintsField.Editor.Core
             Type foundDrawer = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType) : info.FieldType);
             // Debug.LogWarning(foundDrawer);
 
-            if (foundDrawer == null)
+            // ReSharper disable once InvertIf
+            if (foundDrawer != null)
             {
-                return PropertyFieldFallbackUIToolkit(property);
+                PropertyDrawer typeDrawer = MakePropertyDrawer(foundDrawer, info, null, preferredLabel);
+
+                VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, allAttributes,
+                    saintsPropertyDrawers, containerElement, parent);
+                // return element ?? PropertyFieldFallbackUIToolkit(property);
+                return element ?? PropertyFieldFallbackUIToolkit(property);
             }
 
             // Debug.Log($"PropertyFieldFallbackUIToolkit on foundDrawer={foundDrawer}: {property.displayName}");
             // return PropertyFieldFallbackUIToolkit(property);
-            // var draw = new UnityEditorInternal.UnityEventDrawer();
 
-            PropertyDrawer typeDrawer = MakePropertyDrawer(foundDrawer, info, null);
+            // On Hold... Cuz SaintsRow does not support copy/paste yet.
+            // check if it's general class/struct. If so, use SaintsRow to draw it.
+            // if (info.FieldType.IsClass || info.FieldType.IsValueType)
+            // {
+            //     PropertyDrawer saintsRowAttributeDrawer = MakePropertyDrawer(typeof(SaintsRowAttributeDrawer),
+            //         info, new SaintsRowAttribute(), preferredLabel);
+            //     VisualElement saintsRowElement = saintsRowAttributeDrawer.CreatePropertyGUI(property);
+            //     return saintsRowElement;
+            //     // return PropertyFieldFallbackUIToolkit(property);
+            // }
 
-            // Unity should, but does not, set the preferred label which is required by UnityEvent drawer to display the label
-            FieldInfo preferredLabelField = foundDrawer.GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (preferredLabelField != null)
-            {
-                // Debug.Log($"preferredLabelField={preferredLabelField}");
-                preferredLabelField.SetValue(typeDrawer, property.displayName);
-            }
-
-            VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, allAttributes, saintsPropertyDrawers, containerElement, parent);
-            // return element ?? PropertyFieldFallbackUIToolkit(property);
-            return element ?? PropertyFieldFallbackUIToolkit(property);
+            return PropertyFieldFallbackUIToolkit(property);
         }
 
         private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement, object parent)
@@ -663,6 +682,8 @@ namespace SaintsField.Editor.Core
                     }
                 }
 
+                // Debug.Log($"parentRoots.Count={parentRoots.Count}, saintsPropCount={saintsPropCount}");
+
                 // int saintsPropCount = allAttributes.TakeWhile(each =>
                 //     each is ISaintsAttribute
                 //     // || PropertyIsDecoratorDrawer(each)
@@ -678,7 +699,8 @@ namespace SaintsField.Editor.Core
 
                 // Debug.Log(parentRoots.Count);
 
-                if (parentRoots.Count != saintsPropCount)
+                if (saintsPropCount != 0 && parentRoots.Count != saintsPropCount)
+                // if (parentRoots.Count < saintsPropCount)
                     // if (parentRoots.Count != saintsPropertyDrawers.Count)
                 {
                     return;
@@ -721,11 +743,16 @@ namespace SaintsField.Editor.Core
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();
                 fallbackField.BindProperty(property);
-                bool isReference = false;
+
+                // ReSharper disable once ConvertToConstant.Local
+                bool isReference =
 #if UNITY_2021_3_OR_NEWER
-                // HashSet<string> trackedSubPropertyNames = new HashSet<string>();
-                isReference = property.propertyType == SerializedPropertyType.ManagedReference;
+                        false
+#else
+                        // HashSet<string> trackedSubPropertyNames = new HashSet<string>();
+                        property.propertyType == SerializedPropertyType.ManagedReference
 #endif
+                    ;
 
                 bool watch = !property.isArray ||
                              (property.isArray && !SaintsFieldConfigUtil.DisableOnValueChangedWatchArrayFieldUIToolkit());
@@ -748,6 +775,7 @@ namespace SaintsField.Editor.Core
 
                     VisualElement trackerMain = BindWatchUIToolkit(property, onValueChangedCallback, isReference,
                         fallbackField, fieldInfo, parent);
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (isReference || property.propertyType == SerializedPropertyType.Generic)
                     {
                         TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
