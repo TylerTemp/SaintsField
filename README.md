@@ -81,11 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.6**
+**3.36.7**
 
-1.  `EnumToggleButtons` now allow to quick select an enum if it's not a flag. [#139](https://github.com/TylerTemp/SaintsField/issues/139)
-2.  Change `EnumFlags` as an alias of `EnumToggleButtons`
-3.  UI Toolkit: fix an issue when editing a valued-type key for a dictionary type using `ShowInInspector`
+1.  UI Toolkit: `Button` with parameters now support interface, class, struct type
+2.  Fix `SaintsDictionary` compile error in builds [PR #179](https://github.com/TylerTemp/SaintsField/pull/179) by [@Insprill](https://github.com/Insprill)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

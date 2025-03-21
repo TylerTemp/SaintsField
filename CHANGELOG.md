@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.36.7 ##
+
+1.  UI Toolkit: `Button` with parameters now support interface, class, struct type
+2.  Fix `SaintsDictionary` compile error in builds [PR #179](https://github.com/TylerTemp/SaintsField/pull/179) by [@Insprill](https://github.com/Insprill)
+
 ## 3.36.6 ##
 
 1.  `EnumToggleButtons` now allow to quick select an enum if it's not a flag. [#139](https://github.com/TylerTemp/SaintsField/issues/139)
