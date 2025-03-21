@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownField = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownField = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownField.name = NameDropdownField(property);
             SetDropdownLabel(dropdownField.ButtonLabelElement, property.stringValue);
 

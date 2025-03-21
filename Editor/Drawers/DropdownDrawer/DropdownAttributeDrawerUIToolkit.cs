@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
             string buttonLabel = metaInfo.SelectedIndex == -1? "-": metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.style.flexGrow = 1;
             dropdownButton.ButtonLabelElement.text = buttonLabel;
             dropdownButton.name = NameDropdownButtonField(property);

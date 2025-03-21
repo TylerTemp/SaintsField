@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             AdvancedDropdownMetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false);
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButton(property);
             dropdownButton.userData = initMetaInfo.CurValues;

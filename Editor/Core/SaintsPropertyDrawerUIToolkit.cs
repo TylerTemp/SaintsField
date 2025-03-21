@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
@@ -76,6 +77,39 @@ namespace SaintsField.Editor.Core
                     Index = each.index,
                 })
                 .ToList();
+
+            // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
+            if (string.IsNullOrEmpty(preferredLabel))
+            {
+                NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
+
+                bool found = false;
+                for (int richLabelIndex = 0; richLabelIndex < saintsPropertyDrawers.Count; richLabelIndex++)
+                {
+                    SaintsPropertyDrawer eachDrawer = saintsPropertyDrawers[richLabelIndex].Drawer;
+                    if (eachDrawer is RichLabelAttributeDrawer)
+                    {
+                        found = true;
+                        saintsPropertyDrawers[richLabelIndex] = new SaintsPropertyInfo
+                        {
+                            Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
+                            Attribute = noLabelAttribute,
+                            Index = richLabelIndex,
+                        };
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    {
+                        Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
+                        Attribute = noLabelAttribute,
+                        Index = saintsPropertyDrawers.Count,
+                    });
+                }
+            }
 
             // for type drawer that is in SaintsField, use this to draw with a fake property attribute
             SaintsPropertyInfo fieldAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);

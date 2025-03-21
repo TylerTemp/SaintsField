@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
             // Debug.Log($"requiredValue={requiredValue}");
 
-            ObjectField objectField = new ObjectField(property.displayName)
+            ObjectField objectField = new ObjectField(preferredLabel)
             {
                 name = NameObjectField(property),
                 objectType = requiredComp,

@@ -123,7 +123,7 @@ namespace SaintsField.Editor.Drawers
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButtonField(property);
 

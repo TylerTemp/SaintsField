@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement();
-            root.Add(new Label(property.displayName)
+            root.Add(new Label(preferredLabel)
             {
                 name = NameLabelPlaceholder(property),
                 style =

@@ -74,13 +74,13 @@ namespace SaintsField.Editor.Drawers
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            TagField tagField = new TagField(property.displayName)
+            TagField tagField = new TagField(preferredLabel)
             {
                 value = property.stringValue,
                 name = NameTag(property),
             };
 
-            tagField.AddToClassList("unity-base-field__aligned");
+            tagField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
             tagField.AddToClassList(ClassAllowDisable);
 
             return tagField;

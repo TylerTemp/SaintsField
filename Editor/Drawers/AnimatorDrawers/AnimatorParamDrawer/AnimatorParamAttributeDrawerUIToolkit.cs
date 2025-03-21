@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
 
             UIToolkitUtils.DropdownButtonField dropdownButton =
-                UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+                UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.name = NameDropdownField(property);
             dropdownButton.userData = metaInfo;
 

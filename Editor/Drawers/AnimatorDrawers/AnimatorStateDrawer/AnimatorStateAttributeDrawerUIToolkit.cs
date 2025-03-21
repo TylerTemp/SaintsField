@@ -127,7 +127,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
             string buttonLabel = curIndex == -1 ? "-" : FormatStateLabel(metaInfo.AnimatorStates[curIndex], "/");
 
             UIToolkitUtils.DropdownButtonField dropdownButton =
-                UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+                UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.name = NameDropdownButton(property);
             dropdownButton.userData = metaInfo;
             dropdownButton.ButtonLabelElement.text = buttonLabel;

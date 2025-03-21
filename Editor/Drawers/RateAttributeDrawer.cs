@@ -274,7 +274,6 @@ namespace SaintsField.Editor.Drawers
             }
         }
 
-        private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Rate_Label";
         private static string ClassButton(SerializedProperty property) => $"{property.propertyPath}__Rate_Button";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -345,7 +344,7 @@ namespace SaintsField.Editor.Drawers
                 root.Add(MakeStarUIToolkit(property, option, min));
             }
 
-            RateField rateField = new RateField(property.displayName, root);
+            RateField rateField = new RateField(preferredLabel, root);
             rateField.labelElement.style.overflow = Overflow.Hidden;
             rateField.AddToClassList(ClassAllowDisable);
             rateField.AddToClassList("unity-base-field__aligned");

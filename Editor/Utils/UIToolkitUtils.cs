@@ -72,7 +72,7 @@ namespace SaintsField.Editor.Utils
         {
             // label.ClearClassList();
             label.RemoveFromClassList(BaseField<object>.alignedFieldUssClassName);
-            label.style.minWidth = 200;
+            // label.style.minWidth = 200;
 
             StyleLength autoLength = new StyleLength(StyleKeyword.Auto);
             StyleLength curLenght = label.style.width;
@@ -85,8 +85,8 @@ namespace SaintsField.Editor.Utils
                   || curLenght.value == 0)
                 && !float.IsNaN(resolvedWidth) && resolvedWidth > 0)
             {
-                // Debug.Log($"try fix {label.style.width}({curLenght.value.IsAuto()}); {resolvedWidth > 0} {resolvedWidth}");
                 label.style.width = autoLength;
+                label.style.minWidth = 0;
                 // label.schedule.Execute(() => label.style.width = autoLength);
             }
         }

@@ -593,7 +593,7 @@ namespace SaintsField.Editor.Drawers
                 });
             }
 
-            MinMaxSliderField minMaxSliderField = new MinMaxSliderField(property.displayName, root);
+            MinMaxSliderField minMaxSliderField = new MinMaxSliderField(preferredLabel, root);
             minMaxSliderField.labelElement.style.overflow = Overflow.Hidden;
             minMaxSliderField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
 

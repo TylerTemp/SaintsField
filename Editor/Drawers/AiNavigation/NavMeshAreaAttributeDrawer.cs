@@ -157,7 +157,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 ? "-"
                 : FormatAreaName(areas[areaIndex], valueType);
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButtonField(property);
             dropdownButton.ButtonLabelElement.text = buttonLabel;

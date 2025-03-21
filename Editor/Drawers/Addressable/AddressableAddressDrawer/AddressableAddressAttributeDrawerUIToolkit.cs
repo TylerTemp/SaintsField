@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButtonField =
-                UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+                UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButtonField.name = NameDropdownField(property);
             dropdownButtonField.userData = Array.Empty<string>();
             // ReSharper disable once MergeConditionalExpression

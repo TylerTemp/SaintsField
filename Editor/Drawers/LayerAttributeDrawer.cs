@@ -10,6 +10,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 #endif
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace SaintsField.Editor.Drawers
@@ -97,7 +98,7 @@ namespace SaintsField.Editor.Drawers
             {
                 name = NameLayer(property),
             };
-            layerField.AddToClassList("unity-base-field__aligned");
+            layerField.AddToClassList(BaseField<Object>.alignedFieldUssClassName);
             layerField.AddToClassList(ClassAllowDisable);
 
             return layerField;

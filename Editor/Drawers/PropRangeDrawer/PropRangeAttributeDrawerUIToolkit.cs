@@ -87,11 +87,11 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 });
             }
 
-            PropRangeField propRangeField = new PropRangeField(property.displayName, root);
+            PropRangeField propRangeField = new PropRangeField(preferredLabel, root);
 
             propRangeField.AddToClassList(ClassAllowDisable);
             propRangeField.labelElement.style.overflow = Overflow.Hidden;
-            propRangeField.AddToClassList("unity-base-field__aligned");
+            propRangeField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
 
             return propRangeField;
         }
@@ -259,6 +259,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             helpBox.TrackPropertyValue(property, _ => UpdateExternal());
             helpBox.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateExternal));
             SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateExternal);
+
             return;
 
             void UpdateExternal()

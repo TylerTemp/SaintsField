@@ -535,7 +535,7 @@ namespace SaintsField.Editor.Core
             return _cachedDrawer[saintsAttributeWithIndex] = GetOrCreateSaintsDrawerByAttr(saintsAttributeWithIndex.SaintsAttribute);
         }
 
-        private static SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(ISaintsAttribute saintsAttribute)
+        private SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(ISaintsAttribute saintsAttribute)
         {
             Type attributeType = saintsAttribute.GetType();
             if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
@@ -556,7 +556,16 @@ namespace SaintsField.Editor.Core
             }
 
             Type drawerType = eachDrawer.First(each => each.IsSaints).DrawerType;
-            return (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
+            SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
+
+            FieldInfo preferredLabelField = drawerType.GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (preferredLabelField != null)
+            {
+                // Debug.Log($"preferredLabelField={preferredLabelField}");
+                preferredLabelField.SetValue(saintsPropertyDrawer, preferredLabel);
+            }
+
+            return saintsPropertyDrawer;
         }
 
         public void Dispose()

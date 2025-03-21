@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.name = DropdownButtonName(property);
             dropdownButton.AddToClassList(ClassAllowDisable);
             return dropdownButton;

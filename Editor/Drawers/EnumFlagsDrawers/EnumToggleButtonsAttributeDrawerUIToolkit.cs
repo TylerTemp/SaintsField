@@ -216,7 +216,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 name = NameFillEmpty(property),
             });
 
-            EnumFlagsField enumFlagsField = new EnumFlagsField(property.displayName, fieldContainer);
+            // Debug.Log(preferredLabel);
+
+            EnumFlagsField enumFlagsField = new EnumFlagsField(preferredLabel, fieldContainer);
             enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
             // enumFlagsField.style.flexGrow = 1;
             enumFlagsField.AddToClassList(BaseField<object>.alignedFieldUssClassName);

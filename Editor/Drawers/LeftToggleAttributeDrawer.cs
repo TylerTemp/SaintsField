@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Drawers
             // // root.Add(label);
             //
             // return root;
-            Toggle toggle = new Toggle(property.displayName)
+            Toggle toggle = new Toggle(preferredLabel)
             {
                 name = NameLeftToggle(property),
                 style =

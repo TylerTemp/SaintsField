@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
             FieldInfo info, object parent)
         {
-            ObjectField objectField = new ObjectField(property.displayName)
+            ObjectField objectField = new ObjectField(preferredLabel)
             {
                 objectType = typeof(SceneAsset),
                 allowSceneObjects = false,

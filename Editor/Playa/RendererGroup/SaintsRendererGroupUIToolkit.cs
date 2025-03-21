@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
@@ -432,14 +431,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
             if (_eLayout.HasFlagFast(ELayout.Tab))
             {
                 // ReSharper disable once ConvertToLocalFunction
-                EventCallback<AttachToPanelEvent> switchOnAttack = null;
-                switchOnAttack = _ =>
+                EventCallback<AttachToPanelEvent> switchOnAttach = null;
+                switchOnAttach = _ =>
                 {
-                    root.UnregisterCallback(switchOnAttack);
+                    root.UnregisterCallback(switchOnAttach);
                     toolbarToggles[0].value = true;
                     if (foldoutToggle != null) foldoutToggle.value = _foldout;
                 };
-                root.RegisterCallback(switchOnAttack);
+                root.RegisterCallback(switchOnAttach);
             }
 
             float marginTop = _config.MarginTop > 0 ? _config.MarginTop : 2;

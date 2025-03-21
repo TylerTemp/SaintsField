@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         {
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(property.displayName);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButton(property);
             dropdownButton.userData = metaInfo;
