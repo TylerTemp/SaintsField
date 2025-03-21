@@ -30,8 +30,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Button]
         private void Paste()
         {
+#if UNITY_EDITOR
             Debug.Log(EditorGUIUtility.systemCopyBuffer);
             res = EditorGUIUtility.systemCopyBuffer;
+#endif
         }
     }
 }
