@@ -14,6 +14,8 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         // private VisualElement _fieldElement;
 
+        private static StyleSheet _ussClassSaintsFieldEditingDisabledHide;
+
         private string NameContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}";
         private string NameResult() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-result";
 

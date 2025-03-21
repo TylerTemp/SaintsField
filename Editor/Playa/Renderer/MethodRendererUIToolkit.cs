@@ -21,6 +21,8 @@ namespace SaintsField.Editor.Playa.Renderer
         private static string ButtonLabelContainerName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonLabelContainer";
         // private static string ButtonRotatorName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonLabelContainer";
 
+        private static StyleSheet _ussClassSaintsFieldEditingDisabledHide;
+
         private class ButtonUserData
         {
             public string Xml;
@@ -99,7 +101,11 @@ namespace SaintsField.Editor.Playa.Renderer
                         marginRight = 3,
                         paddingTop = 3,
                     },
+                    name = "saintsfield-button-params",
                 };
+
+                _ussClassSaintsFieldEditingDisabledHide ??= Util.LoadResource<StyleSheet>("UIToolkit/ClassSaintsFieldEditingDisabledHide.uss");
+                root.styleSheets.Add(_ussClassSaintsFieldEditingDisabledHide);
 
                 foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
                 {
