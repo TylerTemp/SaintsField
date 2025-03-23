@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             VisualElement container, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton =
-                UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
+                UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButtonField(property);
 

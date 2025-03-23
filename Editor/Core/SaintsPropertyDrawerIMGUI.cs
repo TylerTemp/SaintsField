@@ -140,7 +140,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return GetPropertyHeightFallback(property, label, fieldInfo, preferredLabel);
+                return GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
             }
 
             if (SubGetHeightCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property),
@@ -148,7 +148,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"Sub GetHeight GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return GetPropertyHeightFallback(property, label, fieldInfo, preferredLabel);
+                return GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
             }
 
             (PropertyAttribute[] allAttributes, object parent) =
@@ -259,7 +259,7 @@ namespace SaintsField.Editor.Core
             }
             else
             {
-                fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo, preferredLabel);
+                fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
             }
 
             // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
@@ -406,7 +406,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
                 // EditorGUI.PropertyField(position, property, label, true);
-                UnityDraw(position, property, label, fieldInfo, preferredLabel);
+                UnityDraw(position, property, label, fieldInfo, GetPreferredLabel(property));
                 return;
             }
 
@@ -1200,7 +1200,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"use unity draw: {property.propertyType}");
 #endif
-            UnityDraw(position, property, label, info, preferredLabel);
+            UnityDraw(position, property, label, info, GetPreferredLabel(property));
 
             // EditorGUI.PropertyField(position, property, GUIContent.none, true);
             // if (property.propertyType == SerializedPropertyType.Generic)

@@ -566,14 +566,34 @@ namespace SaintsField.Editor.Core
             Type drawerType = eachDrawer.First(each => each.IsSaints).DrawerType;
             SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
 
+#if UNITY_2022_2_OR_NEWER  // don't bother with too old Unity
             FieldInfo preferredLabelField = drawerType.GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
             if (preferredLabelField != null)
             {
                 // Debug.Log($"preferredLabelField={preferredLabelField}");
-                preferredLabelField.SetValue(saintsPropertyDrawer, preferredLabel);
+                preferredLabelField.SetValue(saintsPropertyDrawer, preferredLabelField.GetValue(this));
             }
+#endif
 
             return saintsPropertyDrawer;
+        }
+
+        protected string GetPreferredLabel(SerializedProperty sp)
+        {
+#if UNITY_2022_3_OR_NEWER
+            return preferredLabel;
+#elif UNITY_2022_2_OR_NEWER  // Unity such a mess...
+            FieldInfo preferredLabelField = GetType().GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (preferredLabelField != null)
+            {
+                // Debug.Log($"preferredLabelField={preferredLabelField}");
+                return (string)preferredLabelField.GetValue(this);
+            }
+
+            return sp.displayName;
+#else
+            return sp.displayName;
+#endif
         }
 
         public void Dispose()

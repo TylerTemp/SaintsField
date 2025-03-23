@@ -95,7 +95,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             #endregion
 
-            ProgressBarField progressBarField = new ProgressBarField(preferredLabel, progressBar)
+            ProgressBarField progressBarField = new ProgressBarField(GetPreferredLabel(property), progressBar)
             {
                 name = NameProgressBar(property),
             };

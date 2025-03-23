@@ -64,7 +64,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             };
             VisualElement foldout = new Foldout
             {
-                text = preferredLabel,
+                text = GetPreferredLabel(property),
                 value = property.isExpanded,
                 name = NameFoldout(property),
             };

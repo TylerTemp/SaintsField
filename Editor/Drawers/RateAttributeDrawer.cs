@@ -344,10 +344,10 @@ namespace SaintsField.Editor.Drawers
                 root.Add(MakeStarUIToolkit(property, option, min));
             }
 
-            RateField rateField = new RateField(preferredLabel, root);
+            RateField rateField = new RateField(GetPreferredLabel(property), root);
             rateField.labelElement.style.overflow = Overflow.Hidden;
             rateField.AddToClassList(ClassAllowDisable);
-            rateField.AddToClassList("unity-base-field__aligned");
+            rateField.AddToClassList(RateField.alignedFieldUssClassName);
             return rateField;
         }
 

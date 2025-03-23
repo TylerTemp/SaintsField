@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 },
             };
 
-            return new ResizableTextArea(preferredLabel, textField)
+            return new ResizableTextArea(GetPreferredLabel(property), textField)
             {
                 style =
                 {

@@ -335,7 +335,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             Type requiredComp = fieldTypeAttribute.CompType;
             Object requiredValue = GetObjFromStr(property.stringValue, requiredComp, fieldTypeAttribute.EStr);
 
-            ObjectField objectField = new ObjectField(preferredLabel)
+            ObjectField objectField = new ObjectField(GetPreferredLabel(property))
             {
                 name = NameObjectField(property),
                 objectType = requiredComp,

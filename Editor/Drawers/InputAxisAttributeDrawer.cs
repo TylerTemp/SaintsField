@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Drawers
             int selectedIndex = IndexOf(axisNames, property.stringValue);
             string buttonLabel = selectedIndex == -1 ? "-" : axisNames[selectedIndex];
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(preferredLabel);
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButtonField(property);
             dropdownButton.ButtonLabelElement.text = buttonLabel;

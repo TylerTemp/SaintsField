@@ -91,7 +91,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 });
             }
 
-            PropRangeField propRangeField = new PropRangeField(preferredLabel, root)
+            PropRangeField propRangeField = new PropRangeField(GetPreferredLabel(property), root)
             {
                 name = NamePropRange(property),
             };

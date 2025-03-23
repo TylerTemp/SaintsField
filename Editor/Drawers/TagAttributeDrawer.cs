@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Drawers
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            TagField tagField = new TagField(preferredLabel)
+            TagField tagField = new TagField(GetPreferredLabel(property))
             {
                 value = property.stringValue,
                 name = NameTag(property),

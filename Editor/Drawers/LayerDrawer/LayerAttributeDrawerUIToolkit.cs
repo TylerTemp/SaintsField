@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 ? property.intValue
                 : LayerMask.NameToLayer(property.stringValue);
 
-            LayerField layerField = new LayerField(preferredLabel, curSelected)
+            LayerField layerField = new LayerField(GetPreferredLabel(property), curSelected)
             {
                 name = NameLayer(property),
             };

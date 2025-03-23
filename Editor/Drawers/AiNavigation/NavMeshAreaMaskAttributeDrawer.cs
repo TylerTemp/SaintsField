@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            MaskField maskField = new MaskField(preferredLabel)
+            MaskField maskField = new MaskField(GetPreferredLabel(property))
             {
                 userData = new List<AiNavigationUtils.NavMeshArea>(),
                 name = NameMaskField(property),

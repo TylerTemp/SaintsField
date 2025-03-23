@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers
             FieldInfo info, object parent)
         {
             CurveRangeAttribute curveRangeAttribute = (CurveRangeAttribute)saintsAttribute;
-            CurveField createFieldElement = new CurveField(preferredLabel)
+            CurveField createFieldElement = new CurveField(GetPreferredLabel(property))
             {
                 value = property.animationCurveValue,
                 ranges = GetRanges(curveRangeAttribute),
