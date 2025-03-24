@@ -473,12 +473,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return root;
         }
 
-        private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> toggleCheckInfos, VisualElement root, VisualElement body, object target)
+        private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledtoggleCheckInfos, VisualElement root, VisualElement body, object target)
         {
-            foreach (ToggleCheckInfo toggleCheckInfo in toggleCheckInfos)
-            {
-                SaintsEditorUtils.FillResult(toggleCheckInfo);
-            }
+            List<ToggleCheckInfo> toggleCheckInfos = notFilledtoggleCheckInfos
+                .Select(SaintsEditorUtils.FillResult)
+                .ToList();
 
             (bool show, bool disable) = SaintsEditorUtils.GetToggleResult(toggleCheckInfos);
 

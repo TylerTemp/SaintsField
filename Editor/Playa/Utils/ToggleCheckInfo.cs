@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SaintsField.Condition;
 
 namespace SaintsField.Editor.Playa.Utils
@@ -18,8 +19,8 @@ namespace SaintsField.Editor.Playa.Utils
             ConditionInfos = conditionInfos;
             Target = target;
 
-            Errors = null;
-            BoolResults = null;
+            Errors = Array.Empty<string>();
+            BoolResults = Array.Empty<bool>();
         }
 
         public ToggleCheckInfo(ToggleCheckInfo otherInfo, IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults)

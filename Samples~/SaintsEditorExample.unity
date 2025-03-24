@@ -1360,7 +1360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7679c7ceb2f84949873cc184e7f3768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  editableMain: 0
+  editableMain: 1
   visibleMain: 1
   editable1: 1
   visible1: 1
@@ -1603,6 +1603,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e430b0ffd69de6a43a4bad2f86ece40e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  f1: 
+  f2: 
+  pRange: 0
+  myEnum: 0
+  myStruct:
+    myString: 
 --- !u!1 &861579776
 GameObject:
   m_ObjectHideFlags: 0

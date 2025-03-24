@@ -106,7 +106,9 @@ namespace SaintsField.Editor.Playa.Utils
         public static (bool show, bool disable) GetToggleResult(List<ToggleCheckInfo> toggleCheckInfos)
         {
             if (!toggleCheckInfos.TrueForAll((each) => each.Errors.Count == 0))
+            {
                 return (true, false);
+            }
 
             List<bool> showResults = new List<bool>();
             // bool hide = false;
@@ -120,7 +122,9 @@ namespace SaintsField.Editor.Playa.Utils
             foreach (ToggleCheckInfo toggleCheckInfo in toggleCheckInfos)
             {
                 if (toggleCheckInfo.Errors.Count != 0)
+                {
                     continue;
+                }
 
                 switch (toggleCheckInfo.Type)
                 {
