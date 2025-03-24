@@ -6,6 +6,8 @@
 2.  UI Toolkit: Add copy/paste ability to `PropRange`
 3.  UI Toolkit: Add copy/paste ability to `Layer`. `Layer` now gives an error if the layer is not a valid value in project
 4.  Add auto validator ability to `Layer`
+5.  Fix `LayoutDisableIf`/`LayoutEnableIf`/`LayoutHideIf`/`LayoutShowIf` not working due to previous code changes
+6.  Fix `PreferredLabel` not set for some drawers, which protentially cause some label incorrect issue in previous versions
 
 ## 3.36.7 ##
 
