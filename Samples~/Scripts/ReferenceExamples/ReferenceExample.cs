@@ -31,6 +31,24 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
             public bool orange;
         }
 
+        [Serializable]
+        public class Orange2 : Base2Fruit
+        {
+            public bool orange2;
+        }
+
+        [Serializable]
+        public class Orange3 : Base2Fruit
+        {
+            public bool orange3;
+        }
+
+        [Serializable]
+        public class Orange4 : Base2Fruit
+        {
+            public bool orange4;
+        }
+
         [SerializeReference, ReferencePicker]
         public Base2Fruit item;
 
@@ -79,6 +97,8 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
 
         [SerializeReference, ReferencePicker]
         public IRefInterface myInterface;
+        [SerializeReference, ReferencePicker]
+        public IRefInterface[] myInterfaces;
 
         [ReadOnly]
         [SerializeReference, ReferencePicker]

@@ -1849,12 +1849,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myClasses:
-  - unique: 123
+  - unique: 31321
   - unique: 333
-  myInterfaces: []
+  myInterfaces:
+  - rid: 650996098112159754
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 650996098112159754
+      type: {class: Issue97/MyClass3, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        int2: 0
 --- !u!1 &943755158
 GameObject:
   m_ObjectHideFlags: 0

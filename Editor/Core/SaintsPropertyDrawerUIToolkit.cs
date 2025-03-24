@@ -471,13 +471,21 @@ namespace SaintsField.Editor.Core
         {
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            (Attribute _, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
+            (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
             if (attributeDrawerType != null)
             {
-                return PropertyFieldFallbackUIToolkit(property);
+                PropertyDrawer typeDrawer = MakePropertyDrawer(attributeDrawerType, info, attr, preferredLabel);
+                VisualElement element = DrawUsingDrawerInstance(attributeDrawerType, typeDrawer, property, info, allAttributes,
+                    saintsPropertyDrawers, containerElement, parent);
+                // return element ?? PropertyFieldFallbackUIToolkit(property);
+                return element;
+                // return PropertyFieldFallbackUIToolkit(property);
             }
 
-            Type foundDrawer = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType) : info.FieldType);
+            Type fieldElementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                ? ReflectUtils.GetElementType(info.FieldType)
+                : info.FieldType;
+            Type foundDrawer = FindTypeDrawerNonSaints(fieldElementType);
             // Debug.LogWarning(foundDrawer);
 
             // ReSharper disable once InvertIf
@@ -488,7 +496,7 @@ namespace SaintsField.Editor.Core
                 VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, allAttributes,
                     saintsPropertyDrawers, containerElement, parent);
                 // return element ?? PropertyFieldFallbackUIToolkit(property);
-                return element ?? PropertyFieldFallbackUIToolkit(property);
+                return element;
             }
 
             // Debug.Log($"PropertyFieldFallbackUIToolkit on foundDrawer={foundDrawer}: {property.displayName}");
@@ -505,7 +513,17 @@ namespace SaintsField.Editor.Core
             //     // return PropertyFieldFallbackUIToolkit(property);
             // }
 
-            return PropertyFieldFallbackUIToolkit(property);
+            {
+                Type saintsRowDrawer = typeof(SaintsRowAttributeDrawer);
+                PropertyDrawer typeDrawer = MakePropertyDrawer(saintsRowDrawer, info, null, preferredLabel);
+
+                VisualElement element = DrawUsingDrawerInstance(saintsRowDrawer, typeDrawer, property, info, allAttributes,
+                    saintsPropertyDrawers, containerElement, parent);
+                // return element ?? PropertyFieldFallbackUIToolkit(property);
+                return element;
+            }
+
+            // return PropertyFieldFallbackUIToolkit(property);
         }
 
         private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement, object parent)

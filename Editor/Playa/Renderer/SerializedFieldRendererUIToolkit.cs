@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Playa.Renderer
         private VisualElement _fieldElement;
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
-            VisualElement result = new PropertyField(FieldWithInfo.SerializedProperty)
+            PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
             {
                 style =
                 {
@@ -19,6 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 },
                 name = FieldWithInfo.SerializedProperty.propertyPath,
             };
+            result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             return (result, false);
 
             #region Don't Delete

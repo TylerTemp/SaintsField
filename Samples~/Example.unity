@@ -20305,23 +20305,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item:
-    rid: -2
+    rid: 650996098112159907
   structImpl:
     rid: -2
   myInterface:
     rid: -2
+  myInterfaces:
+  - rid: 650996098112159910
   myInterfaceDisabled:
-    rid: 650995934049599488
+    rid: 650996098112159908
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 650995934049599488
+    - rid: 650996098112159907
+      type: {class: ReferenceExample/Orange2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
+        base2: 0
+        orange2: 0
+    - rid: 650996098112159908
       type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:
         <TheInt>k__BackingField: 0
         sub2: 
+    - rid: 650996098112159910
+      type: {class: ReferenceExample/StructImpl, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        myStruct: 
 --- !u!1 &1639647309
 GameObject:
   m_ObjectHideFlags: 0
