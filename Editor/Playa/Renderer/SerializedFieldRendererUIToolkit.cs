@@ -22,22 +22,21 @@ namespace SaintsField.Editor.Playa.Renderer
             return (result, false);
 
             #region Don't Delete
-            // On Hold, cuz SaintsPropertyDraw does not support copy/paste yet. Should fix that first
-            // if(ReflectCache.GetCustomAttributes<ISaintsAttribute>(FieldWithInfo.FieldInfo).Any())
-            // {
-            //     VisualElement result = new PropertyField(FieldWithInfo.SerializedProperty)
-            //     {
-            //         style =
-            //         {
-            //             flexGrow = 1,
-            //         },
-            //         name = FieldWithInfo.SerializedProperty.propertyPath,
-            //     };
-            //     return (result, false);
-            // }
-            //
-            // SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(SaintsPropertyDrawer), FieldWithInfo.FieldInfo, null, FieldWithInfo.SerializedProperty.displayName);
+
+            // About letting SaintsPropertyDrawer fallback:
+            // SaintsPropertyDrawer relys on PropertyField to fallback. Directly hi-jiacking the drawer with SaintsPropertyDrawer
+            // the workflow will still get into the PropertyField flow, then SaintsField will fail to decide when the
+            // fallback should stop.
+
+            // ISaintsAttribute saintsAttr = ReflectCache.GetCustomAttributes<ISaintsAttribute>(FieldWithInfo.FieldInfo)
+            //     .FirstOrDefault();
+            // Type drawerType = saintsAttr != null
+            //     ? SaintsPropertyDrawer.GetSaintsDrawerTypeByAttr(saintsAttr)
+            //     : typeof(SaintsPropertyDrawer);
+            // SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer) SaintsPropertyDrawer.MakePropertyDrawer(drawerType, FieldWithInfo.FieldInfo, (Attribute)saintsAttr, FieldWithInfo.SerializedProperty.displayName);
+            // Debug.Log(saintsPropertyDrawer);
             // return (saintsPropertyDrawer.CreatePropertyGUI(FieldWithInfo.SerializedProperty), false);
+
             #endregion
         }
     }

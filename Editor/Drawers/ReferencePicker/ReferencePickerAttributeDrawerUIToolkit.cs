@@ -49,20 +49,17 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                     flexDirection = FlexDirection.Row,
                     // justifyContent = Justify.FlexEnd,
                     overflow = Overflow.Visible,
+                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown.png"),
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                 },
             };
-            button.Add(new Image
-            {
-                image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
-                scaleMode = ScaleMode.ScaleToFit,
-                style =
-                {
-                    maxWidth = 12,
-                    maxHeight = EditorGUIUtility.singleLineHeight,
-                    position = Position.Absolute,
-                    right = 4,
-                },
-            });
 
             object curValue = property.managedReferenceValue;
             string labelName = curValue == null
