@@ -1,9 +1,13 @@
-﻿#if UNITY_2021_3_OR_NEWER
+﻿
+using UnityEditor.UIElements;
+#if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using UnityEditor;
 using System;
 using System.Linq;
+using System.Reflection;
+using SaintsField.Editor.Playa;
 using UnityEngine;
 using UnityEngine.UIElements;
 #endif
@@ -328,6 +332,809 @@ namespace SaintsField.Editor.Utils
                 checkMark.style.unityBackgroundImageTintColor = color;
                 checkMark.parent.style.backgroundColor = StyleKeyword.Initial;
             }
+        }
+
+        // Basiclly the same idea from PropertyField
+        // Note: do NOT pass SerializedPropertyType.Generic type: process it externally.
+        public static VisualElement CreateOrUpdateFieldFromProperty(
+          SerializedProperty property,
+          Type rawType,
+          string label,
+          FieldInfo fieldInfo,
+          IMakeRenderer makeRenderer,
+          IDOTweenPlayRecorder doTweenPlayRecorder,
+          VisualElement originalField)
+        {
+            // TODO: Array
+            // if (property.isArray)
+            // {
+            //     if (originalField is ListView)
+            //     {
+            //         return null;
+            //     }
+            //
+            //
+            // }
+
+            SerializedPropertyType propertyType = property.propertyType;
+            switch (propertyType)
+            {
+                case SerializedPropertyType.Generic:
+                case SerializedPropertyType.ManagedReference:
+                {
+                    if (property.isArray)
+                    {
+                        ListView listView = originalField as ListView;
+                        bool listViewNotExist = listView == null;
+                        if (listViewNotExist)
+                        {
+                            listView = new ListView
+                            {
+                                showBorder = true,
+                                selectionType = SelectionType.Multiple,
+                                showAddRemoveFooter = true,
+                                showBoundCollectionSize = true,
+                                showFoldoutHeader = true,
+                                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                                showAlternatingRowBackgrounds = AlternatingRowBackground.None,
+                                reorderable = true,
+                                reorderMode = ListViewReorderMode.Animated,
+                            };
+
+                            // This won't work as itemsSourceSizeChanged is an internal event
+                            // listView.itemsSourceSizeChanged += () =>
+                            // {
+                            //     using (SerializedPropertyChangeEvent pooled = SerializedPropertyChangeEvent.GetPooled(property))
+                            //     {
+                            //         pooled.target = listView;
+                            //         listView.SendEvent(pooled);
+                            //     }
+                            // };
+
+                            int curSize = property.arraySize;
+                            listView.schedule.Execute(() =>
+                            {
+                                int newSize;
+                                try
+                                {
+                                    newSize = property.arraySize;
+                                }
+                                catch (ObjectDisposedException)
+                                {
+                                    return;
+                                }
+                                catch (NullReferenceException)
+                                {
+                                    return;
+                                }
+
+                                if (newSize == curSize)
+                                {
+                                    return;
+                                }
+
+                                curSize = newSize;
+                                // ReSharper disable once ConvertToUsingDeclaration
+                                using (SerializedPropertyChangeEvent pooled = SerializedPropertyChangeEvent.GetPooled(property))
+                                {
+                                    pooled.target = listView;
+                                    listView.SendEvent(pooled);
+                                }
+                            }).Every(100);
+                        }
+
+                        SerializedProperty serializedProperty = property.Copy();
+                        // string str = PropertyField.listViewNamePrefix + property.propertyPath;
+                        string str = "unity-list-" + property.propertyPath;
+                        listView.headerTitle = label;
+                        listView.userData = serializedProperty;
+                        listView.bindingPath = property.propertyPath;
+                        listView.viewDataKey = str;
+                        listView.name = str;
+
+                        // this is internal too...
+                        // listView.SetProperty((PropertyName) PropertyField.listViewBoundFieldProperty, (object) this);
+                        // Toggle toggle = listView.Q<Toggle>((string) null, Foldout.toggleUssClassName);
+                        // if (toggle != null)
+                        //     toggle.m_Clickable.acceptClicksIfDisabled = true;
+
+                        listView.BindProperty(property);
+
+                        return listViewNotExist ? listView : null;
+
+                    }
+                    if (originalField != null &&
+                        originalField.ClassListContains(SaintsRowAttributeDrawer.SaintsRowClass))
+                    {
+                        return null;
+                    }
+                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, null, makeRenderer, doTweenPlayRecorder);
+                }
+                    // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
+                case SerializedPropertyType.Integer:
+                {
+                    if (property.type == "long")
+                    {
+                        if (originalField is LongField longField)
+                        {
+                            longField.SetValueWithoutNotify(property.longValue);
+                            return null;
+                        }
+
+                        longField = new LongField(label)
+                        {
+                            value = property.longValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        longField.BindProperty(property);
+                        longField.AddToClassList(LongField.alignedFieldUssClassName);
+                        return longField;
+                    }
+
+                    if (property.type == "ulong")
+                    {
+                        if (originalField is UnsignedLongField unsignedLongField)
+                        {
+                            unsignedLongField.SetValueWithoutNotify(property.ulongValue);
+                            return null;
+                        }
+
+                        unsignedLongField = new UnsignedLongField(label)
+                        {
+                            value = property.ulongValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        unsignedLongField.BindProperty(property);
+                        unsignedLongField.AddToClassList(UnsignedLongField.alignedFieldUssClassName);
+                        return unsignedLongField;
+                    }
+
+                    if (property.type == "int")
+                    {
+                        if (originalField is IntegerField integerField)
+                        {
+                            integerField.SetValueWithoutNotify(property.intValue);
+                            return null;
+                        }
+
+                        integerField = new IntegerField(label)
+                        {
+                            value = property.intValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        integerField.BindProperty(property);
+                        integerField.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        return integerField;
+                    }
+
+                    if (property.type == "uint")
+                    {
+                        if (originalField is UnsignedIntegerField unsignedIntegerField)
+                        {
+                            unsignedIntegerField.SetValueWithoutNotify(property.uintValue);
+                            return null;
+                        }
+
+                        unsignedIntegerField = new UnsignedIntegerField(label)
+                        {
+                            value = property.uintValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        unsignedIntegerField.BindProperty(property);
+                        unsignedIntegerField.AddToClassList(UnsignedIntegerField.alignedFieldUssClassName);
+                        return unsignedIntegerField;
+                    }
+
+                    if (property.type == "sbyte")
+                    {
+                        if (originalField is IntegerField integerField)
+                        {
+                            integerField.SetValueWithoutNotify((sbyte)property.intValue);
+                            return null;
+                        }
+
+                        IntegerField element = new IntegerField(label)
+                        {
+                            value = (sbyte)property.intValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        element.BindProperty(property);
+                        element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        // element.RegisterValueChangedCallback(evt =>
+                        // {
+                        //     sbyte newValue = (sbyte)evt.newValue;
+                        //     if (newValue != evt.newValue)
+                        //     {
+                        //         element.SetValueWithoutNotify(newValue);
+                        //     }
+                        // });
+
+                        return element;
+                    }
+                    if (property.type == "byte")
+                    {
+                        if (originalField is IntegerField oldIntegerField)
+                        {
+                            oldIntegerField.SetValueWithoutNotify((byte)property.intValue);
+                            return null;
+                        }
+
+                        IntegerField element = new IntegerField(label)
+                        {
+                            value = (byte)property.intValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        element.BindProperty(property);
+                        element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        // element.RegisterValueChangedCallback(evt =>
+                        // {
+                        //     byte newValue = (byte)evt.newValue;
+                        //     beforeSet?.Invoke(value);
+                        //     setterOrNull(newValue);
+                        //     if (newValue != evt.newValue)
+                        //     {
+                        //         element.SetValueWithoutNotify(newValue);
+                        //     }
+                        // });
+
+                        return element;
+                    }
+
+                    if (property.type == "short")
+                    {
+                        if (originalField is IntegerField oldIntegerField)
+                        {
+                            oldIntegerField.SetValueWithoutNotify((short)property.intValue);
+                            return null;
+                        }
+
+                        IntegerField element = new IntegerField(label)
+                        {
+                            value = (short)property.intValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        element.BindProperty(property);
+                        element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        return element;
+                    }
+                    if (property.type == "ushort")
+                    {
+                        if (originalField is IntegerField oldIntegerField)
+                        {
+                            oldIntegerField.SetValueWithoutNotify((ushort)property.intValue);
+                            return null;
+                        }
+
+                        IntegerField element = new IntegerField(label)
+                        {
+                            value = (ushort)property.intValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        element.BindProperty(property);
+                        element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        return element;
+                    }
+                    throw new ArgumentOutOfRangeException(nameof(property.type), property.type, null);
+                }
+                case SerializedPropertyType.Boolean:
+                {
+                    if(originalField is Toggle toggle)
+                    {
+                        toggle.SetValueWithoutNotify(property.boolValue);
+                        return null;
+                    }
+
+                    toggle = new Toggle(label)
+                    {
+                        value = property.boolValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    toggle.BindProperty(property);
+                    toggle.AddToClassList(Toggle.alignedFieldUssClassName);
+                    return toggle;
+                }
+                case SerializedPropertyType.Float:
+                {
+                    if (originalField is DoubleField doubleField)
+                    {
+                        doubleField.SetValueWithoutNotify(property.doubleValue);
+                        return null;
+                    }
+
+                    doubleField = new DoubleField(label)
+                    {
+                        value = property.doubleValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    doubleField.BindProperty(property);
+                    doubleField.AddToClassList(DoubleField.alignedFieldUssClassName);
+                    return doubleField;
+                }
+                case SerializedPropertyType.String:
+                {
+                    if (originalField is TextField textField)
+                    {
+                      textField.SetValueWithoutNotify(property.stringValue);
+                      return null;
+                    }
+
+                    textField = new TextField(label)
+                    {
+                        value = property.stringValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    textField.BindProperty(property);
+                    textField.AddToClassList(TextField.alignedFieldUssClassName);
+                    return textField;
+                }
+                case SerializedPropertyType.Color:
+                {
+                    if (originalField is ColorField colorField)
+                    {
+                        colorField.SetValueWithoutNotify(property.colorValue);
+                        return null;
+                    }
+
+                    colorField = new ColorField(label)
+                    {
+                        value = property.colorValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    colorField.AddToClassList(ColorField.alignedFieldUssClassName);
+                    colorField.BindProperty(property);
+                    return colorField;
+                }
+                case SerializedPropertyType.ObjectReference:
+                {
+                    if (originalField is ObjectField objectField)
+                    {
+                        objectField.SetValueWithoutNotify(property.objectReferenceValue);
+                        // ReSharper disable once InvertIf
+                        if (objectField.objectType != rawType)
+                        {
+                            objectField.objectType = rawType;
+                            objectField.BindProperty(property);
+                        }
+
+                        return null;
+                    }
+
+                    objectField = new ObjectField(label)
+                    {
+                        objectType = rawType,
+                        value = property.objectReferenceValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    objectField.BindProperty(property);
+                    objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+                    return objectField;
+                }
+                case SerializedPropertyType.LayerMask:
+                {
+                    if(originalField is LayerMaskField layerMaskField)
+                    {
+                        layerMaskField.SetValueWithoutNotify(property.intValue);
+                        return null;
+                    }
+
+                    layerMaskField = new LayerMaskField(label)
+                    {
+                        value = property.intValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    layerMaskField.BindProperty(property);
+                    layerMaskField.AddToClassList(LayerMaskField.alignedFieldUssClassName);
+                    return layerMaskField;
+                }
+                case SerializedPropertyType.Enum:
+                {
+                    bool hasFlags = rawType.GetCustomAttributes(typeof(FlagsAttribute), true).Length > 0;
+
+                    Enum enumValue = (Enum)Enum.ToObject(rawType, property.intValue);
+
+                    if (hasFlags)
+                    {
+                        if (originalField is EnumFlagsField enumFlagsField)
+                        {
+                            enumFlagsField.SetValueWithoutNotify(enumValue);
+                            return null;
+                        }
+
+                        enumFlagsField = new EnumFlagsField(label, enumValue)
+                        {
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        enumFlagsField.BindProperty(property);
+                        enumFlagsField.AddToClassList(EnumFlagsField.alignedFieldUssClassName);
+                        return enumFlagsField;
+                    }
+
+                    if (originalField is PopupField<string> popupFieldString)
+                    {
+                        popupFieldString.index = property.enumValueIndex;
+                        return null;
+                    }
+
+                    List<string> enumValues = Enum.GetValues(rawType)
+                        .Cast<object>()
+                        .Select(each =>
+                        {
+                            (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
+                            return found ? richName : Enum.GetName(rawType, each);
+                        })
+                        .ToList();
+
+                    popupFieldString = new PopupField<string>(label, enumValues, property.intValue)
+                    {
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    popupFieldString.RegisterValueChangedCallback(e =>
+                    {
+                        string newValue = e.newValue;
+                        int index = enumValues.IndexOf(newValue);
+                        property.enumValueIndex = index;
+                        property.serializedObject.ApplyModifiedProperties();
+                    });
+                    popupFieldString.AddToClassList(PopupField<string>.alignedFieldUssClassName);
+
+                    return popupFieldString;
+                }
+                case SerializedPropertyType.Vector2:
+                {
+                    if (originalField is Vector2Field vector2Field)
+                    {
+                        vector2Field.SetValueWithoutNotify(property.vector2Value);
+                        return null;
+                    }
+
+                    vector2Field = new Vector2Field(label)
+                    {
+                        value = property.vector2Value,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    vector2Field.BindProperty(property);
+                    vector2Field.AddToClassList(Vector2Field.alignedFieldUssClassName);
+                    return vector2Field;
+                }
+                case SerializedPropertyType.Vector3:
+                {
+                    if(originalField is Vector3Field vector3Field)
+                    {
+                        vector3Field.SetValueWithoutNotify(property.vector3Value);
+                        return null;
+                    }
+
+                    vector3Field = new Vector3Field(label)
+                    {
+                        value = property.vector3Value,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    vector3Field.BindProperty(property);
+                    vector3Field.AddToClassList(Vector3Field.alignedFieldUssClassName);
+                    return vector3Field;
+                }
+                case SerializedPropertyType.Vector4:
+                {
+                    if (originalField is Vector4Field vector4Field)
+                    {
+                        vector4Field.SetValueWithoutNotify(property.vector4Value);
+                        return null;
+                    }
+
+                    vector4Field = new Vector4Field(label)
+                    {
+                        value = property.vector4Value,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    vector4Field.BindProperty(property);
+                    vector4Field.AddToClassList(Vector4Field.alignedFieldUssClassName);
+                    return vector4Field;
+                }
+                case SerializedPropertyType.Rect:
+                {
+                    if (originalField is RectField rectField)
+                    {
+                        rectField.SetValueWithoutNotify(property.rectValue);
+                        return null;
+                    }
+
+                    rectField = new RectField(label)
+                    {
+                        value = property.rectValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    rectField.BindProperty(property);
+                    rectField.AddToClassList(RectField.alignedFieldUssClassName);
+                    return rectField;
+                }
+                case SerializedPropertyType.ArraySize:
+                {
+                    if (originalField is IntegerField integerField)
+                    {
+                        integerField.SetValueWithoutNotify(property.intValue);
+                        return null;
+                    }
+
+                    integerField = new IntegerField(label)
+                    {
+                        value = property.intValue,
+                        isDelayed = true,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    integerField.BindProperty(property);
+                    integerField.AddToClassList(IntegerField.alignedFieldUssClassName);
+                    return integerField;
+                }
+                case SerializedPropertyType.Character:
+                {
+                    if (originalField is TextField textField)
+                    {
+                        textField.SetValueWithoutNotify(property.stringValue);
+                        return null;
+                    }
+
+                    textField = new TextField(label)
+                    {
+                        value = property.stringValue,
+                        maxLength = 1,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    textField.BindProperty(property);
+                    textField.AddToClassList(TextField.alignedFieldUssClassName);
+                    return textField;
+                }
+                case SerializedPropertyType.AnimationCurve:
+                {
+                    if (originalField is CurveField curveField)
+                    {
+                        curveField.SetValueWithoutNotify(property.animationCurveValue);
+                        return null;
+                    }
+
+                    curveField = new CurveField(label)
+                    {
+                        value = property.animationCurveValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    curveField.BindProperty(property);
+                    curveField.AddToClassList(CurveField.alignedFieldUssClassName);
+                    return curveField;
+                }
+                case SerializedPropertyType.Bounds:
+                {
+                    if (originalField is BoundsField boundsField)
+                    {
+                        boundsField.SetValueWithoutNotify(property.boundsValue);
+                        return null;
+                    }
+
+                    boundsField = new BoundsField(label)
+                    {
+                        value = property.boundsValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    boundsField.BindProperty(property);
+                    boundsField.AddToClassList(BoundsField.alignedFieldUssClassName);
+                    return boundsField;
+                }
+                case SerializedPropertyType.Gradient:
+                {
+                    if (originalField is GradientField gradientField)
+                    {
+                        gradientField.SetValueWithoutNotify(property.gradientValue);
+                        return null;
+                    }
+
+                    gradientField = new GradientField(label)
+                    {
+                        value = property.gradientValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    gradientField.BindProperty(property);
+                    gradientField.AddToClassList(GradientField.alignedFieldUssClassName);
+                    return gradientField;
+                }
+                case SerializedPropertyType.Quaternion:
+                case SerializedPropertyType.ExposedReference:
+                    return null;
+                case SerializedPropertyType.FixedBufferSize:
+                {
+                    if (originalField is IntegerField integerField)
+                    {
+                        integerField.SetValueWithoutNotify(property.intValue);
+                        return null;
+                    }
+
+                    integerField = new IntegerField(label)
+                    {
+                        value = property.intValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    integerField.BindProperty(property);
+                    integerField.AddToClassList(IntegerField.alignedFieldUssClassName);
+                    return integerField;
+                }
+                case SerializedPropertyType.Vector2Int:
+                {
+                    if (originalField is Vector2IntField vector2IntField)
+                    {
+                        vector2IntField.SetValueWithoutNotify(property.vector2IntValue);
+                        return null;
+                    }
+
+                    vector2IntField = new Vector2IntField(label)
+                    {
+                        value = property.vector2IntValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    vector2IntField.BindProperty(property);
+                    vector2IntField.AddToClassList(Vector2IntField.alignedFieldUssClassName);
+                    return vector2IntField;
+                }
+                case SerializedPropertyType.Vector3Int:
+                {
+                    if (originalField is Vector3IntField vector3IntField)
+                    {
+                        vector3IntField.SetValueWithoutNotify(property.vector3IntValue);
+                        return null;
+                    }
+
+                    vector3IntField = new Vector3IntField(label)
+                    {
+                        value = property.vector3IntValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    vector3IntField.BindProperty(property);
+                    vector3IntField.AddToClassList(Vector3IntField.alignedFieldUssClassName);
+                    return vector3IntField;
+                }
+                case SerializedPropertyType.RectInt:
+                {
+                    if (originalField is RectIntField rectIntField)
+                    {
+                        rectIntField.SetValueWithoutNotify(property.rectIntValue);
+                        return null;
+                    }
+
+                    rectIntField = new RectIntField(label)
+                    {
+                        value = property.rectIntValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    rectIntField.BindProperty(property);
+                    rectIntField.AddToClassList(RectIntField.alignedFieldUssClassName);
+                    return rectIntField;
+                }
+                case SerializedPropertyType.BoundsInt:
+                {
+                    if (originalField is BoundsIntField boundsIntField)
+                    {
+                        boundsIntField.SetValueWithoutNotify(property.boundsIntValue);
+                        return null;
+                    }
+
+                    boundsIntField = new BoundsIntField(label)
+                    {
+                        value = property.boundsIntValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    boundsIntField.BindProperty(property);
+                    boundsIntField.AddToClassList(BoundsIntField.alignedFieldUssClassName);
+                    return boundsIntField;
+                }
+                case SerializedPropertyType.Hash128:
+                {
+                    if (originalField is Hash128Field hash128Field)
+                    {
+                        hash128Field.SetValueWithoutNotify(property.hash128Value);
+                        return null;
+                    }
+
+                    hash128Field = new Hash128Field(label)
+                    {
+                        value = property.hash128Value,
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+                    hash128Field.BindProperty(property);
+                    hash128Field.AddToClassList(Hash128Field.alignedFieldUssClassName);
+                    return hash128Field;
+                }
+                default:
+                    return null;
+          }
         }
     }
 #endif

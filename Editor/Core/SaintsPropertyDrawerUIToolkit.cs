@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
@@ -16,7 +17,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Core
 {
-    public partial class SaintsPropertyDrawer
+    public partial class SaintsPropertyDrawer: IMakeRenderer, IDOTweenPlayRecorder
     {
         protected virtual void OnDisposeUIToolkit()
         {
@@ -467,63 +468,23 @@ namespace SaintsField.Editor.Core
         //     _saintsPropertyInfoInjects.Add(func);
         // }
 
-        private static VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string preferredLabel, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
+        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string preferredLabel, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
-            // check if any property has drawer. If so, just use PropertyField
-            // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
-            if (attributeDrawerType != null)
+            (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
+
+            if (drawerType == null)
             {
-                PropertyDrawer typeDrawer = MakePropertyDrawer(attributeDrawerType, info, attr, preferredLabel);
-                VisualElement element = DrawUsingDrawerInstance(attributeDrawerType, typeDrawer, property, info, allAttributes,
-                    saintsPropertyDrawers, containerElement, parent);
-                // return element ?? PropertyFieldFallbackUIToolkit(property);
-                return element;
-                // return PropertyFieldFallbackUIToolkit(property);
+                Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                    ? ReflectUtils.GetElementType(info.FieldType)
+                    : info.FieldType;
+                return UIToolkitUtils.CreateOrUpdateFieldFromProperty(property, rawType, preferredLabel,
+                    info, this, this, null);
             }
 
-            Type fieldElementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                ? ReflectUtils.GetElementType(info.FieldType)
-                : info.FieldType;
-            Type foundDrawer = FindTypeDrawerNonSaints(fieldElementType);
-            // Debug.LogWarning(foundDrawer);
-
-            // ReSharper disable once InvertIf
-            if (foundDrawer != null)
-            {
-                PropertyDrawer typeDrawer = MakePropertyDrawer(foundDrawer, info, null, preferredLabel);
-
-                VisualElement element = DrawUsingDrawerInstance(foundDrawer, typeDrawer, property, info, allAttributes,
-                    saintsPropertyDrawers, containerElement, parent);
-                // return element ?? PropertyFieldFallbackUIToolkit(property);
-                return element;
-            }
-
-            // Debug.Log($"PropertyFieldFallbackUIToolkit on foundDrawer={foundDrawer}: {property.displayName}");
-            // return PropertyFieldFallbackUIToolkit(property);
-
-            // On Hold... Cuz SaintsRow does not support copy/paste yet.
-            // check if it's general class/struct. If so, use SaintsRow to draw it.
-            // if (info.FieldType.IsClass || info.FieldType.IsValueType)
-            // {
-            //     PropertyDrawer saintsRowAttributeDrawer = MakePropertyDrawer(typeof(SaintsRowAttributeDrawer),
-            //         info, new SaintsRowAttribute(), preferredLabel);
-            //     VisualElement saintsRowElement = saintsRowAttributeDrawer.CreatePropertyGUI(property);
-            //     return saintsRowElement;
-            //     // return PropertyFieldFallbackUIToolkit(property);
-            // }
-
-            {
-                Type saintsRowDrawer = typeof(SaintsRowAttributeDrawer);
-                PropertyDrawer typeDrawer = MakePropertyDrawer(saintsRowDrawer, info, null, preferredLabel);
-
-                VisualElement element = DrawUsingDrawerInstance(saintsRowDrawer, typeDrawer, property, info, allAttributes,
-                    saintsPropertyDrawers, containerElement, parent);
-                // return element ?? PropertyFieldFallbackUIToolkit(property);
-                return element;
-            }
-
-            // return PropertyFieldFallbackUIToolkit(property);
+            PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, preferredLabel);
+            VisualElement element = DrawUsingDrawerInstance(drawerType, typeDrawer, property, info, allAttributes,
+                saintsPropertyDrawers, containerElement, parent);
+            return element;
         }
 
         private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement, object parent)
@@ -536,7 +497,7 @@ namespace SaintsField.Editor.Core
 
             MethodInfo uiToolkitMethod = drawerType.GetMethod("CreatePropertyGUI");
 
-            if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType != drawerType)  // null: old Unity || did not override
+            if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
                 PropertyDrawer imGuiDrawer = drawerInstance;
                 MethodInfo imGuiGetPropertyHeightMethod = drawerType.GetMethod("GetPropertyHeight");
@@ -1229,6 +1190,11 @@ namespace SaintsField.Editor.Core
         }
 
         #endregion
+
+        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        {
+            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
+        }
     }
 }
 #endif

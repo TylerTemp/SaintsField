@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.0.0-preview.1 ##
+
+1.  Refactor the `SaintsRow` drawer
+2.  Change the flow of how `SaintsPropertyDrawer` & `SaintsEditor` in UI Toolkit fallback to drawers
+3.  UI Toolkit: `ShowInInspector` now shows a more grayed-out color for label, to distinguish from the serializable field
+4.  UI Toolkit: If you have `SaintsEditor` enabled, or have any saints property added to a serializable class/struct/interface, the `SaintsRow` attribute will automatically be used if the target has no explicit drawer
+5.  UI Toolkit: If you have `SaintsEditor` enabled, the order of the property no longer matters. Things like `[Range(0, 1), InfoBox("Saints InfoBox")]` will work as expected. The 3rd party drawer no longer block the saintfield drawer
+
+This is a preview release. You might not what to try it in your production environment.
+
 ## 3.36.8 ##
 
 1.  UI Toolkit: Add copy/paste ability to `ResizableTextArea`

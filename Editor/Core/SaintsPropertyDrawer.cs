@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -318,7 +319,7 @@ namespace SaintsField.Editor.Core
         }
 
 
-        protected struct SaintsPropertyInfo
+        public struct SaintsPropertyInfo
         {
             // ReSharper disable InconsistentNaming
             public SaintsPropertyDrawer Drawer;
@@ -340,7 +341,7 @@ namespace SaintsField.Editor.Core
                     Type canDrawType = kv.Key;
                     // Debug.Log($"{fieldAttribute}:{kv.Key}:--");
                     // foreach ((bool isSaints, Type drawerType) in kv.Value.Where(each => !each.isSaints))
-                    foreach (var info in kv.Value)
+                    foreach (PropertyDrawerInfo info in kv.Value)
                     {
                         if (info.IsSaints) continue;
                         // if ($"{drawerType}" == "UnityEditor.RangeDrawer")
@@ -445,7 +446,7 @@ namespace SaintsField.Editor.Core
                 if (matched)
                 {
                     PropertyDrawerInfo first = new PropertyDrawerInfo();
-                    foreach (var each in propertyAttributeToPropertyDrawer.Value)
+                    foreach (PropertyDrawerInfo each in propertyAttributeToPropertyDrawer.Value)
                     {
                         if (nonSaints && each.IsSaints) continue;
                         first = each;
@@ -514,10 +515,12 @@ namespace SaintsField.Editor.Core
         }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        private Type GetFirstSaintsDrawerType(Type attributeType)
+        public static Type GetFirstSaintsDrawerType(Type attributeType)
         {
             // Debug.Log(attributeType);
             // Debug.Log(string.Join(",", _propertyAttributeToDrawers.Keys));
+
+            EnsureAndGetTypeToDrawers();
 
             if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
                     out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
@@ -541,6 +544,63 @@ namespace SaintsField.Editor.Core
             // Debug.Log($"create new drawer for {saintsAttributeWithIndex.SaintsAttribute}[{saintsAttributeWithIndex.Index}]");
             // Type drawerType = PropertyAttributeToDrawers[saintsAttributeWithIndex.SaintsAttribute.GetType()].First(each => each.isSaints).drawerType;
             return _cachedDrawer[saintsAttributeWithIndex] = GetOrCreateSaintsDrawerByAttr(saintsAttributeWithIndex.SaintsAttribute);
+        }
+
+        public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(FieldInfo info, SerializedProperty property)
+        {
+            // check if any property has drawer. If so, just use PropertyField
+            // if not, check if it has custom drawer. if it exists, then try use that custom drawer
+            (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
+            if (attributeDrawerType != null)
+            {
+                return (attr, attributeDrawerType);
+            }
+
+            Type fieldElementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                ? ReflectUtils.GetElementType(info.FieldType)
+                : info.FieldType;
+            Type foundDrawer = FindTypeDrawerNonSaints(fieldElementType);
+            // Debug.LogWarning(foundDrawer);
+
+            // ReSharper disable once InvertIf
+            if (foundDrawer != null)
+            {
+                return (null, foundDrawer);
+            }
+
+            // if (fieldElementType.IsClass || (fieldElementType.IsValueType && !fieldElementType.IsPrimitive))
+            // {
+            //     return (null, typeof(SaintsRowAttributeDrawer));
+            //     // Console.WriteLine("The type is a class.");
+            // }
+
+            return (null, null);
+            // else if ()
+            // {
+            //     Console.WriteLine("The type is a struct.");
+            // }
+            // else
+            // {
+            //     Console.WriteLine("The type is neither a class nor a struct.");
+            // }
+
+            // Debug.Log($"PropertyFieldFallbackUIToolkit on foundDrawer={foundDrawer}: {property.displayName}");
+            // return PropertyFieldFallbackUIToolkit(property);
+
+            // On Hold... Cuz SaintsRow does not support copy/paste yet.
+            // check if it's general class/struct. If so, use SaintsRow to draw it.
+            // if (info.FieldType.IsClass || info.FieldType.IsValueType)
+            // {
+            //     PropertyDrawer saintsRowAttributeDrawer = MakePropertyDrawer(typeof(SaintsRowAttributeDrawer),
+            //         info, new SaintsRowAttribute(), preferredLabel);
+            //     VisualElement saintsRowElement = saintsRowAttributeDrawer.CreatePropertyGUI(property);
+            //     return saintsRowElement;
+            //     // return PropertyFieldFallbackUIToolkit(property);
+            // }
+
+            return (null, typeof(SaintsRowAttributeDrawer));
+
+            // return PropertyFieldFallbackUIToolkit(property);
         }
 
         private SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(ISaintsAttribute saintsAttribute)
@@ -567,7 +627,7 @@ namespace SaintsField.Editor.Core
             SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
 
 #if UNITY_2022_2_OR_NEWER  // don't bother with too old Unity
-            FieldInfo preferredLabelField = drawerType.GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo preferredLabelField = typeof(PropertyDrawer).GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
             if (preferredLabelField != null)
             {
                 // Debug.Log($"preferredLabelField={preferredLabelField}");

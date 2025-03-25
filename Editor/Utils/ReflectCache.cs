@@ -32,9 +32,12 @@ namespace SaintsField.Editor.Utils
 
         public static Attribute[] GetCustomAttributes(MemberInfo memberInfo, bool inherit = false)
         {
-            var key = new AttributesKey(memberInfo, inherit);
-            if (CustomAttributes.TryGetValue(key, out var attributes))
+            AttributesKey key = new AttributesKey(memberInfo, inherit);
+            if (CustomAttributes.TryGetValue(key, out object[] attributes))
+            {
                 return (Attribute[])attributes;
+            }
+
             // ReSharper disable once CoVariantArrayConversion
             attributes = memberInfo.GetCustomAttributes().ToArray();
             CustomAttributes[key] = attributes;
@@ -43,9 +46,12 @@ namespace SaintsField.Editor.Utils
 
         public static T[] GetCustomAttributes<T>(MemberInfo memberInfo, bool inherit = false) where T : class
         {
-            var key = new AttributesKey(memberInfo, inherit, typeof(T));
-            if (CustomAttributes.TryGetValue(key, out var attributes))
+            AttributesKey key = new AttributesKey(memberInfo, inherit, typeof(T));
+            if (CustomAttributes.TryGetValue(key, out object[] attributes))
+            {
                 return (T[])attributes;
+            }
+
             // ReSharper disable once CoVariantArrayConversion
             attributes = memberInfo.GetCustomAttributes().OfType<T>().ToArray();
             CustomAttributes[key] = attributes;

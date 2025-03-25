@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
         private static (string error, string propName, int index) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
         {
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
-            object rawValue = fieldInfo.GetValue(parent);
+            // object rawValue = fieldInfo.GetValue(parent);
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
             (string error, int index, object value) = Util.GetValue(property, fieldInfo, parent);
@@ -27,6 +27,9 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
             {
                 return (error, null, index);
             }
+
+            Debug.Log(value);
+            Debug.Log(value.GetType());
 
             IWrapProp curValue = (IWrapProp) value;
             return ("", ReflectUtils.GetIWrapPropName(curValue.GetType()), arrayIndex);

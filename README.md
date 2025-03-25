@@ -81,14 +81,16 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**3.36.8**
+**4.0.0-preview.1**
 
-1.  UI Toolkit: Add copy/paste ability to `ResizableTextArea`
-2.  UI Toolkit: Add copy/paste ability to `PropRange`
-3.  UI Toolkit: Add copy/paste ability to `Layer`. `Layer` now gives an error if the layer is not a valid value in project
-4.  Add auto validator ability to `Layer`
-5.  Fix `LayoutDisableIf`/`LayoutEnableIf`/`LayoutHideIf`/`LayoutShowIf` not working due to previous code changes
-6.  Fix `PreferredLabel` not set for some drawers, which protentially cause some label incorrect issue in previous versions
+1.  Refactor the `SaintsRow` drawer
+2.  Change the flow of how `SaintsPropertyDrawer` & `SaintsEditor` in UI Toolkit fallback to drawers
+3.  UI Toolkit: `ShowInInspector` now shows a more grayed-out color for label, to distinguish from the serializable field
+4.  UI Toolkit: If you have `SaintsEditor` enabled, or have any saints property added to a serializable class/struct/interface, the `SaintsRow` attribute will automatically be used if the target has no explicit drawer
+5.  UI Toolkit: If you have `SaintsEditor` enabled, the order of the property no longer matters. Things like `[Range(0, 1), InfoBox("Saints InfoBox")]` will work as expected. The 3rd party drawer no longer block the saintfield drawer
+
+> [!CAUTION]
+> This version is a preview release. You might not what to try it in your production environment.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private bool _richLabelCondition;
         private bool _tableCondition;
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
             UserDataPayload userDataPayload = new UserDataPayload
             {

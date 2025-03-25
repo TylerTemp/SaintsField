@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 root.Add(aboveTarget);
                 hasAnyChildren = true;
             }
-            (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit();
+            (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit(root);
             if (target != null)
             {
                 VisualElement targetContainer = new VisualElement
@@ -122,7 +122,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return (null, false);
         }
 
-        protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit();
+        protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container);
 
         protected virtual (VisualElement target, bool needUpdate) CreateBelowUIToolkit()
         {
@@ -432,12 +432,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         // before set: useful for struct editing that C# will messup and change the value of the reference you have
-        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull)
+        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
         {
             // if (RuntimeUtil.IsNull(value))
             // {
             //     return null;
             // }
+
+            Color reColor = EColor.EditorSeparator.GetColor();
 
             if (valueType == typeof(bool))
             {
@@ -452,6 +454,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     value = (bool)value,
                 };
                 element.AddToClassList(Toggle.alignedFieldUssClassName);
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -480,6 +486,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (sbyte)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(IntegerField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -514,6 +524,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (byte)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(IntegerField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -548,6 +562,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (short)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(IntegerField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -581,6 +599,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (ushort)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(IntegerField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -615,6 +637,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (int)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                // element.labelElement.style.borderRightColor = EColor.EditorEmphasized.GetColor();
+                // element.labelElement.style.borderRightWidth = 1;
+                // element.labelElement.style.color = EColor.EditorEmphasized.GetColor();
+                element.labelElement.style.color = EColor.EditorSeparator.GetColor();
                 element.AddToClassList(IntegerField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -637,17 +667,21 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(uint))
             {
-                if (oldElement is LongField oldLongField)
+                if (oldElement is UnsignedIntegerField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify((uint)value);
                     return null;
                 }
 
-                LongField element = new LongField(label)
+                UnsignedIntegerField element = new UnsignedIntegerField(label)
                 {
                     value = (uint)value,
                 };
-                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                element.AddToClassList(UnsignedIntegerField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -657,13 +691,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        uint newValue = (uint)evt.newValue;
+                        uint newValue = evt.newValue;
                         beforeSet?.Invoke(value);
                         setterOrNull(newValue);
-                        if (newValue != evt.newValue)
-                        {
-                            element.SetValueWithoutNotify(newValue);
-                        }
                     });
                 }
 
@@ -681,6 +711,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (long)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(LongField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -700,25 +734,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(ulong))
             {
-                // wtf...
-                // long longValue = Convert.ToInt64(value);
-                // long longValue = unchecked((long) value);
-                // long longValue = unchecked((long)Convert.ChangeType(value, typeof(long)));
-                // long longValue = (long) value;
                 ulong ulongRawValue = (ulong)value;
-                long longValue = (long) ulongRawValue;
-                if (oldElement is LongField oldLongField)
+                if (oldElement is UnsignedLongField oldLongField)
                 {
-                    oldLongField.SetValueWithoutNotify(longValue);
+                    oldLongField.SetValueWithoutNotify(ulongRawValue);
                     return null;
                 }
 
-                LongField element = new LongField(label)
+                UnsignedLongField element = new UnsignedLongField(label)
                 {
-                    value = longValue,
+                    value = ulongRawValue,
                 };
-
-                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                element.AddToClassList(UnsignedLongField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -728,25 +759,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        // wtf x2...
-                        long rawNewValue = evt.newValue;
-                        ulong useNewValue;
-                        if (rawNewValue < 0)
-                        {
-                            useNewValue = 0;
-                        }
-                        else
-                        {
-                            useNewValue = (ulong) rawNewValue;
-                        }
-                        long checkLong = (long) useNewValue;
-
+                        ulong useNewValue = evt.newValue;
                         beforeSet?.Invoke(value);
                         setterOrNull(useNewValue);
-                        if (rawNewValue != checkLong)
-                        {
-                            element.SetValueWithoutNotify(checkLong);
-                        }
                     });
                 }
 
@@ -764,6 +779,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (float)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(FloatField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -793,6 +812,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (double)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(DoubleField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -822,6 +845,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (string)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+
                 element.AddToClassList(TextField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -851,6 +879,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Vector2)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(Vector2Field.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -880,6 +912,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Vector3)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(Vector3Field.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -909,6 +945,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Vector4)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(Vector4Field.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -938,6 +978,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Vector2Int)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(Vector2IntField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -967,6 +1011,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Vector3Int)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(Vector3IntField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -1000,6 +1048,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Color)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(ColorField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -1032,6 +1084,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Bounds)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(BoundsField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -1061,6 +1117,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (Rect)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(RectField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -1090,6 +1150,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (RectInt)value,
                 };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 element.AddToClassList(RectIntField.alignedFieldUssClassName);
                 if (setterOrNull == null)
                 {
@@ -1116,6 +1180,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
 
                 EnumField element = new EnumField(label, (Enum)value);
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
                 // ReSharper disable once PossibleNullReferenceException
                 typeof(EnumField).GetField("m_EnumType", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(element, valueType);
                 element.AddToClassList(EnumField.alignedFieldUssClassName);
@@ -1137,7 +1205,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
             {
-                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull);
+                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor);
             }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
@@ -1189,7 +1257,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 bool isReadOnly = !isNormalDictionary;
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
-                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull);
+                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor);
 #else  // WTF Unity, backport it!
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1276,7 +1344,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
-                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull);
+                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor);
             }
 
             // Debug.Log(valueType);
@@ -1311,6 +1379,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             unityTextAlign = TextAnchor.MiddleLeft,
                         },
                     });
+                    if (labelGrayColor)
+                    {
+                        labelButtonField.labelElement.style.color = reColor;
+                    }
                     labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
                     return labelButtonField;
                 }
@@ -1322,6 +1394,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         value = "null",
                         pickingMode = PickingMode.Ignore,
                     };
+                    if (labelGrayColor)
+                    {
+                        textField.labelElement.style.color = reColor;
+                    }
 
                     if(_nullUss == null)
                     {
@@ -1366,6 +1442,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         UnityObjectOverrideType = value?.GetType(),
                     },
                 };
+                if (labelGrayColor)
+                {
+                    genFoldout.style.color = reColor;
+                }
                 genFoldout.AddToClassList("saintsfield-general");
 
                 VisualElement fieldsBodyNew = new VisualElement
@@ -1396,12 +1476,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             if(canConvert)
                             {
                                 objFieldResult =
-                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, beforeSet, setterOrNull);
+                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, beforeSet, setterOrNull, labelGrayColor);
                             }
                             else
                             {
                                 objFieldResult =
-                                    UIToolkitObjectFieldEdit(null, label, newType, null, beforeSet, setterOrNull);
+                                    UIToolkitObjectFieldEdit(null, label, newType, null, beforeSet, setterOrNull, labelGrayColor);
                                 beforeSet?.Invoke(value);
                                 setterOrNull?.Invoke(null);
                             }
@@ -1482,7 +1562,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // Debug.Log($"valueActualType={valueActualType}");
             if (valueActualType != null && typeof(UnityEngine.Object).IsAssignableFrom(valueActualType))
             {
-                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, beforeSet, setterOrNull);
+                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor);
                 // Debug.Log($"objFieldResult={objFieldResult}");
                 if (objFieldResult != null)
                 {
@@ -1544,7 +1624,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         fieldInfo.SetValue(value, newValue);
                         setterOrNull?.Invoke(value);
-                    });
+                    },
+                    labelGrayColor);
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
                 if(result != null)
@@ -1579,7 +1660,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             propertyInfo.SetValue(value, newValue);
                             setterOrNull?.Invoke(value);
                         }
-                        : null);
+                        : null,
+                    labelGrayColor);
                 // ReSharper disable once InvertIf
                 if(result != null)
                 {
@@ -1598,7 +1680,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return useOld? null: genFoldout;
         }
 
-        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> beforeSet, Action<object> setterOrNull)
+        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
         {
             if (oldElement is ObjectField oldUnityEngineObjectField)
             {
@@ -1612,6 +1694,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 value = value,
                 objectType = valueType,
             };
+            if (labelGrayColor)
+            {
+                element.labelElement.style.color = EColor.EditorSeparator.GetColor();
+            }
             element.AddToClassList(ObjectField.alignedFieldUssClassName);
             if (setterOrNull == null)
             {
@@ -1731,7 +1817,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public object RawListValue;
         }
 
-        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull)
+        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
         {
             Foldout foldout = oldElement;
             if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
@@ -1745,6 +1831,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     text = label,
                 };
+                if (labelGrayColor)
+                {
+                    foldout.style.color = EColor.EditorSeparator.GetColor();
+                }
                 foldout.AddToClassList("saintsfield-list");
                 VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
                 if (foldoutContent != null)
@@ -1890,7 +1980,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 rawListValueArray[actualIndex] = newItemValue;
                                 payload.RawValues[actualIndex] = newItemValue;
                             }
-                         : null);
+                         : null,
+                        false);
                     if (item != null)
                     {
                         visualElement.Clear();
@@ -2037,7 +2128,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull)
+        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
         {
             // Debug.Log(dictKeyType);
             // Debug.Log(dictValueType);
@@ -2057,6 +2148,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     text = label,
                 };
+                if (labelGrayColor)
+                {
+                    foldout.style.color = EColor.EditorSeparator.GetColor();
+                }
                 foldout.AddToClassList("saintsfield-dictionary");
                 VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
                 if (foldoutContent != null)
@@ -2225,7 +2320,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 // listView.itemsSource[sourceIndex] = newKey;
                                 key = newKey;
                                 keyChanged = true;
-                            });
+                            }, false);
 
                             if (editing != null)
                             {
@@ -2285,7 +2380,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             object refreshedKey = listView.itemsSource[elementIndex];
                             payload.SetKeyValue(refreshedKey, newValue);
-                        });
+                        }, false);
 
                         if (editing != null)
                         {
@@ -2412,7 +2507,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 Debug.Log($"set new pair key {newKey}");
 #endif
                             }
-                        }
+                        },
+                        false
                     );
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -2445,7 +2541,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             addPairValue = newValue;
                             addPairValueChanged = true;
-                        }
+                        },
+                        false
                     );
                     // ReSharper disable once InvertIf
                     if (r != null)

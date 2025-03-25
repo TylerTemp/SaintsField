@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Playa.Renderer
             public IEnumerator Enumerator;
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit()
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
@@ -142,7 +142,8 @@ namespace SaintsField.Editor.Playa.Renderer
                             {
                                 paraValue = parameterValues[index] = newValue;
                                 paraValueChanged = true;
-                            }
+                            },
+                            false
                         );
                         // ReSharper disable once InvertIf
                         if (r != null)

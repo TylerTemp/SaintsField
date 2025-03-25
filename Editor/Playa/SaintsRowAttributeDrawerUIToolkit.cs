@@ -11,17 +11,20 @@ namespace SaintsField.Editor.Playa
 {
     public partial class SaintsRowAttributeDrawer
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        public const string SaintsRowClass = "saintsfield-saintsrow";
+
+        public static VisualElement CreateElement(SerializedProperty property, string label, FieldInfo info, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
-            // Debug.Log($"Render {property.propertyPath}");
-            // Debug.Log(property.isExpanded);
-
-            SaintsRowAttribute saintsRowAttribute = attribute as SaintsRowAttribute;
-
             VisualElement root;
             if (saintsRowAttribute?.Inline ?? false)
             {
-                root = new VisualElement();
+                root = new VisualElement
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
             }
             else
             {
@@ -29,6 +32,10 @@ namespace SaintsField.Editor.Playa
                 {
                     text = property.displayName,
                     value = property.isExpanded,
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
                 };
                 foldout.RegisterValueChangedCallback(evt =>
                 {
@@ -37,34 +44,46 @@ namespace SaintsField.Editor.Playa
                 root = foldout;
             }
 
-            FillElement(root, property, saintsRowAttribute, fieldInfo, this, this);
+            root.AddToClassList(SaintsRowClass);
+
+            FillElement(root, property, info, makeRenderer, doTweenPlayRecorder);
 
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
                 string propPath = property.propertyPath;
                 root.userData = property.managedReferenceId;
                 root.schedule.Execute(() =>
-                {
-                    long curId = (long) root.userData;
-                    // ReSharper disable once InvertIf
-                    if (curId != property.managedReferenceId)
                     {
-                        // Debug.Log($"Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
-                        root.userData = property.managedReferenceId;
-                        root.Clear();
+                        long curId = (long) root.userData;
+                        // ReSharper disable once InvertIf
+                        if (curId != property.managedReferenceId)
+                        {
+                            // Debug.Log($"Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
+                            root.userData = property.managedReferenceId;
+                            root.Clear();
 
-                        SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
+                            SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 
-                        FillElement(root, newProp, saintsRowAttribute, fieldInfo, this, this);
-                    }
-                    // Debug.Log(property.managedReferenceId);
-                })
-                .Every(100);
+                            FillElement(root, newProp, info, makeRenderer, doTweenPlayRecorder);
+                        }
+                        // Debug.Log(property.managedReferenceId);
+                    })
+                    .Every(100);
             }
             return root;
         }
 
-        private static void FillElement(VisualElement root, SerializedProperty property, SaintsRowAttribute saintsRowAttribute, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        {
+            // Debug.Log($"Render {property.propertyPath}");
+            // Debug.Log(property.isExpanded);
+
+            SaintsRowAttribute saintsRowAttribute = attribute as SaintsRowAttribute;
+
+            return CreateElement(property, preferredLabel, fieldInfo, saintsRowAttribute, this, this);
+        }
+
+        private static void FillElement(VisualElement root, SerializedProperty property, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
             object value = null;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -165,10 +184,10 @@ namespace SaintsField.Editor.Playa
 //                 }
 //             }
 //
-// #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-//             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
-//             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));
-// #endif
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+            bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
+            bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));
+#endif
 
             // if (saintsRowAttribute?.Inline ?? false)
             // {
