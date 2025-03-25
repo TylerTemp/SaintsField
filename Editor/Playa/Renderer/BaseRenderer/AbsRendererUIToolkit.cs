@@ -667,6 +667,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(uint))
             {
+#if UNITY_2022_2_OR_NEWER
                 if (oldElement is UnsignedIntegerField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify((uint)value);
@@ -696,6 +697,37 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         setterOrNull(newValue);
                     });
                 }
+#else
+                if (oldElement is IntegerField oldLongField)
+                {
+                    oldLongField.SetValueWithoutNotify((int)(uint)value);
+                    return null;
+                }
+
+                IntegerField element = new IntegerField(label)
+                {
+                    value = (int)(uint)value,
+                };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        uint newValue = (uint)evt.newValue;
+                        beforeSet?.Invoke(value);
+                        setterOrNull(newValue);
+                    });
+                }
+#endif
 
                 return element;
             }
@@ -734,6 +766,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(ulong))
             {
+#if UNITY_2022_2_OR_NEWER
                 ulong ulongRawValue = (ulong)value;
                 if (oldElement is UnsignedLongField oldLongField)
                 {
@@ -764,6 +797,38 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         setterOrNull(useNewValue);
                     });
                 }
+#else
+                long ulongRawValue = (long)(ulong)value;
+                if (oldElement is LongField oldLongField)
+                {
+                    oldLongField.SetValueWithoutNotify(ulongRawValue);
+                    return null;
+                }
+
+                LongField element = new LongField(label)
+                {
+                    value = ulongRawValue,
+                };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        ulong useNewValue = (ulong)evt.newValue;
+                        beforeSet?.Invoke(value);
+                        setterOrNull(useNewValue);
+                    });
+                }
+#endif
 
                 return element;
             }
@@ -1302,7 +1367,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         keyProp.PropertyType,
                         dictKey,
                         null,
-                        null
+                        null,
+                        false
                     );
                     if (newKeyElement != null)
                     {
@@ -1319,7 +1385,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         valueProp.PropertyType,
                         dictValue,
                         null,
-                        null
+                        null,
+                        false
                     );
                     if (newValueContainer != null)
                     {

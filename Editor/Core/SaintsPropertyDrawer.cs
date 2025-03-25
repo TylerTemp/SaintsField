@@ -598,7 +598,7 @@ namespace SaintsField.Editor.Core
             //     // return PropertyFieldFallbackUIToolkit(property);
             // }
 
-            return (null, typeof(SaintsRowAttributeDrawer));
+            // return (null, typeof(SaintsRowAttributeDrawer));
 
             // return PropertyFieldFallbackUIToolkit(property);
         }

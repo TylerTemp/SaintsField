@@ -476,6 +476,7 @@ namespace SaintsField.Editor.Utils
 
                     if (property.type == "ulong")
                     {
+#if UNITY_2022_2_OR_NEWER
                         if (originalField is UnsignedLongField unsignedLongField)
                         {
                             unsignedLongField.SetValueWithoutNotify(property.ulongValue);
@@ -493,6 +494,25 @@ namespace SaintsField.Editor.Utils
                         unsignedLongField.BindProperty(property);
                         unsignedLongField.AddToClassList(UnsignedLongField.alignedFieldUssClassName);
                         return unsignedLongField;
+#else
+                        if (originalField is LongField unsignedLongField)
+                        {
+                            unsignedLongField.SetValueWithoutNotify(property.longValue);
+                            return null;
+                        }
+
+                        unsignedLongField = new LongField(label)
+                        {
+                            value = property.longValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        unsignedLongField.BindProperty(property);
+                        unsignedLongField.AddToClassList(LongField.alignedFieldUssClassName);
+                        return unsignedLongField;
+#endif
                     }
 
                     if (property.type == "int")
@@ -518,6 +538,7 @@ namespace SaintsField.Editor.Utils
 
                     if (property.type == "uint")
                     {
+#if UNITY_2022_2_OR_NEWER
                         if (originalField is UnsignedIntegerField unsignedIntegerField)
                         {
                             unsignedIntegerField.SetValueWithoutNotify(property.uintValue);
@@ -535,6 +556,25 @@ namespace SaintsField.Editor.Utils
                         unsignedIntegerField.BindProperty(property);
                         unsignedIntegerField.AddToClassList(UnsignedIntegerField.alignedFieldUssClassName);
                         return unsignedIntegerField;
+#else
+                        if (originalField is IntegerField unsignedIntegerField)
+                        {
+                            unsignedIntegerField.SetValueWithoutNotify(property.intValue);
+                            return null;
+                        }
+
+                        unsignedIntegerField = new IntegerField(label)
+                        {
+                            value = property.intValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                            },
+                        };
+                        unsignedIntegerField.BindProperty(property);
+                        unsignedIntegerField.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        return unsignedIntegerField;
+#endif
                     }
 
                     if (property.type == "sbyte")
@@ -991,15 +1031,29 @@ namespace SaintsField.Editor.Utils
                 }
                 case SerializedPropertyType.Gradient:
                 {
+                    // ReSharper disable once JoinDeclarationAndInitializer
+                    Gradient gradient;
+#if UNITY_2022_1_OR_NEWER
+                    gradient = property.gradientValue;
+#else
+                    PropertyInfo propertyInfo = property.GetType().GetProperty("gradientValue", BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (propertyInfo == null)
+                    {
+                        throw new InvalidOperationException("Property 'gradientValue' not found.");
+                    }
+                    gradient = (Gradient)propertyInfo.GetValue(property);
+#endif
+
                     if (originalField is GradientField gradientField)
                     {
-                        gradientField.SetValueWithoutNotify(property.gradientValue);
+
+                        gradientField.SetValueWithoutNotify(gradient);
                         return null;
                     }
 
                     gradientField = new GradientField(label)
                     {
-                        value = property.gradientValue,
+                        value = gradient,
                         style =
                         {
                             flexGrow = 1,

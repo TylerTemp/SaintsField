@@ -95,7 +95,7 @@ namespace SaintsField.Editor.Core
             }
 
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
-            if (string.IsNullOrEmpty(preferredLabel))
+            if (string.IsNullOrEmpty(GetPreferredLabel(property)))
             {
                 NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
 
@@ -293,7 +293,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                     Debug.Log("fallback field drawer");
 #endif
-                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, preferredLabel,
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property),
                         allAttributes, saintsPropertyDrawers, parent);
                     fallback.AddToClassList(ClassFieldUIToolkit(property));
                     fieldContainer.Add(fallback);

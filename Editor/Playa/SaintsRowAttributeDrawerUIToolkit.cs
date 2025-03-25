@@ -80,7 +80,13 @@ namespace SaintsField.Editor.Playa
 
             SaintsRowAttribute saintsRowAttribute = attribute as SaintsRowAttribute;
 
-            return CreateElement(property, preferredLabel, fieldInfo, saintsRowAttribute, this, this);
+            return CreateElement(property,
+#if UNITY_2022_3_OR_NEWER
+                preferredLabel
+#else
+                property.displayName
+#endif
+            , fieldInfo, saintsRowAttribute, this, this);
         }
 
         private static void FillElement(VisualElement root, SerializedProperty property, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
