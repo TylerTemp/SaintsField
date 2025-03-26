@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Utils
 {
     public static class ReflectCache
     {
-        private static readonly Dictionary<AttributesKey, object[]> CustomAttributes = new Dictionary<AttributesKey, object[]>();
+        private static readonly Dictionary<AttributesKey, Attribute[]> CustomAttributes = new Dictionary<AttributesKey, Attribute[]>();
 
         private readonly struct AttributesKey : IEquatable<AttributesKey>
         {
@@ -33,29 +33,29 @@ namespace SaintsField.Editor.Utils
         public static Attribute[] GetCustomAttributes(MemberInfo memberInfo, bool inherit = false)
         {
             AttributesKey key = new AttributesKey(memberInfo, inherit);
-            if (CustomAttributes.TryGetValue(key, out object[] attributes))
+            if (CustomAttributes.TryGetValue(key, out Attribute[] attributes))
             {
-                return (Attribute[])attributes;
+                return attributes;
             }
 
             // ReSharper disable once CoVariantArrayConversion
             attributes = memberInfo.GetCustomAttributes().ToArray();
             CustomAttributes[key] = attributes;
-            return (Attribute[])attributes;
+            return attributes;
         }
 
-        public static T[] GetCustomAttributes<T>(MemberInfo memberInfo, bool inherit = false) where T : class
+        public static T[] GetCustomAttributes<T>(MemberInfo memberInfo, bool inherit = false)
         {
             AttributesKey key = new AttributesKey(memberInfo, inherit, typeof(T));
-            if (CustomAttributes.TryGetValue(key, out object[] attributes))
+            if (CustomAttributes.TryGetValue(key, out Attribute[] attributes))
             {
-                return (T[])attributes;
+                // return (T[])attributes;
+                return attributes.OfType<T>().ToArray();
             }
 
-            // ReSharper disable once CoVariantArrayConversion
-            attributes = memberInfo.GetCustomAttributes().OfType<T>().ToArray();
+            attributes = memberInfo.GetCustomAttributes().ToArray();
             CustomAttributes[key] = attributes;
-            return (T[])attributes;
+            return attributes.OfType<T>().ToArray();
         }
     }
 }

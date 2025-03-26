@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.0-preview.2 ##
+
+1.  UI Toolkit: fix fallback flow that treats `string` as array/list
+
+This version is a preview release. For stable release, please use [version 3.36.8](https://github.com/TylerTemp/SaintsField/releases/tag/3.36.8)
+
 ## 4.0.0-preview.1 ##
 
 1.  Refactor the `SaintsRow` drawer
@@ -8,7 +14,7 @@
 4.  UI Toolkit: If you have `SaintsEditor` enabled, or have any saints property added to a serializable class/struct/interface, the `SaintsRow` attribute will automatically be used if the target has no explicit drawer
 5.  UI Toolkit: If you have `SaintsEditor` enabled, the order of the property no longer matters. Things like `[Range(0, 1), InfoBox("Saints InfoBox")]` will work as expected. The 3rd party drawer no longer block the saintfield drawer
 
-This is a preview release. You might not what to try it in your production environment.
+This version is a preview release. For stable release, please use [version 3.36.8](https://github.com/TylerTemp/SaintsField/releases/tag/3.36.8)
 
 ## 3.36.8 ##
 

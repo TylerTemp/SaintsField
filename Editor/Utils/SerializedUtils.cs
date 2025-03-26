@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Utils
 
         public static bool IsArrayOrDirectlyInsideArray(SerializedProperty property)
         {
-            bool extractFromArrayType = property.isArray;
+            bool extractFromArrayType = property.propertyType == SerializedPropertyType.Generic && property.isArray;
             if (extractFromArrayType)
             {
                 return true;

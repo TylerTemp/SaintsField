@@ -40,13 +40,17 @@ namespace SaintsField.Editor.Playa.Renderer
 
             Type useDrawerType = null;
             Attribute useAttribute = null;
-            if(!FieldWithInfo.SerializedProperty.isArray)
+            bool isArray = FieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic
+                && FieldWithInfo.SerializedProperty.isArray;
+            if(!isArray)
             {
                 PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo);
 
                 ISaintsAttribute saintsAttr = allAttributes
                     .OfType<ISaintsAttribute>()
                     .FirstOrDefault();
+
+                // Debug.Log(saintsAttr);
 
                 useAttribute = saintsAttr as Attribute;
                 if (saintsAttr != null)
@@ -63,7 +67,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
-            // Debug.Log(useDrawerType);
+            // Debug.Log($"{useAttribute}/{useDrawerType}/isArray={isArray}/{FieldWithInfo.SerializedProperty.propertyPath}");
 
             if (useDrawerType == null)
             {

@@ -6,6 +6,15 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class DrawerFallbackFlow : SaintsMonoBehaviour
     {
+        [AdvancedDropdown(nameof(LanguageNames))]
+        public string curLang;
+        private static readonly string[] LanguageNames =
+        {
+            "Chinese",
+            "English",
+            "Japanese",
+        };
+
         [Serializable]
         public enum MyEnum
         {

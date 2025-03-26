@@ -541,6 +541,7 @@ namespace SaintsField.Editor.Core
                     {
                         float height =
                             (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
+                        // Debug.Log(height);
                         Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
                         imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
 
