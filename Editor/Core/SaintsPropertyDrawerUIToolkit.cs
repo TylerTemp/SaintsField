@@ -509,10 +509,10 @@ namespace SaintsField.Editor.Core
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
                 PropertyDrawer imGuiDrawer = drawerInstance;
-                MethodInfo imGuiGetPropertyHeightMethod = drawerType.GetMethod("GetPropertyHeight");
-                MethodInfo imGuiOnGUIMethodInfo = drawerType.GetMethod("OnGUI");
-                Debug.Assert(imGuiGetPropertyHeightMethod != null);
-                Debug.Assert(imGuiOnGUIMethodInfo != null);
+                // MethodInfo imGuiGetPropertyHeightMethod = drawerType.GetMethod("GetPropertyHeight");
+                // MethodInfo imGuiOnGUIMethodInfo = drawerType.GetMethod("OnGUI");
+                // Debug.Assert(imGuiGetPropertyHeightMethod != null);
+                // Debug.Assert(imGuiOnGUIMethodInfo != null);
 
                 Action<object> onValueChangedCallback = null;
                 onValueChangedCallback = value =>
@@ -536,7 +536,8 @@ namespace SaintsField.Editor.Core
 
                 IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
 
-                IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
+                IMGUIContainer imGuiContainer = null;
+                imGuiContainer = new IMGUIContainer(() =>
                 {
                     property.serializedObject.Update();
 
@@ -548,6 +549,29 @@ namespace SaintsField.Editor.Core
                     using(new ImGuiLabelStyleRichTextScoop())
                     using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                     {
+                        // This weird way is from Unity's PropertyDrawer
+                        // The other ways which commented below does not work:
+                        // they either not work for I2Language, or Wwise.Event
+                        // Rect position;
+                        // using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        // {
+                        //     Debug.Log($"== Get Height from {imGuiDrawer}");
+                        //     position = new Rect
+                        //     {
+                        //         height = imGuiDrawer.GetPropertyHeight(property, label),
+                        //         width = imGuiContainer.resolvedStyle.width,
+                        //     };
+                        // }
+                        // Debug.Log($"== Done Height from {imGuiDrawer}: {position.height}");
+                        // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        // {
+                        //     imGuiDrawer.OnGUI(position, property, label);
+                        // }
+                        // // ReSharper disable once PossibleNullReferenceException
+                        // // ReSharper disable once AccessToModifiedClosure
+                        // imGuiContainer.style.height = position.height;
+
+                        using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
                         using (new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
                         {
                             EditorGUILayout.PropertyField(property, label, true);
