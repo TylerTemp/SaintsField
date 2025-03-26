@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue182
 
     public class Comment2Attribute : BelowRichLabelAttribute
     {
-        public Comment2Attribute(string comment) : base($"  <color=gray>{comment}</color>") { }
+        public Comment2Attribute(string comment) : base($"  <color=gray><size=10%>{comment}</size></color>") { }
     }
 
     public class CommentAttribute:PropertyAttribute
