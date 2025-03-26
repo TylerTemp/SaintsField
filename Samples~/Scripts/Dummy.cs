@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -22,8 +24,10 @@ namespace SaintsField.Samples.Scripts
 
         private void ReadCopy()
         {
+#if UNITY_EDITOR
             string clipboardData = EditorGUIUtility.systemCopyBuffer;
             Debug.Log("Clipboard Data: " + clipboardData);
+#endif
         }
     }
 }
