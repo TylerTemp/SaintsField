@@ -88,7 +88,7 @@ namespace: `SaintsField`
 3.  UI Toolkit: fix `SaintsEditor` won't draw a `DecoratorDrawer` of a field
 
 > [!CAUTION]
-> This version is a preview release. You might not what to try it in your production environment.
+> This version is a preview release. For stable release, please use [version 3.36.8](https://github.com/TylerTemp/SaintsField/releases/tag/3.36.8)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
