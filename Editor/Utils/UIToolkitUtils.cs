@@ -345,17 +345,6 @@ namespace SaintsField.Editor.Utils
           IDOTweenPlayRecorder doTweenPlayRecorder,
           VisualElement originalField)
         {
-            // TODO: Array
-            // if (property.isArray)
-            // {
-            //     if (originalField is ListView)
-            //     {
-            //         return null;
-            //     }
-            //
-            //
-            // }
-
             SerializedPropertyType propertyType = property.propertyType;
             switch (propertyType)
             {
@@ -467,6 +456,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         longField.BindProperty(property);
@@ -489,6 +479,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         unsignedLongField.BindProperty(property);
@@ -507,6 +498,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         unsignedLongField.BindProperty(property);
@@ -529,6 +521,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         integerField.BindProperty(property);
@@ -551,6 +544,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         unsignedIntegerField.BindProperty(property);
@@ -569,6 +563,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         unsignedIntegerField.BindProperty(property);
@@ -591,6 +586,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         element.BindProperty(property);
@@ -620,6 +616,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         element.BindProperty(property);
@@ -652,6 +649,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         element.BindProperty(property);
@@ -672,6 +670,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         element.BindProperty(property);
@@ -694,6 +693,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     toggle.BindProperty(property);
@@ -714,6 +714,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     doubleField.BindProperty(property);
@@ -734,6 +735,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     textField.BindProperty(property);
@@ -754,6 +756,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     colorField.AddToClassList(ColorField.alignedFieldUssClassName);
@@ -782,6 +785,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     objectField.BindProperty(property);
@@ -802,6 +806,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     layerMaskField.BindProperty(property);
@@ -827,6 +832,7 @@ namespace SaintsField.Editor.Utils
                             style =
                             {
                                 flexGrow = 1,
+                                flexShrink = 1,
                             },
                         };
                         enumFlagsField.BindProperty(property);
@@ -854,6 +860,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     popupFieldString.RegisterValueChangedCallback(e =>
@@ -881,6 +888,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     vector2Field.BindProperty(property);
@@ -901,6 +909,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     vector3Field.BindProperty(property);
@@ -921,6 +930,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     vector4Field.BindProperty(property);
@@ -941,6 +951,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     rectField.BindProperty(property);
@@ -962,6 +973,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     integerField.BindProperty(property);
@@ -983,6 +995,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     textField.BindProperty(property);
@@ -1003,6 +1016,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     curveField.BindProperty(property);
@@ -1023,6 +1037,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     boundsField.BindProperty(property);
@@ -1057,6 +1072,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     gradientField.BindProperty(property);
@@ -1080,6 +1096,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     integerField.BindProperty(property);
@@ -1100,6 +1117,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     vector2IntField.BindProperty(property);
@@ -1120,6 +1138,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     vector3IntField.BindProperty(property);
@@ -1140,6 +1159,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     rectIntField.BindProperty(property);
@@ -1160,6 +1180,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     boundsIntField.BindProperty(property);
@@ -1180,6 +1201,7 @@ namespace SaintsField.Editor.Utils
                         style =
                         {
                             flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
                     hash128Field.BindProperty(property);
