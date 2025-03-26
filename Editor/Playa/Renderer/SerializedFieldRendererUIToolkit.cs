@@ -266,15 +266,27 @@ namespace SaintsField.Editor.Playa.Renderer
                     mAttributeField.SetValue(decorator, propAttribute);
                 }
 
-                VisualElement ve = decorator.CreatePropertyGUI();
+                VisualElement ve =
+#if UNITY_2022_3_OR_NEWER
+                        decorator.CreatePropertyGUI()
+#else
+                        null
+#endif
+                    ;
+
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (ve == null)
                 {
                     ve = new IMGUIContainer(() =>
                     {
-                        Rect position = new Rect();
-                        position.height = decorator.GetHeight();
-                        position.width = result.resolvedStyle.width;
+                        Rect position = new Rect
+                        {
+                            height = decorator.GetHeight(),
+                            width = result.resolvedStyle.width,
+                        };
                         decorator.OnGUI(position);
+                        // ReSharper disable once PossibleNullReferenceException
+                        // ReSharper disable once AccessToModifiedClosure
                         ve.style.height = position.height;
                     });
                     ve.style.height = decorator.GetHeight();
