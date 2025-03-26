@@ -81,13 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.0-preview.1**
+**4.0.0-preview.2**
 
-1.  Refactor the `SaintsRow` drawer
-2.  Change the flow of how `SaintsPropertyDrawer` & `SaintsEditor` in UI Toolkit fallback to drawers
-3.  UI Toolkit: `ShowInInspector` now shows a more grayed-out color for label, to distinguish from the serializable field
-4.  UI Toolkit: If you have `SaintsEditor` enabled, or have any saints property added to a serializable class/struct/interface, the `SaintsRow` attribute will automatically be used if the target has no explicit drawer
-5.  UI Toolkit: If you have `SaintsEditor` enabled, the order of the property no longer matters. Things like `[Range(0, 1), InfoBox("Saints InfoBox")]` will work as expected. The 3rd party drawer no longer block the saintfield drawer
+1.  UI Toolkit: fix fallback flow that treats `string` as array/list
+2.  UI Toolkit: fix drawer incorrect height when falling back to IMGUI drawer using `IMGUIContainer`
+3.  UI Toolkit: fix `SaintsEditor` won't draw a `DecoratorDrawer` of a field
 
 > [!CAUTION]
 > This version is a preview release. You might not what to try it in your production environment.
