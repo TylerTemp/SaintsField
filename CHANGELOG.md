@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.0-preview.3 ##
+
+1.  UI Toolkit: fix `IMGUIContainer` incorrect draw height when the target field has SaintsField attributes too
+2.  UI Toolkit: fix `SaintsEditor` field won't shrink properly when the field is long
+
 ## 4.0.0-preview.2 ##
 
 1.  UI Toolkit: fix fallback flow that treats `string` as array/list

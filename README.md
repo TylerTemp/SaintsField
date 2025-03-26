@@ -81,11 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.0-preview.2**
+**4.0.0-preview.3**
 
-1.  UI Toolkit: fix fallback flow that treats `string` as array/list
-2.  UI Toolkit: fix drawer incorrect height when falling back to IMGUI drawer using `IMGUIContainer`
-3.  UI Toolkit: fix `SaintsEditor` won't draw a `DecoratorDrawer` of a field
+1.  UI Toolkit: fix `IMGUIContainer` incorrect draw height when the target field has SaintsField attributes too
+2.  UI Toolkit: fix `SaintsEditor` field won't shrink properly when the field is long
 
 > [!CAUTION]
 > This version is a preview release. For stable release, please use [version 3.36.8](https://github.com/TylerTemp/SaintsField/releases/tag/3.36.8)
