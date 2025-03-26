@@ -133,7 +133,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            if (EditorApplication.isPlaying)
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 SharedCache.Clear();
                 return;
@@ -383,7 +383,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 //         private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
 //             VisualElement container, Action<object> onValueChanged, FieldInfo info)
 //         {
-//             if (EditorApplication.isPlaying)
+//             if (EditorApplication.isPlayingOrWillChangePlaymode)
 //             {
 //                 return;
 //             }

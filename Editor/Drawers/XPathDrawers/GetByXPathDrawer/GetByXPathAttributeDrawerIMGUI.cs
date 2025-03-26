@@ -62,7 +62,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
             // return 0;
-            if (EditorApplication.isPlaying)
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return 0;
             }
@@ -178,7 +178,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            if (EditorApplication.isPlaying)
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return false;
             }
@@ -425,7 +425,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         private static string GetBelowMessage(SerializedProperty property,
             ISaintsAttribute saintsAttribute)
         {
-            if (EditorApplication.isPlaying)
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return "";
             }

@@ -531,7 +531,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info, bool isImGui)
         {
-            if (EditorApplication.isPlaying)
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return false;
             }

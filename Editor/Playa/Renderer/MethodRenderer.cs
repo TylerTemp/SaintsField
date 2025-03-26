@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
         {
-            if (EditorApplication.isPlaying)
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return;
             }
