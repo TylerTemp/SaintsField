@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue182
         [Comment2("remove this armor from this parent's Damage Handler when detaching")]
         public Transform unitParent;
 
-        [LayoutStart("On Detach", ELayout.TitleBox)]
+        [LayoutStart("On Detach", ELayout.Background|ELayout.Title)]
         public bool destroySelfUnit,
             destroyThisComponent,
             unparent;

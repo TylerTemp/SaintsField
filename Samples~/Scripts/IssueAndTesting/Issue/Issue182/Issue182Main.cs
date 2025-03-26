@@ -1,7 +1,6 @@
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
-using Transform = log4net.Util.Transform;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue182
 {
@@ -10,7 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue182
         [Comment("remove this armor from this parent's Damage Handler when detaching")]
         public Transform unitParent;
 
-        [LayoutStart("On Detach", ELayout.TitleBox)]
+        [LayoutStart("On Detach", ELayout.Background|ELayout.Title)]
         public bool destroySelfUnit,
             destroyThisComponent,
             unparent;
