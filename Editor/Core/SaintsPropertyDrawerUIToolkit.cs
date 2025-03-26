@@ -477,6 +477,7 @@ namespace SaintsField.Editor.Core
         //     _saintsPropertyInfoInjects.Add(func);
         // }
 
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string preferredLabel, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
@@ -495,6 +496,7 @@ namespace SaintsField.Editor.Core
                 saintsPropertyDrawers, containerElement, parent);
             return element;
         }
+#endif
 
         private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement, object parent)
         {

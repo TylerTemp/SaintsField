@@ -1,6 +1,5 @@
-﻿
+﻿#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
-#if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using UnityEditor;
@@ -188,26 +187,6 @@ namespace SaintsField.Editor.Utils
             label.style.display = DisplayStyle.Flex;
         }
 
-        public class DropdownButtonField : BaseField<string>
-        {
-            public readonly Button ButtonElement;
-            public readonly Label ButtonLabelElement;
-            // private readonly MethodInfo AlignLabel;
-
-            public DropdownButtonField(string label, Button visualInput, Label buttonLabel) : base(label, visualInput)
-            {
-                ButtonElement = visualInput;
-                ButtonLabelElement = buttonLabel;
-
-                // AlignLabel = typeof(BaseField<string>).GetMethod("AlignLabel", BindingFlags.NonPublic | BindingFlags.Instance);
-            }
-
-            // public void AlignLabelForce()
-            // {
-            //     AlignLabel.Invoke(this, new object[]{});
-            // }
-        }
-
         public static DropdownButtonField MakeDropdownButtonUIToolkit(string label)
         {
             Button button = new Button
@@ -334,6 +313,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         // Basiclly the same idea from PropertyField
         // Note: do NOT pass SerializedPropertyType.Generic type: process it externally.
         public static VisualElement CreateOrUpdateFieldFromProperty(
@@ -1210,8 +1190,30 @@ namespace SaintsField.Editor.Utils
                 }
                 default:
                     return null;
-          }
+            }
         }
+#endif
+
+
+    public class DropdownButtonField : BaseField<string>
+    {
+        public readonly Button ButtonElement;
+        public readonly Label ButtonLabelElement;
+        // private readonly MethodInfo AlignLabel;
+
+        public DropdownButtonField(string label, Button visualInput, Label buttonLabel) : base(label, visualInput)
+        {
+            ButtonElement = visualInput;
+            ButtonLabelElement = buttonLabel;
+
+            // AlignLabel = typeof(BaseField<string>).GetMethod("AlignLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        // public void AlignLabelForce()
+        // {
+        //     AlignLabel.Invoke(this, new object[]{});
+        // }
     }
+}
 #endif
 }
