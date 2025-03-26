@@ -6,6 +6,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class DrawerFallbackFlow : SaintsMonoBehaviour
     {
+        [SepTitle(EColor.Aqua)]
         [AdvancedDropdown(nameof(LanguageNames))]
         public string curLang;
         private static readonly string[] LanguageNames =
@@ -23,6 +24,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             One,
             Two,
         }
+
+        [Space]
         public bool _boolV;
         public bool[] _boolVs;
         public byte _byteV;
@@ -64,6 +67,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         public MyStruct myStruct;
+        public MyStruct[] myStructs;
 
         [Serializable]
         public struct SaintsStruct
@@ -77,6 +81,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         public SaintsStruct structWithoutRaw;
+        // this won't work ATM for SaintsRow
+        public SaintsStruct[] structWithoutRaws;
         [InfoBox("Prop without SaintsRow")]
         public SaintsStruct structWithOtherProp;
 

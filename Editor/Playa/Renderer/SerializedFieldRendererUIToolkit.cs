@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -36,7 +37,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // SaintsPropertyDrawer relys on PropertyField to fallback. Directly hi-jiacking the drawer with SaintsPropertyDrawer
             // the workflow will still get into the PropertyField flow, then SaintsField will fail to decide when the
             // fallback should stop.
-
+            PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo);
 
             Type useDrawerType = null;
             Attribute useAttribute = null;
@@ -44,8 +45,6 @@ namespace SaintsField.Editor.Playa.Renderer
                 && FieldWithInfo.SerializedProperty.isArray;
             if(!isArray)
             {
-                PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo);
-
                 ISaintsAttribute saintsAttr = allAttributes
                     .OfType<ISaintsAttribute>()
                     .FirstOrDefault();
@@ -80,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     this,
                     null
                 );
-                return (r, false);
+                return (MergeWithDec(r, allAttributes), false);
             }
 
             // Nah... This didn't handle for mis-ordered case
@@ -97,6 +96,8 @@ namespace SaintsField.Editor.Playa.Renderer
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
 
+            // Debug.Log(useDrawerType);
+
             PropertyDrawer propertyDrawer = SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, FieldWithInfo.FieldInfo, useAttribute, FieldWithInfo.SerializedProperty.displayName);
             // Debug.Log(saintsPropertyDrawer);
 
@@ -111,10 +112,12 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (!useImGui)
             {
-                return (propertyDrawer.CreatePropertyGUI(FieldWithInfo.SerializedProperty), false);
+                VisualElement r = propertyDrawer.CreatePropertyGUI(FieldWithInfo.SerializedProperty);
+                return (MergeWithDec(r, allAttributes), false);
             }
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
+            // We don't need to handle decorators either
             PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
             {
                 style =
@@ -164,6 +167,148 @@ namespace SaintsField.Editor.Playa.Renderer
             // imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
             //
             // return (imGuiContainer, false);
+        }
+
+        private static VisualElement MergeWithDec(VisualElement result, PropertyAttribute[] allAttributes)
+        {
+            VisualElement dec = DrawDecorator(allAttributes);
+            if(dec == null)
+            {
+                return result;
+            }
+
+            VisualElement container = new VisualElement();
+            container.Add(dec);
+            container.Add(result);
+            return container;
+        }
+
+        private static readonly Dictionary<Type, Type> PropertyTypeToDecoratorDrawerType = new Dictionary<Type, Type>();
+
+        private static VisualElement DrawDecorator(IEnumerable<PropertyAttribute> allPropAttributes)
+        {
+            IReadOnlyDictionary<Type, IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo>> propertyAttributeToDecoratorDrawers = SaintsPropertyDrawer.EnsureAndGetTypeToDrawers().attrToDecoratorDrawers;
+            // this can be multiple, should not be a dictionary
+            List<(PropertyAttribute propAttribute, Type drawerType)> decDrawers = new List<(PropertyAttribute, Type drawerType)>();
+
+            foreach (PropertyAttribute propAttribute in allPropAttributes)
+            {
+                Type propType = propAttribute.GetType();
+                Type decDrawer = null;
+
+                if (PropertyTypeToDecoratorDrawerType.TryGetValue(propType, out Type cachedDecoratorDrawerType))
+                {
+                    decDrawer = cachedDecoratorDrawerType;
+                }
+
+                if(decDrawer == null)
+                {
+                    if (propertyAttributeToDecoratorDrawers.TryGetValue(propType,
+                            out IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo> drawerInfos))
+                    {
+                        decDrawer = drawerInfos[0].DrawerType;
+                        // foreach (SaintsPropertyDrawer.PropertyDrawerInfo propertyDrawerInfo in drawerInfos)
+                        // {
+                        //     // Debug.Log($"{propType}: {propertyDrawerInfo.DrawerType}");
+                        //     // ReSharper disable once InvertIf
+                        //     if (propertyDrawerInfo.DrawerType.IsSubclassOf(decoratorDrawerType))
+                        //     {
+                        //
+                        //         break;
+                        //     }
+                        // }
+                    }
+                }
+                if (decDrawer == null)
+                {
+                    foreach (KeyValuePair<Type, IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo>> kv in propertyAttributeToDecoratorDrawers)
+                    {
+                        Type foundAttributeType = kv.Key;
+                        // ReSharper disable once InvertIf
+                        if (foundAttributeType.IsAssignableFrom(propAttribute.GetType()))
+                        {
+                            foreach (SaintsPropertyDrawer.PropertyDrawerInfo propertyDrawerInfo in kv.Value)
+                            {
+                                // ReSharper disable once InvertIf
+                                if (propertyDrawerInfo.UseForChildren)
+                                {
+                                    decDrawer = propertyDrawerInfo.DrawerType;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (decDrawer != null)
+                {
+                    decDrawers.Add((propAttribute, decDrawer));
+                    PropertyTypeToDecoratorDrawerType[propType] = decDrawer;
+                }
+            }
+
+            if (decDrawers.Count == 0)
+            {
+                return null;
+            }
+
+            VisualElement result = new VisualElement();
+            result.AddToClassList("unity-decorator-drawers-container");
+            // this.m_DecoratorDrawersContainer = new VisualElement();
+            // this.m_DecoratorDrawersContainer.AddToClassList(PropertyField.decoratorDrawersContainerClassName);
+
+            foreach ((PropertyAttribute propAttribute, Type drawerType) in decDrawers)
+            {
+                DecoratorDrawer decorator = (DecoratorDrawer)Activator.CreateInstance(drawerType);
+                FieldInfo mAttributeField = drawerType.GetField("m_Attribute", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (mAttributeField != null)
+                {
+                    mAttributeField.SetValue(decorator, propAttribute);
+                }
+
+                VisualElement ve = decorator.CreatePropertyGUI();
+                if (ve == null)
+                {
+                    ve = new IMGUIContainer(() =>
+                    {
+                        Rect position = new Rect();
+                        position.height = decorator.GetHeight();
+                        position.width = result.resolvedStyle.width;
+                        decorator.OnGUI(position);
+                        ve.style.height = position.height;
+                    });
+                    ve.style.height = decorator.GetHeight();
+                }
+                result.Add(ve);
+            }
+
+            // foreach (DecoratorDrawer decoratorDrawer in decoratorDrawers)
+            // {
+            //     DecoratorDrawer decorator = decoratorDrawer;
+            //     VisualElement ve = decorator.CreatePropertyGUI();
+            //     if (ve == null)
+            //     {
+            //         ve = (VisualElement) new IMGUIContainer((Action) (() =>
+            //         {
+            //             Rect position = new Rect();
+            //             position.height = decorator.GetHeight();
+            //             position.width = this.resolvedStyle.width;
+            //             decorator.OnGUI(position);
+            //             ve.style.height = (StyleLength) position.height;
+            //         }));
+            //         ve.style.height = (StyleLength) decorator.GetHeight();
+            //     }
+            //     this.m_DecoratorDrawersContainer.Add(ve);
+            // }
+
+            return result;
+
+            // // PropertyHandler propertyHandle = UnityEditor.ScriptAttributeUtility.GetHandler(FieldWithInfo.SerializedProperty);
+            // PropertyHandler propertyHandle = (PropertyHandler)typeof(UnityEditor.Editor).Assembly
+            //     .GetType("UnityEditor.ScriptAttributeUtility")
+            //     .GetMethod("GetHandler", BindingFlags.NonPublic | BindingFlags.Static)
+            //     .Invoke(null, new object[] { FieldWithInfo.SerializedProperty });
+
         }
 
         public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)

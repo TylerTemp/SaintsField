@@ -50,6 +50,15 @@ namespace SaintsField.Editor.Core
             Debug.Log($"Create property gui {property.propertyPath}/{property.displayName}/{this}");
 #endif
 
+            // IMGUIContainer Fallback
+            if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideDrawCount) &&
+                insideDrawCount > 0)
+            {
+                // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
+                // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
+                return new VisualElement();
+            }
+
             VisualElement containerElement = new VisualElement
             {
                 style =
@@ -539,14 +548,19 @@ namespace SaintsField.Editor.Core
                     using(new ImGuiLabelStyleRichTextScoop())
                     using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                     {
-                        float height =
-                            (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
-                        // Debug.Log(height);
-                        Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-                        imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
+                        using (new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        {
+                            EditorGUILayout.PropertyField(property, label, true);
+                        }
 
-                        // Debug.Log(changed.changed);
-
+                        // float height =
+                        //     (float)imGuiGetPropertyHeightMethod.Invoke(imGuiDrawer, new object[] { property, label });
+                        // Debug.Log($"container height={height}");
+                        // Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
+                        // imGuiOnGUIMethodInfo.Invoke(imGuiDrawer, new object[] { rect, property, label });
+                        //
+                        // // Debug.Log(changed.changed);
+                        //
                         // ReSharper disable once InvertIf
                         if (changed.changed)
                         {

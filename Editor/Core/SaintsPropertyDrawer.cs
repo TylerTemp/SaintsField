@@ -35,8 +35,8 @@ namespace SaintsField.Editor.Core
         protected static readonly Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>> PropertyAttributeToPropertyDrawers =
             new Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>>();
 // #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
-        private static IReadOnlyDictionary<Type, IReadOnlyList<Type>> _propertyAttributeToDecoratorDrawers =
-            new Dictionary<Type, IReadOnlyList<Type>>();
+        private static IReadOnlyDictionary<Type, IReadOnlyList<PropertyDrawerInfo>> _propertyAttributeToDecoratorDrawers =
+            new Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>>();
 // #endif
 
         // [MenuItem("Saints/Debug")]
@@ -163,16 +163,16 @@ namespace SaintsField.Editor.Core
             SceneViewNotifications.Add(message);
         }
 
-        public static IReadOnlyDictionary<Type, IReadOnlyList<PropertyDrawerInfo>> EnsureAndGetTypeToDrawers()
+        public static (IReadOnlyDictionary<Type, IReadOnlyList<PropertyDrawerInfo>> attrToPropertyDrawers, IReadOnlyDictionary<Type, IReadOnlyList<PropertyDrawerInfo>> attrToDecoratorDrawers) EnsureAndGetTypeToDrawers()
         {
             if (PropertyAttributeToPropertyDrawers.Count != 0)
             {
-                return PropertyAttributeToPropertyDrawers;
+                return (PropertyAttributeToPropertyDrawers, _propertyAttributeToDecoratorDrawers);
             }
 
             Dictionary<Type, HashSet<Type>> attrToDrawers = new Dictionary<Type, HashSet<Type>>();
-            Dictionary<Type, List<Type>> attrToDecoratorDrawers =
-                new Dictionary<Type, List<Type>>();
+            Dictionary<Type, HashSet<Type>> attrToDecoratorDrawers =
+                new Dictionary<Type, HashSet<Type>>();
 
             foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -231,9 +231,9 @@ namespace SaintsField.Editor.Core
                                      ?.GetValue(instance))
                                  .Where(each => each != null))
                     {
-                        if (!attrToDecoratorDrawers.TryGetValue(attr, out List<Type> attrList))
+                        if (!attrToDecoratorDrawers.TryGetValue(attr, out HashSet<Type> attrList))
                         {
-                            attrToDecoratorDrawers[attr] = attrList = new List<Type>();
+                            attrToDecoratorDrawers[attr] = attrList = new HashSet<Type>();
                         }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CORE_DRAWER_INIT
@@ -259,6 +259,7 @@ namespace SaintsField.Editor.Core
                             UseForChildren = ReflectCache.GetCustomAttributes<CustomPropertyDrawer>(each, true)
                                 .Any(instance => typeof(CustomPropertyDrawer)
                                     .GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance)
+                                    // ReSharper disable once MergeIntoPattern
                                     ?.GetValue(instance) is bool useForChildren && useForChildren)
                         })
                     .ToArray();
@@ -268,17 +269,41 @@ namespace SaintsField.Editor.Core
             }
 
 // #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
-            _propertyAttributeToDecoratorDrawers = attrToDecoratorDrawers.ToDictionary(each => each.Key, each => (IReadOnlyList<Type>)each.Value);
+
+            Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>> propertyAttributeToDecoratorDrawers =
+                new Dictionary<Type, IReadOnlyList<PropertyDrawerInfo>>();
+            foreach (KeyValuePair<Type, HashSet<Type>> kv in attrToDecoratorDrawers)
+            {
+                propertyAttributeToDecoratorDrawers[kv.Key] = kv.Value
+                    .Select(each => new PropertyDrawerInfo
+                    {
+                        IsSaints = false,
+                        DrawerType = each,
+                        UseForChildren = ReflectCache.GetCustomAttributes<CustomPropertyDrawer>(each, true)
+                            .Any(instance => typeof(CustomPropertyDrawer)
+                                .GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance)
+                                // ReSharper disable once MergeIntoPattern
+                                ?.GetValue(instance) is bool useForChildren && useForChildren)
+                    })
+                    .ToArray();
+// #if EXT_INSPECTOR_LOG
+//                     Debug.Log($"attr {kv.Key} has drawer(s) {string.Join(",", kv.Value)}");
+// #endif
+            }
+
+            _propertyAttributeToDecoratorDrawers = propertyAttributeToDecoratorDrawers;
+            // _propertyAttributeToDecoratorDrawers = attrToDecoratorDrawers.ToDictionary(each => each.Key, each => (IReadOnlyList<Type>)each.Value);
 // #endif
 
-            return PropertyAttributeToPropertyDrawers;
+            return (PropertyAttributeToPropertyDrawers, _propertyAttributeToDecoratorDrawers);
         }
 
+        // TODO: check useForChildren
         public static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (!_propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-                    out IReadOnlyList<Type> eachDrawer))
+                    out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
             {
                 // Debug.Log(propertyAttribute.GetType());
                 // foreach (Type key in PropertyAttributeToPropertyDrawers.Keys)
@@ -292,7 +317,8 @@ namespace SaintsField.Editor.Core
                 return false;
             }
 
-            return eachDrawer.Any(drawerType => drawerType.IsSubclassOf(typeof(DecoratorDrawer)));
+            // return eachDrawer.Any(drawerType => drawerType.DrawerType.IsSubclassOf(typeof(DecoratorDrawer)));
+            return true;
         }
         // ~SaintsPropertyDrawer()
         // {
