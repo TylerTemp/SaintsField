@@ -9,7 +9,8 @@
         "AYellowpaper.SerializedCollections",
         "NaughtyAttributes.Core",
         "today.comes.saintsfield.Runtime.Addressable",
-        "Unity.Netcode.Runtime"
+        "Unity.Netcode.Runtime",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

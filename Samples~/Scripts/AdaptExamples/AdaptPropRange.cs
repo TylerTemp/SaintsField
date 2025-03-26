@@ -1,9 +1,12 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.AdaptExamples
 {
     public class AdaptPropRange : MonoBehaviour
     {
+        public float3 f3;
+
         [Adapt(EUnit.Percent)] public float percentF;
         [Adapt(EUnit.Percent)] public int percentI;
         [PropRange(0f, 1f), Adapt(EUnit.Percent), OverlayRichLabel("<color=gray>%", end: true), BelowRichLabel("$" + nameof(percentRange)), BelowButton("$" + nameof(ExternalPumpValue), "Pump")] public float percentRange;
