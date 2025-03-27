@@ -1635,7 +1635,7 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
-  _myEnum: 0
+  _myEnum: 1
   _go: {fileID: 0}
   _trans: {fileID: 0}
   _so: {fileID: 0}
@@ -1645,10 +1645,12 @@ MonoBehaviour:
   myEnum: 0
   myStruct:
     myString: 
+  myStructs: []
   structWithoutRaw:
     s1: 
     i1: 0
     go: {fileID: 0}
+  structWithoutRaws: []
   structWithOtherProp:
     s1: 
     i1: 0

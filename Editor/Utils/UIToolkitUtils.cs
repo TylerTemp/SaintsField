@@ -820,22 +820,34 @@ namespace SaintsField.Editor.Utils
                         return enumFlagsField;
                     }
 
-                    if (originalField is PopupField<string> popupFieldString)
+                    // Debug.Log($"property.enumValueIndex={property.enumValueIndex}");
+
+                    if (originalField is PopupField<object> popupFieldString)
                     {
                         popupFieldString.index = property.enumValueIndex;
                         return null;
                     }
 
-                    List<string> enumValues = Enum.GetValues(rawType)
+                    List<object> enumRawValues = Enum.GetValues(rawType)
                         .Cast<object>()
-                        .Select(each =>
+                        .ToList();
+
+                    Dictionary<object, string> enumObjectToFancyName = enumRawValues
+                        .ToDictionary(each => each, each =>
                         {
                             (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
                             return found ? richName : Enum.GetName(rawType, each);
-                        })
-                        .ToList();
+                        });
+                    //
+                    // List<string> enumFancyNames = enumRawValues
+                    //     .Select(each =>
+                    //     {
+                    //         (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
+                    //         return found ? richName : Enum.GetName(rawType, each);
+                    //     })
+                    //     .ToList();
 
-                    popupFieldString = new PopupField<string>(label, enumValues, property.intValue)
+                    popupFieldString = new PopupField<object>(label, enumRawValues, enumValue, selected => enumObjectToFancyName[selected], listItem => enumObjectToFancyName[listItem])
                     {
                         style =
                         {
@@ -845,9 +857,15 @@ namespace SaintsField.Editor.Utils
                     };
                     popupFieldString.RegisterValueChangedCallback(e =>
                     {
-                        string newValue = e.newValue;
-                        int index = enumValues.IndexOf(newValue);
-                        property.enumValueIndex = index;
+                        object newValue = e.newValue;
+                        // Debug.Log(newValue);
+                        // int index = enumFancyNames.IndexOf(newValue);
+                        // if (index == -1)
+                        // {
+                        //     return;
+                        // }
+                        // Debug.Log(index);
+                        property.intValue = newValue == null? 0: (int)newValue;
                         property.serializedObject.ApplyModifiedProperties();
                     });
                     popupFieldString.AddToClassList(PopupField<string>.alignedFieldUssClassName);
