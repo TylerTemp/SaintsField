@@ -228,7 +228,10 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG
                         Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content, parsedResult.content);
 #endif
-                        openTags.RemoveAt(openTags.Count - 1);
+                        if(openTags.Count > 0)
+                        {
+                            openTags.RemoveAt(openTags.Count - 1);
+                        }
                     }
 
                     switch (parsedResult.content)
@@ -385,9 +388,9 @@ namespace SaintsField.Editor.Core
                                             {
                                                 tagFinalResult = string.Format(formatString, finalValue);
                                             }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
                                             catch (Exception ex)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
                                             {
 #if SAINTSFIELD_DEBUG
                                                 Debug.LogException(ex);
