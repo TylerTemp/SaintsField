@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.0 ##
+
+Fix rich text gives error if a close tag has no opening tag
+
+## 4.0.0-preview.5 ##
+
+Fix Enum picker
+
 ## 4.0.0-preview.3 ##
 
 1.  UI Toolkit: fix `IMGUIContainer` incorrect draw height when the target field has SaintsField attributes too

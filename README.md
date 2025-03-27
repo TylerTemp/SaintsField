@@ -81,13 +81,21 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.0-preview.3**
+**4.0.0**
 
-1.  UI Toolkit: fix `IMGUIContainer` incorrect draw height when the target field has SaintsField attributes too
-2.  UI Toolkit: fix `SaintsEditor` field won't shrink properly when the field is long
+4.0.0 is capable of last stable release 3.36.8. You should be safe to upgrade to 4.0.0
 
-> [!CAUTION]
-> This version is a preview release. For stable release, please use [version 3.36.8](https://github.com/TylerTemp/SaintsField/releases/tag/3.36.8)
+Changes since 3.36.8:
+
+1.  UI Toolkit: `ShowInInspector` now shows a more grayed-out color for label, to distinguish from the serializable field
+2.  UI Toolkit: If you have `SaintsEditor` enabled, or have any saints property added to a serializable class/struct/interface, the `SaintsRow` attribute will automatically be used if the target has no explicit drawer
+3.  UI Toolkit: If you have `SaintsEditor` enabled, the order of the property no longer matters. Things like `[Range(0, 1), InfoBox("Saints InfoBox")]` will work as expected. The 3rd party drawer no longer block the saintfield drawer
+4.  UI Toolkit: fix drawer incorrect height when falling back to IMGUI drawer using `IMGUIContainer`
+5.  Fix rich text gives error if a close tag has no opening tag
+
+Breaking Changes:
+
+4.0.0 Breaking changes the fallback flow in UI Toolkit internally. This change does not have implact on API usages. For more information, please read [📣Announcements: Upcoming 4.0 Version](https://github.com/TylerTemp/SaintsField/discussions/183)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
