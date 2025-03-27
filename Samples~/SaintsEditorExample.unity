@@ -1603,42 +1603,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e430b0ffd69de6a43a4bad2f86ece40e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enumFromSome: 2
+  enumFromSomeFlags: 5
+  s: 
   curLang: 
-  _boolV: 0
-  _boolVs: 010000
-  _byteV: 0
-  _sbyteV: 0
-  _shortV: -5
-  _ushortV: 0
-  _longV: 9223372036854775807
-  _uLongV: 18446744073709551615
-  _floatV: 0.1234
-  _doubleV: 0.1234
-  _stringV: Hi
-  _vector2V: {x: 1, y: 1}
-  _vector3V: {x: 1, y: 1, z: 1}
-  _vector4V: {x: 1, y: 1, z: 1, w: 1}
-  _vector2VInt: {x: 1, y: 1}
-  _vector3VInt: {x: 1, y: 1, z: 1}
-  _colorV: {r: 1, g: 0, b: 0, a: 1}
-  _boundsV:
+  boolV: 0
+  boolVs: 
+  byteV: 0
+  sbyteV: 0
+  shortV: -5
+  ushortV: 0
+  longV: 9223372036854775807
+  uLongV: 18446744073709551615
+  floatV: 0.1234
+  doubleV: 0.1234
+  stringV: Hi
+  vector2V: {x: 1, y: 1}
+  vector3V: {x: 1, y: 1, z: 1}
+  vector4V: {x: 1, y: 1, z: 1, w: 1}
+  vector2VInt: {x: 1, y: 1}
+  vector3VInt: {x: 1, y: 1, z: 1}
+  colorV: {r: 1, g: 0, b: 0, a: 1}
+  boundsV:
     m_Center: {x: 1, y: 1, z: 1}
     m_Extent: {x: 0, y: 0.5, z: 0}
-  _rectV:
+  rectV:
     serializedVersion: 2
     x: 0
     y: 0
     width: 1
     height: 1
-  _rectIntV:
+  rectIntV:
     x: 0
     y: 0
     width: 1
     height: 1
-  _myEnum: 1
-  _go: {fileID: 0}
-  _trans: {fileID: 0}
-  _so: {fileID: 0}
+  myEnumV: 0
+  go: {fileID: 0}
+  trans: {fileID: 0}
+  so: {fileID: 0}
   f1: 
   f2: 
   pRange: 0

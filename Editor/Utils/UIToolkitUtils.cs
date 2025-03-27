@@ -571,14 +571,6 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         element.AddToClassList(IntegerField.alignedFieldUssClassName);
-                        // element.RegisterValueChangedCallback(evt =>
-                        // {
-                        //     sbyte newValue = (sbyte)evt.newValue;
-                        //     if (newValue != evt.newValue)
-                        //     {
-                        //         element.SetValueWithoutNotify(newValue);
-                        //     }
-                        // });
 
                         return element;
                     }
@@ -601,17 +593,6 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         element.AddToClassList(IntegerField.alignedFieldUssClassName);
-                        // element.RegisterValueChangedCallback(evt =>
-                        // {
-                        //     byte newValue = (byte)evt.newValue;
-                        //     beforeSet?.Invoke(value);
-                        //     setterOrNull(newValue);
-                        //     if (newValue != evt.newValue)
-                        //     {
-                        //         element.SetValueWithoutNotify(newValue);
-                        //     }
-                        // });
-
                         return element;
                     }
 
@@ -820,57 +801,70 @@ namespace SaintsField.Editor.Utils
                         return enumFlagsField;
                     }
 
-                    // Debug.Log($"property.enumValueIndex={property.enumValueIndex}");
-
-                    if (originalField is PopupField<object> popupFieldString)
-                    {
-                        popupFieldString.index = property.enumValueIndex;
-                        return null;
-                    }
-
                     List<object> enumRawValues = Enum.GetValues(rawType)
                         .Cast<object>()
                         .ToList();
 
-                    Dictionary<object, string> enumObjectToFancyName = enumRawValues
-                        .ToDictionary(each => each, each =>
+                    List<string> enumDisplayNames = enumRawValues
+                        .Select(each =>
                         {
                             (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
                             return found ? richName : Enum.GetName(rawType, each);
-                        });
+                        })
+                        .ToList();
+
+                    // Debug.Log($"property.enumValueIndex={property.enumValueIndex}");
+                    int propertyFieldIndex = property.enumValueIndex < 0 || property.enumValueIndex >= enumDisplayNames.Count
+                        ? -1
+                        : property.enumValueIndex;
+
+                    if (originalField is PopupField<string> popupField)
+                    {
+                        popupField.index = propertyFieldIndex;
+                        return null;
+                    }
                     //
-                    // List<string> enumFancyNames = enumRawValues
-                    //     .Select(each =>
+                    // Dictionary<object, string> enumObjectToFancyName = enumRawValues
+                    //     .ToDictionary(each => each, each =>
                     //     {
                     //         (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
                     //         return found ? richName : Enum.GetName(rawType, each);
-                    //     })
-                    //     .ToList();
+                    //     });
 
-                    popupFieldString = new PopupField<object>(label, enumRawValues, enumValue, selected => enumObjectToFancyName[selected], listItem => enumObjectToFancyName[listItem])
+                    popupField = new PopupField<string>(label)
                     {
                         style =
                         {
                             flexGrow = 1,
                             flexShrink = 1,
                         },
+                        choices = enumDisplayNames,
+                        index = propertyFieldIndex,
                     };
-                    popupFieldString.RegisterValueChangedCallback(e =>
-                    {
-                        object newValue = e.newValue;
-                        // Debug.Log(newValue);
-                        // int index = enumFancyNames.IndexOf(newValue);
-                        // if (index == -1)
-                        // {
-                        //     return;
-                        // }
-                        // Debug.Log(index);
-                        property.intValue = newValue == null? 0: (int)newValue;
-                        property.serializedObject.ApplyModifiedProperties();
-                    });
-                    popupFieldString.AddToClassList(PopupField<string>.alignedFieldUssClassName);
 
-                    return popupFieldString;
+                    popupField.BindProperty(property);
+
+                    // popupField.RegisterValueChangedCallback(e =>
+                    // {
+                    //     string newValue = e.newValue;
+                    //     // Debug.Log(newValue);
+                    //     // int index = enumFancyNames.IndexOf(newValue);
+                    //     // if (index == -1)
+                    //     // {
+                    //     //     return;
+                    //     // }
+                    //     // Debug.Log(index);
+                    //     if (newValue == null)
+                    //     {
+                    //         return;
+                    //     }
+                    //
+                    //     property.intValue = (int)newValue;
+                    //     property.serializedObject.ApplyModifiedProperties();
+                    // });
+                    popupField.AddToClassList(PopupField<string>.alignedFieldUssClassName);
+
+                    return popupField;
                 }
                 case SerializedPropertyType.Vector2:
                 {
