@@ -21,6 +21,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             private readonly IReadOnlyDictionary<int, IReadOnlyList<string>> _headerToPropNames;
             private readonly Type _elementType;
 
+            public bool Changed;
+
             // public SaintsTable(TreeViewState state) : base(state)
             // {
             //     Reload();
@@ -188,26 +190,43 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             GUIContent guiContent = prop.propertyType == SerializedPropertyType.Generic
                                 ? new GUIContent(prop.displayName)
                                 : GUIContent.none;
-                            EditorGUI.PropertyField(getCellRect, prop,
-                                guiContent);
+                            // ReSharper disable once ConvertToUsingDeclaration
+                            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                            {
+                                EditorGUI.PropertyField(getCellRect, prop,
+                                    guiContent);
+                                if (changed.changed)
+                                {
+                                    Changed = true;
+                                }
+                            }
                         }
                         else
                         {
                             Rect leftRect = getCellRect;
-                            foreach (string propName in propNames)
+                            // ReSharper disable once ConvertToUsingDeclaration
+                            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                             {
-                                SerializedProperty prop = serObj.FindProperty(propName);
+                                foreach (string propName in propNames)
+                                {
+                                    SerializedProperty prop = serObj.FindProperty(propName);
 
-                                GUIContent guiContent = prop.propertyType == SerializedPropertyType.Generic
-                                    ? new GUIContent(prop.displayName)
-                                    : GUIContent.none;
+                                    GUIContent guiContent = prop.propertyType == SerializedPropertyType.Generic
+                                        ? new GUIContent(prop.displayName)
+                                        : GUIContent.none;
 
-                                float height = EditorGUI.GetPropertyHeight(prop, guiContent, true);
-                                (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
-                                leftRect = belowRect;
-                                EditorGUI.PropertyField(useRect, prop,
-                                    guiContent);
+                                    float height = EditorGUI.GetPropertyHeight(prop, guiContent, true);
+                                    (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
+                                    leftRect = belowRect;
+                                    EditorGUI.PropertyField(useRect, prop,
+                                        guiContent);
 
+                                }
+
+                                if (changed.changed)
+                                {
+                                    Changed = true;
+                                }
                             }
                         }
                     }
@@ -221,23 +240,40 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             ? new GUIContent(prop.displayName)
                             : GUIContent.none;
                         // Debug.Log(getCellRect.height);
-                        EditorGUI.PropertyField(getCellRect, prop,
-                            guiContent);
+                        // ReSharper disable once ConvertToUsingDeclaration
+                        using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                        {
+                            EditorGUI.PropertyField(getCellRect, prop,
+                                guiContent);
+                            if(changed.changed)
+                            {
+                                Changed = true;
+                            }
+                        }
                     }
                     else
                     {
                         Rect leftRect = getCellRect;
-                        foreach (string propName in propNames)
+                        // ReSharper disable once ConvertToUsingDeclaration
+                        using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                         {
-                            SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
-                            GUIContent guiContent =
-                                prop.propertyType == SerializedPropertyType.Generic
-                                    ? new GUIContent(prop.displayName)
-                                    : GUIContent.none;
-                            float height = EditorGUI.GetPropertyHeight(prop, guiContent, true);
-                            (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
-                            leftRect = belowRect;
-                            EditorGUI.PropertyField(useRect, prop, guiContent);
+                            foreach (string propName in propNames)
+                            {
+                                SerializedProperty prop = arrayItemProp.FindPropertyRelative(propName);
+                                GUIContent guiContent =
+                                    prop.propertyType == SerializedPropertyType.Generic
+                                        ? new GUIContent(prop.displayName)
+                                        : GUIContent.none;
+                                float height = EditorGUI.GetPropertyHeight(prop, guiContent, true);
+                                (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
+                                leftRect = belowRect;
+                                EditorGUI.PropertyField(useRect, prop, guiContent);
+                            }
+
+                            if (changed.changed)
+                            {
+                                Changed = true;
+                            }
                         }
                     }
                 }
@@ -450,7 +486,14 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             //     _curSize = arrayProp.arraySize;
             //     // _saintsTable.Reload();
             // }
-            _saintsTable.Reload();
+            // _saintsTable.Reload();
+
+            // ReSharper disable once InvertIf
+            if (_saintsTable.Changed)
+            {
+                _saintsTable.Changed = false;
+                _saintsTable.Reload();
+            }
 
             return Mathf.Max(_saintsTable.totalHeight, EditorGUIUtility.singleLineHeight * (arrayProp.arraySize + 1)) + SingleLineHeight;
         }
