@@ -1,13 +1,15 @@
+using System;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
-    public class CopyPasteTest : SaintsMonoBehaviour
+    public class CopyPasteTest : MonoBehaviour
     {
         public bool boolV;
         [LeftToggle] public bool leftToggle;
@@ -26,6 +28,21 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         private void SetToUI() => layerString = "UIX";
         [Layer, PostFieldButton(nameof(SetToNumber), "U"), BelowRichLabel("<field/>")] public int layerInt;
         private void SetToNumber() => layerInt = -1;
+
+        [Serializable]
+        public class MyClass
+        {
+            public string myString;
+        }
+
+        [PostFieldButton("R")]
+        [SaintsRow] public MyClass myClass1;
+        [SaintsRow] public MyClass myClass2;
+
+        private void R()
+        {
+            myClass1.myString = $"{Random.Range(0, 99999)}";
+        }
 
         [Button]
         private void Paste()

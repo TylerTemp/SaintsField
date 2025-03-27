@@ -302,8 +302,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                     Debug.Log("fallback field drawer");
 #endif
-                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property),
-                        allAttributes, saintsPropertyDrawers, parent);
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property), saintsPropertyDrawers);
                     fallback.AddToClassList(ClassFieldUIToolkit(property));
                     fieldContainer.Add(fallback);
                     containerElement.visible = false;
@@ -478,7 +477,7 @@ namespace SaintsField.Editor.Core
         // }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string preferredLabel, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
+        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
 
@@ -487,18 +486,18 @@ namespace SaintsField.Editor.Core
                 Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
                     ? ReflectUtils.GetElementType(info.FieldType)
                     : info.FieldType;
-                return UIToolkitUtils.CreateOrUpdateFieldFromProperty(property, rawType, preferredLabel,
+                return UIToolkitUtils.CreateOrUpdateFieldFromProperty(property, rawType, passedPreferredLabel,
                     info, this, this, null);
             }
 
-            PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, preferredLabel);
-            VisualElement element = DrawUsingDrawerInstance(drawerType, typeDrawer, property, info, allAttributes,
-                saintsPropertyDrawers, containerElement, parent);
+            PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
+            VisualElement element = DrawUsingDrawerInstance(drawerType, typeDrawer, property, info,
+                saintsPropertyDrawers, containerElement);
             return element;
         }
 #endif
 
-        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<PropertyAttribute> allAttributes, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement, object parent)
+        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
         {
             Debug.Assert(drawerType != null);
             if (drawerInstance == null)
@@ -510,7 +509,7 @@ namespace SaintsField.Editor.Core
 
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
-                PropertyDrawer imGuiDrawer = drawerInstance;
+                // PropertyDrawer imGuiDrawer = drawerInstance;
                 // MethodInfo imGuiGetPropertyHeightMethod = drawerType.GetMethod("GetPropertyHeight");
                 // MethodInfo imGuiOnGUIMethodInfo = drawerType.GetMethod("OnGUI");
                 // Debug.Assert(imGuiGetPropertyHeightMethod != null);
@@ -538,8 +537,7 @@ namespace SaintsField.Editor.Core
 
                 IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
 
-                IMGUIContainer imGuiContainer = null;
-                imGuiContainer = new IMGUIContainer(() =>
+                IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
                     property.serializedObject.Update();
 
@@ -765,14 +763,14 @@ namespace SaintsField.Editor.Core
                 fallbackField.BindProperty(property);
 
                 // ReSharper disable once ConvertToConstant.Local
-                bool isReference =
-#if UNITY_2021_3_OR_NEWER
-                        false
-#else
-                        // HashSet<string> trackedSubPropertyNames = new HashSet<string>();
-                        property.propertyType == SerializedPropertyType.ManagedReference
-#endif
-                    ;
+                bool isReference = property.propertyType == SerializedPropertyType.ManagedReference;
+// #if UNITY_2021_3_OR_NEWER
+//                         property.propertyType == SerializedPropertyType.ManagedReference
+// #else
+//                         // HashSet<string> trackedSubPropertyNames = new HashSet<string>();
+//                         false
+// #endif
+                    // ;
 
                 bool watch = !property.isArray ||
                              (property.isArray && !SaintsFieldConfigUtil.DisableOnValueChangedWatchArrayFieldUIToolkit());
@@ -793,6 +791,7 @@ namespace SaintsField.Editor.Core
                     // };
                     // fallbackField.Add(trackerContainer);
 
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     VisualElement trackerMain = BindWatchUIToolkit(property, onValueChangedCallback, isReference,
                         fallbackField, fieldInfo, parent);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
