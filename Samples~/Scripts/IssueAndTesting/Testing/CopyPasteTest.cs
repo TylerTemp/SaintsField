@@ -2,6 +2,7 @@ using System;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -43,6 +44,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         {
             myClass1.myString = $"{Random.Range(0, 99999)}";
         }
+
+        public Vector2Int v2I;
+        public Vector2 v2;
 
         [Button]
         private void Paste()

@@ -56,9 +56,10 @@ namespace SaintsField.Editor.Playa
                         });
                     }
 
-                    (bool hasReflectionOk, bool hasResult) = ClipboardHelper.HasSerializedProperty();
+                    // (bool hasReflectionOk, bool hasResult) = ClipboardHelper.HasSerializedProperty();
 
-                    if (hasReflectionOk && ClipboardHelper.EnsureGetSerializedPropertyMethod())
+                    // ReSharper disable once InvertIf
+                    if (ClipboardHelper.EnsureHasSerializedPropertyMethod() && ClipboardHelper.EnsureGetSerializedPropertyMethod())
                     {
                         if (!seperated)
                         {
@@ -66,7 +67,7 @@ namespace SaintsField.Editor.Playa
                             evt.menu.AppendSeparator();
                         }
 
-                        if (hasResult)
+                        if (ClipboardHelper.HasSerializedProperty())
                         {
                             evt.menu.AppendAction("Paste", _ =>
                             {

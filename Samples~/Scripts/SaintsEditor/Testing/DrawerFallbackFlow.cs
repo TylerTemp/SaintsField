@@ -7,6 +7,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class DrawerFallbackFlow : SaintsMonoBehaviour
     {
+        public char character;
+
         [Serializable]
         public enum EnumFromSome
         {
