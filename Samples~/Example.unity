@@ -11077,7 +11077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a01f32b96f151b4d9c2a0136de5f05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  res: 2
+  res: GenericPropertyJSON:{"name":"gos","type":-1,"arraySize":1,"arrayType":"PPtr<$GameObject>","children":[{"name":"Array","type":-1,"arraySize":1,"arrayType":"PPtr<$GameObject>","children":[{"name":"size","type":12,"val":1},{"name":"data","type":5,"val":"UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":157114}"}]}]}
   propR: 2.71
   layerString: SortButton
   layerInt: 2
@@ -11087,6 +11087,11 @@ MonoBehaviour:
     myString: 74937
   v2I: {x: 0, y: -1}
   v2: {x: 0, y: 0}
+  gos:
+  - {fileID: 764521261}
+  goDrawer:
+  - {fileID: 764521261}
+  myClasses: []
 --- !u!1 &765557043
 GameObject:
   m_ObjectHideFlags: 0

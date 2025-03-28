@@ -98,6 +98,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             Foldout foldoutElement = listView.Q<Foldout>();
 
+            UIToolkitUtils.AddContextualMenuManipulator(foldoutElement, property, () => {});
+
             VisualElement foldoutContent = foldoutElement.Q<VisualElement>(className: "unity-foldout__content");
 
             VisualElement preContent = new VisualElement

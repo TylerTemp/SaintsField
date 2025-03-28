@@ -49,6 +49,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [AdvancedDropdown]
         public Vector2 v2;
 
+        public GameObject[] gos;
+        [ListDrawerSettings]
+        public GameObject[] goDrawer;
+        public MyClass[] myClasses;
+
         [Button]
         private void Paste()
         {
