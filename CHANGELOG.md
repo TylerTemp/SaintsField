@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.1 ##
+
+1.  UI Toolkit: Fix Unity 6000 injected serialized field can not be properly drawn [#184](https://github.com/TylerTemp/SaintsField/issues/184)
+2.  IMGUI: `Table` only rebuild if there are changes happend [#180](https://github.com/TylerTemp/SaintsField/issues/180)
+3.  UI Toolkit: `SaintsRow` support copy/paste. Which means serializable strcut/class/interface drawn by `SaintsEditor` now support copy/paste just like Unity's default behavior
+
 ## 4.0.0 ##
 
 Fix rich text gives error if a close tag has no opening tag

@@ -81,21 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.0**
+**4.0.1**
 
-4.0.0 is capable of last stable release 3.36.8. You should be safe to upgrade to 4.0.0
-
-Changes since 3.36.8:
-
-1.  UI Toolkit: `ShowInInspector` now shows a more grayed-out color for label, to distinguish from the serializable field
-2.  UI Toolkit: If you have `SaintsEditor` enabled, or have any saints property added to a serializable class/struct/interface, the `SaintsRow` attribute will automatically be used if the target has no explicit drawer
-3.  UI Toolkit: If you have `SaintsEditor` enabled, the order of the property no longer matters. Things like `[Range(0, 1), InfoBox("Saints InfoBox")]` will work as expected. The 3rd party drawer no longer block the saintfield drawer
-4.  UI Toolkit: fix drawer incorrect height when falling back to IMGUI drawer using `IMGUIContainer`
-5.  Fix rich text gives error if a close tag has no opening tag
-
-Breaking Changes:
-
-4.0.0 Breaking changes the fallback flow in UI Toolkit internally. This change does not have implact on API usages. For more information, please read [📣Announcements: Upcoming 4.0 Version](https://github.com/TylerTemp/SaintsField/discussions/183)
+1.  UI Toolkit: Fix Unity 6000 injected serialized field can not be properly drawn [#184](https://github.com/TylerTemp/SaintsField/issues/184)
+2.  IMGUI: `Table` only rebuild if there are changes happend [#180](https://github.com/TylerTemp/SaintsField/issues/180)
+3.  UI Toolkit: `SaintsRow` support copy/paste. Which means serializable strcut/class/interface drawn by `SaintsEditor` now support copy/paste just like Unity's default behavior
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
