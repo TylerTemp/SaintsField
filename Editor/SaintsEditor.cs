@@ -28,6 +28,8 @@ namespace SaintsField.Editor
 {
     public partial class SaintsEditor: UnityEditor.Editor, IDOTweenPlayRecorder, IMakeRenderer
     {
+        private static bool _saintsEditorIMGUI = true;
+
         // private MonoScript _monoScript;
         // private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();
 
@@ -94,10 +96,13 @@ namespace SaintsField.Editor
 
             // Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
             Dictionary<string, SerializedProperty> pendingSerializedProperties = serializedPropertyDict.ToDictionary(each => each.Key, each => each.Value);
-            // Debug.Log($"{string.Join(",", pendingSerializedProperties.Keys)}");
             pendingSerializedProperties.Remove("m_Script");
 
-            for (var inherentDepth = 0; inherentDepth < types.Count; inherentDepth++)
+            // base type -> this type
+            // a later field should override current in different depth
+            // but, if the field is not in the same depth, it should be added (method override)
+            // Yep, C# is a crap
+            for (int inherentDepth = 0; inherentDepth < types.Count; inherentDepth++)
             {
                 Type systemType = types[inherentDepth];
 
@@ -105,6 +110,7 @@ namespace SaintsField.Editor
                 List<SaintsFieldWithInfo> fieldInfos = new List<SaintsFieldWithInfo>();
                 List<SaintsFieldWithInfo> propertyInfos = new List<SaintsFieldWithInfo>();
                 List<SaintsFieldWithInfo> methodInfos = new List<SaintsFieldWithInfo>();
+                List<string> memberNames = new List<string>();
 
                 foreach (MemberInfo memberInfo in systemType
                              .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
@@ -115,6 +121,7 @@ namespace SaintsField.Editor
                     IReadOnlyList<IPlayaAttribute> playaAttributes = ReflectCache.GetCustomAttributes<IPlayaAttribute>(memberInfo);
 
                     ISaintsLayoutBase[] layoutBases = GetLayoutBases(playaAttributes.OfType<ISaintsLayoutBase>()).ToArray();
+
                     switch (memberInfo)
                     {
                         case FieldInfo fieldInfo:
@@ -134,6 +141,7 @@ namespace SaintsField.Editor
                                     playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                                 int order = orderProp?.Order ?? int.MinValue;
 
+                                // Debug.Log($"{fieldInfo.Name}/{string.Join(",", pendingSerializedProperties.Keys)}");
                                 fieldInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
@@ -141,12 +149,15 @@ namespace SaintsField.Editor
                                     Target = target,
 
                                     RenderType = SaintsRenderType.SerializedField,
-                                    SerializedProperty = pendingSerializedProperties[fieldInfo.Name],
+                                    SerializedProperty = serializedPropertyDict[fieldInfo.Name],
+                                    MemberName = fieldInfo.Name,
                                     FieldInfo = fieldInfo,
                                     InherentDepth = inherentDepth,
                                     Order = order,
                                     // serializable = true,
                                 });
+                                memberNames.Add(fieldInfo.Name);
+                                // Debug.Log($"remove key {fieldInfo.Name}");
                                 pendingSerializedProperties.Remove(fieldInfo.Name);
                             }
                             #endregion
@@ -165,11 +176,13 @@ namespace SaintsField.Editor
 
                                     RenderType = SaintsRenderType.NonSerializedField,
                                     // memberType = nonSerFieldInfo.MemberType,
+                                    MemberName = fieldInfo.Name,
                                     FieldInfo = fieldInfo,
                                     InherentDepth = inherentDepth,
                                     Order = order,
                                     // serializable = false,
                                 });
+                                memberNames.Add(fieldInfo.Name);
                             }
                             #endregion
                         }
@@ -189,13 +202,14 @@ namespace SaintsField.Editor
                                     Target = target,
 
                                     RenderType = SaintsRenderType.NativeProperty,
+                                    MemberName = propertyInfo.Name,
                                     PropertyInfo = propertyInfo,
                                     InherentDepth = inherentDepth,
                                     Order = order,
                                 });
+                                memberNames.Add(propertyInfo.Name);
                             }
                             #endregion
-
                         }
                             break;
                         case MethodInfo methodInfo:
@@ -215,7 +229,7 @@ namespace SaintsField.Editor
                             methodInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
-                                Debug.Log($"[{systemType}] method: {methodInfo.Name}");
+                            Debug.Log($"[{systemType}] method: {methodInfo.Name}");
 #endif
 
                             methodInfos.Add(new SaintsFieldWithInfo
@@ -226,15 +240,20 @@ namespace SaintsField.Editor
 
                                 // memberType = MemberTypes.Method,
                                 RenderType = SaintsRenderType.Method,
+                                MemberName = methodInfo.Name,
                                 MethodInfo = methodInfo,
                                 InherentDepth = inherentDepth,
                                 Order = order,
                             });
+                            memberNames.Add(methodInfo.Name);
                             #endregion
                         }
                             break;
                     }
                 }
+
+                // now handle overrides
+                fieldWithInfos.RemoveAll(each => memberNames.Contains(each.MemberName));
 
                 fieldWithInfos.AddRange(fieldInfos);
                 fieldWithInfos.AddRange(propertyInfos);

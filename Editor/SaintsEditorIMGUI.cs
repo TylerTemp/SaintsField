@@ -11,6 +11,11 @@ namespace SaintsField.Editor
 
         public virtual void OnEnable()
         {
+            if (!_saintsEditorIMGUI)
+            {
+                return;
+            }
+
             // Debug.Log($"OnEnable");
             try
             {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using SaintsField.Editor.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 
@@ -17,6 +18,7 @@ namespace SaintsField.Editor
 
         public override VisualElement CreateInspectorGUI()
         {
+            _saintsEditorIMGUI = false;
             // Debug.Log("CreateInspectorGUI");
 
             if (target == null)

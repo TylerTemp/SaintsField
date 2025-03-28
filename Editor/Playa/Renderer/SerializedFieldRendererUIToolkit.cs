@@ -61,6 +61,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     (Attribute attrOrNull, Type drawerType) =
                         SaintsPropertyDrawer.GetFallbackDrawerType(FieldWithInfo.FieldInfo,
                             FieldWithInfo.SerializedProperty);
+                    // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
                     useAttribute = attrOrNull;
                     useDrawerType = drawerType;
                 }
@@ -95,8 +96,6 @@ namespace SaintsField.Editor.Playa.Renderer
             // };
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
-
-            // Debug.Log(useDrawerType);
 
             PropertyDrawer propertyDrawer = SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, FieldWithInfo.FieldInfo, useAttribute, FieldWithInfo.SerializedProperty.displayName);
             // Debug.Log(saintsPropertyDrawer);

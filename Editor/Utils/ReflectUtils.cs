@@ -22,8 +22,10 @@ namespace SaintsField.Editor.Utils
                 thisType,
             };
 
+            // ReSharper disable once UseIndexFromEndExpression
             while (types[types.Count - 1].BaseType != null)
             {
+                // ReSharper disable once UseIndexFromEndExpression
                 types.Add(types[types.Count - 1].BaseType);
             }
 

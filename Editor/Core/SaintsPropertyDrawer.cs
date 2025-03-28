@@ -430,8 +430,10 @@ namespace SaintsField.Editor.Core
             // }
 
             bool isGenericType = fieldType.IsGenericType;
+            // Debug.Log($"FindTypeDrawer for {fieldType}, isGenericType={isGenericType}");
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"FindTypeDrawer for {fieldType}, isGenericType={isGenericType}");
+            Debug.Log($"FindTypeDrawer for {fieldType}, isGenericType={isGenericType}");
 #endif
 
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
@@ -446,6 +448,7 @@ namespace SaintsField.Editor.Core
                     // Debug.Log(fieldType.GetGenericTypeDefinition().IsSubclassOf(propertyAttributeToPropertyDrawer.Key));
                     // Debug.Log(fieldType.IsAssignableFrom(propertyAttributeToPropertyDrawer.Key));
                     // Debug.Log(propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType));
+
                     // ReSharper disable once MergeIntoPattern
                     if (!matched && fieldType.BaseType != null && fieldType.BaseType.IsGenericType)
                     {
@@ -474,7 +477,11 @@ namespace SaintsField.Editor.Core
                     PropertyDrawerInfo first = new PropertyDrawerInfo();
                     foreach (PropertyDrawerInfo each in propertyAttributeToPropertyDrawer.Value)
                     {
-                        if (nonSaints && each.IsSaints) continue;
+                        // Debug.Log($"nonSaints={nonSaints}; each={each.DrawerType}, {each.IsSaints}");
+                        if (nonSaints && each.IsSaints)
+                        {
+                            continue;
+                        }
                         first = each;
                         break;
                     }
@@ -585,8 +592,8 @@ namespace SaintsField.Editor.Core
             Type fieldElementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
                 ? ReflectUtils.GetElementType(info.FieldType)
                 : info.FieldType;
-            Type foundDrawer = FindTypeDrawerNonSaints(fieldElementType);
-            // Debug.LogWarning(foundDrawer);
+
+            Type foundDrawer = FindTypeDrawerAny(fieldElementType);
 
             // ReSharper disable once InvertIf
             if (foundDrawer != null)
