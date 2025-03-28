@@ -178,10 +178,12 @@ namespace SaintsField.Editor.Utils
                     return EnsureHas("rect");
                 case SerializedPropertyType.BoundsInt:
                     return EnsureHas("bounds");
+#if UNITY_2021_3_OR_NEWER
                 case SerializedPropertyType.ManagedReference:
                     return EnsureHasSerializedPropertyMethod();
                 case SerializedPropertyType.Hash128:
                     return EnsureHas("hash128");
+#endif
                 default:
                     // throw new ArgumentOutOfRangeException();
                     return false;
@@ -242,10 +244,12 @@ namespace SaintsField.Editor.Utils
                     return EnsureHas("rect");
                 case SerializedPropertyType.BoundsInt:
                     return EnsureHas("bounds");
+#if UNITY_2021_3_OR_NEWER
                 case SerializedPropertyType.ManagedReference:
                     return EnsureGetSerializedPropertyMethod();
                 case SerializedPropertyType.Hash128:
                     return EnsureHas("hash128");
+#endif
                 default:
                     // throw new ArgumentOutOfRangeException();
                     return false;
