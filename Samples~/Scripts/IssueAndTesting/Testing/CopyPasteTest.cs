@@ -2,7 +2,6 @@ using System;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10,15 +9,15 @@ using UnityEditor;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
-    public class CopyPasteTest : MonoBehaviour
+    public class CopyPasteTest : SaintsMonoBehaviour
     {
-        public bool boolV;
-        [LeftToggle] public bool leftToggle;
-
-        public sbyte sByteV;
-        public byte byteV;
-
-        public string s;
+        // public bool boolV;
+        // [LeftToggle] public bool leftToggle;
+        //
+        // public sbyte sByteV;
+        // public byte byteV;
+        //
+        // public string s;
 
         [ResizableTextArea]
         public string res;
@@ -45,14 +44,16 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             myClass1.myString = $"{Random.Range(0, 99999)}";
         }
 
+        [AdvancedDropdown]
         public Vector2Int v2I;
+        [AdvancedDropdown]
         public Vector2 v2;
 
         [Button]
         private void Paste()
         {
 #if UNITY_EDITOR
-            Debug.Log(EditorGUIUtility.systemCopyBuffer);
+            // Debug.Log(EditorGUIUtility.systemCopyBuffer);
             res = EditorGUIUtility.systemCopyBuffer;
 #endif
         }

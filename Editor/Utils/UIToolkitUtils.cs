@@ -1204,6 +1204,40 @@ namespace SaintsField.Editor.Utils
                     return null;
             }
         }
+
+        public static void AddContextualMenuManipulator(VisualElement ele, SerializedProperty property, Action onValueChangedCallback)
+        {
+            ele.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
+
+                bool spearator = false;
+                if (ClipboardHelper.CanCopySerializedProperty(property.propertyType))
+                {
+                    spearator = true;
+                    evt.menu.AppendSeparator();
+                    evt.menu.AppendAction("Copy", _ => ClipboardHelper.DoCopySerializedProperty(property));
+                }
+
+                (bool hasReflectionPaste, bool hasValuePaste) = ClipboardHelper.CanPasteSerializedProperty(property.propertyType);
+
+                // ReSharper disable once InvertIf
+                if (hasReflectionPaste)
+                {
+                    if (!spearator)
+                    {
+                        evt.menu.AppendSeparator();
+                    }
+
+                    evt.menu.AppendAction("Paste", _ =>
+                    {
+                        ClipboardHelper.DoPasteSerializedProperty(property);
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback.Invoke();
+                    }, hasValuePaste? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
+                }
+            }));
+        }
 #endif
 
 

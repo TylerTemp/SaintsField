@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
@@ -79,20 +80,10 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 }
             });
 
+            UIToolkitUtils.AddContextualMenuManipulator(resizableTextArea.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
             resizableTextArea.labelElement.AddManipulator(new ContextualMenuManipulator(evt =>
             {
-                evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
-                evt.menu.AppendSeparator();
-                evt.menu.AppendAction("Copy", _ => EditorGUIUtility.systemCopyBuffer = property.stringValue);
-                evt.menu.AppendAction("Paste", _ =>
-                {
-#if SAINTSFIELD_DEBUG
-                    Debug.Log($"Pasted: {EditorGUIUtility.systemCopyBuffer}");
-#endif
-                    property.stringValue = EditorGUIUtility.systemCopyBuffer;
-                    property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(property.stringValue);
-                });
                 evt.menu.AppendAction("Clear", _ =>
                 {
                     property.stringValue = string.Empty;

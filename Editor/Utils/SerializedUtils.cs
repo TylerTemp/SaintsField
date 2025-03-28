@@ -467,7 +467,7 @@ namespace SaintsField.Editor.Utils
                 SerializedProperty iterator = serializedObject.GetIterator();
                 while (iterator.NextVisible(true))
                 {
-                    if (SerializedUtils.SearchProp(iterator, search))
+                    if (SearchProp(iterator, search))
                     {
                         return true;
                     }

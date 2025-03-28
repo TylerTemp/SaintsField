@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.3 ##
+
+1.  UI Toolkit: `Layer` of string type should not give error when the layer name is an empty string
+2.  UI Toolkit: Add copy/paste ability to `AdvancedDropdown` & `Dropdown`
+
 ## 4.0.2 ##
 
 1.  UI Toolkit: Fix `SaintsEditor` failed to fall back a type drawer if the drawer is inheritance from `SaintsPropertyDrawer` [#187](https://github.com/TylerTemp/SaintsField/issues/187)

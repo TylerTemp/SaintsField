@@ -61,7 +61,12 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;
-            container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property)).ButtonElement.clicked += () =>
+
+            UIToolkitUtils.DropdownButtonField dropdownButtonField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property));
+
+            UIToolkitUtils.AddContextualMenuManipulator(dropdownButtonField.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
+            dropdownButtonField.ButtonElement.clicked += () =>
                 ShowDropdown(property, saintsAttribute, container, dropdownAttribute.SlashAsSub, info, parent, onValueChangedCallback);
         }
 

@@ -62,6 +62,10 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             }
 
             string curName = property.stringValue;
+            if (string.IsNullOrEmpty(curName))
+            {
+                return string.Empty;
+            }
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (LayerInfo layerInfo in allLayers)
             {

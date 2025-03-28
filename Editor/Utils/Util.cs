@@ -1312,6 +1312,21 @@ namespace SaintsField.Editor.Utils
             return ($"Not found index {index} in {source}", null);
         }
 
+        public static void PropertyChangedCallback(SerializedProperty property, MemberInfo info, Action<object> onValueChangedCallback)
+        {
+            object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (noCacheParent == null)
+            {
+                Debug.LogWarning("Property disposed unexpectedly, skip onChange callback.");
+                return;
+            }
+            (string error, int _, object curValue) = GetValue(property, info, noCacheParent);
+            if (error == "")
+            {
+                onValueChangedCallback(curValue);
+            }
+        }
+
         #region Scene Related
 
         public struct TargetWorldPosInfo

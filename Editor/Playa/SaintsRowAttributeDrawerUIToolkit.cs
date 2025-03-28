@@ -42,47 +42,7 @@ namespace SaintsField.Editor.Playa
                     property.isExpanded = evt.newValue;
                 });
 
-                foldout.AddManipulator(new ContextualMenuManipulator(evt =>
-                {
-                    evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
-                    bool seperated = false;
-                    if (ClipboardHelper.EnsureSetSerializedPropertyMethod())
-                    {
-                        seperated = true;
-                        evt.menu.AppendSeparator();
-                        evt.menu.AppendAction("Copy", _ =>
-                        {
-                            ClipboardHelper.SetSerializedProperty(property);
-                        });
-                    }
-
-                    // (bool hasReflectionOk, bool hasResult) = ClipboardHelper.HasSerializedProperty();
-
-                    // ReSharper disable once InvertIf
-                    if (ClipboardHelper.EnsureHasSerializedPropertyMethod() && ClipboardHelper.EnsureGetSerializedPropertyMethod())
-                    {
-                        if (!seperated)
-                        {
-                            // seperated = true;
-                            evt.menu.AppendSeparator();
-                        }
-
-                        if (ClipboardHelper.HasSerializedProperty())
-                        {
-                            evt.menu.AppendAction("Paste", _ =>
-                            {
-                                ClipboardHelper.GetSerializedProperty(property);
-                                property.serializedObject.ApplyModifiedProperties();
-                            });
-                        }
-                        else
-                        {
-                            evt.menu.AppendAction("Paste", _ => { }, DropdownMenuAction.Status.Disabled);
-                        }
-                    }
-
-                    // ClipboardContextMenuHelper.SetupPropertyCopyPaste(property, evt.menu, null);
-                }));
+                UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => {});
 
                 root = foldout;
             }
