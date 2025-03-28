@@ -1248,13 +1248,13 @@ namespace SaintsField.Editor.Core
                 // this code is used to prevent the decorator to be drawn everytime a fallback happens
                 // the marco is not added by default
 #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
-                Type dec = fieldInfo.GetCustomAttributesFast<PropertyAttribute>(true)
+                Type dec = ReflectCache.GetCustomAttributes<PropertyAttribute>(fieldInfo)
                     .Select(propertyAttribute =>
                     {
                         // Debug.Log(propertyAttribute.GetType());
                         Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-                            out IReadOnlyList<Type> eachDrawers)
-                            ? eachDrawers[0]
+                            out IReadOnlyList<PropertyDrawerInfo> eachDrawers)
+                            ? eachDrawers[0].DrawerType
                             : null;
 
                         // Debug.Log($"Found {results}");
