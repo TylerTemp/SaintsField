@@ -4,6 +4,7 @@
     {
         // None,
         SerializedField,
+        InjectedSerializedField,
         NonSerializedField,
         Method,
         // DOTweenMethod,

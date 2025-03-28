@@ -253,7 +253,7 @@ namespace SaintsField.Editor
                         LayoutBases = Array.Empty<ISaintsLayoutBase>(),
                         Target = target,
 
-                        RenderType = SaintsRenderType.SerializedField,
+                        RenderType = SaintsRenderType.InjectedSerializedField,
                         SerializedProperty = pendingSer.Value,
                         FieldInfo = null,
                         InherentDepth = types.Count - 1,
@@ -830,10 +830,6 @@ namespace SaintsField.Editor
             {
                 case SaintsRenderType.SerializedField:
                 {
-                    if (fieldWithInfo.FieldInfo == null)
-                    {
-                        return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
-                    }
                     foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
                     {
                         switch (playaAttribute)
@@ -847,8 +843,9 @@ namespace SaintsField.Editor
 
                     return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
                 }
+                case SaintsRenderType.InjectedSerializedField:
+                    return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.NonSerializedField:
-                    // return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.NativeProperty:
                     return new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.Method:
