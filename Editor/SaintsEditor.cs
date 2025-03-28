@@ -829,6 +829,11 @@ namespace SaintsField.Editor
             switch (fieldWithInfo.RenderType)
             {
                 case SaintsRenderType.SerializedField:
+                {
+                    if (fieldWithInfo.FieldInfo == null)
+                    {
+                        return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
+                    }
                     foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
                     {
                         switch (playaAttribute)
@@ -839,7 +844,9 @@ namespace SaintsField.Editor
                                 return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
                         }
                     }
+
                     return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
+                }
                 case SaintsRenderType.NonSerializedField:
                     // return new NonSerializedFieldRenderer(serializedObject, fieldWithInfo);
                 case SaintsRenderType.NativeProperty:
