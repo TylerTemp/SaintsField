@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Playa
 
         public SerializedProperty SerializedProperty;
 
-        public string MemberName;
+        public string MemberId;
         public FieldInfo FieldInfo;
         public MethodInfo MethodInfo;
         public PropertyInfo PropertyInfo;

@@ -28,8 +28,8 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
                 return (error, null, index);
             }
 
-            Debug.Log(value);
-            Debug.Log(value.GetType());
+            // Debug.Log(value);
+            // Debug.Log(value.GetType());
 
             IWrapProp curValue = (IWrapProp) value;
             return ("", ReflectUtils.GetIWrapPropName(curValue.GetType()), arrayIndex);

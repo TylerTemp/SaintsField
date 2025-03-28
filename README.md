@@ -81,11 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.1**
+**4.0.2**
 
-1.  UI Toolkit: Fix Unity 6000 injected serialized field can not be properly drawn [#184](https://github.com/TylerTemp/SaintsField/issues/184)
-2.  IMGUI: `Table` only rebuild if there are changes happend [#180](https://github.com/TylerTemp/SaintsField/issues/180)
-3.  UI Toolkit: `SaintsRow` support copy/paste. Which means serializable strcut/class/interface drawn by `SaintsEditor` now support copy/paste just like Unity's default behavior
+1.  UI Toolkit: Fix `SaintsEditor` failed to fall back a type drawer if the drawer is inheritance from `SaintsPropertyDrawer` [#187](https://github.com/TylerTemp/SaintsField/issues/187)
+2.  `Button` now can display overload and override methods
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

@@ -1043,6 +1043,8 @@ namespace SaintsField.Editor.Utils
                             throw new ArgumentOutOfRangeException(nameof(invokeRequiredTypeArr.Length), invokeRequiredTypeArr.Length, null);
                     }
 
+                    // Debug.Log(invokeRequiredTypeArr);
+
                     Type genericActionIns = genericAction.MakeGenericType(invokeRequiredTypeArr);
                     MethodInfo addPersistentListenerMethod = unityEventBase
                         .GetType()

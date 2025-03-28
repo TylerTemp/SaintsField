@@ -434,6 +434,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         // before set: useful for struct editing that C# will messup and change the value of the reference you have
         protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
         {
+
+            // Debug.Log(valueType);
             // if (RuntimeUtil.IsNull(value))
             // {
             //     return null;
@@ -927,6 +929,58 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         beforeSet?.Invoke(value);
                         setterOrNull(evt.newValue);
+                    });
+                }
+
+                return element;
+            }
+            if (valueType == typeof(char))
+            {
+                if (oldElement is TextField oldTextField)
+                {
+                    oldTextField.maxLength = 1;
+                    oldTextField.SetValueWithoutNotify($"{value}");
+                    return null;
+                }
+
+                TextField element = new TextField(label)
+                {
+                    value = $"{value}",
+                    maxLength = 1,
+                };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+
+                element.AddToClassList(TextField.alignedFieldUssClassName);
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        string newValue = evt.newValue;
+
+                        if (string.IsNullOrEmpty(newValue))
+                        {
+                            return;
+                        }
+
+                        if (newValue.Length > 1)
+                        {
+                            // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                            newValue = newValue.Substring(0, 1);
+                            element.SetValueWithoutNotify(newValue);
+                        }
+
+                        beforeSet?.Invoke(value);
+
+                        char newChar = newValue[0];
+                        setterOrNull(newChar);
                     });
                 }
 

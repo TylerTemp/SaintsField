@@ -110,7 +110,7 @@ namespace SaintsField.Editor
                 List<SaintsFieldWithInfo> fieldInfos = new List<SaintsFieldWithInfo>();
                 List<SaintsFieldWithInfo> propertyInfos = new List<SaintsFieldWithInfo>();
                 List<SaintsFieldWithInfo> methodInfos = new List<SaintsFieldWithInfo>();
-                List<string> memberNames = new List<string>();
+                List<string> memberDepthIds = new List<string>();
 
                 foreach (MemberInfo memberInfo in systemType
                              .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
@@ -150,13 +150,13 @@ namespace SaintsField.Editor
 
                                     RenderType = SaintsRenderType.SerializedField,
                                     SerializedProperty = serializedPropertyDict[fieldInfo.Name],
-                                    MemberName = fieldInfo.Name,
+                                    MemberId = fieldInfo.Name,
                                     FieldInfo = fieldInfo,
                                     InherentDepth = inherentDepth,
                                     Order = order,
                                     // serializable = true,
                                 });
-                                memberNames.Add(fieldInfo.Name);
+                                memberDepthIds.Add(fieldInfo.Name);
                                 // Debug.Log($"remove key {fieldInfo.Name}");
                                 pendingSerializedProperties.Remove(fieldInfo.Name);
                             }
@@ -176,13 +176,13 @@ namespace SaintsField.Editor
 
                                     RenderType = SaintsRenderType.NonSerializedField,
                                     // memberType = nonSerFieldInfo.MemberType,
-                                    MemberName = fieldInfo.Name,
+                                    MemberId = fieldInfo.Name,
                                     FieldInfo = fieldInfo,
                                     InherentDepth = inherentDepth,
                                     Order = order,
                                     // serializable = false,
                                 });
-                                memberNames.Add(fieldInfo.Name);
+                                memberDepthIds.Add(fieldInfo.Name);
                             }
                             #endregion
                         }
@@ -202,12 +202,12 @@ namespace SaintsField.Editor
                                     Target = target,
 
                                     RenderType = SaintsRenderType.NativeProperty,
-                                    MemberName = propertyInfo.Name,
+                                    MemberId = propertyInfo.Name,
                                     PropertyInfo = propertyInfo,
                                     InherentDepth = inherentDepth,
                                     Order = order,
                                 });
-                                memberNames.Add(propertyInfo.Name);
+                                memberDepthIds.Add(propertyInfo.Name);
                             }
                             #endregion
                         }
@@ -224,13 +224,21 @@ namespace SaintsField.Editor
                                 playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
                             int order = orderProp?.Order ?? int.MinValue;
 
-                            // inspector does not care about inherited/new method. It just needs to use the last one
-                            fieldWithInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
-                            methodInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
+                            // wrong: inspector does not care about inherited/new method. It just needs to use the last one
+                            // right: we support method override now
+                            // fieldWithInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
+                            // methodInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
                             Debug.Log($"[{systemType}] method: {methodInfo.Name}");
 #endif
+
+                            string buttonExtraId = string.Join(":", methodInfo.GetParameters()
+                                    .Select(each => each.ParameterType)
+                                    .Append(methodInfo.ReturnType)
+                                    .Select(each => each.FullName));
+
+                            string buttonId = $"{methodInfo.Name}.{buttonExtraId}";
 
                             methodInfos.Add(new SaintsFieldWithInfo
                             {
@@ -240,12 +248,12 @@ namespace SaintsField.Editor
 
                                 // memberType = MemberTypes.Method,
                                 RenderType = SaintsRenderType.Method,
-                                MemberName = methodInfo.Name,
+                                MemberId = buttonId,
                                 MethodInfo = methodInfo,
                                 InherentDepth = inherentDepth,
                                 Order = order,
                             });
-                            memberNames.Add(methodInfo.Name);
+                            memberDepthIds.Add(buttonId);
                             #endregion
                         }
                             break;
@@ -253,7 +261,7 @@ namespace SaintsField.Editor
                 }
 
                 // now handle overrides
-                fieldWithInfos.RemoveAll(each => memberNames.Contains(each.MemberName));
+                fieldWithInfos.RemoveAll(each => memberDepthIds.Contains(each.MemberId));
 
                 fieldWithInfos.AddRange(fieldInfos);
                 fieldWithInfos.AddRange(propertyInfos);

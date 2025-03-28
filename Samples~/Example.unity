@@ -38,12 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -716,6 +716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
   m_AgentTypeID: 0
   m_CollectObjects: 0
   m_Size: {x: 10, y: 10, z: 10}
@@ -1032,7 +1033,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   withAttr:
-    value: []
+    value:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
 --- !u!1 &98296081
 GameObject:
   m_ObjectHideFlags: 0
@@ -11106,6 +11110,8 @@ MonoBehaviour:
     myString: 
   myClass2:
     myString: 
+  v2I: {x: 0, y: 0}
+  v2: {x: 0, y: 0}
 --- !u!1 &765557043
 GameObject:
   m_ObjectHideFlags: 0
@@ -13592,12 +13598,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saintsArrayGo:
     value: []
-  gameObjects2: []
+  gameObjects2:
+  - value:
+    - {fileID: 0}
+    - {fileID: 0}
   gameObjects2Nest:
     value: []
   gameObjects4: []
   _arrSize:
-    value: 
+    value: 0000000000000000
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
@@ -14272,6 +14281,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myLis:
   - myStrings:
+    - 
     - 
     - 
   - myStrings:
@@ -16574,7 +16584,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1

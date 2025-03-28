@@ -49,6 +49,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [ShowInInspector, Ordered] private float _floatV = 0.1234f;
         [ShowInInspector, Ordered] private double _doubleV = 0.1234d;
         [ShowInInspector, Ordered] private string _stringV = "Hi";
+        [ShowInInspector, Ordered] private char _charV = 'c';
         [ShowInInspector, Ordered] private Vector2 _vector2V = Vector2.one;
         [ShowInInspector, Ordered] private Vector3 _vector3V = Vector3.one;
         [ShowInInspector, Ordered] private Vector4 _vector4V = Vector4.one;
