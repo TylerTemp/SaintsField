@@ -4,6 +4,7 @@
 
 1.  UI Toolkit: Fix `SaintsEditor` failed to fall back a type drawer if the drawer is inheritance from `SaintsPropertyDrawer` [#187](https://github.com/TylerTemp/SaintsField/issues/187)
 2.  `Button` now can display overload and override methods
+3.  UI Toolkit: `ShowInInspector` support `char` type
 
 ## 4.0.1 ##
 
