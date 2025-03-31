@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Utils
 
         private readonly Color _oldColor;
 
-        private EditorGUIBackgroundColor(Color newColor)
+        public EditorGUIBackgroundColor(Color newColor)
         {
             _oldColor = GUI.backgroundColor;
             GUI.backgroundColor = newColor;
@@ -25,6 +25,10 @@ namespace SaintsField.Editor.Utils
 
         public static EditorGUIBackgroundColor ToggleButton(bool on) => on
             ? new EditorGUIBackgroundColor(ToggledColor)
+            : new EditorGUIBackgroundColor();
+
+        public static EditorGUIBackgroundColor ToggleButton(bool on, Color useColor) => on
+            ? new EditorGUIBackgroundColor(useColor)
             : new EditorGUIBackgroundColor();
 
         public void Dispose()

@@ -14348,8 +14348,8 @@ MonoBehaviour:
     myMask: 0
   myMaskDisabled: 0
   myMaskDisabledLabel: 0
-  enumNormal: 1
-  enumExpand: 0
+  enumNormal: 0
+  enumExpand: 5
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0

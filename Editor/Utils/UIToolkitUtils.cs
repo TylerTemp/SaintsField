@@ -1204,6 +1204,7 @@ namespace SaintsField.Editor.Utils
                     return null;
             }
         }
+#endif
 
         public static void AddContextualMenuManipulator(VisualElement ele, SerializedProperty property, Action onValueChangedCallback)
         {
@@ -1238,28 +1239,22 @@ namespace SaintsField.Editor.Utils
                 }
             }));
         }
-#endif
 
 
-    public class DropdownButtonField : BaseField<string>
-    {
-        public readonly Button ButtonElement;
-        public readonly Label ButtonLabelElement;
-        // private readonly MethodInfo AlignLabel;
-
-        public DropdownButtonField(string label, Button visualInput, Label buttonLabel) : base(label, visualInput)
+        public class DropdownButtonField : BaseField<string>
         {
-            ButtonElement = visualInput;
-            ButtonLabelElement = buttonLabel;
+            public readonly Button ButtonElement;
+            public readonly Label ButtonLabelElement;
+            // private readonly MethodInfo AlignLabel;
 
-            // AlignLabel = typeof(BaseField<string>).GetMethod("AlignLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            public DropdownButtonField(string label, Button visualInput, Label buttonLabel) : base(label, visualInput)
+            {
+                ButtonElement = visualInput;
+                ButtonLabelElement = buttonLabel;
+
+                // AlignLabel = typeof(BaseField<string>).GetMethod("AlignLabel", BindingFlags.NonPublic | BindingFlags.Instance);
+            }
         }
-
-        // public void AlignLabelForce()
-        // {
-        //     AlignLabel.Invoke(this, new object[]{});
-        // }
     }
-}
 #endif
 }

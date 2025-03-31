@@ -11,6 +11,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
     public partial class EnumToggleButtonsAttributeDrawer
     {
+        private static readonly Color ToggleGreenColor = new Color(0, 1, 40/255f, 0.65f);
+
         private bool _forceUnfold;
 
         private GUIStyle _iconButtonStyle;
@@ -248,7 +250,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                         accToggleBitFieldButtonRect = leftAccRect;
                     }
 
-                    using (EditorGUIBackgroundColor.ToggleButton(isOn))
+                    using (EditorGUIBackgroundColor.ToggleButton(isOn, ToggleGreenColor))
                     {
                         if (GUI.Button(drawRichRect, GUIContent.none, _miniButtonStyle))
                         {
@@ -287,7 +289,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
                     // Debug.Log($"{bit}/{curValue}: {isOn}");
 
-                    using (EditorGUIBackgroundColor.ToggleButton(isOn))
+                    using (EditorGUIBackgroundColor.ToggleButton(isOn, ToggleGreenColor))
                     {
                         if (GUI.Button(drawBitRect, bitButtonText, _miniButtonStyle))
                         {
@@ -383,7 +385,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 // Debug.Log($"draw {flexButton.NonRichText} @ {flexButton.X}, {flexButton.YOffset} at {buttonRect}/{position}");
                 // EditorGUI.DrawRect(buttonRect, Color.blue);
 
-                using (EditorGUIBackgroundColor.ToggleButton(isOn))
+                using (EditorGUIBackgroundColor.ToggleButton(isOn, ToggleGreenColor))
                 {
                     if (GUI.Button(buttonRect, flexButton.IsRichText? GUIContent.none: new GUIContent(flexButton.NonRichText), _miniButtonStyle))
                     {
