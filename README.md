@@ -81,11 +81,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.4**
+**4.0.3**
 
-1.  UI Toolkit: Fix right click copy/paste for `ListDrawerSettings` & `Tabel`
-2.  UI Toolkit: Fix an error when using `PropRange` with int type
-3.  IMGUI: Change `EnumToggleButtons` selected one with green background color
+1.  UI Toolkit: `Layer` of string type should not give error when the layer name is an empty string
+2.  UI Toolkit: Add right click copy/paste ability to `AdvancedDropdown`, `Dropdown`, `ListDrawerSettings` & `Tabel`
+3.  UI Toolkit: Fix an error when using `PropRange` with int type
+4.  IMGUI: Change `EnumToggleButtons` selected one with green background color
+
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
