@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.4 ##
+
+1.  UI Toolkit: Fix right click copy/paste for `ListDrawerSettings` & `Tabel`
+2.  UI Toolkit: Fix an error when using `PropRange` with int type
+3.  IMGUI: Change `EnumToggleButtons` selected one with green background color
+
 ## 4.0.3 ##
 
 1.  UI Toolkit: `Layer` of string type should not give error when the layer name is an empty string

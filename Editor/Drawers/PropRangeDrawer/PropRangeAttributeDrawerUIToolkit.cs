@@ -326,7 +326,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     _cachedChangeValue = intValue;
                     property.serializedObject.ApplyModifiedProperties();
 
-                    floatField.SetValueWithoutNotify((int) preValueInfo.value);
+                    integerField.SetValueWithoutNotify((int) preValueInfo.value);
                     slider.SetValueWithoutNotify((int) preValueInfo.value);
                     info.SetValue(parent, intValue);
                     onValueChangedCallback.Invoke(intValue);

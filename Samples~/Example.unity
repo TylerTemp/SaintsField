@@ -11077,7 +11077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a01f32b96f151b4d9c2a0136de5f05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  res: GenericPropertyJSON:{"name":"gos","type":-1,"arraySize":1,"arrayType":"PPtr<$GameObject>","children":[{"name":"Array","type":-1,"arraySize":1,"arrayType":"PPtr<$GameObject>","children":[{"name":"size","type":12,"val":1},{"name":"data","type":5,"val":"UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":157114}"}]}]}
+  res: GenericPropertyJSON:{"name":"classArray","type":-1,"arraySize":2,"arrayType":"MyClass","children":[{"name":"Array","type":-1,"arraySize":2,"arrayType":"MyClass","children":[{"name":"size","type":12,"val":2},{"name":"data","type":-1,"children":[{"name":"myString","type":3,"val":"13"}]},{"name":"data","type":-1,"children":[{"name":"myString","type":3,"val":"22"}]}]}]}
   propR: 2.71
   layerString: SortButton
   layerInt: 2
@@ -11087,11 +11087,19 @@ MonoBehaviour:
     myString: 74937
   v2I: {x: 0, y: -1}
   v2: {x: 0, y: 0}
-  gos:
-  - {fileID: 764521261}
   goDrawer:
   - {fileID: 764521261}
-  myClasses: []
+  goArray: []
+  classDrawer:
+  - myString: 13
+  - myString: 22
+  classArray:
+  - myString: 13
+  - myString: 22
+  scriptableArray:
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  scriptables:
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
 --- !u!1 &765557043
 GameObject:
   m_ObjectHideFlags: 0
@@ -11893,7 +11901,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myStructs:
-  - myInt: 0
+  - myInt: 12
     myString: 
     myObject: {fileID: 833747048}
   - myInt: 1
@@ -11907,7 +11915,7 @@ MonoBehaviour:
     myObject: {fileID: 0}
   defaultExpanded2: []
   hideButtons:
-  - myInt: 0
+  - myInt: 132
     myString: 
     myObject: {fileID: 0}
   - myInt: 0
@@ -14348,7 +14356,7 @@ MonoBehaviour:
     myMask: 0
   myMaskDisabled: 0
   myMaskDisabledLabel: 0
-  enumNormal: 0
+  enumNormal: 2
   enumExpand: 5
 --- !u!4 &1036765201
 Transform:

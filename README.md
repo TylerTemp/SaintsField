@@ -81,11 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.2**
+**4.0.4**
 
-1.  UI Toolkit: Fix `SaintsEditor` failed to fall back a type drawer if the drawer is inheritance from `SaintsPropertyDrawer` [#187](https://github.com/TylerTemp/SaintsField/issues/187)
-2.  `Button` now can display overload and override methods
-3.  UI Toolkit: `ShowInInspector` support `char` type
+1.  UI Toolkit: Fix right click copy/paste for `ListDrawerSettings` & `Tabel`
+2.  UI Toolkit: Fix an error when using `PropRange` with int type
+3.  IMGUI: Change `EnumToggleButtons` selected one with green background color
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

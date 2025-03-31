@@ -91,6 +91,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                     text = arrayProperty.displayName,
                     style = { flexGrow = 1 },
                 };
+                UIToolkitUtils.AddContextualMenuManipulator(foldout, arrayProperty, () => {});
                 foldout.Add(propField);
                 result.Add(foldout);
 
