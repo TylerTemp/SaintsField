@@ -117,7 +117,9 @@ namespace SaintsField.Editor.Utils
                     throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType,
                         null);
                 case SerializedPropertyType.Gradient:
+#if UNITY_2022_1_OR_NEWER
                     propertyInfo.SetValue(null, property.gradientValue);
+#endif
                     return;
 #if UNITY_2021_1_OR_NEWER
                 case SerializedPropertyType.Hash128:
