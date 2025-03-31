@@ -107,9 +107,7 @@ namespace SaintsField.Editor
                 Type systemType = types[inherentDepth];
 
                 // as we can not get the correct order, we'll make it order as: field(serialized+nonSerialized), property, method
-                List<SaintsFieldWithInfo> fieldInfos = new List<SaintsFieldWithInfo>();
-                List<SaintsFieldWithInfo> propertyInfos = new List<SaintsFieldWithInfo>();
-                List<SaintsFieldWithInfo> methodInfos = new List<SaintsFieldWithInfo>();
+                List<SaintsFieldWithInfo> thisDepthInfos = new List<SaintsFieldWithInfo>();
                 List<string> memberDepthIds = new List<string>();
 
                 foreach (MemberInfo memberInfo in systemType
@@ -142,7 +140,7 @@ namespace SaintsField.Editor
                                 int order = orderProp?.Order ?? int.MinValue;
 
                                 // Debug.Log($"{fieldInfo.Name}/{string.Join(",", pendingSerializedProperties.Keys)}");
-                                fieldInfos.Add(new SaintsFieldWithInfo
+                                thisDepthInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
                                     LayoutBases = layoutBases,
@@ -168,7 +166,7 @@ namespace SaintsField.Editor
                             {
                                 OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                                 int order = orderProp?.Order ?? int.MinValue;
-                                fieldInfos.Add(new SaintsFieldWithInfo
+                                thisDepthInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
                                     LayoutBases = layoutBases,
@@ -195,7 +193,7 @@ namespace SaintsField.Editor
                                 OrderedAttribute orderProp =
                                     playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
                                 int order = orderProp?.Order ?? int.MinValue;
-                                propertyInfos.Add(new SaintsFieldWithInfo
+                                thisDepthInfos.Add(new SaintsFieldWithInfo
                                 {
                                     PlayaAttributes = playaAttributes,
                                     LayoutBases = layoutBases,
@@ -240,7 +238,7 @@ namespace SaintsField.Editor
 
                             string buttonId = $"{methodInfo.Name}.{buttonExtraId}";
 
-                            methodInfos.Add(new SaintsFieldWithInfo
+                            thisDepthInfos.Add(new SaintsFieldWithInfo
                             {
                                 PlayaAttributes = playaAttributes,
                                 LayoutBases = layoutBases,
@@ -263,9 +261,10 @@ namespace SaintsField.Editor
                 // now handle overrides
                 fieldWithInfos.RemoveAll(each => memberDepthIds.Contains(each.MemberId));
 
-                fieldWithInfos.AddRange(fieldInfos);
-                fieldWithInfos.AddRange(propertyInfos);
-                fieldWithInfos.AddRange(methodInfos);
+                fieldWithInfos.AddRange(thisDepthInfos);
+                // fieldWithInfos.AddRange(fieldInfos);
+                // fieldWithInfos.AddRange(propertyInfos);
+                // fieldWithInfos.AddRange(methodInfos);
             }
 
             if (pendingSerializedProperties.Count > 0)
